@@ -1,0 +1,75 @@
+/*
+ * Project: pico-56
+ *
+ * Copyright (c) 2023 Troy Schrapel
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico-56
+ *
+ */
+
+
+; -----------------------------------------------------------------------------
+; vga_sync - provides the vga hsync and vsync signals
+;
+; sync data passed-in via dma. each scanline will have four records
+; one for active, front porch, sync and back porch sections 
+;
+; +-------------------------+---------+---------+----------------------+
+; |         31 - 16         |   15    |   14    |        13 - 0        |
+; |       instruction       |  vsync  |  hsync  |         delay        |
+; +-------------------------+---------+---------+----------------------+
+;
+; instruction: an instruction to run at the start of each segment (usually nop)
+; vsync      : vsync signal (1 for high)
+; hsync      : hsync signal (1 for high)
+; delay      : time in pio ticks to hold the current sync configuration
+
+.program vga_sync
+
+.define public SETUP_OVERHEAD     5 ; pio ticks between segments
+.define public WORD_VSYNC_OFFSET 15
+.define public WORD_HSYNC_OFFSET 14
+.define public WORD_EXEC_OFFSET  16 ; bit offset to instruction data
+.define        WORD_DELAY_BITS   14
+.define        WORD_SYNC_BITS     2
+.define        WORD_EXEC_BITS    16
+
+    ; auto-pull
+    out x, WORD_DELAY_BITS    ; setup delay
+    out pins, WORD_SYNC_BITS  ; output sync pins
+    out exec, WORD_EXEC_BITS  ; execute given instruction
+loop:
+    jmp x-- loop              ; fulfil the delay
+.wrap
+
+
+
+; -----------------------------------------------------------------------------
+; vga_rgb - provides the vga rgb data
+;
+; output the vga rgb data. up to 16 bits per pixel supported
+; rgb data passed-in via dma. 
+;
+; before using this program, the y register of the state machine must be set
+; to one less than the number of visible pixels in the scanline.
+; additionally, an appropriate delay should be added to the instruction 
+; following the loop label. this delay will be the number of pio ticks
+; to wait between pixels less the LOOP_TICKS overhead
+;
+; the program discards any unused bits of rgb data
+
+.program vga_rgb
+.define public LOOP_TICKS 2
+.define public DELAY_INSTR loop
+.define public RGB_IRQ 4
+
+    mov pins, null
+    wait 1 irq RGB_IRQ
+    mov x, y [0]
+loop:
+    ; auto-pull
+    out pins, 16  ; here, we apply a dynamic delay
+    jmp x-- loop
+.wrap

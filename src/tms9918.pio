@@ -1,0 +1,43 @@
+/*
+ * Project: pico9918
+ *
+ * Copyright (c) 2024 Troy Schrapel
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico-prom
+ *
+ */
+ 
+ .program tms9918
+
+.wrap_target
+main:
+mainLoop:
+  jmp pin mainLoop    ; if CE is high, do nothing, otherwise, we're up!
+
+  in pins, 18
+  
+
+  set x, 10
+
+readLoop:
+  wait 0 pin 1
+  in pins, 1
+  wait 1 pin 1
+  jmp x-- readLoop
+  jmp main
+
+doWrite:
+  set pindirs, 0b10 [31]
+  set pindirs, 0b11 [5]
+  set pindirs, 0b01
+  set x, 10
+writeLoop:
+  wait 0 pin 1 [2]
+  out pindirs, 1
+  wait 1 pin 1 [1]
+  jmp x-- writeLoop
+  out null 21
+
+.wrap

@@ -1,0 +1,6 @@
+{
+  "files.associations": {
+    "*.md": "markdown",
+    "xtr1common": "c"
+  }
+}
