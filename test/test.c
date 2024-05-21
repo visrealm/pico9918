@@ -87,21 +87,22 @@ uint32_t buildGpioState(bool read, bool write, bool mode, uint8_t value)
 
 void writeTo9918(bool mode, uint8_t value)
 {
-  gpio_put_all(buildGpioState(false, true, mode, value));
   gpio_set_dir_out_masked(GPIO_CD_MASK);
-  sleep_us(20);
+  gpio_put_all(buildGpioState(false, true, mode, value));
+  sleep_us(1);
   gpio_put_all(buildGpioState(false, false, mode, value));
-  gpio_set_dir_in_masked(GPIO_CD_MASK);
-  sleep_us(20);
+  sleep_us(1);
+  //gpio_set_dir_in_masked(GPIO_CD_MASK);
 }
 
 uint8_t readFrom9918(bool mode)
 {
   gpio_put_all(buildGpioState(true, false, mode, 0));
   gpio_set_dir_in_masked(GPIO_CD_MASK);
-  sleep_us(1);
+  //sleep_us(1);
   uint8_t value = REVERSE((gpio_get_all() >> GPIO_CD0) & 0xff);
   gpio_put_all(buildGpioState(false, false, mode, value));
+  //sleep_us(1);
   return value;
 }
 
@@ -203,6 +204,8 @@ VrEmuTms9918* vrEmuTms9918New()
 
   gpio_set_dir_all_bits(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // set r, w, mode to outputs
   gpio_put_all(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // drive r, w, mode high
+  gpio_set_pulls(GPIO_CSW, true, false);
+  gpio_set_pulls(GPIO_CSR, true, false);
 
   return NULL;
 }
@@ -430,39 +433,48 @@ int main(void)
   tms = vrEmuTms9918New();
 
   sleep_ms(1000);
-
-  vrEmuTms9918InitialiseGfxII(tms);
-  vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
-
-  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_PATT_ADDRESS + 32 * 8);
-  vrEmuTms9918WriteBytes(tms, tmsFont, tmsFontBytes);
-
-  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_COLOR_ADDRESS);
-  vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAC, 6144);
-  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_PATT_ADDRESS);
-  vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAP, 6144);
-
-  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_ATTR_ADDRESS);
-  const char* str = "Hello, World!";
-  const int strLen = strlen(str);
-
-  for (int i = 0; i < strLen; ++i)
+  //while (1)
   {
-    vrEmuTms9918WriteData(tms, i * 10 + 24 - 2);
-    vrEmuTms9918WriteData(tms, i * 10 - 2);
-    vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
-    vrEmuTms9918WriteData(tms, i + 2);
 
-    vrEmuTms9918WriteData(tms, i * 10 + 24);
-    vrEmuTms9918WriteData(tms, i * 10);
-    vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
-    vrEmuTms9918WriteData(tms, 1);
+    vrEmuTms9918InitialiseGfxII(tms);
+    vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
+
+    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_PATT_ADDRESS + 32 * 8);
+    vrEmuTms9918WriteBytes(tms, tmsFont, tmsFontBytes);
+
+    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_COLOR_ADDRESS);
+    vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAC, 6144);
+    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_PATT_ADDRESS);
+    vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAP, 6144);
+
+    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_ATTR_ADDRESS);
+    const char* str = "Hello, World!";
+    const int strLen = strlen(str);
+
+    for (int i = 0; i < strLen; ++i)
+    {
+      vrEmuTms9918WriteData(tms, i * 10 + 24 - 2);
+      vrEmuTms9918WriteData(tms, i * 10 - 2);
+      vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
+      vrEmuTms9918WriteData(tms, i + 2);
+
+      vrEmuTms9918WriteData(tms, i * 10 + 24);
+      vrEmuTms9918WriteData(tms, i * 10);
+      vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
+      vrEmuTms9918WriteData(tms, 1);
+    }
+
+    //sleep_ms(100);
+
+    //  int i = 0;
+    //  while (1)
+    //  {
+      //  vrEmuTms9918WriteRegisterValue(tms, 7, ++i & 0x0f);
   }
 
-  int i = 0;
   while (1)
   {
-    vrEmuTms9918WriteRegisterValue(tms, 7, ++i & 0x0f);
+    tight_loop_contents();
   }
 
   vrEmuTms9918Destroy(tms);

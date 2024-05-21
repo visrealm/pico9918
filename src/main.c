@@ -17,8 +17,12 @@
 #include "vrEmuTms9918Util.h"
 
 #include "pico/stdlib.h"
+#include "pico/multicore.h"
 
 #include <stdlib.h>
+
+#include "pico/stdlib.h"
+#define inline __force_inline
 
 
  /*
@@ -79,7 +83,7 @@ uint8_t regValue = 0;
 VrEmuTms9918* tms = NULL;
 
 
-void gpioCallback(uint gpio, uint32_t events)
+void __time_critical_func(gpioCallback)(uint gpio, uint32_t events)
 {
   if (gpio == GPIO_CSR)
   {
@@ -91,8 +95,7 @@ void gpioCallback(uint gpio, uint32_t events)
     }
     else
     {
-      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0);
-      vrEmuTms9918ReadData(tms);
+      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadData(tms)] << GPIO_CD0);
     }
   }
   else if (gpio == GPIO_CSW)
@@ -111,6 +114,63 @@ void gpioCallback(uint gpio, uint32_t events)
   }
 }
 
+void __time_critical_func(gpioExclusiveCallback)()
+{
+  //uint32_t events8 = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+  //iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+
+  uint32_t gpios = gpio_get_all();
+
+  /*if ((gpios & GPIO_CSR_MASK) == 0)
+  {
+    gpio_set_dir_out_masked(GPIO_CD_MASK);
+    if (gpios & GPIO_MODE_MASK)
+    {
+      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadStatus(tms)] << GPIO_CD0);
+    }
+    else
+    {
+      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadData(tms)] << GPIO_CD0);
+    }
+  }
+  else */if ((gpios & GPIO_CSW_MASK) == 0)
+  {
+    //gpio_set_dir_in_masked(GPIO_CD_MASK);
+    //uint32_t gpios = gpio_get_all();
+    uint8_t value = reversed[(gpios >> GPIO_CD0) & 0xff];
+    if (gpios & GPIO_MODE_MASK)
+    {
+      vrEmuTms9918WriteAddr(tms, value);
+    }
+    else
+    {
+      vrEmuTms9918WriteData(tms, value);
+    }
+  }
+  //gpio_acknowledge_irq(GPIO_CSR, GPIO_IRQ_EDGE_RISE);
+  gpio_acknowledge_irq(GPIO_CSW, GPIO_IRQ_EDGE_FALL);
+}
+
+void setupGpio()
+{
+  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK);
+  gpio_set_dir_all_bits(0); // all inputs
+
+  irq_set_exclusive_handler(IO_IRQ_BANK0, gpioExclusiveCallback);
+  gpio_set_irq_enabled(GPIO_CSW, GPIO_IRQ_EDGE_FALL, true);
+  //gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_RISE, true);
+  irq_set_enabled(IO_IRQ_BANK0, true);
+
+  // Set up TMS9918 external PINs first. This is a priority to capture early writes 
+  //gpio_set_irq_enabled_with_callback(GPIO_CSW, GPIO_IRQ_EDGE_FALL, true, &gpioCallback);
+  //gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_FALL, true);
+
+  multicore_fifo_pop_blocking();
+
+  vgaLoop();
+}
+
+
 
 
 uint16_t __aligned(4) tmsPal[16];
@@ -121,7 +181,7 @@ uint16_t colorFromRgb(uint16_t r, uint16_t g, uint16_t b)
   return ((uint16_t)(r / 16.0f) & 0x0f) | (((uint16_t)(g / 16.0f) & 0x0f) << 4) | (((uint16_t)(b / 16.0f) & 0x0f) << 8);
 }
 
-static void tmsScanline(uint16_t y, VgaParams* params, uint16_t* pixels)
+static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
   const uint32_t vBorder = (params->vVirtualPixels - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (params->hVirtualPixels - TMS9918_PIXELS_X) / 2;
@@ -163,14 +223,9 @@ int main(void)
 {
   set_sys_clock_khz(252000, false);
 
-  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK);
-  gpio_set_dir_all_bits(0); // all inputs
-
-  // Set up TMS9918 external PINs first. This is a priority to capture early writes 
-  gpio_set_irq_enabled_with_callback(GPIO_CSW, GPIO_IRQ_EDGE_FALL, true, &gpioCallback);
-  gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_FALL, true);
-
   tms = vrEmuTms9918New();
+
+  multicore_launch_core1(setupGpio);
 
   for (int c = 0; c < 16; ++c)
   {
@@ -185,6 +240,8 @@ int main(void)
 
 
   vgaInit(params);
+
+  multicore_fifo_push_timeout_us(0, 0);
 
   while (1)
   {

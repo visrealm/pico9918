@@ -13,7 +13,8 @@ pico_add_extra_outputs(${PROGRAM})
 
 target_link_libraries(${PROGRAM} PUBLIC
         pico_stdlib
-        hardware_pio
+        pico_multicore
+        hardware_pio        
         pico9918-vga
         vrEmuTms9918
         vrEmuTms9918Util)

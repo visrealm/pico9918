@@ -54,7 +54,7 @@ uint16_t* rgbDataBufferOdd = NULL;
  */
 static int syncDmaChan = 0;
 static int rgbDmaChan = 0;
-static VgaInitParams vgaParams;
+static VgaInitParams vgaParams = { 0 };
 
 uint32_t vgaMinimumPioClockKHz(VgaParams* params)
 {
@@ -308,8 +308,13 @@ static void initDma()
 /*
  * main vga loop
  */
-static void vgaLoop()
+void vgaLoop()
 {
+  if (vgaParams.initFn)
+  {
+    vgaParams.initFn();
+  }
+
   uint64_t frameNumber = 0;
   while (1)
   {
@@ -357,7 +362,7 @@ void vgaInit(VgaInitParams params)
   pio_sm_set_enabled(VGA_PIO, SYNC_SM, true);
   pio_sm_set_enabled(VGA_PIO, RGB_SM, true);
 
-  multicore_launch_core1(vgaLoop);
+  //multicore_launch_core1(vgaLoop);
 }
 
 VgaInitParams vgaCurrentParams()
