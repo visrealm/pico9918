@@ -87,13 +87,35 @@ uint32_t buildGpioState(bool read, bool write, bool mode, uint8_t value)
     (REVERSE(value) << GPIO_CD0);
 }
 
+int del = 0;
+int del2 = 0;
+void doFn(uint8_t value)
+{
+  --del;
+  del2 += value;
+  del2 *= value;
+  del2 -= value & 0xff;
+  del2 ^= value;
+  del2 += value;
+  del2 *= value;
+  del2 -= value & 0xff;
+  del2 ^= value;
+}
+
 void writeTo9918(bool mode, uint8_t value)
 {
   gpio_set_dir_out_masked(GPIO_CD_MASK);
   gpio_put_all(buildGpioState(false, true, mode, value));
   sleep_us(1);
+//  del = 12;
+//  while (del) doFn(value);
+  //for (del = 0; del < 50; ++del);
   gpio_put_all(buildGpioState(false, false, mode, value));
-  sleep_us(1);
+
+  //del = 8;
+  //while (del) doFn(value);
+
+  //sleep_us(1);
   //gpio_set_dir_in_masked(GPIO_CD_MASK);
 }
 
@@ -193,8 +215,6 @@ typedef enum
 struct vrEmuTMS9918_s;
 typedef struct vrEmuTMS9918_s VrEmuTms9918;
 
-void onTms9918Interrupt();
-
 
 /* PUBLIC INTERFACE
  * ---------------------------------------- */
@@ -211,8 +231,6 @@ VrEmuTms9918* vrEmuTms9918New()
   gpio_put_all(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // drive r, w, mode high
   gpio_set_pulls(GPIO_CSW, true, false);
   gpio_set_pulls(GPIO_CSR, true, false);
-
-  gpio_set_irq_enabled_with_callback(GPIO_INT, GPIO_IRQ_EDGE_FALL, true, onTms9918Interrupt);
 
   return NULL;
 }
@@ -437,7 +455,9 @@ int i = 0;
 
 void onTms9918Interrupt()
 {
+  vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_CYAN);
   animateSprites(++i);
+  vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
 
   vrEmuTms9918ReadStatus(tms);   // clear the interrupt
 }
@@ -449,9 +469,10 @@ int main(void)
 
   tms = vrEmuTms9918New();
 
-  sleep_ms(50);
+  sleep_ms(100);
   //while (1)
   //{
+  vrEmuTms9918ReadStatus(tms);   // clear the interrupt
 
   vrEmuTms9918InitialiseGfxII(tms);
   vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
@@ -494,6 +515,8 @@ int main(void)
     vrEmuTms9918WriteData(tms, 0x0);
   }
   //  }
+
+  gpio_set_irq_enabled_with_callback(GPIO_INT, GPIO_IRQ_EDGE_FALL, true, onTms9918Interrupt);
 
   while (1)
   {
