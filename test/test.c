@@ -48,11 +48,13 @@ extern size_t tmsFontBytes;
 #define GPIO_CSR 26
 #define GPIO_CSW 27
 #define GPIO_MODE 28
+#define GPIO_INT 22
 
 #define GPIO_CD_MASK (0xff << GPIO_CD0)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
 #define GPIO_CSW_MASK (0x01 << GPIO_CSW)
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
+#define GPIO_INT_MASK (0x01 << GPIO_INT)
 
 /* todo should I make this uint32_t and shift the bits too?*/
 static uint8_t reversed[] =
@@ -191,6 +193,9 @@ typedef enum
 struct vrEmuTMS9918_s;
 typedef struct vrEmuTMS9918_s VrEmuTms9918;
 
+void onTms9918Interrupt();
+
+
 /* PUBLIC INTERFACE
  * ---------------------------------------- */
 
@@ -200,12 +205,14 @@ typedef struct vrEmuTMS9918_s VrEmuTms9918;
   */
 VrEmuTms9918* vrEmuTms9918New()
 {
-  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK);
+  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
 
   gpio_set_dir_all_bits(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // set r, w, mode to outputs
   gpio_put_all(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // drive r, w, mode high
   gpio_set_pulls(GPIO_CSW, true, false);
   gpio_set_pulls(GPIO_CSR, true, false);
+
+  gpio_set_irq_enabled_with_callback(GPIO_INT, GPIO_IRQ_EDGE_FALL, true, onTms9918Interrupt);
 
   return NULL;
 }
@@ -426,72 +433,74 @@ void animateSprites(uint64_t frameNumber)
   }
 }
 
+int i = 0;
+
+void onTms9918Interrupt()
+{
+  animateSprites(++i);
+
+  vrEmuTms9918ReadStatus(tms);   // clear the interrupt
+}
+
+
 int main(void)
 {
   set_sys_clock_khz(252000, false);
 
   tms = vrEmuTms9918New();
 
-  sleep_ms(20);
+  sleep_ms(50);
   //while (1)
   //{
 
-    vrEmuTms9918InitialiseGfxII(tms);
-    vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
+  vrEmuTms9918InitialiseGfxII(tms);
+  vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
 
-    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_PATT_ADDRESS + 32 * 8);
-    vrEmuTms9918WriteBytes(tms, tmsFont, tmsFontBytes);
+  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_PATT_ADDRESS + 32 * 8);
+  vrEmuTms9918WriteBytes(tms, tmsFont, tmsFontBytes);
 
-    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_COLOR_ADDRESS);
-    vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAC, 6144);
-    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_PATT_ADDRESS);
-    vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAP, 6144);
+  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_COLOR_ADDRESS);
+  vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAC, 6144);
+  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_PATT_ADDRESS);
+  vrEmuTms9918WriteBytes(tms, BREAKOUT_TIAP, 6144);
 
-    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_ATTR_ADDRESS);
-    const char* str = "Hello, World!";
-    const int strLen = strlen(str);
+  vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_ATTR_ADDRESS);
+  const char* str = "Hello, World!";
+  const int strLen = strlen(str);
 
-    for (int i = 0; i < strLen; ++i)
-    {
-      vrEmuTms9918WriteData(tms, i * 10 + 24 - 2);
-      vrEmuTms9918WriteData(tms, i * 10 - 2);
-      vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
-      vrEmuTms9918WriteData(tms, i + 2);
+  for (int i = 0; i < strLen; ++i)
+  {
+    vrEmuTms9918WriteData(tms, i * 10 + 24 - 2);
+    vrEmuTms9918WriteData(tms, i * 10 - 2);
+    vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
+    vrEmuTms9918WriteData(tms, i + 2);
 
-      vrEmuTms9918WriteData(tms, i * 10 + 24);
-      vrEmuTms9918WriteData(tms, i * 10);
-      vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
-      vrEmuTms9918WriteData(tms, 1);
-    }
-
-    for (int i = strLen; i < 16; ++i)
-    {
-      vrEmuTms9918WriteData(tms, 0xd0);
-      vrEmuTms9918WriteData(tms, 0x0);
-      vrEmuTms9918WriteData(tms, 0x0);
-      vrEmuTms9918WriteData(tms, 0x0);
-
-      vrEmuTms9918WriteData(tms, 0xd2);
-      vrEmuTms9918WriteData(tms, 0x0);
-      vrEmuTms9918WriteData(tms, 0x0);
-      vrEmuTms9918WriteData(tms, 0x0);
-    }
-
-    int i = 0;
-    while (1)
-    {
-      animateSprites(++i);
-      sleep_ms(16);
-      // vrEmuTms9918WriteRegisterValue(tms, 7, ++i & 0x0f);
-    }
-    //  }
-
-    while (1)
-    {
-      tight_loop_contents();
-    }
-
-    vrEmuTms9918Destroy(tms);
-
-    return 0;
+    vrEmuTms9918WriteData(tms, i * 10 + 24);
+    vrEmuTms9918WriteData(tms, i * 10);
+    vrEmuTms9918WriteData(tms, str[strLen - (i + 1)]);
+    vrEmuTms9918WriteData(tms, 1);
   }
+
+  for (int i = strLen; i < 16; ++i)
+  {
+    vrEmuTms9918WriteData(tms, 0xd0);
+    vrEmuTms9918WriteData(tms, 0x0);
+    vrEmuTms9918WriteData(tms, 0x0);
+    vrEmuTms9918WriteData(tms, 0x0);
+
+    vrEmuTms9918WriteData(tms, 0xd2);
+    vrEmuTms9918WriteData(tms, 0x0);
+    vrEmuTms9918WriteData(tms, 0x0);
+    vrEmuTms9918WriteData(tms, 0x0);
+  }
+  //  }
+
+  while (1)
+  {
+    tight_loop_contents();
+  }
+
+  vrEmuTms9918Destroy(tms);
+
+  return 0;
+}
