@@ -55,7 +55,7 @@ extern size_t tmsFontBytes;
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
 
 /* todo should I make this uint32_t and shift the bits too?*/
-static uint32_t reversed[] =
+static uint8_t reversed[] =
 {
   0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
   0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8,
@@ -432,9 +432,9 @@ int main(void)
 
   tms = vrEmuTms9918New();
 
-  sleep_ms(1000);
+  sleep_ms(20);
   //while (1)
-  {
+  //{
 
     vrEmuTms9918InitialiseGfxII(tms);
     vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
@@ -464,20 +464,34 @@ int main(void)
       vrEmuTms9918WriteData(tms, 1);
     }
 
-    //sleep_ms(100);
+    for (int i = strLen; i < 16; ++i)
+    {
+      vrEmuTms9918WriteData(tms, 0xd0);
+      vrEmuTms9918WriteData(tms, 0x0);
+      vrEmuTms9918WriteData(tms, 0x0);
+      vrEmuTms9918WriteData(tms, 0x0);
 
-    //  int i = 0;
-    //  while (1)
-    //  {
-      //  vrEmuTms9918WriteRegisterValue(tms, 7, ++i & 0x0f);
+      vrEmuTms9918WriteData(tms, 0xd2);
+      vrEmuTms9918WriteData(tms, 0x0);
+      vrEmuTms9918WriteData(tms, 0x0);
+      vrEmuTms9918WriteData(tms, 0x0);
+    }
+
+    int i = 0;
+    while (1)
+    {
+      animateSprites(++i);
+      sleep_ms(16);
+      // vrEmuTms9918WriteRegisterValue(tms, 7, ++i & 0x0f);
+    }
+    //  }
+
+    while (1)
+    {
+      tight_loop_contents();
+    }
+
+    vrEmuTms9918Destroy(tms);
+
+    return 0;
   }
-
-  while (1)
-  {
-    tight_loop_contents();
-  }
-
-  vrEmuTms9918Destroy(tms);
-
-  return 0;
-}

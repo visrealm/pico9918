@@ -24,26 +24,30 @@
 #include "pico/stdlib.h"
 #define inline __force_inline
 
+uint16_t __aligned(4) tmsPal[16];
+uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
- /*
-  * External pins
-  *
-  * Pin  | GPIO | Name   | TMS9918A Pin
-  * -----+------+--------+-------------
-  *  19  |  14  |  CD0   |  24
-  *  20  |  15  |  CD1   |  23
-  *  21  |  16  |  CD2   |  22
-  *  22  |  17  |  CD3   |  21
-  *  24  |  18  |  CD4   |  20
-  *  25  |  19  |  CD5   |  19
-  *  26  |  20  |  CD6   |  18
-  *  27  |  21  |  CD7   |  17
-  *  29  |  22  |  /INT  |  16
-  *  30  |  RUN |  RST   |  34
-  *  31  |  26  |  /CSR  |  15
-  *  32  |  27  |  /CSW  |  14
-  *  34  |  28  |  MODE  |  13
-  */
+
+
+/*
+ * External pins
+ *
+ * Pin  | GPIO | Name   | TMS9918A Pin
+ * -----+------+--------+-------------
+ *  19  |  14  |  CD0   |  24
+ *  20  |  15  |  CD1   |  23
+ *  21  |  16  |  CD2   |  22
+ *  22  |  17  |  CD3   |  21
+ *  24  |  18  |  CD4   |  20
+ *  25  |  19  |  CD5   |  19
+ *  26  |  20  |  CD6   |  18
+ *  27  |  21  |  CD7   |  17
+ *  29  |  22  |  /INT  |  16
+ *  30  |  RUN |  RST   |  34
+ *  31  |  26  |  /CSR  |  15
+ *  32  |  27  |  /CSW  |  14
+ *  34  |  28  |  MODE  |  13
+ */
 
 #define GPIO_CD0 14
 #define GPIO_CSR 26
@@ -56,8 +60,8 @@
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
 
 
-  /* todo should I make this uint32_t and shift the bits too?*/
-static uint32_t reversed[] =
+ /* todo should I make this uint32_t and shift the bits too?*/
+static uint8_t reversed[] =
 {
   0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
   0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8,
@@ -82,6 +86,7 @@ uint8_t regValue = 0;
 
 VrEmuTms9918* tms = NULL;
 
+static int i = 0;
 
 void __time_critical_func(gpioCallback)(uint gpio, uint32_t events)
 {
@@ -114,14 +119,16 @@ void __time_critical_func(gpioCallback)(uint gpio, uint32_t events)
   }
 }
 
+uint16_t c = 0;
+
 void __time_critical_func(gpioExclusiveCallback)()
 {
   //uint32_t events8 = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
-  //iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+  iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 
-  uint32_t gpios = gpio_get_all();
+  uint32_t gpios = sio_hw->gpio_in;//gpio_get_all();
 
-  /*if ((gpios & GPIO_CSR_MASK) == 0)
+  if ((gpios & GPIO_CSR_MASK) == 0)
   {
     gpio_set_dir_out_masked(GPIO_CD_MASK);
     if (gpios & GPIO_MODE_MASK)
@@ -133,14 +140,16 @@ void __time_critical_func(gpioExclusiveCallback)()
       gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadData(tms)] << GPIO_CD0);
     }
   }
-  else */if ((gpios & GPIO_CSW_MASK) == 0)
+  else if ((gpios & GPIO_CSW_MASK) == 0)
   {
-    //gpio_set_dir_in_masked(GPIO_CD_MASK);
-    //uint32_t gpios = gpio_get_all();
+    gpio_set_dir_in_masked(GPIO_CD_MASK);
+    uint32_t gpios = gpio_get_all();
+    //uint8_t value = (gpios >> GPIO_CD0) & 0xff;
     uint8_t value = reversed[(gpios >> GPIO_CD0) & 0xff];
     if (gpios & GPIO_MODE_MASK)
     {
       vrEmuTms9918WriteAddr(tms, value);
+      ++i;
     }
     else
     {
@@ -148,7 +157,8 @@ void __time_critical_func(gpioExclusiveCallback)()
     }
   }
   //gpio_acknowledge_irq(GPIO_CSR, GPIO_IRQ_EDGE_RISE);
-  gpio_acknowledge_irq(GPIO_CSW, GPIO_IRQ_EDGE_FALL);
+  //gpio_acknowledge_irq(GPIO_CSW, GPIO_IRQ_EDGE_FALL);
+  //c = tmsPal[i & 0x0f];
 }
 
 void setupGpio()
@@ -158,7 +168,7 @@ void setupGpio()
 
   irq_set_exclusive_handler(IO_IRQ_BANK0, gpioExclusiveCallback);
   gpio_set_irq_enabled(GPIO_CSW, GPIO_IRQ_EDGE_FALL, true);
-  //gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_RISE, true);
+  gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_FALL, true);
   irq_set_enabled(IO_IRQ_BANK0, true);
 
   // Set up TMS9918 external PINs first. This is a priority to capture early writes 
@@ -173,8 +183,6 @@ void setupGpio()
 
 
 
-uint16_t __aligned(4) tmsPal[16];
-uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
 uint16_t colorFromRgb(uint16_t r, uint16_t g, uint16_t b)
 {
@@ -226,6 +234,8 @@ int main(void)
   tms = vrEmuTms9918New();
 
   multicore_launch_core1(setupGpio);
+
+
 
   for (int c = 0; c < 16; ++c)
   {
