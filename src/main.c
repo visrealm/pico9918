@@ -106,7 +106,7 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
   else// if ((gpios & GPIO_CSW_MASK) == 0)
   {
     gpio_set_dir_in_masked(GPIO_CD_MASK);
-    uint8_t value = reversed[(gpio_get_all() >> GPIO_CD0) & 0xff];
+    uint8_t value = reversed[(sio_hw->gpio_in >> GPIO_CD0) & 0xff];
     if (gpios & GPIO_MODE_MASK)
     {
       vrEmuTms9918WriteAddr(tms, value);
