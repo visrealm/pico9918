@@ -63,7 +63,7 @@ uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
 
  /* todo should I make this uint32_t and shift the bits too?*/
-static uint8_t reversed[] =
+static uint8_t  __aligned(4) reversed[] =
 {
   0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
   0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8,
@@ -85,10 +85,8 @@ static uint8_t reversed[] =
 
 VrEmuTms9918* tms = NULL;
 
-void __time_critical_func(gpioExclusiveCallback)()
+void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
-  iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
-
   uint32_t gpios = sio_hw->gpio_in;
 
   if ((gpios & GPIO_CSR_MASK) == 0)
@@ -101,26 +99,29 @@ void __time_critical_func(gpioExclusiveCallback)()
     }
     else
     {
-      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadData(tms)] << GPIO_CD0);
+      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0);
+      vrEmuTms9918ReadData(tms);
     }
   }
-  else if ((gpios & GPIO_CSW_MASK) == 0)
+  else// if ((gpios & GPIO_CSW_MASK) == 0)
   {
     gpio_set_dir_in_masked(GPIO_CD_MASK);
-    uint32_t gpios = gpio_get_all();
-    uint8_t value = reversed[(gpios >> GPIO_CD0) & 0xff];
+    uint8_t value = reversed[(gpio_get_all() >> GPIO_CD0) & 0xff];
     if (gpios & GPIO_MODE_MASK)
     {
       vrEmuTms9918WriteAddr(tms, value);
+      gpio_put(GPIO_INT, !(vrEmuTms9918PeekStatus(tms) & 0x80));
     }
     else
     {
       vrEmuTms9918WriteData(tms, value);
     }
   }
+
+  iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 }
 
-void setupGpio()
+void proc1Entry()
 {
   // set up gpio pins
   gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
@@ -129,7 +130,7 @@ void setupGpio()
   gpio_put(GPIO_INT, true);
 
   // set up gpio interrupts
-  irq_set_exclusive_handler(IO_IRQ_BANK0, gpioExclusiveCallback);
+  irq_set_exclusive_handler(IO_IRQ_BANK0, gpioExclusiveCallbackProc1);
   gpio_set_irq_enabled(GPIO_CSW, GPIO_IRQ_EDGE_FALL, true);
   gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_FALL, true);
   irq_set_enabled(IO_IRQ_BANK0, true);
@@ -194,9 +195,7 @@ int main(void)
 
   tms = vrEmuTms9918New();
 
-  multicore_launch_core1(setupGpio);
-
-
+  multicore_launch_core1(proc1Entry);
 
   for (int c = 0; c < 16; ++c)
   {
@@ -212,7 +211,7 @@ int main(void)
 
   vgaInit(params);
 
-  multicore_fifo_push_timeout_us(0, 0);
+  multicore_fifo_push_timeout_us(0, 0); // start the vga loop on proc1
 
   while (1)
   {

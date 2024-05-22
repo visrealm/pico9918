@@ -57,7 +57,7 @@ extern size_t tmsFontBytes;
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
 
 /* todo should I make this uint32_t and shift the bits too?*/
-static uint8_t reversed[] =
+static uint8_t  __aligned(4) reversed[] =
 {
   0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
   0x08, 0x88, 0x48, 0xC8, 0x28, 0xA8, 0x68, 0xE8, 0x18, 0x98, 0x58, 0xD8, 0x38, 0xB8, 0x78, 0xF8,
@@ -107,9 +107,9 @@ void writeTo9918(bool mode, uint8_t value)
   gpio_set_dir_out_masked(GPIO_CD_MASK);
   gpio_put_all(buildGpioState(false, true, mode, value));
   sleep_us(1);
-//  del = 12;
-//  while (del) doFn(value);
-  //for (del = 0; del < 50; ++del);
+  //  del = 12;
+  //  while (del) doFn(value);
+    //for (del = 0; del < 50; ++del);
   gpio_put_all(buildGpioState(false, false, mode, value));
 
   //del = 8;
@@ -123,10 +123,9 @@ uint8_t readFrom9918(bool mode)
 {
   gpio_put_all(buildGpioState(true, false, mode, 0));
   gpio_set_dir_in_masked(GPIO_CD_MASK);
-  //sleep_us(1);
+  sleep_us(1);
   uint8_t value = REVERSE((gpio_get_all() >> GPIO_CD0) & 0xff);
   gpio_put_all(buildGpioState(false, false, mode, value));
-  //sleep_us(1);
   return value;
 }
 
@@ -469,12 +468,14 @@ int main(void)
 
   tms = vrEmuTms9918New();
 
-  sleep_ms(100);
-  //while (1)
-  //{
-  vrEmuTms9918ReadStatus(tms);   // clear the interrupt
+  sleep_ms(25);
 
   vrEmuTms9918InitialiseGfxII(tms);
+  vrEmuTms9918InitialiseGfxII(tms);
+
+  //while ((vrEmuTms9918ReadStatus(tms) & 0x80) == 0)
+//    sleep_ms(10);
+
   vrEmuTms9918SetFgBgColor(tms, TMS_WHITE, TMS_BLACK);
 
   vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_PATT_ADDRESS + 32 * 8);
