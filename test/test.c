@@ -121,8 +121,8 @@ void writeTo9918(bool mode, uint8_t value)
 
 uint8_t readFrom9918(bool mode)
 {
-  gpio_put_all(buildGpioState(true, false, mode, 0));
   gpio_set_dir_in_masked(GPIO_CD_MASK);
+  gpio_put_all(buildGpioState(true, false, mode, 0));
   sleep_us(1);
   uint8_t value = REVERSE((gpio_get_all() >> GPIO_CD0) & 0xff);
   gpio_put_all(buildGpioState(false, false, mode, value));
@@ -447,6 +447,13 @@ void animateSprites(uint64_t frameNumber)
     if (yPos - 2 == 0xd0) ++yPos;
     vrEmuTms9918WriteData(tms, yPos - 2);
     vrEmuTms9918WriteData(tms, 128 - 8 + (x * 80.0f) - 2);
+
+
+    vrEmuTms9918SetAddressRead(tms, TMS_DEFAULT_VRAM_SPRITE_ATTR_ADDRESS + (8 * i) + 2);
+    char c = vrEmuTms9918ReadData(tms);
+    vrEmuTms9918SetAddressWrite(tms, TMS_DEFAULT_VRAM_SPRITE_ATTR_ADDRESS + (8 * i) + 2);
+    vrEmuTms9918WriteData(tms, c);
+
   }
 }
 

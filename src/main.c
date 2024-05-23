@@ -84,6 +84,8 @@ static uint8_t  __aligned(4) reversed[] =
 };
 
 VrEmuTms9918* tms = NULL;
+uint8_t lastRead = 0;
+uint32_t nextValue = 0;
 
 void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
@@ -91,33 +93,43 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
 
   if ((gpios & GPIO_CSR_MASK) == 0)
   {
-    gpio_set_dir_out_masked(GPIO_CD_MASK);
+    sio_hw->gpio_oe_set = GPIO_CD_MASK;
     if (gpios & GPIO_MODE_MASK)
     {
-      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadStatus(tms)] << GPIO_CD0);
-      gpio_put(GPIO_INT, !(vrEmuTms9918PeekStatus(tms) & 0x80));
+      sio_hw->gpio_out = ((uint32_t)reversed[vrEmuTms9918ReadStatus(tms)] << GPIO_CD0) | GPIO_INT_MASK;
+    //  sio_hw->gpio_oe_set = GPIO_CD_MASK;
     }
     else
     {
-      gpio_put_masked(GPIO_CD_MASK, reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0);
+      sio_hw->gpio_out = nextValue | GPIO_INT_MASK;
+      //sio_hw->gpio_oe_set = GPIO_CD_MASK;
+      //((vrEmuTms9918PeekStatus(tms) & 0x80) ? 0 : GPIO_INT_MASK);
+//      nextValue = vrEmuTms9918ReadData(tms);
+//      sio_hw->gpio_oe_set = GPIO_CD_MASK;
       vrEmuTms9918ReadData(tms);
+      nextValue = (reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0);
     }
+    //sleep_us(1);
+    //sio_hw->gpio_oe_clr = GPIO_CD_MASK;
   }
   else// if ((gpios & GPIO_CSW_MASK) == 0)
   {
-    gpio_set_dir_in_masked(GPIO_CD_MASK);
+        sio_hw->gpio_oe_clr = GPIO_CD_MASK;
+
     uint8_t value = reversed[(sio_hw->gpio_in >> GPIO_CD0) & 0xff];
     if (gpios & GPIO_MODE_MASK)
     {
       vrEmuTms9918WriteAddr(tms, value);
       gpio_put(GPIO_INT, !(vrEmuTms9918PeekStatus(tms) & 0x80));
+      nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
     }
     else
     {
       vrEmuTms9918WriteData(tms, value);
+      nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
     }
+    //    iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
   }
-
   iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 }
 
@@ -126,7 +138,7 @@ void proc1Entry()
   // set up gpio pins
   gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
   gpio_set_dir_all_bits(0); // all inputs
-  gpio_set_dir_out_masked(GPIO_INT_MASK); // all inputs
+  gpio_set_dir_out_masked(GPIO_INT_MASK); // int is an output
   gpio_put(GPIO_INT, true);
 
   // set up gpio interrupts
