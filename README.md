@@ -14,7 +14,9 @@ v0.3 Schematic is available now under (see ) but that revision has not yet been 
 
 ## Videos
 
-Initial "raw" videos recorded in the moments following the first boot on my TI-99/4A
+Initial "raw" videos recorded in the moments following the first boot on my TI-99/4A.
+
+These videos are showing the v0.2 hardware with an external Pi Pico providing the required GROMCLK signal to the TI-99. This signal has been added to v0.3. I'm still waiting on v0.3 boards to arrive.
 
 ### It freaking works!
 [![PICO9918 Prototype - It freaking works](https://img.visualrealmsoftware.com/youtube/thumb/Ri09dCjWxGE)](https://youtu.be/Ri09dCjWxGE)
