@@ -28,7 +28,7 @@
 #include <stdlib.h>
 
  /*
-  * External pins
+  * Pin mapping
   *
   * Pin  | GPIO | Name      | TMS9918A Pin
   * -----+------+-----------+-------------
@@ -45,8 +45,19 @@
   *  31  |  26  |  /CSR     |  15
   *  32  |  27  |  /CSW     |  14
   *  34  |  28  |  MODE     |  13
-  *  35  |  29  |  GROMCL   |  37
-  *  36  |  23  |  CPUCLK   |  38
+  *  35  |  29  |  GROMCLK  |  37
+  *  37  |  23  |  CPUCLK   |  38
+  *
+  * Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29
+  *       a genuine Raspberry Pi Pico can't be used.
+  *       v0.3 of the PCB is designed for the DWEII?
+  *       RP2040 USB-C module which exposes these additional
+  *       GPIOs. A future pico9918 revision will do without
+  *       an external RP2040 board and use the RP2040 directly.
+  *
+  * Purchase links:
+  *       https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
+  *       https://www.aliexpress.com/item/1005007066733934.html
   */
 
 #define GPIO_CD0 14
@@ -125,7 +136,6 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
     {
       sio_hw->gpio_out = nextValue | currentInt;
       vrEmuTms9918ReadData(tms);
-      nextValue = (reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0);
     }
   }
   else if ((gpios & GPIO_CSW_MASK) == 0)  /* write */
@@ -138,15 +148,15 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
 
       currentInt = (vrEmuTms9918PeekStatus(tms) & 0x80) ? 0 : GPIO_INT_MASK;
       sio_hw->gpio_out = nextValue | currentInt;
-
-      nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
     }
     else /* write data */
     {
       vrEmuTms9918WriteData(tms, value);
-      nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
     }
   }
+
+  nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
+
   iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 }
 
