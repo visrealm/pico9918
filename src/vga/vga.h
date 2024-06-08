@@ -1,7 +1,7 @@
 /*
- * Project: pico-56 - vga
+ * Project: pico9918 - vga
  *
- * Copyright (c) 2023 Troy Schrapel
+ * Copyright (c) 2024 Troy Schrapel
  *
  * This code is licensed under the MIT license
  *

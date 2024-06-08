@@ -120,7 +120,6 @@ static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
  */
 void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
-  sio_hw->gpio_oe_clr = GPIO_CD_MASK;
   uint32_t gpios = sio_hw->gpio_in;
 
   if ((gpios & GPIO_CSR_MASK) == 0) /* read? */
@@ -138,11 +137,11 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
       vrEmuTms9918ReadData(tms);
     }
   }
-  else if ((gpios & GPIO_CSW_MASK) == 0)  /* write */
+  else if ((gpios & GPIO_CSW_MASK) == 0)  /* write? */
   {
     uint8_t value = reversed[(sio_hw->gpio_in >> GPIO_CD0) & 0xff];
 
-    if (gpios & GPIO_MODE_MASK) /* write register */
+    if (gpios & GPIO_MODE_MASK) /* write register/address */
     {
       vrEmuTms9918WriteAddr(tms, value);
 
@@ -154,9 +153,15 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
       vrEmuTms9918WriteData(tms, value);
     }
   }
+  else /* both CSR and CSW are high (inactive). Go High-Z */
+  {
+    sio_hw->gpio_oe_clr = GPIO_CD_MASK;
+  }
 
+  /* update read-ahead */
   nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
 
+  /* interrupt handled */
   iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 }
 
@@ -176,8 +181,8 @@ void proc1Entry()
 
   // set up gpio interrupts
   irq_set_exclusive_handler(IO_IRQ_BANK0, gpioExclusiveCallbackProc1);
-  gpio_set_irq_enabled(GPIO_CSW, GPIO_IRQ_EDGE_FALL, true);
-  gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_FALL, true);
+  gpio_set_irq_enabled(GPIO_CSW, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
+  gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
   irq_set_enabled(IO_IRQ_BANK0, true);
 
   // wait until everything else is ready, then run the vga loop
@@ -267,12 +272,18 @@ uint initClock(uint gpio, float freqHz)
   return clkSm;
 }
 
-
-/* main entry point */
+/*
+ * main entry point
+ */
 int main(void)
 {
+  /* currently, VGA hard-coded to 640x480@60Hz. We want a high clock frequency
+   * that comes close to being divisible by 25.175MHz. 252.0 is close... enough :)
+   * I do have code which sets the best clock baased on the chosen VGA mode,
+   * but this'll do for now. */
   set_sys_clock_khz(252000, false);
 
+  /* we need one of these. it's the main guy */
   tms = vrEmuTms9918New();
 
   /* set up the GPIO pins and interrupt handler */
@@ -282,7 +293,7 @@ int main(void)
   initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
   initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
-  /* Then set up VGA output */
+  /* then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(VGA_640_480_60HZ, 2);
   params.scanlineFn = tmsScanline;

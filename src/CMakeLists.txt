@@ -20,4 +20,4 @@ target_link_libraries(${PROGRAM} PUBLIC
         vrEmuTms9918Util)
 
 add_subdirectory(pio-utils)
-add_subdirectory(tms9918)
+add_subdirectory(vga)
