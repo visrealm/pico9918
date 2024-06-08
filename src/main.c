@@ -5,55 +5,55 @@
  *
  * This code is licensed under the MIT license
  *
- * https://github.com/visrealm/pico-prom
+ * https://github.com/visrealm/pico9918
  *
  */
 
 #include "vga.h"
 #include "vga-modes.h"
 
-#include "tms9918.pio.h"
+#include "clocks.pio.h"
+
+#include "palette.h"
 
 #include "vrEmuTms9918Util.h"
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
+#include "pico/stdlib.h"
+
+#include "hardware/pio.h"
+#include "hardware/clocks.h"
 
 #include <stdlib.h>
 
-#include "pico/stdlib.h"
-#define inline __force_inline
-
-uint16_t __aligned(4) tmsPal[16];
-uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
-
-
-
-/*
- * External pins
- *
- * Pin  | GPIO | Name   | TMS9918A Pin
- * -----+------+--------+-------------
- *  19  |  14  |  CD0   |  24
- *  20  |  15  |  CD1   |  23
- *  21  |  16  |  CD2   |  22
- *  22  |  17  |  CD3   |  21
- *  24  |  18  |  CD4   |  20
- *  25  |  19  |  CD5   |  19
- *  26  |  20  |  CD6   |  18
- *  27  |  21  |  CD7   |  17
- *  29  |  22  |  /INT  |  16
- *  30  |  RUN |  RST   |  34
- *  31  |  26  |  /CSR  |  15
- *  32  |  27  |  /CSW  |  14
- *  34  |  28  |  MODE  |  13
- */
+ /*
+  * External pins
+  *
+  * Pin  | GPIO | Name   | TMS9918A Pin
+  * -----+------+--------+-------------
+  *  19  |  14  |  CD0   |  24
+  *  20  |  15  |  CD1   |  23
+  *  21  |  16  |  CD2   |  22
+  *  22  |  17  |  CD3   |  21
+  *  24  |  18  |  CD4   |  20
+  *  25  |  19  |  CD5   |  19
+  *  26  |  20  |  CD6   |  18
+  *  27  |  21  |  CD7   |  17
+  *  29  |  22  |  /INT  |  16
+  *  30  |  RUN |  RST   |  34
+  *  31  |  26  |  /CSR  |  15
+  *  32  |  27  |  /CSW  |  14
+  *  34  |  28  |  MODE  |  13
+  */
 
 #define GPIO_CD0 14
 #define GPIO_CSR 26
 #define GPIO_CSW 27
 #define GPIO_MODE 28
 #define GPIO_INT 22
+#define GPIO_GROMCL 29
+#define GPIO_CPUCL 23
 
 #define GPIO_CD_MASK (0xff << GPIO_CD0)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
@@ -61,8 +61,14 @@ uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
 
+#define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
- /* todo should I make this uint32_t and shift the bits too?*/
+
+  /* In revision 0.2 of my prototype PCB, CD0 through CD7 are inconveniently reversed into the
+     Pi Pico GPIO pins. Quickest way to deal with that is this lookup table.
+     v0.3+ of the pico9918 hardware will have this fix in hardware, so will be removed soon
+   */
+
 static uint8_t  __aligned(4) reversed[] =
 {
   0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
@@ -83,63 +89,78 @@ static uint8_t  __aligned(4) reversed[] =
   0x0F, 0x8F, 0x4F, 0xCF, 0x2F, 0xAF, 0x6F, 0xEF, 0x1F, 0x9F, 0x5F, 0xDF, 0x3F, 0xBF, 0x7F, 0xFF
 };
 
-VrEmuTms9918* tms = NULL;
-uint8_t lastRead = 0;
-uint32_t nextValue = 0;
 
+/* file globals */
+
+static VrEmuTms9918* tms = NULL;  /* our vrEmuTms9918 instance handle */
+static uint32_t nextValue = 0; /* TMS9918A read-ahead value */
+static uint32_t currentInt = GPIO_INT_MASK; /* current interrupt pin state */
+
+static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
+
+
+/*
+ * RP2040 exclusive GPIO interrupt callback for PROC1
+ * Called whenever CSR or CSW changes and reads or writes the data
+ *
+ * Note: This needs to be extremely responsive. No dilly-dallying here.
+ */
 void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
+  sio_hw->gpio_oe_clr = GPIO_CD_MASK;
   uint32_t gpios = sio_hw->gpio_in;
 
-  if ((gpios & GPIO_CSR_MASK) == 0)
+  if ((gpios & GPIO_CSR_MASK) == 0) /* read? */
   {
     sio_hw->gpio_oe_set = GPIO_CD_MASK;
-    if (gpios & GPIO_MODE_MASK)
+
+    if (gpios & GPIO_MODE_MASK) /* read status register */
     {
       sio_hw->gpio_out = ((uint32_t)reversed[vrEmuTms9918ReadStatus(tms)] << GPIO_CD0) | GPIO_INT_MASK;
-    //  sio_hw->gpio_oe_set = GPIO_CD_MASK;
+      currentInt = GPIO_INT_MASK;
     }
-    else
+    else /* read data */
     {
-      sio_hw->gpio_out = nextValue | GPIO_INT_MASK;
-      //sio_hw->gpio_oe_set = GPIO_CD_MASK;
-      //((vrEmuTms9918PeekStatus(tms) & 0x80) ? 0 : GPIO_INT_MASK);
-//      nextValue = vrEmuTms9918ReadData(tms);
-//      sio_hw->gpio_oe_set = GPIO_CD_MASK;
+      sio_hw->gpio_out = nextValue | currentInt;
       vrEmuTms9918ReadData(tms);
       nextValue = (reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0);
     }
-    //sleep_us(1);
-    //sio_hw->gpio_oe_clr = GPIO_CD_MASK;
   }
-  else// if ((gpios & GPIO_CSW_MASK) == 0)
+  else if ((gpios & GPIO_CSW_MASK) == 0)  /* write */
   {
-        sio_hw->gpio_oe_clr = GPIO_CD_MASK;
-
     uint8_t value = reversed[(sio_hw->gpio_in >> GPIO_CD0) & 0xff];
-    if (gpios & GPIO_MODE_MASK)
+
+    if (gpios & GPIO_MODE_MASK) /* write register */
     {
       vrEmuTms9918WriteAddr(tms, value);
-      gpio_put(GPIO_INT, !(vrEmuTms9918PeekStatus(tms) & 0x80));
+
+      currentInt = (vrEmuTms9918PeekStatus(tms) & 0x80) ? 0 : GPIO_INT_MASK;
+      sio_hw->gpio_out = nextValue | currentInt;
+
       nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
     }
-    else
+    else /* write data */
     {
       vrEmuTms9918WriteData(tms, value);
       nextValue = reversed[vrEmuTms9918ReadDataNoInc(tms)] << GPIO_CD0;
     }
-    //    iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
   }
   iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 }
 
+/*
+ * 2nd CPU core (proc1) entry
+ */
 void proc1Entry()
 {
   // set up gpio pins
   gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
-  gpio_set_dir_all_bits(0); // all inputs
-  gpio_set_dir_out_masked(GPIO_INT_MASK); // int is an output
-  gpio_put(GPIO_INT, true);
+  gpio_put_all(GPIO_INT_MASK);
+  gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
+
+  // ensure CSR and CSW are high (inactive)
+  while (!gpio_get(GPIO_CSW) || !gpio_get(GPIO_CSR))
+    tight_loop_contents();
 
   // set up gpio interrupts
   irq_set_exclusive_handler(IO_IRQ_BANK0, gpioExclusiveCallbackProc1);
@@ -152,22 +173,17 @@ void proc1Entry()
   vgaLoop();
 }
 
-
-
-
-
-uint16_t colorFromRgb(uint16_t r, uint16_t g, uint16_t b)
-{
-  return ((uint16_t)(r / 16.0f) & 0x0f) | (((uint16_t)(g / 16.0f) & 0x0f) << 4) | (((uint16_t)(b / 16.0f) & 0x0f) << 8);
-}
-
+/*
+ * generate a single VGA scanline
+ */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
   const uint32_t vBorder = (params->vVirtualPixels - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (params->hVirtualPixels - TMS9918_PIXELS_X) / 2;
 
-  uint16_t bg = tmsPal[vrEmuTms9918RegValue(tms, TMS_REG_FG_BG_COLOR) & 0x0f];
+  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(tms, TMS_REG_FG_BG_COLOR) & 0x0f];
 
+  /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
   {
     for (int x = 0; x < params->hVirtualPixels; ++x)
@@ -179,52 +195,92 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   y -= vBorder;
 
+  /*** left border ***/
   for (int x = 0; x < hBorder; ++x)
   {
     pixels[x] = bg;
   }
 
+  /*** main display region ***/
+
+  /* generate the scanline */
   vrEmuTms9918ScanLine(tms, y, tmsScanlineBuffer);
 
+  /* convert from tms palette to bgr12 */
   int tmsX = 0;
   for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X; ++x, ++tmsX)
   {
-    pixels[x] = tmsPal[tmsScanlineBuffer[tmsX]];
+    pixels[x] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX]];
   }
 
+  /*** right border ***/
   for (int x = hBorder + TMS9918_PIXELS_X; x < params->hVirtualPixels; ++x)
   {
     pixels[x] = bg;
   }
 
-  gpio_put(GPIO_INT, !(vrEmuTms9918PeekStatus(tms) & 0x80));
+  /*** interrupt signal? ***/
+  if (y == TMS9918_PIXELS_Y - 1)
+  {
+    currentInt = (vrEmuTms9918PeekStatus(tms) & 0x80) ? 0 : GPIO_INT_MASK;
+    gpio_put(GPIO_INT, !!currentInt);
+  }
+}
+
+/*
+ * initialise a clock output using PIO
+ *
+ * GROMCLK is crystal frequency / 24 (~447KHz)
+ * CPUCLK is crystal frequency / 3 (~3.58MHz)
+ */
+uint initClock(uint gpio, float freqHz)
+{
+  static uint clocksPioOffset = -1;
+
+  if (clocksPioOffset == -1)
+  {
+    clocksPioOffset = pio_add_program(pio1, &clock_program);
+  }
+
+  uint clkSm = pio_claim_unused_sm(pio1, true);
+  clock_program_init(pio1, clkSm, clocksPioOffset, GPIO_CPUCL);
+
+  float clockDiv = (float)clock_get_hz(clk_sys) / (TMS_CRYSTAL_FREQ_HZ * 10.0f);
+
+  pio_sm_set_clkdiv(pio1, clkSm, clockDiv);
+  pio_sm_set_enabled(pio1, clkSm, true);
+
+  pio_sm_put(pio0, clkSm, (uint)(clock_get_hz(clk_sys) / clockDiv / (2.0f * freqHz)) - 3.0f);
+
+  return clkSm;
 }
 
 
+/* main entry point */
 int main(void)
 {
   set_sys_clock_khz(252000, false);
 
   tms = vrEmuTms9918New();
 
+  /* set up the GPIO pins and interrupt handler */
   multicore_launch_core1(proc1Entry);
 
-  for (int c = 0; c < 16; ++c)
-  {
-    uint32_t rgba8 = vrEmuTms9918Palette[c];
-    tmsPal[c] = colorFromRgb((rgba8 & 0xff000000) >> 24, (rgba8 & 0xff0000) >> 16, (rgba8 & 0xff00) >> 8);
-  }
+  /* set up the GROMCLK and CPUCLK signals */
+  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
+  initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
-  // Then set up VGA output
+  /* Then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(VGA_640_480_60HZ, 2);
   params.scanlineFn = tmsScanline;
-
-
   vgaInit(params);
 
-  multicore_fifo_push_timeout_us(0, 0); // start the vga loop on proc1
+  /* signal proc1 that we're ready to start the display */
+  multicore_fifo_push_timeout_us(0, 0);
 
+  /* twiddle our thumbs - everything from this point on
+     is handled by interrupts and PIOs */
   while (1)
   {
     tight_loop_contents();

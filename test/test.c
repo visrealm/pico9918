@@ -5,7 +5,7 @@
  *
  * This code is licensed under the MIT license
  *
- * https://github.com/visrealm/pico-prom
+ * https://github.com/visrealm/pico9918
  *
  */
 
@@ -30,8 +30,13 @@
   */
 
 #include "pico/stdlib.h"
+#include "hardware/pio.h"
+#include "hardware/clocks.h"
+#include "clocks.pio.h"
 
 #include "breakout.h"
+
+
 
   //#include <stddef>
 #include <stdlib.h>
@@ -44,6 +49,9 @@
 extern const uint8_t tmsFont[];
 extern size_t tmsFontBytes;
 
+#define GPIO_GROMCL 0
+#define GPIO_CPUCL 1
+
 #define GPIO_CD0 14
 #define GPIO_CSR 26
 #define GPIO_CSW 27
@@ -55,6 +63,9 @@ extern size_t tmsFontBytes;
 #define GPIO_CSW_MASK (0x01 << GPIO_CSW)
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
+
+#define TMS_CRYSTAL_FREQ_HZ 10738635.0f
+
 
 /* todo should I make this uint32_t and shift the bits too?*/
 static uint8_t  __aligned(4) reversed[] =
@@ -106,7 +117,7 @@ void writeTo9918(bool mode, uint8_t value)
 {
   gpio_set_dir_out_masked(GPIO_CD_MASK);
   gpio_put_all(buildGpioState(false, true, mode, value));
-  sleep_us(1);
+  sleep_us(0);
   //  del = 12;
   //  while (del) doFn(value);
     //for (del = 0; del < 50; ++del);
@@ -115,7 +126,7 @@ void writeTo9918(bool mode, uint8_t value)
   //del = 8;
   //while (del) doFn(value);
 
-  //sleep_us(1);
+  sleep_us(0);
   //gpio_set_dir_in_masked(GPIO_CD_MASK);
 }
 
@@ -123,9 +134,10 @@ uint8_t readFrom9918(bool mode)
 {
   gpio_set_dir_in_masked(GPIO_CD_MASK);
   gpio_put_all(buildGpioState(true, false, mode, 0));
-  sleep_us(1);
+  sleep_us(0);
   uint8_t value = REVERSE((gpio_get_all() >> GPIO_CD0) & 0xff);
   gpio_put_all(buildGpioState(false, false, mode, value));
+  sleep_us(0);
   return value;
 }
 
@@ -226,10 +238,11 @@ VrEmuTms9918* vrEmuTms9918New()
 {
   gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
 
-  gpio_set_dir_all_bits(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // set r, w, mode to outputs
-  gpio_put_all(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // drive r, w, mode high
   gpio_set_pulls(GPIO_CSW, true, false);
   gpio_set_pulls(GPIO_CSR, true, false);
+
+  gpio_put_all(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // drive r, w, mode high
+  gpio_set_dir_all_bits(GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK); // set r, w, mode to outputs
 
   return NULL;
 }
@@ -473,11 +486,34 @@ int main(void)
 {
   set_sys_clock_khz(252000, false);
 
+  uint clocksPioOffset = pio_add_program(pio0, &clock_program);
+
+  uint gromClkSm = pio_claim_unused_sm(pio0, true);
+  uint cpuClkSm = pio_claim_unused_sm(pio0, true);
+
+  clock_program_init(pio0, gromClkSm, clocksPioOffset, GPIO_GROMCL);
+  clock_program_init(pio0, cpuClkSm, clocksPioOffset, GPIO_CPUCL);
+
+  float clockDiv = (float)clock_get_hz(clk_sys) / (TMS_CRYSTAL_FREQ_HZ * 10.0f);
+
+  pio_sm_set_clkdiv(pio0, gromClkSm, clockDiv);
+  pio_sm_set_clkdiv(pio0, cpuClkSm, clockDiv);
+
+  pio_sm_set_enabled(pio0, gromClkSm, true);
+  pio_sm_set_enabled(pio0, cpuClkSm, true);
+
+  const float gromClkFreq = TMS_CRYSTAL_FREQ_HZ / 24.0f;
+  const float cpuClkFreq = TMS_CRYSTAL_FREQ_HZ / 3.0f;
+
+  pio_sm_put(pio0, gromClkSm, (uint)(clock_get_hz(clk_sys) / clockDiv / (2.0f * gromClkFreq)) - 3.0f);
+  pio_sm_put(pio0, cpuClkSm, (uint)(clock_get_hz(clk_sys) / clockDiv / (2.0f * cpuClkFreq)) - 3.0f);
+
   tms = vrEmuTms9918New();
 
-  sleep_ms(25);
+  sleep_ms(50);
 
-  vrEmuTms9918InitialiseGfxII(tms);
+  vrEmuTms9918ReadStatus(tms);
+
   vrEmuTms9918InitialiseGfxII(tms);
 
   //while ((vrEmuTms9918ReadStatus(tms) & 0x80) == 0)

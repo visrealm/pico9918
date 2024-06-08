@@ -1,11 +1,11 @@
 /*
- * Project: pico-56 - tms9918
+ * Project: pico9918
  *
  * Copyright (c) 2023 Troy Schrapel
  *
  * This code is licensed under the MIT license
  *
- * https://github.com/visrealm/pico-56
+ * https://github.com/visrealm/pico9918
  *
  */
 

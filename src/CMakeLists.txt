@@ -4,10 +4,10 @@ set(PROGRAM pico9918)
 
 add_executable(${PROGRAM})
 
-target_sources(${PROGRAM} PRIVATE main.c tms9918.pio.h)
+target_sources(${PROGRAM} PRIVATE main.c palette.c clocks.pio.h)
 
 # generate header file from pio
-pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/tms9918.pio)
+pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/clocks.pio)
 
 pico_add_extra_outputs(${PROGRAM})
 
