@@ -6,6 +6,9 @@ add_executable(${PROGRAM})
 
 target_sources(${PROGRAM} PRIVATE main.c palette.c clocks.pio.h)
 
+# generate image array source files from png images
+visrealm_generate_image_source_ram(${PROGRAM} splash res/splash.png )
+
 # generate header file from pio
 pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/clocks.pio)
 

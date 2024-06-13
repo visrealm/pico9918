@@ -22,4 +22,16 @@ typedef enum
   VGA_1280_1024_60HZ,
 } VgaMode;
 
-extern VgaParams vgaGetParams(VgaMode mode, int pixelScale);
+
+/*
+ * get the vga parameters for known modes
+ */
+VgaParams vgaGetParams(VgaMode mode);
+
+/*
+ * set the scale/multiplier of virtual pixel size
+ */
+bool setVgaParamsScale(VgaParams* params, int pixelScale);
+bool setVgaParamsScaleXY(VgaParams* params, int pixelScaleX, int pixelScaleY);
+bool setVgaParamsScaleX(VgaParams* params, int pixelScale);
+bool setVgaParamsScaleY(VgaParams* params, int pixelScale);

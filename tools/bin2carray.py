@@ -25,10 +25,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description='Convert binary files into C-style arrays for use with the PICO-56.',
         epilog="GitHub: https://github.com/visrealm/pico-56")
-    parser.add_argument('-v', '--verbose', help='verbose output', action='store_true')
-    parser.add_argument('-p', '--prefix', help='array variable prefix', default='')
-    parser.add_argument('-o', '--out', help='output file - defaults to base input file name with .c extension')
-    parser.add_argument('-i', '--in', nargs='+', help='input file(s) to store in Pi Pico ROM - can use wildcards')
+    parser.add_argument('-v', '--verbose',
+                        help='verbose output', action='store_true')
+    parser.add_argument(
+        '-p', '--prefix', help='array variable prefix', default='')
+    parser.add_argument(
+        '-o', '--out', help='output file - defaults to base input file name with .c extension')
+    parser.add_argument('-i', '--in', nargs='+',
+                        help='input file(s) to store in Pi Pico ROM - can use wildcards')
     args = vars(parser.parse_args())
 
     outSourceFileName = args['out']
@@ -47,15 +51,16 @@ def main() -> int:
         outHeaderFileName = os.path.splitext(outSourceFileName)[0] + ".h"
         outHeaderFile = open(outHeaderFileName, "w")
 
-        outSourceFile.write(getFileHeader(outSourceFileName, inFileNames, args, isHeaderFile=False))
-        outHeaderFile.write(getFileHeader(outHeaderFileName, inFileNames, args, isHeaderFile=True))
+        outSourceFile.write(getFileHeader(
+            outSourceFileName, inFileNames, args, isHeaderFile=False))
+        outHeaderFile.write(getFileHeader(
+            outHeaderFileName, inFileNames, args, isHeaderFile=True))
 
     for infile in inFileNames:
         processFile(infile, outSourceFile,
                     outHeaderFile, args)
 
     outSourceFile.close()
-    outHeaderFile.write("\n#endif")
     outHeaderFile.close()
 
     fileList = ""
@@ -95,8 +100,7 @@ def getFileHeader(fileName, fileList, args, isHeaderFile) -> str:
     if isHeaderFile:
         baseName = args['prefix'] + "_" + os.path.basename(fileName)
         sanitizedFile = re.sub('[^0-9a-zA-Z]+', '_', baseName.upper())
-        hdrText += f"#ifndef _{sanitizedFile}\n"
-        hdrText += f"#define _{sanitizedFile}\n\n"
+        hdrText += f"#pragma once\n\n"
     else:
         hdrText += "#include \"pico/platform.h\"\n"
     hdrText += "#include <inttypes.h>"
@@ -153,9 +157,11 @@ def processFile(infile, srcOutput, hdrOutput, args) -> None:
     closeFile = False
     if srcOutput == None:
         srcOutput = open(outPathWithoutExt + ".c", "w")
-        srcOutput.write(getFileHeader(srcOutput.name, [infile], args, isHeaderFile=False))
+        srcOutput.write(getFileHeader(srcOutput.name, [
+                        infile], args, isHeaderFile=False))
         hdrOutput = open(outPathWithoutExt + ".h", "w")
-        hdrOutput.write(getFileHeader(hdrOutput.name, [infile], args, isHeaderFile=True))
+        hdrOutput.write(getFileHeader(hdrOutput.name, [
+                        infile], args, isHeaderFile=True))
         closeFile = True
 
     varName = os.path.split(infile)[1]
@@ -182,7 +188,6 @@ def processFile(infile, srcOutput, hdrOutput, args) -> None:
 
     if closeFile:
         srcOutput.close()
-        hdrOutput.write("\n#endif")
         hdrOutput.close()
 
     return

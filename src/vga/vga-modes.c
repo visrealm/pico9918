@@ -16,10 +16,8 @@ void vgaUpdateTotalPixels(VgaSyncParams* params);
 /*
  * populate VgaParams for known vga modes
  */
-VgaParams vgaGetParams(VgaMode mode, int pixelScale)
+VgaParams vgaGetParams(VgaMode mode)
 {
-  if (pixelScale < 1) pixelScale = 1;
-
   VgaParams params;
 
   switch (mode)
@@ -112,12 +110,42 @@ VgaParams vgaGetParams(VgaMode mode, int pixelScale)
     params.vSyncParams.freqHz = 1.0f / frameTimeSeconds;
   }
 
-  params.hPixelScale = pixelScale;
-  params.vPixelScale = pixelScale;
-  params.hVirtualPixels = (params.hSyncParams.displayPixels / params.hPixelScale);
-  params.vVirtualPixels = (params.vSyncParams.displayPixels / params.vPixelScale);
+  setVgaParamsScale(&params, 1);
 
   return params;
+}
+
+/*
+ * set the scale/multiplier of virtual pixel size
+ */
+bool setVgaParamsScale(VgaParams* params, int pixelScale)
+{
+  return setVgaParamsScaleX(params, pixelScale) &&
+    setVgaParamsScaleY(params, pixelScale);
+}
+
+bool setVgaParamsScaleXY(VgaParams* params, int pixelScaleX, int pixelScaleY)
+{
+  return setVgaParamsScaleX(params, pixelScaleX) &&
+    setVgaParamsScaleY(params, pixelScaleY);
+}
+
+bool setVgaParamsScaleX(VgaParams* params, int pixelScale)
+{
+  if (!params || pixelScale < 1) return false;
+
+  params->hPixelScale = pixelScale;
+  params->hVirtualPixels = (params->hSyncParams.displayPixels / params->hPixelScale);
+  return true;
+}
+
+bool setVgaParamsScaleY(VgaParams* params, int pixelScale)
+{
+  if (!params || pixelScale < 1) return false;
+
+  params->vPixelScale = pixelScale;
+  params->vVirtualPixels = (params->vSyncParams.displayPixels / params->vPixelScale);
+  return true;
 }
 
 /*

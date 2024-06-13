@@ -35,9 +35,12 @@
 #define SYNC_SM         0        // vga sync state machine index
 #define RGB_SM          1        // vga rgb state machine index
 
-
 #define END_OF_SCANLINE_MSG 0x40000000
 #define END_OF_FRAME_MSG 0x80000000
+
+#define CRT_EFFECT 0
+#define SCANLINE_TIME_DEBUG 1
+
 
  /*
   * sync pio dma data buffers
@@ -46,15 +49,21 @@ uint32_t __aligned(4) syncDataActive[4];  // active display area
 uint32_t __aligned(4) syncDataPorch[4];   // vertical porch
 uint32_t __aligned(4) syncDataSync[4];    // vertical sync
 
-uint16_t* rgbDataBufferEven = NULL;
-uint16_t* rgbDataBufferOdd = NULL;
+uint16_t* __aligned(4) rgbDataBuffer[2 + SCANLINE_TIME_DEBUG] = { 0 };       // two scanline buffers (odd and even)
 
 /*
  * file scope
  */
 static int syncDmaChan = 0;
 static int rgbDmaChan = 0;
+static uint syncDmaChanMask = 0;
+static uint rgbDmaChanMask = 0;
 static VgaInitParams vgaParams = { 0 };
+
+#if SCANLINE_TIME_DEBUG
+bool hasRenderedNext = false;
+#endif
+
 
 uint32_t vgaMinimumPioClockKHz(VgaParams* params)
 {
@@ -84,8 +93,15 @@ static bool buildSyncData()
     return false;
   }
 
-  if (!rgbDataBufferEven) rgbDataBufferEven = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
-  if (!rgbDataBufferOdd) rgbDataBufferOdd = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
+  rgbDataBuffer[0] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
+  rgbDataBuffer[1] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
+
+#if SCANLINE_TIME_DEBUG
+  rgbDataBuffer[2] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
+
+  for (int i = 0; i < vgaParams.params.hVirtualPixels; ++i)
+    rgbDataBuffer[2][i] = 0x0f00;
+#endif
 
   vgaParams.params.pioDivider = round(sysClockKHz / (float)minClockKHz);
   vgaParams.params.pioFreqKHz = sysClockKHz / vgaParams.params.pioDivider;
@@ -102,10 +118,10 @@ static bool buildSyncData()
 
 
   // compute sync bits
-  const uint32_t hSyncOff = (vgaParams.params.hSyncParams.syncHigh ? 0 : 1) << vga_sync_WORD_HSYNC_OFFSET;
-  const uint32_t hSyncOn = (vgaParams.params.hSyncParams.syncHigh ? 1 : 0) << vga_sync_WORD_HSYNC_OFFSET;
-  const uint32_t vSyncOff = (vgaParams.params.vSyncParams.syncHigh ? 0 : 1) << vga_sync_WORD_VSYNC_OFFSET;
-  const uint32_t vSyncOn = (vgaParams.params.vSyncParams.syncHigh ? 1 : 0) << vga_sync_WORD_VSYNC_OFFSET;
+  const uint32_t hSyncOff = !vgaParams.params.hSyncParams.syncHigh << vga_sync_WORD_HSYNC_OFFSET;
+  const uint32_t hSyncOn = vgaParams.params.hSyncParams.syncHigh << vga_sync_WORD_HSYNC_OFFSET;
+  const uint32_t vSyncOff = !vgaParams.params.vSyncParams.syncHigh << vga_sync_WORD_VSYNC_OFFSET;
+  const uint32_t vSyncOn = vgaParams.params.vSyncParams.syncHigh << vga_sync_WORD_VSYNC_OFFSET;
 
   // compute exec instructions
   const uint32_t instIrq = pio_encode_irq_set(false, vga_rgb_RGB_IRQ) << vga_sync_WORD_EXEC_OFFSET;
@@ -165,6 +181,7 @@ static void vgaInitSync()
 
   // initialise sync dma
   syncDmaChan = dma_claim_unused_channel(true);
+  syncDmaChanMask = 0x01 << syncDmaChan;
   dma_channel_config syncDmaChanConfig = dma_channel_get_default_config(syncDmaChan);
   channel_config_set_transfer_data_size(&syncDmaChanConfig, DMA_SIZE_32);           // transfer 32 bits at a time
   channel_config_set_read_increment(&syncDmaChanConfig, true);                       // increment read
@@ -218,6 +235,7 @@ static void vgaInitRgb()
 
   // initialise rgb dma
   rgbDmaChan = dma_claim_unused_channel(true);
+  rgbDmaChanMask = 0x01 << rgbDmaChan;
   dma_channel_config rgbDmaChanConfig = dma_channel_get_default_config(rgbDmaChan);
   channel_config_set_transfer_data_size(&rgbDmaChanConfig, DMA_SIZE_16);  // transfer 16 bits at a time
   channel_config_set_read_increment(&rgbDmaChanConfig, true);             // increment read
@@ -225,7 +243,7 @@ static void vgaInitRgb()
   channel_config_set_dreq(&rgbDmaChanConfig, pio_get_dreq(VGA_PIO, RGB_SM, true));
 
   // setup the dma channel and set it going
-  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBufferEven, vgaParams.params.hVirtualPixels, false);
+  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], vgaParams.params.hVirtualPixels, false);
   dma_channel_set_irq0_enabled(rgbDmaChan, true);
 }
 
@@ -237,9 +255,9 @@ static void __time_critical_func(dmaIrqHandler)(void)
   static int currentTimingLine = -1;
   static int currentDisplayLine = -1;
 
-  if (dma_hw->ints0 & (1u << syncDmaChan))
+  if (dma_hw->ints0 & syncDmaChanMask)
   {
-    dma_hw->ints0 = 1u << syncDmaChan;
+    dma_hw->ints0 = syncDmaChanMask;
 
     if (++currentTimingLine >= vgaParams.params.vSyncParams.totalPixels)
     {
@@ -266,16 +284,34 @@ static void __time_critical_func(dmaIrqHandler)(void)
     multicore_fifo_push_timeout_us(END_OF_SCANLINE_MSG | currentTimingLine, 0);
   }
 
-
-  if (dma_hw->ints0 & (1u << rgbDmaChan))
+  if (dma_hw->ints0 & rgbDmaChanMask)
   {
-    dma_hw->ints0 = 1u << rgbDmaChan;
+    dma_hw->ints0 = rgbDmaChanMask;
 
     divmod_result_t pxLineVal = divmod_u32u32(currentDisplayLine++, vgaParams.params.vPixelScale);
     uint32_t pxLine = to_quotient_u32(pxLineVal);
     uint32_t pxLineRpt = to_remainder_u32(pxLineVal);
+    uint16_t* currentBuffer = rgbDataBuffer[pxLine & 0x01];
 
-    dma_channel_set_read_addr(rgbDmaChan, (pxLine & 1) ? rgbDataBufferOdd : rgbDataBufferEven, true);
+#if CRT_EFFECT
+    if (pxLineRpt != 0)
+    {
+      for (int i = 0; i < 10; ++i)
+      {
+        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x0777;
+      }
+    }
+#endif
+
+#if SCANLINE_TIME_DEBUG
+    if (pxLineRpt != 0 && hasRenderedNext)
+    {
+      currentBuffer = rgbDataBuffer[2];
+    }
+#endif
+
+
+    dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
     // need a new line every X display lines
     if ((pxLineRpt == 0))
@@ -284,14 +320,24 @@ static void __time_critical_func(dmaIrqHandler)(void)
       if (requestLine >= vgaParams.params.vVirtualPixels) requestLine -= vgaParams.params.vVirtualPixels;
 
       multicore_fifo_push_timeout_us(requestLine, 0);
+      hasRenderedNext = false;
 
       if (requestLine == vgaParams.params.vVirtualPixels - 1)
       {
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
       }
     }
+#if CRT_EFFECT
+    else
+    {
+      for (int i = 10; i < vgaParams.params.hVirtualPixels; ++i)
+      {
+        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x0777;
+      }
+    }
+#endif
+    }
   }
-}
 
 /*
  * initialise the pio dma
@@ -335,13 +381,14 @@ void vgaLoop()
         vgaParams.endOfScanlineFn();
       }
     }
-    else if (message & 0x01)
-    {
-      vgaParams.scanlineFn(message & 0xfff, &vgaParams.params, rgbDataBufferOdd);
-    }
     else
     {
-      vgaParams.scanlineFn(message & 0xfff, &vgaParams.params, rgbDataBufferEven);
+      // get the next scanline pixels
+      vgaParams.scanlineFn(message & 0xfff, &vgaParams.params, rgbDataBuffer[message & 0x01]);
+#if SCANLINE_TIME_DEBUG
+      dma_channel_set_read_addr(rgbDmaChan, rgbDataBuffer[2], true);
+      hasRenderedNext = true;
+#endif
     }
   }
 }
