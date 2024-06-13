@@ -39,7 +39,7 @@
 #define END_OF_FRAME_MSG 0x80000000
 
 #define CRT_EFFECT 0
-#define SCANLINE_TIME_DEBUG 1
+#define SCANLINE_TIME_DEBUG 0
 
 
  /*
@@ -320,8 +320,10 @@ static void __time_critical_func(dmaIrqHandler)(void)
       if (requestLine >= vgaParams.params.vVirtualPixels) requestLine -= vgaParams.params.vVirtualPixels;
 
       multicore_fifo_push_timeout_us(requestLine, 0);
-      hasRenderedNext = false;
 
+#if SCANLINE_TIME_DEBUG
+      hasRenderedNext = false;
+#endif
       if (requestLine == vgaParams.params.vVirtualPixels - 1)
       {
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
@@ -336,8 +338,8 @@ static void __time_critical_func(dmaIrqHandler)(void)
       }
     }
 #endif
-    }
   }
+}
 
 /*
  * initialise the pio dma

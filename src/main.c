@@ -212,15 +212,25 @@ void proc1Entry()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  const uint32_t vBorder = (params->vVirtualPixels - TMS9918_PIXELS_Y) / 2;
-  const uint32_t hBorder = (params->hVirtualPixels - TMS9918_PIXELS_X * 2) / 2;
+
+#if 1
+#define VIRTUAL_PIXELS_X 640
+#define VIRTUAL_PIXELS_Y 240
+#else 
+#define VIRTUAL_PIXELS_X params->hVirtualPixels
+#define VIRTUAL_PIXELS_Y params->vVirtualPixels
+#endif
+
+
+  const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
+  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
   uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(tms, TMS_REG_FG_BG_COLOR) & 0x0f];
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
   {
-    for (int x = 0; x < params->hVirtualPixels; ++x)
+    for (int x = 0; x < VIRTUAL_PIXELS_X; ++x)
     {
       pixels[x] = bg;
     }
@@ -242,7 +252,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
           uint16_t c = *(splashPtr++);
           if (c & 0xf000)
           {
-           pixels[x] = c;
+            pixels[x] = c;
           }
         }
       }
@@ -283,7 +293,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 
   /*** right border ***/
-  for (int x = hBorder + TMS9918_PIXELS_X * 2; x < params->hVirtualPixels; ++x)
+  for (int x = hBorder + TMS9918_PIXELS_X * 2; x < VIRTUAL_PIXELS_X; ++x)
   {
     pixels[x] = bg;
   }
