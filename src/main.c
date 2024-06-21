@@ -80,7 +80,7 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#define GPIO_CD_REVERSED 1
+#define GPIO_CD_REVERSED 0
 #define LED_BLINK_ON_WRITE 1
 
 
@@ -132,6 +132,9 @@ static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
  */
 void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
+  /* interrupt handled */
+  iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+
   uint32_t gpios = sio_hw->gpio_in;
 
   if ((gpios & GPIO_CSR_MASK) == 0) /* read? */
@@ -177,9 +180,6 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
 
   /* update read-ahead */
   nextValue = REVERSE(vrEmuTms9918ReadDataNoInc(tms)) << GPIO_CD0;
-
-  /* interrupt handled */
-  iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 }
 
 /*
@@ -319,14 +319,14 @@ uint initClock(uint gpio, float freqHz)
   }
 
   uint clkSm = pio_claim_unused_sm(pio1, true);
-  clock_program_init(pio1, clkSm, clocksPioOffset, GPIO_CPUCL);
+  clock_program_init(pio1, clkSm, clocksPioOffset, gpio);
 
   float clockDiv = (float)clock_get_hz(clk_sys) / (TMS_CRYSTAL_FREQ_HZ * 10.0f);
 
   pio_sm_set_clkdiv(pio1, clkSm, clockDiv);
   pio_sm_set_enabled(pio1, clkSm, true);
 
-  pio_sm_put(pio0, clkSm, (uint)(clock_get_hz(clk_sys) / clockDiv / (2.0f * freqHz)) - 3.0f);
+  pio_sm_put(pio1, clkSm, (uint)(clock_get_hz(clk_sys) / clockDiv / (2.0f * freqHz)) - 3.0f);
 
   return clkSm;
 }
