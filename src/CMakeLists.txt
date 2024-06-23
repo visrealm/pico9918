@@ -14,6 +14,8 @@ pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/clocks.pio)
 
 pico_add_extra_outputs(${PROGRAM})
 
+pico_set_binary_type(${PROGRAM} no_flash)
+
 target_link_libraries(${PROGRAM} PUBLIC
         pico_stdlib
         pico_multicore

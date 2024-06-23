@@ -160,7 +160,7 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
     {
       vrEmuTms9918WriteAddr(tms, value);
 
-      currentInt = (vrEmuTms9918PeekStatus(tms) & 0x80) ? 0 : GPIO_INT_MASK;
+      currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
       sio_hw->gpio_out = nextValue | currentInt;
     }
     else /* write data */
@@ -208,7 +208,7 @@ void proc1Entry()
 }
 
 /*
- * generate a single VGA scanline
+ * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
@@ -301,7 +301,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** interrupt signal? ***/
   if (y == TMS9918_PIXELS_Y - 1)
   {
-    currentInt = (vrEmuTms9918PeekStatus(tms) & 0x80) ? 0 : GPIO_INT_MASK;
+    currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
     gpio_put(GPIO_INT, !!currentInt);
   }
 }
