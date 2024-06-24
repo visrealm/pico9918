@@ -21,8 +21,7 @@ target_link_libraries(${PROGRAM} PUBLIC
         pico_multicore
         hardware_pio        
         pico9918-vga
-        vrEmuTms9918
-        vrEmuTms9918Util)
+        vrEmuTms9918)
 
 add_subdirectory(pio-utils)
 add_subdirectory(vga)

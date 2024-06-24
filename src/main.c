@@ -80,7 +80,7 @@
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
 #define GPIO_CD_REVERSED 0  /* unset for v0.3 PCB */
-#define LED_BLINK_ON_WRITE 1
+#define LED_BLINK_ON_WRITE 0
 
 
 #if GPIO_CD_REVERSED
@@ -122,7 +122,6 @@ static uint32_t currentInt = GPIO_INT_MASK; /* current interrupt pin state */
 
 static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
-
 /*
  * RP2040 exclusive GPIO interrupt callback for PROC1
  * Called whenever CSR or CSW changes and reads or writes the data
@@ -131,10 +130,10 @@ static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
  */
 void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
+  uint32_t gpios = sio_hw->gpio_in;
+
   /* interrupt handled */
   iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
-
-  uint32_t gpios = sio_hw->gpio_in;
 
   if ((gpios & GPIO_CSR_MASK) == 0) /* read? */
   {
@@ -142,7 +141,7 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
 
     if (gpios & GPIO_MODE_MASK) /* read status register */
     {
-      sio_hw->gpio_out = ((uint32_t)REVERSE(vrEmuTms9918ReadStatus(tms)) << GPIO_CD0) | GPIO_INT_MASK;
+      sio_hw->gpio_out = ((uint32_t)REVERSE(vrEmuTms9918ReadStatus(tms)) << GPIO_CD0) | currentInt;
       currentInt = GPIO_INT_MASK;
     }
     else /* read data */
@@ -269,9 +268,16 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 
   /*** main display region ***/
+  irq_set_mask_enabled(1u << IO_IRQ_BANK0, false);
+  uint8_t status = vrEmuTms9918PeekStatus(tms);
+  irq_set_mask_enabled(1u << IO_IRQ_BANK0, true);
 
   /* generate the scanline */
-  vrEmuTms9918ScanLine(tms, y, tmsScanlineBuffer);
+  status = vrEmuTms9918ScanLine(tms, y, tmsScanlineBuffer, status);
+
+  irq_set_mask_enabled(1u << IO_IRQ_BANK0, false);
+  vrEmuTms9918SetStatus(tms, (status & 0x7f) | (currentInt ? 0 : 0x80));
+  irq_set_mask_enabled(1u << IO_IRQ_BANK0, true);
 
   /* convert from tms palette to bgr12 */
   int tmsX = 0;
