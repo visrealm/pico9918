@@ -22,7 +22,6 @@
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
-#include "pico/stdlib.h"
 
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
@@ -80,7 +79,7 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#define GPIO_CD_REVERSED 0
+#define GPIO_CD_REVERSED 0  /* unset for v0.3 PCB */
 #define LED_BLINK_ON_WRITE 1
 
 
@@ -301,8 +300,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** interrupt signal? ***/
   if (y == TMS9918_PIXELS_Y - 1)
   {
+    irq_set_mask_enabled(1u << IO_IRQ_BANK0, false);
+    vrEmuTms9918InterruptSet(tms);
     currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
     gpio_put(GPIO_INT, !!currentInt);
+    irq_set_mask_enabled(1u << IO_IRQ_BANK0, true);
   }
 }
 
