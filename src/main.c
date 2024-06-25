@@ -293,7 +293,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
     {
-      pixels[x] = pixels[x + 1] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX] & 0x0f];
+      pixels[x] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX] & 0x0f];
+      pixels[x + 1] = pixels[x];
     }
   }
 

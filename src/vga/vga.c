@@ -356,7 +356,7 @@ static void initDma()
 /*
  * main vga loop
  */
-void vgaLoop()
+void __time_critical_func(vgaLoop)()
 {
   if (vgaParams.initFn)
   {

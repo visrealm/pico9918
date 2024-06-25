@@ -2,6 +2,7 @@
   "files.associations": {
     "*.md": "markdown",
     "xtr1common": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "multicore.h": "c"
   }
 }
