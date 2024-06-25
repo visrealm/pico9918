@@ -8,9 +8,11 @@ include(visrealm_tools.cmake)
 
 set(BUILD_SHARED_LIBS OFF)
 
-set(PROJECT pico-prom)
+set(PROJECT pico9918)
 
 project(${PROJECT} C CXX)
+
+add_definitions(-DPICO_BUILD)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
@@ -18,7 +20,7 @@ set(CMAKE_CXX_STANDARD 17)
 # Initialize the Pico SDK
 pico_sdk_init()
 
+add_subdirectory(submodules/vrEmuTms9918)
 add_subdirectory(src)
 add_subdirectory(test)
-add_subdirectory(submodules/vrEmuTms9918)
 

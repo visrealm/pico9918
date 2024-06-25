@@ -26,6 +26,21 @@ function(visrealm_generate_image_source TARGET DST ROMSRC)
   target_sources(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${DST}.c)
 endfunction()
 
+# custom function to generate source code from images using tools/img2carray.py
+function(visrealm_generate_image_source_ram TARGET DST RAMSRC)
+  set(fullSrc ${CMAKE_CURRENT_SOURCE_DIR}/${RAMSRC})
+  cmake_path(GET fullSrc PARENT_PATH srcPath)
+
+  add_custom_command(
+      OUTPUT ${DST}.c ${DST}.h
+      COMMAND ${PYTHON} ${IMG_CONV} -r ${CMAKE_CURRENT_SOURCE_DIR}/${RAMSRC} -o ${DST}.c
+      DEPENDS ${IMG_CONV} ${srcPath}
+  )
+  target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_sources(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${DST}.c)
+endfunction()
+
+
 
 
 # custom function to generate source code from images using tools/img2carray.py

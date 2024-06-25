@@ -34,7 +34,7 @@ def main() -> int:
         '-o', '--out', help='output file - defaults to base input file name with .c extension')
     parser.add_argument('-r', '--ram', nargs='+', default='',
                         help='input file(s) to store in Pi Pico RAM - can use wildcards')
-    parser.add_argument('-i', '--in', nargs='+',
+    parser.add_argument('-i', '--in', nargs='+', default='',
                         help='input file(s) to store in Pi Pico ROM - can use wildcards')
     args = vars(parser.parse_args())
 
@@ -73,7 +73,6 @@ def main() -> int:
                          outHeaderFile, args, inRam=False)
 
     outSourceFile.close()
-    outHeaderFile.write("\n#endif")
     outHeaderFile.close()
 
     fileList = ""
@@ -118,8 +117,7 @@ def getFileHeader(fileName, romFileList, ramFileList, args, isHeaderFile) -> str
     if isHeaderFile:
         baseName = args['prefix'] + "_" + os.path.basename(fileName)
         sanitizedFile = re.sub('[^0-9a-zA-Z]+', '_', baseName.upper())
-        hdrText += f"#ifndef _{sanitizedFile}\n"
-        hdrText += f"#define _{sanitizedFile}\n\n"
+        hdrText += f"#pragma once\n\n"
     else:
         hdrText += "#include \"pico/platform.h\"\n"
     hdrText += "#include <inttypes.h>"
@@ -271,7 +269,6 @@ def processImageFile(infile, srcOutput, hdrOutput, args, inRam) -> None:
 
     if closeFile:
         srcOutput.close()
-        hdrOutput.write("\n#endif")
         hdrOutput.close()
 
     return

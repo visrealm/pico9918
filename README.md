@@ -8,11 +8,11 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 
 ## Hardware
 
-Gerbers will be released soon once I validate the v0.3 PCB. The next stage will be to shrink it down, by including the RP2040 directly, rather than pluggin in an external Pi PIco module.
+v0.3 Schematic and Gerber available now. This revision has been tested on my two TI-99/4As (PAL and NTSC) and my HBC-56 and is fully functional, however it is not representative of the final PCB design which will include the RP2040 directoly on the PCB.
 
-v0.3 Schematic is available now, however this revision has not yet been tested.
+<p align="left"><a href="pcb/v0.3/pico9918_v0_3_schematic.png"><img src="pcb/v0.3/pico9918_v0_3_schematic.png" alt="PICO9918 v0.3" width="720px"></a></p>
 
-<p align="left"><a href="pcb/schematic_v0_3.png"><img src="pcb/schematic_v0_3.png" alt="PICO9918 v0.3" width="720px"></a></p>
+<p align="left"><a href="pcb/v0.3/pico9918_v0_3_pcb.png"><img src="pcb/v0.3/pico9918_v0_3_pcb.png" alt="PICO9918 v0.3" width="720px"></a></p>
 
 ### Raspberry Pi Pico Module
 
