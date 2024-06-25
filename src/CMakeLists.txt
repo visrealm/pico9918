@@ -13,8 +13,10 @@ visrealm_generate_image_source_ram(${PROGRAM} splash res/splash.png )
 pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/clocks.pio)
 
 pico_add_extra_outputs(${PROGRAM})
+pico_enable_stdio_usb(${PROGRAM} 0)
+pico_enable_stdio_uart(${PROGRAM} 0)
 
-pico_set_binary_type(${PROGRAM} no_flash)
+#pico_set_binary_type(${PROGRAM} copy_to_ram)   # TOO SLOW TO BOOT
 
 target_link_libraries(${PROGRAM} PUBLIC
         pico_stdlib
