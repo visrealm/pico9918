@@ -8,7 +8,7 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 
 ## Hardware
 
-v0.3 Schematic and Gerber available now. This revision has been tested on my two TI-99/4As (PAL and NTSC) and my HBC-56 and is fully functional, however it is not representative of the final PCB design which will include the RP2040 directoly on the PCB.
+v0.3 Schematic and Gerber available now. This revision has been tested on my two TI-99/4As (PAL and NTSC) and my HBC-56 and is fully functional, however it is not representative of the final PCB design which will include the RP2040 directly on the PCB.
 
 <p align="left"><a href="pcb/v0.3/pico9918_v0_3_schematic.png"><img src="pcb/v0.3/pico9918_v0_3_schematic.png" alt="PICO9918 v0.3" width="720px"></a></p>
 
