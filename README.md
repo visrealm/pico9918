@@ -2,7 +2,9 @@
 
 A drop-in replacement for a classic TMS9918A VDP using a Raspberry Pi Pico.
 
-Currently in the early prototyping stages, but looks very promising.
+Currently in the early prototyping stages, but looks very promising on my TI-99/4A and [HBC-56](https://github.com/visrealm/hbc-56) test beds.
+
+The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here.
 
 ## Hardware
 
@@ -33,6 +35,9 @@ These videos are showing the v0.2 hardware with an external Pi Pico providing th
 
 ### Don't mess with Texas!
 [![PICO9918 Prototype - Don't mess with Texas](https://img.visualrealmsoftware.com/youtube/thumb/ljNRFKbOGJs)](https://youtu.be/ljNRFKbOGJs)
+
+### 80 column mode
+[![PICO9918 Prototype - 80 column mode test](https://img.visualrealmsoftware.com/youtube/thumb/qdCapu0CVJ8)](https://youtu.be/qdCapu0CVJ8)
 
 ## License
 This code is licensed under the [MIT](https://opensource.org/licenses/MIT "MIT") license
