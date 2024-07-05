@@ -78,6 +78,11 @@
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
 #define GPIO_LED_MASK (0x01 << GPIO_LED)
 
+#define GPIO_IRQ_READ_DATA   ((GPIO_CSW_MASK) >> GPIO_CSR)
+#define GPIO_IRQ_READ_STATUS ((GPIO_CSW_MASK | GPIO_MODE_MASK) >> GPIO_CSR)
+#define GPIO_IRQ_WRITE_DATA  ((GPIO_CSR_MASK) >> GPIO_CSR)
+#define GPIO_IRQ_WRITE_REG   ((GPIO_CSR_MASK | GPIO_MODE_MASK) >> GPIO_CSR)
+
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
 #define LED_BLINK_ON_WRITE 0
@@ -88,7 +93,6 @@ static VrEmuTms9918* tms = NULL;  /* our vrEmuTms9918 instance handle */
 static uint32_t nextValue = 0; /* TMS9918A read-ahead value */
 static uint32_t currentInt = GPIO_INT_MASK; /* current interrupt pin state */
 static uint32_t currentStatus = 0; /* current status register value */
-static uint32_t currentStatusInt = 0; /* TMS9918A read-ahead value */
 static uint32_t nextValueInt = 0; /* TMS9918A read-ahead value */
 
 static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
@@ -117,90 +121,43 @@ static inline void disableGpioInterrupts()
  *
  * Note: This needs to be extremely responsive. No dilly-dallying here.
  */
-void test_irq();
-
-#define XXX (&iobank0_hw->intr - iobank0_hw)
 
 void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
   switch ((sio_hw->gpio_in >> GPIO_CSR) & 0x07)
   {
-    case 1:
+    case GPIO_IRQ_WRITE_DATA:
       iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
       vrEmuTms9918WriteData(tms, sio_hw->gpio_in >> GPIO_CD0);
       break;
-    case 2:
+
+    case GPIO_IRQ_READ_DATA:
       sio_hw->gpio_oe_set = GPIO_CD_MASK;
       sio_hw->gpio_out = nextValueInt;
       iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
       vrEmuTms9918ReadData(tms);
       break;
-    case 5:
+
+    case GPIO_IRQ_WRITE_REG:
       iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
       vrEmuTms9918WriteAddr(tms, sio_hw->gpio_in >> GPIO_CD0);
       currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
-      currentStatusInt = currentStatus | currentInt;
       break;
-    case 6:
+
+    case GPIO_IRQ_READ_STATUS:
       sio_hw->gpio_oe_set = GPIO_CD_MASK;
       sio_hw->gpio_out = currentStatus | GPIO_INT_MASK;
       iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
       currentStatus = vrEmuTms9918ReadStatus(tms) << GPIO_CD0;
       currentInt = GPIO_INT_MASK;
-      currentStatusInt = currentStatus | currentInt;
       break;
+
     default:
       iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+      sio_hw->gpio_oe_clr = GPIO_CD_MASK;
+      sio_hw->gpio_out = currentInt;
       break;
   }
-  /*
-    if ((gpio & GPIO_CSR_MASK) == 0) // read?
-    {
-      //iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u] & (GPIO_IRQ_EDGE_FALL << ((GPIO_CSR & 0x07) << 2));
-      sio_hw->gpio_oe_set = GPIO_CD_MASK;
-
-      if (gpio & GPIO_MODE_MASK) // read status register
-  {
-    sio_hw->gpio_out = currentStatus | currentInt;
-    currentStatus = vrEmuTms9918ReadStatus(tms) << GPIO_CD0;
-    currentInt = GPIO_INT_MASK;
-  }
-    else // read data
-    {
-      sio_hw->gpio_out = nextValue | currentInt;
-      vrEmuTms9918ReadData(tms);
-    }
-}
-  else if ((gpio & GPIO_CSW_MASK) == 0)  // write?
-  {
-    //iobank0_hw->intr[GPIO_CSW >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSW >> 3u] & (GPIO_IRQ_EDGE_FALL << ((GPIO_CSW & 0x07) << 2));
-    uint8_t value = gpio >> GPIO_CD0;
-
-    if (gpio & GPIO_MODE_MASK) // write register/address
-    {
-      vrEmuTms9918WriteAddr(tms, value);
-
-      currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
-      sio_hw->gpio_out = nextValue | currentInt;
-    }
-    else // write data
-    {
-      vrEmuTms9918WriteData(tms, value);
-
-#if LED_BLINK_ON_WRITE
-      sio_hw->gpio_out = GPIO_LED_MASK | currentInt;
-#endif
-    }
-  }
-  else // both CSR and CSW are high (inactive). Go High-Z
-  {
-    //iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u]
-//      & ((GPIO_IRQ_EDGE_RISE << ((GPIO_CSR & 0x07) << 2)) & (GPIO_IRQ_EDGE_RISE << ((GPIO_CSW & 0x07) << 2)));
-
-sio_hw->gpio_oe_clr = GPIO_CD_MASK;
-sio_hw->gpio_out = currentInt;
-  }
-  */
 
   /* update read-ahead */
   nextValue = vrEmuTms9918ReadDataNoInc(tms) << GPIO_CD0;
@@ -280,7 +237,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     if (!currentInt) newStatus |= 0x80;
     vrEmuTms9918SetStatus(tms, newStatus);
     currentStatus = newStatus << GPIO_CD0;
-    currentStatusInt = currentStatus | currentInt;
     //    enableGpioInterrupts();
   }
 
@@ -318,7 +274,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     vrEmuTms9918InterruptSet(tms);
     currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
     currentStatus |= 0x80 << GPIO_CD0;
-    currentStatusInt = currentStatus | currentInt;
     nextValueInt = nextValue | currentInt;
     gpio_put(GPIO_INT, !!currentInt);
     //enableGpioInterrupts();
@@ -390,9 +345,9 @@ int main(void)
    * that comes close to being divisible by 25.175MHz. 252.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
-  vreg_set_voltage(VREG_VOLTAGE_1_25);
-  set_sys_clock_khz(315000, false);
-  //set_sys_clock_khz(252000, false);
+  vreg_set_voltage(VREG_VOLTAGE_1_20);
+  //set_sys_clock_khz(315000, false);
+  set_sys_clock_khz(252000, false);
   //set_sys_clock_khz(126000, false);
 
   /* we need one of these. it's the main guy */
