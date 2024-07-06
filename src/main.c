@@ -78,11 +78,6 @@
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
 #define GPIO_LED_MASK (0x01 << GPIO_LED)
 
-#define GPIO_IRQ_READ_DATA   ((GPIO_CSW_MASK) >> GPIO_CSR)
-#define GPIO_IRQ_READ_STATUS ((GPIO_CSW_MASK | GPIO_MODE_MASK) >> GPIO_CSR)
-#define GPIO_IRQ_WRITE_DATA  ((GPIO_CSR_MASK) >> GPIO_CSR)
-#define GPIO_IRQ_WRITE_REG   ((GPIO_CSR_MASK | GPIO_MODE_MASK) >> GPIO_CSR)
-
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
 #define LED_BLINK_ON_WRITE 0
@@ -116,30 +111,54 @@ static inline void disableGpioInterrupts()
 }
 
 /*
+ * mark the interrupt as handled.
+ * Note: all relevant GPIO pins are in the same group
+ */
+static inline void gpioInterruptHandled()
+{
+  iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+}
+
+/*
  * RP2040 exclusive GPIO interrupt callback for PROC1
  * Called whenever CSR or CSW changes and reads or writes the data
  *
  * Note: This needs to be extremely responsive. No dilly-dallying here.
+ *       This function isn't pretty, but is done this way to guide
+ *       gcc in producing optimized assembly. I considered writing
+ *       this in assembly, but decided on this instead.
  */
 
 void __time_critical_func(gpioExclusiveCallbackProc1)()
 {
+
+  // shift the bit mask combos down to lowest significant bits
+  const int GPIO_IRQ_READ_DATA = (GPIO_CSW_MASK) >> GPIO_CSR;
+  const int GPIO_IRQ_READ_STATUS = (GPIO_CSW_MASK | GPIO_MODE_MASK) >> GPIO_CSR;
+  const int GPIO_IRQ_WRITE_DATA = (GPIO_CSR_MASK) >> GPIO_CSR;
+  const int GPIO_IRQ_WRITE_REG = (GPIO_CSR_MASK | GPIO_MODE_MASK) >> GPIO_CSR;
+
+  // test the MODE, /CSW and /CSR pins to determine which action to take
+  // shifting them down to bits 2, 1 and 0 respectively rather than testing
+  // them at the higher bit range since ARM can only load 8-bit immediate
+  // values in one cycle to compare
+
   switch ((sio_hw->gpio_in >> GPIO_CSR) & 0x07)
   {
     case GPIO_IRQ_WRITE_DATA:
-      iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+      gpioInterruptHandled();
       vrEmuTms9918WriteData(tms, sio_hw->gpio_in >> GPIO_CD0);
       break;
 
     case GPIO_IRQ_READ_DATA:
       sio_hw->gpio_oe_set = GPIO_CD_MASK;
       sio_hw->gpio_out = nextValueInt;
-      iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+      gpioInterruptHandled();
       vrEmuTms9918ReadData(tms);
       break;
 
     case GPIO_IRQ_WRITE_REG:
-      iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+      gpioInterruptHandled();
       vrEmuTms9918WriteAddr(tms, sio_hw->gpio_in >> GPIO_CD0);
       currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
       break;
@@ -147,13 +166,13 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
     case GPIO_IRQ_READ_STATUS:
       sio_hw->gpio_oe_set = GPIO_CD_MASK;
       sio_hw->gpio_out = currentStatus | GPIO_INT_MASK;
-      iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+      gpioInterruptHandled();
       currentStatus = vrEmuTms9918ReadStatus(tms) << GPIO_CD0;
       currentInt = GPIO_INT_MASK;
       break;
 
     default:
-      iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
+      gpioInterruptHandled();
       sio_hw->gpio_oe_clr = GPIO_CD_MASK;
       sio_hw->gpio_out = currentInt;
       break;
@@ -172,6 +191,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 {
 
 #if 1
+  // better compile-time optimizations if we hard-code these
 #define VIRTUAL_PIXELS_X 640
 #define VIRTUAL_PIXELS_Y 240
 #else 
@@ -193,7 +213,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       pixels[x] = bg;
     }
 
-
     /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
      * size  : 172px x 10px
      *       : 3440 bytes
@@ -202,10 +221,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     if (y >= vBorder + TMS9918_PIXELS_Y + 12)
     {
       y -= vBorder + TMS9918_PIXELS_Y + 12;
-      if (y < 10)
+      if (y < splashHeight)
       {
-        uint16_t* splashPtr = splash + (y * 172);
-        for (int x = 4; x < 4 + 172; ++x)
+        uint16_t* splashPtr = splash + (y * splashWidth);
+        for (int x = 4; x < 4 + splashWidth; ++x)
         {
           uint16_t c = *(splashPtr++);
           if (c & 0xf000)
@@ -231,16 +250,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   /* generate the scanline */
   uint8_t newStatus = vrEmuTms9918ScanLine(tms, y, tmsScanlineBuffer, currentStatus >> GPIO_CD0) & 0x7f;
-  //  if (vrEmuTms9918DisplayEnabled(tms))
-  {
-    //  disableGpioInterrupts();
-    if (!currentInt) newStatus |= 0x80;
-    vrEmuTms9918SetStatus(tms, newStatus);
-    currentStatus = newStatus << GPIO_CD0;
-    //    enableGpioInterrupts();
-  }
-
-
+  if (!currentInt) newStatus |= 0x80;
+  vrEmuTms9918SetStatus(tms, newStatus);
+  currentStatus = newStatus << GPIO_CD0;
 
   /* convert from tms palette to bgr12 */
   int tmsX = 0;
@@ -270,13 +282,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** interrupt signal? ***/
   if (y == TMS9918_PIXELS_Y - 1)
   {
-    //disableGpioInterrupts();
     vrEmuTms9918InterruptSet(tms);
     currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
     currentStatus |= 0x80 << GPIO_CD0;
     nextValueInt = nextValue | currentInt;
     gpio_put(GPIO_INT, !!currentInt);
-    //enableGpioInterrupts();
   }
 }
 

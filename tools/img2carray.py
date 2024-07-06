@@ -117,7 +117,7 @@ def getFileHeader(fileName, romFileList, ramFileList, args, isHeaderFile) -> str
     if isHeaderFile:
         baseName = args['prefix'] + "_" + os.path.basename(fileName)
         sanitizedFile = re.sub('[^0-9a-zA-Z]+', '_', baseName.upper())
-        hdrText += f"#pragma once\n\n"
+        hdrText += f"#pragma once\n"
     else:
         hdrText += "#include \"pico/platform.h\"\n"
     hdrText += "#include <inttypes.h>"
@@ -195,6 +195,11 @@ def generateProto(varName, src, inRam, isHeader) -> str:
 
     # output the image array prototype
     proto += typePrefix + dataType + varNamePrefix + varName + "[]" + suffix
+    if isHeader:
+      proto += "\nconst int " + varNamePrefix + varName + \
+          "Width = " + str(src.width) + ";\n"
+      proto += "const int " + varNamePrefix + varName + \
+          "Height = " + str(src.height) + ";\n"
     return proto
 
 

@@ -16,6 +16,8 @@ pico_add_extra_outputs(${PROGRAM})
 pico_enable_stdio_usb(${PROGRAM} 0)
 pico_enable_stdio_uart(${PROGRAM} 0)
 
+add_compile_options(-O3 -g3)
+
 #pico_set_binary_type(${PROGRAM} copy_to_ram)   # TOO SLOW TO BOOT
 
 target_link_libraries(${PROGRAM} PUBLIC

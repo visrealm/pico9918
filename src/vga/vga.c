@@ -38,9 +38,8 @@
 #define END_OF_SCANLINE_MSG 0x40000000
 #define END_OF_FRAME_MSG 0x80000000
 
-#define CRT_EFFECT 0
+#define CRT_EFFECT 1
 #define SCANLINE_TIME_DEBUG 0
-
 
  /*
   * sync pio dma data buffers
@@ -89,7 +88,6 @@ static bool buildSyncData()
 
   if (sysClockKHz < minClockKHz)
   {
-    printf("Error: System clock is %d KHz. Minimum required is %d KHz\n", sysClockKHz, minClockKHz);
     return false;
   }
 
@@ -291,14 +289,14 @@ static void __time_critical_func(dmaIrqHandler)(void)
     divmod_result_t pxLineVal = divmod_u32u32(currentDisplayLine++, vgaParams.params.vPixelScale);
     uint32_t pxLine = to_quotient_u32(pxLineVal);
     uint32_t pxLineRpt = to_remainder_u32(pxLineVal);
-    uint16_t* currentBuffer = rgbDataBuffer[pxLine & 0x01];
+    uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
 
 #if CRT_EFFECT
     if (pxLineRpt != 0)
     {
-      for (int i = 0; i < 10; ++i)
+      for (int i = 0; i < 5; ++i)
       {
-        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x0777;
+        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }
     }
 #endif
@@ -306,7 +304,7 @@ static void __time_critical_func(dmaIrqHandler)(void)
 #if SCANLINE_TIME_DEBUG
     if (pxLineRpt != 0 && hasRenderedNext)
     {
-      currentBuffer = rgbDataBuffer[2];
+      currentBuffer = (uint32_t*)rgbDataBuffer[2];
     }
 #endif
 
@@ -332,9 +330,10 @@ static void __time_critical_func(dmaIrqHandler)(void)
 #if CRT_EFFECT
     else
     {
-      for (int i = 10; i < vgaParams.params.hVirtualPixels; ++i)
+      int end = vgaParams.params.hVirtualPixels / 2;
+      for (int i = 5; i < end; ++i)
       {
-        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x0777;
+        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }
     }
 #endif
@@ -353,6 +352,7 @@ static void initDma()
   dma_channel_start(rgbDmaChan);
 }
 
+
 /*
  * main vga loop
  */
@@ -362,6 +362,7 @@ void __time_critical_func(vgaLoop)()
   {
     vgaParams.initFn();
   }
+
 
   uint64_t frameNumber = 0;
   while (1)
