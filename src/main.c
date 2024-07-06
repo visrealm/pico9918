@@ -84,7 +84,6 @@
 
   /* file globals */
 
-static VrEmuTms9918* tms = NULL;  /* our vrEmuTms9918 instance handle */
 static uint32_t nextValue = 0; /* TMS9918A read-ahead value */
 static uint32_t currentInt = GPIO_INT_MASK; /* current interrupt pin state */
 static uint32_t currentStatus = 0; /* current status register value */
@@ -147,27 +146,27 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
   {
     case GPIO_IRQ_WRITE_DATA:
       gpioInterruptHandled();
-      vrEmuTms9918WriteData(tms, sio_hw->gpio_in >> GPIO_CD0);
+      vrEmuTms9918WriteData(sio_hw->gpio_in >> GPIO_CD0);
       break;
 
     case GPIO_IRQ_READ_DATA:
       sio_hw->gpio_oe_set = GPIO_CD_MASK;
       sio_hw->gpio_out = nextValueInt;
       gpioInterruptHandled();
-      vrEmuTms9918ReadData(tms);
+      vrEmuTms9918ReadData();
       break;
 
     case GPIO_IRQ_WRITE_REG:
       gpioInterruptHandled();
-      vrEmuTms9918WriteAddr(tms, sio_hw->gpio_in >> GPIO_CD0);
-      currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
+      vrEmuTms9918WriteAddr(sio_hw->gpio_in >> GPIO_CD0);
+      currentInt = vrEmuTms9918InterruptStatus() ? 0 : GPIO_INT_MASK;
       break;
 
     case GPIO_IRQ_READ_STATUS:
       sio_hw->gpio_oe_set = GPIO_CD_MASK;
       sio_hw->gpio_out = currentStatus | GPIO_INT_MASK;
       gpioInterruptHandled();
-      currentStatus = vrEmuTms9918ReadStatus(tms) << GPIO_CD0;
+      currentStatus = vrEmuTms9918ReadStatus() << GPIO_CD0;
       currentInt = GPIO_INT_MASK;
       break;
 
@@ -179,7 +178,7 @@ void __time_critical_func(gpioExclusiveCallbackProc1)()
   }
 
   /* update read-ahead */
-  nextValue = vrEmuTms9918ReadDataNoInc(tms) << GPIO_CD0;
+  nextValue = vrEmuTms9918ReadDataNoInc() << GPIO_CD0;
   nextValueInt = nextValue | currentInt;
 }
 
@@ -203,7 +202,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
-  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(tms, TMS_REG_FG_BG_COLOR) & 0x0f];
+  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
@@ -249,12 +248,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** main display region ***/
 
   /* generate the scanline */
-  uint8_t newStatus = vrEmuTms9918ScanLine(tms, y, tmsScanlineBuffer, currentStatus >> GPIO_CD0) & 0x7f;
+  uint8_t newStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer, currentStatus >> GPIO_CD0) & 0x7f;
   if (!currentInt) newStatus |= 0x80;
-  vrEmuTms9918SetStatus(tms, newStatus);
+  vrEmuTms9918SetStatus(newStatus);
   currentStatus = newStatus << GPIO_CD0;
 
-  /* convert from tms palette to bgr12 */
+  /* convert from  palette to bgr12 */
   int tmsX = 0;
   if (tmsScanlineBuffer[0] & 0xf0)
   {
@@ -282,8 +281,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** interrupt signal? ***/
   if (y == TMS9918_PIXELS_Y - 1)
   {
-    vrEmuTms9918InterruptSet(tms);
-    currentInt = vrEmuTms9918InterruptStatus(tms) ? 0 : GPIO_INT_MASK;
+    vrEmuTms9918InterruptSet();
+    currentInt = vrEmuTms9918InterruptStatus() ? 0 : GPIO_INT_MASK;
     currentStatus |= 0x80 << GPIO_CD0;
     nextValueInt = nextValue | currentInt;
     gpio_put(GPIO_INT, !!currentInt);
@@ -361,7 +360,7 @@ int main(void)
   //set_sys_clock_khz(126000, false);
 
   /* we need one of these. it's the main guy */
-  tms = vrEmuTms9918New();
+   vrEmuTms9918Init();
 
   /* set up the GPIO pins and interrupt handler */
   multicore_launch_core1(proc1Entry);
