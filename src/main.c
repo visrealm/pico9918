@@ -292,12 +292,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
   {
-    /*
     for (int x = 0; x < VIRTUAL_PIXELS_X; ++x)
     {
       pixels[x] = bg;
     }
-
+/*
     if (y < vBorder)
     {
       uint32_t writeVal = writeVals[y & 0x0f];
