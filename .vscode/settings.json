@@ -3,6 +3,8 @@
     "*.md": "markdown",
     "xtr1common": "c",
     "stdlib.h": "c",
-    "multicore.h": "c"
+    "multicore.h": "c",
+    "stdio.h": "c",
+    "tms9918.pio.h": "c"
   }
 }

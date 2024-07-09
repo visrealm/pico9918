@@ -13,17 +13,17 @@
 #include "vga.pio.h"
 #include "pio_utils.h"
 
-#include "pico/divider.h"
+ //#include "pico/divider.h"
 #include "pico/multicore.h"
 
 #include "hardware/dma.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+ //#include <math.h>
+ //#include <stdio.h>
+ //#include <string.h>
+ //#include <stdlib.h>
 
 #define SYNC_PINS_START 0        // first sync pin gpio number
 #define SYNC_PINS_COUNT 2        // number of sync pins (h and v)
@@ -41,14 +41,32 @@
 #define CRT_EFFECT 1
 #define SCANLINE_TIME_DEBUG 0
 
- /*
-  * sync pio dma data buffers
-  */
+#if 1
+#define VIRTUAL_PIXELS_X 640
+#define VIRTUAL_PIXELS_Y 240
+#else
+#define VIRTUAL_PIXELS_X vgaParams.params.hVirtualPixels
+#define VIRTUAL_PIXELS_Y vgaParams.params.vVirtualPixels
+#endif
+
+int roundflt(float x)
+{
+  if (x < 0.0f)
+    return (int)(x - 0.5f);
+  else
+    return (int)(x + 0.5f);
+}
+
+#define round roundflt
+
+/*
+ * sync pio dma data buffers
+ */
 uint32_t __aligned(4) syncDataActive[4];  // active display area
 uint32_t __aligned(4) syncDataPorch[4];   // vertical porch
 uint32_t __aligned(4) syncDataSync[4];    // vertical sync
 
-uint16_t* __aligned(4) rgbDataBuffer[2 + SCANLINE_TIME_DEBUG] = { 0 };       // two scanline buffers (odd and even)
+uint16_t __aligned(4) rgbDataBuffer[2 + SCANLINE_TIME_DEBUG][640 * sizeof(uint16_t)] = { 0 };       // two scanline buffers (odd and even)
 
 /*
  * file scope
@@ -91,11 +109,11 @@ static bool buildSyncData()
     return false;
   }
 
-  rgbDataBuffer[0] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
-  rgbDataBuffer[1] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
+  //rgbDataBuffer[0] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
+  //rgbDataBuffer[1] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
 
 #if SCANLINE_TIME_DEBUG
-  rgbDataBuffer[2] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
+  //rgbDataBuffer[2] = malloc(vgaParams.params.hVirtualPixels * sizeof(uint16_t));
 
   for (int i = 0; i < vgaParams.params.hVirtualPixels; ++i)
     rgbDataBuffer[2][i] = 0x0f00;
@@ -178,7 +196,7 @@ static void vgaInitSync()
   pio_sm_init(VGA_PIO, SYNC_SM, syncProgOffset, &syncConfig);
 
   // initialise sync dma
-  syncDmaChan = dma_claim_unused_channel(true);
+  syncDmaChan = 0;//dma_claim_unused_channel(true);
   syncDmaChanMask = 0x01 << syncDmaChan;
   dma_channel_config syncDmaChanConfig = dma_channel_get_default_config(syncDmaChan);
   channel_config_set_transfer_data_size(&syncDmaChanConfig, DMA_SIZE_32);           // transfer 32 bits at a time
@@ -201,7 +219,10 @@ static void vgaInitRgb()
 
   // copy the rgb program and set the appropriate pixel delay
   uint16_t rgbProgramInstr[vga_rgb_program.length];
-  memcpy(rgbProgramInstr, vga_rgb_program.instructions, sizeof(rgbProgramInstr));
+  for (int i = 0; i < vga_rgb_program.length; ++i)
+  {
+    rgbProgramInstr[i] = vga_rgb_program.instructions[i];
+  }
   rgbProgramInstr[vga_rgb_DELAY_INSTR] |= pio_encode_delay(rgbCyclesPerPixel - vga_rgb_LOOP_TICKS);
 
   pio_program_t rgbProgram = {
@@ -218,7 +239,7 @@ static void vgaInitRgb()
 
   // add rgb pio program
   pio_sm_set_consecutive_pindirs(VGA_PIO, RGB_SM, RGB_PINS_START, RGB_PINS_COUNT, true);
-  pio_set_y(VGA_PIO, RGB_SM, vgaParams.params.hVirtualPixels - 1);
+  pio_set_y(VGA_PIO, RGB_SM, VIRTUAL_PIXELS_X - 1);
 
   uint rgbProgOffset = pio_add_program(VGA_PIO, &rgbProgram);
   pio_sm_config rgbConfig = vga_rgb_program_get_default_config(rgbProgOffset);
@@ -232,7 +253,7 @@ static void vgaInitRgb()
   pio_sm_init(VGA_PIO, RGB_SM, rgbProgOffset, &rgbConfig);
 
   // initialise rgb dma
-  rgbDmaChan = dma_claim_unused_channel(true);
+  rgbDmaChan = 1;//dma_claim_unused_channel(true);
   rgbDmaChanMask = 0x01 << rgbDmaChan;
   dma_channel_config rgbDmaChanConfig = dma_channel_get_default_config(rgbDmaChan);
   channel_config_set_transfer_data_size(&rgbDmaChanConfig, DMA_SIZE_16);  // transfer 16 bits at a time
@@ -241,14 +262,14 @@ static void vgaInitRgb()
   channel_config_set_dreq(&rgbDmaChanConfig, pio_get_dreq(VGA_PIO, RGB_SM, true));
 
   // setup the dma channel and set it going
-  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], vgaParams.params.hVirtualPixels, false);
+  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], VIRTUAL_PIXELS_X, false);
   dma_channel_set_irq0_enabled(rgbDmaChan, true);
 }
 
 /*
  * dma interrupt handler
  */
-static void __time_critical_func(dmaIrqHandler)(void)
+static void __isr __time_critical_func(dmaIrqHandler)(void)
 {
   static int currentTimingLine = -1;
   static int currentDisplayLine = -1;
@@ -286,10 +307,11 @@ static void __time_critical_func(dmaIrqHandler)(void)
   {
     dma_hw->ints0 = rgbDmaChanMask;
 
-    divmod_result_t pxLineVal = divmod_u32u32(currentDisplayLine++, vgaParams.params.vPixelScale);
-    uint32_t pxLine = to_quotient_u32(pxLineVal);
-    uint32_t pxLineRpt = to_remainder_u32(pxLineVal);
+    //divmod_result_t pxLineVal = divmod_u32u32(, vgaParams.params.vPixelScale);
+    uint32_t pxLine = currentDisplayLine >> 1;
+    uint32_t pxLineRpt = currentDisplayLine & 0x01;
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
+    currentDisplayLine++;
 
 #if CRT_EFFECT
     if (pxLineRpt != 0)
@@ -315,14 +337,14 @@ static void __time_critical_func(dmaIrqHandler)(void)
     if ((pxLineRpt == 0))
     {
       uint32_t requestLine = pxLine + 1;
-      if (requestLine >= vgaParams.params.vVirtualPixels) requestLine -= vgaParams.params.vVirtualPixels;
+      if (requestLine >= VIRTUAL_PIXELS_Y) requestLine -= VIRTUAL_PIXELS_Y;
 
       multicore_fifo_push_timeout_us(requestLine, 0);
 
 #if SCANLINE_TIME_DEBUG
       hasRenderedNext = false;
 #endif
-      if (requestLine == vgaParams.params.vVirtualPixels - 1)
+      if (requestLine == VIRTUAL_PIXELS_Y - 1)
       {
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
       }
@@ -330,7 +352,7 @@ static void __time_critical_func(dmaIrqHandler)(void)
 #if CRT_EFFECT
     else
     {
-      int end = vgaParams.params.hVirtualPixels / 2;
+      int end = VIRTUAL_PIXELS_X / 2;
       for (int i = 5; i < end; ++i)
       {
         currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
@@ -364,7 +386,7 @@ void __time_critical_func(vgaLoop)()
   }
 
 
-  uint64_t frameNumber = 0;
+  uint32_t frameNumber = 0;
   while (1)
   {
     uint32_t message = multicore_fifo_pop_blocking();
@@ -374,8 +396,8 @@ void __time_critical_func(vgaLoop)()
       if (vgaParams.endOfFrameFn)
       {
         vgaParams.endOfFrameFn(frameNumber);
+        ++frameNumber;
       }
-      ++frameNumber;
     }
     else if ((message & END_OF_SCANLINE_MSG) != 0)
     {

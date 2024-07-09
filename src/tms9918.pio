@@ -1,0 +1,50 @@
+/*
+ * Project: pico9918
+ *
+ * Copyright (c) 2024 Troy Schrapel
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico9918
+ *
+ */
+
+.program tmsRead
+  pull block
+  mov x, osr
+.wrap_target
+entry:
+  push           ; push the last type of data we read
+  irq set 1
+  wait 1 gpio 26   ; once CSR is high, change pindirs to inputs
+  mov osr, null
+  out pindirs, 8
+
+pullLoop:
+  pull noblock      ; continuously empty the rx fifo
+  mov x, osr        ; since we want the latest value
+  mov isr, pins       ; set y to CSR state
+  in y, 1
+  jmp y--, pullLoop ; still 1? loop, otherwise, let's read
+
+;  wait 0 gpio 26   ; wait for CSR to go low
+;  pull block
+  out pindirs, 8
+  jmp pin readStatus  ; if 'mode' is high, read status bits
+readData:
+  out pins, 8     ; output
+  mov isr, null   ; tell cpu we read data
+  jmp entry
+readStatus:  
+  out null, 8     ; skip data bits
+  out pins, 8     ; output
+  mov isr, !null  ; tell cpu we read status
+.wrap
+
+.program tmsWrite
+  wait 0 gpio 27
+  in pins, 16     ; auto-push
+  ;push
+  irq set 0 
+  wait 1 gpio 27
+.wrap
