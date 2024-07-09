@@ -138,7 +138,8 @@ static void updateTmsReadAhead()
   uint32_t readAhead = 0xff;      // pin direction
   readAhead |= nextValue << 8;
   readAhead |= currentStatus << 16;
-  pio_sm_exec(pio1, tmsReadSm, 0x8080);
+  //pio_sm_exec(pio1, tmsReadSm, 0x8080);
+  //pio_sm_exec(pio1, tmsReadSm, 0x8080);
   pio_sm_put(pio1, tmsReadSm, readAhead);
 }
 
@@ -244,7 +245,7 @@ void  __isr __scratch_x("isr") pio_irq_handler()
     readVals[nextReadVal++] = readVal;//0xf0f0f0f0;
     nextReadVal &= 0x0f;
 
-    if (readVal == 0) // data
+    if ((readVal & 0x04) == 0) // data
     {
       //
       vrEmuTms9918ReadDataImpl();
@@ -419,18 +420,18 @@ uint initClock(uint gpio, float freqHz)
 
   if (clocksPioOffset == -1)
   {
-    clocksPioOffset = pio_add_program(pio1, &clock_program);
+    clocksPioOffset = pio_add_program(pio0, &clock_program);
   }
 
   static uint clkSm = 2;//pio_claim_unused_sm(pio1, true);
-  clock_program_init(pio1, clkSm, clocksPioOffset, gpio);
+  clock_program_init(pio0, clkSm, clocksPioOffset, gpio);
 
   float clockDiv = (float)PICO_CLOCK_HZ / (TMS_CRYSTAL_FREQ_HZ * 10.0f);
 
-  pio_sm_set_clkdiv(pio1, clkSm, clockDiv);
-  pio_sm_set_enabled(pio1, clkSm, true);
+  pio_sm_set_clkdiv(pio0, clkSm, clockDiv);
+  pio_sm_set_enabled(pio0, clkSm, true);
 
-  pio_sm_put(pio1, clkSm, (uint)(PICO_CLOCK_HZ / clockDiv / (2.0f * freqHz)) - 3.0f);
+  pio_sm_put(pio0, clkSm, (uint)(PICO_CLOCK_HZ / clockDiv / (2.0f * freqHz)) - 3.0f);
 
   return clkSm++;
 }
@@ -459,7 +460,7 @@ void tmsPioInit()
   sm_config_set_jmp_pin(&readConfig, GPIO_MODE);
   sm_config_set_out_pins(&readConfig, GPIO_CD0, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // R shift, autopush @ 16 bits
-  sm_config_set_out_shift(&readConfig, false, false, 32); // R shift, autopush @ 16 bits
+  sm_config_set_out_shift(&readConfig, true, false, 32); // R shift, autopush @ 16 bits
 
   pio_sm_init(pio1, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(pio1, tmsReadSm, true);
