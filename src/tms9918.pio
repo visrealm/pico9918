@@ -14,9 +14,7 @@
   mov x, osr
 .wrap_target
 entry:
-  push           ; push the last type of data we read
-  irq set 1
-  wait 1 gpio 26 [10]   ; once CSR is high, change pindirs to inputs
+  wait 1 gpio 26    ; once CSR is high, change pindirs to inputs
   mov osr, null
   out pindirs, 8
 
@@ -26,26 +24,27 @@ pullLoop:
   mov isr, null
   in pins, 1
   mov y, isr
-  jmp y--, pullLoop ; still 1? loop, otherwise, let's read
+  jmp y--, pullLoop [31]; still 1? loop, otherwise, let's read
 
   out pindirs, 8
   jmp pin readStatus  ; if 'mode' is high, read status bits
 readData:
   out pins, 8     ; output
-  ;mov isr, null   ; tell cpu we read data
   in pins, 8
-  jmp entry
+  jmp endPart
 readStatus:  
   out null, 8     ; skip data bits
   out pins, 8     ; output
   in pins, 3
-;  mov isr, !null  ; tell cpu we read status
+endPart:
+  push     
+  irq set 1 [31]      ; push the last type of data we read
 .wrap
 
 .program tmsWrite
-  wait 0 gpio 27 [10]
+  wait 0 gpio 27  [31]
+  nop [10]
   in pins, 16     ; auto-push
-  ;push
   irq set 0 
-  wait 1 gpio 27 [10]
+  wait 1 gpio 27 [31]
 .wrap
