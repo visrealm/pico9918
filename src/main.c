@@ -129,8 +129,7 @@ static inline void gpioInterruptHandled()
   //iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
 }
 
-static
-uint16_t bg = 0;
+//static uint16_t bg = 0;
 
 
 static void updateTmsReadAhead()
@@ -284,15 +283,16 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
-  //uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
+  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   //if (y == 0) bg = 0;
-  if (currentInt) bg = 0x000f; else bg = 0x00f0;
+  //if (currentInt) bg = 0x000f; else bg = 0x00f0;
 
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
   {
+    /*
     for (int x = 0; x < VIRTUAL_PIXELS_X; ++x)
     {
       pixels[x] = bg;
@@ -324,12 +324,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
       }
     }
-
-    /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
-     * size  : 172px x 10px
-     *       : 3440 bytes
-     * format: 16bpp abgr image
-     *
+*/
+/* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
+ * size  : 172px x 10px
+ *       : 3440 bytes
+ * format: 16bpp abgr image
+ */
     if (y >= vBorder + TMS9918_PIXELS_Y + 12)
     {
       y -= vBorder + TMS9918_PIXELS_Y + 12;
@@ -346,7 +346,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
       }
     }
-    */
 
     return;
   }
@@ -444,6 +443,7 @@ void tmsPioInit()
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writeConfig, GPIO_CD0);
   sm_config_set_in_shift(&writeConfig, false, true/*true*/, 16); // R shift, autopush @ 16 bits
+  sm_config_set_clkdiv(&writeConfig, 4.0f);
 
   pio_sm_init(pio1, tmsWriteSm, tmsWriteProgram, &writeConfig);
   pio_sm_set_enabled(pio1, tmsWriteSm, true);
@@ -461,6 +461,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readConfig, GPIO_CD0, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // R shift, autopush @ 16 bits
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift, autopush @ 16 bits
+  sm_config_set_clkdiv(&readConfig, 4.0f);
 
   pio_sm_init(pio1, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(pio1, tmsReadSm, true);

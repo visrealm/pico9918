@@ -24,7 +24,7 @@ pullLoop:
   mov isr, null
   in pins, 1
   mov y, isr
-  jmp y--, pullLoop [31]; still 1? loop, otherwise, let's read
+  jmp y--, pullLoop; still 1? loop, otherwise, let's read
 
   out pindirs, 8
   jmp pin readStatus  ; if 'mode' is high, read status bits
@@ -38,13 +38,12 @@ readStatus:
   in pins, 3
 endPart:
   push     
-  irq set 1 [31]      ; push the last type of data we read
+  irq set 1      ; push the last type of data we read
 .wrap
 
 .program tmsWrite
-  wait 0 gpio 27  [31]
-  nop [10]
+  wait 0 gpio 27 [12]
   in pins, 16     ; auto-push
   irq set 0 
-  wait 1 gpio 27 [31]
+  wait 1 gpio 27 [12]
 .wrap
