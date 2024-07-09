@@ -19,13 +19,14 @@ entry:
   wait 1 gpio 26   ; once CSR is high, change pindirs to inputs
   mov osr, null
   out pindirs, 8
+  wait 0 gpio 26   ; once CSR is high, change pindirs to inputs
 
-pullLoop:
-  pull noblock      ; continuously empty the rx fifo
-  mov x, osr        ; since we want the latest value
-  mov isr, pins       ; set y to CSR state
-  in y, 1
-  jmp y--, pullLoop ; still 1? loop, otherwise, let's read
+;pullLoop:
+  pull block      ; continuously empty the rx fifo
+;  mov x, osr        ; since we want the latest value
+;  mov isr, pins       ; set y to CSR state
+;  in y, 1
+;  jmp y--, pullLoop ; still 1? loop, otherwise, let's read
 
 ;  wait 0 gpio 26   ; wait for CSR to go low
 ;  pull block
@@ -42,9 +43,9 @@ readStatus:
 .wrap
 
 .program tmsWrite
-  wait 0 gpio 27
+  wait 0 gpio 27 [10]
   in pins, 16     ; auto-push
   ;push
   irq set 0 
-  wait 1 gpio 27
+  wait 1 gpio 27 [10]
 .wrap

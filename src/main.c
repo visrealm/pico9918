@@ -138,6 +138,7 @@ static void updateTmsReadAhead()
   uint32_t readAhead = 0xff;      // pin direction
   readAhead |= nextValue << 8;
   readAhead |= currentStatus << 16;
+  pio_sm_exec(pio1, tmsReadSm, 0x8080);
   pio_sm_put(pio1, tmsReadSm, readAhead);
 }
 
@@ -213,9 +214,9 @@ int nextWriteVal = 0;
 
 void  __isr __scratch_x("isr") pio_irq_handler()
 {
-  if (pio_interrupt_get(pio1, 0)) // write?
+  if (pio1->irq & (1u << 0)) // write?
   {
-    uint32_t writeVal = pio_sm_get(pio1, tmsWriteSm);
+    uint32_t writeVal = pio1->rxf[tmsWriteSm];;//pio_sm_get(pio1, tmsWriteSm);
     writeVals[nextWriteVal++] = writeVal;
     nextWriteVal &= 0x0f;
 
@@ -228,18 +229,18 @@ void  __isr __scratch_x("isr") pio_irq_handler()
     }
     else // data
     {
-      bg |= 0x0f;
+      //bg |= 0x0f;
       vrEmuTms9918WriteDataImpl(writeVal & 0xff);
     }
 
     nextValue = vrEmuTms9918ReadDataNoIncImpl();
     updateTmsReadAhead();
 
-    pio_interrupt_clear(pio1, 0);
+    pio1->irq = (1u << 0);
   }
-  else if (pio_interrupt_get(pio1, 1)) // read?
+  else if (pio1->irq & (1u << 1)) // read?
   {
-    uint32_t readVal = pio_sm_get(pio1, tmsReadSm);
+    uint32_t readVal = pio1->rxf[tmsReadSm];//pio_sm_get(pio1, tmsReadSm);
     readVals[nextReadVal++] = readVal;//0xf0f0f0f0;
     nextReadVal &= 0x0f;
 
@@ -251,14 +252,14 @@ void  __isr __scratch_x("isr") pio_irq_handler()
     }
     else // status
     {
-      bg |= 0xf0;
+      //bg |= 0xf0;
       currentStatus = vrEmuTms9918ReadStatusImpl();
       currentInt = false;
       gpio_put(GPIO_INT, !currentInt);
     }
     updateTmsReadAhead();
 
-    pio_interrupt_clear(pio1, 1);
+    pio1->irq = (1u << 1);
   }
   irq_clear(PIO1_IRQ_0);
 }
@@ -284,7 +285,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   //uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
-  if (y == 0) bg = 0;
+  //if (y == 0) bg = 0;
+  if (currentInt) bg = 0x000f; else bg = 0x00f0;
 
 
   /*** top and bottom borders ***/
@@ -456,7 +458,7 @@ void tmsPioInit()
   sm_config_set_in_pins(&readConfig, GPIO_CSR);
   sm_config_set_jmp_pin(&readConfig, GPIO_MODE);
   sm_config_set_out_pins(&readConfig, GPIO_CD0, 8);
-  sm_config_set_in_shift(&readConfig, true, false, 32); // R shift, autopush @ 16 bits
+  sm_config_set_in_shift(&readConfig, false, false, 32); // R shift, autopush @ 16 bits
   sm_config_set_out_shift(&readConfig, false, false, 32); // R shift, autopush @ 16 bits
 
   pio_sm_init(pio1, tmsReadSm, tmsReadProgram, &readConfig);
