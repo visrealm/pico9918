@@ -29,40 +29,38 @@
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
 
- //#include <stdlib.h>
-
-  /*
-   * Pin mapping
-   *
-   * Pin  | GPIO | Name      | TMS9918A Pin
-   * -----+------+-----------+-------------
-   *  19  |  14  |  CD0      |  24
-   *  20  |  15  |  CD1      |  23
-   *  21  |  16  |  CD2      |  22
-   *  22  |  17  |  CD3      |  21
-   *  24  |  18  |  CD4      |  20
-   *  25  |  19  |  CD5      |  19
-   *  26  |  20  |  CD6      |  18
-   *  27  |  21  |  CD7      |  17
-   *  29  |  22  |  /INT     |  16
-   *  30  |  RUN |  RST      |  34
-   *  31  |  26  |  /CSR     |  15
-   *  32  |  27  |  /CSW     |  14
-   *  34  |  28  |  MODE     |  13
-   *  35  |  29  |  GROMCLK  |  37
-   *  37  |  23  |  CPUCLK   |  38
-   *
-   * Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29
-   *       a genuine Raspberry Pi Pico can't be used.
-   *       v0.3 of the PCB is designed for the DWEII?
-   *       RP2040 USB-C module which exposes these additional
-   *       GPIOs. A future pico9918 revision will do without
-   *       an external RP2040 board and use the RP2040 directly.
-   *
-   * Purchase links:
-   *       https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
-   *       https://www.aliexpress.com/item/1005007066733934.html
-   */
+ /*
+  * Pin mapping
+  *
+  * Pin  | GPIO | Name      | TMS9918A Pin
+  * -----+------+-----------+-------------
+  *  19  |  14  |  CD0      |  24
+  *  20  |  15  |  CD1      |  23
+  *  21  |  16  |  CD2      |  22
+  *  22  |  17  |  CD3      |  21
+  *  24  |  18  |  CD4      |  20
+  *  25  |  19  |  CD5      |  19
+  *  26  |  20  |  CD6      |  18
+  *  27  |  21  |  CD7      |  17
+  *  29  |  22  |  /INT     |  16
+  *  30  |  RUN |  RST      |  34
+  *  31  |  26  |  /CSR     |  15
+  *  32  |  27  |  /CSW     |  14
+  *  34  |  28  |  MODE     |  13
+  *  35  |  29  |  GROMCLK  |  37
+  *  37  |  23  |  CPUCLK   |  38
+  *
+  * Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29
+  *       a genuine Raspberry Pi Pico can't be used.
+  *       v0.3 of the PCB is designed for the DWEII?
+  *       RP2040 USB-C module which exposes these additional
+  *       GPIOs. A future pico9918 revision will do without
+  *       an external RP2040 board and use the RP2040 directly.
+  *
+  * Purchase links:
+  *       https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
+  *       https://www.aliexpress.com/item/1005007066733934.html
+  */
 
 #define GPIO_CD0 14
 #define GPIO_CSR 26
@@ -83,7 +81,7 @@
 #define PICO_CLOCK_HZ 252000000
 
 
-   /* file globals */
+  /* file globals */
 
 static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
@@ -114,13 +112,13 @@ void  __isr __scratch_x("isr") pio_irq_handler()
   {
     uint32_t writeVal = pio1->rxf[tmsWriteSm];
 
-    if (writeVal & (GPIO_MODE_MASK >> GPIO_CD0)) // reg/addr
+    if (writeVal & (GPIO_MODE_MASK >> GPIO_CD0)) // write reg/addr
     {
       vrEmuTms9918WriteAddrImpl(writeVal & 0xff);
       currentInt = vrEmuTms9918InterruptStatusImpl();
       gpio_put(GPIO_INT, !currentInt);
     }
-    else // data
+    else // write data
     {
       vrEmuTms9918WriteDataImpl(writeVal & 0xff);
     }
@@ -133,12 +131,13 @@ void  __isr __scratch_x("isr") pio_irq_handler()
   else if (pio1->irq & (1u << 1)) // read?
   {
     uint32_t readVal = pio1->rxf[tmsReadSm];
-    if ((readVal & 0x04) == 0) // data
+
+    if ((readVal & 0x04) == 0) // read data
     {
       vrEmuTms9918ReadDataImpl();
       nextValue = vrEmuTms9918ReadDataNoIncImpl();
     }
-    else // status
+    else // read status
     {
       currentStatus = vrEmuTms9918ReadStatusImpl();
       currentInt = false;
@@ -150,6 +149,25 @@ void  __isr __scratch_x("isr") pio_irq_handler()
   }
   irq_clear(PIO1_IRQ_0);
 }
+
+
+/*
+ * enable gpio interrupts inline
+ */
+static inline void enableTmsPioInterrupts()
+{
+  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << PIO1_IRQ_0;
+  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = 1u << PIO1_IRQ_0;
+}
+
+/*
+ * disable gpio interrupts inline
+ */
+static inline void disableTmsPioInterrupts()
+{
+  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << PIO1_IRQ_0;
+}
+
 
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
@@ -220,8 +238,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   if (currentInt) newStatus |= 0x80;
   vrEmuTms9918SetStatusImpl(newStatus);
+  disableTmsPioInterrupts();
   currentStatus = newStatus;
   updateTmsReadAhead();
+  enableTmsPioInterrupts();
 
   /* convert from  palette to bgr12 */
   int tmsX = 0;
@@ -252,9 +272,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (y == TMS9918_PIXELS_Y - 1)
   {
     vrEmuTms9918InterruptSetImpl();
-    currentInt = vrEmuTms9918InterruptStatusImpl();// ? 0 : GPIO_INT_MASK;
+    currentInt = vrEmuTms9918InterruptStatusImpl();
+    disableTmsPioInterrupts();
     currentStatus |= 0x80;
     updateTmsReadAhead();
+    enableTmsPioInterrupts();
 
     gpio_put(GPIO_INT, !currentInt);
   }
@@ -272,7 +294,7 @@ uint initClock(uint gpio, float freqHz)
     clocksPioOffset = pio_add_program(pio0, &clock_program);
   }
 
-  static uint clkSm = 2;//pio_claim_unused_sm(pio1, true);
+  static uint clkSm = 2;
   clock_program_init(pio0, clkSm, clocksPioOffset, gpio);
 
   float clockDiv = (float)PICO_CLOCK_HZ / (TMS_CRYSTAL_FREQ_HZ * 10.0f);

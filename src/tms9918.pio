@@ -17,12 +17,14 @@
 ;           values for status, read data and pin direction
 
 .program tmsRead
+.define public CSR_PIN 26
+
   pull block
   mov x, osr        ; ensure we have a valid fifio value in x
 
 .wrap_target
-  wait 1 gpio 26    ; wait for CSR to go high (inactive) 
-  mov osr, null     ; change CD0-7 pindirs to inputs
+  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
+  mov osr, null       ; change CD0-7 pindirs to inputs
   out pindirs, 8
 
 pullLoop:
@@ -54,8 +56,10 @@ endPart:
 ;
 
 .program tmsWrite
-  wait 0 gpio 27 [12]   ; wait for CSW to go active (low)
-  in pins, 16           ; grab the data CD0-7 and auto-push
-  irq set 0             ; inform the cpu it has some data
-  wait 1 gpio 27 [12]   ; wait for CSW high (inactive)
+.define public CSW_PIN 27
+
+  wait 0 gpio CSW_PIN [12]   ; wait for CSW to go active (low)
+  in pins, 16                ; grab the data CD0-7 and auto-push
+  irq set 0                  ; inform the cpu it has some data
+  wait 1 gpio CSW_PIN [12]   ; wait for CSW high (inactive)
 .wrap
