@@ -71,165 +71,57 @@
 #define GPIO_INT 22
 #define GPIO_GROMCL 29
 #define GPIO_CPUCL 23
-#define GPIO_LED 25
 
 #define GPIO_CD_MASK (0xff << GPIO_CD0)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
 #define GPIO_CSW_MASK (0x01 << GPIO_CSW)
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
-#define GPIO_LED_MASK (0x01 << GPIO_LED)
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#define LED_BLINK_ON_WRITE 0
-
 #define PICO_CLOCK_HZ 252000000
-   //#define PICO_CLOCK_HZ 315000000
 
 
-         /* file globals */
+   /* file globals */
 
-static uint8_t nextValue = 0; /* TMS9918A read-ahead value */
-static bool currentInt = false;//GPIO_INT_MASK; /* current interrupt pin state */
+static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
+static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0; /* current status register value */
-static uint32_t nextValueInt = 0; /* TMS9918A read-ahead value */
 
 static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
-const uint tmsWriteSm = 0;//pio_claim_unused_sm(pio1, true);
-const uint tmsReadSm = 1;//pio_claim_unused_sm(pio1, true);
-
-
-/*
- * enable gpio interrupts inline
- */
-static inline void enableGpioInterrupts()
-{
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << IO_IRQ_BANK0;
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = 1u << IO_IRQ_BANK0;
-}
+const uint tmsWriteSm = 0;
+const uint tmsReadSm = 1;
 
 /*
- * disable gpio interrupts inline
+ * update the value send to the read PIO
  */
-static inline void disableGpioInterrupts()
+static void __attribute__((noinline)) updateTmsReadAhead()
 {
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << IO_IRQ_BANK0;
-}
-
-/*
- * mark the interrupt as handled.
- * Note: all relevant GPIO pins are in the same group
- */
-static inline void gpioInterruptHandled()
-{
-  uint32_t* addr = (uint32_t*)0x400140FC;
-  *(uint32_t*)addr = *(uint32_t*)(addr + 24);
-  //iobank0_hw->intr[GPIO_CSR >> 3u] = iobank0_hw->proc1_irq_ctrl.ints[GPIO_CSR >> 3u];
-}
-
-//static uint16_t bg = 0;
-
-
-static void updateTmsReadAhead()
-{
-  uint32_t readAhead = 0xff;      // pin direction
+  uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
   readAhead |= currentStatus << 16;
-  //pio_sm_exec(pio1, tmsReadSm, 0x8080);
-  //pio_sm_exec(pio1, tmsReadSm, 0x8080);
   pio_sm_put(pio1, tmsReadSm, readAhead);
 }
 
-
 /*
- * RP2040 exclusive GPIO interrupt callback for PROC1
- * Called whenever CSR or CSW changes and reads or writes the data
- *
- * Note: This needs to be extremely responsive. No dilly-dallying here.
- *       This function isn't pretty, but is done this way to guide
- *       gcc in producing optimized assembly. I considered writing
- *       this in assembly, but decided on this instead.
+ * handle interrupts from the TMS9918<->CPU interface
  */
- /*
- void __isr __scratch_x("isr") gpioExclusiveCallbackProc1()
- {
-   // shift the bit mask combos down to lowest significant bits
-   const int GPIO_IRQ_READ_DATA = (GPIO_CSW_MASK) >> GPIO_CSR;
-   const int GPIO_IRQ_READ_STATUS = (GPIO_CSW_MASK | GPIO_MODE_MASK) >> GPIO_CSR;
-   const int GPIO_IRQ_WRITE_DATA = (GPIO_CSR_MASK) >> GPIO_CSR;
-   const int GPIO_IRQ_WRITE_REG = (GPIO_CSR_MASK | GPIO_MODE_MASK) >> GPIO_CSR;
-   const int GPIO_IRQ_INACTIVE1 = (GPIO_CSW_MASK | GPIO_CSR_MASK) >> GPIO_CSR;
-   const int GPIO_IRQ_INACTIVE2 = (GPIO_CSW_MASK | GPIO_CSR_MASK | GPIO_MODE_MASK) >> GPIO_CSR;
-
-   // test the MODE, /CSW and /CSR pins to determine which action to take
-   // shifting them down to bits 2, 1 and 0 respectively rather than testing
-   // them at the higher bit range since ARM can only load 8-bit immediate
-   // values in one cycle to compare
-   gpioInterruptHandled();
-
-   switch ((sio_hw->gpio_in >> GPIO_CSR) & 0x07)
-   {
-     case GPIO_IRQ_WRITE_DATA:
-       vrEmuTms9918WriteDataImpl(sio_hw->gpio_in >> GPIO_CD0);
-       break;
-
-     case GPIO_IRQ_READ_DATA:
-       sio_hw->gpio_oe_set = GPIO_CD_MASK;
-       sio_hw->gpio_out = nextValueInt;
-       vrEmuTms9918ReadDataImpl();
-       break;
-
-     case GPIO_IRQ_WRITE_REG:
-       vrEmuTms9918WriteAddrImpl(sio_hw->gpio_in >> GPIO_CD0);
-       currentInt = vrEmuTms9918InterruptStatusImpl() ? 0 : GPIO_INT_MASK;
-       break;
-
-     case GPIO_IRQ_READ_STATUS:
-       sio_hw->gpio_oe_set = GPIO_CD_MASK;
-       sio_hw->gpio_out = currentStatus;
-       currentInt = GPIO_INT_MASK;
-       currentStatus = (vrEmuTms9918ReadStatusImpl() << GPIO_CD0) | currentInt;
-       break;
-
-     case GPIO_IRQ_INACTIVE1:
-     case GPIO_IRQ_INACTIVE2:
-       sio_hw->gpio_oe_clr = GPIO_CD_MASK;
-       sio_hw->gpio_out = currentInt;
-       break;
-   }
-
-   // update read-ahead
-   nextValue = vrEmuTms9918ReadDataNoIncImpl() << GPIO_CD0;
-   nextValueInt = nextValue | currentInt;
- }
- */
-
-uint32_t writeVals[16] = { 0 };
-uint32_t readVals[16] = { 0 };
-int nextReadVal = 0;
-int nextWriteVal = 0;
-
-
 void  __isr __scratch_x("isr") pio_irq_handler()
 {
   if (pio1->irq & (1u << 0)) // write?
   {
-    uint32_t writeVal = pio1->rxf[tmsWriteSm];;//pio_sm_get(pio1, tmsWriteSm);
-    writeVals[nextWriteVal++] = writeVal;
-    nextWriteVal &= 0x0f;
+    uint32_t writeVal = pio1->rxf[tmsWriteSm];
 
-    if (writeVal & (1 << 14))//(GPIO_MODE_MASK >> GPIO_CD0)) // red/addr
+    if (writeVal & (GPIO_MODE_MASK >> GPIO_CD0)) // reg/addr
     {
-      //      bg |= 0xf00;
       vrEmuTms9918WriteAddrImpl(writeVal & 0xff);
       currentInt = vrEmuTms9918InterruptStatusImpl();
       gpio_put(GPIO_INT, !currentInt);
     }
     else // data
     {
-      //bg |= 0x0f;
       vrEmuTms9918WriteDataImpl(writeVal & 0xff);
     }
 
@@ -240,19 +132,14 @@ void  __isr __scratch_x("isr") pio_irq_handler()
   }
   else if (pio1->irq & (1u << 1)) // read?
   {
-    uint32_t readVal = pio1->rxf[tmsReadSm];//pio_sm_get(pio1, tmsReadSm);
-    readVals[nextReadVal++] = readVal;//0xf0f0f0f0;
-    nextReadVal &= 0x0f;
-
+    uint32_t readVal = pio1->rxf[tmsReadSm];
     if ((readVal & 0x04) == 0) // data
     {
-      //
       vrEmuTms9918ReadDataImpl();
       nextValue = vrEmuTms9918ReadDataNoIncImpl();
     }
     else // status
     {
-      //bg |= 0xf0;
       currentStatus = vrEmuTms9918ReadStatusImpl();
       currentInt = false;
       gpio_put(GPIO_INT, !currentInt);
@@ -285,10 +172,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
-  //if (y == 0) bg = 0;
-  //if (currentInt) bg = 0x000f; else bg = 0x00f0;
-
-
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
   {
@@ -296,39 +179,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     {
       pixels[x] = bg;
     }
-/*
-    if (y < vBorder)
-    {
-      uint32_t writeVal = writeVals[y & 0x0f];
-      for (int i = 0; i < 32; ++i)
-      {
-        uint16_t bitColor = ((writeVal << i) & 0x80000000) ? 0x0fff : 0x000;
-        int offset = i * 16 + hBorder;
-        for (int x = 0; x < 16; ++x)
-        {
-          pixels[offset + x] = bitColor;
-        }
-      }
-    }
-    else
-    {
-      uint32_t readVal = readVals[y & 0x0f];
-      for (int i = 0; i < 32; ++i)
-      {
-        uint16_t bitColor = ((readVal << i) & 0x80000000) ? 0x0fff : 0x000;
-        int offset = i * 16 + hBorder;
-        for (int x = 0; x < 16; ++x)
-        {
-          pixels[offset + x] = bitColor;
-        }
-      }
-    }
-*/
-/* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
- * size  : 172px x 10px
- *       : 3440 bytes
- * format: 16bpp abgr image
- */
+
+    /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
+     * size  : 172px x 10px
+     *       : 3440 bytes
+     * format: 16bpp abgr image
+     */
     if (y >= vBorder + TMS9918_PIXELS_Y + 12)
     {
       y -= vBorder + TMS9918_PIXELS_Y + 12;
@@ -362,13 +218,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /* generate the scanline */
   uint8_t newStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer, currentStatus) & 0x7f;
 
-  //disableGpioInterrupts();
   if (currentInt) newStatus |= 0x80;
   vrEmuTms9918SetStatusImpl(newStatus);
   currentStatus = newStatus;
   updateTmsReadAhead();
-  //currentStatus = (newStatus << GPIO_CD0) | GPIO_INT_MASK;
-  //enableGpioInterrupts();
 
   /* convert from  palette to bgr12 */
   int tmsX = 0;
@@ -398,13 +251,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** interrupt signal? ***/
   if (y == TMS9918_PIXELS_Y - 1)
   {
-    //    disableGpioInterrupts();
     vrEmuTms9918InterruptSetImpl();
     currentInt = vrEmuTms9918InterruptStatusImpl();// ? 0 : GPIO_INT_MASK;
     currentStatus |= 0x80;
     updateTmsReadAhead();
 
-    //    enableGpioInterrupts();
     gpio_put(GPIO_INT, !currentInt);
   }
 }
@@ -434,14 +285,16 @@ uint initClock(uint gpio, float freqHz)
   return clkSm++;
 }
 
+/*
+ * Set up PIOs for TMS9918 <-> CPU interface
+ */
 void tmsPioInit()
 {
   uint tmsWriteProgram = pio_add_program(pio1, &tmsWrite_program);
 
-
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writeConfig, GPIO_CD0);
-  sm_config_set_in_shift(&writeConfig, false, true/*true*/, 16); // R shift, autopush @ 16 bits
+  sm_config_set_in_shift(&writeConfig, false, true, 16); // L shift, autopush @ 16 bits
   sm_config_set_clkdiv(&writeConfig, 4.0f);
 
   pio_sm_init(pio1, tmsWriteSm, tmsWriteProgram, &writeConfig);
@@ -458,17 +311,15 @@ void tmsPioInit()
   sm_config_set_in_pins(&readConfig, GPIO_CSR);
   sm_config_set_jmp_pin(&readConfig, GPIO_MODE);
   sm_config_set_out_pins(&readConfig, GPIO_CD0, 8);
-  sm_config_set_in_shift(&readConfig, false, false, 32); // R shift, autopush @ 16 bits
-  sm_config_set_out_shift(&readConfig, true, false, 32); // R shift, autopush @ 16 bits
+  sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
+  sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
   sm_config_set_clkdiv(&readConfig, 4.0f);
 
   pio_sm_init(pio1, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(pio1, tmsReadSm, true);
 
   irq_set_exclusive_handler(PIO1_IRQ_0, pio_irq_handler);
-  //irq_set_exclusive_handler(PIO1_IRQ_1, pio_irq_handler1);
   irq_set_enabled(PIO1_IRQ_0, true);
-  //irq_set_enabled(PIO1_IRQ_1, true);
   pio_set_irq0_source_enabled(pio1, pis_interrupt0, true);
   pio_set_irq0_source_enabled(pio1, pis_interrupt1, true);
   pio_interrupt_clear(pio1, 0);
@@ -484,20 +335,11 @@ void tmsPioInit()
 void proc1Entry()
 {
   // set up gpio pins
-  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK | GPIO_LED_MASK);
+  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
   gpio_put_all(GPIO_INT_MASK);
-  gpio_set_dir_all_bits(GPIO_INT_MASK | GPIO_LED_MASK); // int is an output
-
+  gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
 
   tmsPioInit();
-  // set up gpio interrupts
-  /*
-  irq_set_priority(IO_IRQ_BANK0, 0);
-  irq_set_exclusive_handler(IO_IRQ_BANK0, gpioExclusiveCallbackProc1);
-  gpio_set_irq_enabled(GPIO_CSW, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
-  gpio_set_irq_enabled(GPIO_CSR, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true);
-  irq_set_enabled(IO_IRQ_BANK0, true);
-  */
 
   // set up the GROMCLK and CPUCLK signals
   initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
@@ -519,21 +361,13 @@ int main(void)
    * that comes close to being divisible by 25.175MHz. 252.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
-  vreg_set_voltage(VREG_VOLTAGE_1_20);
-  //set_sys_clock_khz(315000, false);
-  //set_sys_clock_khz(PICO_CLOCK_HZ / 1000, false);
-
 
   set_sys_clock_pll(1260000000, 5, 1);   // 252000
-  //set_sys_clock_pll(1260000000, 4, 1);   // 315000
-  //set_sys_clock_pll(1512000000, 5, 1);     // 302000
 
   /* we need one of these. it's the main guy */
   vrEmuTms9918Init();
 
-  /* set up the GPIO pins and interrupt handler */
-
-
+  /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
 
   /* then set up VGA output */

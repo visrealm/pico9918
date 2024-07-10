@@ -9,41 +9,53 @@
  *
  */
 
+; -----------------------------------------------------------------------------
+; tmsRead - monitor the CSR pin and send either status or data value
+;
+;           due to the read-ahead nature of the TMS9918, we have the 
+;           possible read values already. The FIFO contains the current
+;           values for status, read data and pin direction
+
 .program tmsRead
   pull block
-  mov x, osr
+  mov x, osr        ; ensure we have a valid fifio value in x
+
 .wrap_target
-entry:
-  wait 1 gpio 26    ; once CSR is high, change pindirs to inputs
-  mov osr, null
+  wait 1 gpio 26    ; wait for CSR to go high (inactive) 
+  mov osr, null     ; change CD0-7 pindirs to inputs
   out pindirs, 8
 
 pullLoop:
   pull noblock      ; continuously empty the rx fifo
   mov x, osr        ; since we want the latest value
   mov isr, null
-  in pins, 1
-  mov y, isr
-  jmp y--, pullLoop; still 1? loop, otherwise, let's read
+  in pins, 1        ; hacky way to jmp based on the CSR pin
+  mov y, isr        ; since we can only have one jmp pin
+  jmp y--, pullLoop ; still 1? loop, otherwise, let's read
 
-  out pindirs, 8
+  out pindirs, 8    ; set up CD0-7 as outputs
   jmp pin readStatus  ; if 'mode' is high, read status bits
 readData:
-  out pins, 8     ; output
-  in pins, 8
+  out pins, 8       ; mode is low, send the data byte
   jmp endPart
 readStatus:  
-  out null, 8     ; skip data bits
-  out pins, 8     ; output
-  in pins, 3
+  out null, 8       ; skip data bits
+  out pins, 8       ; output the status byte
 endPart:
-  push     
-  irq set 1      ; push the last type of data we read
+  in pins, 3        ; push CSR, CSW and MODE back through fifo
+  push              ; push ^^^ back to cpu to process
+  irq set 1         ; it needs to know if we read status or data
 .wrap
 
+; -----------------------------------------------------------------------------
+; tmsWrite - monitor the CSW pin and pass on pin state via FIFO
+;           
+;            very simple grab the data and send it through...
+;
+
 .program tmsWrite
-  wait 0 gpio 27 [12]
-  in pins, 16     ; auto-push
-  irq set 0 
-  wait 1 gpio 27 [12]
+  wait 0 gpio 27 [12]   ; wait for CSW to go active (low)
+  in pins, 16           ; grab the data CD0-7 and auto-push
+  irq set 0             ; inform the cpu it has some data
+  wait 1 gpio 27 [12]   ; wait for CSW high (inactive)
 .wrap
