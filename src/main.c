@@ -189,7 +189,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
-  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
+  //  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
+
+  uint16_t bg = currentInt ? 0x000f : 0x00f0;
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
@@ -225,7 +227,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
       }
     }
-
     return;
   }
 
@@ -242,8 +243,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /* generate the scanline */
   uint8_t newStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer, currentStatus) & 0x7f;
 
-  if (currentInt) newStatus |= 0x80;
   disableTmsPioInterrupts();
+  if (currentInt) newStatus |= 0x80;
   vrEmuTms9918SetStatusImpl(newStatus);
   currentStatus = newStatus;
   updateTmsReadAhead();
@@ -263,7 +264,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
     {
-      pixels[x] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX] & 0x0f];
+      pixels[x] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX]];
       pixels[x + 1] = pixels[x];
     }
   }
@@ -300,14 +301,17 @@ uint initClock(uint gpio, float freqHz)
   }
 
   static uint clkSm = 2;
-  clock_program_init(pio0, clkSm, clocksPioOffset, gpio);
 
-  float clockDiv = (float)PICO_CLOCK_HZ / (TMS_CRYSTAL_FREQ_HZ * 10.0f);
+  pio_gpio_init(pio0, gpio);
+  pio_sm_set_consecutive_pindirs(pio0, clkSm, gpio, 1, true);
+  pio_sm_config c = clock_program_get_default_config(clocksPioOffset);
+  sm_config_set_set_pins(&c, gpio, 1);
 
+  pio_sm_init(pio0, clkSm, clocksPioOffset, &c);
+
+  float clockDiv = (float)PICO_CLOCK_HZ / (freqHz * 2.0f);
   pio_sm_set_clkdiv(pio0, clkSm, clockDiv);
   pio_sm_set_enabled(pio0, clkSm, true);
-
-  pio_sm_put(pio0, clkSm, (uint)(PICO_CLOCK_HZ / clockDiv / (2.0f * freqHz)) - 3.0f);
 
   return clkSm++;
 }
@@ -366,7 +370,7 @@ void proc1Entry()
   tmsPioInit();
 
   // set up the GROMCLK and CPUCLK signals
-  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
+  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 23.8f);
   initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
   // wait until everything else is ready, then run the vga loop
