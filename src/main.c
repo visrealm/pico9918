@@ -54,7 +54,7 @@
   *       a genuine Raspberry Pi Pico can't be used.
   *       v0.3 of the PCB is designed for the DWEII?
   *       RP2040 USB-C module which exposes these additional
-  *       GPIOs. A future pico9918 revision will do without
+  *       GPIOs. A future pico9918 revision (v0.4+) will do without
   *       an external RP2040 board and use the RP2040 directly.
   *
   * Purchase links:
@@ -63,8 +63,8 @@
   */
 
 #define GPIO_CD0 14
-#define GPIO_CSR 26
-#define GPIO_CSW 27
+#define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
+#define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio
 #define GPIO_MODE 28
 #define GPIO_INT 22
 #define GPIO_GROMCL 29
@@ -79,6 +79,9 @@
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
 #define PICO_CLOCK_HZ 252000000
+
+#define TMS_PIO pio1
+#define TMS_IRQ PIO1_IRQ_0
 
 
   /* file globals */
@@ -95,22 +98,23 @@ const uint tmsReadSm = 1;
 /*
  * update the value send to the read PIO
  */
-static void __attribute__((noinline)) updateTmsReadAhead()
+inline static void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
   readAhead |= currentStatus << 16;
-  pio_sm_put(pio1, tmsReadSm, readAhead);
+  pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
 /*
  * handle interrupts from the TMS9918<->CPU interface
  */
-void  __isr __scratch_x("isr") pio_irq_handler()
+void  __not_in_flash_func(pio_irq_handler)()
 {
-  if (pio1->irq & (1u << 0)) // write?
+
+  if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsWriteSm))) == 0) // write?
   {
-    uint32_t writeVal = pio1->rxf[tmsWriteSm];
+    uint32_t writeVal = TMS_PIO->rxf[tmsWriteSm];
 
     if (writeVal & (GPIO_MODE_MASK >> GPIO_CD0)) // write reg/addr
     {
@@ -125,12 +129,10 @@ void  __isr __scratch_x("isr") pio_irq_handler()
 
     nextValue = vrEmuTms9918ReadDataNoIncImpl();
     updateTmsReadAhead();
-
-    pio1->irq = (1u << 0);
   }
-  else if (pio1->irq & (1u << 1)) // read?
+  else if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsReadSm))) == 0) // read?
   {
-    uint32_t readVal = pio1->rxf[tmsReadSm];
+    uint32_t readVal = TMS_PIO->rxf[tmsReadSm];
 
     if ((readVal & 0x04) == 0) // read data
     {
@@ -144,10 +146,7 @@ void  __isr __scratch_x("isr") pio_irq_handler()
       gpio_put(GPIO_INT, !currentInt);
     }
     updateTmsReadAhead();
-
-    pio1->irq = (1u << 1);
   }
-  irq_clear(PIO1_IRQ_0);
 }
 
 
@@ -156,8 +155,9 @@ void  __isr __scratch_x("isr") pio_irq_handler()
  */
 static inline void enableTmsPioInterrupts()
 {
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << PIO1_IRQ_0;
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = 1u << PIO1_IRQ_0;
+  __dmb();
+  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << TMS_IRQ;
+  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = 1u << TMS_IRQ;
 }
 
 /*
@@ -165,7 +165,8 @@ static inline void enableTmsPioInterrupts()
  */
 static inline void disableTmsPioInterrupts()
 {
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << PIO1_IRQ_0;
+  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << TMS_IRQ;
+  __dmb();
 }
 
 
@@ -200,22 +201,27 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
      * size  : 172px x 10px
-     *       : 3440 bytes
-     * format: 16bpp abgr image
+     *       : 430 bytes
+     * format: 16-bit abgr palette, 2bpp indexed image
      */
     if (y >= vBorder + TMS9918_PIXELS_Y + 12)
     {
       y -= vBorder + TMS9918_PIXELS_Y + 12;
       if (y < splashHeight)
       {
-        uint16_t* splashPtr = splash + (y * splashWidth);
-        for (int x = 4; x < 4 + splashWidth; ++x)
+        uint8_t* splashPtr = splash + (y * splashWidth / 4);
+        for (int x = 4; x < 4 + splashWidth; x += 4)
         {
-          uint16_t c = *(splashPtr++);
-          if (c & 0xf000)
-          {
-            pixels[x] = c;
-          }
+          uint8_t c = *(splashPtr++);
+          uint8_t p0 = (c & 0xc0);
+          uint8_t p1 = (c & 0x30);
+          uint8_t p2 = (c & 0x0c);
+          uint8_t p3 = (c & 0x03);
+
+          if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
+          if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
+          if (p2) { pixels[x + 2] = splash_pal[(p2 >> 2)]; }
+          if (p3) { pixels[x + 3] = splash_pal[p3]; }
         }
       }
     }
@@ -237,8 +243,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   uint8_t newStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer, currentStatus) & 0x7f;
 
   if (currentInt) newStatus |= 0x80;
-  vrEmuTms9918SetStatusImpl(newStatus);
   disableTmsPioInterrupts();
+  vrEmuTms9918SetStatusImpl(newStatus);
   currentStatus = newStatus;
   updateTmsReadAhead();
   enableTmsPioInterrupts();
@@ -271,14 +277,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** interrupt signal? ***/
   if (y == TMS9918_PIXELS_Y - 1)
   {
+    disableTmsPioInterrupts();
     vrEmuTms9918InterruptSetImpl();
     currentInt = vrEmuTms9918InterruptStatusImpl();
-    disableTmsPioInterrupts();
     currentStatus |= 0x80;
     updateTmsReadAhead();
-    enableTmsPioInterrupts();
-
     gpio_put(GPIO_INT, !currentInt);
+    enableTmsPioInterrupts();
   }
 }
 
@@ -312,21 +317,21 @@ uint initClock(uint gpio, float freqHz)
  */
 void tmsPioInit()
 {
-  uint tmsWriteProgram = pio_add_program(pio1, &tmsWrite_program);
+  uint tmsWriteProgram = pio_add_program(TMS_PIO, &tmsWrite_program);
 
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writeConfig, GPIO_CD0);
   sm_config_set_in_shift(&writeConfig, false, true, 16); // L shift, autopush @ 16 bits
   sm_config_set_clkdiv(&writeConfig, 4.0f);
 
-  pio_sm_init(pio1, tmsWriteSm, tmsWriteProgram, &writeConfig);
-  pio_sm_set_enabled(pio1, tmsWriteSm, true);
+  pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
+  pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
 
-  uint tmsReadProgram = pio_add_program(pio1, &tmsRead_program);
+  uint tmsReadProgram = pio_add_program(TMS_PIO, &tmsRead_program);
 
   for (uint i = 0; i < 8; ++i)
   {
-    pio_gpio_init(pio1, GPIO_CD0 + i);
+    pio_gpio_init(TMS_PIO, GPIO_CD0 + i);
   }
 
   pio_sm_config readConfig = tmsRead_program_get_default_config(tmsReadProgram);
@@ -337,17 +342,14 @@ void tmsPioInit()
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
   sm_config_set_clkdiv(&readConfig, 4.0f);
 
-  pio_sm_init(pio1, tmsReadSm, tmsReadProgram, &readConfig);
-  pio_sm_set_enabled(pio1, tmsReadSm, true);
+  pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
+  pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
+  irq_set_exclusive_handler(TMS_IRQ, pio_irq_handler);
+  irq_set_enabled(TMS_IRQ, true);
+  pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
+  pio_set_irq0_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
 
-  irq_set_exclusive_handler(PIO1_IRQ_0, pio_irq_handler);
-  irq_set_enabled(PIO1_IRQ_0, true);
-  pio_set_irq0_source_enabled(pio1, pis_interrupt0, true);
-  pio_set_irq0_source_enabled(pio1, pis_interrupt1, true);
-  pio_interrupt_clear(pio1, 0);
-  pio_interrupt_clear(pio1, 1);
-
-  pio_sm_put(pio1, tmsReadSm, 0x000000ff);
+  pio_sm_put(TMS_PIO, tmsReadSm, 0x000000ff);
 }
 
 

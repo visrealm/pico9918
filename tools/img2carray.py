@@ -196,10 +196,10 @@ def generateProto(varName, src, inRam, isHeader) -> str:
     # output the image array prototype
     proto += typePrefix + dataType + varNamePrefix + varName + "[]" + suffix
     if isHeader:
-      proto += "\nconst int " + varNamePrefix + varName + \
-          "Width = " + str(src.width) + ";\n"
-      proto += "const int " + varNamePrefix + varName + \
-          "Height = " + str(src.height) + ";\n"
+        proto += "\nconst int " + varNamePrefix + varName + \
+            "Width = " + str(src.width) + ";\n"
+        proto += "const int " + varNamePrefix + varName + \
+            "Height = " + str(src.height) + ";\n"
     return proto
 
 
@@ -210,6 +210,7 @@ def imageToArrayContents(src, pix, bpp) -> str:
     rows = []
     for y in range(src.height):
         row = []
+        value = 0
         for x in range(src.width):
             col = pix[x, y]
             if hasattr(col, "__len__"):
@@ -219,12 +220,21 @@ def imageToArrayContents(src, pix, bpp) -> str:
                 row.append(encodeRGBA32ToABGR16Hex(col[0], col[1], col[2], a))
             elif bpp == 8:
                 row.append("{0:#0{1}x}".format(col, 4))
-            else:
-                if x & 1:
-                    value = value | col
+            elif bpp == 4:
+                value = value | col
+                if (x & 1):
                     row.append("{0:#0{1}x}".format(value, 4))
+                    value = 0
                 else:
-                    value = col << 4
+                    value <<= bpp
+            else:  # 2bpp
+                value = value | col
+                if (x & 3) == 3:
+                    row.append("{0:#0{1}x}".format(value, 4))
+                    value = 0
+                else:
+                    value <<= bpp
+
         rows.append(", ".join(row))
     return "\n  " + (",\n  ".join(rows))
 
@@ -254,7 +264,10 @@ def processImageFile(infile, srcOutput, hdrOutput, args, inRam) -> None:
 
         bpp = 16
         if src.palette:
-            bpp = 4 if len(src.palette.tobytes()) <= (16 * 3) else 8
+            if len(src.palette.tobytes()) <= (4 * 3):
+                bpp = 2
+            else:
+                bpp = 4 if len(src.palette.tobytes()) <= (16 * 3) else 8
 
         comment = generateArrayComment(infile, src, bpp)
 
