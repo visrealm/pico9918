@@ -32,7 +32,7 @@ I could reduce the VGA bit depth to 9-bit or 10-bit to allow the use of a genuin
 
 If you're not interested in building the firmware yourself, you'll find the latest firmware in the [Releases](https://github.com/visrealm/pico9918/releases).
 
-To install, just hold the 'Mode' buton while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
+To install, just hold the 'Mode' button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
 
 ## Development environment
 
