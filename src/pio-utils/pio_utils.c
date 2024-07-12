@@ -42,14 +42,6 @@ static void pio_set_xy(PIO pio, uint sm, uint32_t val, enum pio_src_dest dest)
 }
 
 /*
- * set the pio state machine x register
- */
-void pio_set_x(PIO pio, uint sm, uint32_t x)
-{
-  pio_set_xy(pio, sm, x, pio_x);
-}
-
-/*
  * set the pio state machine y register
  */
 void pio_set_y(PIO pio, uint sm, uint32_t y)

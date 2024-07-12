@@ -42,7 +42,7 @@ typedef struct
 
 
 typedef void (*vgaScanlineRgbFn)(uint16_t y, VgaParams* params, uint16_t* pixels);
-typedef void (*vgaEndOfFrameFn)(uint64_t frameNumber);
+typedef void (*vgaEndOfFrameFn)(uint32_t frameNumber);
 typedef void (*vgaInitFn)();
 typedef void (*vgaEndOfScanlineFn)();
 

@@ -1,0 +1,78 @@
+/*
+ * Project: pico9918
+ *
+ * Copyright (c) 2024 Troy Schrapel
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico9918
+ *
+ */
+
+; -----------------------------------------------------------------------------
+; tmsRead - monitor the CSR pin and send either status or data value
+;
+;           due to the read-ahead nature of the TMS9918, we have the 
+;           possible read values already. Each tx FIFO word contains
+;           the current values for status, read data and pin direction
+;
+; fifo osr  0b|xxxxxxxx|ssssssss|dddddddd|11111111|
+;             | ignore | status |  data  | pindir |
+;
+; fifo isr  0b|m|w|r|
+;             |o|r|e|
+;             |d|i|a|
+;             |e|t|d|
+;             | |e| |
+;
+
+.program tmsRead
+.define public CSR_PIN 26
+
+  pull block
+  mov x, osr        ; ensure we have a valid fifio value in x
+
+.wrap_target
+  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
+  mov osr, null       ; change CD0-7 pindirs to inputs
+  out pindirs, 8
+
+pullLoop:
+  pull noblock      ; continuously empty the tx fifo
+  mov x, osr        ; since we want the latest value
+  mov isr, null
+  in pins, 1        ; hacky way to jmp based on the CSR pin
+  mov y, isr        ; since we can only have one jmp pin
+  jmp y--, pullLoop ; still 1? loop, otherwise, let's read
+
+  out pindirs, 8    ; set up CD0-7 as outputs
+  jmp pin readStatus  ; if 'mode' is high, read status bits
+readData:
+  out pins, 8       ; mode is low, send the data byte
+  jmp endPart
+readStatus:  
+  out null, 8       ; skip data bits
+  out pins, 8       ; output the status byte
+endPart:
+  in pins, 3        ; push CSR, CSW and MODE back through fifo
+  push              ; push ^^^ back to cpu to process
+.wrap
+
+; -----------------------------------------------------------------------------
+; tmsWrite - monitor the CSW pin and pass on pin state via FIFO
+;           
+;            very simple grab the data and send it through...
+;
+; fifo isr   0b|x|m|w|r|xxxx|dddddddd|
+;              | |o|r|e|    |  CD0-7 |
+;              | |d|i|a|    |        |
+;              | |e|t|d|    |        |
+;              | | |e| |    |        |
+
+.program tmsWrite
+.define public CSW_PIN 27
+
+  wait 0 gpio CSW_PIN [12]   ; wait for CSW to go active (low)
+  in pins, 16                ; grab the data CD0-7 and auto-push
+  wait 1 gpio CSW_PIN [12]   ; wait for CSW high (inactive)
+.wrap
