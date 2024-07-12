@@ -78,7 +78,10 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#define PICO_CLOCK_HZ 252000000
+#define PICO_CLOCK_PLL 1260000000
+#define PICO_CLOCK_PLL_DIV1 5
+#define PICO_CLOCK_PLL_DIV2 1
+#define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
 
 #define TMS_PIO pio1
 #define TMS_IRQ PIO1_IRQ_0
@@ -190,9 +193,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
-  //uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
-
-  uint16_t bg = currentInt ? 0x000f : 0x00f0;
+  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
@@ -284,7 +285,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     }
     else
     {
-      currentStatus = tempStatus;
+      currentStatus |= tempStatus;
     }
 
     vrEmuTms9918SetStatusImpl(currentStatus);
@@ -398,7 +399,7 @@ int main(void)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
 
-  set_sys_clock_pll(1260000000, 5, 1);   // 252000
+  set_sys_clock_pll(PICO_CLOCK_PLL, PICO_CLOCK_PLL_DIV1, PICO_CLOCK_PLL_DIV2);   // 252000
 
   /* we need one of these. it's the main guy */
   vrEmuTms9918Init();
