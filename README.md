@@ -14,6 +14,10 @@ v0.3 Schematic and Gerber available now. This revision has been tested on my two
 
 <p align="left"><a href="pcb/v0.3/pico9918_v0_3_pcb.png"><img src="pcb/v0.3/pico9918_v0_3_pcb.png" alt="PICO9918 v0.3" width="720px"></a></p>
 
+### PCB v0.3 Notes
+
+There are a number of 0Ohm resistors (jumpers). You may need to omit the RST resistor. On some machines, the extra time is required to bootstrap the Pico. This will be changed to a soft reset on v0.4.
+
 ### Raspberry Pi Pico Module
 
 Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29, a genuine Raspberry Pi Pico can't be used. v0.3 of the PCB is designed for the DWEII? RP2040 USB-C module which exposes these additional GPIOs. A future pico9918 revision will do without an external RP2040 board and use the RP2040 directly.
@@ -23,6 +27,12 @@ Purchase links:
  * https://www.aliexpress.com/item/1005007066733934.html
 
 I could reduce the VGA bit depth to 9-bit or 10-bit to allow the use of a genuine Raspberry Pi Pico board, but given the longer-term plan is to use the RP2040 directly, I've decided to go this way for the prototype.
+
+## Firmware
+
+If you're not interested in building the firmware yourself, you'll find the latest firmware in the [Releases](https://github.com/visrealm/pico9918/releases).
+
+To install, just hold the 'Mode' buton while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
 
 ## Development environment
 
