@@ -30,7 +30,7 @@
 #include "hardware/vreg.h"
 
  /*
-  * Pin mapping
+  * Pin mapping (PCB v0.3)
   *
   * Pin  | GPIO | Name      | TMS9918A Pin
   * -----+------+-----------+-------------
@@ -62,13 +62,31 @@
   *       https://www.aliexpress.com/item/1005007066733934.html
   */
 
+#define PCB_MAJOR_VERSION 0
+#define PCB_MINOR_VERSION 3
+
 #define GPIO_CD0 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
 #define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio
 #define GPIO_MODE 28
 #define GPIO_INT 22
+
+#if PCB_MAJOR_VERSION != 0
+#error "Time traveller?"
+#endif
+
+  // pin-mapping for gromclk and cpuclk changed in PCB v0.4
+  // in order to have MODE and MODE1 sequential
+#if PCB_MINOR_VERSION < 4
 #define GPIO_GROMCL 29
 #define GPIO_CPUCL 23
+#else
+#define GPIO_GROMCL 25
+#define GPIO_CPUCL 24
+#define GPIO_RESET 23
+#define GPIO_MODE1 29
+#endif
+
 
 #define GPIO_CD_MASK (0xff << GPIO_CD0)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
