@@ -141,7 +141,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     }
     else // read status
     {
-      currentStatus = vrEmuTms9918ReadStatusImpl();
+      currentStatus = 0;
       currentInt = false;
       gpio_put(GPIO_INT, !currentInt);
     }
@@ -241,14 +241,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** main display region ***/
 
   /* generate the scanline */
-  uint8_t newStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer, currentStatus) & 0x7f;
-
-  disableTmsPioInterrupts();
-  if (currentInt) newStatus |= 0x80;
-  vrEmuTms9918SetStatusImpl(newStatus);
-  currentStatus = newStatus;
-  updateTmsReadAhead();
-  enableTmsPioInterrupts();
+  uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer) & 0x7f;
 
   /* convert from  palette to bgr12 */
   int tmsX = 0;
@@ -278,14 +271,27 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** interrupt signal? ***/
   if (y == TMS9918_PIXELS_Y - 1)
   {
-    disableTmsPioInterrupts();
-    vrEmuTms9918InterruptSetImpl();
-    currentInt = vrEmuTms9918InterruptStatusImpl();
-    currentStatus |= 0x80;
-    updateTmsReadAhead();
-    gpio_put(GPIO_INT, !currentInt);
-    enableTmsPioInterrupts();
+    tempStatus |= STATUS_INT;
   }
+
+  disableTmsPioInterrupts();
+  if ((currentStatus & STATUS_INT) == 0)
+  {
+    if ((currentStatus & STATUS_5S) == 1)
+    {
+      currentStatus |= tempStatus & 0xe0;
+    }
+    else
+    {
+      currentStatus = tempStatus;
+    }
+
+    vrEmuTms9918SetStatusImpl(currentStatus);
+    currentInt = vrEmuTms9918InterruptStatusImpl();
+    gpio_put(GPIO_INT, !currentInt);
+    updateTmsReadAhead();
+  }
+  enableTmsPioInterrupts();
 }
 
 /*
@@ -370,7 +376,7 @@ void proc1Entry()
   tmsPioInit();
 
   // set up the GROMCLK and CPUCLK signals
-  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 23.8f);
+  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
   initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
   // wait until everything else is ready, then run the vga loop
