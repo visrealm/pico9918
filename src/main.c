@@ -142,6 +142,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     else // read status
     {
       currentStatus = 0;
+      vrEmuTms9918SetStatusImpl(currentStatus);
       currentInt = false;
       gpio_put(GPIO_INT, !currentInt);
     }
@@ -189,7 +190,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
-  //  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
+  //uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   uint16_t bg = currentInt ? 0x000f : 0x00f0;
 
@@ -241,7 +242,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** main display region ***/
 
   /* generate the scanline */
-  uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer) & 0x7f;
+  uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+
+  /*** interrupt signal? ***/
+  if (y == TMS9918_PIXELS_Y - 1)
+  {
+    tempStatus |= STATUS_INT;
+  }
 
   /* convert from  palette to bgr12 */
   int tmsX = 0;
@@ -268,16 +275,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     pixels[x] = bg;
   }
 
-  /*** interrupt signal? ***/
-  if (y == TMS9918_PIXELS_Y - 1)
-  {
-    tempStatus |= STATUS_INT;
-  }
-
   disableTmsPioInterrupts();
   if ((currentStatus & STATUS_INT) == 0)
   {
-    if ((currentStatus & STATUS_5S) == 1)
+    if ((currentStatus & STATUS_5S) != 0)
     {
       currentStatus |= tempStatus & 0xe0;
     }
@@ -287,9 +288,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     }
 
     vrEmuTms9918SetStatusImpl(currentStatus);
+    updateTmsReadAhead();
+
     currentInt = vrEmuTms9918InterruptStatusImpl();
     gpio_put(GPIO_INT, !currentInt);
-    updateTmsReadAhead();
   }
   enableTmsPioInterrupts();
 }
