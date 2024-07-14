@@ -211,6 +211,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
+  static int frameCount = 0;
+  static int logoOffset = 100;
+
   uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   /*** top and bottom borders ***/
@@ -226,24 +229,37 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
      *       : 430 bytes
      * format: 16-bit abgr palette, 2bpp indexed image
      */
-    if (y >= vBorder + TMS9918_PIXELS_Y + 12)
+    if (frameCount < 600)
     {
-      y -= vBorder + TMS9918_PIXELS_Y + 12;
-      if (y < splashHeight)
+      if (y == 0)
       {
-        uint8_t* splashPtr = splash + (y * splashWidth / 4);
-        for (int x = 4; x < 4 + splashWidth; x += 4)
+        ++frameCount;
+        if (frameCount & 0x01)
         {
-          uint8_t c = *(splashPtr++);
-          uint8_t p0 = (c & 0xc0);
-          uint8_t p1 = (c & 0x30);
-          uint8_t p2 = (c & 0x0c);
-          uint8_t p3 = (c & 0x03);
+          if (frameCount < 200 && logoOffset > 12) --logoOffset;
+          else if (frameCount > 500) ++logoOffset;
+        }
+      }
 
-          if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
-          if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
-          if (p2) { pixels[x + 2] = splash_pal[(p2 >> 2)]; }
-          if (p3) { pixels[x + 3] = splash_pal[p3]; }
+      if (y < (VIRTUAL_PIXELS_Y - 1))
+      {
+        y -= vBorder + TMS9918_PIXELS_Y + logoOffset;
+        if (y < splashHeight)
+        {
+          uint8_t* splashPtr = splash + (y * splashWidth / 4);
+          for (int x = 4; x < 4 + splashWidth; x += 4)
+          {
+            uint8_t c = *(splashPtr++);
+            uint8_t p0 = (c & 0xc0);
+            uint8_t p1 = (c & 0x30);
+            uint8_t p2 = (c & 0x0c);
+            uint8_t p3 = (c & 0x03);
+
+            if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
+            if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
+            if (p2) { pixels[x + 2] = splash_pal[(p2 >> 2)]; }
+            if (p3) { pixels[x + 3] = splash_pal[p3]; }
+          }
         }
       }
     }
