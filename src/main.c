@@ -63,7 +63,7 @@
   */
 
 #define PCB_MAJOR_VERSION 0
-#define PCB_MINOR_VERSION 3
+#define PCB_MINOR_VERSION 4
 
 #define GPIO_CD0 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
@@ -105,7 +105,9 @@
 #define TMS_IRQ PIO1_IRQ_0
 
 
-  /* file globals */
+
+
+/* file globals */
 
 static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
@@ -190,7 +192,6 @@ static inline void disableTmsPioInterrupts()
   *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << TMS_IRQ;
   __dmb();
 }
-
 
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
@@ -364,6 +365,9 @@ uint initClock(uint gpio, float freqHz)
  */
 void tmsPioInit()
 {
+  irq_set_exclusive_handler(TMS_IRQ, pio_irq_handler);
+  irq_set_enabled(TMS_IRQ, true);
+
   uint tmsWriteProgram = pio_add_program(TMS_PIO, &tmsWrite_program);
 
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
@@ -373,6 +377,7 @@ void tmsPioInit()
 
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
+  pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
 
   uint tmsReadProgram = pio_add_program(TMS_PIO, &tmsRead_program);
 
@@ -391,9 +396,6 @@ void tmsPioInit()
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
-  irq_set_exclusive_handler(TMS_IRQ, pio_irq_handler);
-  irq_set_enabled(TMS_IRQ, true);
-  pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
   pio_set_irq0_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
 
   pio_sm_put(TMS_PIO, tmsReadSm, 0x000000ff);
@@ -420,7 +422,6 @@ void proc1Entry()
   multicore_fifo_pop_blocking();
   vgaLoop();
 }
-
 
 
 /*
@@ -454,10 +455,10 @@ int main(void)
   vgaInit(params);
 
   /* signal proc1 that we're ready to start the display */
-  multicore_fifo_push_timeout_us(0, 0);
+  multicore_fifo_push_blocking(0);
 
   /* twiddle our thumbs - everything from this point on
-     is handled by interrupts and PIOs */
+     is handled by interrupts and PIOs */;
   while (1)
   {
     tight_loop_contents();
