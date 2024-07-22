@@ -63,7 +63,7 @@
   */
 
 #define PCB_MAJOR_VERSION 0
-#define PCB_MINOR_VERSION 4
+#define PCB_MINOR_VERSION 3
 
 #define GPIO_CD0 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
@@ -199,7 +199,7 @@ static inline void disableTmsPioInterrupts()
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
 
-#if 1
+#if 0
   // better compile-time optimizations if we hard-code these
 #define VIRTUAL_PIXELS_X 640
 #define VIRTUAL_PIXELS_Y 240
@@ -444,10 +444,11 @@ int main(void)
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
-  params.params = vgaGetParams(VGA_640_480_60HZ);
+  params.params = vgaGetParams(RGBS_NTSC_720_480i_60HZ);
+  //params.params = vgaGetParams(VGA_640_480_60HZ);
 
   /* virtual size will be 640 x 320 to accomodate 80-column mode */
-  setVgaParamsScaleY(&params.params, 2);
+  //setVgaParamsScaleY(&params.params, 2);
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
