@@ -48,12 +48,19 @@ int roundflt(float x)
     return (int)(x + 0.5f);
 }
 
+#ifndef VGA_SYNC_PINS_START
+#error Must define VGA_SYNC_PINS_START
+#endif
 
-#define SYNC_PINS_START 0        // first sync pin gpio number
-#define SYNC_PINS_COUNT 2        // number of sync pins (h and v)
+#ifndef VGA_RGB_PINS_START
+#error Must define VGA_RGB_PINS_START
+#endif
 
-#define RGB_PINS_START  2        // first rgb pin gpio number
-#define RGB_PINS_COUNT 12        // number of rgb pins
+#define SYNC_PINS_START VGA_SYNC_PINS_START // first sync pin gpio number
+#define SYNC_PINS_COUNT 2                   // number of sync pins (h and v)
+
+#define RGB_PINS_START  VGA_RGB_PINS_START  // first rgb pin gpio number
+#define RGB_PINS_COUNT 12                   // number of rgb pins
 
 #define VGA_PIO         pio0_hw  // which pio are we using for vga?
 #define SYNC_SM         0        // vga sync state machine index
