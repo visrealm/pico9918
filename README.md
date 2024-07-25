@@ -61,5 +61,10 @@ These videos are showing the v0.2 hardware with an external Pi Pico providing th
 ### 80 column mode
 [![PICO9918 Prototype - 80 column mode test](https://img.visualrealmsoftware.com/youtube/thumb/qdCapu0CVJ8)](https://youtu.be/qdCapu0CVJ8)
 
+And now v0.4 - the single board version:
+
+### v0.4 prototype working!
+[![PICO9918 v0.4 PCB. Integrated RP2040 all-in-one build.](https://img.visualrealmsoftware.com/youtube/thumb/KSbJnAwclQw)](https://youtu.be/KSbJnAwclQw)
+
 ## License
 This code is licensed under the [MIT](https://opensource.org/licenses/MIT "MIT") license
