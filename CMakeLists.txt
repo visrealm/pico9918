@@ -10,6 +10,9 @@ set(BUILD_SHARED_LIBS OFF)
 
 set(PROJECT pico9918)
 
+set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
+set(PICO_BOARD "pico9918_v04")
+
 project(${PROJECT} C CXX)
 
 add_definitions(-DPICO_BUILD=1)
