@@ -111,7 +111,7 @@
 
 static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
-static uint8_t currentStatus = 0; /* current status register value */
+static uint8_t currentStatus = 0x1f; /* current status register value */
 
 static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
@@ -164,7 +164,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     }
     else // read status
     {
-      currentStatus = 0;
+      currentStatus = 0x1f;
       vrEmuTms9918SetStatusImpl(currentStatus);
       currentInt = false;
       gpio_put(GPIO_INT, !currentInt);
@@ -269,12 +269,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   y -= vBorder;
 
-  /*** left border ***/
-  for (int x = 0; x < hBorder; ++x)
-  {
-    pixels[x] = bg;
-  }
-
   /*** main display region ***/
 
   /* generate the scanline */
@@ -284,6 +278,25 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (y == TMS9918_PIXELS_Y - 1)
   {
     tempStatus |= STATUS_INT;
+  }
+
+  disableTmsPioInterrupts();
+  if ((currentStatus & STATUS_INT) == 0)
+  {
+    currentStatus = (currentStatus & 0xe0) | tempStatus;
+
+    vrEmuTms9918SetStatusImpl(currentStatus);
+    updateTmsReadAhead();
+
+    currentInt = vrEmuTms9918InterruptStatusImpl();
+    gpio_put(GPIO_INT, !currentInt);
+  }
+  enableTmsPioInterrupts();
+
+  /*** left border ***/
+  for (int x = 0; x < hBorder; ++x)
+  {
+    pixels[x] = bg;
   }
 
   /* convert from  palette to bgr12 */
@@ -305,31 +318,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     }
   }
 
+
   /*** right border ***/
   for (int x = hBorder + TMS9918_PIXELS_X * 2; x < VIRTUAL_PIXELS_X; ++x)
   {
     pixels[x] = bg;
   }
 
-  disableTmsPioInterrupts();
-  if ((currentStatus & STATUS_INT) == 0)
-  {
-    if ((currentStatus & STATUS_5S) != 0)
-    {
-      currentStatus |= tempStatus & 0xe0;
-    }
-    else
-    {
-      currentStatus |= tempStatus;
-    }
-
-    vrEmuTms9918SetStatusImpl(currentStatus);
-    updateTmsReadAhead();
-
-    currentInt = vrEmuTms9918InterruptStatusImpl();
-    gpio_put(GPIO_INT, !currentInt);
-  }
-  enableTmsPioInterrupts();
 }
 
 /*
