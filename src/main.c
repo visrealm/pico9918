@@ -34,14 +34,14 @@
   *
   * Pin  | GPIO | Name      | TMS9918A Pin
   * -----+------+-----------+-------------
-  *  19  |  14  |  CD0      |  24
-  *  20  |  15  |  CD1      |  23
-  *  21  |  16  |  CD2      |  22
-  *  22  |  17  |  CD3      |  21
-  *  24  |  18  |  CD4      |  20
-  *  25  |  19  |  CD5      |  19
-  *  26  |  20  |  CD6      |  18
-  *  27  |  21  |  CD7      |  17
+  *  19  |  14  |  CD7      |  24
+  *  20  |  15  |  CD6      |  23
+  *  21  |  16  |  CD5      |  22
+  *  22  |  17  |  CD4      |  21
+  *  24  |  18  |  CD3      |  20
+  *  25  |  19  |  CD2      |  19
+  *  26  |  20  |  CD1      |  18
+  *  27  |  21  |  CD0      |  17
   *  29  |  22  |  /INT     |  16
   *  30  |  RUN |  RST      |  34
   *  31  |  26  |  /CSR     |  15
@@ -65,7 +65,7 @@
 #define PCB_MAJOR_VERSION 0
 #define PCB_MINOR_VERSION 4
 
-#define GPIO_CD0 14
+#define GPIO_CD7 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
 #define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio
 #define GPIO_MODE 28
@@ -88,7 +88,7 @@
 #endif
 
 
-#define GPIO_CD_MASK (0xff << GPIO_CD0)
+#define GPIO_CD_MASK (0xff << GPIO_CD7)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
 #define GPIO_CSW_MASK (0x01 << GPIO_CSW)
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
@@ -139,7 +139,7 @@ void  __not_in_flash_func(pio_irq_handler)()
   {
     uint32_t writeVal = TMS_PIO->rxf[tmsWriteSm];
 
-    if (writeVal & (GPIO_MODE_MASK >> GPIO_CD0)) // write reg/addr
+    if (writeVal & (GPIO_MODE_MASK >> GPIO_CD7)) // write reg/addr
     {
       vrEmuTms9918WriteAddrImpl(writeVal & 0xff);
       currentInt = vrEmuTms9918InterruptStatusImpl();
@@ -366,7 +366,7 @@ void tmsPioInit()
   uint tmsWriteProgram = pio_add_program(TMS_PIO, &tmsWrite_program);
 
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
-  sm_config_set_in_pins(&writeConfig, GPIO_CD0);
+  sm_config_set_in_pins(&writeConfig, GPIO_CD7);
   sm_config_set_in_shift(&writeConfig, false, true, 16); // L shift, autopush @ 16 bits
   sm_config_set_clkdiv(&writeConfig, 4.0f);
 
@@ -378,13 +378,13 @@ void tmsPioInit()
 
   for (uint i = 0; i < 8; ++i)
   {
-    pio_gpio_init(TMS_PIO, GPIO_CD0 + i);
+    pio_gpio_init(TMS_PIO, GPIO_CD7 + i);
   }
 
   pio_sm_config readConfig = tmsRead_program_get_default_config(tmsReadProgram);
   sm_config_set_in_pins(&readConfig, GPIO_CSR);
   sm_config_set_jmp_pin(&readConfig, GPIO_MODE);
-  sm_config_set_out_pins(&readConfig, GPIO_CD0, 8);
+  sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
   sm_config_set_clkdiv(&readConfig, 4.0f);
