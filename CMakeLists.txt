@@ -10,15 +10,15 @@ set(BUILD_SHARED_LIBS OFF)
 
 set(PROJECT pico9918)
 
+set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
+set(PICO_BOARD "pico9918_v04")
+
 project(${PROJECT} C CXX)
 
 add_definitions(-DPICO_BUILD=1)
-add_definitions(-DPICO_DISABLE_SHARED_IRQ_HANDLERS=1)
 add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 add_definitions(-DVGA_SYNC_PINS_START=0)
 add_definitions(-DVGA_RGB_PINS_START=2)
-add_definitions(-DPICO_PANIC_FUNCTION=)
-add_definitions(-DPICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)

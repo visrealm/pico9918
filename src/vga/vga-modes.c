@@ -135,7 +135,7 @@ bool setVgaParamsScaleX(VgaParams* params, int pixelScale)
   if (!params || pixelScale < 1) return false;
 
   params->hPixelScale = pixelScale;
-  params->hVirtualPixels = (params->hSyncParams.displayPixels / 1);//params->hPixelScale);
+  params->hVirtualPixels = (params->hSyncParams.displayPixels / params->hPixelScale);
   return true;
 }
 
@@ -144,7 +144,7 @@ bool setVgaParamsScaleY(VgaParams* params, int pixelScale)
   if (!params || pixelScale < 1) return false;
 
   params->vPixelScale = pixelScale;
-  params->vVirtualPixels = (params->vSyncParams.displayPixels / 2);//params->vPixelScale);
+  params->vVirtualPixels = (params->vSyncParams.displayPixels / params->vPixelScale);
   return true;
 }
 

@@ -8,7 +8,19 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 
 ## Hardware
 
-v0.3 Schematic and Gerber available now. This revision has been tested on my two TI-99/4As (PAL and NTSC) and my HBC-56 and is fully functional, however it is not representative of the final PCB design which will include the RP2040 directly on the PCB.
+There are two main variants of the hardware.
+
+### v1.0 (formerly v0.4)
+
+PICO9918 v1.0 is the single board version which doesn't require a piggy-backed Pi Pico. It is in the process of being manufactured now and is based on v0.4 seen below:
+
+<p align="left"><a href="img/pico9918_v0_4_sm.png"><img src="img/pico9918_v0_4_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
+
+Once I have tested v1.0 and made it available, I will publish the schematics and gerbers for this version.
+
+### v0.3
+
+v0.3 schematic and gerber available now. This revision has been tested on my two TI-99/4As (PAL and NTSC) and my HBC-56 and is fully functional, however it is not representative of the final PCB design which will include the RP2040 directly on the PCB.
 
 <p align="left"><a href="pcb/v0.3/pico9918_v0_3_schematic.png"><img src="pcb/v0.3/pico9918_v0_3_schematic.png" alt="PICO9918 v0.3" width="720px"></a></p>
 
@@ -46,6 +58,10 @@ The build system expects `python3` to be available. If you have installed Python
 
 You can do this from an elevated (Administator) command prompt in your python directory e.g. `C:\Program Files\Python310\` by creating a symlink with the command: `mklink python3.exe python.exe`.
 
+## Discussion
+
+For all the latest news and discussion on the PICO9918, you can follow [this AtariAge thread](https://forums.atariage.com/topic/367656-introducing-the-pico9918-a-tms9918a-drop-in-replacement-powered-by-a-pi-pico/)
+
 ## Videos
 
 Initial "raw" videos recorded in the moments following the first boot on my TI-99/4A.
@@ -60,6 +76,11 @@ These videos are showing the v0.2 hardware with an external Pi Pico providing th
 
 ### 80 column mode
 [![PICO9918 Prototype - 80 column mode test](https://img.visualrealmsoftware.com/youtube/thumb/qdCapu0CVJ8)](https://youtu.be/qdCapu0CVJ8)
+
+And now v0.4 - the single board version:
+
+### v0.4 prototype working!
+[![PICO9918 v0.4 PCB. Integrated RP2040 all-in-one build.](https://img.visualrealmsoftware.com/youtube/thumb/KSbJnAwclQw)](https://youtu.be/KSbJnAwclQw)
 
 ## License
 This code is licensed under the [MIT](https://opensource.org/licenses/MIT "MIT") license

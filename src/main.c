@@ -63,7 +63,7 @@
   */
 
 #define PCB_MAJOR_VERSION 0
-#define PCB_MINOR_VERSION 3
+#define PCB_MINOR_VERSION 4
 
 #define GPIO_CD0 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
@@ -105,11 +105,13 @@
 #define TMS_IRQ PIO1_IRQ_0
 
 
-  /* file globals */
+
+
+/* file globals */
 
 static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
-static uint8_t currentStatus = 0; /* current status register value */
+static uint8_t currentStatus = 0x1f; /* current status register value */
 
 static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
@@ -162,7 +164,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     }
     else // read status
     {
-      currentStatus = 0;
+      currentStatus = 0x1f;
       vrEmuTms9918SetStatusImpl(currentStatus);
       currentInt = false;
       gpio_put(GPIO_INT, !currentInt);
@@ -191,7 +193,6 @@ static inline void disableTmsPioInterrupts()
   __dmb();
 }
 
-
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
  */
@@ -211,6 +212,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
+  static int frameCount = 0;
+  static int logoOffset = 100;
+
   uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   /*** top and bottom borders ***/
@@ -226,24 +230,37 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
      *       : 430 bytes
      * format: 16-bit abgr palette, 2bpp indexed image
      */
-    if (y >= vBorder + TMS9918_PIXELS_Y + 12)
+    if (frameCount < 600)
     {
-      y -= vBorder + TMS9918_PIXELS_Y + 12;
-      if (y < splashHeight)
+      if (y == 0)
       {
-        uint8_t* splashPtr = splash + (y * splashWidth / 4);
-        for (int x = 4; x < 4 + splashWidth; x += 4)
+        ++frameCount;
+        if (frameCount & 0x01)
         {
-          uint8_t c = *(splashPtr++);
-          uint8_t p0 = (c & 0xc0);
-          uint8_t p1 = (c & 0x30);
-          uint8_t p2 = (c & 0x0c);
-          uint8_t p3 = (c & 0x03);
+          if (frameCount < 200 && logoOffset > 12) --logoOffset;
+          else if (frameCount > 500) ++logoOffset;
+        }
+      }
 
-          if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
-          if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
-          if (p2) { pixels[x + 2] = splash_pal[(p2 >> 2)]; }
-          if (p3) { pixels[x + 3] = splash_pal[p3]; }
+      if (y < (VIRTUAL_PIXELS_Y - 1))
+      {
+        y -= vBorder + TMS9918_PIXELS_Y + logoOffset;
+        if (y < splashHeight)
+        {
+          uint8_t* splashPtr = splash + (y * splashWidth / 4);
+          for (int x = 4; x < 4 + splashWidth; x += 4)
+          {
+            uint8_t c = *(splashPtr++);
+            uint8_t p0 = (c & 0xc0);
+            uint8_t p1 = (c & 0x30);
+            uint8_t p2 = (c & 0x0c);
+            uint8_t p3 = (c & 0x03);
+
+            if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
+            if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
+            if (p2) { pixels[x + 2] = splash_pal[(p2 >> 2)]; }
+            if (p3) { pixels[x + 3] = splash_pal[p3]; }
+          }
         }
       }
     }
@@ -251,12 +268,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 
   y -= vBorder;
-
-  /*** left border ***/
-  for (int x = 0; x < hBorder; ++x)
-  {
-    pixels[x] = bg;
-  }
 
   /*** main display region ***/
 
@@ -267,6 +278,25 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (y == TMS9918_PIXELS_Y - 1)
   {
     tempStatus |= STATUS_INT;
+  }
+
+  disableTmsPioInterrupts();
+  if ((currentStatus & STATUS_INT) == 0)
+  {
+    currentStatus = (currentStatus & 0xe0) | tempStatus;
+
+    vrEmuTms9918SetStatusImpl(currentStatus);
+    updateTmsReadAhead();
+
+    currentInt = vrEmuTms9918InterruptStatusImpl();
+    gpio_put(GPIO_INT, !currentInt);
+  }
+  enableTmsPioInterrupts();
+
+  /*** left border ***/
+  for (int x = 0; x < hBorder; ++x)
+  {
+    pixels[x] = bg;
   }
 
   /* convert from  palette to bgr12 */
@@ -288,31 +318,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     }
   }
 
+
   /*** right border ***/
   for (int x = hBorder + TMS9918_PIXELS_X * 2; x < VIRTUAL_PIXELS_X; ++x)
   {
     pixels[x] = bg;
   }
 
-  disableTmsPioInterrupts();
-  if ((currentStatus & STATUS_INT) == 0)
-  {
-    if ((currentStatus & STATUS_5S) != 0)
-    {
-      currentStatus |= tempStatus & 0xe0;
-    }
-    else
-    {
-      currentStatus |= tempStatus;
-    }
-
-    vrEmuTms9918SetStatusImpl(currentStatus);
-    updateTmsReadAhead();
-
-    currentInt = vrEmuTms9918InterruptStatusImpl();
-    gpio_put(GPIO_INT, !currentInt);
-  }
-  enableTmsPioInterrupts();
 }
 
 /*
@@ -348,6 +360,9 @@ uint initClock(uint gpio, float freqHz)
  */
 void tmsPioInit()
 {
+  irq_set_exclusive_handler(TMS_IRQ, pio_irq_handler);
+  irq_set_enabled(TMS_IRQ, true);
+
   uint tmsWriteProgram = pio_add_program(TMS_PIO, &tmsWrite_program);
 
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
@@ -357,6 +372,7 @@ void tmsPioInit()
 
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
+  pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
 
   uint tmsReadProgram = pio_add_program(TMS_PIO, &tmsRead_program);
 
@@ -375,9 +391,6 @@ void tmsPioInit()
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
-  irq_set_exclusive_handler(TMS_IRQ, pio_irq_handler);
-  irq_set_enabled(TMS_IRQ, true);
-  pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
   pio_set_irq0_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
 
   pio_sm_put(TMS_PIO, tmsReadSm, 0x000000ff);
@@ -404,7 +417,6 @@ void proc1Entry()
   multicore_fifo_pop_blocking();
   vgaLoop();
 }
-
 
 
 /*
@@ -438,10 +450,10 @@ int main(void)
   vgaInit(params);
 
   /* signal proc1 that we're ready to start the display */
-  multicore_fifo_push_timeout_us(0, 0);
+  multicore_fifo_push_blocking(0);
 
   /* twiddle our thumbs - everything from this point on
-     is handled by interrupts and PIOs */
+     is handled by interrupts and PIOs */;
   while (1)
   {
     tight_loop_contents();
