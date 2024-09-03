@@ -164,10 +164,19 @@ void  __not_in_flash_func(pio_irq_handler)()
     }
     else // read status
     {
-      currentStatus = 0x1f;
-      vrEmuTms9918SetStatusImpl(currentStatus);
-      currentInt = false;
-      gpio_put(GPIO_INT, !currentInt);
+      tms9918->regWriteStage = 0;
+      switch (tms9918->registers [0x0F] & 0x0F)
+      {
+        case 0:
+          currentStatus = 0x1f;
+          vrEmuTms9918SetStatusImpl(currentStatus);
+          currentInt = false;
+          gpio_put(GPIO_INT, !currentInt);
+          break;
+        case 1:
+          tms9918->status [0x01] &= ~0x01;
+          break;
+      }
     }
     updateTmsReadAhead();
   }
