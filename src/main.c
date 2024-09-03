@@ -104,8 +104,8 @@
 #define TMS_PIO pio1
 #define TMS_IRQ PIO1_IRQ_0
 
-
-
+//extern "C" 
+int run9900 (unsigned char * memory, unsigned short pc, unsigned short wp, unsigned char * regx38);
 
 /* file globals */
 
@@ -125,7 +125,7 @@ inline static void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
-  readAhead |= currentStatus << 16;
+  readAhead |= (tms9918->status [tms9918->registers [0x0F] & 0x0F]) << 16;
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
@@ -220,6 +220,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
   {
+    tms9918->scanline = 0;
+    tms9918->blanking = 1;
+    tms9918->status [0x01] &= ~0x01;
+    tms9918->status [0x01] |=  0x02;
+    tms9918->status [0x03] = 0;
     for (int x = 0; x < VIRTUAL_PIXELS_X; ++x)
     {
       pixels[x] = bg;
@@ -268,6 +273,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 
   y -= vBorder;
+  tms9918->scanline = y;
+  tms9918->blanking = 0; // Is it even possible to support H blanking?
+  tms9918->status [0x01] &= ~0x03;
+  if (y && (tms9918->registers [0x13] == y))
+    tms9918->status [0x01] |= 0x01;
+  tms9918->status [0x03] = y;
 
   /*** main display region ***/
 
@@ -418,12 +429,13 @@ void proc1Entry()
   vgaLoop();
 }
 
-
 /*
  * main entry point
  */
 int main(void)
 {
+  int unlock = 0;
+  uint8_t old_regs [8];
   /* currently, VGA hard-coded to 640x480@60Hz. We want a high clock frequency
    * that comes close to being divisible by 25.175MHz. 252.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
@@ -456,7 +468,22 @@ int main(void)
      is handled by interrupts and PIOs */;
   while (1)
   {
-    tight_loop_contents();
+    if (tms9918->registers [0x39] == 0x1C) {
+      tms9918->registers [0x39] = 0;
+      if ((++unlock >= 2) && (memcmp (old_regs, tms9918->registers, 8) == 0)) {
+        tms9918->lockedMask = 0x3F;
+      } else {
+        unlock = 1;
+        memcpy (old_regs, tms9918->registers, 8);
+      }
+    }
+    if ((tms9918->restart) || (tms9918->registers [0x38] & 1)) { // Start?
+      tms9918->restart = 0;
+      tms9918->registers [0x38] = 1;
+      tms9918->status [2] |= 0x80; // Running
+      run9900 (&(tms9918->vram [0]), (tms9918->registers [0x36] << 8) | tms9918->registers [0x37], 0xFFFE, &(tms9918->registers [0x38]));
+      tms9918->status [2] &= ~0x80; // Stopped
+    }
   }
 
   return 0;

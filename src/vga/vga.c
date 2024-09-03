@@ -20,7 +20,7 @@
 #include "hardware/clocks.h"
 
  // compile options
-#define VGA_CRT_EFFECT 1
+#define VGA_CRT_EFFECT 0
 #define VGA_SCANLINE_TIME_DEBUG 0
 #define VGA_HARDCODED_640 1
 #define VGA_NO_MALLOC 1
