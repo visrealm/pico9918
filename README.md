@@ -82,5 +82,10 @@ And now v0.4 - the single board version:
 ### v0.4 prototype working!
 [![PICO9918 v0.4 PCB. Integrated RP2040 all-in-one build.](https://img.visualrealmsoftware.com/youtube/thumb/KSbJnAwclQw)](https://youtu.be/KSbJnAwclQw)
 
-## License
-This code is licensed under the [MIT](https://opensource.org/licenses/MIT "MIT") license
+## Licensing
+
+### Hardware
+The hardware design files in this repository are licensed under the CERN-OHL-S. See [LICENSE_HARDWARE.md](LICENSE_HARDWARE.md) for details.
+
+### Firmware
+The firmware code in this repository is licensed under the MIT License. See [LICENSE_FIRMWARE.md](LICENSE_FIRMWARE.md) for details.
