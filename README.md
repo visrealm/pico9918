@@ -2,9 +2,37 @@
 
 A drop-in replacement for a classic TMS9918A VDP using a Raspberry Pi Pico.
 
-Currently in the early prototyping stages, but looks very promising on my TI-99/4A and [HBC-56](https://github.com/visrealm/hbc-56) test beds.
-
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here.
+
+## Supported devices
+
+This is a list of devices the PICO9918 has been tested and confirmed to work on. 
+
+* Texas Instruments TI-99/4A (NTSC and PAL)
+* CBS ColecoVision (NTSC and PAL)
+* Powertran Cortex
+
+Homebrews:
+
+* Troy Schrapel's [HBC-56](https://github.com/visrealm/hbc-56)
+* Stuart Connor's [TM990](http://www.stuartconner.me.uk/tm990/tm990.htm)
+
+If you have tested the PICO9918 on any other device, please let me know and I'll happily update this list. :)
+
+### Unsupported devices
+
+So far, there aren't any. 
+
+## Purchasing options
+
+Fully assembled and tested PICO9918 v1.0s are available on my Tindie store:
+
+<a href="https://www.tindie.com/products/visrealm/pico9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
+
+Also (more convenient for North America)
+
+<a href="https://www.arcadeshopper.com/wp/store/#!/Pico9918-V1-0-VDP-replacement/p/692136720"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
+
 
 ## Hardware
 
