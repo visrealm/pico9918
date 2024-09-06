@@ -113,7 +113,7 @@ static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0x1f; /* current status register value */
 
-static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
+static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
@@ -219,8 +219,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 #define VIRTUAL_PIXELS_Y params->vVirtualPixels
 #endif
 
+  int vPixels = ((tms9918->registers[0x31] & 0x40) ? 30 : 24) * 8;
 
-  const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
+  const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
   static int frameCount = 0;
@@ -229,7 +230,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   uint16_t bg = rgb12tobgr12[tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]];
 
   /*** top and bottom borders ***/
-  if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
+  if (y < vBorder || y >= (vBorder + vPixels))
   {
     tms9918->scanline = 0;
     tms9918->blanking = 1;
@@ -258,9 +259,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
       }
 
-      if (y < (VIRTUAL_PIXELS_Y - 1))
+      if (y < (vPixels - 1))
       {
-        y -= vBorder + TMS9918_PIXELS_Y + logoOffset;
+        y -= vBorder + vPixels + logoOffset;
         if (y < splashHeight)
         {
           uint8_t* splashPtr = splash + (y * splashWidth / 4);
@@ -297,7 +298,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
 
   /*** interrupt signal? ***/
-  if (y == TMS9918_PIXELS_Y - 1)
+  if (y == vPixels - 2)
   {
     tempStatus |= STATUS_INT;
   }
@@ -323,7 +324,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   /* convert from  palette to bgr12 */
   int tmsX = 0;
-  if (tmsScanlineBuffer[0] & 0xf0)
+  if (tmsScanlineBuffer[0] & 0xc0)
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
     {
