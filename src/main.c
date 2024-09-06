@@ -118,6 +118,8 @@ static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
 
+static uint16_t __aligned(4) rgb12tobgr12[4096];
+
 /*
  * update the value send to the read PIO
  */
@@ -224,7 +226,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   static int frameCount = 0;
   static int logoOffset = 100;
 
-  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
+  uint16_t bg = rgb12tobgr12[tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]];
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
@@ -282,12 +284,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 
   y -= vBorder;
-  tms9918->scanline = y;
+  tms9918->scanline = y + 1;
   tms9918->blanking = 0; // Is it even possible to support H blanking?
   tms9918->status [0x01] &= ~0x03;
-  if (y && (tms9918->registers [0x13] == y))
+  if (y && (tms9918->registers [0x13] == tms9918->scanline))
     tms9918->status [0x01] |= 0x01;
-  tms9918->status [0x03] = y;
+  tms9918->status [0x03] = tms9918->scanline;
 
   /*** main display region ***/
 
@@ -325,15 +327,15 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
     {
-      pixels[x] = tms9918PaletteBGR12[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4];
-      pixels[x + 1] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX] & 0x0f];
+      pixels[x] = rgb12tobgr12[tms9918->pram[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4]];
+      pixels[x + 1] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX] & 0x0f]];
     }
   }
   else
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
     {
-      pixels[x] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX]];
+      pixels[x] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX]]];
       pixels[x + 1] = pixels[x];
     }
   }
@@ -443,8 +445,6 @@ void proc1Entry()
  */
 int main(void)
 {
-  int unlock = 0;
-  uint8_t old_regs [8];
   /* currently, VGA hard-coded to 640x480@60Hz. We want a high clock frequency
    * that comes close to being divisible by 25.175MHz. 252.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
@@ -457,6 +457,11 @@ int main(void)
 
   /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
+
+  for (int i = 0; i < 4096; ++i)
+  {
+    rgb12tobgr12[i] = (i >> 8) | (i & 0xf0) | ((i & 0x0f) << 8);
+  }
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
@@ -477,15 +482,6 @@ int main(void)
      is handled by interrupts and PIOs */;
   while (1)
   {
-    if (tms9918->registers [0x39] == 0x1C) {
-      tms9918->registers [0x39] = 0;
-      if ((++unlock >= 2) && (memcmp (old_regs, tms9918->registers, 8) == 0)) {
-        tms9918->lockedMask = 0x3F;
-      } else {
-        unlock = 1;
-        memcpy (old_regs, tms9918->registers, 8);
-      }
-    }
     if ((tms9918->restart) || (tms9918->registers [0x38] & 1)) { // Start?
       tms9918->restart = 0;
       tms9918->registers [0x38] = 1;
