@@ -30,7 +30,7 @@
  // a number of compiile-time optimisations can occur 
  // if it knows some of the VGA parameters 
 #if VGA_HARDCODED_640
-#define VIRTUAL_PIXELS_X 640
+#define VIRTUAL_PIXELS_X 320
 #define VIRTUAL_PIXELS_Y 240
 #else
 #include "pico/divider.h"

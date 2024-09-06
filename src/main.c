@@ -97,7 +97,7 @@
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
 #define PICO_CLOCK_PLL 1260000000
-#define PICO_CLOCK_PLL_DIV1 5
+#define PICO_CLOCK_PLL_DIV1 4
 #define PICO_CLOCK_PLL_DIV2 1
 #define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
 
@@ -117,6 +117,9 @@ static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
+static int frameCount = 0;
+static int logoOffset = 100;
+
 
 static uint16_t __aligned(4) rgb12tobgr12[4096];
 
@@ -129,6 +132,14 @@ inline static void updateTmsReadAhead()
   readAhead |= nextValue << 8;
   readAhead |= (tms9918->status [tms9918->registers [0x0F] & 0x0F]) << 16;
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
+}
+
+void __not_in_flash_func(gpioIrqHandler)()
+{
+  gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
+  vrEmuTms9918Reset();
+  frameCount = 0;
+  logoOffset = 100;
 }
 
 /*
@@ -212,7 +223,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
 #if 1
   // better compile-time optimizations if we hard-code these
-#define VIRTUAL_PIXELS_X 640
+#define VIRTUAL_PIXELS_X 320
 #define VIRTUAL_PIXELS_Y 240
 #else 
 #define VIRTUAL_PIXELS_X params->hVirtualPixels
@@ -222,12 +233,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   int vPixels = ((tms9918->registers[0x31] & 0x40) ? 30 : 24) * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
-  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
+  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 1) / 2;
 
-  static int frameCount = 0;
-  static int logoOffset = 100;
+  static bool doneInt = false;
 
-  uint16_t bg = rgb12tobgr12[tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]];
+  uint16_t bg = /*rgb12tobgr12[*/tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];//];
+
+  if (y < 10) doneInt = false;
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + vPixels))
@@ -259,13 +271,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
       }
 
-      if (y < (vPixels - 1))
+      if (y < (VIRTUAL_PIXELS_Y - 1))
       {
         y -= vBorder + vPixels + logoOffset;
         if (y < splashHeight)
         {
           uint8_t* splashPtr = splash + (y * splashWidth / 4);
-          for (int x = 4; x < 4 + splashWidth; x += 4)
+          for (int x = 4; x < 4 + splashWidth / 2; x += 2)
           {
             uint8_t c = *(splashPtr++);
             uint8_t p0 = (c & 0xc0);
@@ -274,9 +286,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
             uint8_t p3 = (c & 0x03);
 
             if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
-            if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
-            if (p2) { pixels[x + 2] = splash_pal[(p2 >> 2)]; }
-            if (p3) { pixels[x + 3] = splash_pal[p3]; }
+            //if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
+            if (p2) { pixels[x + 1] = splash_pal[(p2 >> 2)]; }
+            //if (p3) { pixels[x + 3] = splash_pal[p3]; }
           }
         }
       }
@@ -288,8 +300,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   tms9918->scanline = y + 1;
   tms9918->blanking = 0; // Is it even possible to support H blanking?
   tms9918->status [0x01] &= ~0x03;
-  if (y && (tms9918->registers [0x13] == tms9918->scanline))
-    tms9918->status [0x01] |= 0x01;
   tms9918->status [0x03] = tms9918->scanline;
 
   /*** main display region ***/
@@ -298,8 +308,15 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
 
   /*** interrupt signal? ***/
-  if (y == vPixels - 2)
+  if (!doneInt && y > vPixels - 6)
   {
+    tempStatus |= STATUS_INT;
+    doneInt = true;
+  }
+
+  if (tms9918->registers [0x13] == tms9918->scanline)
+  {
+    tms9918->status [0x01] |= 0x01;
     tempStatus |= STATUS_INT;
   }
 
@@ -326,24 +343,24 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   int tmsX = 0;
   if (tmsScanlineBuffer[0] & 0xc0)
   {
-    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
+    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
       pixels[x] = rgb12tobgr12[tms9918->pram[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4]];
-      pixels[x + 1] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX] & 0x0f]];
+      //pixels[x + 1] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX] & 0x0f]];
     }
   }
   else
   {
-    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
+    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
-      pixels[x] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX]]];
-      pixels[x + 1] = pixels[x];
+      pixels[x] = /*rgb12tobgr12[*/tms9918->pram[tmsScanlineBuffer[tmsX]];//];
+      //pixels[x + 1] = pixels[x];
     }
   }
 
 
   /*** right border ***/
-  for (int x = hBorder + TMS9918_PIXELS_X * 2; x < VIRTUAL_PIXELS_X; ++x)
+  for (int x = hBorder + TMS9918_PIXELS_X * 1; x < VIRTUAL_PIXELS_X; ++x)
   {
     pixels[x] = bg;
   }
@@ -436,6 +453,11 @@ void proc1Entry()
   initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
   initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
+  // set up reset gpio interrupt handler
+  irq_set_exclusive_handler(IO_IRQ_BANK0, gpioIrqHandler);
+  irq_set_enabled(IO_IRQ_BANK0, true);
+  gpio_set_irq_enabled(GPIO_RESET, GPIO_IRQ_EDGE_FALL, true);
+
   // wait until everything else is ready, then run the vga loop
   multicore_fifo_pop_blocking();
   vgaLoop();
@@ -450,6 +472,7 @@ int main(void)
    * that comes close to being divisible by 25.175MHz. 252.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
+  vreg_set_voltage(VREG_VOLTAGE_1_30);
 
   set_sys_clock_pll(PICO_CLOCK_PLL, PICO_CLOCK_PLL_DIV1, PICO_CLOCK_PLL_DIV2);   // 252000
 
@@ -459,17 +482,17 @@ int main(void)
   /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
 
-  for (int i = 0; i < 4096; ++i)
-  {
-    rgb12tobgr12[i] = (i >> 8) | (i & 0xf0) | ((i & 0x0f) << 8);
-  }
+  //for (int i = 0; i < 4096; ++i)
+  //{
+//    rgb12tobgr12[i] = (i >> 8) | (i & 0xf0) | ((i & 0x0f) << 8);
+//  }
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(VGA_640_480_60HZ);
 
-  /* virtual size will be 640 x 320 to accomodate 80-column mode */
-  setVgaParamsScaleY(&params.params, 2);
+  /* virtual size will be 320 x 240 */
+  setVgaParamsScale(&params.params, 2);
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
