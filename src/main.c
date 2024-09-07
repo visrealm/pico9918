@@ -312,12 +312,23 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     tempStatus |= STATUS_INT;
     doneInt = true;
+
+    if (tms9918->registers[0x32] & 0x20)
+    {
+      tms9918->restart = 1;
+    }
+
   }
 
   if (tms9918->registers [0x13] == tms9918->scanline)
   {
     tms9918->status [0x01] |= 0x01;
     tempStatus |= STATUS_INT;
+  }
+
+  if (tms9918->registers[0x32] & 0x40)
+  {
+    tms9918->restart = 1;
   }
 
   disableTmsPioInterrupts();
