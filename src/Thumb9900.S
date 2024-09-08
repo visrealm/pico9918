@@ -1123,11 +1123,7 @@ I_JMP:  SXTH R0,R0 // R0 now has a signed offset
         ADDS R4,R0,#2 // Does this jump to itself?
         BNE  dojump   // Else quit the emulation
 // *********************************************************************************************
-I_IDLE: MOVS R0,#0
-        MOV  R1,R9
-        STRB R0,[R1,#0] // Clear register >38
-
-        ADR  R0,RETCODE
+I_IDLE: ADR  R0,RETCODE
         STR  R3,[R0,#0] // PC
 
         POP  {R0-R7}
@@ -1200,6 +1196,7 @@ I_JNE:  SXTH R0,R0 // R0 now has a signed offset
 // R6 =DEST (initially INST|BYTE)
 // R7 =2nd JUMP location
 // R8 =memory
+// R9 =regx38
 // R10=SPARE
 // R11=WP
 
