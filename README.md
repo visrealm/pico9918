@@ -11,6 +11,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * Texas Instruments TI-99/4A (NTSC and PAL)
 * CBS ColecoVision (NTSC and PAL)
 * Powertran Cortex
+* Casio PV-7 (MSX)
 
 Homebrews:
 
