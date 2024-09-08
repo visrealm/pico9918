@@ -9,6 +9,7 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 This is a list of devices the PICO9918 has been tested and confirmed to work on. 
 
 * Texas Instruments TI-99/4A (NTSC and PAL)
+* Texas Instruments TI-99/4QI
 * CBS ColecoVision (NTSC and PAL)
 * Powertran Cortex
 * Casio PV-7 (MSX)
