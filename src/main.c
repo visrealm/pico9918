@@ -17,8 +17,6 @@
 
 #include "palette.h"
 
-//#include "splash.h"
-
 #include "impl/vrEmuTms9918Priv.h"
 #include "vrEmuTms9918Util.h"
 
@@ -64,6 +62,20 @@
 
 #define PCB_MAJOR_VERSION 0
 #define PCB_MINOR_VERSION 4
+
+// compile-options to ease development between Jason and I
+#ifndef PICO9918_NO_SPLASH
+#define PICO9918_NO_SPLASH      0
+#endif
+
+#ifndef PICO9918_RGB_TO_BGR_FIX
+#define PICO9918_RGB_TO_BGR_FIX 0
+#endif
+
+#if !PICO9918_NO_SPLASH
+#include "splash.h"
+#endif
+
 
 #define GPIO_CD7 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
@@ -120,8 +132,12 @@ const uint tmsReadSm = 1;
 static int frameCount = 0;
 static int logoOffset = 100;
 
-
+#if PICO9918_RGB_TO_BGR_FIX
 static uint16_t __aligned(4) rgb12tobgr12[4096];
+#define CONVERT_BGR(bgr) rgb12tobgr12[bgr]
+#else
+#define CONVERT_BGR(bgr) bgr
+#endif
 
 /*
  * update the value send to the read PIO
@@ -237,7 +253,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   static bool doneInt = false;
 
-  uint16_t bg = rgb12tobgr12[tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]];
+  uint16_t bg = CONVERT_BGR(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
 
   if (y < 10) doneInt = false;
 
@@ -259,7 +275,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
      *       : 430 bytes
      * format: 16-bit abgr palette, 2bpp indexed image
      */
-    /*if (frameCount < 600)
+#if !PICO9918_NO_SPLASH
+    if (frameCount < 600)
     {
       if (y == 0)
       {
@@ -292,7 +309,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
           }
         }
       }
-    }*/
+    }
+#endif
     return;
   }
 
@@ -354,7 +372,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
-      pixels[x] = rgb12tobgr12[tms9918->pram[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4]];
+      pixels[x] = CONVERT_BGR(tms9918->pram[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4]);
       //pixels[x + 1] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX] & 0x0f]];
     }
   }
@@ -362,7 +380,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
-      pixels[x] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX]]];
+      pixels[x] = CONVERT_BGR(tms9918->pram[tmsScanlineBuffer[tmsX]]);
       //pixels[x + 1] = pixels[x];
     }
   }
@@ -539,10 +557,12 @@ int main(void)
   /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
 
+#if PICO9918_RGB_TO_BGR_FIX
   for (int i = 0; i < 4096; ++i)
   {
     rgb12tobgr12[i] = (i >> 8) | (i & 0xf0) | ((i & 0x0f) << 8);
   }
+#endif
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
