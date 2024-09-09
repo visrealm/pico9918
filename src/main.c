@@ -315,15 +315,15 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 
   y -= vBorder;
-  tms9918->scanline = y + 1;
-  tms9918->blanking = 0; // Is it even possible to support H blanking?
-  tms9918->status [0x01] &= ~0x03;
-  tms9918->status [0x03] = tms9918->scanline;
-
   /*** main display region ***/
 
   /* generate the scanline */
   uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+
+  tms9918->scanline = y;
+  tms9918->blanking = 0; // Is it even possible to support H blanking?
+  tms9918->status [0x01] &= ~0x03;
+  tms9918->status [0x03] = tms9918->scanline;
 
   /*** interrupt signal? ***/
   if (!doneInt && y > vPixels - 6)
@@ -336,7 +336,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     }
   }
 
-  if (tms9918->registers [0x13] == tms9918->scanline)
+  if (tms9918->scanline && (tms9918->registers[0x13] == tms9918->scanline))
   {
     tms9918->status [0x01] |= 0x01;
     tempStatus |= STATUS_INT;
