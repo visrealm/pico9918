@@ -150,12 +150,19 @@ inline static void updateTmsReadAhead()
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
+
+/*
+ * handle reset pin going active (low)
+ */
 void __not_in_flash_func(gpioIrqHandler)()
 {
   gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
   vrEmuTms9918Reset();
+
   frameCount = 0;
   logoOffset = 100;
+  currentInt = false;
+  gpio_put(GPIO_INT, !currentInt);
 }
 
 /*
