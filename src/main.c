@@ -583,6 +583,7 @@ int main(void)
      is handled by interrupts and PIOs */;
 
   memcpy (tms9918->gram1, preload, sizeof (preload));
+  memcpy (tms9918->gram1 + 0x800, preload, sizeof (preload));
   tms9918->gpuAddress = 0x4000;
   while (1)
   {

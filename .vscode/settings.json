@@ -5,6 +5,7 @@
     "stdlib.h": "c",
     "multicore.h": "c",
     "stdio.h": "c",
-    "tms9918.pio.h": "c"
+    "tms9918.pio.h": "c",
+    "cstdint": "c"
   }
 }
