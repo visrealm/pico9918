@@ -13,6 +13,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * CBS ColecoVision (NTSC and PAL)
 * Powertran Cortex
 * Casio PV-7 (MSX)
+* NABU Personal Computer
 
 Homebrews:
 
