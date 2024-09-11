@@ -299,9 +299,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     pixels[x] = bg;
   }
 
-  /* convert from  palette to bgr12 */
+  /* convert from palette to bgr12 */
   int tmsX = 0;
-  if (tmsScanlineBuffer[0] & 0xf0)
+  if (tms9918->mode == TMS_MODE_TEXT80)
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
     {
