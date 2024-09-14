@@ -8,7 +8,6 @@ target_sources(${PROGRAM} PRIVATE main.c palette.c clocks.pio.h tms9918.pio.h Th
 
 # compile-time options to ease development between JasonACT and I
 set(PICO9918_NO_SPLASH 0)
-set(PICO9918_RGB_TO_BGR_FIX 0)
 
 # generate image array source files from png images
 if (PICO9918_NO_SPLASH EQUAL 0)
@@ -26,7 +25,6 @@ pico_enable_stdio_uart(${PROGRAM} 0)
 pico_set_binary_type(${PROGRAM} copy_to_ram)   # TOO SLOW TO BOOT
 
 add_definitions(-DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH})
-add_definitions(-DPICO9918_RGB_TO_BGR_FIX=${PICO9918_RGB_TO_BGR_FIX})
 add_definitions(-DPICO_DISABLE_SHARED_IRQ_HANDLERS=1)
 add_definitions(-DPICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1)
 add_definitions(-DPICO_PANIC_FUNCTION=)

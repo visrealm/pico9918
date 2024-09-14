@@ -132,12 +132,16 @@ const uint tmsReadSm = 1;
 static int frameCount = 0;
 static int logoOffset = 100;
 
-#if PICO9918_RGB_TO_BGR_FIX
-static uint16_t __aligned(4) rgb12tobgr12[4096];
-#define CONVERT_BGR(bgr) rgb12tobgr12[bgr]
-#else
-#define CONVERT_BGR(bgr) bgr
-#endif
+
+/* F18A palette entries are big-endian 0x00rrggbb which looks like
+   0xggbb00rr to our rp2040. our vga code is expecting 0x00bbggrr
+   so we've got B and R correct by pure chance. just need to shift G
+   over. this function does that. note: msbs are ignore so... */
+
+inline uint16_t bigRgb2LittleBgr(uint16_t val)
+{
+  return val | ((val >> 12) << 4);
+}
 
 /*
  * update the value send to the read PIO
@@ -150,6 +154,8 @@ inline static void updateTmsReadAhead()
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
+
+#ifdef GPIO_RESET
 
 /*
  * handle reset pin going active (low)
@@ -164,6 +170,8 @@ void __not_in_flash_func(gpioIrqHandler)()
   currentInt = false;
   gpio_put(GPIO_INT, !currentInt);
 }
+
+#endif
 
 /*
  * handle interrupts from the TMS9918<->CPU interface
@@ -260,7 +268,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   static bool doneInt = false;
 
-  uint16_t bg = CONVERT_BGR(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  uint16_t bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
 
   if (y < 10) doneInt = false;
 
@@ -374,7 +382,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
-      pixels[x] = CONVERT_BGR(tms9918->pram[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4]);
+      pixels[x] = bigRgb2LittleBgr(tms9918->pram[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4]);
       //pixels[x + 1] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX] & 0x0f]];
     }
   }
@@ -382,7 +390,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
-      pixels[x] = CONVERT_BGR(tms9918->pram[tmsScanlineBuffer[tmsX]]);
+      pixels[x] = bigRgb2LittleBgr(tms9918->pram[tmsScanlineBuffer[tmsX]]);
       //pixels[x + 1] = pixels[x];
     }
   }
@@ -486,10 +494,14 @@ void proc1Entry()
   initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
   initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
+#ifdef GPIO_RESET
+
   // set up reset gpio interrupt handler
   irq_set_exclusive_handler(IO_IRQ_BANK0, gpioIrqHandler);
   irq_set_enabled(IO_IRQ_BANK0, true);
   gpio_set_irq_enabled(GPIO_RESET, GPIO_IRQ_EDGE_FALL, true);
+
+#endif
 
   // wait until everything else is ready, then run the vga loop
   multicore_fifo_pop_blocking();
