@@ -10,7 +10,8 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 
 * Texas Instruments TI-99/4A (NTSC and PAL)
 * Texas Instruments TI-99/4QI
-* CBS ColecoVision (NTSC and PAL)
+* ColecoVision (NTSC and PAL)
+* Coleco ADAM (NTSC)
 * Powertran Cortex
 * Casio PV-7 (MSX)
 * NABU Personal Computer
@@ -19,6 +20,7 @@ Homebrews:
 
 * Troy Schrapel's [HBC-56](https://github.com/visrealm/hbc-56)
 * Stuart Connor's [TM990](http://www.stuartconner.me.uk/tm990/tm990.htm)
+* John Winans' Z80-Retro (https://github.com/Z80-Retro)
 
 If you have tested the PICO9918 on any other device, please let me know and I'll happily update this list. :)
 
