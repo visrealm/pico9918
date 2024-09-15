@@ -12,9 +12,12 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * Texas Instruments TI-99/4QI
 * ColecoVision (NTSC and PAL)
 * Coleco ADAM (NTSC)
-* Powertran Cortex
-* Casio PV-7 (MSX)
+* MSX
+  * Casio PV-7
+  * Toshiba HX-21
 * NABU Personal Computer
+* Powertran Cortex
+* Tomy Pyuuta
 
 Homebrews:
 
