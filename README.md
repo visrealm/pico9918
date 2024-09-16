@@ -17,6 +17,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
   * Toshiba HX-21
 * NABU Personal Computer
 * Powertran Cortex
+* Sega SC-3000
 * Tomy Pyuuta
 
 Homebrews:
