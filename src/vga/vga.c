@@ -66,15 +66,15 @@ int roundflt(float x)
 /*
  * sync pio dma data buffers
  */
-uint32_t __aligned(4) syncDataActive[4];  // active display area
-uint32_t __aligned(4) syncDataPorch[4];   // vertical porch
-uint32_t __aligned(4) syncDataSync[4];    // vertical sync
+uint32_t __aligned(8) syncDataActive[4];  // active display area
+uint32_t __aligned(8) syncDataPorch[4];   // vertical porch
+uint32_t __aligned(8) syncDataSync[4];    // vertical sync
 
 #if VGA_NO_MALLOC
-uint16_t __aligned(4) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG][640 * sizeof(uint16_t)] = { 0 };   // two scanline buffers (odd and even)
+__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG][320] = { 0 };   // two scanline buffers (odd and even)
 #else
 #include <stdlib.h>
-uint16_t* __aligned(4) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG] = { 0 };                          // two scanline buffers (odd and even)
+uint16_t* __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG] = { 0 };                          // two scanline buffers (odd and even)
 #endif
 
 

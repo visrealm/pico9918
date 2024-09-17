@@ -68,14 +68,9 @@
 #define PICO9918_NO_SPLASH      0
 #endif
 
-#ifndef PICO9918_RGB_TO_BGR_FIX
-#define PICO9918_RGB_TO_BGR_FIX 0
-#endif
-
 #if !PICO9918_NO_SPLASH
 #include "splash.h"
 #endif
-
 
 #define GPIO_CD7 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
@@ -125,7 +120,7 @@ static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0x1f; /* current status register value */
 
-static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
+static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(8) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
@@ -574,13 +569,6 @@ int main(void)
 
   /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
-
-#if PICO9918_RGB_TO_BGR_FIX
-  for (int i = 0; i < 4096; ++i)
-  {
-    rgb12tobgr12[i] = (i >> 8) | (i & 0xf0) | ((i & 0x0f) << 8);
-  }
-#endif
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };

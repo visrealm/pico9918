@@ -40,7 +40,7 @@
  /* palette of 12-bit BGR values generated from above 32-bit RGBA values
   * Format: 0000BBBBGGGGRRRR */
 
-uint16_t __aligned(4) tms9918PaletteBGR12[16] =
+uint16_t __aligned(8) tms9918PaletteBGR12[16] =
 {
   BGR12FROMRGBA32(TMSPAL00),
   BGR12FROMRGBA32(TMSPAL01),
