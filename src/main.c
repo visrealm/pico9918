@@ -133,7 +133,7 @@ static int logoOffset = 100;
    so we've got B and R correct by pure chance. just need to shift G
    over. this function does that. note: msbs are ignore so... */
 
-inline uint16_t bigRgb2LittleBgr(uint16_t val)
+inline uint32_t bigRgb2LittleBgr(uint32_t val)
 {
   return val | ((val >> 12) << 4);
 }
@@ -263,7 +263,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   static bool doneInt = false;
 
-  uint16_t bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  uint32_t* dPixels = (uint32_t*)pixels;
+  uint32_t bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  bg = bg | (bg << 16);
 
   if (y < 10) doneInt = false;
 
@@ -275,9 +277,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     tms9918->status [0x01] &= ~0x01;
     tms9918->status [0x01] |=  0x02;
     tms9918->status [0x03] = 0;
-    for (int x = 0; x < VIRTUAL_PIXELS_X; ++x)
+    for (int x = 0; x < VIRTUAL_PIXELS_X / 2; ++x)
     {
-      pixels[x] = bg;
+      dPixels[x] = bg;
     }
 
     /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
@@ -366,9 +368,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   enableTmsPioInterrupts();
 
   /*** left border ***/
-  for (int x = 0; x < hBorder; ++x)
+  for (int x = 0; x < hBorder / 2; ++x)
   {
-    pixels[x] = bg;
+    dPixels[x] = bg;
   }
 
   /* convert from  palette to bgr12 */
@@ -383,18 +385,36 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
   else
   {
-    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
+    /*for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
       pixels[x] = bigRgb2LittleBgr(tms9918->pram[tmsScanlineBuffer[tmsX]]);
       //pixels[x + 1] = pixels[x];
+    }*/
+
+    uint8_t* src = &(tmsScanlineBuffer [0]);
+    uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X * 1]);
+    uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
+    while (src < end)
+    {
+      uint32_t data;
+      data = tms9918->pram[src [0]] | (tms9918->pram[src [1]] << 16);
+      dP [0] = data | ((data >> 8) & 0x00f000f0);
+      data = tms9918->pram[src [2]] | (tms9918->pram[src [3]] << 16);
+      dP [1] = data | ((data >> 8) & 0x00f000f0);
+      data = tms9918->pram[src [4]] | (tms9918->pram[src [5]] << 16);
+      dP [2] = data | ((data >> 8) & 0x00f000f0);
+      data = tms9918->pram[src [6]] | (tms9918->pram[src [7]] << 16);
+      dP [3] = data | ((data >> 8) & 0x00f000f0);
+      dP += 4;
+      src += 8;
     }
   }
 
 
   /*** right border ***/
-  for (int x = hBorder + TMS9918_PIXELS_X * 1; x < VIRTUAL_PIXELS_X; ++x)
+  for (int x = (hBorder + TMS9918_PIXELS_X * 1) / 2; x < VIRTUAL_PIXELS_X / 2; ++x)
   {
-    pixels[x] = bg;
+    dPixels[x] = bg;
   }
   
   tms9918->scanline = y + 1;
