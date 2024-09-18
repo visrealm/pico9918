@@ -128,8 +128,8 @@ static int frameCount = 0;
 static int logoOffset = 100;
 
 
-/* F18A palette entries are big-endian 0x00rrggbb which looks like
-   0xggbb00rr to our rp2040. our vga code is expecting 0x00bbggrr
+/* F18A palette entries are big-endian 0x0RGB which looks like
+   0xGB0R to our RP2040. our vga code is expecting 0x0BGR
    so we've got B and R correct by pure chance. just need to shift G
    over. this function does that. note: msbs are ignore so... */
 
