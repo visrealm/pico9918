@@ -6,6 +6,7 @@
     "multicore.h": "c",
     "stdio.h": "c",
     "tms9918.pio.h": "c",
-    "cstdint": "c"
+    "cstdint": "c",
+    "typeinfo": "c"
   }
 }

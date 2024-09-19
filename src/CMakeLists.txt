@@ -32,6 +32,7 @@ add_definitions(-DPICO_PANIC_FUNCTION=)
 target_link_libraries(${PROGRAM} PUBLIC
         pico_stdlib
         pico_multicore
+        hardware_dma        
         hardware_pio        
         pico9918-vga
         vrEmuTms9918)

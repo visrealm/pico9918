@@ -23,6 +23,7 @@
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
 
+#include "hardware/dma.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
@@ -120,12 +121,16 @@ static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0x1f; /* current status register value */
 
+static __attribute__((section(".scratch_y.buffer"))) uint32_t bg; 
+
 static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(8) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
 static int frameCount = 0;
 static int logoOffset = 100;
+
+static uint32_t dma32; // memset 32bit
 
 
 /* F18A palette entries are big-endian 0x0RGB which looks like
@@ -241,6 +246,40 @@ static inline void disableTmsPioInterrupts()
   __dmb();
 }
 
+static void updateInterrupts(uint8_t tempStatus)
+{
+  disableTmsPioInterrupts();
+  if ((currentStatus & STATUS_INT) == 0)
+  {
+    currentStatus = (currentStatus & 0xe0) | tempStatus;
+
+    vrEmuTms9918SetStatusImpl(currentStatus);
+    updateTmsReadAhead();
+
+    currentInt = vrEmuTms9918InterruptStatusImpl();
+    gpio_put(GPIO_INT, !currentInt);
+  }
+  enableTmsPioInterrupts();
+}
+
+
+static void tmsEndOfFrame(uint32_t frameNumber)
+{
+  tms9918->scanline = 0;
+  tms9918->blanking = 1;
+  tms9918->status [0x01] &= ~0x01;
+  tms9918->status [0x01] |=  0x02;
+  tms9918->status [0x03] = 0;
+  ++frameCount;
+
+  if (tms9918->registers[0x32] & 0x20)
+  {
+      tms9918->restart = 1;
+  }
+
+  updateInterrupts(STATUS_INT);
+}
+
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
  */
@@ -264,7 +303,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   static bool doneInt = false;
 
   uint32_t* dPixels = (uint32_t*)pixels;
-  uint32_t bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
   bg = bg | (bg << 16);
 
   if (y < 10) doneInt = false;
@@ -272,15 +311,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + vPixels))
   {
-    tms9918->scanline = 0;
-    tms9918->blanking = 1;
-    tms9918->status [0x01] &= ~0x01;
-    tms9918->status [0x01] |=  0x02;
-    tms9918->status [0x03] = 0;
-    for (int x = 0; x < VIRTUAL_PIXELS_X / 2; ++x)
-    {
-      dPixels[x] = bg;
-    }
+    dma_channel_wait_for_finish_blocking(dma32);
+    dma_channel_set_write_addr(dma32, dPixels, false);
+    dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
+    dma_channel_wait_for_finish_blocking(dma32);
 
     /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
      * size  : 172px x 10px
@@ -326,6 +360,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     return;
   }
 
+  /*** left border ***/
+  dma_channel_set_write_addr(dma32, dPixels, false);
+  dma_channel_set_trans_count(dma32, hBorder / 2, true);
+
   y -= vBorder;
   /*** main display region ***/
 
@@ -333,15 +371,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
 
   /*** interrupt signal? ***/
-  if (!doneInt && y > vPixels - 6)
-  {
-    tempStatus |= STATUS_INT;
-    doneInt = true;
-    if (tms9918->registers[0x32] & 0x20)
-    {
-        tms9918->restart = 1;
-    }
-  }
 
   if (tms9918->scanline && (tms9918->registers[0x13] == tms9918->scanline))
   {
@@ -354,24 +383,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       tms9918->restart = 1;
   }
 
-  disableTmsPioInterrupts();
-  if ((currentStatus & STATUS_INT) == 0)
-  {
-    currentStatus = (currentStatus & 0xe0) | tempStatus;
-
-    vrEmuTms9918SetStatusImpl(currentStatus);
-    updateTmsReadAhead();
-
-    currentInt = vrEmuTms9918InterruptStatusImpl();
-    gpio_put(GPIO_INT, !currentInt);
-  }
-  enableTmsPioInterrupts();
-
-  /*** left border ***/
-  for (int x = 0; x < hBorder / 2; ++x)
-  {
-    dPixels[x] = bg;
-  }
+  updateInterrupts(tempStatus);
 
   /* convert from  palette to bgr12 */
   int tmsX = 0;
@@ -412,11 +424,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
 
   /*** right border ***/
-  for (int x = (hBorder + TMS9918_PIXELS_X * 1) / 2; x < VIRTUAL_PIXELS_X / 2; ++x)
-  {
-    dPixels[x] = bg;
-  }
-  
+  dma_channel_wait_for_finish_blocking(dma32);
+  dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 1) / 2]), true);
+
   tms9918->scanline = y + 1;
   tms9918->blanking = 0; // Is it even possible to support H blanking?
   tms9918->status [0x01] &= ~0x03;
@@ -590,6 +600,17 @@ int main(void)
   /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
 
+
+	dma32 = 2;//dma_claim_unused_channel(true);
+	dma_channel_config cfg = dma_channel_get_default_config(dma32);
+	channel_config_set_read_increment(&cfg, false);
+	channel_config_set_write_increment(&cfg, true);
+	channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
+	dma_channel_set_config(dma32, &cfg, false);
+
+  dma_channel_set_read_addr(dma32, &bg, false);
+
+
   /* then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(VGA_640_480_60HZ);
@@ -599,6 +620,7 @@ int main(void)
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
+  params.endOfFrameFn = tmsEndOfFrame;
 
   vgaInit(params);
 
