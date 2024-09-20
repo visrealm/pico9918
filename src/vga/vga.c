@@ -441,6 +441,8 @@ void __time_critical_func(vgaLoop)()
     }
     else
     {
+      multicore_fifo_drain();
+
       // get the next scanline pixels
       vgaParams.scanlineFn(message & 0xfff, &vgaParams.params, rgbDataBuffer[message & 0x01]);
 #if VGA_SCANLINE_TIME_DEBUG

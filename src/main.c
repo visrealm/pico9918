@@ -276,8 +276,6 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   {
       tms9918->restart = 1;
   }
-
-  updateInterrupts(STATUS_INT);
 }
 
 /*
@@ -295,7 +293,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 #define VIRTUAL_PIXELS_Y params->vVirtualPixels
 #endif
 
-  int vPixels = ((tms9918->registers[0x31] & 0x40) ? 30 : 24) * 8;
+  int vPixels = (tms9918->registers[0x31] & 0x40) ? 30 * 8 - 1 : 24 * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 1) / 2;
@@ -381,6 +379,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (tms9918->registers[0x32] & 0x40)
   {
       tms9918->restart = 1;
+  }
+
+  if (y >= vPixels - 1)
+  {
+    tempStatus |= STATUS_INT;
   }
 
   updateInterrupts(tempStatus);
