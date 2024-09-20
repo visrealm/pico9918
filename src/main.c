@@ -265,17 +265,7 @@ static void updateInterrupts(uint8_t tempStatus)
 
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
-  tms9918->scanline = 0;
-  tms9918->blanking = 1;
-  tms9918->status [0x01] &= ~0x01;
-  tms9918->status [0x01] |=  0x02;
-  tms9918->status [0x03] = 0;
   ++frameCount;
-
-  if (tms9918->registers[0x32] & 0x20)
-  {
-      tms9918->restart = 1;
-  }
 }
 
 /*
@@ -302,6 +292,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  //if (tms9918->isUnlocked) bg = 0x0f0; else bg = 0x00f;
   bg = bg | (bg << 16);
 
   if (y < 10) doneInt = false;
@@ -381,8 +372,19 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       tms9918->restart = 1;
   }
 
-  if (y >= vPixels - 1)
+  if (!doneInt && y >= vPixels - 6)
   {
+    doneInt = true;
+    tms9918->scanline = 0;
+    tms9918->blanking = 1;
+    tms9918->status [0x01] &= ~0x01;
+    tms9918->status [0x01] |=  0x02;
+    tms9918->status [0x03] = 0;
+    if (tms9918->registers[0x32] & 0x20)
+    {
+        tms9918->restart = 1;
+    }
+
     tempStatus |= STATUS_INT;
   }
 
@@ -390,7 +392,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   /* convert from  palette to bgr12 */
   int tmsX = 0;
-  if (tmsScanlineBuffer[0] & 0xc0)
+  if (vrEmuTms9918DisplayMode(tms9918) == TMS_MODE_TEXT80)
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
     {
@@ -400,12 +402,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
   else
   {
-    /*for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
-    {
-      pixels[x] = bigRgb2LittleBgr(tms9918->pram[tmsScanlineBuffer[tmsX]]);
-      //pixels[x + 1] = pixels[x];
-    }*/
-
     uint8_t* src = &(tmsScanlineBuffer [0]);
     uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X * 1]);
     uint32_t* dP = (uint32_t*)&(pixels [hBorder]);

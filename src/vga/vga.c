@@ -26,6 +26,8 @@
 #define VGA_NO_MALLOC 1
 #define VGA_COMBINE_SYNC 0
 
+#define VGA_SCANLINE_CB_ENABLE 0
+
 
  // a number of compiile-time optimisations can occur 
  // if it knows some of the VGA parameters 
@@ -326,7 +328,9 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     {
       dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
     }
+#if VGA_SCANLINE_CB_ENABLE    
     multicore_fifo_push_timeout_us(END_OF_SCANLINE_MSG | currentTimingLine, 0);
+#endif
   }
 
   if (dma_hw->ints0 & rgbDmaChanMask)
@@ -432,6 +436,7 @@ void __time_critical_func(vgaLoop)()
         ++frameNumber;
       }
     }
+#if VGA_SCANLINE_CB_ENABLE    
     else if ((message & END_OF_SCANLINE_MSG) != 0)
     {
       if (vgaParams.endOfScanlineFn)
@@ -439,9 +444,22 @@ void __time_critical_func(vgaLoop)()
         vgaParams.endOfScanlineFn();
       }
     }
+#endif
     else
     {
-      multicore_fifo_drain();
+      bool doEof = false;
+      while (multicore_fifo_rvalid()) // if we dropped a scanline, no point rendering it now
+      {
+        uint32_t nextMessage = sio_hw->fifo_rd;
+        if (nextMessage == END_OF_FRAME_MSG)
+        {
+          doEof = true;
+        }
+        else
+        {
+          message = nextMessage;
+        }
+      }
 
       // get the next scanline pixels
       vgaParams.scanlineFn(message & 0xfff, &vgaParams.params, rgbDataBuffer[message & 0x01]);
@@ -449,6 +467,12 @@ void __time_critical_func(vgaLoop)()
       dma_channel_set_read_addr(rgbDmaChan, rgbDataBuffer[2], true);
       hasRenderedNext = true;
 #endif
+      if (doEof && vgaParams.endOfFrameFn)
+      {
+        vgaParams.endOfFrameFn(frameNumber);
+        ++frameNumber;
+      }
+
     }
   }
 }
