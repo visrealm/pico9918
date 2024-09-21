@@ -426,19 +426,31 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint8_t* src = &(tmsScanlineBuffer [0]);
     uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
     uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
+    uint32_t pram [64];
+    uint32_t data;
+    for (int i = 0; i < 64; i += 8)
+    {
+      data = tms9918->pram [i + 0]; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
+      data = tms9918->pram [i + 1]; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
+      data = tms9918->pram [i + 2]; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
+      data = tms9918->pram [i + 3]; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
+      data = tms9918->pram [i + 4]; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
+      data = tms9918->pram [i + 5]; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
+      data = tms9918->pram [i + 6]; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
+      data = tms9918->pram [i + 7]; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+    }
     while (src < end)
     {
-      uint32_t data;
-      data = tms9918->pram[src [0]]; data |= data << 16;// | (tms9918->pram[src [1]] << 16);
-      dP [0] = data | ((data >> 8) & 0x00f000f0);
-      data = tms9918->pram[src [1]]; data |= data << 16;
-      dP [1] = data | ((data >> 8) & 0x00f000f0);
-      data = tms9918->pram[src [2]]; data |= data << 16;
-      dP [2] = data | ((data >> 8) & 0x00f000f0);
-      data = tms9918->pram[src [3]]; data |= data << 16;
-      dP [3] = data | ((data >> 8) & 0x00f000f0);
-      dP += 4;
-      src += 4;
+      dP [0] = pram[src [0]];
+      dP [1] = pram[src [1]];
+      dP [2] = pram[src [2]];
+      dP [3] = pram[src [3]];
+      dP [4] = pram[src [4]];
+      dP [5] = pram[src [5]];
+      dP [6] = pram[src [6]];
+      dP [7] = pram[src [7]];
+      dP += 8;
+      src += 8;
     }
   }
 
@@ -466,7 +478,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const int16_t diagBitOn = 0x2e2;
   const int16_t diagBitOff = 0x222;
 
-  int realY = y += vBorder;
+  int realY = y;
 
   uint8_t reg = realY / 3;
   if (reg < 64)
