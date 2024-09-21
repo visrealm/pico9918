@@ -446,6 +446,10 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   dma_channel_wait_for_finish_blocking(dma32);
   dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
 
+  tms9918->scanline = y + 1;
+  tms9918->blanking = 0; // Is it even possible to support H blanking?
+  tms9918->status [0x03] = tms9918->scanline;  
+
 
 #define REG_DIAG 0
 #if REG_DIAG
@@ -454,36 +458,46 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
    * representation of the VDP registers to the right-side of the screen */
 
   dma_channel_wait_for_finish_blocking(dma32);
-  uint8_t reg = y / 3;
-  int8_t regValue = tms9918->registers[reg];
-  if (y % 3 != 0)
+
+  const int diagBitWidth = 4;
+  const int diagBitSpacing = 2;
+  const int diagRightMargin = 6;
+
+  const int16_t diagBitOn = 0x2e2;
+  const int16_t diagBitOff = 0x222;
+
+  int realY = y += vBorder;
+
+  uint8_t reg = realY / 3;
+  if (reg < 64)
   {
-    const int diagBitWidth = 4;
-    const int diagBitSpacing = 2;
-    const int diagRightMargin = 8;
-
-    const int16_t diagBitOn = 0x2e2;
-    const int16_t diagBitOff = 0x222;
-
-    int x = VIRTUAL_PIXELS_X - (8 * (diagBitWidth + diagBitWidth)) + diagRightMargin;
-    for (int i = 0; i < 8; ++i)
+    if (realY % 3 != 0)
     {
-      const bool on = regValue < 0;
+      int8_t regValue = tms9918->registers[reg];
+      int x = VIRTUAL_PIXELS_X - ((8 * (diagBitWidth + diagBitSpacing)) + diagRightMargin);
+      for (int i = 0; i < 8; ++i)
+      {
+        const bool on = regValue < 0;
+        for (int xi = 0; xi < diagBitWidth; ++xi)
+        {
+          pixels[x++] = on ? diagBitOn : diagBitOff;
+        }
+        x += diagBitSpacing + (i == 3) * diagBitSpacing;
+        regValue <<= 1;
+      }
+    }
+    else if ((reg & 0x07) == 0)
+    {
+      int x = VIRTUAL_PIXELS_X - diagRightMargin + 1;
+
       for (int xi = 0; xi < diagBitWidth; ++xi)
       {
-        pixels[x++] = on ? diagBitOn : diagBitOff;
+        pixels[x++] ^= pixels[x];
       }
-      x += diagBitSpacing;
-      regValue <<= 1;
     }
   }
 
-#endif
-
-
-  tms9918->scanline = y + 1;
-  tms9918->blanking = 0; // Is it even possible to support H blanking?
-  tms9918->status [0x03] = tms9918->scanline;  
+#endif  
 }
 
 /*
