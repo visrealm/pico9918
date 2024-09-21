@@ -32,7 +32,7 @@
  // a number of compiile-time optimisations can occur 
  // if it knows some of the VGA parameters 
 #if VGA_HARDCODED_640
-#define VIRTUAL_PIXELS_X 320
+#define VIRTUAL_PIXELS_X 640
 #define VIRTUAL_PIXELS_Y 240
 #else
 #include "pico/divider.h"
@@ -73,7 +73,7 @@ uint32_t __aligned(8) syncDataPorch[4];   // vertical porch
 uint32_t __aligned(8) syncDataSync[4];    // vertical sync
 
 #if VGA_NO_MALLOC
-__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG][320] = { 0 };   // two scanline buffers (odd and even)
+__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG][VIRTUAL_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
 #else
 #include <stdlib.h>
 uint16_t* __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG] = { 0 };                          // two scanline buffers (odd and even)

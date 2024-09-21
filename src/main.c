@@ -165,6 +165,9 @@ void __not_in_flash_func(gpioIrqHandler)()
   gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
   vrEmuTms9918Reset();
 
+  nextValue = 0;
+  updateTmsReadAhead();  
+  
   frameCount = 0;
   logoOffset = 100;
   currentInt = false;
@@ -269,6 +272,54 @@ static void tmsEndOfFrame(uint32_t frameNumber)
 }
 
 /*
+ * output the PICO9918 splash logo at the bottom of the screen
+ */
+static void outputSplash(uint16_t y, uint32_t vBorder, uint32_t vPixels, uint16_t* pixels)
+{
+#if !PICO9918_NO_SPLASH
+  #define VIRTUAL_PIXELS_Y 240
+
+  if (y == 0)
+  {
+    if (frameCount & 0x01)
+    {
+      if (frameCount < 180 && logoOffset > 12) --logoOffset;
+      else if (frameCount > 480) ++logoOffset;
+    }
+  }
+
+  if (y < (VIRTUAL_PIXELS_Y - 1))
+  {
+    y -= vBorder + vPixels + logoOffset;
+    if (y < splashHeight)
+    {
+      /* the source image is 2bpp, so 4 pixels in a byte
+       * this doesn't need to be overly performant as it only
+       * gets called in the first few seconds of startup (or reset)
+       */
+      const int leftBorderPx = 4;
+      const int splashBpp = 2;
+      const int splashPixPerByte = 8 / splashBpp;
+      uint8_t* splashPtr = splash + (y * splashWidth / splashPixPerByte);
+
+      for (int x = leftBorderPx; x < leftBorderPx + splashWidth; x += splashPixPerByte)
+      {
+        uint8_t c = *(splashPtr++);
+        uint8_t pixMask = 0xc0;
+        uint8_t offset = 6;
+
+        for (int px = 0; px < 4; ++px, offset -= 2, pixMask >>= 2)
+        {
+          uint8_t palIndex = (c & pixMask) >> offset;
+          if (palIndex) pixels[x + px] = splash_pal[palIndex];
+        }
+      }
+    }
+  }
+#endif
+}
+
+/*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
@@ -276,7 +327,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
 #if 1
   // better compile-time optimizations if we hard-code these
-#define VIRTUAL_PIXELS_X 320
+#define VIRTUAL_PIXELS_X 640
 #define VIRTUAL_PIXELS_Y 240
 #else 
 #define VIRTUAL_PIXELS_X params->hVirtualPixels
@@ -286,13 +337,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   int vPixels = (tms9918->registers[0x31] & 0x40) ? 30 * 8 - 1 : 24 * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
-  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 1) / 2;
+  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
   static bool doneInt = false;
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
-  //if (tms9918->isUnlocked) bg = 0x0f0; else bg = 0x00f;
   bg = bg | (bg << 16);
 
   if (y == 0) doneInt = false;
@@ -308,47 +358,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     tms9918->status [0x03] = 0;
     dma_channel_wait_for_finish_blocking(dma32);
 
-    /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
-     * size  : 172px x 10px
-     *       : 430 bytes
-     * format: 16-bit abgr palette, 2bpp indexed image
-     */
-#if !PICO9918_NO_SPLASH
     if (frameCount < 600)
-    {
-      if (y == 0)
-      {
-        ++frameCount;
-        if (frameCount & 0x01)
-        {
-          if (frameCount < 200 && logoOffset > 12) --logoOffset;
-          else if (frameCount > 500) ++logoOffset;
-        }
-      }
+      outputSplash(y, vBorder, vPixels, pixels);
 
-      if (y < (VIRTUAL_PIXELS_Y - 1))
-      {
-        y -= vBorder + vPixels + logoOffset;
-        if (y < splashHeight)
-        {
-          uint8_t* splashPtr = splash + (y * splashWidth / 4);
-          for (int x = 4; x < 4 + splashWidth / 2; x += 2)
-          {
-            uint8_t c = *(splashPtr++);
-            uint8_t p0 = (c & 0xc0);
-            uint8_t p1 = (c & 0x30);
-            uint8_t p2 = (c & 0x0c);
-            uint8_t p3 = (c & 0x03);
-
-            if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
-            //if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
-            if (p2) { pixels[x + 1] = splash_pal[(p2 >> 2)]; }
-            //if (p3) { pixels[x + 3] = splash_pal[p3]; }
-          }
-        }
-      }
-    }
-#endif
     return;
   }
 
@@ -363,8 +375,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
 
   /*** interrupt signal? ***/
-
-  if (y < vPixels - 6)
+  const int interruptThreshold = 4;
+  if (y < vPixels - interruptThreshold)
   {
     tms9918->status [0x01] &= ~0x03;
   }
@@ -384,7 +396,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       tms9918->restart = 1;
   }
 
-  if (!doneInt && y >= vPixels - 6)
+  if (!doneInt && y >= vPixels - interruptThreshold)
   {
     doneInt = true;
     tms9918->status [0x01] |=  0x02;
@@ -399,40 +411,75 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   updateInterrupts(tempStatus);
 
   /* convert from  palette to bgr12 */
-  int tmsX = 0;
   if (vrEmuTms9918DisplayMode(tms9918) == TMS_MODE_TEXT80)
   {
-    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 1; x += 1, ++tmsX)
+    int tmsX = 0;
+    for (int x = hBorder; tmsX < TMS9918_PIXELS_X; x += 2, ++tmsX)
     {
-      pixels[x] = bigRgb2LittleBgr(tms9918->pram[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4]);
-      //pixels[x + 1] = rgb12tobgr12[tms9918->pram[tmsScanlineBuffer[tmsX] & 0x0f]];
+      uint8_t doublePix = tmsScanlineBuffer[tmsX];
+      pixels[x] = bigRgb2LittleBgr(tms9918->pram[doublePix >> 4]);
+      pixels[x + 1] = bigRgb2LittleBgr(tms9918->pram[doublePix & 0x0f]);
     }
   }
   else
   {
     uint8_t* src = &(tmsScanlineBuffer [0]);
-    uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X * 1]);
+    uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
     uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
     while (src < end)
     {
       uint32_t data;
-      data = tms9918->pram[src [0]] | (tms9918->pram[src [1]] << 16);
+      data = tms9918->pram[src [0]]; data |= data << 16;// | (tms9918->pram[src [1]] << 16);
       dP [0] = data | ((data >> 8) & 0x00f000f0);
-      data = tms9918->pram[src [2]] | (tms9918->pram[src [3]] << 16);
+      data = tms9918->pram[src [1]]; data |= data << 16;
       dP [1] = data | ((data >> 8) & 0x00f000f0);
-      data = tms9918->pram[src [4]] | (tms9918->pram[src [5]] << 16);
+      data = tms9918->pram[src [2]]; data |= data << 16;
       dP [2] = data | ((data >> 8) & 0x00f000f0);
-      data = tms9918->pram[src [6]] | (tms9918->pram[src [7]] << 16);
+      data = tms9918->pram[src [3]]; data |= data << 16;
       dP [3] = data | ((data >> 8) & 0x00f000f0);
       dP += 4;
-      src += 8;
+      src += 4;
     }
   }
 
-
   /*** right border ***/
   dma_channel_wait_for_finish_blocking(dma32);
-  dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 1) / 2]), true);
+  dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
+
+
+#define REG_DIAG 0
+#if REG_DIAG
+
+  /* Register diagnostics. with this enabled, we overlay a binary 
+   * representation of the VDP registers to the right-side of the screen */
+
+  dma_channel_wait_for_finish_blocking(dma32);
+  uint8_t reg = y / 3;
+  int8_t regValue = tms9918->registers[reg];
+  if (y % 3 != 0)
+  {
+    const int diagBitWidth = 4;
+    const int diagBitSpacing = 2;
+    const int diagRightMargin = 8;
+
+    const int16_t diagBitOn = 0x2e2;
+    const int16_t diagBitOff = 0x222;
+
+    int x = VIRTUAL_PIXELS_X - (8 * (diagBitWidth + diagBitWidth)) + diagRightMargin;
+    for (int i = 0; i < 8; ++i)
+    {
+      const bool on = regValue < 0;
+      for (int xi = 0; xi < diagBitWidth; ++xi)
+      {
+        pixels[x++] = on ? diagBitOn : diagBitOff;
+      }
+      x += diagBitSpacing;
+      regValue <<= 1;
+    }
+  }
+
+#endif
+
 
   tms9918->scanline = y + 1;
   tms9918->blanking = 0; // Is it even possible to support H blanking?
@@ -621,8 +668,8 @@ int main(void)
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(VGA_640_480_60HZ);
 
-  /* virtual size will be 320 x 240 */
-  setVgaParamsScale(&params.params, 2);
+  /* virtual size will be 640 x 240 */
+  setVgaParamsScaleY(&params.params, 2);
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
