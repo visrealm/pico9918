@@ -295,7 +295,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   //if (tms9918->isUnlocked) bg = 0x0f0; else bg = 0x00f;
   bg = bg | (bg << 16);
 
-  if (y < 10) doneInt = false;
+  if (y == 0) doneInt = false;
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + vPixels))
@@ -303,6 +303,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     dma_channel_wait_for_finish_blocking(dma32);
     dma_channel_set_write_addr(dma32, dPixels, false);
     dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
+    tms9918->scanline = 0;
+    tms9918->blanking = 1;
+    tms9918->status [0x03] = 0;
     dma_channel_wait_for_finish_blocking(dma32);
 
     /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
@@ -361,6 +364,15 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   /*** interrupt signal? ***/
 
+  if (y < vPixels - 6)
+  {
+    tms9918->status [0x01] &= ~0x03;
+  }
+  else
+  {
+    tms9918->status [0x01] &= ~0x01;
+  }
+
   if (tms9918->scanline && (tms9918->registers[0x13] == tms9918->scanline))
   {
     tms9918->status [0x01] |= 0x01;
@@ -375,11 +387,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (!doneInt && y >= vPixels - 6)
   {
     doneInt = true;
-    tms9918->scanline = 0;
-    tms9918->blanking = 1;
-    tms9918->status [0x01] &= ~0x01;
     tms9918->status [0x01] |=  0x02;
-    tms9918->status [0x03] = 0;
     if (tms9918->registers[0x32] & 0x20)
     {
         tms9918->restart = 1;
@@ -428,7 +436,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   tms9918->scanline = y + 1;
   tms9918->blanking = 0; // Is it even possible to support H blanking?
-  tms9918->status [0x01] &= ~0x03;
   tms9918->status [0x03] = tms9918->scanline;  
 }
 
