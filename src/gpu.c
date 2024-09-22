@@ -78,6 +78,33 @@ void isr_hardfault () {
 }
 
 /*
+ * run a gpu dma job
+ */
+static void triggerGpuDma()
+{
+  uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8000));
+  uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8002));
+  uint32_t width = tms9918->vram[0x8004];
+  uint32_t height = tms9918->vram[0x8005];
+  uint32_t stride = tms9918->vram[0x8006];
+  uint32_t params = tms9918->vram[0x8007];
+  *(uint16_t*)(tms9918->vram + 0x8008) = 0;
+
+  int32_t srcInc = params & 0x01 ? 0 : (params & 0x02 ? -1 : 1);
+  int32_t dstInc = params & 0x02 ? -1 : 1;
+
+  uint8_t *srcPtr = tms9918->vram + srcVramAddr;
+  uint8_t *dstPtr = tms9918->vram + dstVramAddr;
+  for (int y = 0; y < height; ++y)
+  {
+    for (int x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc)
+      *dstPtr = *srcPtr;
+    srcPtr += (stride - width) * srcInc;
+    dstPtr += (stride - width) * dstInc;
+  }
+}
+
+/*
  * TMS9900 GPU main loop implementation
  */
 static void __attribute__ ((noinline)) volatileHack () {
@@ -94,28 +121,8 @@ restart:
       tms9918->gpuAddress = lastAddress;
       tms9918->restart = 0;
     }
-    if (tms9918->vram[0x8008])
-    {       
-      *(uint16_t*)(tms9918->vram + 0x8008) = 0;
-      uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8000));
-      uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8002));
-      uint32_t width = tms9918->vram[0x8004];
-      uint32_t height = tms9918->vram[0x8005];
-      uint32_t stride = tms9918->vram[0x8006];
-      uint32_t params = tms9918->vram[0x8007];
-
-      int32_t srcInc = params & 0x01 ? 0 : (params & 0x02 ? -1 : 1);
-      int32_t dstInc = params & 0x02 ? -1 : 1;
-
-      uint8_t *srcPtr = tms9918->vram + srcVramAddr;
-      uint8_t *dstPtr = tms9918->vram + dstVramAddr;
-      for (int y = 0; y < height; ++y)
-      {
-        for (int x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc)
-          *dstPtr = *srcPtr;
-        srcPtr += (stride - width) * srcInc;
-        dstPtr += (stride - width) * dstInc;
-      }
+    if (tms9918->vram[0x8008]){
+      triggerGpuDma();
     }
     if (didFault) {
       didFault = 0;
