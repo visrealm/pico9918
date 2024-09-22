@@ -27,6 +27,7 @@
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
+#include "hardware/structs/mpu.h"
 
  /*
   * Pin mapping (PCB v0.3)
@@ -645,15 +646,61 @@ static uint8_t preload [] = {
  0x16, 0xFD, 0x03, 0xC0, 0x0C, 0x00, 0x03, 0x40
 };
 
+static void guard(void* a) {
+    uintptr_t addr = (uintptr_t)a;
+    mpu_hw->ctrl = 5;
+    mpu_hw->rbar = (addr & (uint)~0xff) | M0PLUS_MPU_RBAR_VALID_BITS | 0;
+}
+
+static int didFault = 0;
+
+//extern "C"
+void isr_hardfault () {
+  didFault = 1;
+  tms9918->registers [0x38] = 0; // Stop the GPU
+  mpu_hw->rasr = 0; // Turn off memory protection
+}
+
 static void __attribute__ ((noinline)) volatileHack () {
   tms9918->restart = 0;
   if ((tms9918->gpuAddress & 1) == 0) { // Odd addresses will cause the RP2040 to crash
+    uint16_t lastAddress = tms9918->gpuAddress;
+restart:
     tms9918->registers [0x38] = 1;
     tms9918->status [2] |= 0x80; // Running
-    uint16_t lastAddress = run9900 (&(tms9918->vram [0]), tms9918->gpuAddress, 0xFFFE, &(tms9918->registers [0x38]));
+    mpu_hw->rasr = 1 | (0x07 << 1) | (0xfe << 8) | 0x10000000; // Turn on memory protection
+    lastAddress = run9900 (&(tms9918->vram [0]), lastAddress, 0xFFFE, &(tms9918->registers [0x38]));
+    mpu_hw->rasr = 0; // Turn off memory protection
     if (tms9918->registers [0x38] & 1) { // GPU program decided to stop itself?
       tms9918->gpuAddress = lastAddress;
       tms9918->restart = 0;
+    }
+    if (tms9918->vram[0x8008])
+    {       
+      *(uint16_t*)(tms9918->vram + 0x8008) = 0;
+      uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8000));
+      uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8002));
+      uint32_t width = tms9918->vram[0x8004];
+      uint32_t height = tms9918->vram[0x8005];
+      uint32_t stride = tms9918->vram[0x8006];
+      uint32_t params = tms9918->vram[0x8007];
+
+      int32_t srcInc = params & 0x01 ? 0 : (params & 0x02 ? -1 : 1);
+      int32_t dstInc = params & 0x02 ? -1 : 1;
+
+      uint8_t *srcPtr = tms9918->vram + srcVramAddr;
+      uint8_t *dstPtr = tms9918->vram + dstVramAddr;
+      for (int y = 0; y < height; ++y)
+      {
+        for (int x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc)
+          *dstPtr = *srcPtr;
+        srcPtr += (stride - width) * srcInc;
+        dstPtr += (stride - width) * dstInc;
+      }
+    }
+    if (didFault) {
+      didFault = 0;
+      goto restart;
     }
   }
   tms9918->status [2] &= ~0x80; // Stopped
@@ -712,6 +759,7 @@ int main(void)
   memcpy (tms9918->gram1, preload, sizeof (preload));
   memcpy (tms9918->gram1 + 0x800, preload, sizeof (preload));
   tms9918->gpuAddress = 0x4000;
+  guard(&(tms9918->vram [0x8000]));
   while (1)
   {
     if (tms9918->restart)
