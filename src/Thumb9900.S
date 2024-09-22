@@ -1,3 +1,16 @@
+/*
+ * Project: pico9918
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico9918
+ * 
+ * Purpose: TMS9900 GPU core
+ * 
+ * Author: JasonACT (AtariAge)
+ *
+ */
+
 .syntax unified // ARM unified syntax
 .thumb_func     // Code uses Thumb instructions
 

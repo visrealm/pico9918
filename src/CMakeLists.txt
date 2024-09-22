@@ -4,7 +4,7 @@ set(PROGRAM pico9918)
 
 add_executable(${PROGRAM})
 
-target_sources(${PROGRAM} PRIVATE main.c palette.c clocks.pio.h tms9918.pio.h Thumb9900.S)
+target_sources(${PROGRAM} PRIVATE main.c gpu.c clocks.pio.h tms9918.pio.h Thumb9900.S)
 
 # compile-time options to ease development between JasonACT and I
 set(PICO9918_NO_SPLASH 0)
