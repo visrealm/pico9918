@@ -269,7 +269,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
 }
 
 /*
- * output the PICO9918 splash logo at the bottom of the screen
+ * output the PICO9918 splash logo / firmware version at the bottom of the screen
  */
 static void outputSplash(uint16_t y, uint32_t vBorder, uint32_t vPixels, uint16_t* pixels)
 {
