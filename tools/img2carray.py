@@ -119,7 +119,7 @@ def getFileHeader(fileName, romFileList, ramFileList, args, isHeaderFile) -> str
         sanitizedFile = re.sub('[^0-9a-zA-Z]+', '_', baseName.upper())
         hdrText += f"#pragma once\n"
     else:
-        hdrText += "#include \"pico/platform.h\"\n"
+        hdrText += "#include \"pico.h\"\n"
     hdrText += "#include <inttypes.h>"
     return hdrText
 
