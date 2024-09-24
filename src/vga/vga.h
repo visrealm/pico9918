@@ -55,10 +55,11 @@ typedef struct
   vgaScanlineRgbFn scanlineFn;
   vgaEndOfFrameFn endOfFrameFn;
   vgaEndOfScanlineFn endOfScanlineFn;
+  bool scanlines;
 } VgaInitParams;
 
 void vgaLoop();
 
 void vgaInit(VgaInitParams params);
 
-VgaInitParams vgaCurrentParams();
+VgaInitParams *vgaCurrentParams();

@@ -14,13 +14,14 @@
 #include "pio_utils.h"
 
 #include "pico/multicore.h"
+#include "pico/binary_info.h"
 
 #include "hardware/dma.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
  // compile options
-#define VGA_CRT_EFFECT 0
+#define VGA_CRT_EFFECT PICO9918_SCANLINES
 #define VGA_SCANLINE_TIME_DEBUG 0
 #define VGA_HARDCODED_640 1
 #define VGA_NO_MALLOC 1
@@ -64,6 +65,11 @@ int roundflt(float x)
 #define END_OF_SCANLINE_MSG 0x40000000
 #define END_OF_FRAME_MSG 0x80000000
 
+bi_decl(bi_1pin_with_name(SYNC_PINS_START, "H Sync"));
+bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "V Sync"));
+bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START, "Red (LSB - MSB)"));
+bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START + 4, "Green (LSB - MSB)"));
+bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START + 8, "Blue (LSB - MSB)"));
 
 /*
  * sync pio dma data buffers
@@ -350,7 +356,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     currentDisplayLine++;
 
 #if VGA_CRT_EFFECT
-    if (pxLineRpt != 0)
+    if (vgaParams.scanlines && pxLineRpt != 0)
     {
       for (int i = 0; i < 5; ++i)
       {
@@ -387,7 +393,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
       }
     }
 #if VGA_CRT_EFFECT
-    else // apply a lame CRT effect, darkening every 2nd scanline
+    else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
       int end = VIRTUAL_PIXELS_X / 2;
       for (int i = 5; i < end; ++i)
@@ -496,7 +502,7 @@ void vgaInit(VgaInitParams params)
   //multicore_launch_core1(vgaLoop);
 }
 
-VgaInitParams vgaCurrentParams()
+VgaInitParams *vgaCurrentParams()
 {
-  return vgaParams;
+  return &vgaParams;
 }
