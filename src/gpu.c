@@ -15,6 +15,7 @@
 
 #include "pico/stdlib.h"
 #include "hardware/structs/mpu.h"
+#include "pico.h" // For PICO_RP2040
 
 #include <string.h> // memcpy
 
@@ -61,9 +62,15 @@ static uint8_t preload [] = {
  * set up the MPU to guard a 256 byte page from a given address
  */
 static void guard(void* a) {
-    uintptr_t addr = (uintptr_t)a;
-    mpu_hw->ctrl = 5;
-    mpu_hw->rbar = (addr & (uint)~0xff) | M0PLUS_MPU_RBAR_VALID_BITS | 0;
+  uintptr_t addr = (uintptr_t)a;
+#if PICO_RP2040 // Old memory protection unit
+  mpu_hw->rbar = (addr & (uint)~0xff) | M0PLUS_MPU_RBAR_VALID_BITS | 0;
+  mpu_hw->rasr = 1 | (0x07 << 1) | (0xfe << 8) | 0x10000000;
+#else
+  mpu_hw->rnr = 0;
+  mpu_hw->rbar = (addr & (uint)~31u) | (2u << M33_MPU_RBAR_AP_LSB) | M33_MPU_RBAR_XN_BITS;
+  mpu_hw->rlar = (addr & (uint)~31u) | M33_MPU_RLAR_EN_BITS;
+#endif
 }
 
 static int didFault = 0;
@@ -74,7 +81,7 @@ static int didFault = 0;
 void isr_hardfault () {
   didFault = 1;
   tms9918->registers [0x38] = 0; // Stop the GPU
-  mpu_hw->rasr = 0; // Turn off memory protection
+  mpu_hw->ctrl = 0; // Turn off memory protection - all models
 }
 
 /*
@@ -114,9 +121,15 @@ static void __attribute__ ((noinline)) volatileHack () {
 restart:
     tms9918->registers [0x38] = 1;
     tms9918->status [2] |= 0x80; // Running
-    mpu_hw->rasr = 1 | (0x07 << 1) | (0xfe << 8) | 0x10000000; // Turn on memory protection
+
+#if PICO_RP2040 // Old memory protection unit
+    mpu_hw->ctrl = M0PLUS_MPU_CTRL_PRIVDEFENA_BITS | M0PLUS_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
+#else
+    mpu_hw->ctrl = M33_MPU_CTRL_PRIVDEFENA_BITS | M33_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
+#endif
     lastAddress = run9900 (&(tms9918->vram [0]), lastAddress, 0xFFFE, &(tms9918->registers [0x38]));
-    mpu_hw->rasr = 0; // Turn off memory protection
+    mpu_hw->ctrl = 0; // Turn off memory protection - all models
+
     if (tms9918->registers [0x38] & 1) { // GPU program decided to stop itself?
       tms9918->gpuAddress = lastAddress;
       tms9918->restart = 0;

@@ -17,7 +17,8 @@
 .section .data  // In RAM Please
 
 .global run9900 // Entry point
-//.global instscnt // Global instruction counter
+
+#include "pico.h" // For PICO_RP2040
 
 //.extern F18A_PIX
 
@@ -823,6 +824,7 @@ I_DIV:  CMP   R5,R4
         REV16 R2,R2
         ORRS R4,R2
 
+#if PICO_RP2040 // This will be the only chip that has the hardware integer divider
         MOVS R2,#0xD0
         LSLS R2,#24 // -> 0xD0000000 = SIO_BASE
         STR  R4,[R2, #0x60] // SIO_DIV_UDIVIDEND_OFFSET
@@ -840,6 +842,17 @@ I_DIV:  CMP   R5,R4
 
         REV16 R4,R4
         STRH R4,[R6,#0]
+
+#else // All newer chips can do divide
+        UDIV R2,R4,R5    // Quotient in R2
+        MLS  R5,R2,R5,R4 // Remainder - R5=R4-(R2*R5)
+        MOVS R4,#0xF7 // ~OV
+        ANDS R1,R4
+
+        REV16 R2,R2
+        STRH R2,[R6,#0]
+#endif
+
         REV16 R5,R5
         STRH R5,[R6,#2]
         B    start
@@ -1134,7 +1147,7 @@ OP_3LO: LSRS R2,R0,#13 // if ((BYTE & 0x30) == 0x20) Ts==2 (already checked Ts h
 I_JMP:  SXTH R0,R0 // R0 now has a signed offset
         ASRS R0,#7 // Word offset
         ADDS R4,R0,#2 // Does this jump to itself?
-        BNE  dojump   // Else quit the emulation
+        BNE  dojmp2   // Else quit the emulation
 // *********************************************************************************************
 I_IDLE: ADR  R0,RETCODE
         STR  R3,[R0,#0] // PC
@@ -1151,48 +1164,36 @@ I_IDLE: ADR  R0,RETCODE
 RETCODE: .WORD 0
 // *********************************************************************************************
 .align 4
-I_JLT:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        MOVS R4,#0x60 // AG|EQ
+I_JLT:  MOVS R4,#0x60 // AG|EQ
         TST  R4,R1
         BNE  start  // At least one of them was not zero
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JLE:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#6 // EQ -> Carry
+I_JLE:  LSRS R4,R1,#6 // EQ -> Carry
         BCS  dojump
         LSRS R4,R1,#8 // LG -> Carry
         BCS  start
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JEQ:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#6 // EQ -> Carry
+I_JEQ:  LSRS R4,R1,#6 // EQ -> Carry
         BCC  start
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JHE:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        MOVS R4,#0xA0 // LG|EQ
+I_JHE:  MOVS R4,#0xA0 // LG|EQ
         TST  R4,R1
         BEQ  start // Both were zero
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JGT:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#7 // AG -> Carry
+I_JGT:  LSRS R4,R1,#7 // AG -> Carry
         BCC  start
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JNE:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#6 // EQ -> Carry
+I_JNE:  LSRS R4,R1,#6 // EQ -> Carry
         BCS  start
         B    dojump
 // *********************************************************************************************
@@ -1234,7 +1235,9 @@ run9900:
         B    start
 // *********************************************************************************************
 .align 4
-dojump: ADDS R3,R0
+dojump: SXTH R0,R0 // R0 now has a signed offset
+        ASRS R0,#7 // Word offset
+dojmp2: ADDS R3,R0 // Special entry point just for JMP
         UXTH R3,R3 // Discard any extra
 // *********************************************************************************************
 start:  MOV  R0,R9
@@ -1257,47 +1260,35 @@ startX: REV16 R6,R0    // R6=INST|BYTE
 
 // *********************************************************************************************
 .align 4
-I_JNC:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#5 // C -> Carry
+I_JNC:  LSRS R4,R1,#5 // C -> Carry
         BCS  start
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JOC:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#5 // C -> Carry
+I_JOC:  LSRS R4,R1,#5 // C -> Carry
         BCC  start
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JNO:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#4 // O -> Carry
+I_JNO:  LSRS R4,R1,#4 // O -> Carry
         BCS  start
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JL:   SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        MOVS R4,#0xA0 // LG|EQ
+I_JL:   MOVS R4,#0xA0 // LG|EQ
         TST  R4,R1
         BNE  start // At least one of them was not zero
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JH:   SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#6 // EQ -> Carry
+I_JH:   LSRS R4,R1,#6 // EQ -> Carry
         BCS  start
         LSRS R4,R1,#8 // LG -> Carry
         BCC  start
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JOP:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        LSRS R4,R1,#3 // P -> Carry
+I_JOP:  LSRS R4,R1,#3 // P -> Carry
         BCC  start
         B    dojump
 // *********************************************************************************************
@@ -1545,10 +1536,9 @@ I_XOP: // F18A PIX instruction
         BICS R2,R7      // R2=000yyyyy 00000yyy
 
         LSRS R4,R5,#8   // R4=00000000 xxxxxxxx
-        ADDS R2,R4      // R2=000yyyyy xxxxxzzz
         MOVS R7,#7
-        ANDS R4,R7      // R4=00000000 00000xxx (bit offset)
-        SUBS R2,R4      // R2=000yyyyy xxxxxyyy (byte offset)
+        BICS R4,R7      // R4=00000000 xxxxx000
+        ORRS R2,R4      // R2=000yyyyy xxxxxyyy (byte offset)
 
         ADR  R7,VREGSL
         LDR  R7,[R7,#0] // Get offset
