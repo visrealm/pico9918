@@ -79,7 +79,7 @@ uint32_t __aligned(8) syncDataPorch[4];   // vertical porch
 uint32_t __aligned(8) syncDataSync[4];    // vertical sync
 
 #if VGA_NO_MALLOC
-__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG][VIRTUAL_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
+__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG][VIRTUAL_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
 #else
 #include <stdlib.h>
 uint16_t* __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG] = { 0 };                          // two scanline buffers (odd and even)

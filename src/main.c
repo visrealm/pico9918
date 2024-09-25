@@ -138,9 +138,9 @@ static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0x1f; /* current status register value */
 
-static __attribute__((section(".scratch_y.buffer"))) uint32_t bg; 
+static __attribute__((section(".scratch_y.buffer"))) uint32_t __aligned(4) bg; 
 
-static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(8) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
+static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;

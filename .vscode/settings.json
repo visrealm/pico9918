@@ -44,6 +44,9 @@
         "cstdint": "c",
         "array": "c",
         "string": "c",
-        "string_view": "c"
+        "string_view": "c",
+        "pico.h": "c",
+        "platform.h": "c",
+        "gpu.h": "c"
     }
 }
