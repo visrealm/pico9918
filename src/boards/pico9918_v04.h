@@ -11,8 +11,7 @@
 
 // This header may be included by other board headers as "boards/pico.h"
 
-#ifndef _BOARDS_PICO_H
-#define _BOARDS_PICO_H
+#pragma once
 
 // For board detection
 #define PICO9918
@@ -94,6 +93,4 @@
 // There is an example in adc/read_vsys in pico-examples.
 #ifndef PICO_VSYS_PIN
 #define PICO_VSYS_PIN 29
-#endif
-
 #endif

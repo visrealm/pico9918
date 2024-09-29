@@ -97,8 +97,8 @@ static void triggerGpuDma()
   uint32_t params = tms9918->vram[0x8007];
   *(uint16_t*)(tms9918->vram + 0x8008) = 0;
 
-  int32_t srcInc = params & 0x01 ? 0 : (params & 0x02 ? -1 : 1);
   int32_t dstInc = params & 0x02 ? -1 : 1;
+  int32_t srcInc = params & 0x01 ? 0 : dstInc;
 
   uint8_t *srcPtr = tms9918->vram + srcVramAddr;
   uint8_t *dstPtr = tms9918->vram + dstVramAddr;

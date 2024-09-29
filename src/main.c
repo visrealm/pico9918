@@ -107,8 +107,8 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#define PICO_CLOCK_PLL 604000000
-#define PICO_CLOCK_PLL_DIV1 2
+#define PICO_CLOCK_PLL 1512000000
+#define PICO_CLOCK_PLL_DIV1 4
 #define PICO_CLOCK_PLL_DIV2 1
 #define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
 
@@ -758,6 +758,7 @@ void proc1Entry()
  */
 int main(void)
 {
+  vreg_set_voltage(VREG_VOLTAGE_1_30);
   /* currently, VGA hard-coded to 640x480@60Hz. We want a high clock frequency
    * that comes close to being divisible by 25.175MHz. 302.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
