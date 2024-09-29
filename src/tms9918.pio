@@ -56,6 +56,8 @@ readStatus:
 endPart:
   in pins, 3        ; push CSR, CSW and MODE back through fifo
   push              ; push ^^^ back to cpu to process
+  mov isr, x
+  push
 .wrap
 
 ; -----------------------------------------------------------------------------

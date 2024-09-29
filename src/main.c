@@ -107,8 +107,30 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#define PICO_CLOCK_PLL 1512000000
-#define PICO_CLOCK_PLL_DIV1 4
+//#define PICO_CLOCK_PLL 1512000000 // 302.4MHz - standard voltage
+//#define PICO_CLOCK_PLL_DIV1 5
+
+//#define PICO_CLOCK_PLL 1308000000 // 327MHz - 1.15v
+//#define PICO_CLOCK_PLL_DIV1 4
+
+//#define PICO_CLOCK_PLL 984000000 // 328MHz - 1.15v
+//#define PICO_CLOCK_PLL_DIV1 3
+
+//#define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
+//#define PICO_CLOCK_PLL_DIV1 3
+
+#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
+#define PICO_CLOCK_PLL_DIV1 3
+
+//#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
+//#define PICO_CLOCK_PLL_DIV1 4
+
+//#define PICO_CLOCK_PLL 804000000 // 402MHz - DOES NOT WORK
+//#define PICO_CLOCK_PLL_DIV1 2
+
+//#define PICO_CLOCK_PLL 1212000000 // 404MHz - DOES NOT WORK
+//#define PICO_CLOCK_PLL_DIV1 3
+
 #define PICO_CLOCK_PLL_DIV2 1
 #define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
 
@@ -188,6 +210,7 @@ void  __not_in_flash_func(pio_irq_handler)()
   else if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsReadSm))) == 0) // read?
   {
     uint32_t readVal = TMS_PIO->rxf[tmsReadSm];
+    uint32_t readDat = TMS_PIO->rxf[tmsReadSm]; // What was read?
 
     if ((readVal & 0x04) == 0) // read data
     {
@@ -200,7 +223,8 @@ void  __not_in_flash_func(pio_irq_handler)()
       switch (tms9918->registers [0x0F] & 0x0F)
       {
         case 0:
-          currentStatus = 0x1f;
+          currentStatus &= ~(readDat >> 16); // Switch off any 3 high bits which have just been read
+          currentStatus |= 0x1f;
           vrEmuTms9918SetStatusImpl(currentStatus);
           currentInt = false;
           gpio_put(GPIO_INT, !currentInt);
@@ -220,8 +244,6 @@ void  __not_in_flash_func(pio_irq_handler)()
  */
 static inline void enableTmsPioInterrupts()
 {
-  __dmb();
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << TMS_IRQ;
   *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = 1u << TMS_IRQ;
 }
 
@@ -231,7 +253,6 @@ static inline void enableTmsPioInterrupts()
 static inline void disableTmsPioInterrupts()
 {
   *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << TMS_IRQ;
-  __dmb();
 }
 
 #ifdef GPIO_RESET
