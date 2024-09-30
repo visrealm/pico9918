@@ -110,8 +110,8 @@
 //#define PICO_CLOCK_PLL 1512000000 // 302.4MHz - standard voltage
 //#define PICO_CLOCK_PLL_DIV1 5
 
-//#define PICO_CLOCK_PLL 1308000000 // 327MHz - 1.15v
-//#define PICO_CLOCK_PLL_DIV1 4
+#define PICO_CLOCK_PLL 1308000000 // 327MHz - 1.15v
+#define PICO_CLOCK_PLL_DIV1 4
 
 //#define PICO_CLOCK_PLL 984000000 // 328MHz - 1.15v
 //#define PICO_CLOCK_PLL_DIV1 3
@@ -119,8 +119,8 @@
 //#define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
 //#define PICO_CLOCK_PLL_DIV1 3
 
-#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
-#define PICO_CLOCK_PLL_DIV1 3
+//#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
+//#define PICO_CLOCK_PLL_DIV1 3
 
 //#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
 //#define PICO_CLOCK_PLL_DIV1 4
@@ -160,9 +160,9 @@ static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0x1f; /* current status register value */
 
-static __attribute__((section(".scratch_y.buffer"))) uint32_t __aligned(4) bg; 
+static __attribute__((section(".scratch_y.buffer"))) uint32_t bg; 
 
-static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
+static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(8) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
@@ -210,7 +210,6 @@ void  __not_in_flash_func(pio_irq_handler)()
   else if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsReadSm))) == 0) // read?
   {
     uint32_t readVal = TMS_PIO->rxf[tmsReadSm];
-    uint32_t readDat = TMS_PIO->rxf[tmsReadSm]; // What was read?
 
     if ((readVal & 0x04) == 0) // read data
     {
@@ -219,18 +218,25 @@ void  __not_in_flash_func(pio_irq_handler)()
     }
     else // read status
     {
+      readVal >>= (3 + 16); // What status was read?
       tms9918->regWriteStage = 0;
       switch (tms9918->registers [0x0F] & 0x0F)
       {
         case 0:
-          currentStatus &= ~(readDat >> 16); // Switch off any 3 high bits which have just been read
-          currentStatus |= 0x1f;
+          readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
+          currentStatus &= ~readVal; // Switch off any 3 high bits which have just been read
+          if (readVal & STATUS_5S) // Was 5th Sprite read?
+            currentStatus |= 0x1f;
           vrEmuTms9918SetStatusImpl(currentStatus);
-          currentInt = false;
-          gpio_put(GPIO_INT, !currentInt);
+          if (readVal & STATUS_INT)  // Was Interrupt read?
+          {
+            currentInt = false;
+            gpio_put(GPIO_INT, !currentInt);
+          }
           break;
         case 1:
-          tms9918->status [0x01] &= ~0x01;
+          if ((readVal << 31) >> 31) // & 0x01
+            tms9918->status [0x01] &= ~0x01;
           break;
       }
     }
@@ -266,11 +272,13 @@ void __not_in_flash_func(gpioIrqHandler)()
   disableTmsPioInterrupts();
   vrEmuTms9918Reset();
 
+  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << TMS_IRQ;
   pio_sm_clear_fifos(TMS_PIO, tmsReadSm);
   pio_sm_clear_fifos(TMS_PIO, tmsWriteSm);
 
   nextValue = 0;
   currentStatus = 0x1f;
+  vrEmuTms9918SetStatusImpl(currentStatus);
   currentInt = false;
   doneInt = true;
   updateTmsReadAhead();  

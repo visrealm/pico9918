@@ -30,7 +30,7 @@
 .define public CSR_PIN 26
 
   pull block
-  mov x, osr        ; ensure we have a valid fifio value in x
+  mov x, osr        ; ensure we have a valid fifo value in x
 
 .wrap_target
   wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
@@ -53,11 +53,10 @@ readData:
 readStatus:  
   out null, 8       ; skip data bits
   out pins, 8       ; output the status byte
+  mov isr, x        ; make this status value available
 endPart:
   in pins, 3        ; push CSR, CSW and MODE back through fifo
   push              ; push ^^^ back to cpu to process
-  mov isr, x
-  push
 .wrap
 
 ; -----------------------------------------------------------------------------
