@@ -62,6 +62,7 @@ int roundflt(float x)
 #define SYNC_SM         0        // vga sync state machine index
 #define RGB_SM          1        // vga rgb state machine index
 
+#define FRONT_PORCH_MSG 0x20000000
 #define END_OF_SCANLINE_MSG 0x40000000
 #define END_OF_FRAME_MSG 0x80000000
 
@@ -141,7 +142,7 @@ static bool buildSyncData()
     rgbDataBuffer[2][i] = 0x0f00;
 #endif
 
-  vgaParams.params.pioDivider = (sysClockKHz / (float)minClockKHz);
+  vgaParams.params.pioDivider = /*roundflt*/(sysClockKHz / (float)minClockKHz);
   vgaParams.params.pioFreqKHz = sysClockKHz / vgaParams.params.pioDivider;
 
   vgaParams.params.pioClocksPerPixel = vgaParams.params.pioFreqKHz / (float)vgaParams.params.pixelClockKHz;
@@ -325,6 +326,10 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     else if (currentTimingLine < (vgaParams.params.vSyncParams.syncPixels + vgaParams.params.vSyncParams.backPorchPixels))
     {
       dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
+      if (currentTimingLine + 2 == (vgaParams.params.vSyncParams.syncPixels + vgaParams.params.vSyncParams.backPorchPixels))
+      {
+        multicore_fifo_push_timeout_us(0, 0);
+      }
     }
     else if (currentTimingLine < (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels))
     {
@@ -333,6 +338,10 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     else
     {
       dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
+      if (currentTimingLine == (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels) + 2)
+      {
+        multicore_fifo_push_timeout_us(FRONT_PORCH_MSG | 1, 0);
+      }
     }
 #if VGA_SCANLINE_CB_ENABLE    
     multicore_fifo_push_timeout_us(END_OF_SCANLINE_MSG | currentTimingLine, 0);
@@ -373,16 +382,22 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
 #endif
 
-
+    if (currentDisplayLine == VIRTUAL_PIXELS_Y * 2)
+    {
+      currentBuffer [0] = 0;
+      currentBuffer [1] = 0;
+      currentBuffer [2] = 0;
+      currentBuffer [3] = 0;
+      currentBuffer [4] = 0;
+    }
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
     // need a new line every X display lines
     if ((pxLineRpt == 0))
     {
       uint32_t requestLine = pxLine + 1;
-      if (requestLine >= VIRTUAL_PIXELS_Y) requestLine -= VIRTUAL_PIXELS_Y;
-
-      multicore_fifo_push_timeout_us(requestLine, 0);
+      if (requestLine < VIRTUAL_PIXELS_Y)
+        multicore_fifo_push_timeout_us(requestLine, 0);
 
 #if VGA_SCANLINE_TIME_DEBUG
       hasRenderedNext = false;
@@ -434,7 +449,14 @@ void __time_critical_func(vgaLoop)()
   {
     uint32_t message = multicore_fifo_pop_blocking();
 
-    if (message == END_OF_FRAME_MSG)
+    if ((message & ~1) == FRONT_PORCH_MSG)
+    {
+      if (vgaParams.porchFn)
+      {
+        vgaParams.porchFn(rgbDataBuffer[message & 1]);
+      }
+    }
+    else if (message == END_OF_FRAME_MSG)
     {
       if (vgaParams.endOfFrameFn)
       {

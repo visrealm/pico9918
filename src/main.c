@@ -29,6 +29,7 @@
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
+#include "hardware/adc.h"
 
  /*
   * Pin mapping (PCB v0.3)
@@ -71,7 +72,11 @@
 
 #if !PICO9918_NO_SPLASH
 #include "splash.h"
-#include "font.h"
+#endif
+
+
+#if PICO9918_DIAG
+  #include "font.h"  
 #endif
 
 #define TIMING_DIAG PICO9918_DIAG
@@ -107,11 +112,17 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
+//#define PICO_CLOCK_PLL 756000000 // 252MHz - standard voltage
+//#define PICO_CLOCK_PLL_DIV1 3
+
+//#define PICO_CLOCK_PLL 828000000 // 276MHz - standard voltage
+//#define PICO_CLOCK_PLL_DIV1 3
+
 //#define PICO_CLOCK_PLL 1512000000 // 302.4MHz - standard voltage
 //#define PICO_CLOCK_PLL_DIV1 5
 
-#define PICO_CLOCK_PLL 1308000000 // 327MHz - 1.15v
-#define PICO_CLOCK_PLL_DIV1 4
+//#define PICO_CLOCK_PLL 1308000000 // 327MHz - 1.15v
+//#define PICO_CLOCK_PLL_DIV1 4
 
 //#define PICO_CLOCK_PLL 984000000 // 328MHz - 1.15v
 //#define PICO_CLOCK_PLL_DIV1 3
@@ -122,8 +133,8 @@
 //#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
 //#define PICO_CLOCK_PLL_DIV1 3
 
-//#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
-//#define PICO_CLOCK_PLL_DIV1 4
+#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
+#define PICO_CLOCK_PLL_DIV1 4
 
 //#define PICO_CLOCK_PLL 804000000 // 402MHz - DOES NOT WORK
 //#define PICO_CLOCK_PLL_DIV1 2
@@ -162,7 +173,7 @@ static uint8_t currentStatus = 0x1f; /* current status register value */
 
 static __attribute__((section(".scratch_y.buffer"))) uint32_t bg; 
 
-static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(8) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
+static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
@@ -235,7 +246,7 @@ void  __not_in_flash_func(pio_irq_handler)()
           }
           break;
         case 1:
-          if ((readVal << 31) >> 31) // & 0x01
+          if (readVal << 31)
             tms9918->status [0x01] &= ~0x01;
           break;
       }
@@ -343,6 +354,30 @@ static __attribute__ ((noinline)) uint32_t toBcd(uint32_t number)
 }
 
 
+/* F18A palette entries are big-endian 0x0RGB which looks like
+   0xGB0R to our RP2040. our vga code is expecting 0x0BGR
+   so we've got B and R correct by pure chance. just need to shift G
+   over. this function does that. note: msbs are ignore so... */
+
+inline uint32_t bigRgb2LittleBgr(uint32_t val)
+{
+  return val | ((val >> 12) << 4);
+}
+
+static void tmsPorch(uint16_t* pixels)
+{
+  uint32_t* dPixels = (uint32_t*)pixels;
+  //bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  bg = 0;//bg | (bg << 16);
+  dma_channel_wait_for_finish_blocking(dma32);
+  dma_channel_set_write_addr(dma32, dPixels, false);
+  dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
+
+  tms9918->blanking = 1; // V
+  tms9918->scanline = 255; // F18A value for vsync
+  tms9918->status [0x03] = 255;
+}
+
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
@@ -367,16 +402,6 @@ static void tmsEndOfFrame(uint32_t frameNumber)
     eofInterrupt();
     updateInterrupts(STATUS_INT);
   }
-}
-
-/* F18A palette entries are big-endian 0x0RGB which looks like
-   0xGB0R to our RP2040. our vga code is expecting 0x0BGR
-   so we've got B and R correct by pure chance. just need to shift G
-   over. this function does that. note: msbs are ignore so... */
-
-inline uint32_t bigRgb2LittleBgr(uint32_t val)
-{
-  return val | ((val >> 12) << 4);
 }
 
 /*
@@ -429,6 +454,20 @@ static void outputSplash(uint16_t y, uint32_t vBorder, uint32_t vPixels, uint16_
 
 #if PICO9918_DIAG
 
+uint32_t temperature = 0;
+
+static void analogReadTempSetup() {
+  adc_init();
+  adc_set_temp_sensor_enabled(true);
+  adc_select_input(4); // Temperature sensor
+}
+
+static float analogReadTemp(float vref) {
+  int v = adc_read();
+  float t = 27.0f - ((v * vref / 4096.0f) - 0.706f) / 0.001721f; // From the datasheet
+  return t;
+}
+
 /* render a bcd value scanline */
 void __attribute__ ((noinline))  renderBcd(uint16_t scanline, uint32_t bcd, uint16_t x, uint16_t y, uint16_t color, uint16_t* pixels)
 {
@@ -474,6 +513,7 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   renderBcd(y, renderTimeBcd, xPos, yPos, 0x0f40, pixels);
   renderBcd(y, renderTimePerScanlineBcd, xPos + 28, yPos, 0x004f, pixels); yPos += 8;
 
+  renderBcd(y, temperature, xPos, yPos, 0x004f, pixels);
 #endif
 
 #if REG_DIAG
@@ -529,7 +569,7 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  int vPixels = (tms9918->registers[0x31] & 0x40) ? 30 * 8 - 1 : 24 * 8;
+  int vPixels = (tms9918->registers[0x31] & 0x40) ? 30 * 8 /*- 1*/ : 24 * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
@@ -538,16 +578,25 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
   bg = bg | (bg << 16);
 
-  if (y == 0) doneInt = false;
+  if (y == 0)
+  {
+#if PICO9918_DIAG
+    uint32_t t = (int)(analogReadTemp(3.3f) * 10.0f);
+    uint32_t i = (t / 100);
+    t -= (i * 100);
+    temperature = (i << 12) | ((t / 10) << 8) | (0x0A << 4) | (t % 10);
+#endif
+    doneInt = false;
+  }
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + vPixels))
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
     dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
-    tms9918->scanline = 0;
-    tms9918->blanking = 1;
-    tms9918->status [0x03] = 0;
+    tms9918->blanking = 1; // V
+    tms9918->scanline = 255; // F18A value for vsync
+    tms9918->status [0x03] = 255;
     dma_channel_wait_for_finish_blocking(dma32);
 
 #if PICO9918_DIAG
@@ -562,11 +611,15 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   uint32_t frameStart = time_us_32();
 
+  y -= vBorder;
+  tms9918->blanking = 0;
+  tms9918->scanline = y;
+  tms9918->status [0x03] = y;
+
   /*** left border ***/
   dma_channel_set_write_addr(dma32, dPixels, false);
   dma_channel_set_trans_count(dma32, hBorder / 2, true);
 
-  y -= vBorder;
   /*** main display region ***/
 
   /* generate the scanline */
@@ -612,12 +665,14 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint32_t data;
     for (int i = 0, x = 0; i < 16; ++i)
     {
-      uint32_t c = tms9918->pram[i];
+      uint32_t c = tms9918->pram[i] & 0xFF0F;
       for (int j = 0; j < 16; ++j, ++x)
       {
-        data = (tms9918->pram[j] << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
+        data = ((tms9918->pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
       }
     }
+    tms9918->blanking = 1; // H
+
     uint8_t* src = &(tmsScanlineBuffer [0]);
     uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
     uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
@@ -645,15 +700,17 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint32_t data;
     for (int i = 0; i < 64; i += 8)
     {
-      data = tms9918->pram [i + 0]; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
-      data = tms9918->pram [i + 1]; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
-      data = tms9918->pram [i + 2]; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
-      data = tms9918->pram [i + 3]; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
-      data = tms9918->pram [i + 4]; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
-      data = tms9918->pram [i + 5]; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
-      data = tms9918->pram [i + 6]; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
-      data = tms9918->pram [i + 7]; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+      data = tms9918->pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
+      data = tms9918->pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
+      data = tms9918->pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
+      data = tms9918->pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
+      data = tms9918->pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
+      data = tms9918->pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
+      data = tms9918->pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
+      data = tms9918->pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
     }
+    tms9918->blanking = 1; // H
+
     while (src < end)
     {
       dP [0] = pram[src [0]];
@@ -672,10 +729,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** right border ***/
   //dma_channel_wait_for_finish_blocking(dma32);
   dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
-
-  tms9918->scanline = y + 1;
-  tms9918->blanking = 0; // Is it even possible to support H blanking?
-  tms9918->status [0x03] = tms9918->scanline;  
 
   accumulatedFrameTime += time_us_32() - frameStart;
 
@@ -787,11 +840,12 @@ void proc1Entry()
  */
 int main(void)
 {
-  vreg_set_voltage(VREG_VOLTAGE_1_30);
   /* currently, VGA hard-coded to 640x480@60Hz. We want a high clock frequency
    * that comes close to being divisible by 25.175MHz. 302.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
+  //vreg_set_voltage(VREG_VOLTAGE_1_15);
+  vreg_set_voltage(VREG_VOLTAGE_1_30);
   set_sys_clock_pll(PICO_CLOCK_PLL, PICO_CLOCK_PLL_DIV1, PICO_CLOCK_PLL_DIV2);
 
   /* we need one of these. it's the main guy */
@@ -800,11 +854,11 @@ int main(void)
   /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
 
-	dma_channel_config cfg = dma_channel_get_default_config(dma32);
-	channel_config_set_read_increment(&cfg, false);
-	channel_config_set_write_increment(&cfg, true);
-	channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
-	dma_channel_set_config(dma32, &cfg, false);
+  dma_channel_config cfg = dma_channel_get_default_config(dma32);
+  channel_config_set_read_increment(&cfg, false);
+  channel_config_set_write_increment(&cfg, true);
+  channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
+  dma_channel_set_config(dma32, &cfg, false);
 
   dma_channel_set_read_addr(dma32, &bg, false);
 
@@ -820,10 +874,15 @@ int main(void)
   params.scanlines = PICO9918_SCANLINES;
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;
+  params.porchFn = tmsPorch;
 
   const char *version = PICO9918_VERSION;
 
   vgaInit(params);
+
+#if PICO9918_DIAG
+  analogReadTempSetup();
+#endif
 
   /* signal proc1 that we're ready to start the display */
   multicore_fifo_push_blocking(0);

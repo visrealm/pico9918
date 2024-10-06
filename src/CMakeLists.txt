@@ -88,6 +88,7 @@ target_link_libraries(${PROGRAM} PUBLIC
         pico_multicore
         hardware_dma        
         hardware_pio        
+        hardware_adc
         pico9918-vga
         vrEmuTms9918)
 
