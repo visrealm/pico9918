@@ -329,6 +329,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
       if (currentTimingLine + 2 == (vgaParams.params.vSyncParams.syncPixels + vgaParams.params.vSyncParams.backPorchPixels))
       {
         multicore_fifo_push_timeout_us(0, 0);
+        multicore_fifo_push_timeout_us(1, 0);
       }
     }
     else if (currentTimingLine < (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels))
@@ -340,7 +341,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
       dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
       if (currentTimingLine == (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels) + 2)
       {
-        multicore_fifo_push_timeout_us(FRONT_PORCH_MSG | 1, 0);
+        multicore_fifo_push_timeout_us(FRONT_PORCH_MSG, 0);
       }
     }
 #if VGA_SCANLINE_CB_ENABLE    
@@ -352,6 +353,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
   {
     dma_hw->ints0 = rgbDmaChanMask;
 
+    currentDisplayLine++;
 #if VGA_HARDCODED_640
     uint32_t pxLine = currentDisplayLine >> 1;
     uint32_t pxLineRpt = currentDisplayLine & 0x01;
@@ -362,7 +364,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
 #endif
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
-    currentDisplayLine++;
 
 #if VGA_CRT_EFFECT
     if (vgaParams.scanlines && pxLineRpt != 0)
@@ -382,22 +383,16 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
 #endif
 
-    if (currentDisplayLine == VIRTUAL_PIXELS_Y * 2)
-    {
-      currentBuffer [0] = 0;
-      currentBuffer [1] = 0;
-      currentBuffer [2] = 0;
-      currentBuffer [3] = 0;
-      currentBuffer [4] = 0;
-    }
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
     // need a new line every X display lines
-    if ((pxLineRpt == 0))
+    if (pxLineRpt == 0)
     {
       uint32_t requestLine = pxLine + 1;
       if (requestLine < VIRTUAL_PIXELS_Y)
+      {
         multicore_fifo_push_timeout_us(requestLine, 0);
+      }
 
 #if VGA_SCANLINE_TIME_DEBUG
       hasRenderedNext = false;
@@ -449,11 +444,11 @@ void __time_critical_func(vgaLoop)()
   {
     uint32_t message = multicore_fifo_pop_blocking();
 
-    if ((message & ~1) == FRONT_PORCH_MSG)
+    if (message == FRONT_PORCH_MSG)
     {
       if (vgaParams.porchFn)
       {
-        vgaParams.porchFn(rgbDataBuffer[message & 1]);
+        vgaParams.porchFn();
       }
     }
     else if (message == END_OF_FRAME_MSG)
@@ -476,16 +471,19 @@ void __time_critical_func(vgaLoop)()
     else
     {
       bool doEof = false;
-      while (multicore_fifo_rvalid()) // if we dropped a scanline, no point rendering it now
+      if (message != 0)
       {
-        uint32_t nextMessage = sio_hw->fifo_rd;
-        if (nextMessage == END_OF_FRAME_MSG)
+        while (multicore_fifo_rvalid()) // if we dropped a scanline, no point rendering it now
         {
-          doEof = true;
-        }
-        else
-        {
-          message = nextMessage;
+          uint32_t nextMessage = sio_hw->fifo_rd;
+          if (nextMessage == END_OF_FRAME_MSG)
+          {
+            doEof = true;
+          }
+          else
+          {
+            message = nextMessage;
+          }
         }
       }
 

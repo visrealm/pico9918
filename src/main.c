@@ -127,14 +127,14 @@
 //#define PICO_CLOCK_PLL 984000000 // 328MHz - 1.15v
 //#define PICO_CLOCK_PLL_DIV1 3
 
-//#define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
-//#define PICO_CLOCK_PLL_DIV1 3
+#define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
+#define PICO_CLOCK_PLL_DIV1 3
 
 //#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
 //#define PICO_CLOCK_PLL_DIV1 3
 
-#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
-#define PICO_CLOCK_PLL_DIV1 4
+//#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
+//#define PICO_CLOCK_PLL_DIV1 4
 
 //#define PICO_CLOCK_PLL 804000000 // 402MHz - DOES NOT WORK
 //#define PICO_CLOCK_PLL_DIV1 2
@@ -364,15 +364,8 @@ inline uint32_t bigRgb2LittleBgr(uint32_t val)
   return val | ((val >> 12) << 4);
 }
 
-static void tmsPorch(uint16_t* pixels)
+static void tmsPorch()
 {
-  uint32_t* dPixels = (uint32_t*)pixels;
-  //bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
-  bg = 0;//bg | (bg << 16);
-  dma_channel_wait_for_finish_blocking(dma32);
-  dma_channel_set_write_addr(dma32, dPixels, false);
-  dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
-
   tms9918->blanking = 1; // V
   tms9918->scanline = 255; // F18A value for vsync
   tms9918->status [0x03] = 255;
