@@ -24,6 +24,7 @@
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
+#include "pico/binary_info.h"
 
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
@@ -104,7 +105,13 @@
 #define TMS_PIO pio1
 #define TMS_IRQ PIO1_IRQ_0
 
-
+bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
+bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
+bi_decl(bi_pin_mask_with_names(GPIO_CD_MASK, "CPU Data (CD7 - CD0)"));
+bi_decl(bi_1pin_with_name(GPIO_CSR, "Read"));
+bi_decl(bi_1pin_with_name(GPIO_CSW, "Write"));
+bi_decl(bi_1pin_with_name(GPIO_MODE, "Mode"));
+bi_decl(bi_1pin_with_name(GPIO_INT, "Interrupt"));
 
 
 /* file globals */
@@ -299,9 +306,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     pixels[x] = bg;
   }
 
-  /* convert from  palette to bgr12 */
+  /* convert from palette to bgr12 */
   int tmsX = 0;
-  if (tmsScanlineBuffer[0] & 0xf0)
+  if (tms9918->mode == TMS_MODE_TEXT80)
   {
     for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
     {
@@ -368,7 +375,7 @@ void tmsPioInit()
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writeConfig, GPIO_CD7);
   sm_config_set_in_shift(&writeConfig, false, true, 16); // L shift, autopush @ 16 bits
-  sm_config_set_clkdiv(&writeConfig, 4.0f);
+  sm_config_set_clkdiv(&writeConfig, 1.0f);
 
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
@@ -387,7 +394,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readConfig, 4.0f);
+  sm_config_set_clkdiv(&readConfig, 1.0f);
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
