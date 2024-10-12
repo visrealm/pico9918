@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 3.13)
 
 # compile-time options
 
-set(PICO9918_VERSION   "0.4.2.1")
+set(PICO9918_VERSION   "0.4.2.2")
 set(PICO9918_PCB_MAJOR_VER 0)
 set(PICO9918_PCB_MINOR_VER 4)
 
-set(PICO9918_SCANLINES 0)
+set(PICO9918_SCANLINES 1)
 set(PICO9918_NO_SPLASH 0)
-set(PICO9918_DIAG      1)
+set(PICO9918_DIAG      0)
 
 # end compile-time options
 
@@ -86,9 +86,10 @@ target_include_directories(${PROGRAM} PRIVATE
 target_link_libraries(${PROGRAM} PUBLIC
         pico_stdlib
         pico_multicore
-        hardware_dma        
-        hardware_pio        
+        hardware_dma
+        hardware_pio
         hardware_adc
+        hardware_flash
         pico9918-vga
         vrEmuTms9918)
 

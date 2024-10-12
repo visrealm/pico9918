@@ -562,7 +562,7 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  int vPixels = (tms9918->registers[0x31] & 0x40) ? 30 * 8 /*- 1*/ : 24 * 8;
+  int vPixels = (tms9918->registers[0x31] & 0x40) ? 30 * 8 : 24 * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
@@ -771,7 +771,7 @@ void tmsPioInit()
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writeConfig, GPIO_CD7);
   sm_config_set_in_shift(&writeConfig, false, true, 16); // L shift, autopush @ 16 bits
-  sm_config_set_clkdiv(&writeConfig, 4.0f);
+  sm_config_set_clkdiv(&writeConfig, 1.0f);
 
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
@@ -790,7 +790,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readConfig, 4.0f);
+  sm_config_set_clkdiv(&readConfig, 1.0f);
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
