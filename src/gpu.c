@@ -108,6 +108,7 @@ static inline uint8_t hexv (uint32_t v) {
 
 static void __attribute__ ((noinline)) flashSector () {
   static uint32_t flashing = 0;
+  int retry = 0;
   UF2_Block_Ptr p = (UF2_Block_Ptr)&(tms9918->vram [0]);
 
   tms9918->vram [767] = 0x00; // Wait
@@ -149,6 +150,8 @@ static void __attribute__ ((noinline)) flashSector () {
   }
   if (tms9918->vram [766] == 0) {
     strcpy (&(tms9918->vram [736]), PROGRAMMING);
+    retry = 3;
+retry:
     flash_range_program (a, p->data, PAYLOAD);
     xip_ctrl_hw->flush = 1;
     while (!(xip_ctrl_hw->stat & XIP_STAT_FLUSH_READY_BITS))
@@ -157,6 +160,10 @@ static void __attribute__ ((noinline)) flashSector () {
     strcpy (&(tms9918->vram [736]), VALIDATING);
 
   if (memcmp ((void *)(XIP_BASE + a), p->data, PAYLOAD) != 0) {
+    if (retry) {
+      retry--;
+      goto retry;
+    }
     strcpy (&(tms9918->vram [736]), FAILEDCOMPARISON);
     tms9918->vram [756] = hexv (a >> 20);
     tms9918->vram [757] = hexv (a >> 16);
@@ -194,7 +201,7 @@ static void guard(void* a) {
   uintptr_t addr = (uintptr_t)a;
 #if PICO_RP2040 // Old memory protection unit
   mpu_hw->rbar = (addr & (uint)~0xff) | M0PLUS_MPU_RBAR_VALID_BITS | 0;
-  mpu_hw->rasr = 1 | (0x07 << 1) | (0xfe << 8) | 0x10000000; // 0x07 = initial 32 bytes only
+  mpu_hw->rasr = 1 | (0x07 << 1) | (0xfe << 8) | 0x10000000; // 0xfe = initial 32 bytes only
 #else
   mpu_hw->rnr = 0;
   mpu_hw->rbar = (addr & (uint)~31u) | (2u << M33_MPU_RBAR_AP_LSB) | M33_MPU_RBAR_XN_BITS;
