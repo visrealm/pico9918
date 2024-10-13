@@ -127,11 +127,11 @@
 //#define PICO_CLOCK_PLL 984000000 // 328MHz - 1.15v
 //#define PICO_CLOCK_PLL_DIV1 3
 
-#define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
-#define PICO_CLOCK_PLL_DIV1 3
-
-//#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
+//#define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
 //#define PICO_CLOCK_PLL_DIV1 3
+
+#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
+#define PICO_CLOCK_PLL_DIV1 3
 
 //#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
 //#define PICO_CLOCK_PLL_DIV1 4
@@ -588,8 +588,16 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     dma_channel_set_write_addr(dma32, dPixels, false);
     dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
     tms9918->blanking = 1; // V
-    tms9918->scanline = 255; // F18A value for vsync
-    tms9918->status [0x03] = 255;
+    if ((y >= vBorder + vPixels) && (tms9918->scanline != 255))
+    {
+      tms9918->scanline = y - vBorder;
+      // We're only here because we are not in 30 row mode, so this test is safe
+      if (tms9918->scanline >= 216) // This is where the emulator tops out
+      {
+        tms9918->scanline = 255; // F18A value for vsync
+      }
+    }
+    tms9918->status [0x03] = tms9918->scanline;
     dma_channel_wait_for_finish_blocking(dma32);
 
 #if PICO9918_DIAG
@@ -599,6 +607,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     if (frameCount < 600)
       outputSplash(y, vBorder, vPixels, pixels);
 
+  // Unsure which of these is 100% correct...
+  //if ((tms9918->registers[0x32] & 0x40) && (y >= vBorder + vPixels) && (tms9918->scanline != 255))
+    if ((tms9918->registers[0x32] & 0x40) && (tms9918->scanline == 192))
+    {
+      gpuTrigger();
+    }
     return;
   }
 
