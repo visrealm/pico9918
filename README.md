@@ -2,29 +2,44 @@
 
 A drop-in replacement for a classic TMS9918A VDP using a Raspberry Pi Pico.
 
-The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here.
+The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
 
 ## Supported devices
 
 This is a list of devices the PICO9918 has been tested and confirmed to work on. 
 
-* Texas Instruments TI-99/4A (NTSC and PAL)
-* Texas Instruments TI-99/4QI
-* CBS ColecoVision (NTSC and PAL)
-* Powertran Cortex
-* Casio PV-7 (MSX)
-* NABU Personal Computer
+* [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A) (NTSC and PAL)
+* [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
+* [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision) (NTSC and PAL)
+* [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam) (NTSC)
+* [MSX](https://en.wikipedia.org/wiki/MSX)
+  * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
+  * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
+* [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
+* [Powertran Cortex](http://powertrancortex.com/)
+* [Sega SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
+* [Sord M5](https://en.wikipedia.org/wiki/Sord_M5)
+* [Tomy Pyuuta](https://en.wikipedia.org/wiki/Tomy_Tutor)
 
 Homebrews:
 
 * Troy Schrapel's [HBC-56](https://github.com/visrealm/hbc-56)
 * Stuart Connor's [TM990](http://www.stuartconner.me.uk/tm990/tm990.htm)
+* John Winans' [Z80-Retro](https://github.com/Z80-Retro)
 
 If you have tested the PICO9918 on any other device, please let me know and I'll happily update this list. :)
 
 ### Unsupported devices
 
 So far, there aren't any. 
+
+# F18A compatibility
+
+Work is being done to add F18A compatibility to the PICO9918. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
+
+[![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/TabTIPL1xQY)](https://youtu.be/TabTIPL1xQY)
+
+Pre-release firmware for F18A compatibility mode is available in [Releases](https://github.com/visrealm/pico9918/releases/tag/v0.4.1-f18a-preview1).
 
 ## Purchasing options
 
@@ -34,7 +49,7 @@ Fully assembled and tested PICO9918 v1.0s are available on my Tindie store:
 
 Also (more convenient for North America)
 
-<a href="https://www.arcadeshopper.com/wp/store/#!/Pico9918-V1-0-VDP-replacement/p/692136720"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
+<a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=Pico9918"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
 
 
 ## Hardware
@@ -112,6 +127,9 @@ And now v0.4 - the single board version:
 
 ### v0.4 prototype working!
 [![PICO9918 v0.4 PCB. Integrated RP2040 all-in-one build.](https://img.visualrealmsoftware.com/youtube/thumb/KSbJnAwclQw)](https://youtu.be/KSbJnAwclQw)
+
+### F18A mode development preview
+[![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/TabTIPL1xQY)](https://youtu.be/TabTIPL1xQY)
 
 ## Licensing
 
