@@ -14,13 +14,14 @@
 #include "pio_utils.h"
 
 #include "pico/multicore.h"
+#include "pico/binary_info.h"
 
 #include "hardware/dma.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
  // compile options
-#define VGA_CRT_EFFECT 0
+#define VGA_CRT_EFFECT PICO9918_SCANLINES
 #define VGA_SCANLINE_TIME_DEBUG 0
 #define VGA_HARDCODED_640 0
 #define VGA_NO_MALLOC 1
@@ -62,6 +63,11 @@ int roundflt(float x)
 #define END_OF_SCANLINE_MSG 0x40000000
 #define END_OF_FRAME_MSG 0x80000000
 
+bi_decl(bi_1pin_with_name(SYNC_PINS_START, "H Sync"));
+bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "V Sync"));
+bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START, "Red (LSB - MSB)"));
+bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START + 4, "Green (LSB - MSB)"));
+bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START + 8, "Blue (LSB - MSB)"));
 
 /*
  * sync pio dma data buffers
