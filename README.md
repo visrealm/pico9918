@@ -49,7 +49,7 @@ Fully assembled and tested PICO9918 v1.0s are available on my Tindie store:
 
 Also (more convenient for North America)
 
-<a href="https://www.arcadeshopper.com/wp/store/#!/Pico9918-V1-0-VDP-replacement/p/692136720"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
+<a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=Pico9918"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
 
 
 ## Hardware
