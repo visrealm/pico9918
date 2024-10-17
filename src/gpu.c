@@ -15,7 +15,6 @@
 
 #include "pico/stdlib.h"
 #include "hardware/structs/mpu.h"
-#include "hardware/regs/ssi.h"
 #include "hardware/structs/xip_ctrl.h"
 #include <hardware/flash.h>
 #include "pico.h" // For PICO_RP2040
@@ -108,6 +107,8 @@ static inline uint8_t hexv (uint32_t v) {
 
 static void __attribute__ ((noinline)) flashSector () {
   static uint32_t flashing = 0;
+  static uint32_t repeat = 0;
+  int i;
   int retry = 0;
   UF2_Block_Ptr p = (UF2_Block_Ptr)&(tms9918->vram [0]);
 
@@ -153,15 +154,32 @@ static void __attribute__ ((noinline)) flashSector () {
     retry = 3;
 retry:
     flash_range_program (a, p->data, PAYLOAD);
-    xip_ctrl_hw->flush = 1;
-    while (!(xip_ctrl_hw->stat & XIP_STAT_FLUSH_READY_BITS))
-      tight_loop_contents();
+
+    // This cache flush may be unstable over 133MHz
+    //xip_ctrl_hw->flush = 1;
+    //while (!(xip_ctrl_hw->stat & XIP_STAT_FLUSH_READY_BITS))
+    //  tight_loop_contents();
+
+    // Alternate 'local' cache flush
+    i = 0;
+    while (i < PAYLOAD) {
+      *(volatile uint32_t *)(XIP_BASE + a + i) = 0;
+      i += sizeof(uint32_t);
+    }
   } else
     strcpy (&(tms9918->vram [736]), VALIDATING);
 
   if (memcmp ((void *)(XIP_BASE + a), p->data, PAYLOAD) != 0) {
     if (retry) {
       retry--;
+      repeat++;
+      tms9918->vram [729] = 'R';
+      tms9918->vram [730] = 'E';
+      tms9918->vram [731] = 'P';
+      tms9918->vram [732] = ':';
+      tms9918->vram [733] = hexv (repeat >>  8);
+      tms9918->vram [734] = hexv (repeat >>  4);
+      tms9918->vram [735] = hexv (repeat >>  0);
       goto retry;
     }
     strcpy (&(tms9918->vram [736]), FAILEDCOMPARISON);
@@ -172,7 +190,7 @@ retry:
     tms9918->vram [760] = hexv (a >>  4);
     tms9918->vram [761] = hexv (a >>  0);
     int i = 0;
-    while (i < 736) {
+    while (i < 728) {
       b = *(uint8_t *)(XIP_BASE + a++);
       tms9918->vram [i++] = hexv (b >> 4);
       tms9918->vram [i++] = hexv (b);
