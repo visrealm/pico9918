@@ -110,6 +110,12 @@
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
 
+#ifdef GPIO_RESET
+#define GPIO_RESET_MASK (0x01 << GPIO_RESET)
+#else
+#define GPIO_RESET_MASK 0
+#endif
+
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
 //#define PICO_CLOCK_PLL 756000000 // 252MHz - standard voltage
@@ -261,7 +267,7 @@ void  __not_in_flash_func(pio_irq_handler)()
  */
 static inline void enableTmsPioInterrupts()
 {
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = 1u << TMS_IRQ;
+  irq_set_enabled(TMS_IRQ, true);
 }
 
 /*
@@ -269,7 +275,7 @@ static inline void enableTmsPioInterrupts()
  */
 static inline void disableTmsPioInterrupts()
 {
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << TMS_IRQ;
+  irq_set_enabled(TMS_IRQ, false);
 }
 
 #ifdef GPIO_RESET
@@ -279,11 +285,10 @@ static inline void disableTmsPioInterrupts()
  */
 void __not_in_flash_func(gpioIrqHandler)()
 {
-  gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
   disableTmsPioInterrupts();
   vrEmuTms9918Reset();
 
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << TMS_IRQ;
+  irq_clear(TMS_IRQ);
   pio_sm_clear_fifos(TMS_PIO, tmsReadSm);
   pio_sm_clear_fifos(TMS_PIO, tmsWriteSm);
 
@@ -298,6 +303,8 @@ void __not_in_flash_func(gpioIrqHandler)()
   logoOffset = 100;
   gpio_put(GPIO_INT, !currentInt);
   enableTmsPioInterrupts();
+
+  gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
 }
 
 #endif
@@ -814,7 +821,7 @@ void tmsPioInit()
 void proc1Entry()
 {
   // set up gpio pins
-  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
+  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK | GPIO_RESET_MASK);
   gpio_put_all(GPIO_INT_MASK);
   gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
 
@@ -827,8 +834,8 @@ void proc1Entry()
 #ifdef GPIO_RESET
   // set up reset gpio interrupt handler
   irq_set_exclusive_handler(IO_IRQ_BANK0, gpioIrqHandler);
-  irq_set_enabled(IO_IRQ_BANK0, true);
   gpio_set_irq_enabled(GPIO_RESET, GPIO_IRQ_EDGE_FALL, true);
+  irq_set_enabled(IO_IRQ_BANK0, true);
 #endif
 
   // wait until everything else is ready, then run the vga loop
