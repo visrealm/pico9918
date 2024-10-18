@@ -399,7 +399,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readConfig, 1.0f);
+  sm_config_set_clkdiv(&readConfig, 4.0f);
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
