@@ -25,9 +25,19 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
+if (${PICO9918_SCART_RGBS})
+  if (${PICO9918_SCART_PAL})
+    set(PICO9918_OUTPUT_STR "rgbs-pal576i")
+  else()
+    set(PICO9918_OUTPUT_STR "rgbs-ntsc480i")
+  endif()
+else()
+  set(PICO9918_OUTPUT_STR "vga")
+endif()
+
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
-set(PICO9918_BINARY_SUFFIX -pcb-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_GIT_BRANCH}-build-${PICO9918_VERSION_STR})
+set(PICO9918_BINARY_SUFFIX -pcb-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_OUTPUT_STR}-build-${PICO9918_VERSION_STR})
 
 if (${PICO9918_SCANLINES})
   set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-sl)
@@ -59,12 +69,14 @@ pico_add_extra_outputs(${PROGRAM})
 pico_enable_stdio_usb(${PROGRAM} 0)
 pico_enable_stdio_uart(${PROGRAM} 0)
 
-pico_set_binary_type(${PROGRAM} copy_to_ram)   # TOO SLOW TO BOOT
+pico_set_binary_type(${PROGRAM} copy_to_ram)
 
 add_definitions(-DPICO9918_VERSION="${PICO9918_VERSION}")
 add_definitions(-DPICO9918_PCB_MAJOR_VER=${PICO9918_PCB_MAJOR_VER})
 add_definitions(-DPICO9918_PCB_MINOR_VER=${PICO9918_PCB_MINOR_VER})
 add_definitions(-DPICO9918_SCANLINES=${PICO9918_SCANLINES})
+add_definitions(-DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS})
+add_definitions(-DPICO9918_SCART_PAL=${PICO9918_SCART_PAL})
 
 add_definitions(-DPICO_DISABLE_SHARED_IRQ_HANDLERS=1)
 #add_definitions(-DPICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1)

@@ -63,8 +63,8 @@
   *       https://www.aliexpress.com/item/1005007066733934.html
   */
 
-#define PCB_MAJOR_VERSION 0
-#define PCB_MINOR_VERSION 3
+#define PCB_MAJOR_VERSION PICO9918_PCB_MAJOR_VER
+#define PCB_MINOR_VERSION PICO9918_PCB_MINOR_VER
 
 #define GPIO_CD7 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
@@ -97,13 +97,15 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-//#define PICO_CLOCK_PLL 1260000000
-//#define PICO_CLOCK_PLL_DIV1 5
-//#define PICO_CLOCK_PLL_DIV2 1
-
-#define PICO_CLOCK_PLL 1536000000
-#define PICO_CLOCK_PLL_DIV1 3
-#define PICO_CLOCK_PLL_DIV2 2
+#if PICO9918_SCART_RGBS // for 15kHz
+  #define PICO_CLOCK_PLL 1536000000
+  #define PICO_CLOCK_PLL_DIV1 3
+  #define PICO_CLOCK_PLL_DIV2 2
+#else // for 31.46875 kHz
+  #define PICO_CLOCK_PLL 1260000000
+  #define PICO_CLOCK_PLL_DIV1 5
+  #define PICO_CLOCK_PLL_DIV2 1
+#endif
 
 #define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
 
@@ -451,11 +453,19 @@ int main(void)
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
-  params.params = vgaGetParams(RGBS_NTSC_720_480i_60HZ);
-  //params.params = vgaGetParams(VGA_640_480_60HZ);
 
-  /* virtual size will be 640 x 320 to accomodate 80-column mode */
-  //setVgaParamsScaleY(&params.params, 2);
+#if PICO9918_SCART_RGBS
+  #if PICO9918_SCART_PAL
+    params.params = vgaGetParams(RGBS_PAL_720_576i_50HZ);
+  #else
+    params.params = vgaGetParams(RGBS_NTSC_720_480i_60HZ);
+  #endif
+#else // VGA
+  params.params = vgaGetParams(VGA_640_480_60HZ);
+
+  /* virtual size will be 640 x 240 to accomodate 80-column mode */
+  setVgaParamsScaleY(&params.params, 2);
+#endif
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
