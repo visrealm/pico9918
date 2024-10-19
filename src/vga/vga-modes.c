@@ -96,6 +96,37 @@ VgaParams vgaGetParams(VgaMode mode)
       params.vSyncParams.backPorchPixels = 38;
       params.vSyncParams.syncHigh = true;
       break;
+
+  case RGBS_PAL_720_576i_50HZ:
+      params.pixelClockKHz = 13500;
+      params.hSyncParams.displayPixels = 720;
+      params.hSyncParams.frontPorchPixels = 22;
+      params.hSyncParams.syncPixels = 64;
+      params.hSyncParams.backPorchPixels = 74;
+      params.hSyncParams.syncHigh = false;
+
+      params.vSyncParams.displayPixels = 576 / 2; // halving since... interlaced
+      params.vSyncParams.frontPorchPixels = 8;
+      params.vSyncParams.syncPixels = 3;          // this should be 2.5
+      params.vSyncParams.backPorchPixels = 14;
+      params.vSyncParams.syncHigh = false;
+      break;
+
+  case RGBS_NTSC_720_480i_60HZ:
+      params.pixelClockKHz = 13500;
+      params.hSyncParams.displayPixels = 720;
+      params.hSyncParams.frontPorchPixels = 22;
+      params.hSyncParams.syncPixels = 64;
+      params.hSyncParams.backPorchPixels = 74;
+      params.hSyncParams.syncHigh = false;
+
+      params.vSyncParams.displayPixels = 480 / 2; // halving since... interlaced
+      params.vSyncParams.frontPorchPixels = 3;
+      params.vSyncParams.syncPixels = 3;       
+      params.vSyncParams.backPorchPixels = 17; // this should be 16.5 
+      params.vSyncParams.syncHigh = false;
+      break;
+
   }
 
   if (params.pixelClockKHz && params.hSyncParams.displayPixels && params.vSyncParams.displayPixels)
