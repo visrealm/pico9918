@@ -63,8 +63,8 @@
   *       https://www.aliexpress.com/item/1005007066733934.html
   */
 
-#define PCB_MAJOR_VERSION 0
-#define PCB_MINOR_VERSION 4
+#define PCB_MAJOR_VERSION PICO9918_PCB_MAJOR_VER
+#define PCB_MINOR_VERSION PICO9918_PCB_MINOR_VER
 
 #define GPIO_CD7 14
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
@@ -97,9 +97,16 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#define PICO_CLOCK_PLL 1260000000
-#define PICO_CLOCK_PLL_DIV1 5
-#define PICO_CLOCK_PLL_DIV2 1
+#if PICO9918_SCART_RGBS // for 15kHz
+  #define PICO_CLOCK_PLL 1536000000
+  #define PICO_CLOCK_PLL_DIV1 3
+  #define PICO_CLOCK_PLL_DIV2 2
+#else // for 31.46875 kHz
+  #define PICO_CLOCK_PLL 1260000000
+  #define PICO_CLOCK_PLL_DIV1 5
+  #define PICO_CLOCK_PLL_DIV2 1
+#endif
+
 #define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
 
 #define TMS_PIO pio1
@@ -206,7 +213,7 @@ static inline void disableTmsPioInterrupts()
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
 
-#if 1
+#if 0
   // better compile-time optimizations if we hard-code these
 #define VIRTUAL_PIXELS_X 640
 #define VIRTUAL_PIXELS_Y 240
@@ -394,7 +401,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readConfig, 1.0f);
+  sm_config_set_clkdiv(&readConfig, 4.0f);
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
@@ -446,10 +453,19 @@ int main(void)
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
+
+#if PICO9918_SCART_RGBS
+  #if PICO9918_SCART_PAL
+    params.params = vgaGetParams(RGBS_PAL_720_576i_50HZ);
+  #else
+    params.params = vgaGetParams(RGBS_NTSC_720_480i_60HZ);
+  #endif
+#else // VGA
   params.params = vgaGetParams(VGA_640_480_60HZ);
 
-  /* virtual size will be 640 x 320 to accomodate 80-column mode */
+  /* virtual size will be 640 x 240 to accomodate 80-column mode */
   setVgaParamsScaleY(&params.params, 2);
+#endif
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
