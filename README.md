@@ -10,6 +10,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 
 * [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A) (NTSC and PAL)
 * [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
+* [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
 * [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision) (NTSC and PAL)
 * [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam) (NTSC)
 * [MSX](https://en.wikipedia.org/wiki/MSX)
