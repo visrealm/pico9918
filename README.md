@@ -14,6 +14,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision) (NTSC and PAL)
 * [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam) (NTSC)
 * [MSX](https://en.wikipedia.org/wiki/MSX)
+  * [Casio MX-10](https://www.msx.org/wiki/Casio_MX-10)
   * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
 * [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
