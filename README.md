@@ -10,16 +10,20 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 
 * [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A) (NTSC and PAL)
 * [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
+* [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
 * [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision) (NTSC and PAL)
 * [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam) (NTSC)
 * [MSX](https://en.wikipedia.org/wiki/MSX)
+  * [Casio MX-10](https://www.msx.org/wiki/Casio_MX-10)
   * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
+  * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
 * [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
 * [Powertran Cortex](http://powertrancortex.com/)
-* [Sega SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
+* [Sega SG-1000 / SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
 * [Sord M5](https://en.wikipedia.org/wiki/Sord_M5)
-* [Tomy Pyuuta](https://en.wikipedia.org/wiki/Tomy_Tutor)
+* [Tomy Pyūta / Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor)
+* [Tomy Pyūta Jr](http://videogamekraken.com/pyuta-jr-by-tomy)
 
 Homebrews:
 
