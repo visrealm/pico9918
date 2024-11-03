@@ -5,7 +5,7 @@
  *
  * https://github.com/visrealm/pico9918
  * 
- * Purpose: TMS9900 GPU core
+ * Purpose: TMS9900 GPU core (rp2040)
  * 
  * Author: JasonACT (AtariAge)
  *

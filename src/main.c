@@ -459,7 +459,12 @@ uint32_t temperature = 0;
 static void analogReadTempSetup() {
   adc_init();
   adc_set_temp_sensor_enabled(true);
+
+#if PICO_RP2040
   adc_select_input(4); // Temperature sensor
+#else
+  adc_select_input(8); // RP2350 QFN80 package only... 
+#endif
 }
 
 static float analogReadTemp(float vref) {

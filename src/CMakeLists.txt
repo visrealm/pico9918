@@ -7,7 +7,7 @@ set(PICO9918_VERSION   "0.4.2.2")
 set(PICO9918_PCB_MAJOR_VER 0)
 set(PICO9918_PCB_MINOR_VER 4)
 
-set(PICO9918_SCANLINES 1)
+set(PICO9918_SCANLINES 0)
 set(PICO9918_NO_SPLASH 0)
 set(PICO9918_DIAG      0)
 
@@ -25,7 +25,7 @@ execute_process(
 
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
-set(PICO9918_BINARY_SUFFIX -pcb-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_GIT_BRANCH}-build-${PICO9918_VERSION_STR})
+set(PICO9918_BINARY_SUFFIX -pcb-${PICO_BOARD}-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_GIT_BRANCH}-build-${PICO9918_VERSION_STR})
 
 if (${PICO9918_SCANLINES})
   set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-sl)
@@ -39,7 +39,7 @@ set(PROGRAM pico9918${PICO9918_BINARY_SUFFIX})
 
 add_executable(${PROGRAM} )
 
-target_sources(${PROGRAM} PRIVATE main.c gpu.c clocks.pio.h tms9918.pio.h Thumb9900.S)
+target_sources(${PROGRAM} PRIVATE main.c clocks.pio.h tms9918.pio.h)
 
 pico_set_program_name(${PROGRAM} "pico9918")
 pico_set_program_version(${PROGRAM} ${PICO9918_VERSION})
@@ -89,11 +89,12 @@ target_link_libraries(${PROGRAM} PUBLIC
         hardware_dma
         hardware_pio
         hardware_adc
-        hardware_flash
         pico9918-vga
+        pico9918-gpu
         vrEmuTms9918)
 
 pico_add_extra_outputs(${PROGRAM})
 
 add_subdirectory(pio-utils)
 add_subdirectory(vga)
+add_subdirectory(gpu)
