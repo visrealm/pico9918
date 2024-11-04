@@ -38,6 +38,7 @@ project(pico9918 C CXX ASM)
 
 add_definitions(-DPICO_BUILD=1)
 add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
+add_definitions(-DVR_EMU_TMS9918_MODE=1)
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()

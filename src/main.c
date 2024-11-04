@@ -123,17 +123,8 @@
 //#define PICO_CLOCK_PLL 756000000 // 252MHz - standard voltage
 //#define PICO_CLOCK_PLL_DIV1 3
 
-//#define PICO_CLOCK_PLL 828000000 // 276MHz - standard voltage
-//#define PICO_CLOCK_PLL_DIV1 3
-
 //#define PICO_CLOCK_PLL 1512000000 // 302.4MHz - standard voltage
 //#define PICO_CLOCK_PLL_DIV1 5
-
-//#define PICO_CLOCK_PLL 1308000000 // 327MHz - 1.15v
-//#define PICO_CLOCK_PLL_DIV1 4
-
-//#define PICO_CLOCK_PLL 984000000 // 328MHz - 1.15v
-//#define PICO_CLOCK_PLL_DIV1 3
 
 #define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
 #define PICO_CLOCK_PLL_DIV1 3
@@ -206,7 +197,7 @@ inline static void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
-  readAhead |= (tms9918->status [tms9918->registers [0x0F] & 0x0F]) << 16;
+  readAhead |= (TMS_STATUS(tms9918, TMS_REGISTER(tms9918, 0x0F) & 0x0F)) << 16;
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
@@ -247,7 +238,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     {
       readVal >>= (3 + 16); // What status was read?
       tms9918->regWriteStage = 0;
-      switch (tms9918->registers [0x0F] & 0x0F)
+      switch (TMS_REGISTER(tms9918, 0x0F) & 0x0F)
       {
         case 0:
           readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
@@ -263,7 +254,7 @@ void  __not_in_flash_func(pio_irq_handler)()
           break;
         case 1:
           if (readVal << 31)
-            tms9918->status [0x01] &= ~0x01;
+            TMS_STATUS(tms9918, 0x01) &= ~0x01;
           break;
       }
     }
@@ -324,8 +315,8 @@ void __not_in_flash_func(gpioIrqHandler)()
 static void eofInterrupt()
 {
   doneInt = true;
-  tms9918->status [0x01] |=  0x02;
-  if (tms9918->registers[0x32] & 0x20)
+  TMS_STATUS(tms9918, 0x01) |=  0x02;
+  if (TMS_REGISTER(tms9918, 0x32) & 0x20)
   {
     gpuTrigger();
   }
@@ -383,15 +374,15 @@ inline uint32_t bigRgb2LittleBgr(uint32_t val)
 
 static void tmsPorch()
 {
-  tms9918->blanking = 1; // V
-  tms9918->scanline = 255; // F18A value for vsync
-  tms9918->status [0x03] = 255;
+  tms9918->vram.map.blanking = 1; // V
+  tms9918->vram.map.scanline = 255; // F18A value for vsync
+  TMS_STATUS(tms9918, 0x03) = 255;
 }
 
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
-  //vgaCurrentParams()->scanlines = tms9918->registers[0x32] & 0x04;
+  //vgaCurrentParams()->scanlines = TMS_REGISTER(tms9918, 0x32) & 0x04;
 
 #if TIMING_DIAG
   const uint32_t framesPerUpdate = 1 << 2;
@@ -550,7 +541,7 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   {
     if (y % 3 != 0)
     {
-      int8_t regValue = tms9918->registers[reg];
+      int8_t regValue = TMS_REGISTER(tms9918, reg);
       int x = VIRTUAL_PIXELS_X - ((8 * (diagBitWidth + diagBitSpacing)) + diagRightMargin);
       for (int i = 0; i < 8; ++i)
       {
@@ -584,13 +575,13 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  int vPixels = (tms9918->registers[0x31] & 0x40) ? 30 * 8 : 24 * 8;
+  int vPixels = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 * 8 : 24 * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
   uint32_t* dPixels = (uint32_t*)pixels;
-  bg = bigRgb2LittleBgr(tms9918->pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  bg = bigRgb2LittleBgr(tms9918->vram.map.pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
   bg = bg | (bg << 16);
 
   if (y == 0)
@@ -609,11 +600,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
     dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
-    tms9918->blanking = 1; // V
+    tms9918->vram.map.blanking = 1; // V
     if ((y >= vBorder + vPixels))
     {
-      tms9918->scanline = y - vBorder;
-      tms9918->status [0x03] = tms9918->scanline;
+      tms9918->vram.map.scanline = y - vBorder;
+      TMS_STATUS(tms9918, 0x03) = tms9918->vram.map.scanline;
     }
     dma_channel_wait_for_finish_blocking(dma32);
 
@@ -625,7 +616,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     {
       outputSplash(y, vBorder, vPixels, pixels);
     }
-    if (tms9918->registers[0x32] & 0x40)
+    if (TMS_REGISTER(tms9918, 0x32) & 0x40)
     {
       gpuTrigger();
     }
@@ -635,9 +626,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   uint32_t frameStart = time_us_32();
 
   y -= vBorder;
-  tms9918->blanking = 0;
-  tms9918->scanline = y;
-  tms9918->status [0x03] = y;
+  tms9918->vram.map.blanking = 0;
+  tms9918->vram.map.scanline = y;
+  TMS_STATUS(tms9918, 0x03) = y;
 
   /*** left border ***/
   dma_channel_set_write_addr(dma32, dPixels, false);
@@ -655,20 +646,20 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const int interruptThreshold = 1;
   if (y < vPixels - interruptThreshold)
   {
-    tms9918->status [0x01] &= ~0x03;
+    TMS_STATUS(tms9918, 0x01) &= ~0x03;
   }
   else
   {
-    tms9918->status [0x01] &= ~0x01;
+    TMS_STATUS(tms9918, 0x01) &= ~0x01;
   }
 
-  if (tms9918->scanline && (tms9918->registers[0x13] == tms9918->scanline))
+  if (tms9918->vram.map.scanline && (TMS_REGISTER(tms9918, 0x13) == tms9918->vram.map.scanline))
   {
-    tms9918->status [0x01] |= 0x01;
+    TMS_STATUS(tms9918, 0x01) |= 0x01;
     tempStatus |= STATUS_INT;
   }
 
-  if (tms9918->registers[0x32] & 0x40)
+  if (TMS_REGISTER(tms9918, 0x32) & 0x40)
   {
     gpuTrigger();
   }
@@ -688,13 +679,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint32_t data;
     for (int i = 0, x = 0; i < 16; ++i)
     {
-      uint32_t c = tms9918->pram[i] & 0xFF0F;
+      uint32_t c = tms9918->vram.map.pram[i] & 0xFF0F;
       for (int j = 0; j < 16; ++j, ++x)
       {
-        data = ((tms9918->pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
+        data = ((tms9918->vram.map.pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
       }
     }
-    tms9918->blanking = 1; // H
+    tms9918->vram.map.blanking = 1; // H
 
     uint8_t* src = &(tmsScanlineBuffer [0]);
     uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
@@ -723,16 +714,16 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint32_t data;
     for (int i = 0; i < 64; i += 8)
     {
-      data = tms9918->pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
-      data = tms9918->pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
-      data = tms9918->pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
-      data = tms9918->pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
-      data = tms9918->pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
-      data = tms9918->pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
-      data = tms9918->pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
-      data = tms9918->pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
     }
-    tms9918->blanking = 1; // H
+    tms9918->vram.map.blanking = 1; // H
 
     while (src < end)
     {

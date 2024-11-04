@@ -110,9 +110,9 @@ static void __attribute__ ((noinline)) flashSector () {
   static uint32_t repeat = 0;
   int i;
   int retry = 0;
-  UF2_Block_Ptr p = (UF2_Block_Ptr)&(tms9918->vram [0]);
+  UF2_Block_Ptr p = (UF2_Block_Ptr)&(tms9918->vram.bytes [0]);
 
-  tms9918->vram [767] = 0x00; // Wait
+  tms9918->vram.bytes [767] = 0x00; // Wait
   tms9918->flash = 0;
   if ((p->magicStart0 != 0x0A324655) || // UF2\n
       (p->magicStart1 != 0x9E5D5157) ||
@@ -124,33 +124,33 @@ static void __attribute__ ((noinline)) flashSector () {
       (p->targetAddr  >= 0x10040000) || // +256KB
       ((p->targetAddr & 0xFF) != 0)  || // Target must be 256 byte aligned
       (p->payloadSize != PAYLOAD)) {    // Only support standard size
-    strcpy (&(tms9918->vram [736]), SKIPPING);
-    tms9918->vram [767] = 0x01; // Ignored - continue
+    strcpy (&(tms9918->vram.bytes [736]), SKIPPING);
+    tms9918->vram.bytes [767] = 0x01; // Ignored - continue
     return;
   }
   if (p->blockNo == 0) {
     flashing = 1;
-    if (tms9918->vram [766] == 0) {
-      strcpy (&(tms9918->vram [736]), ERASING);
+    if (tms9918->vram.bytes [766] == 0) {
+      strcpy (&(tms9918->vram.bytes [736]), ERASING);
       flash_range_erase (0, ((PAYLOAD * p->numBlocks) + 0xFFF) & ~0xFFF);
     }
   } else if (!flashing) {
-    strcpy (&(tms9918->vram [736]), FAILEDSEQUENCE);
-    tms9918->vram [767] = 0x05; // Failed - sequence
+    strcpy (&(tms9918->vram.bytes [736]), FAILEDSEQUENCE);
+    tms9918->vram.bytes [767] = 0x05; // Failed - sequence
     tms9918->lockedMask = 0x07;
     return;
   }
   uint32_t a = (p->targetAddr - (intptr_t)XIP_BASE);
   uint32_t b = a >> 12; // Get 4KB block number
   if (b >= 64) { // Only support loading 256KB of flash (RAM size)
-    strcpy (&(tms9918->vram [736]), FAILEDSIZE);
-    tms9918->vram [767] = 0x04; // Failed - size
+    strcpy (&(tms9918->vram.bytes [736]), FAILEDSIZE);
+    tms9918->vram.bytes [767] = 0x04; // Failed - size
     flashing = 0;
     tms9918->lockedMask = 0x07;
     return;
   }
-  if (tms9918->vram [766] == 0) {
-    strcpy (&(tms9918->vram [736]), PROGRAMMING);
+  if (tms9918->vram.bytes [766] == 0) {
+    strcpy (&(tms9918->vram.bytes [736]), PROGRAMMING);
     retry = 3;
 retry:
     flash_range_program (a, p->data, PAYLOAD);
@@ -167,49 +167,49 @@ retry:
       i += sizeof(uint32_t);
     }
   } else
-    strcpy (&(tms9918->vram [736]), VALIDATING);
+    strcpy (&(tms9918->vram.bytes [736]), VALIDATING);
 
   if (memcmp ((void *)(XIP_BASE + a), p->data, PAYLOAD) != 0) {
     if (retry) {
       retry--;
       repeat++;
-      tms9918->vram [729] = 'R';
-      tms9918->vram [730] = 'E';
-      tms9918->vram [731] = 'P';
-      tms9918->vram [732] = ':';
-      tms9918->vram [733] = hexv (repeat >>  8);
-      tms9918->vram [734] = hexv (repeat >>  4);
-      tms9918->vram [735] = hexv (repeat >>  0);
+      tms9918->vram.bytes [729] = 'R';
+      tms9918->vram.bytes [730] = 'E';
+      tms9918->vram.bytes [731] = 'P';
+      tms9918->vram.bytes [732] = ':';
+      tms9918->vram.bytes [733] = hexv (repeat >>  8);
+      tms9918->vram.bytes [734] = hexv (repeat >>  4);
+      tms9918->vram.bytes [735] = hexv (repeat >>  0);
       goto retry;
     }
-    strcpy (&(tms9918->vram [736]), FAILEDCOMPARISON);
-    tms9918->vram [756] = hexv (a >> 20);
-    tms9918->vram [757] = hexv (a >> 16);
-    tms9918->vram [758] = hexv (a >> 12);
-    tms9918->vram [759] = hexv (a >>  8);
-    tms9918->vram [760] = hexv (a >>  4);
-    tms9918->vram [761] = hexv (a >>  0);
+    strcpy (&(tms9918->vram.bytes [736]), FAILEDCOMPARISON);
+    tms9918->vram.bytes [756] = hexv (a >> 20);
+    tms9918->vram.bytes [757] = hexv (a >> 16);
+    tms9918->vram.bytes [758] = hexv (a >> 12);
+    tms9918->vram.bytes [759] = hexv (a >>  8);
+    tms9918->vram.bytes [760] = hexv (a >>  4);
+    tms9918->vram.bytes [761] = hexv (a >>  0);
     int i = 0;
     while (i < 728) {
       b = *(uint8_t *)(XIP_BASE + a++);
-      tms9918->vram [i++] = hexv (b >> 4);
-      tms9918->vram [i++] = hexv (b);
+      tms9918->vram.bytes [i++] = hexv (b >> 4);
+      tms9918->vram.bytes [i++] = hexv (b);
     }
-    tms9918->vram [767] = 0x03; // Failed - comparison
+    tms9918->vram.bytes [767] = 0x03; // Failed - comparison
     flashing = 0;
     tms9918->lockedMask = 0x07;
     return;
   }
   if (p->blockNo + 1 == p->numBlocks) {
-    if (tms9918->vram [766] == 0)
-      strcpy (&(tms9918->vram [736]), SUCCESSPOWER);
+    if (tms9918->vram.bytes [766] == 0)
+      strcpy (&(tms9918->vram.bytes [736]), SUCCESSPOWER);
     else
-      strcpy (&(tms9918->vram [736]), SUCCESSFLASH);
-    tms9918->vram [767] = 0x02; // Success - power cycle needed
+      strcpy (&(tms9918->vram.bytes [736]), SUCCESSFLASH);
+    tms9918->vram.bytes [767] = 0x02; // Success - power cycle needed
     flashing = 0;
     tms9918->lockedMask = 0x07;
   } else
-    tms9918->vram [767] = 0x01; // Success - continue
+    tms9918->vram.bytes [767] = 0x01; // Success - continue
 }
 
 /*
@@ -234,7 +234,7 @@ static int didFault = 0;
  */
 void isr_hardfault () {
   didFault = 1;
-  tms9918->registers [0x38] = 0; // Stop the GPU
+  TMS_REGISTER(tms9918, 0x38) = 0; // Stop the GPU
   mpu_hw->ctrl = 0; // Turn off memory protection - all models
 }
 
@@ -243,19 +243,19 @@ void isr_hardfault () {
  */
 static void triggerGpuDma()
 {
-  uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8000));
-  uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram + 0x8002));
-  uint32_t width = tms9918->vram[0x8004];
-  uint32_t height = tms9918->vram[0x8005];
-  uint32_t stride = tms9918->vram[0x8006];
-  uint32_t params = tms9918->vram[0x8007];
-  *(uint16_t*)(tms9918->vram + 0x8008) = 0;
+  uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram.bytes + 0x8000));
+  uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram.bytes + 0x8002));
+  uint32_t width = tms9918->vram.bytes[0x8004];
+  uint32_t height = tms9918->vram.bytes[0x8005];
+  uint32_t stride = tms9918->vram.bytes[0x8006];
+  uint32_t params = tms9918->vram.bytes[0x8007];
+  *(uint16_t*)(tms9918->vram.bytes + 0x8008) = 0;
 
   int32_t dstInc = params & 0x02 ? -1 : 1;
   int32_t srcInc = params & 0x01 ? 0 : dstInc;
 
-  uint8_t *srcPtr = tms9918->vram + srcVramAddr;
-  uint8_t *dstPtr = tms9918->vram + dstVramAddr;
+  uint8_t *srcPtr = tms9918->vram.bytes + srcVramAddr;
+  uint8_t *dstPtr = tms9918->vram.bytes + dstVramAddr;
   for (int y = 0; y < height; ++y)
   {
     for (int x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc)
@@ -273,22 +273,22 @@ static void __attribute__ ((noinline)) volatileHack () {
   if ((tms9918->gpuAddress & 1) == 0) { // Odd addresses will cause the RP2040 to crash
     uint16_t lastAddress = tms9918->gpuAddress;
 restart:
-    tms9918->registers [0x38] = 1;
-    tms9918->status [2] |= 0x80; // Running
+    TMS_REGISTER(tms9918, 0x38) = 1;
+    TMS_STATUS(tms9918, 2) |= 0x80; // Running
 
 #if PICO_RP2040 // Old memory protection unit
     mpu_hw->ctrl = M0PLUS_MPU_CTRL_PRIVDEFENA_BITS | M0PLUS_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
 #else
     mpu_hw->ctrl = M33_MPU_CTRL_PRIVDEFENA_BITS | M33_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
 #endif
-    lastAddress = run9900 (&(tms9918->vram [0]), lastAddress, 0xFFFE, &(tms9918->registers [0x38]));
+    lastAddress = run9900 (tms9918->vram.bytes, lastAddress, 0xFFFE, &TMS_REGISTER(tms9918, 0x38));
     mpu_hw->ctrl = 0; // Turn off memory protection - all models
 
-    if (tms9918->registers [0x38] & 1) { // GPU program decided to stop itself?
+    if (TMS_REGISTER(tms9918, 0x38) & 1) { // GPU program decided to stop itself?
       tms9918->gpuAddress = lastAddress;
       tms9918->restart = 0;
     }
-    if (tms9918->vram[0x8008]){
+    if (tms9918->vram.bytes[0x8008]){
       triggerGpuDma();
     }
     if (didFault) {
@@ -296,8 +296,8 @@ restart:
       goto restart;
     }
   }
-  tms9918->status [2] &= ~0x80; // Stopped
-  tms9918->registers [0x38] = 0;
+  TMS_STATUS(tms9918, 2) &= ~0x80; // Stopped
+  TMS_REGISTER(tms9918, 0x38) = 0;
 }
 
 /*
@@ -306,12 +306,12 @@ restart:
 void gpuInit()
 {
   /* copy pre-load code to GPU ram at >4000 ...and >4800 ?*/
-  memcpy (tms9918->gram1, preload, sizeof (preload));
-  memcpy (tms9918->gram1 + 0x800, preload, sizeof (preload));
+  memcpy (tms9918->vram.map.gram1, preload, sizeof (preload));
+  memcpy (tms9918->vram.map.gram1 + 0x800, preload, sizeof (preload));
   
   tms9918->gpuAddress = 0x4000;
 
-  guard(&(tms9918->vram [0x8000]));
+  guard(&(tms9918->vram.bytes [0x8000]));
 }
 
 /*
