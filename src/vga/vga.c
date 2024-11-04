@@ -22,10 +22,10 @@
 
  // compile options
 #define VGA_CRT_EFFECT PICO9918_SCANLINES
-#define VGA_SCANLINE_TIME_DEBUG 0
-#define VGA_HARDCODED_640 1
+#define VGA_HARDCODED_640 !PICO9918_SCART_RGBS
+#define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
+
 #define VGA_NO_MALLOC 1
-#define VGA_COMBINE_SYNC 0
 
 #define VGA_SCANLINE_CB_ENABLE 0
 
@@ -64,10 +64,16 @@ int roundflt(float x)
 
 #define FRONT_PORCH_MSG 0x20000000
 #define END_OF_SCANLINE_MSG 0x40000000
-#define END_OF_FRAME_MSG 0x80000000
+#define END_OF_FRAME_MSG    0x80000000
 
+#if VGA_COMBINE_SYNC
+bi_decl(bi_1pin_with_name(SYNC_PINS_START, "C Sync"));
+bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "C Sync"));
+#else
 bi_decl(bi_1pin_with_name(SYNC_PINS_START, "H Sync"));
 bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "V Sync"));
+#endif
+
 bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START, "Red (LSB - MSB)"));
 bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START + 4, "Green (LSB - MSB)"));
 bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START + 8, "Blue (LSB - MSB)"));
@@ -80,7 +86,7 @@ uint32_t __aligned(8) syncDataPorch[4];   // vertical porch
 uint32_t __aligned(8) syncDataSync[4];    // vertical sync
 
 #if VGA_NO_MALLOC
-__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG][VIRTUAL_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
+__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2][VIRTUAL_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
 #else
 #include <stdlib.h>
 uint16_t* __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG] = { 0 };                          // two scanline buffers (odd and even)
@@ -95,11 +101,6 @@ static int rgbDmaChan = 0;
 static uint syncDmaChanMask = 0;
 static uint rgbDmaChanMask = 0;
 static VgaInitParams vgaParams = { 0 };
-
-#if VGA_SCANLINE_TIME_DEBUG
-bool hasRenderedNext = false;
-#endif
-
 
 uint32_t vgaMinimumPioClockKHz(VgaParams* params)
 {
@@ -131,15 +132,6 @@ static bool buildSyncData()
 #if !VGA_NO_MALLOC
   rgbDataBuffer[0] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
   rgbDataBuffer[1] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
-#endif
-
-#if VGA_SCANLINE_TIME_DEBUG
-#if !VGA_NO_MALLOC
-  rgbDataBuffer[2] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
-#endif
-
-  for (int i = 0; i < VIRTUAL_PIXELS_X; ++i)
-    rgbDataBuffer[2][i] = 0x0f00;
 #endif
 
   vgaParams.params.pioDivider = /*roundflt*/(sysClockKHz / (float)minClockKHz);
@@ -375,14 +367,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
 #endif
 
-#if VGA_SCANLINE_TIME_DEBUG
-    // apply a few darkened values before passing to dma
-    if (pxLineRpt != 0 && hasRenderedNext)
-    {
-      currentBuffer = (uint32_t*)rgbDataBuffer[2];
-    }
-#endif
-
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
     // need a new line every X display lines
@@ -394,9 +378,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
         multicore_fifo_push_timeout_us(requestLine, 0);
       }
 
-#if VGA_SCANLINE_TIME_DEBUG
-      hasRenderedNext = false;
-#endif
       if (requestLine == VIRTUAL_PIXELS_Y - 1)
       {
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
@@ -489,10 +470,6 @@ void __time_critical_func(vgaLoop)()
 
       // get the next scanline pixels
       vgaParams.scanlineFn(message & 0xfff, &vgaParams.params, rgbDataBuffer[message & 0x01]);
-#if VGA_SCANLINE_TIME_DEBUG
-      dma_channel_set_read_addr(rgbDmaChan, rgbDataBuffer[2], true);
-      hasRenderedNext = true;
-#endif
       if (doEof && vgaParams.endOfFrameFn)
       {
         vgaParams.endOfFrameFn(frameNumber);

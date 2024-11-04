@@ -64,6 +64,8 @@
   *       https://www.aliexpress.com/item/1005007066733934.html
   */
 
+#define PCB_MAJOR_VERSION PICO9918_PCB_MAJOR_VER
+#define PCB_MINOR_VERSION PICO9918_PCB_MINOR_VER
 
 // compile-options to ease development between Jason and I
 #ifndef PICO9918_NO_SPLASH
@@ -169,6 +171,14 @@ bi_decl(bi_1pin_with_name(GPIO_MODE1, "Mode 1 (V9938)"));
 
 #define VIRTUAL_PIXELS_X 640
 #define VIRTUAL_PIXELS_Y 240
+
+bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
+bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
+bi_decl(bi_pin_mask_with_names(GPIO_CD_MASK, "CPU Data (CD7 - CD0)"));
+bi_decl(bi_1pin_with_name(GPIO_CSR, "Read"));
+bi_decl(bi_1pin_with_name(GPIO_CSW, "Write"));
+bi_decl(bi_1pin_with_name(GPIO_MODE, "Mode"));
+bi_decl(bi_1pin_with_name(GPIO_INT, "Interrupt"));
 
 
 /* file globals */
@@ -810,7 +820,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readConfig, 1.0f);
+  sm_config_set_clkdiv(&readConfig, 4.0f);
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
@@ -878,10 +888,19 @@ int main(void)
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
+
+#if PICO9918_SCART_RGBS
+  #if PICO9918_SCART_PAL
+    params.params = vgaGetParams(RGBS_PAL_720_576i_50HZ);
+  #else
+    params.params = vgaGetParams(RGBS_NTSC_720_480i_60HZ);
+  #endif
+#else // VGA
   params.params = vgaGetParams(VGA_640_480_60HZ);
 
   /* virtual size will be 640 x 240 */
   setVgaParamsScaleY(&params.params, 2);
+#endif
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlines = PICO9918_SCANLINES;
