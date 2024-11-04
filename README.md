@@ -47,7 +47,7 @@ Pre-release firmware for F18A compatibility mode is available in [Releases](http
 
 ## Purchasing options
 
-Fully assembled and tested PICO9918 v1.0s are available on my Tindie store:
+Fully assembled and tested PICO9918 v1.1s are available on my Tindie store:
 
 <a href="https://www.tindie.com/products/visrealm/pico9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
 
@@ -58,37 +58,25 @@ Also (more convenient for North America)
 
 ## Hardware
 
-There are two main variants of the hardware.
+There are two main variants of the hardware. 
 
-### v1.0 (formerly v0.4)
+### v1.1 (formerly v1.0 and v0.4)
 
-PICO9918 v1.0 is the single board version which doesn't require a piggy-backed Pi Pico. It is in the process of being manufactured now and is based on v0.4 seen below:
+PICO9918 v1.1 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
 
-<p align="left"><a href="img/pico9918_v0_4_sm.png"><img src="img/pico9918_v0_4_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
-
-Once I have tested v1.0 and made it available, I will publish the schematics and gerbers for this version.
+<p align="left"><a href="img/pico9918_v1_0_sm.png"><img src="img/pico9918_v1_0_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
 
 ### v0.3
 
-v0.3 schematic and gerber available now. This revision has been tested on my two TI-99/4As (PAL and NTSC) and my HBC-56 and is fully functional, however it is not representative of the final PCB design which will include the RP2040 directly on the PCB.
+v0.3 is relatively cheap and easy to build, schematic and gerbers are available. This version makes use of an external Pi Pico module piggy-backed onto the PICO9918 PCB.
 
-<p align="left"><a href="pcb/v0.3/pico9918_v0_3_schematic.png"><img src="pcb/v0.3/pico9918_v0_3_schematic.png" alt="PICO9918 v0.3" width="720px"></a></p>
+<p align="left"><a href="img/pico9918_v0_3_sm.jpg"><img src="img/pico9918_v0_3_sm.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
 
-<p align="left"><a href="pcb/v0.3/pico9918_v0_3_pcb.png"><img src="pcb/v0.3/pico9918_v0_3_pcb.png" alt="PICO9918 v0.3" width="720px"></a></p>
+<p align="left"><a href="img/pico9918_v0_3_sm2.jpg"><img src="img/pico9918_v0_3_sm2.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
 
-### PCB v0.3 Notes
+### Schematics
 
-There are a number of 0Ohm resistors (jumpers). You may need to omit the RST resistor. On some machines, the extra time is required to bootstrap the Pico. This will be changed to a soft reset on v0.4.
-
-### Raspberry Pi Pico Module
-
-Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29, a genuine Raspberry Pi Pico can't be used. v0.3 of the PCB is designed for the DWEII? RP2040 USB-C module which exposes these additional GPIOs. A future pico9918 revision will do without an external RP2040 board and use the RP2040 directly.
-
-Purchase links:
- * https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
- * https://www.aliexpress.com/item/1005007066733934.html
-
-I could reduce the VGA bit depth to 9-bit or 10-bit to allow the use of a genuine Raspberry Pi Pico board, but given the longer-term plan is to use the RP2040 directly, I've decided to go this way for the prototype.
+Schematics and Gerbers are available in [/pcb](pcb)
 
 ## Firmware
 
@@ -98,15 +86,15 @@ To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico i
 
 ## Development environment
 
-To set up your development environment for the Raspberry Pi Pico, follow the [Raspberry Pi C/C++ SDK Setup](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) instructions.
+To set up your development environment for the Raspberry Pi Pico, follow the [Raspberry Pi C/C++ SDK Setup](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) instructions. The latest PICO9918 source can be configured and built using the official [Raspberry Pi Pico VSCode plugin](https://github.com/raspberrypi/pico-vscode).
 
 #### Windows
-
-For Windows users, there is a pre-packaged installer provided by the Raspberry Pi Foundation: https://github.com/raspberrypi/pico-setup-windows/releases/. Once installed, just open the pre-configured "Pico - Visual Studio Code" from your start menu.
 
 The build system expects `python3` to be available. If you have installed Python 3 outside of the Microsoft Store, you may need to alias your Python executable.
 
 You can do this from an elevated (Administator) command prompt in your python directory e.g. `C:\Program Files\Python310\` by creating a symlink with the command: `mklink python3.exe python.exe`.
+
+The custom python build tools are used to convert binary data (images) into code. These also require the [pillow](https://pypi.org/project/pillow/) library - ([Installation instructions for pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html))
 
 ## Discussion
 
