@@ -18,6 +18,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
   * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
   * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
+  * [Yamaha YIS-503](https://www.msx.org/wiki/Yamaha_YIS-503)
 * [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
 * [Powertran Cortex](http://powertrancortex.com/)
 * [Sega SG-1000 / SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
