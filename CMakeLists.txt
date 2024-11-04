@@ -39,6 +39,20 @@ project(pico9918 C CXX ASM)
 add_definitions(-DPICO_BUILD=1)
 add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 
+# Standard boot configures SYS_CLK as 125MHz, but we want boot2 to use
+# PICO_FLASH_SPI_CLKDIV=4 so we can update the firmware during runtime,
+# especially when overclocking more for F18A mode.  This 4 x DIV would be
+# slower to "Copy to RAM" at startup, but specifying the minimum Pico9918
+# speed here solves that additional delay issue.
+add_definitions(-DSYS_CLK_HZ=252000000)
+add_definitions(-DPLL_SYS_VCO_FREQ_HZ=756000000)
+add_definitions(-DPLL_SYS_POSTDIV1=3)
+add_definitions(-DPLL_SYS_POSTDIV2=1)
+# SDK Flash write routines exit XIP mode and use boot2 to reenter it, so
+# boot2 needs to be properly configured for whatever speed we end up at.
+add_definitions(-DPICO_FLASH_SPI_CLKDIV=4)
+add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=32)
+
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
