@@ -89,7 +89,7 @@ static inline uint8_t hexv (uint32_t v) {
 #if PICO_RP2040
   #define FAMILY_ID 0xe48bff56
 #else
-  #define FAMILY_ID 0xe48bff5b
+  #define FAMILY_ID 0xe48bff59
 #endif
 
 #define PAYLOAD 256
