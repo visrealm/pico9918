@@ -8,27 +8,20 @@
 ' https://github.com/visrealm/pico9918
 '
 
-    CONST OPT_COUNT    = 4
-    CONST OPT_NAME_LEN = 16
-    CONST TRUE         = -1
-    CONST FALSE        = 0
+    CONST OPT_COUNT     = 6
+    CONST OPT_NAME_LEN  = 16
+    CONST TRUE          = -1
+    CONST FALSE         = 0
+    CONST #VDP_NAME_TAB = $1800
+    CONST MENU_TOP      = 8
     
     optIdx = 0
     currentOptIdx = 0
 
-    GOSUB setup_tiles    
-    
-    PRINT AT 26 + 32,"v1.0.0"
-    PRINT AT 20,"CONFIGURATOR"
-    
-    FOR I = 64 TO 95
-        VPOKE $1800 + I, 20
-        VPOKE $1800 + 640 + I, 20
-        VPOKE $1800 + 128 + I, 20
-    NEXT I
-    
+    'VDP(7) = 0
 
-    PRINT AT 768-32, "    (C) 2024 Troy Schrapel"
+    GOSUB setup_tiles
+    GOSUB setup_header
     
     GOSUB vdp_detect
     
@@ -45,21 +38,29 @@
         verMaj = (verReg AND $f0) / 16
         verMin = verReg AND $0f
         IF (statReg AND $E8) = $E8 THEN
-            PRINT AT 35 + 96, "DETECTED: PICO9918 ver ", verMaj, ".", verMin
+            PRINT AT (32 * 3) + 3, "Detected: PICO9918 ver ", verMaj, ".", verMin
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
-            PRINT AT 37 + 96, "DETECTED: F18A ver ", verMaj, ".", verMin
+            PRINT AT (32 * 3) + 5, "Detected: F18A ver ", verMaj, "."
+            VPOKE #VDP_NAME_TAB + (32 * 3) + 5 + 21, hexChar(verMin)
         ELSE
-            PRINT AT 40 + 96, "DETECTED UNKNOWN SR1 = ", <>statReg
+            PRINT AT (32 * 3) + 8, "Detected UNKNOWN SR1 = ", <>statReg
         END IF
         
     ELSE
-        PRINT AT 38 + 96, "DETECTED: LEGACY VDP"
+        PRINT AT (32 * 3) + 6, "Detected: LEGACY VDP"
     END IF
-    isPico9918 = TRUE
+    isPico9918 = isF18ACompatible   ' FOR TESTING
     IF NOT isPico9918 THEN
-        PRINT AT 64+ 39 + 320, "PICO9918 NOT FOUND"
+        PRINT AT (32 * (9 + (isF18ACompatible AND 3))) + 7, "PICO9918 not found"
+        IF NOT isF18ACompatible THEN
+            PRINT AT (32 * 12) + 15, "OR"
+            PRINT AT (32 * 15) + 3, "PICO9918 firmware too old"
+            PRINT AT (32 * 17) + 3, "Firmware v1.0.0+ required"
+            PRINT AT (32 * 19) + 4, "Update manually via USB"
+        END IF
     ELSE
+        PRINT AT (32 * 6) + 11, "MAIN MENU"
         GOSUB render_options
         WHILE 1
             WAIT
@@ -95,7 +96,7 @@ exit:
     
 
 delay: PROCEDURE
-    FOR del = 1 TO 10
+    FOR del = 1 TO 5
         WAIT
     NEXT del
     END
@@ -119,9 +120,25 @@ setup_tiles: PROCEDURE
         DEFINE COLOR I, 1, white
     NEXT I
 
-    DEFINE VRAM $1800, 19, logoNames
-    DEFINE VRAM $1820, 19, logoNames2
+    DEFINE COLOR 20, 1, dash_c
+
+    END
+
+setup_header: PROCEDURE
+
+    DEFINE VRAM #VDP_NAME_TAB, 19, logoNames
+    DEFINE VRAM #VDP_NAME_TAB + 32, 19, logoNames2
+
+    PRINT AT 20,"Configurator"
+    PRINT AT 26 + 32,"v1.0.0"
     
+    FOR I = 0 TO 31
+        VPOKE #VDP_NAME_TAB + (32 * 2)  + I, 20
+        VPOKE #VDP_NAME_TAB + (32 * 22) + I, 20
+        VPOKE #VDP_NAME_TAB + (32 * 4)  + I, 20
+    NEXT I
+
+    PRINT AT (32 * 23) + 4, "(C) 2024 Troy Schrapel"    
     END
 
 render_options: PROCEDURE
@@ -131,14 +148,15 @@ render_options: PROCEDURE
     END
 
 render_opt: PROCEDURE
-    PRINT AT 322 + (optIdx * 32), " ",optIdx + 1,". "
-    DEFINE VRAM $1946 + (optIdx * 32), OPT_NAME_LEN, VARPTR options(optIdx * 18 + 1)
-    PRINT AT 342 + (optIdx * 32), " : ", <.5>options((optIdx * 18) + 17)
+    #ROWOFFSET = 32 * (MENU_TOP + optIdx)
+    PRINT AT #ROWOFFSET + 2, " ",optIdx + 1,". "
+    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 6, OPT_NAME_LEN, VARPTR options(optIdx * 18 + 1)
+    PRINT AT #ROWOFFSET + 22, " : ", <.5>options((optIdx * 18) + 17)
     IF optIdx = currentOptIdx THEN
         FOR R = 0 TO 27
-            C = VPEEK($1942 + (optIdx * 32) + R)
+            C = VPEEK(#VDP_NAME_TAB + #ROWOFFSET + 2 + R)
             C = C + 128
-            VPOKE ($1942 + (optIdx * 32) + R), C
+            VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 2 + R), C
         NEXT R
     END IF
     END
@@ -167,11 +185,15 @@ vdp_gpu_detect:
     DATA BYTE $03, $40    ' IDLE    
 
 options:
-    DATA BYTE 0,"CRT SCANLINES   ",2
-    DATA BYTE 1,"SCANLINE SPRITES",2
-    DATA BYTE 2,"CLOCK FREQ.     ",4
-    DATA BYTE 3,"DIAGNOSTICS     ",2
+    DATA BYTE 0,"CRT scanlines   ",2
+    DATA BYTE 1,"Scanline sprites",2
+    DATA BYTE 2,"Clock freq.     ",4
+    DATA BYTE 3,"Diagnostics     ",2
+    DATA BYTE 4,"Default palette ",15
+    DATA BYTE 5,"Reset defaults  ",15
 
+hexChar:
+    DATA BYTE "0123456789ABCDEF"
 
 ' PICO9918 logo pattern
 logo:
@@ -217,6 +239,8 @@ logo2:
 
 dash:
     DATA BYTE $00,$00,$00,$ff,$ff,$00,$00,$00
+dash_c:
+    DATA BYTE $00,$00,$00,$ff,$ee,$00,$00,$00
 
 
 ' PICO9918 logo name table entries (rows 1 and 2)
