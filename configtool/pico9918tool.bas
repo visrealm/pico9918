@@ -17,6 +17,16 @@
     CONST MENU_TOP       = 8
     CONST DASH           = 20
 
+    CONST CONF_PICO_MODEL       = 0
+    CONST CONF_HW_VERSION       = 1
+    CONST CONF_SW_VERSION       = 2
+    CONST CONF_CLOCK_TESTED     = 4
+
+    CONST CONF_CRT_SCANLINES    = 8
+    CONST CONF_SCANLINE_SPRITES = 9
+    CONST CONF_CLOCK_PRESET_ID  = 10
+
+
     DEF FN XY(X, Y) = ((Y) * 32 + (X))
     DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))
     DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C
@@ -70,12 +80,24 @@
             PRINT AT XY(4, 19), "Update manually via USB"
         END IF
     ELSE
+        ' load current values        
+        'VDP(1) = $C2    ' disable vdp interrupts
+        'VDP(15) = 12    ' read config register
+        'FOR I = 0 TO 3'OPT_COUNT - 1
+        '    VDP(48) = options(I * OPT_STRUCT_LEN)
+        '    confValue = 0'USR RDVST
+        '    optValues(I) = confValue
+        '    PRINT AT XY(0,I), options(I * OPT_STRUCT_LEN), ",  ", confValue
+        'NEXT I
+        'VDP(15) = 0     ' reset status register
+        'VDP(1) = $E2    ' enable vdp interrupts
+
         GOSUB update_palette
         PRINT AT XY(11, 6), "MAIN MENU"
         GOSUB render_options
         WHILE 1
             WAIT
-            dirty = 1
+            dirty = 0
             valdirty = 0
             
             key = CONT.KEY
@@ -85,10 +107,13 @@
 
             IF CONT.DOWN AND currentOptIdx < (OPT_COUNT - 1) THEN
                 currentOptIdx = currentOptIdx + 1
+                dirty = 1
             ELSEIF CONT.UP AND currentOptIdx > 0 THEN
                 currentOptIdx = currentOptIdx - 1
+                dirty = 1
             ELSEIF key > 0 AND key <= OPT_COUNT THEN
                 currentOptIdx = key - 1
+                dirty = 1
             ELSEIF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.RIGHT THEN
                 optValuesCount = options((currentOptIdx * OPT_STRUCT_LEN) + 18)
                 currentOptIndex = optValues(currentOptIdx)
@@ -96,12 +121,6 @@
                 IF currentOptIndex >= optValuesCount THEN currentOptIndex = 0
                 optValues(currentOptIdx) = currentOptIndex
                 valdirty = 1
-
-                IF currentOptIdx = 0 THEN
-                    VDP(58) = 2
-                    VDP(59) = currentOptIndex
-                END IF
-
             ELSEIF CONT.LEFT THEN
                 optValuesCount = options((currentOptIdx * OPT_STRUCT_LEN) + 18)
                 currentOptIndex = optValues(currentOptIdx)
@@ -109,8 +128,6 @@
                 IF currentOptIndex >= optValuesCount THEN currentOptIndex = optValuesCount - 1
                 optValues(currentOptIdx) = currentOptIndex
                 valdirty = 1
-            ELSE
-                dirty = 0
             END IF
             
             IF dirty THEN
@@ -125,6 +142,9 @@
                 optIdx = currentOptIdx
                 WAIT
                 GOSUB render_opt
+                WAIT
+                VDP(58) = options(currentOptIdx * OPT_STRUCT_LEN)
+                VDP(59) = currentOptIndex
                 GOSUB delay
             END IF
             
@@ -265,14 +285,14 @@ vdp_gpu_detect:
     DATA BYTE $3F, $00
     DATA BYTE $03, $40    ' IDLE    
 
-' index, name[16], values index, num values, current value
+' Pico9918Options index, name[16], values index, num values, current value
 options:
-    DATA BYTE 0,"CRT scanlines   ",0,2,0
-    DATA BYTE 1,"Scanline sprites",2,2,0
-    DATA BYTE 2,"Clock freq.     ",4,3,0
-    DATA BYTE 3,"Diagnostics     ",0,2,0
-    DATA BYTE 4,"Default palette ",0,0,0
-    DATA BYTE 5,"Reset defaults  ",0,0,0
+    DATA BYTE CONF_CRT_SCANLINES,"CRT scanlines   ",0,2,0
+    DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites",2,2,0
+    DATA BYTE CONF_CLOCK_PRESET_ID,"Clock freq.     ",4,3,0
+    DATA BYTE 0,"Diagnostics     ",0,2,0
+    DATA BYTE 0,"Default palette ",0,0,0
+    DATA BYTE 0,"Reset defaults  ",0,0,0
 
 optionValues:
     DATA BYTE "Off   "

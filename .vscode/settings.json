@@ -47,6 +47,7 @@
         "string_view": "c",
         "pico.h": "c",
         "platform.h": "c",
-        "gpu.h": "c"
+        "gpu.h": "c",
+        "random": "c"
     }
 }

@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.13)
 
 # compile-time options
 
-set(PICO9918_VERSION   "0.4.3")
-set(PICO9918_PCB_MAJOR_VER 0)
-set(PICO9918_PCB_MINOR_VER 4)
+set(PICO9918_MAJOR_VER 1)
+set(PICO9918_MINOR_VER 0)
 
-set(PICO9918_SCANLINES 1)
+set(PICO9918_PCB_MAJOR_VER 1)
+set(PICO9918_PCB_MINOR_VER 0)
 
 # SCART RGBs options
 set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
@@ -15,7 +15,7 @@ set(PICO9918_SCART_PAL  0)  # 1 for PAL 576i, 0 for NTSC 480i
 
 
 set(PICO9918_NO_SPLASH 0)
-set(PICO9918_DIAG 0)
+set(PICO9918_DIAG 1)
 
 # end compile-time options
 
@@ -39,13 +39,10 @@ else()
   set(PICO9918_OUTPUT_STR "vga")
 endif()
 
+set(PICO9918_VERSION   "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
-set(PICO9918_BINARY_SUFFIX -pcb-${PICO_BOARD}-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_OUTPUT_STR}-build-${PICO9918_VERSION_STR})
-
-if (${PICO9918_SCANLINES})
-  set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-sl)
-endif()
+set(PICO9918_BINARY_SUFFIX -pcb-${PICO_BOARD}-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_OUTPUT_STR}-build-v${PICO9918_VERSION_STR})
 
 if (${PICO9918_DIAG})
   set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-diag)
@@ -83,9 +80,10 @@ pico_set_binary_type(${PROGRAM} copy_to_ram)
 
 add_definitions(-DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH})
 add_definitions(-DPICO9918_VERSION="${PICO9918_VERSION}")
+add_definitions(-DPICO9918_MAJOR_VER=${PICO9918_MAJOR_VER})
+add_definitions(-DPICO9918_MINOR_VER=${PICO9918_MINOR_VER})
 add_definitions(-DPICO9918_PCB_MAJOR_VER=${PICO9918_PCB_MAJOR_VER})
 add_definitions(-DPICO9918_PCB_MINOR_VER=${PICO9918_PCB_MINOR_VER})
-add_definitions(-DPICO9918_SCANLINES=${PICO9918_SCANLINES})
 add_definitions(-DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS})
 add_definitions(-DPICO9918_SCART_PAL=${PICO9918_SCART_PAL})
 add_definitions(-DPICO9918_DIAG=${PICO9918_DIAG})
@@ -100,6 +98,7 @@ target_link_libraries(${PROGRAM} PUBLIC
         hardware_dma
         hardware_pio
         hardware_adc
+        hardware_flash
         pico9918-vga
         pico9918-gpu
         vrEmuTms9918)

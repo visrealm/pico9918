@@ -21,7 +21,6 @@
 #include "hardware/clocks.h"
 
  // compile options
-#define VGA_CRT_EFFECT PICO9918_SCANLINES
 #define VGA_HARDCODED_640 !PICO9918_SCART_RGBS
 #define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
 
@@ -357,7 +356,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
 
-#if VGA_CRT_EFFECT
     if (vgaParams.scanlines && pxLineRpt != 0)
     {
       for (int i = 0; i < 5; ++i)
@@ -365,7 +363,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
         currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }
     }
-#endif
 
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
@@ -383,7 +380,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
       }
     }
-#if VGA_CRT_EFFECT
     else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
       int end = VIRTUAL_PIXELS_X / 2;
@@ -392,7 +388,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
         currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }
     }
-#endif
   }
 }
 

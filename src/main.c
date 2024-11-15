@@ -30,6 +30,8 @@
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
 #include "hardware/adc.h"
+#include "hardware/flash.h"
+#include "hardware/watchdog.h"
 
  /*
   * Pin mapping (PCB v0.3)
@@ -67,6 +69,10 @@
 #define PCB_MAJOR_VERSION PICO9918_PCB_MAJOR_VER
 #define PCB_MINOR_VERSION PICO9918_PCB_MINOR_VER
 
+#define PCB_VERSION (PCB_MAJOR_VERSION << 4) | PCB_MINOR_VERSION
+
+static_assert(PICO9918_PCB_MAJOR_VER < 2, "Time traveller? PICO9918_PCB_MAJOR_VER must be 0 or 1");
+
 // compile-options to ease development between Jason and I
 #ifndef PICO9918_NO_SPLASH
 #define PICO9918_NO_SPLASH      0
@@ -75,7 +81,6 @@
 #if !PICO9918_NO_SPLASH
 #include "splash.h"
 #endif
-
 
 #if PICO9918_DIAG
   #include "font.h"  
@@ -90,13 +95,9 @@
 #define GPIO_MODE 28
 #define GPIO_INT 22
 
-#if PICO9918_PCB_MAJOR_VER != 0
-#error "Time traveller? PICO9918_PCB_MAJOR_VER must be 0"
-#endif
-
   // pin-mapping for gromclk and cpuclk changed in PCB v0.4
   // in order to have MODE and MODE1 sequential
-#if PICO9918_PCB_MINOR_VER < 4
+#if PICO9918_PCB_MAJOR_VER == 0 && PICO9918_PCB_MINOR_VER <= 3
 #define GPIO_GROMCL 29
 #define GPIO_CPUCL 23
 #else
@@ -120,29 +121,6 @@
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-//#define PICO_CLOCK_PLL 756000000 // 252MHz - standard voltage
-//#define PICO_CLOCK_PLL_DIV1 3
-
-//#define PICO_CLOCK_PLL 1512000000 // 302.4MHz - standard voltage
-//#define PICO_CLOCK_PLL_DIV1 5
-
-#define PICO_CLOCK_PLL 1056000000 // 352MHz - 1.3v
-#define PICO_CLOCK_PLL_DIV1 3
-
-//#define PICO_CLOCK_PLL 1128000000 // 376MHz - 1.3v
-//#define PICO_CLOCK_PLL_DIV1 3
-
-//#define PICO_CLOCK_PLL 1512000000 // 378MHz - 1.3v
-//#define PICO_CLOCK_PLL_DIV1 4
-
-//#define PICO_CLOCK_PLL 804000000 // 402MHz - DOES NOT WORK
-//#define PICO_CLOCK_PLL_DIV1 2
-
-//#define PICO_CLOCK_PLL 1212000000 // 404MHz - DOES NOT WORK
-//#define PICO_CLOCK_PLL_DIV1 3
-
-#define PICO_CLOCK_PLL_DIV2 1
-#define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
 
 bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
 bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
@@ -310,7 +288,97 @@ void __not_in_flash_func(gpioIrqHandler)()
 
 #endif
 
+typedef struct
+{
+  int pll;
+  int pllDiv1;
+  int pllDiv2;
+  int voltage;
+  int clockHz;
+} ClockSettings;
 
+#define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
+
+static const ClockSettings clockPresets[] = {
+  CLOCK_PRESET(756000000, 3, 1, VREG_VOLTAGE_1_10),     // 252
+  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_15),    // 302.4
+  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
+};
+
+static int clockPresetIndex = 0;
+static bool testingClock = false;
+
+typedef enum 
+{
+  // not settable via registers
+  CONF_PICO_MODEL       = 0,
+  CONF_HW_VERSION       = 1,
+  CONF_SW_VERSION       = 2,
+  CONF_CLOCK_TESTED     = 4,
+
+  // settable via registers
+  CONF_CRT_SCANLINES    = 8,
+  CONF_SCANLINE_SPRITES = 9,
+  CONF_CLOCK_PRESET_ID  = 10,
+} Pico9918Options;
+
+#if PICO_RP2040
+  #define PICO_MODEL 1
+#elif PICO_2350
+  #define PICO_MODEL 2
+#endif
+
+#define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash
+#define CONFIG_FLASH_ADDR   (void*)(XIP_BASE + CONFIG_FLASH_OFFSET) // in the top 4kB of a 2MB flash
+#define CONFIG_BYTES 256
+
+void readConfig(uint8_t config[CONFIG_BYTES])
+{
+  memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
+
+  if (config[CONF_PICO_MODEL] != PICO_RP2040 ||
+      config[CONF_HW_VERSION] != PCB_VERSION ||
+      config[CONF_CLOCK_PRESET_ID] > 2 ||
+      config[CONF_CRT_SCANLINES] > 1 ||
+      config[CONF_SCANLINE_SPRITES] > 1) // not initialised
+  {
+    memset(config, CONFIG_BYTES, 0);
+
+    config[CONF_PICO_MODEL] = PICO_MODEL;
+    config[CONF_HW_VERSION] = PCB_VERSION;
+    config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
+    config[CONF_CLOCK_TESTED] = 0;
+
+    config[CONF_CRT_SCANLINES] = 0;
+    config[CONF_SCANLINE_SPRITES] = 0;
+    config[CONF_CLOCK_PRESET_ID] = 0;
+  }
+}
+
+void writeConfig(uint8_t config[CONFIG_BYTES])
+{
+  flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
+
+  config[CONF_PICO_MODEL] = PICO_MODEL;
+  config[CONF_HW_VERSION] = PCB_VERSION;
+  config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
+
+  int attempts = 5;
+retry:
+  flash_range_program(CONFIG_FLASH_OFFSET, (const void*)tms9918->config, 256);
+
+  // flush
+  int i = 0;
+  while (i < 256) {
+    *((volatile uint32_t *)(CONFIG_FLASH_ADDR) + i) = 0;
+    i += sizeof(uint32_t);
+  }
+
+  if (--attempts && memcmp(CONFIG_FLASH_ADDR, (const void*)tms9918->config, 256) != 0)
+  {
+    goto retry;    
+  }
+}
 
 static void eofInterrupt()
 {
@@ -319,6 +387,15 @@ static void eofInterrupt()
   if (TMS_REGISTER(tms9918, 0x32) & 0x20)
   {
     gpuTrigger();
+  }
+  if (tms9918->configDirty)
+  {
+    tms9918->configDirty = false;
+
+    vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES];
+    tms9918->maxScanlineSprites = tms9918->config[CONF_SCANLINE_SPRITES] ? 32 : 4;
+
+    writeConfig(tms9918->config); // do we want to do this immedately?
   }
 }
 
@@ -371,6 +448,7 @@ inline uint32_t bigRgb2LittleBgr(uint32_t val)
 {
   return val | ((val >> 12) << 4);
 }
+
 
 static void tmsPorch()
 {
@@ -519,7 +597,10 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   renderBcd(y, renderTimeBcd, xPos, yPos, 0x0f40, pixels);
   renderBcd(y, renderTimePerScanlineBcd, xPos + 28, yPos, 0x004f, pixels); yPos += 8;
 
-  renderBcd(y, temperature, xPos, yPos, 0x004f, pixels);
+  renderBcd(y, temperature, xPos, yPos, 0x004f, pixels); yPos += 8;
+
+  renderBcd(y, tms9918->config[CONF_CRT_SCANLINES], xPos, yPos, 0x400f, pixels); yPos += 8;
+  renderBcd(y, tms9918->config[CONF_SCANLINE_SPRITES], xPos, yPos, 0x400f, pixels); yPos += 8;
 #endif
 
 #if REG_DIAG
@@ -615,6 +696,14 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     if (frameCount < 600)
     {
       outputSplash(y, vBorder, vPixels, pixels);
+
+      if (testingClock && frameCount == 599)
+      {
+        // new clock lasted 10 seconds... let's accept it
+        tms9918->config[CONF_CLOCK_TESTED] = tms9918->config[CONF_CLOCK_PRESET_ID];
+        tms9918->configDirty = true;
+        testingClock = false;
+      }
     }
     if (TMS_REGISTER(tms9918, 0x32) & 0x40)
     {
@@ -772,7 +861,7 @@ uint initClock(uint gpio, float freqHz)
 
   pio_sm_init(pio0, clkSm, clocksPioOffset, &c);
 
-  float clockDiv = (float)PICO_CLOCK_HZ / (freqHz * 2.0f);
+  float clockDiv = (float)clockPresets[clockPresetIndex].clockHz / (freqHz * 2.0f);
   pio_sm_set_clkdiv(pio0, clkSm, clockDiv);
   pio_sm_set_enabled(pio0, clkSm, true);
 
@@ -859,8 +948,9 @@ int main(void)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
   //vreg_set_voltage(VREG_VOLTAGE_1_15);
-  vreg_set_voltage(VREG_VOLTAGE_1_30);
-  set_sys_clock_pll(PICO_CLOCK_PLL, PICO_CLOCK_PLL_DIV1, PICO_CLOCK_PLL_DIV2);
+  ClockSettings clockSettings = clockPresets[clockPresetIndex];
+  vreg_set_voltage(clockSettings.voltage);
+  set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
 
   /* we need one of these. it's the main guy */
   vrEmuTms9918Init();
@@ -876,6 +966,31 @@ int main(void)
 
   dma_channel_set_read_addr(dma32, &bg, false);
 
+  /* we could set clock freq here from options */
+  readConfig(tms9918->config);
+
+  /*
+   * if we're trying out a new clock rate, we need to have a failsafe 
+   * we test it first 
+   */
+  if (tms9918->config[CONF_CLOCK_PRESET_ID] != 0 && 
+      tms9918->config[CONF_CLOCK_PRESET_ID] != tms9918->config[CONF_CLOCK_TESTED])
+  {
+    testingClock = true;
+    int wantedClock = tms9918->config[CONF_CLOCK_PRESET_ID];
+    tms9918->config[CONF_CLOCK_PRESET_ID] = 0;
+    tms9918->config[CONF_CLOCK_TESTED] = 0;
+    writeConfig(tms9918->config);
+    tms9918->config[CONF_CLOCK_PRESET_ID] = wantedClock;
+  }
+
+  tms9918->configDirty = false;
+  
+  clockPresetIndex = tms9918->config[CONF_CLOCK_PRESET_ID];
+
+  clockSettings = clockPresets[clockPresetIndex];
+  vreg_set_voltage(clockSettings.voltage);
+  set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
@@ -893,8 +1008,10 @@ int main(void)
   setVgaParamsScaleY(&params.params, 2);
 #endif
 
+  tms9918->maxScanlineSprites = tms9918->config[CONF_SCANLINE_SPRITES] ? 32 : 4;
+
   /* set vga scanline callback to generate tms9918 scanlines */
-  params.scanlines = PICO9918_SCANLINES;
+  params.scanlines = tms9918->config[CONF_CRT_SCANLINES];
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;
   params.porchFn = tmsPorch;
