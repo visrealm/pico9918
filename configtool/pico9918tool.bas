@@ -81,16 +81,17 @@
         END IF
     ELSE
         ' load current values        
-        'VDP(1) = $C2    ' disable vdp interrupts
-        'VDP(15) = 12    ' read config register
-        'FOR I = 0 TO 3'OPT_COUNT - 1
-        '    VDP(48) = options(I * OPT_STRUCT_LEN)
-        '    confValue = 0'USR RDVST
-        '    optValues(I) = confValue
-        '    PRINT AT XY(0,I), options(I * OPT_STRUCT_LEN), ",  ", confValue
-        'NEXT I
-        'VDP(15) = 0     ' reset status register
-        'VDP(1) = $E2    ' enable vdp interrupts
+        VDP(1) = $C2    ' disable vdp interrupts
+        VDP(15) = 12    ' read config register
+        FOR I = 0 TO OPT_COUNT - 1
+            optIdx = options(I * OPT_STRUCT_LEN)
+            IF optIdx > 0 THEN
+                VDP(58) = optIdx
+                optValues(I) = USR RDVST
+            END IF
+        NEXT I
+        VDP(15) = 0     ' reset status register
+        VDP(1) = $E2    ' enable vdp interrupts
 
         GOSUB update_palette
         PRINT AT XY(11, 6), "MAIN MENU"
