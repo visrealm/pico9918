@@ -14,16 +14,22 @@
     CONST FALSE         = 0
     CONST #VDP_NAME_TAB = $1800
     CONST MENU_TOP      = 8
+    CONST DASH          = 20
+
+    DEF FN XY(X, Y) = ((Y) * 32 + (X))
+    DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))
+    DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C
+    DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))
     
     optIdx = 0
     currentOptIdx = 0
-
-    'VDP(7) = 0
 
     GOSUB setup_tiles
     GOSUB setup_header
     
     GOSUB vdp_detect
+
+    BORDER 0
     
     IF isF18ACompatible THEN
         
@@ -35,32 +41,34 @@
         verReg = USR RDVST
         VDP(15) = 0
         VDP(1) = $E2
-        verMaj = (verReg AND $f0) / 16
+        verMaj = verReg / 16
         verMin = verReg AND $0f
         IF (statReg AND $E8) = $E8 THEN
-            PRINT AT (32 * 3) + 3, "Detected: PICO9918 ver ", verMaj, ".", verMin
+            PRINT AT XY(3, 3), "Detected: PICO9918 ver ", verMaj, ".", verMin
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
-            PRINT AT (32 * 3) + 5, "Detected: F18A ver ", verMaj, "."
-            VPOKE #VDP_NAME_TAB + (32 * 3) + 5 + 21, hexChar(verMin)
+            PRINT AT XY(5, 3), "Detected: F18A ver  ."
+            PUT_XY(5 + 19, 3, hexChar(verMaj))
+            PUT_XY(5 + 21, 3, hexChar(verMin))
         ELSE
-            PRINT AT (32 * 3) + 8, "Detected UNKNOWN SR1 = ", <>statReg
+            PRINT AT XY(8, 3), "Detected UNKNOWN SR1 = ", <>statReg
         END IF
         
     ELSE
-        PRINT AT (32 * 3) + 6, "Detected: LEGACY VDP"
+        PRINT AT XY(6, 3), "Detected: LEGACY VDP"
     END IF
-    isPico9918 = isF18ACompatible   ' FOR TESTING
+    'isPico9918 = isF18ACompatible   ' FOR TESTING
     IF NOT isPico9918 THEN
-        PRINT AT (32 * (9 + (isF18ACompatible AND 3))) + 7, "PICO9918 not found"
+        PRINT AT XY(7, 9 + (isF18ACompatible AND 3)), "PICO9918 not found"
         IF NOT isF18ACompatible THEN
-            PRINT AT (32 * 12) + 15, "OR"
-            PRINT AT (32 * 15) + 3, "PICO9918 firmware too old"
-            PRINT AT (32 * 17) + 3, "Firmware v1.0.0+ required"
-            PRINT AT (32 * 19) + 4, "Update manually via USB"
+            PRINT AT XY(15, 12), "OR"
+            PRINT AT XY(3, 15), "PICO9918 firmware too old"
+            PRINT AT XY(4, 17), "Firmware v1.0+ required"
+            PRINT AT XY(4, 19), "Update manually via USB"
         END IF
     ELSE
-        PRINT AT (32 * 6) + 11, "MAIN MENU"
+        GOSUB update_palette
+        PRINT AT XY(11, 6), "MAIN MENU"
         GOSUB render_options
         WHILE 1
             WAIT
@@ -106,39 +114,50 @@ setup_tiles: PROCEDURE
     VDP(1) = $82                        ' disable interrupts and display
 
     DEFINE CHAR 32, 96, font
-    DEFINE CHAR 128 + 32, 96, font
-    DEFINE CHAR 1, 19, logo
-    DEFINE CHAR 129, 19, logo2
+    DEFINE CHAR 32 + 128, 96, font
 
-    DEFINE CHAR 20, 1, dash
-    DEFINE CHAR 148, 1, dash
+    DEFINE CHAR 1, 19, logo
+    DEFINE CHAR 1 + 128, 19, logo2
+
+    DEFINE CHAR DASH, 1, dash
+    DEFINE CHAR DASH + 128, 1, dash
+    DEFINE CHAR 21, 1, round_left
+    DEFINE CHAR 22, 1, round_right
     
+    FOR I = 0 TO 31
+        DEFINE COLOR I, 1, white
+    NEXT I
+    FOR I = 32 TO 127
+        DEFINE COLOR I, 1, grey
+    NEXT I
+    FOR I = 128 TO 147
+        DEFINE COLOR I, 1, white
+    NEXT I
     FOR J = 148 TO 250
         DEFINE COLOR J, 1, inv_white
     NEXT J
-    FOR I = 0 TO 147
-        DEFINE COLOR I, 1, white
-    NEXT I
 
-    DEFINE COLOR 20, 1, dash_c
+    DEFINE COLOR DASH, 1, dash_c
+    DEFINE COLOR 21, 1, highlight
+    DEFINE COLOR 22, 1, highlight
 
     END
 
 setup_header: PROCEDURE
 
-    DEFINE VRAM #VDP_NAME_TAB, 19, logoNames
-    DEFINE VRAM #VDP_NAME_TAB + 32, 19, logoNames2
+    DEFINE VRAM NAME_TAB_XY(0, 0), 19, logoNames
+    DEFINE VRAM NAME_TAB_XY(0, 1), 19, logoNames2
 
-    PRINT AT 20,"Configurator"
-    PRINT AT 26 + 32,"v1.0.0"
-    
+    PRINT AT XY(20, 0),"Configurator"
+    PRINT AT XY(28, 1),"v1.0"
+    PRINT AT XY(4, 23), "(C) 2024 Troy Schrapel"    
+
     FOR I = 0 TO 31
-        VPOKE #VDP_NAME_TAB + (32 * 2)  + I, 20
-        VPOKE #VDP_NAME_TAB + (32 * 22) + I, 20
-        VPOKE #VDP_NAME_TAB + (32 * 4)  + I, 20
+        PUT_XY(I, 2, DASH)
+        PUT_XY(I, 4, DASH)
+        PUT_XY(I, 22, DASH)
     NEXT I
 
-    PRINT AT (32 * 23) + 4, "(C) 2024 Troy Schrapel"    
     END
 
 render_options: PROCEDURE
@@ -148,19 +167,39 @@ render_options: PROCEDURE
     END
 
 render_opt: PROCEDURE
-    #ROWOFFSET = 32 * (MENU_TOP + optIdx)
+    #ROWOFFSET = XY(0, MENU_TOP + optIdx)
     PRINT AT #ROWOFFSET + 2, " ",optIdx + 1,". "
     DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 6, OPT_NAME_LEN, VARPTR options(optIdx * 18 + 1)
-    PRINT AT #ROWOFFSET + 22, " : ", <.5>options((optIdx * 18) + 17)
+    PRINT AT #ROWOFFSET + 22, " : ", <.4>options((optIdx * 18) + 17)," "
     IF optIdx = currentOptIdx THEN
-        FOR R = 0 TO 27
-            C = VPEEK(#VDP_NAME_TAB + #ROWOFFSET + 2 + R)
-            C = C + 128
-            VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 2 + R), C
+        FOR R = 3 TO 28
+            C = VPEEK(#VDP_NAME_TAB + #ROWOFFSET+ R)
+            C = C OR 128
+            VPOKE (#VDP_NAME_TAB + #ROWOFFSET + R), C
         NEXT R
+        VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 2), 21
+        VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 29), 22
     END IF
     END
-    
+
+update_palette: PROCEDURE    
+    WAIT
+    VDP(47) = $c0 + 2 ' palette data port fron index #2
+    PRINT "\0\7"
+    PRINT "\0\10"
+    PRINT "\0\12"
+    PRINT "\0\15"
+    PRINT "\0\15"
+    PRINT "\2\47"
+    PRINT "\4\79"
+    PRINT "\7\127"
+    PRINT "\15\255"
+    PRINT "\15\255"
+    PRINT "\15\255"
+    PRINT "\15\255"
+    PRINT "\9\153"
+    VDP(47) = $40
+    END
 
 vdp_detect: PROCEDURE
     GOSUB vdp_unlock
@@ -173,13 +212,13 @@ vdp_detect: PROCEDURE
     
 vdp_unlock: PROCEDURE
     VDP(1) = $C2                        ' disable interrupts
-    VDP(57) = $1C                        ' unlock
+    VDP(57) = $1C                       ' unlock
     VDP(57) = $1C                       ' unlock... again
     VDP(1) = $E2                        ' enable interrupts
     END
 
+' TMS9900 machine code (for PICO9918 GPU) to write $00 to VDP $3F00
 vdp_gpu_detect:
-    ' TMS9900 machine code (for GPU) to write $00 to VDP $3F00
     DATA BYTE $04, $E0    ' CLR  @>3F00
     DATA BYTE $3F, $00
     DATA BYTE $03, $40    ' IDLE    
@@ -240,7 +279,11 @@ logo2:
 dash:
     DATA BYTE $00,$00,$00,$ff,$ff,$00,$00,$00
 dash_c:
-    DATA BYTE $00,$00,$00,$ff,$ee,$00,$00,$00
+    DATA BYTE $00,$00,$00,$77,$44,$00,$00,$00
+round_left:
+    DATA BYTE $3F,$7F,$FF,$FF,$FF,$FF,$7F,$3F
+round_right:
+    DATA BYTE $FC,$FE,$FF,$FF,$FF,$FF,$FE,$FC
 
 
 ' PICO9918 logo name table entries (rows 1 and 2)
@@ -257,8 +300,11 @@ grey:
 blue:
     DATA BYTE $40,$40,$40,$40,$40,$40,$40,$40
 inv_white:
-    DATA BYTE $0f,$0f,$0f,$0f,$0f,$0f,$0f,$0f
-
+'    DATA BYTE $0f,$0f,$0f,$0f,$0f,$0f,$0f,$0f
+'    DATA BYTE $f5,$f4,$f4,$f4,$f4,$f4,$f4,$f4
+    DATA BYTE $f9,$f8,$f7,$f6,$f5,$f4,$f3,$f2
+highlight:
+    DATA BYTE $90,$80,$70,$60,$50,$40,$30,$20
 
 font:
     DATA BYTE $00,$00,$00,$00,$00,$00,$00,$00 ' <SPACE$
@@ -357,3 +403,22 @@ font:
     DATA BYTE $70,$18,$18,$0E,$18,$18,$70,$00 ' }
     DATA BYTE $76,$DC,$00,$00,$00,$00,$00,$00 ' ~
     DATA BYTE $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF '  
+
+palette:
+    DATA BYTE $00,$00
+    DATA BYTE $00,$00
+    DATA BYTE $02,$C3
+    DATA BYTE $05,$00'D6
+    DATA BYTE $05,$4F
+    DATA BYTE $07,$6F
+    DATA BYTE $0D,$54
+    DATA BYTE $04,$EF
+    DATA BYTE $0F,$54
+    DATA BYTE $0F,$76
+    DATA BYTE $0D,$C3
+    DATA BYTE $0E,$D6
+    DATA BYTE $02,$B2
+    DATA BYTE $0C,$5C
+    DATA BYTE $08,$88
+    DATA BYTE $0F,$FF
+  
