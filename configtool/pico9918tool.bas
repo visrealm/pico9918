@@ -8,18 +8,21 @@
 ' https://github.com/visrealm/pico9918
 '
 
-    CONST OPT_COUNT     = 6
-    CONST OPT_NAME_LEN  = 16
-    CONST TRUE          = -1
-    CONST FALSE         = 0
-    CONST #VDP_NAME_TAB = $1800
-    CONST MENU_TOP      = 8
-    CONST DASH          = 20
+    CONST OPT_COUNT      = 6
+    CONST OPT_NAME_LEN   = 16
+    CONST OPT_STRUCT_LEN = 20
+    CONST TRUE           = -1
+    CONST FALSE          = 0
+    CONST #VDP_NAME_TAB  = $1800
+    CONST MENU_TOP       = 8
+    CONST DASH           = 20
 
     DEF FN XY(X, Y) = ((Y) * 32 + (X))
     DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))
     DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C
     DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))
+
+    DIM optValues(OPT_COUNT)
     
     optIdx = 0
     currentOptIdx = 0
@@ -57,7 +60,7 @@
     ELSE
         PRINT AT XY(6, 3), "Detected: LEGACY VDP"
     END IF
-    'isPico9918 = isF18ACompatible   ' FOR TESTING
+    isPico9918 = isF18ACompatible   ' FOR TESTING
     IF NOT isPico9918 THEN
         PRINT AT XY(7, 9 + (isF18ACompatible AND 3)), "PICO9918 not found"
         IF NOT isF18ACompatible THEN
@@ -73,25 +76,56 @@
         WHILE 1
             WAIT
             dirty = 1
+            valdirty = 0
             
             key = CONT.KEY
             IF key >= $30 THEN key = key - $30
-            
+
+            lastOptIdx = currentOptIdx
+
             IF CONT.DOWN AND currentOptIdx < (OPT_COUNT - 1) THEN
                 currentOptIdx = currentOptIdx + 1
             ELSEIF CONT.UP AND currentOptIdx > 0 THEN
                 currentOptIdx = currentOptIdx - 1
             ELSEIF key > 0 AND key <= OPT_COUNT THEN
                 currentOptIdx = key - 1
+            ELSEIF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.RIGHT THEN
+                optValuesCount = options((currentOptIdx * OPT_STRUCT_LEN) + 18)
+                currentOptIndex = optValues(currentOptIdx)
+                currentOptIndex = currentOptIndex + 1
+                IF currentOptIndex >= optValuesCount THEN currentOptIndex = 0
+                optValues(currentOptIdx) = currentOptIndex
+                valdirty = 1
+
+                IF currentOptIdx = 0 THEN
+                    VDP(58) = 2
+                    VDP(59) = currentOptIndex
+                END IF
+
+            ELSEIF CONT.LEFT THEN
+                optValuesCount = options((currentOptIdx * OPT_STRUCT_LEN) + 18)
+                currentOptIndex = optValues(currentOptIdx)
+                currentOptIndex = currentOptIndex - 1
+                IF currentOptIndex >= optValuesCount THEN currentOptIndex = optValuesCount - 1
+                optValues(currentOptIdx) = currentOptIndex
+                valdirty = 1
             ELSE
                 dirty = 0
             END IF
             
             IF dirty THEN
+                optIdx = lastOptIdx
                 WAIT
-                GOSUB render_options
+                GOSUB render_opt
+                optIdx = currentOptIdx
+                GOSUB render_opt
                 GOSUB delay
                 dirty = 0
+            ELSEIF valdirty THEN
+                optIdx = currentOptIdx
+                WAIT
+                GOSUB render_opt
+                GOSUB delay
             END IF
             
         WEND
@@ -150,12 +184,13 @@ setup_header: PROCEDURE
 
     PRINT AT XY(20, 0),"Configurator"
     PRINT AT XY(28, 1),"v1.0"
-    PRINT AT XY(4, 23), "(C) 2024 Troy Schrapel"    
+    PRINT AT XY(4, 22), "(C) 2024 Troy Schrapel"    
 
     FOR I = 0 TO 31
         PUT_XY(I, 2, DASH)
         PUT_XY(I, 4, DASH)
-        PUT_XY(I, 22, DASH)
+        PUT_XY(I, 21, DASH)
+        PUT_XY(I, 23, DASH)
     NEXT I
 
     END
@@ -169,8 +204,15 @@ render_options: PROCEDURE
 render_opt: PROCEDURE
     #ROWOFFSET = XY(0, MENU_TOP + optIdx)
     PRINT AT #ROWOFFSET + 2, " ",optIdx + 1,". "
-    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 6, OPT_NAME_LEN, VARPTR options(optIdx * 18 + 1)
-    PRINT AT #ROWOFFSET + 22, " : ", <.4>options((optIdx * 18) + 17)," "
+    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 6, OPT_NAME_LEN, VARPTR options(optIdx * OPT_STRUCT_LEN + 1)
+    OPTVALIDX = options((optIdx * OPT_STRUCT_LEN) + 17)
+    OPTCOUNT = options((optIdx * OPT_STRUCT_LEN) + 18)
+    CURRENTVALOFFSET = optValues(optIdx)
+    PRINT AT #ROWOFFSET + 22, "        "
+    IF OPTCOUNT > 0 THEN
+        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 23, 6, VARPTR optionValues((OPTVALIDX + CURRENTVALOFFSET) * 6)
+    END IF
+
     IF optIdx = currentOptIdx THEN
         FOR R = 3 TO 28
             C = VPEEK(#VDP_NAME_TAB + #ROWOFFSET+ R)
@@ -223,16 +265,28 @@ vdp_gpu_detect:
     DATA BYTE $3F, $00
     DATA BYTE $03, $40    ' IDLE    
 
+' index, name[16], values index, num values, current value
 options:
-    DATA BYTE 0,"CRT scanlines   ",2
-    DATA BYTE 1,"Scanline sprites",2
-    DATA BYTE 2,"Clock freq.     ",4
-    DATA BYTE 3,"Diagnostics     ",2
-    DATA BYTE 4,"Default palette ",15
-    DATA BYTE 5,"Reset defaults  ",15
+    DATA BYTE 0,"CRT scanlines   ",0,2,0
+    DATA BYTE 1,"Scanline sprites",2,2,0
+    DATA BYTE 2,"Clock freq.     ",4,3,0
+    DATA BYTE 3,"Diagnostics     ",0,2,0
+    DATA BYTE 4,"Default palette ",0,0,0
+    DATA BYTE 5,"Reset defaults  ",0,0,0
+
+optionValues:
+    DATA BYTE "Off   "
+    DATA BYTE "On    "
+    DATA BYTE "4     "
+    DATA BYTE "32    "
+    DATA BYTE "252MHz"
+    DATA BYTE "302MHz"
+    DATA BYTE "352MHz"
 
 hexChar:
     DATA BYTE "0123456789ABCDEF"
+
+
 
 ' PICO9918 logo pattern
 logo:
@@ -408,7 +462,7 @@ palette:
     DATA BYTE $00,$00
     DATA BYTE $00,$00
     DATA BYTE $02,$C3
-    DATA BYTE $05,$00'D6
+    DATA BYTE $05,$00
     DATA BYTE $05,$4F
     DATA BYTE $07,$6F
     DATA BYTE $0D,$54
