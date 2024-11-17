@@ -1,5 +1,7 @@
 '
-' Project: pico9918tool
+' Project: pico9918
+'
+' PICO9918 Configurator
 '
 ' Copyright (c) 2024 Troy Schrapel
 '
@@ -7,8 +9,41 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' Pico9918Options index, name[16], values index, num values,help[32]
+' -----------------------------------------------------------------------------
+' CVBasic source file. See: github.com/nanochess/CVBasic
+' -----------------------------------------------------------------------------
+'
+' BUILDING INSTRUCTIONS:
+'
+' 1. create ./asm and ./bin directories
+' 2. cvbasic, gasm80 and xdt99 in path
+'
+' -- TI-99 --
+'   > cvbasic --ti994a pico9918tool.bas asm/pico9918tool99.a99 lib
+'   > xas99.py -b -R asm/pico9918tool99.a99
+'   > linkticart.py asm/pico9918tool99.bin bin/pico9918tool99_8.bin "PICO9918 CONFIG TOOL"
+'
+' -- ColecoVision --
+'   > cvbasic pico9918tool.bas asm/pico9918tool_cv.asm lib
+'   > gasm80 asm/pico9918tool_cv.asm -o bin/pico9918tool_cv.rom
+'
+' -- MSX --
+'   > cvbasic --msx pico9918tool.bas asm/pico9918tool_msx.asm lib
+'   > gasm80 asm/pico9918tool_msx.asm -o bin/pico9918tool_msx.rom
+'
+' Cartridge images will be in the ./bin directory
+'
+' -----------------------------------------------------------------------------
 
+    ' helper constants
+    CONST TRUE           = -1
+    CONST FALSE          = 0
+
+    CONST MENU_TOP_ROW   = 8
+    CONST DASH_CHAR_IDX  = 20
+
+
+    ' Pico9918Options index, name[16], values index, num values,help[32]
     CONST CONF_COUNT      = 9
     CONST CONF_INDEX      = 0
     CONST CONF_LABEL      = 1
@@ -19,69 +54,84 @@
     CONST CONF_HELP_LEN   = 32
     CONST CONF_STRUCT_LEN = (CONF_HELP + CONF_HELP_LEN)
 
+    ' config option value label length
     CONST CONF_VALUE_LABEL_LEN = 6
 
-    CONST TRUE           = -1
-    CONST FALSE          = 0
-    CONST #VDP_NAME_TAB  = $1800
-    CONST #VDP_NAME2_TAB = $1C00
-    CONST MENU_TOP       = 8
-    CONST DASH           = 20
-
+    ' -------------------------------
+    ' PICO9918 Config Ids.
+    ' See Pico9918Options enum in main.c
     CONST CONF_PICO_MODEL       = 0
     CONST CONF_HW_VERSION       = 1
     CONST CONF_SW_VERSION       = 2
     CONST CONF_CLOCK_TESTED     = 4
+    ' ^^^ read only
+    ' now the read/write ones
 
-    CONST CONF_CRT_SCANLINES    = 8
-    CONST CONF_SCANLINE_SPRITES = 9
-    CONST CONF_CLOCK_PRESET_ID  = 10
+    CONST CONF_CRT_SCANLINES    = 8         ' 0 (off) or 1 (on)
+    CONST CONF_SCANLINE_SPRITES = 9         ' 0 - 3 where value = (1 << (x + 2))
+    CONST CONF_CLOCK_PRESET_ID  = 10        ' 0 - 2 see ClockSettings in main.c
+    ' ^^^ read/write config IDs
+    ' now the "special" config IDs
 
-    CONST CONF_SAVE_TO_FLASH    = 255
+    CONST CONF_SAVE_TO_FLASH    = 255   
+    ' -------------------------------
 
     CONST CONF_MENU_RESET       = 254
     CONST CONF_MENU_SAVE        = 250
 
 
-    DEF FN XY(X, Y) = ((Y) * 32 + (X))
-    DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))
-    DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C
-    DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))
+    ' name table helpers
+    DEF FN XY(X, Y) = ((Y) * 32 + (X))                      ' PRINT AT XY(1, 2), ...
 
-    DEF FN XY2(X, Y) = ((Y) * 32 + (X) + $400)
-    DEF FN NAME_TAB_XY2(X, Y) = (#VDP_NAME_TAB + XY2(X, Y))
-    DEF FN PUT_XY2(X, Y, C) = VPOKE NAME_TAB_XY2(X, Y), C
-    DEF FN GET_XY2(X, Y) = VPEEK(NAME_TAB_XY2(X, Y))
+    CONST #VDP_NAME_TAB  = $1800
+    DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))   ' DEFINE VRAM NAME_TAB_XY(1, 2), ...
+    DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C     ' place a byte in the name table
+    DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))          ' read a byte from the name table
 
+    ' menu helpers
     DEF FN MENU_DATA(I, C) = configMenuData((I) * CONF_STRUCT_LEN + (C))
-
     DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow
 
-    DEF FN WRITE_CONFIG_TO_VDP(I, V) = VDP(58) = I : VDP(59) = V
+    ' VDP helpers
+    DEF FN VDP_DISABLE_INT = VDP(1) = $C2
+    DEF FN VDP_ENABLE_INT = VDP(1) = $E2
+    DEF FN VDP_WRITE_CONFIG(I, V) = VDP(58) = I : VDP(59) = V
+    DEF FN VDP_READ_STATUS = USR RDVST
+    DEF FN VDP_SET_CURRENT_STATUS_REG(R) = VDP(15) = R
+    DEF FN VDP_RESET_STATUS_REG = VDP_SET_CURRENT_STATUS_REG(0)
 
+    ' =========================================================================
+    ' PROGRAM ENTRY
+    ' -------------------------------------------------------------------------
 
-    DIM tempConfigValues(CONF_COUNT)
-    DIM deviceConfigValues(CONF_COUNT)
+    ' configuration values
+    DIM tempConfigValues(CONF_COUNT)        ' current (live) config values
+    DIM deviceConfigValues(CONF_COUNT)      ' values saved in the PICO9918
     
-    g_currentMenuIndex = 0
+    ' GLOBALS    
+    g_currentMenuIndex = 0                  ' current menu index
 
+    ' setup the screen
+    BORDER 0
     GOSUB setupTiles
     GOSUB setupHeader
     
+    ' what are we working with?
     GOSUB vdpDetect
-
-    BORDER 0
-    
+   
     IF isF18ACompatible THEN
+
+        ' looks like we're F18A compatible. do some more digging...
         
-        VDP(1) = $C2
-        
-        VDP(15) = 1
-        statReg = USR RDVST
-        VDP(15) = 14
-        verReg = USR RDVST
-        VDP(15) = 0
-        VDP(1) = $E2
+        VDP_DISABLE_INT
+
+        VDP_SET_CURRENT_STATUS_REG(1)       ' SR1: ID
+        statReg = VDP_READ_STATUS
+        VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
+        verReg = VDP_READ_STATUS
+        VDP_RESET_STATUS_REG
+        VDP_ENABLE_INT
+
         verMaj = verReg / 16
         verMin = verReg AND $0f
         IF (statReg AND $E8) = $E8 THEN
@@ -98,7 +148,9 @@
     ELSE
         PRINT AT XY(6, 3), "Detected: LEGACY VDP"
     END IF
+
     isPico9918 = isF18ACompatible   ' FOR TESTING
+
     IF NOT isPico9918 THEN
         PRINT AT XY(7, 9 + (isF18ACompatible AND 3)), "PICO9918 not found"
         IF NOT isF18ACompatible THEN
@@ -108,6 +160,8 @@
             PRINT AT XY(4, 19), "Update manually via USB"
         END IF
     ELSE
+        ' We are a PICO9918, set up the menu
+
         VDP(50) = $80  ' reset VDP registers to boot values
         VDP(0) = defaultReg(0)
         VDP(1) = defaultReg(1)
@@ -117,25 +171,26 @@
         VDP(5) = defaultReg(5)
         VDP(6) = defaultReg(6)
         VDP(7) = defaultReg(7)
-        VDP(1) = $E2 ' enable interrupts and display (so we can wait)
-        WAIT    
-        WAIT         ' ensure default config is now in place
-        VDP(1) = $C2 ' enable display, but interrupts still off
 
-        GOSUB vdpUnlock ' reset locked vdp. unlock it again
+        VDP_ENABLE_INT  ' enable interrupts (so we can wait)
+        WAIT    
+        WAIT            ' ensure default config is now in place
+        VDP_DISABLE_INT ' enable display, but interrupts still off
+
+        GOSUB vdpUnlock ' reset locked the vdp. unlock it again
 
         GOSUB vdpLoadConfigValues  ' load config values from VDP
 
-        'VR0:>02 VR1:>E2 VR2:>06 VR3:>FF VR4:>03 VR5:>36 VR6:>07 VR7:>00
-
-        VDP(1) = $E2    ' enable vdp interrupts
-
         GOSUB applyConfigValues
 
+        ' render the menu
         GOSUB updatePalette
         PRINT AT XY(11, 6), "MAIN MENU"
         GOSUB renderMenu
 
+        VDP_ENABLE_INT
+
+        ' main menu loop
         WHILE 1
             WAIT
 
@@ -210,7 +265,7 @@
                 WAIT
                 vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
                 IF vdpOptId < 200 THEN
-                    WRITE_CONFIG_TO_VDP(vdpOptId, currentValueIndex)
+                    VDP_WRITE_CONFIG(vdpOptId, currentValueIndex)
                 END IF
 
                 IF vdpOptId = CONF_CRT_SCANLINES THEN
@@ -272,7 +327,7 @@ saveOptions: PROCEDURE
     END IF
 
     ' instruct the pico9918 to commit config to flash
-    WRITE_CONFIG_TO_VDP(CONF_SAVE_TO_FLASH, 1)
+    VDP_WRITE_CONFIG(CONF_SAVE_TO_FLASH, 1)
 
     clockChanged = deviceConfigValues(2) <> tempConfigValues(2)
 
@@ -302,8 +357,8 @@ setupTiles: PROCEDURE
     DEFINE CHAR 1, 19, logo         ' first row of top left logo
     DEFINE CHAR 1 + 128, 19, logo2  ' second row of top left logo
 
-    DEFINE CHAR DASH, 1, dash       ' dash (divider) pattern
-    DEFINE CHAR DASH + 128, 1, dash
+    DEFINE CHAR DASH_CHAR_IDX, 1, dash       ' dash (divider) pattern
+    DEFINE CHAR DASH_CHAR_IDX + 128, 1, dash
 
     DEFINE CHAR 21, 1, round_left   ' ends of selection bar
     DEFINE CHAR 22, 1, round_right
@@ -321,7 +376,7 @@ setupTiles: PROCEDURE
         DEFINE COLOR I, 1, inv_white ' selected (highlighted) colors
     NEXT I
 
-    DEFINE COLOR DASH, 1, dash_c     ' dash (divider) color
+    DEFINE COLOR DASH_CHAR_IDX, 1, dash_c     ' dash (divider) color
 
     DEFINE COLOR 21, 1, highlight    ' selection bar ends
     DEFINE COLOR 22, 1, highlight
@@ -344,10 +399,10 @@ setupHeader: PROCEDURE
     PRINT AT XY(4, 22), "(C) 2024 Troy Schrapel"    
 
     FOR I = 0 TO 31
-        PUT_XY(I, 2, DASH)
-        PUT_XY(I, 4, DASH)
-        PUT_XY(I, 21, DASH)
-        PUT_XY(I, 23, DASH)
+        PUT_XY(I, 2, DASH_CHAR_IDX)
+        PUT_XY(I, 4, DASH_CHAR_IDX)
+        PUT_XY(I, 21, DASH_CHAR_IDX)
+        PUT_XY(I, 23, DASH_CHAR_IDX)
     NEXT I
 
     END
@@ -377,7 +432,7 @@ renderMenuRow: PROCEDURE
     IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN RETURN
 
     ' pre-compute row offset. we'll need this a few times
-    #ROWOFFSET = XY(0, MENU_TOP + a_menuIndexToRender)
+    #ROWOFFSET = XY(0, MENU_TOP_ROW + a_menuIndexToRender)
 
     ' output menu number (index + 1)
     PRINT AT #ROWOFFSET + 1, " ", a_menuIndexToRender + 1, ". "
@@ -479,7 +534,7 @@ hideSprites: PROCEDURE
 ' -----------------------------------------------------------------------------
 updatePalette: PROCEDURE    
     WAIT
-    VDP(47) = $c0 + 2 ' palette data port fron index #2
+    VDP(47) = $c0 + 2 ' palette data port from index #2
     PRINT "\0\7"
     PRINT "\0\10"
     PRINT "\0\12"
@@ -511,10 +566,10 @@ vdpDetect: PROCEDURE
 ' unlock F18A mode
 ' -----------------------------------------------------------------------------
 vdpUnlock: PROCEDURE
-    VDP(1) = $C2                        ' disable interrupts
+    VDP_DISABLE_INT
     VDP(57) = $1C                       ' unlock
     VDP(57) = $1C                       ' unlock... again
-    VDP(1) = $E2                        ' enable interrupts
+    VDP_ENABLE_INT
     END
 
 ' -----------------------------------------------------------------------------
@@ -526,7 +581,7 @@ vdpLoadConfigValues: PROCEDURE
         a_menuIndexToRender = MENU_DATA(I, CONF_INDEX)
         IF a_menuIndexToRender > 0 THEN
             VDP(58) = a_menuIndexToRender
-            optValue = USR RDVST
+            optValue = VDP_READ_STATUS
             tempConfigValues(I) = optValue
             deviceConfigValues(I) = optValue
         END IF
