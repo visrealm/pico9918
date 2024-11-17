@@ -8,12 +8,13 @@
 ' https://github.com/visrealm/pico9918
 '
 
-    CONST OPT_COUNT      = 6
+    CONST OPT_COUNT      = 9
     CONST OPT_NAME_LEN   = 16
-    CONST OPT_STRUCT_LEN = 20
+    CONST OPT_STRUCT_LEN = 52
     CONST TRUE           = -1
     CONST FALSE          = 0
     CONST #VDP_NAME_TAB  = $1800
+    CONST #VDP_NAME2_TAB = $1C00
     CONST MENU_TOP       = 8
     CONST DASH           = 20
 
@@ -26,21 +27,32 @@
     CONST CONF_SCANLINE_SPRITES = 9
     CONST CONF_CLOCK_PRESET_ID  = 10
 
+    CONST CONF_SAVE_TO_FLASH    = 255
+
+    CONST CONF_MENU_RESET       = 254
+    CONST CONF_MENU_SAVE        = 250
+
 
     DEF FN XY(X, Y) = ((Y) * 32 + (X))
     DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))
     DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C
     DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))
 
+    DEF FN XY2(X, Y) = ((Y) * 32 + (X) + $400)
+    DEF FN NAME_TAB_XY2(X, Y) = (#VDP_NAME_TAB + XY2(X, Y))
+    DEF FN PUT_XY2(X, Y, C) = VPOKE NAME_TAB_XY2(X, Y), C
+    DEF FN GET_XY2(X, Y) = VPEEK(NAME_TAB_XY2(X, Y))
+
     DIM optValues(OPT_COUNT)
+    DIM bootValues(OPT_COUNT)
     
     optIdx = 0
     currentOptIdx = 0
 
-    GOSUB setup_tiles
-    GOSUB setup_header
+    GOSUB setupTiles
+    GOSUB setupHeader
     
-    GOSUB vdp_detect
+    GOSUB vdpDetect
 
     BORDER 0
     
@@ -81,21 +93,49 @@
         END IF
     ELSE
         ' load current values        
-        VDP(1) = $C2    ' disable vdp interrupts
+        'VDP(1) = $C2    ' disable vdp interrupts
+
+        'VDP(10) = $07   ' tile 2 layer
+        'VDP(11) = $ff   ' tile 2 layer color
+        'VDP(49) = $80
+        'PRINT AT XY2(10,10), "LAYER 2"
+        VDP(50) = $80 ' reset VDP registers to boot values
+        VDP(1) = $82   ' disable vdp interrupts and display
+        VDP(0) = $02
+        VDP(2) = $06
+        VDP(3) = $FF
+        VDP(4) = $03
+        VDP(5) = $36
+        VDP(6) = $07
+        VDP(7) = $00
+        VDP(1) = $E2 ' enable interrupts and display (so we can wait)
+        WAIT    
+        WAIT         ' ensure default config is now in place
+        VDP(1) = $C2 ' enable display, but interrupts still off
+
+        GOSUB vdpUnlock ' reset locked vdp. unlock it again
+
         VDP(15) = 12    ' read config register
         FOR I = 0 TO OPT_COUNT - 1
             optIdx = options(I * OPT_STRUCT_LEN)
             IF optIdx > 0 THEN
                 VDP(58) = optIdx
-                optValues(I) = USR RDVST
+                optValue = USR RDVST
+                optValues(I) = optValue
+                bootValues(I) = optValue
             END IF
         NEXT I
         VDP(15) = 0     ' reset status register
+
+        'VR0:>02 VR1:>E2 VR2:>06 VR3:>FF VR4:>03 VR5:>36 VR6:>07 VR7:>00
+
         VDP(1) = $E2    ' enable vdp interrupts
 
-        GOSUB update_palette
+        GOSUB applyOptions
+
+        GOSUB updatePalette
         PRINT AT XY(11, 6), "MAIN MENU"
-        GOSUB render_options
+        GOSUB renderOptions
         WHILE 1
             WAIT
 
@@ -110,15 +150,29 @@
             lastOptIdx = currentOptIdx
 
 
-            IF CONT.DOWN AND currentOptIdx < (OPT_COUNT - 1) THEN
-                currentOptIdx = currentOptIdx + 1
-                dirty = 1
-            ELSEIF CONT.UP AND currentOptIdx > 0 THEN
-                currentOptIdx = currentOptIdx - 1
-                dirty = 1
+            IF CONT.DOWN THEN
+                WHILE 1
+                    currentOptIdx = currentOptIdx + 1
+                    IF currentOptIdx >= OPT_COUNT THEN currentOptIdx = 0
+                    IF options(currentOptIdx * OPT_STRUCT_LEN) <> 255 THEN
+                        dirty = currentOptIdx <> lastOptIdx
+                        EXIT WHILE
+                    END IF
+                WEND
+            ELSEIF CONT.UP THEN
+                WHILE 1
+                    currentOptIdx = currentOptIdx - 1
+                    IF currentOptIdx >= OPT_COUNT THEN currentOptIdx = OPT_COUNT - 1
+                    IF options(currentOptIdx * OPT_STRUCT_LEN) <> 255 THEN
+                        dirty = currentOptIdx <> lastOptIdx
+                        EXIT WHILE
+                    END IF
+                WEND
             ELSEIF key > 0 AND key <= OPT_COUNT THEN
-                currentOptIdx = key - 1
-                dirty = 1
+                IF options((key - 1) * OPT_STRUCT_LEN) <> 255 THEN
+                    currentOptIdx = key - 1
+                    dirty = currentOptIdx <> lastOptIdx
+                END IF
             ELSEIF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.RIGHT THEN
                 optValuesCount = options((currentOptIdx * OPT_STRUCT_LEN) + 18)
                 currentOptIndex = optValues(currentOptIdx)
@@ -138,19 +192,33 @@
             IF dirty THEN
                 optIdx = lastOptIdx
                 WAIT
-                GOSUB render_opt
+                GOSUB renderOpt
                 optIdx = currentOptIdx
-                GOSUB render_opt
+                GOSUB renderOpt
                 IF currentOptIdx <> 1 THEN GOSUB hideSprites
                 GOSUB delay
                 dirty = 0
             ELSEIF valdirty THEN
                 optIdx = currentOptIdx
                 WAIT
-                GOSUB render_opt
+                GOSUB renderOpt
                 WAIT
-                VDP(58) = options(currentOptIdx * OPT_STRUCT_LEN)
-                VDP(59) = currentOptIndex
+                vdpOptId = options(currentOptIdx * OPT_STRUCT_LEN)
+                IF vdpOptId < 200 THEN
+                    VDP(58) = vdpOptId
+                    VDP(59) = currentOptIndex
+                END IF
+
+                IF vdpOptId = CONF_CRT_SCANLINES THEN
+                    VDP(50) = currentOptIndex * $04
+                ELSEIF vdpOptId = CONF_SCANLINE_SPRITES THEN
+                    VDP(30) = pow2(currentOptIndex + 2)
+                ELSEIF vdpOptId = CONF_MENU_RESET THEN
+                    GOSUB resetOptions
+                ELSEIF vdpOptId = CONF_MENU_SAVE THEN
+                    GOSUB saveOptions
+                END IF
+
                 GOSUB delay
             END IF
             
@@ -161,16 +229,31 @@ exit:
     WAIT
     GOTO exit
     
-    
-
 delay: PROCEDURE
-    FOR del = 1 TO 5
+    FOR del = 1 TO 10
         WAIT
     NEXT del
     END
-    
 
-setup_tiles: PROCEDURE
+resetOptions: PROCEDURE
+    FOR I = 0 TO OPT_COUNT - 1
+        optValues(I) = 0
+    NEXT I
+    GOSUB applyOptions
+    GOSUB renderOptions
+    END
+
+saveOptions: PROCEDURE
+    VDP(58) = CONF_SAVE_TO_FLASH
+    VDP(59) = 1
+
+    FOR I = 0 TO OPT_COUNT - 1
+        bootValues(I) = optValues(I)
+    NEXT I
+    GOSUB renderOptions
+    END
+
+setupTiles: PROCEDURE
     VDP(1) = $82                        ' disable interrupts and display
 
     DEFINE CHAR 32, 96, font
@@ -206,7 +289,7 @@ setup_tiles: PROCEDURE
     SPRITE FLICKER OFF
     END
 
-setup_header: PROCEDURE
+setupHeader: PROCEDURE
 
     DEFINE VRAM NAME_TAB_XY(0, 0), 19, logoNames
     DEFINE VRAM NAME_TAB_XY(0, 1), 19, logoNames2
@@ -224,32 +307,42 @@ setup_header: PROCEDURE
 
     END
 
-render_options: PROCEDURE
+applyOptions: PROCEDURE
+    VDP(50) = optValues(0) * $04
+    VDP(30) = pow2(optValues(1) + 2)
+    END
+
+renderOptions: PROCEDURE
     FOR optIdx = 0 TO OPT_COUNT - 1
-        GOSUB render_opt
+        GOSUB renderOpt
     NEXT optIdx
     END
 
-render_opt: PROCEDURE
+renderOpt: PROCEDURE
+    IF options(optIdx * OPT_STRUCT_LEN) = 255 THEN RETURN
     #ROWOFFSET = XY(0, MENU_TOP + optIdx)
-    PRINT AT #ROWOFFSET + 2, " ",optIdx + 1,". "
-    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 6, OPT_NAME_LEN, VARPTR options(optIdx * OPT_STRUCT_LEN + 1)
+    PRINT AT #ROWOFFSET + 1, " ",optIdx + 1,". "
+    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 5, OPT_NAME_LEN, VARPTR options(optIdx * OPT_STRUCT_LEN + 1)
     OPTVALIDX = options((optIdx * OPT_STRUCT_LEN) + 17)
     OPTCOUNT = options((optIdx * OPT_STRUCT_LEN) + 18)
     CURRENTVALOFFSET = optValues(optIdx)
-    PRINT AT #ROWOFFSET + 22, "        "
+    PRINT AT #ROWOFFSET + 21, "          "
     IF OPTCOUNT > 0 THEN
-        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 23, 6, VARPTR optionValues((OPTVALIDX + CURRENTVALOFFSET) * 6)
+        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 22, 6, VARPTR optionValues((OPTVALIDX + CURRENTVALOFFSET) * 6)
     END IF
+    IF bootValues(optIdx) <> optValues(optIdx) THEN
+        PRINT AT #ROWOFFSET + 29, "*"
+    END IF    
 
     IF optIdx = currentOptIdx THEN
-        FOR R = 3 TO 28
+        FOR R = 2 TO 29
             C = VPEEK(#VDP_NAME_TAB + #ROWOFFSET+ R)
             C = C OR 128
             VPOKE (#VDP_NAME_TAB + #ROWOFFSET + R), C
         NEXT R
-        VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 2), 21
-        VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 29), 22
+        VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 1), 21
+        VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 30), 22
+        DEFINE VRAM #VDP_NAME_TAB + XY(0, 19), 32, VARPTR options(optIdx * OPT_STRUCT_LEN + 20)
     END IF
     END
 
@@ -280,23 +373,14 @@ animateSprites: PROCEDURE
         xPos = xPos + logoSpriteWidths(spritePattIndex) + 1
     NEXT I
     SPRITE 16,$d0,0,0,0
-
     END
-
-'        SPRITE (startSpriteIndex + 0) AND 7,spritePosY - sine(animIndex + 1),spritePosX + 0 ,0,15
-'        SPRITE (startSpriteIndex + 1) AND 7,spritePosY - sine(animIndex + 4),spritePosX + 15,4,15
-'        SPRITE (startSpriteIndex + 2) AND 7,spritePosY - sine(animIndex + 7),spritePosX + 20,8,15
-'        SPRITE (startSpriteIndex + 3) AND 7,spritePosY - sine(animIndex + 10),spritePosX + 34,12,15
-'        SPRITE (startSpriteIndex + 4) AND 7,spritePosY - sine(animIndex + 13),spritePosX + 50,16,15
-'        SPRITE (startSpriteIndex + 5) AND 7,spritePosY - sine(animIndex + 16),spritePosX + 65,16,15
-'        SPRITE (startSpriteIndex + 6) AND 7,spritePosY - sine(animIndex + 19),spritePosX + 80,20,15
-'        SPRITE (startSpriteIndex + 7) AND 7,spritePosY - sine(animIndex + 22),spritePosX + 87,24,15
+    
 
 hideSprites: PROCEDURE
     SPRITE 0,$d0,0,0,0
     END
 
-update_palette: PROCEDURE    
+updatePalette: PROCEDURE    
     WAIT
     VDP(47) = $c0 + 2 ' palette data port fron index #2
     PRINT "\0\7"
@@ -315,16 +399,16 @@ update_palette: PROCEDURE
     VDP(47) = $40
     END
 
-vdp_detect: PROCEDURE
-    GOSUB vdp_unlock
-    DEFINE VRAM $3F00, 6, vdp_gpu_detect
+vdpDetect: PROCEDURE
+    GOSUB vdpUnlock
+    DEFINE VRAM $3F00, 6, vdpGpuDetect
     VDP($36) = $3F                       ' set gpu start address msb
     VDP($37) = $00                       ' set gpu start address lsb (triggers)
     isF18ACompatible = VPEEK($3F00)=0    ' check result
     END
     
     
-vdp_unlock: PROCEDURE
+vdpUnlock: PROCEDURE
     VDP(1) = $C2                        ' disable interrupts
     VDP(57) = $1C                       ' unlock
     VDP(57) = $1C                       ' unlock... again
@@ -332,19 +416,22 @@ vdp_unlock: PROCEDURE
     END
 
 ' TMS9900 machine code (for PICO9918 GPU) to write $00 to VDP $3F00
-vdp_gpu_detect:
+vdpGpuDetect:
     DATA BYTE $04, $E0    ' CLR  @>3F00
     DATA BYTE $3F, $00
     DATA BYTE $03, $40    ' IDLE    
 
-' Pico9918Options index, name[16], values index, num values, current value
+' Pico9918Options index, name[16], values index, num values, current value,help[32]
 options:
-    DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ",0,2,0
-    DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites",2,4,0
-    DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ",6,3,0
-    DATA BYTE 0,"Diagnostics     ",0,0,0
-    DATA BYTE 0,"Default palette ",0,0,0
-    DATA BYTE 0,"Reset defaults  ",0,0,0
+    DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ", 0, 2, 0, "    Faux CRT scanline effect    "
+    DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites", 2, 4, 0, "                                "
+    DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, 0, "      Applied on next boot      "
+    DATA BYTE 0,                    "<Diagnostics>   ", 0, 0, 0, "   Manage diagnostics options   "
+    DATA BYTE 0,                    "<Palette>       ", 0, 0, 0, "     Change default palette     "
+    DATA BYTE 0,                    "Device info.    ", 0, 0, 0, "    View device information     "
+    DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, 0, " Reset to default configuration "
+    DATA BYTE 255,                  "                ", 0, 0, 0, "                                "
+    DATA BYTE CONF_MENU_SAVE,       "Save Settings   ", 0, 0, 0, " Save configuration to PICO9918 "
 
 optionValues:
     DATA BYTE "Off   "
@@ -597,3 +684,6 @@ palette:
     DATA BYTE $08,$09,$0A,$0B,$0D,$0E,$10,$12,$13,$15,$16,$17
     DATA BYTE $18,$18,$18,$18,$17,$16,$15,$13,$12,$10,$0E,$0D
     DATA BYTE $0B,$0A,$09,$08,$08,$08,$08,$09,$0A,$0B,$0D,$0E
+
+pow2:
+    DATA BYTE $01,$02,$04,$08,$10,$20,$40,$80

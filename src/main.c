@@ -256,8 +256,95 @@ static inline void disableTmsPioInterrupts()
   irq_set_enabled(TMS_IRQ, false);
 }
 
-#ifdef GPIO_RESET
+#if PICO_RP2040
+  #define PICO_MODEL 1
+#elif PICO_2350
+  #define PICO_MODEL 2
+#endif
 
+
+typedef enum 
+{
+  // not settable via registers
+  CONF_PICO_MODEL       = 0,
+  CONF_HW_VERSION       = 1,
+  CONF_SW_VERSION       = 2,
+  CONF_CLOCK_TESTED     = 4,
+
+  // settable via registers
+  CONF_CRT_SCANLINES    = 8,
+  CONF_SCANLINE_SPRITES = 9,
+  CONF_CLOCK_PRESET_ID  = 10,
+  CONF_SAVE_TO_FLASH    = 255,
+} Pico9918Options;
+
+static void applyConfig()
+{
+  vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES];
+
+  if (tms9918->config[CONF_CRT_SCANLINES])
+    TMS_REGISTER(tms9918, 50) |= 0x04;
+  else
+    TMS_REGISTER(tms9918, 50) &= ~0x04;
+
+  TMS_REGISTER(tms9918, 30) = 1 << (tms9918->config[CONF_SCANLINE_SPRITES] + 2);
+}
+
+#define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash
+#define CONFIG_FLASH_ADDR   (void*)(XIP_BASE + CONFIG_FLASH_OFFSET) // in the top 4kB of a 2MB flash
+#define CONFIG_BYTES 256
+
+void readConfig(uint8_t config[CONFIG_BYTES])
+{
+  memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
+
+  if (config[CONF_PICO_MODEL] != PICO_RP2040 ||
+      config[CONF_HW_VERSION] != PCB_VERSION ||
+      config[CONF_CLOCK_PRESET_ID] > 2 ||
+      config[CONF_CRT_SCANLINES] > 1 ||
+      config[CONF_SCANLINE_SPRITES] > 3) // not initialised
+  {
+    memset(config, 0, CONFIG_BYTES);
+
+    config[CONF_PICO_MODEL] = PICO_MODEL;
+    config[CONF_HW_VERSION] = PCB_VERSION;
+    config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
+    config[CONF_CLOCK_TESTED] = 0;
+
+    config[CONF_CRT_SCANLINES] = 0;
+    config[CONF_SCANLINE_SPRITES] = 0;
+    config[CONF_CLOCK_PRESET_ID] = 0;
+  }
+
+  config[CONF_SAVE_TO_FLASH] = 0;
+}
+
+void writeConfig(uint8_t config[CONFIG_BYTES])
+{
+  flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
+
+  config[CONF_PICO_MODEL] = PICO_MODEL;
+  config[CONF_HW_VERSION] = PCB_VERSION;
+  config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
+
+  int attempts = 5;
+retry:
+  flash_range_program(CONFIG_FLASH_OFFSET, (const void*)tms9918->config, 256);
+
+  // flush
+  int i = 0;
+  while (i < 256) {
+    *((volatile uint32_t *)(CONFIG_FLASH_ADDR) + i) = 0;
+    i += sizeof(uint32_t);
+  }
+
+  if (--attempts && memcmp(CONFIG_FLASH_ADDR, (const void*)tms9918->config, 256) != 0)
+  {
+    goto retry;    
+  }
+}
+
+#ifdef GPIO_RESET
 
 /*
  * handle reset pin going active (low)
@@ -267,6 +354,9 @@ void __not_in_flash_func(gpioIrqHandler)()
   gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
 
   disableTmsPioInterrupts();
+
+  readConfig(tms9918->config);
+
   vrEmuTms9918Reset();
 
   irq_clear(TMS_IRQ);
@@ -307,84 +397,6 @@ static const ClockSettings clockPresets[] = {
 
 static int clockPresetIndex = 0;
 static bool testingClock = false;
-
-typedef enum 
-{
-  // not settable via registers
-  CONF_PICO_MODEL       = 0,
-  CONF_HW_VERSION       = 1,
-  CONF_SW_VERSION       = 2,
-  CONF_CLOCK_TESTED     = 4,
-
-  // settable via registers
-  CONF_CRT_SCANLINES    = 8,
-  CONF_SCANLINE_SPRITES = 9,
-  CONF_CLOCK_PRESET_ID  = 10,
-} Pico9918Options;
-
-#if PICO_RP2040
-  #define PICO_MODEL 1
-#elif PICO_2350
-  #define PICO_MODEL 2
-#endif
-
-#define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash
-#define CONFIG_FLASH_ADDR   (void*)(XIP_BASE + CONFIG_FLASH_OFFSET) // in the top 4kB of a 2MB flash
-#define CONFIG_BYTES 256
-
-void readConfig(uint8_t config[CONFIG_BYTES])
-{
-  memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
-
-  if (config[CONF_PICO_MODEL] != PICO_RP2040 ||
-      config[CONF_HW_VERSION] != PCB_VERSION ||
-      config[CONF_CLOCK_PRESET_ID] > 2 ||
-      config[CONF_CRT_SCANLINES] > 1 ||
-      config[CONF_SCANLINE_SPRITES] > 1) // not initialised
-  {
-    memset(config, CONFIG_BYTES, 0);
-
-    config[CONF_PICO_MODEL] = PICO_MODEL;
-    config[CONF_HW_VERSION] = PCB_VERSION;
-    config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
-    config[CONF_CLOCK_TESTED] = 0;
-
-    config[CONF_CRT_SCANLINES] = 0;
-    config[CONF_SCANLINE_SPRITES] = 0;
-    config[CONF_CLOCK_PRESET_ID] = 0;
-  }
-}
-
-void writeConfig(uint8_t config[CONFIG_BYTES])
-{
-  flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
-
-  config[CONF_PICO_MODEL] = PICO_MODEL;
-  config[CONF_HW_VERSION] = PCB_VERSION;
-  config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
-
-  int attempts = 5;
-retry:
-  flash_range_program(CONFIG_FLASH_OFFSET, (const void*)tms9918->config, 256);
-
-  // flush
-  int i = 0;
-  while (i < 256) {
-    *((volatile uint32_t *)(CONFIG_FLASH_ADDR) + i) = 0;
-    i += sizeof(uint32_t);
-  }
-
-  if (--attempts && memcmp(CONFIG_FLASH_ADDR, (const void*)tms9918->config, 256) != 0)
-  {
-    goto retry;    
-  }
-}
-
-static void applyConfig()
-{
-  vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES];
-  tms9918->maxScanlineSprites = 1 << (tms9918->config[CONF_SCANLINE_SPRITES] + 2);
-}
 
 uint32_t temperature = 0;
 
@@ -429,8 +441,14 @@ static void eofInterrupt()
   if (tms9918->configDirty)
   {
     tms9918->configDirty = false;
-    applyConfig();
-    writeConfig(tms9918->config); // do we want to do this immedately?
+    applyConfig();  // apply config option to device now
+  }
+
+  // request to save config? let's do that
+  if (tms9918->config[CONF_SAVE_TO_FLASH])
+  {
+    tms9918->config[CONF_SAVE_TO_FLASH] = 0;
+    writeConfig(tms9918->config);
   }
 }
 
@@ -536,7 +554,6 @@ static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
   if (!clocksRunning) configureClocks();
-  //vgaCurrentParams()->scanlines = TMS_REGISTER(tms9918, 0x32) & 0x04;
 
 #if TIMING_DIAG
   const uint32_t framesPerUpdate = 1 << 2;
@@ -655,9 +672,6 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   renderBcd(y, renderTimePerScanlineBcd, xPos + 28, yPos, 0x004f, pixels); yPos += 8;
 
   renderBcd(y, temperature, xPos, yPos, 0x004f, pixels); yPos += 8;
-
-  renderBcd(y, tms9918->config[CONF_CRT_SCANLINES], xPos, yPos, 0x400f, pixels); yPos += 8;
-  renderBcd(y, tms9918->config[CONF_SCANLINE_SPRITES], xPos, yPos, 0x400f, pixels); yPos += 8;
 #endif
 
 #if REG_DIAG
@@ -754,7 +768,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       {
         // new clock lasted 10 seconds... let's accept it
         tms9918->config[CONF_CLOCK_TESTED] = tms9918->config[CONF_CLOCK_PRESET_ID];
-        tms9918->configDirty = true;
+        tms9918->config[CONF_SAVE_TO_FLASH] = 1;
         testingClock = false;
       }
     }
@@ -1005,7 +1019,7 @@ int main(void)
     tms9918->config[CONF_CLOCK_PRESET_ID] = wantedClock;
   }
 
-  tms9918->configDirty = false;
+  tms9918->configDirty = true;
   
   clockPresetIndex = tms9918->config[CONF_CLOCK_PRESET_ID];
 
@@ -1037,9 +1051,6 @@ int main(void)
   const char *version = PICO9918_VERSION;
 
   vgaInit(params);
-
-  /* apply configuration values to vga and tms setup */
-  applyConfig();
 
 #if PICO9918_DIAG
   analogReadTempSetup();
