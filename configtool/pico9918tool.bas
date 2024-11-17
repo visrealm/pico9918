@@ -98,6 +98,9 @@
         GOSUB render_options
         WHILE 1
             WAIT
+
+            IF currentOptIdx = 1 THEN GOSUB animateSprites  ' do this first to ensure it's done within a frame
+
             dirty = 0
             valdirty = 0
             
@@ -105,6 +108,7 @@
             IF key >= $30 THEN key = key - $30
 
             lastOptIdx = currentOptIdx
+
 
             IF CONT.DOWN AND currentOptIdx < (OPT_COUNT - 1) THEN
                 currentOptIdx = currentOptIdx + 1
@@ -137,6 +141,7 @@
                 GOSUB render_opt
                 optIdx = currentOptIdx
                 GOSUB render_opt
+                IF currentOptIdx <> 1 THEN GOSUB hideSprites
                 GOSUB delay
                 dirty = 0
             ELSEIF valdirty THEN
@@ -196,6 +201,9 @@ setup_tiles: PROCEDURE
     DEFINE COLOR 21, 1, highlight
     DEFINE COLOR 22, 1, highlight
 
+    DEFINE SPRITE 0, 7, logoSprites
+
+    SPRITE FLICKER OFF
     END
 
 setup_header: PROCEDURE
@@ -203,8 +211,8 @@ setup_header: PROCEDURE
     DEFINE VRAM NAME_TAB_XY(0, 0), 19, logoNames
     DEFINE VRAM NAME_TAB_XY(0, 1), 19, logoNames2
 
-    PRINT AT XY(20, 0),"Configurator"
-    PRINT AT XY(28, 1),"v1.0"
+    PRINT AT XY(28, 0),"v1.0"
+    PRINT AT XY(20, 1),"Configurator"
     PRINT AT XY(4, 22), "(C) 2024 Troy Schrapel"    
 
     FOR I = 0 TO 31
@@ -243,6 +251,49 @@ render_opt: PROCEDURE
         VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 2), 21
         VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 29), 22
     END IF
+    END
+
+animateSprites: PROCEDURE
+    CONST spritePosX = 77
+    CONST spritePosY = 167
+
+    startAnimIndex = startAnimIndex + 1
+    if startAnimIndex >= 30 THEN startAnimIndex = 0
+
+    startSpriteIndex = startSpriteIndex + 1
+
+    xPos = 16
+    animIndex = startAnimIndex
+
+    FOR I = 0 TO 7
+        spritePattIndex = logoSpriteIndices(I)
+        SPRITE (startSpriteIndex + I) AND 15,spritePosY - sine(animIndex), xPos, spritePattIndex * 4, 15        
+        animIndex = animIndex + 3
+        xPos = xPos + logoSpriteWidths(spritePattIndex) + 1
+    NEXT I
+    xPos = xPos + 16
+    animIndex = animIndex - 3
+    FOR I = 8 TO 15
+        spritePattIndex = logoSpriteIndices(I AND 7)
+        SPRITE (startSpriteIndex + I) AND 15,spritePosY - sine(animIndex), xPos, spritePattIndex * 4, 15        
+        animIndex = animIndex + 3
+        xPos = xPos + logoSpriteWidths(spritePattIndex) + 1
+    NEXT I
+    SPRITE 16,$d0,0,0,0
+
+    END
+
+'        SPRITE (startSpriteIndex + 0) AND 7,spritePosY - sine(animIndex + 1),spritePosX + 0 ,0,15
+'        SPRITE (startSpriteIndex + 1) AND 7,spritePosY - sine(animIndex + 4),spritePosX + 15,4,15
+'        SPRITE (startSpriteIndex + 2) AND 7,spritePosY - sine(animIndex + 7),spritePosX + 20,8,15
+'        SPRITE (startSpriteIndex + 3) AND 7,spritePosY - sine(animIndex + 10),spritePosX + 34,12,15
+'        SPRITE (startSpriteIndex + 4) AND 7,spritePosY - sine(animIndex + 13),spritePosX + 50,16,15
+'        SPRITE (startSpriteIndex + 5) AND 7,spritePosY - sine(animIndex + 16),spritePosX + 65,16,15
+'        SPRITE (startSpriteIndex + 6) AND 7,spritePosY - sine(animIndex + 19),spritePosX + 80,20,15
+'        SPRITE (startSpriteIndex + 7) AND 7,spritePosY - sine(animIndex + 22),spritePosX + 87,24,15
+
+hideSprites: PROCEDURE
+    SPRITE 0,$d0,0,0,0
     END
 
 update_palette: PROCEDURE    
@@ -288,10 +339,10 @@ vdp_gpu_detect:
 
 ' Pico9918Options index, name[16], values index, num values, current value
 options:
-    DATA BYTE CONF_CRT_SCANLINES,"CRT scanlines   ",0,2,0
-    DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites",2,2,0
-    DATA BYTE CONF_CLOCK_PRESET_ID,"Clock freq.     ",4,3,0
-    DATA BYTE 0,"Diagnostics     ",0,2,0
+    DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ",0,2,0
+    DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites",2,4,0
+    DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ",6,3,0
+    DATA BYTE 0,"Diagnostics     ",0,0,0
     DATA BYTE 0,"Default palette ",0,0,0
     DATA BYTE 0,"Reset defaults  ",0,0,0
 
@@ -299,6 +350,8 @@ optionValues:
     DATA BYTE "Off   "
     DATA BYTE "On    "
     DATA BYTE "4     "
+    DATA BYTE "8     "
+    DATA BYTE "16    "
     DATA BYTE "32    "
     DATA BYTE "252MHz"
     DATA BYTE "302MHz"
@@ -479,6 +532,42 @@ font:
     DATA BYTE $76,$DC,$00,$00,$00,$00,$00,$00 ' ~
     DATA BYTE $FF,$FF,$FF,$FF,$FF,$FF,$FF,$FF '  
 
+logoSprites:
+    DATA BYTE $3F,$7F,$FF,$00,$00,$FF,$FF,$FF    ' P
+    DATA BYTE $E0,$E0,$E0,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $E0,$F8,$FC,$3C,$3C,$FC,$F8,$F0    ' 
+    DATA BYTE $00,$00,$00,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $F0,$F0,$F0,$F0,$F0,$F0,$F0,$F0    ' I
+    DATA BYTE $F0,$F0,$F0,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $00,$00,$00,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $00,$00,$00,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $0F,$3F,$7F,$F0,$E0,$E0,$E0,$F0    ' C
+    DATA BYTE $7F,$3F,$0F,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $F8,$F0,$E0,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $F8,$F0,$E0,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $0F,$3F,$7F,$F0,$E0,$E0,$E0,$F0    ' O
+    DATA BYTE $7F,$3F,$0F,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $E0,$F8,$FC,$1E,$0E,$0E,$0E,$1E    ' 
+    DATA BYTE $FC,$F8,$E0,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $3F,$40,$8F,$90,$8F,$40,$3F,$00    ' 9
+    DATA BYTE $3F,$40,$FF,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $F0,$08,$C4,$24,$E4,$04,$E4,$24    ' 
+    DATA BYTE $C4,$08,$F0,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $3C,$44,$84,$E4,$24,$24,$24,$24    ' 1
+    DATA BYTE $24,$24,$3C,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $00,$00,$00,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $00,$00,$00,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $3F,$40,$8F,$90,$4F,$40,$8F,$90    ' 8
+    DATA BYTE $8F,$40,$3F,$00,$00,$00,$00,$00    ' 
+    DATA BYTE $F0,$08,$C4,$24,$C8,$08,$C4,$24    ' 
+    DATA BYTE $C4,$08,$F0,$00,$00,$00,$00,$00    ' 
+
+logoSpriteWidths:
+    DATA BYTE 14,4,13,15,14,6,14
+
+logoSpriteIndices:
+    DATA BYTE 0,1,2,3,4,4,5,6
+
 palette:
     DATA BYTE $00,$00
     DATA BYTE $00,$00
@@ -497,3 +586,14 @@ palette:
     DATA BYTE $08,$88
     DATA BYTE $0F,$FF
   
+  sine:
+    DATA BYTE $10,$12,$13,$15,$16,$17,$18,$18,$18,$18,$17,$16
+    DATA BYTE $15,$13,$12,$10,$0E,$0D,$0B,$0A,$09,$08,$08,$08
+    DATA BYTE $08,$09,$0A,$0B,$0D,$0E,$10,$12,$13,$15,$16,$17
+    DATA BYTE $18,$18,$18,$18,$17,$16,$15,$13,$12,$10,$0E,$0D
+    DATA BYTE $0B,$0A,$09,$08,$08,$08,$08,$09,$0A,$0B,$0D,$0E
+    DATA BYTE $10,$12,$13,$15,$16,$17,$18,$18,$18,$18,$17,$16
+    DATA BYTE $15,$13,$12,$10,$0E,$0D,$0B,$0A,$09,$08,$08,$08
+    DATA BYTE $08,$09,$0A,$0B,$0D,$0E,$10,$12,$13,$15,$16,$17
+    DATA BYTE $18,$18,$18,$18,$17,$16,$15,$13,$12,$10,$0E,$0D
+    DATA BYTE $0B,$0A,$09,$08,$08,$08,$08,$09,$0A,$0B,$0D,$0E

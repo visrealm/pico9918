@@ -48,6 +48,7 @@
         "pico.h": "c",
         "platform.h": "c",
         "gpu.h": "c",
-        "random": "c"
+        "random": "c",
+        "dma.h": "c"
     }
 }

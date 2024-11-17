@@ -167,7 +167,6 @@ static int logoOffset = 100;
 static bool doneInt = false;  // interrupt raised this frame?
 
 static const uint32_t dma32 = 2; // memset 32bit
-
 /*
  * update the value send to the read PIO
  */
@@ -259,11 +258,14 @@ static inline void disableTmsPioInterrupts()
 
 #ifdef GPIO_RESET
 
+
 /*
  * handle reset pin going active (low)
  */
 void __not_in_flash_func(gpioIrqHandler)()
 {
+  gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
+
   disableTmsPioInterrupts();
   vrEmuTms9918Reset();
 
@@ -282,8 +284,6 @@ void __not_in_flash_func(gpioIrqHandler)()
   logoOffset = 100;
   gpio_put(GPIO_INT, !currentInt);
   enableTmsPioInterrupts();
-
-  gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
 }
 
 #endif
@@ -380,6 +380,32 @@ retry:
   }
 }
 
+static void applyConfig()
+{
+  vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES];
+  tms9918->maxScanlineSprites = 1 << (tms9918->config[CONF_SCANLINE_SPRITES] + 2);
+}
+
+uint32_t temperature = 0;
+
+static void analogReadTempSetup() {
+  adc_init();
+  adc_set_temp_sensor_enabled(true);
+
+#if PICO_RP2040
+  adc_select_input(4); // Temperature sensor
+#else
+  adc_select_input(8); // RP2350 QFN80 package only... 
+#endif
+}
+
+static float analogReadTemp(float vref) {
+  int v = adc_read();
+  float t = 27.0f - ((v * vref / 4096.0f) - 0.706f) / 0.001721f; // From the datasheet
+  return t;
+}
+
+
 static void eofInterrupt()
 {
   doneInt = true;
@@ -388,13 +414,22 @@ static void eofInterrupt()
   {
     gpuTrigger();
   }
+
+  if ((frameCount & 0x0f) == 0) // every 16th frame
+  {
+    float tempC = analogReadTemp(3.3f);
+    uint32_t t = (int)(tempC * 10.0f);
+    uint32_t i = (t / 100);
+    t -= (i * 100);
+    temperature = (i << 12) | ((t / 10) << 8) | (0x0A << 4) | (t % 10);
+    uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
+    TMS_STATUS(tms9918, 13) = t4;
+  }
+
   if (tms9918->configDirty)
   {
     tms9918->configDirty = false;
-
-    vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES];
-    tms9918->maxScanlineSprites = tms9918->config[CONF_SCANLINE_SPRITES] ? 32 : 4;
-
+    applyConfig();
     writeConfig(tms9918->config); // do we want to do this immedately?
   }
 }
@@ -450,6 +485,46 @@ inline uint32_t bigRgb2LittleBgr(uint32_t val)
 }
 
 
+/*
+ * initialise a clock output using PIO
+ */
+uint initClock(uint gpio, float freqHz)
+{
+  static uint clocksPioOffset = -1;
+
+  if (clocksPioOffset == -1)
+  {
+    clocksPioOffset = pio_add_program(pio0, &clock_program);
+  }
+
+  static uint clkSm = 2;
+
+  pio_gpio_init(pio0, gpio);
+  pio_sm_set_consecutive_pindirs(pio0, clkSm, gpio, 1, true);
+  pio_sm_config c = clock_program_get_default_config(clocksPioOffset);
+  sm_config_set_set_pins(&c, gpio, 1);
+
+  pio_sm_init(pio0, clkSm, clocksPioOffset, &c);
+
+  float clockDiv = (float)clockPresets[clockPresetIndex].clockHz / (freqHz * 2.0f);
+  pio_sm_set_clkdiv(pio0, clkSm, clockDiv);
+  pio_sm_set_enabled(pio0, clkSm, true);
+
+  return clkSm++;
+}
+
+static bool clocksRunning = false;
+void configureClocks()
+{
+  if (clocksRunning) return;
+
+  clocksRunning = true;
+  // set up the GROMCLK and CPUCLK signals
+  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
+  initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
+}
+
+
 static void tmsPorch()
 {
   tms9918->vram.map.blanking = 1; // V
@@ -460,6 +535,7 @@ static void tmsPorch()
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
+  if (!clocksRunning) configureClocks();
   //vgaCurrentParams()->scanlines = TMS_REGISTER(tms9918, 0x32) & 0x04;
 
 #if TIMING_DIAG
@@ -532,25 +608,6 @@ static void outputSplash(uint16_t y, uint32_t vBorder, uint32_t vPixels, uint16_
 }
 
 #if PICO9918_DIAG
-
-uint32_t temperature = 0;
-
-static void analogReadTempSetup() {
-  adc_init();
-  adc_set_temp_sensor_enabled(true);
-
-#if PICO_RP2040
-  adc_select_input(4); // Temperature sensor
-#else
-  adc_select_input(8); // RP2350 QFN80 package only... 
-#endif
-}
-
-static float analogReadTemp(float vref) {
-  int v = adc_read();
-  float t = 27.0f - ((v * vref / 4096.0f) - 0.706f) / 0.001721f; // From the datasheet
-  return t;
-}
 
 /* render a bcd value scanline */
 void __attribute__ ((noinline))  renderBcd(uint16_t scanline, uint32_t bcd, uint16_t x, uint16_t y, uint16_t color, uint16_t* pixels)
@@ -651,6 +708,8 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
 
 #endif
 
+
+
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
  */
@@ -667,17 +726,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
   if (y == 0)
   {
-#if PICO9918_DIAG
-    uint32_t t = (int)(analogReadTemp(3.3f) * 10.0f);
-    uint32_t i = (t / 100);
-    t -= (i * 100);
-    temperature = (i << 12) | ((t / 10) << 8) | (0x0A << 4) | (t % 10);
-#endif
     doneInt = false;
   }
 
   /*** top and bottom borders ***/
-  if (y < vBorder || y >= (vBorder + vPixels))
+  if (y < vBorder || y >= (vBorder + vPixels))  // TODO: Note of this runs in ROW30 mode
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
     dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
@@ -690,7 +743,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     dma_channel_wait_for_finish_blocking(dma32);
 
 #if PICO9918_DIAG
-    renderDiagnostics(y, pixels);
+    renderDiagnostics(y, pixels); // TODO: This won't display in ROW30 mode
 #endif
 
     if (frameCount < 600)
@@ -841,34 +894,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 }
 
 /*
- * initialise a clock output using PIO
- */
-uint initClock(uint gpio, float freqHz)
-{
-  static uint clocksPioOffset = -1;
-
-  if (clocksPioOffset == -1)
-  {
-    clocksPioOffset = pio_add_program(pio0, &clock_program);
-  }
-
-  static uint clkSm = 2;
-
-  pio_gpio_init(pio0, gpio);
-  pio_sm_set_consecutive_pindirs(pio0, clkSm, gpio, 1, true);
-  pio_sm_config c = clock_program_get_default_config(clocksPioOffset);
-  sm_config_set_set_pins(&c, gpio, 1);
-
-  pio_sm_init(pio0, clkSm, clocksPioOffset, &c);
-
-  float clockDiv = (float)clockPresets[clockPresetIndex].clockHz / (freqHz * 2.0f);
-  pio_sm_set_clkdiv(pio0, clkSm, clockDiv);
-  pio_sm_set_enabled(pio0, clkSm, true);
-
-  return clkSm++;
-}
-
-/*
  * Set up PIOs for TMS9918 <-> CPU interface
  */
 void tmsPioInit()
@@ -921,10 +946,6 @@ void proc1Entry()
   gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
 
   tmsPioInit();
-
-  // set up the GROMCLK and CPUCLK signals
-  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
-  initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
 #ifdef GPIO_RESET
   // set up reset gpio interrupt handler
@@ -1008,10 +1029,7 @@ int main(void)
   setVgaParamsScaleY(&params.params, 2);
 #endif
 
-  tms9918->maxScanlineSprites = tms9918->config[CONF_SCANLINE_SPRITES] ? 32 : 4;
-
   /* set vga scanline callback to generate tms9918 scanlines */
-  params.scanlines = tms9918->config[CONF_CRT_SCANLINES];
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;
   params.porchFn = tmsPorch;
@@ -1019,6 +1037,9 @@ int main(void)
   const char *version = PICO9918_VERSION;
 
   vgaInit(params);
+
+  /* apply configuration values to vga and tms setup */
+  applyConfig();
 
 #if PICO9918_DIAG
   analogReadTempSetup();
