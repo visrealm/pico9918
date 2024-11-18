@@ -42,6 +42,11 @@
     CONST MENU_TITLE_ROW   = 5
     CONST MENU_TOP_ROW     = 8
 
+    CONST MENU_ID_MAIN     = 0
+    CONST MENU_ID_INFO     = 1
+    CONST MENU_ID_DIAG     = 2
+    CONST MENU_ID_PALETTE  = 3
+
     ' pattern indixes
     CONST PATT_IDX_SELECTED_L = 20
     CONST PATT_IDX_SELECTED_R = 21
@@ -51,7 +56,6 @@
     CONST PATT_IDX_BORDER_TR  = 25
     CONST PATT_IDX_BORDER_BL  = 26
     CONST PATT_IDX_BORDER_BR  = 27
-
 
     ' Pico9918Options index, name[16], values index, num values,help[32]
     CONST CONF_COUNT      = 9
@@ -87,6 +91,8 @@
     CONST CONF_SAVE_TO_FLASH    = 255   
     ' -------------------------------
 
+    CONST CONF_MENU_PALETTE     = 251
+    CONST CONF_MENU_DIAG        = 252
     CONST CONF_MENU_INFO        = 253
     CONST CONF_MENU_RESET       = 254
     CONST CONF_MENU_EMPTY       = 255
@@ -200,10 +206,10 @@
         ' render the menu
         GOSUB updatePalette
 
-        g_currentMenu = 0
+        g_currentMenu = MENU_ID_MAIN
 
         WHILE 1
-            ON g_currentMenu GOSUB mainMenu, deviceInfo
+            ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu
             GOSUB clearScreen
             VDP_DISABLE_INT
         WEND
@@ -326,7 +332,13 @@ mainMenu: PROCEDURE
             ELSEIF vdpOptId = CONF_SCANLINE_SPRITES THEN
                 VDP(30) = pow2(currentValueIndex + 2)
             ELSEIF vdpOptId = CONF_MENU_INFO THEN
-                g_currentMenu = 1
+                g_currentMenu = MENU_ID_INFO
+                EXIT WHILE
+            ELSEIF vdpOptId = CONF_MENU_DIAG THEN
+                g_currentMenu = MENU_ID_DIAG
+                EXIT WHILE
+            ELSEIF vdpOptId = CONF_MENU_PALETTE THEN
+                g_currentMenu = MENU_ID_PALETTE
                 EXIT WHILE
             ELSEIF vdpOptId = CONF_MENU_RESET THEN
                 GOSUB resetOptions
@@ -339,7 +351,7 @@ mainMenu: PROCEDURE
     WEND
     END
 
-deviceInfo: PROCEDURE
+deviceInfoMenu: PROCEDURE
     const PICO_MODEL_RP2040 = 1
     const PICO_MODEL_RP2350 = 2
     
@@ -425,10 +437,50 @@ deviceInfo: PROCEDURE
         VDP_ENABLE_INT
     WEND
 
-    g_currentMenu = 0
+    g_currentMenu = MENU_ID_MAIN
 
     END
 
+diagMenu: PROCEDURE
+
+    DEFINE VRAM NAME_TAB_XY(10, MENU_TITLE_ROW - 1), 11, horzBar
+    DEFINE VRAM NAME_TAB_XY(10, MENU_TITLE_ROW + 1), 11, horzBar
+    PRINT AT XY(9, MENU_TITLE_ROW), "\23DIAGNOSTICS\23"
+    VPOKE NAME_TAB_XY(9, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TL
+    VPOKE NAME_TAB_XY(9 + 12, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TR
+    VPOKE NAME_TAB_XY(9, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
+    VPOKE NAME_TAB_XY(9 + 12, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
+
+    VDP_ENABLE_INT
+
+    WHILE 1
+        WAIT
+        IF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.LEFT THEN EXIT WHILE
+    WEND
+
+    g_currentMenu = MENU_ID_MAIN
+    END
+
+
+paletteMenu: PROCEDURE
+
+    DEFINE VRAM NAME_TAB_XY(12, MENU_TITLE_ROW - 1), 7, horzBar
+    DEFINE VRAM NAME_TAB_XY(12, MENU_TITLE_ROW + 1), 7, horzBar
+    PRINT AT XY(11, MENU_TITLE_ROW), "\23PALETTE\23"
+    VPOKE NAME_TAB_XY(11, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TL
+    VPOKE NAME_TAB_XY(11 + 8, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TR
+    VPOKE NAME_TAB_XY(11, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
+    VPOKE NAME_TAB_XY(11 + 8, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
+
+    VDP_ENABLE_INT
+
+    WHILE 1
+        WAIT
+        IF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.LEFT THEN EXIT WHILE
+    WEND
+
+    g_currentMenu = MENU_ID_MAIN
+    END
 ' -----------------------------------------------------------------------------
 ' delay between user input (1/6 second)
 ' -----------------------------------------------------------------------------
@@ -757,8 +809,8 @@ configMenuData:
     DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ", 0, 2, "    Faux CRT scanline effect    "
     DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites", 2, 4, "                                "
     DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, " RP2040 clock (requires reboot) "
-    DATA BYTE 0,                    "> Diagnostics   ", 0, 0, "   Manage diagnostics options   "
-    DATA BYTE 0,                    "> Palette       ", 0, 0, "     Change default palette     "
+    DATA BYTE CONF_MENU_DIAG,       "> Diagnostics   ", 0, 0, "   Manage diagnostics options   "
+    DATA BYTE CONF_MENU_PALETTE,    "> Palette       ", 0, 0, "     Change default palette     "
     DATA BYTE CONF_MENU_INFO,       "> Device info.  ", 0, 0, "    View device information     "
     DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
     DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
