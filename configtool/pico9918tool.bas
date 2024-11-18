@@ -207,6 +207,7 @@
         GOSUB updatePalette
 
         g_currentMenu = MENU_ID_MAIN
+        VDP(24) = 1
 
         WHILE 1
             ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu
@@ -738,7 +739,7 @@ hideSprites: PROCEDURE
 ' -----------------------------------------------------------------------------
 updatePalette: PROCEDURE    
     WAIT
-    VDP(47) = $c0 + 2 ' palette data port from index #2
+    VDP(47) = $c0 + 18 ' palette data port from index #2
     PRINT "\0\7"
     PRINT "\0\10"
     PRINT "\0\12"
