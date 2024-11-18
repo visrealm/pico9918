@@ -69,7 +69,14 @@
 #define PCB_MAJOR_VERSION PICO9918_PCB_MAJOR_VER
 #define PCB_MINOR_VERSION PICO9918_PCB_MINOR_VER
 
-#define PCB_VERSION (PCB_MAJOR_VERSION << 4) | PCB_MINOR_VERSION
+#define PICO9918_PCB_VERSION ((PCB_MAJOR_VERSION << 4) | PCB_MINOR_VERSION)
+#define PICO9918_SW_VERSION ((PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER)
+
+#if PICO9918_SCART_RGBS // 0 = VGA, 1 = NTSC, 2 = PAL
+    #define PICO9918_DISP_DRIVER (1 + PICO9918_SCART_PAL)
+#else
+    #define PICO9918_DISP_DRIVER 0
+#endif
 
 static_assert(PICO9918_PCB_MAJOR_VER < 2, "Time traveller? PICO9918_PCB_MAJOR_VER must be 0 or 1");
 
@@ -270,6 +277,7 @@ typedef enum
   CONF_HW_VERSION       = 1,
   CONF_SW_VERSION       = 2,
   CONF_CLOCK_TESTED     = 4,
+  CONF_DISP_DRIVER      = 5,
 
   // settable via registers
   CONF_CRT_SCANLINES    = 8,
@@ -277,6 +285,7 @@ typedef enum
   CONF_CLOCK_PRESET_ID  = 10,
   CONF_SAVE_TO_FLASH    = 255,
 } Pico9918Options;
+
 
 static void applyConfig()
 {
@@ -298,8 +307,9 @@ void readConfig(uint8_t config[CONFIG_BYTES])
 {
   memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
 
-  if (config[CONF_PICO_MODEL] != PICO_RP2040 ||
-      config[CONF_HW_VERSION] != PCB_VERSION ||
+  if (config[CONF_PICO_MODEL] != PICO_MODEL ||
+      config[CONF_HW_VERSION] != PICO9918_PCB_VERSION ||
+      config[CONF_DISP_DRIVER] != PICO9918_DISP_DRIVER ||
       config[CONF_CLOCK_PRESET_ID] > 2 ||
       config[CONF_CRT_SCANLINES] > 1 ||
       config[CONF_SCANLINE_SPRITES] > 3) // not initialised
@@ -307,8 +317,9 @@ void readConfig(uint8_t config[CONFIG_BYTES])
     memset(config, 0, CONFIG_BYTES);
 
     config[CONF_PICO_MODEL] = PICO_MODEL;
-    config[CONF_HW_VERSION] = PCB_VERSION;
-    config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
+    config[CONF_HW_VERSION] = PICO9918_PCB_VERSION;
+    config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
+    config[CONF_DISP_DRIVER] = PICO9918_DISP_DRIVER;
     config[CONF_CLOCK_TESTED] = 0;
 
     config[CONF_CRT_SCANLINES] = 0;
@@ -317,6 +328,13 @@ void readConfig(uint8_t config[CONFIG_BYTES])
   }
 
   config[CONF_SAVE_TO_FLASH] = 0;
+
+    // looks like we've just upgraded
+  if (config[CONF_SW_VERSION] != PICO9918_SW_VERSION)
+  {
+    config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
+    config[CONF_SAVE_TO_FLASH] = 1;
+  }  
 }
 
 void writeConfig(uint8_t config[CONFIG_BYTES])
@@ -324,8 +342,8 @@ void writeConfig(uint8_t config[CONFIG_BYTES])
   flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
 
   config[CONF_PICO_MODEL] = PICO_MODEL;
-  config[CONF_HW_VERSION] = PCB_VERSION;
-  config[CONF_SW_VERSION] = (PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER;
+  config[CONF_HW_VERSION] = PICO9918_PCB_VERSION;
+  config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
 
   int attempts = 5;
 retry:
