@@ -35,17 +35,21 @@
 '
 ' -----------------------------------------------------------------------------
 
+    BANK ROM 256
+
+
     ' helper constants
     CONST TRUE           = -1
     CONST FALSE          = 0
 
-    CONST MENU_TITLE_ROW   = 5
-    CONST MENU_TOP_ROW     = 8
+    CONST MENU_TITLE_ROW   = 3
+    CONST MENU_TOP_ROW     = MENU_TITLE_ROW + 3
 
     CONST MENU_ID_MAIN     = 0
     CONST MENU_ID_INFO     = 1
     CONST MENU_ID_DIAG     = 2
     CONST MENU_ID_PALETTE  = 3
+    CONST MENU_ID_FIRMWARE = 4
 
     ' pattern indixes
     CONST PATT_IDX_SELECTED_L = 20
@@ -56,9 +60,13 @@
     CONST PATT_IDX_BORDER_TR  = 25
     CONST PATT_IDX_BORDER_BL  = 26
     CONST PATT_IDX_BORDER_BR  = 27
+    CONST PATT_IDX_BOX_TL     = 28
+    CONST PATT_IDX_BOX_TR     = 29
+    CONST PATT_IDX_BOX_BL     = 30
+    CONST PATT_IDX_BOX_BR     = 31
 
     ' Pico9918Options index, name[16], values index, num values,help[32]
-    CONST CONF_COUNT      = 9
+    CONST CONF_COUNT      = 10
     CONST CONF_INDEX      = 0
     CONST CONF_LABEL      = 1
     CONST CONF_LABEL_LEN  = 16
@@ -97,6 +105,7 @@
     CONST CONF_MENU_RESET       = 254
     CONST CONF_MENU_EMPTY       = 255
     CONST CONF_MENU_SAVE        = 250
+    CONST CONF_MENU_FIRMWARE    = 249
 
     ' name table helpers
     DEF FN XY(X, Y) = ((Y) * 32 + (X))                      ' PRINT AT XY(1, 2), ...
@@ -111,6 +120,10 @@
     ' menu helpers
     DEF FN MENU_DATA(I, C) = configMenuData((I) * CONF_STRUCT_LEN + (C))
     DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow
+
+    ' passing in L since I'm seeing issues using LEN(T) here. Possibly a bug?
+    DEF FN DRAW_TITLE(T, L) = a_titleLen = L : PRINT AT XY((32 - a_titleLen) / 2, MENU_TITLE_ROW), T : GOSUB drawTitleBox
+
 
     ' VDP helpers
     DEF FN VDP_DISABLE_INT = VDP(1) = $C2
@@ -127,7 +140,7 @@
     ' configuration values
     DIM tempConfigValues(CONF_COUNT)        ' current (live) config values
     DIM savedConfigValues(CONF_COUNT)       ' values saved in the PICO9918
-    
+
     ' GLOBALS    
     g_currentMenuIndex = 0                  ' current menu index
 
@@ -155,29 +168,29 @@
         verMaj = verReg / 16
         verMin = verReg AND $0f
         IF (statReg AND $E8) = $E8 THEN
-            PRINT AT XY(3, 3), "Detected: PICO9918 ver ", verMaj, ".", verMin
+            PRINT AT XY(3, 21), "Detected: PICO9918 ver ", verMaj, ".", verMin
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
-            PRINT AT XY(5, 3), "Detected: F18A ver  ."
-            PUT_XY(5 + 19, 3, hexChar(verMaj))
-            PUT_XY(5 + 21, 3, hexChar(verMin))
+            PRINT AT XY(5, 21), "Detected: F18A ver  ."
+            PUT_XY(5 + 19, 21, hexChar(verMaj))
+            PUT_XY(5 + 21, 21, hexChar(verMin))
         ELSE
-            PRINT AT XY(8, 3), "Detected UNKNOWN SR1 = ", <>statReg
+            PRINT AT XY(8, 21), "Detected UNKNOWN SR1 = ", <>statReg
         END IF
         
     ELSE
-        PRINT AT XY(6, 3), "Detected: LEGACY VDP"
+        PRINT AT XY(6, 21), "Detected: LEGACY VDP"
     END IF
 
     isPico9918 = isF18ACompatible   ' FOR TESTING
 
     IF NOT isPico9918 THEN
-        PRINT AT XY(7, 9 + (isF18ACompatible AND 3)), "PICO9918 not found"
+        PRINT AT XY(7, 6 + (isF18ACompatible AND 3)), "PICO9918 not found"
         IF NOT isF18ACompatible THEN
-            PRINT AT XY(15, 12), "OR"
-            PRINT AT XY(3, 15), "PICO9918 firmware too old"
-            PRINT AT XY(4, 17), "Firmware v1.0+ required"
-            PRINT AT XY(4, 19), "Update manually via USB"
+            PRINT AT XY(15, 9), "OR"
+            PRINT AT XY(3, 12), "PICO9918 firmware too old"
+            PRINT AT XY(4, 14), "Firmware v1.0+ required"
+            PRINT AT XY(4, 16), "Update manually via USB"
         END IF
     ELSE
         ' We are a PICO9918, set up the menu
@@ -210,7 +223,7 @@
         VDP(24) = 1
 
         WHILE 1
-            ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu
+            ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu
             GOSUB clearScreen
             VDP_DISABLE_INT
         WEND
@@ -225,25 +238,34 @@ exit:
     GOTO exit
 
 clearScreen: PROCEDURE
-    DEFINE VRAM NAME_TAB_XY(0, 4), 32, horzBar
-    FOR R = 5 TO 20
+    DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
+    FOR R = 3 TO 19
         PRINT AT XY(0, R), "                                "
     NEXT R
     END
 
+drawTitleBox: PROCEDURE
+    L = a_titleLen
+    DEFINE VRAM NAME_TAB_XY((32 - L) / 2, MENU_TITLE_ROW - 1), L, horzBar
+    DEFINE VRAM NAME_TAB_XY((32 - L) / 2, MENU_TITLE_ROW + 1), L, horzBar
+    
+    VPOKE NAME_TAB_XY((32 - L) / 2 - 1,     MENU_TITLE_ROW), PATT_IDX_BORDER_V
+    VPOKE NAME_TAB_XY((32 - L) / 2 + L,     MENU_TITLE_ROW), PATT_IDX_BORDER_V
+
+    VPOKE NAME_TAB_XY((32 - L) / 2 - 1,     MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TL
+    VPOKE NAME_TAB_XY((32 - L) / 2 + L, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TR
+    VPOKE NAME_TAB_XY((32 - L) / 2 - 1,     MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
+    VPOKE NAME_TAB_XY((32 - L) / 2 + L, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
+
+    END
 
 ' -----------------------------------------------------------------------------
 ' the top-level menu
 ' -----------------------------------------------------------------------------
 mainMenu: PROCEDURE 
+    
+    DRAW_TITLE("MAIN MENU", 9)
 
-    DEFINE VRAM NAME_TAB_XY(11, MENU_TITLE_ROW - 1), 9, horzBar
-    DEFINE VRAM NAME_TAB_XY(11, MENU_TITLE_ROW + 1), 9, horzBar
-    PRINT AT XY(10, MENU_TITLE_ROW), "\23MAIN MENU\23"
-    VPOKE NAME_TAB_XY(10, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TL
-    VPOKE NAME_TAB_XY(10 + 10, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TR
-    VPOKE NAME_TAB_XY(10, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(10 + 10, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
     GOSUB renderMenu
     GOSUB initSprites
 
@@ -284,12 +306,17 @@ mainMenu: PROCEDURE
 
         ' number button pressed?
         ELSEIF key > 0 AND key <= CONF_COUNT THEN
-            IF MENU_DATA(key - 1, CONF_INDEX) <> 255 THEN
+            I = MENU_DATA(key - 1, CONF_INDEX)
+            IF I <> 255 THEN
                 g_currentMenuIndex = key - 1
+
+                IF I > 200 THEN
+                    valueChanged = TRUE
+                END IF
             END IF
 
         ' <fire>, <space> or <right> pressed? - next option value
-        ELSEIF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.RIGHT THEN 
+        ELSEIF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.RIGHT THEN 
             IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
                 tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
                 currentValueIndex = tempConfigValues(g_currentMenuIndex)
@@ -317,10 +344,11 @@ mainMenu: PROCEDURE
             RENDER_MENU_ROW(g_currentMenuIndex)
 
             IF g_currentMenuIndex <> 1 THEN GOSUB hideSprites
-            GOSUB delay
+            IF NOT valueChanged THEN GOSUB delay
+        END IF
 
-        ' has the value changed for this config option?
-        ELSEIF valueChanged THEN
+        ' has the value changed for this config option? (or we selected a submenu by number)
+        IF valueChanged THEN
             RENDER_MENU_ROW(g_currentMenuIndex)
             WAIT
             vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
@@ -332,6 +360,9 @@ mainMenu: PROCEDURE
                 VDP(50) = currentValueIndex * $04
             ELSEIF vdpOptId = CONF_SCANLINE_SPRITES THEN
                 VDP(30) = pow2(currentValueIndex + 2)
+            ELSEIF vdpOptId = CONF_MENU_FIRMWARE THEN
+                g_currentMenu = MENU_ID_FIRMWARE
+                EXIT WHILE
             ELSEIF vdpOptId = CONF_MENU_INFO THEN
                 g_currentMenu = MENU_ID_INFO
                 EXIT WHILE
@@ -352,69 +383,99 @@ mainMenu: PROCEDURE
     WEND
     END
 
+firmwareMenu: PROCEDURE
+    
+    DRAW_TITLE("FIRMWARE UPDATE", 15)
+
+    VDP_ENABLE_INT
+    GOSUB delay
+
+    BANK SELECT 1
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 0), 32, bank1Start
+    BANK SELECT 2
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 1), 32, bank2Start
+    BANK SELECT 3
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 2), 32, bank3Start
+    BANK SELECT 4
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 3), 32, bank4Start
+    BANK SELECT 5
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 4), 32, bank5Start
+    BANK SELECT 6
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 5), 32, bank6Start
+    BANK SELECT 7
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 6), 32, bank7Start
+    BANK SELECT 8
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 7), 32, bank8Start
+    BANK SELECT 9
+    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 8), 32, bank9Start
+
+    WHILE 1
+        WAIT
+        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
+
+    WEND
+
+    g_currentMenu = MENU_ID_MAIN
+
+    END    
+
 deviceInfoMenu: PROCEDURE
     const PICO_MODEL_RP2040 = 1
     const PICO_MODEL_RP2350 = 2
-    
-    DEFINE VRAM NAME_TAB_XY(10, MENU_TITLE_ROW - 1), 11, horzBar
-    DEFINE VRAM NAME_TAB_XY(10, MENU_TITLE_ROW + 1), 11, horzBar
-    PRINT AT XY(9, MENU_TITLE_ROW), "\23DEVICE INFO\23"
-    VPOKE NAME_TAB_XY(9, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TL
-    VPOKE NAME_TAB_XY(9 + 12, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TR
-    VPOKE NAME_TAB_XY(9, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(9 + 12, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
 
-    PRINT AT XY(2, 9), "Processor family : "
-    PRINT AT XY(2,10), "Hardware version : "
-    PRINT AT XY(2,11), "Software version : "
-    PRINT AT XY(2,12), "Display driver   : "
-    PRINT AT XY(2,13), "Resolution       : "
-    PRINT AT XY(2,14), "F18A version     : "
-    PRINT AT XY(2,15), "Core temperature : 0.0`C"
+    DRAW_TITLE("DEVICE INFO", 11)
+
+    PRINT AT XY(2, MENU_TOP_ROW + 0), "Processor family : "
+    PRINT AT XY(2, MENU_TOP_ROW + 1), "Hardware version : "
+    PRINT AT XY(2, MENU_TOP_ROW + 2), "Software version : "
+    PRINT AT XY(2, MENU_TOP_ROW + 3), "Display driver   : "
+    PRINT AT XY(2, MENU_TOP_ROW + 4), "Resolution       : "
+    PRINT AT XY(2, MENU_TOP_ROW + 5), "F18A version     : "
+    PRINT AT XY(2, MENU_TOP_ROW + 6), "Core temperature : Error"
 
     VDP_SET_CURRENT_STATUS_REG(12)  ' config
 
     VDP(58) = CONF_PICO_MODEL
     optValue = VDP_READ_STATUS
     IF optValue = PICO_MODEL_RP2350 THEN
-        PRINT AT XY(21, 9), "RP2350"
+        PRINT AT XY(21, MENU_TOP_ROW + 0), "RP2350"
     ELSE
-        PRINT AT XY(21, 9), "RP2040"
+        PRINT AT XY(21, MENU_TOP_ROW + 0), "RP2040"
     END IF
 
     VDP(58) = CONF_HW_VERSION
     optValue = VDP_READ_STATUS
     verMaj = optValue / 16
     verMin = optValue AND $0f
-    PRINT AT XY(21, 10), verMaj, ".", verMin
-    IF verMaj = 1 THEN PRINT AT XY(24, 10), "+"
+    PRINT AT XY(21, MENU_TOP_ROW + 1), verMaj, ".", verMin
+    IF verMaj = 1 THEN PRINT AT XY(24, MENU_TOP_ROW + 1), "+"
 
     VDP(58) = CONF_SW_VERSION
     optValue = VDP_READ_STATUS
     verMaj = optValue / 16
     verMin = optValue AND $0f
-    PRINT AT XY(21, 11), verMaj, ".", verMin
+    PRINT AT XY(21, MENU_TOP_ROW + 2), verMaj, ".", verMin
 
     VDP(58) = CONF_DISP_DRIVER
     optValue = VDP_READ_STATUS
     IF optValue = 1 THEN
-        PRINT AT XY(21, 12), "RGBs NTSC"
-        PRINT AT XY(21, 13), "480i 60Hz"
+        PRINT AT XY(21, MENU_TOP_ROW + 3), "RGBs NTSC"
+        PRINT AT XY(21, MENU_TOP_ROW + 4), "480i 60Hz"
     ELSEIF optValue = 2 THEN
-        PRINT AT XY(21, 12), "RGBs PAL"
-        PRINT AT XY(21, 13), "576i 50Hz"
+        PRINT AT XY(21, MENU_TOP_ROW + 3), "RGBs PAL"
+        PRINT AT XY(21, MENU_TOP_ROW + 4), "576i 50Hz"
     ELSE
-        PRINT AT XY(21, 12), "VGA"
-        PRINT AT XY(21, 13), "480p 60Hz"
+        PRINT AT XY(21, MENU_TOP_ROW + 3), "VGA"
+        PRINT AT XY(21, MENU_TOP_ROW + 4), "480p 60Hz"
     END IF
 
     VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
     optValue = VDP_READ_STATUS
     verMaj = optValue / 16
     verMin = optValue AND $0f
-    PUT_XY(21, 14, hexChar(verMaj))
-    PUT_XY(22, 14, ".")
-    PUT_XY(23, 14, hexChar(verMin))
+    PUT_XY(21, MENU_TOP_ROW + 5, hexChar(verMaj))
+    PUT_XY(22, MENU_TOP_ROW + 5, ".")
+    PUT_XY(23, MENU_TOP_ROW + 5, hexChar(verMin))
     VDP_RESET_STATUS_REG
 
     VDP_ENABLE_INT
@@ -422,19 +483,32 @@ deviceInfoMenu: PROCEDURE
 
     WHILE 1
         WAIT
-        IF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.LEFT THEN EXIT WHILE
+        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
 
         VDP_DISABLE_INT
 
         VDP_SET_CURRENT_STATUS_REG(13)      ' SR13: Temperature
         optValue = VDP_READ_STATUS
-        tempC = optValue / 4
-        tempDec = optValue AND $03
-        tempDec = tempDec * 25
-
-        PRINT AT XY(21,15), tempC, ".", tempDec, "`C  "
-
         VDP_RESET_STATUS_REG
+
+        IF optValue > 0 THEN
+            tempC = optValue / 4
+            tempDec = optValue AND $03
+            tempDec = tempDec * 25
+
+            PRINT AT XY(21,MENU_TOP_ROW + c), tempC, ".", <2>tempDec, "`C  "
+
+            #optValueF = optValue
+            #optValueF = #optValueF * 9
+            #optValueF = #optValueF / 5
+
+            #tempC = #optValueF / 4 + 32
+            #tempDec = #optValueF AND $03
+            #tempDec = #tempDec * 25
+
+            PRINT AT XY(19,MENU_TOP_ROW + 7), ": ",#tempC, ".", <2>#tempDec, "`F  "
+        END IF
+
         VDP_ENABLE_INT
     WEND
 
@@ -444,44 +518,81 @@ deviceInfoMenu: PROCEDURE
 
 diagMenu: PROCEDURE
 
-    DEFINE VRAM NAME_TAB_XY(10, MENU_TITLE_ROW - 1), 11, horzBar
-    DEFINE VRAM NAME_TAB_XY(10, MENU_TITLE_ROW + 1), 11, horzBar
-    PRINT AT XY(9, MENU_TITLE_ROW), "\23DIAGNOSTICS\23"
-    VPOKE NAME_TAB_XY(9, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TL
-    VPOKE NAME_TAB_XY(9 + 12, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TR
-    VPOKE NAME_TAB_XY(9, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(9 + 12, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
+    DRAW_TITLE("DIAGNOSTICS", 11)
 
     VDP_ENABLE_INT
 
+    GOSUB delay
+
     WHILE 1
         WAIT
-        IF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.LEFT THEN EXIT WHILE
+        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
     WEND
 
     g_currentMenu = MENU_ID_MAIN
     END
-
 
 paletteMenu: PROCEDURE
 
-    DEFINE VRAM NAME_TAB_XY(12, MENU_TITLE_ROW - 1), 7, horzBar
-    DEFINE VRAM NAME_TAB_XY(12, MENU_TITLE_ROW + 1), 7, horzBar
-    PRINT AT XY(11, MENU_TITLE_ROW), "\23PALETTE\23"
-    VPOKE NAME_TAB_XY(11, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TL
-    VPOKE NAME_TAB_XY(11 + 8, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_TR
-    VPOKE NAME_TAB_XY(11, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(11 + 8, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
+    DRAW_TITLE("PALETTE", 7)
+
+    DIM bmpBuf(64)
+
+    FOR I = 0 TO 15
+        bmpBuf(I * 2) = PATT_IDX_BOX_TL
+        bmpBuf(I * 2 + 1) = PATT_IDX_BOX_TR
+        bmpBuf(32 + I * 2) = PATT_IDX_BOX_BL
+        bmpBuf(32 + I * 2 + 1) = PATT_IDX_BOX_BR
+    NEXT I
+
+    I = 0
+    DEFINE VRAM NAME_TAB_XY(0, 8), 32, VARPTR bmpBuf(I)
+    DEFINE VRAM NAME_TAB_XY(0, 9), 32, VARPTR bmpBuf(I + 32)
+
+    FOR I = 0 TO 64
+        bmpBuf(I) = 0
+    NEXT I
+
+
+    CONST BITMAP_WIDTH  = 16 * 15
+    CONST BITMAP_HEIGHT = 13
+
+    ' Bitmap layer
+    VDP(31) = $f0           ' bml en, pri, trans, fat, pal = 0
+    VDP(32) = $70           ' $1C00
+    VDP(33) = 18            ' x
+    VDP(34) = 65            ' y
+    VDP(35) = BITMAP_WIDTH  ' w
+    VDP(36) = BITMAP_HEIGHT ' h
+
+    CONST PAL_SWATCH_STRIDE = (BITMAP_WIDTH / 4)
+
+
+    FOR C = 1 TO 15
+        col = C * 16 + C
+        bmpBuf((C * 4) - 4) = col
+        bmpBuf((C * 4) - 3) = col
+        bmpBuf((C * 4) - 2) = col
+    NEXT C
+
+    FOR R = 0 TO 12
+        DEFINE VRAM $1C00 + (R * PAL_SWATCH_STRIDE), PAL_SWATCH_STRIDE, VARPTR bmpBuf(0)
+    NEXT R
 
     VDP_ENABLE_INT
 
+    GOSUB delay
+
     WHILE 1
         WAIT
-        IF CONT.BUTTON OR (CONT1.KEY = 32) OR CONT.LEFT THEN EXIT WHILE
+        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
     WEND
 
+    VDP(31) = $00   ' bml en, pri, trans, fat, pal = 0
+    
     g_currentMenu = MENU_ID_MAIN
     END
+
 ' -----------------------------------------------------------------------------
 ' delay between user input (1/6 second)
 ' -----------------------------------------------------------------------------
@@ -551,10 +662,12 @@ setupTiles: PROCEDURE
     DEFINE CHAR PATT_IDX_BORDER_H, 6, lineSegments  '   border segments
     DEFINE CHAR PATT_IDX_BORDER_H + 128, 6, lineSegments
 
+    DEFINE CHAR PATT_IDX_BOX_TL, 4, palBox
+
     DEFINE CHAR PATT_IDX_SELECTED_L, 1, highlightLeft   ' ends of selection bar
     DEFINE CHAR PATT_IDX_SELECTED_R, 1, highlightRight
     
-    FOR I = 0 TO 31                 
+    FOR I = 0 TO 31
         DEFINE COLOR I, 1, white    ' title color
     NEXT I
     FOR I = 32 TO 127
@@ -594,12 +707,12 @@ setupHeader: PROCEDURE
 
     PRINT AT XY(28, 0),"v1.0"
     PRINT AT XY(20, 1),"Configurator"
-    PRINT AT XY(4, 22), "(C) 2024 Troy Schrapel"    
+    PRINT AT XY(5, 23), "(C) 2024 Troy Schrapel"    
 
     DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
-    DEFINE VRAM NAME_TAB_XY(0, 4), 32, horzBar
-    DEFINE VRAM NAME_TAB_XY(0, 21), 32, horzBar
-    DEFINE VRAM NAME_TAB_XY(0, 23), 32, horzBar
+    'DEFINE VRAM NAME_TAB_XY(0, 4), 32, horzBar
+    DEFINE VRAM NAME_TAB_XY(0, 20), 32, horzBar
+    DEFINE VRAM NAME_TAB_XY(0, 22), 32, horzBar
 
     END
 
@@ -624,6 +737,8 @@ renderMenu: PROCEDURE
 ' render a menu row. Arguments: a_menuIndexToRender
 ' -----------------------------------------------------------------------------
 renderMenuRow: PROCEDURE
+    CONST MENU_START_X = 0
+
     ' don't render special index 255
     IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN RETURN
 
@@ -631,11 +746,11 @@ renderMenuRow: PROCEDURE
     #ROWOFFSET = XY(0, MENU_TOP_ROW + a_menuIndexToRender)
 
     ' output menu number (index + 1)
-    PRINT AT #ROWOFFSET + 1, " ", a_menuIndexToRender + 1, ". "
+    PRINT AT #ROWOFFSET + MENU_START_X, " ", a_menuIndexToRender + 1, ". "
 
     ' output menu label
-    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 5, CONF_LABEL_LEN, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_LABEL)
-    PRINT AT #ROWOFFSET + 21, "          "
+    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 4, CONF_LABEL_LEN, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_LABEL)
+    PRINT AT #ROWOFFSET + MENU_START_X + 20, "            "
 
     ' determine and output config option value label
     valuesCount = MENU_DATA(a_menuIndexToRender, CONF_NUM_VALUES)
@@ -644,12 +759,12 @@ renderMenuRow: PROCEDURE
         currentValueOffset = tempConfigValues(a_menuIndexToRender)
 
         ' output option value
-        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + 22, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
+        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 23, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
     END IF
 
-    ' if thie config option is "dirty" output an asteric next to it
+    ' if the config option is "dirty" output an asterix next to it
     IF savedConfigValues(a_menuIndexToRender) <> tempConfigValues(a_menuIndexToRender) THEN
-        PRINT AT #ROWOFFSET + 29, "*"
+        PRINT AT #ROWOFFSET + 30 - MENU_START_X, "*"
     END IF    
 
     ' if this is the current menu item - highlight it
@@ -664,18 +779,18 @@ renderMenuRow: PROCEDURE
 highlightMenuRow: PROCEDURE
     ' Set MSB bit for all characters in this row which selects the
     ' "highlight" versions of the patterns
-    FOR R = 2 TO 29
+    FOR R = MENU_START_X + 1 TO 31 - MENU_START_X
         C = VPEEK(#VDP_NAME_TAB + #ROWOFFSET+ R)
         C = C OR 128
         VPOKE (#VDP_NAME_TAB + #ROWOFFSET + R), C
     NEXT R
 
     ' ends of highlight bar
-    VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 1),  PATT_IDX_SELECTED_L
-    VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 30), PATT_IDX_SELECTED_R
+    VPOKE (#VDP_NAME_TAB + #ROWOFFSET + MENU_START_X),  PATT_IDX_SELECTED_L
+    VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 31 - MENU_START_X), PATT_IDX_SELECTED_R
 
     ' output help line for the active menu item
-    DEFINE VRAM #VDP_NAME_TAB + XY(0, 19), 32, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_HELP)
+    DEFINE VRAM #VDP_NAME_TAB + XY(0, 18), 32, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_HELP)
     END
 
 ' -----------------------------------------------------------------------------
@@ -705,7 +820,7 @@ initSprites: PROCEDURE
 ' -----------------------------------------------------------------------------
 animateSprites: PROCEDURE
 
-    CONST spritePosY = 135
+    CONST spritePosY = 127
 
     ' "static" values
     s_startAnimIndex = s_startAnimIndex + 3
@@ -810,12 +925,13 @@ configMenuData:
     DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ", 0, 2, "    Faux CRT scanline effect    "
     DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites", 2, 4, "                                "
     DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, " RP2040 clock (requires reboot) "
-    DATA BYTE CONF_MENU_DIAG,       "> Diagnostics   ", 0, 0, "   Manage diagnostics options   "
-    DATA BYTE CONF_MENU_PALETTE,    "> Palette       ", 0, 0, "     Change default palette     "
-    DATA BYTE CONF_MENU_INFO,       "> Device info.  ", 0, 0, "    View device information     "
     DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
-    DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
     DATA BYTE CONF_MENU_SAVE,       "Save Settings   ", 0, 0, " Save configuration to PICO9918 "
+    DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
+    DATA BYTE CONF_MENU_DIAG,       "Diagnostics  >>>", 0, 0, "   Manage diagnostics options   "
+    DATA BYTE CONF_MENU_PALETTE,    "Palette      >>>", 0, 0, "     Change default palette     "
+    DATA BYTE CONF_MENU_INFO,       "Device info. >>>", 0, 0, "    View device information     "
+    DATA BYTE CONF_MENU_FIRMWARE,   "Firmware     >>>", 0, 0, "        Update firmware         "
 
 ' -----------------------------------------------------------------------------
 ' Pico9918Option values. Indexed from options()
@@ -898,6 +1014,12 @@ colorLineSegH:
     DATA BYTE $00, $00, $00, $77, $44, $50, $50, $50
 colorLineSeg:
     DATA BYTE $50, $50, $50, $50, $50, $50, $50, $50
+
+palBox:
+    DATA BYTE $3F, $51, $62, $44, $48, $51, $62, $44
+    DATA BYTE $FC, $12, $22, $46, $8A, $12, $22, $46
+    DATA BYTE $48, $51, $62, $44, $48, $51, $3F, $00
+    DATA BYTE $8A, $12, $22, $46, $8A, $12, $FC, $00
 
 horzBar:
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
@@ -1095,3 +1217,5 @@ sine: ' sine wave values for scanline sprite animation
 
 pow2: ' 1 << INDEX
     DATA BYTE $01, $02, $04, $08, $10, $20, $40, $80
+
+INCLUDE "firmware.bas"

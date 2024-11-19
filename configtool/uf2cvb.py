@@ -10,6 +10,7 @@
 # https://github.com/visrealm/pico9918
 #
 
+
 import sys
 import struct
 
@@ -48,15 +49,16 @@ with open("firmware.bas", mode='w') as output:
                     print("Error!", filename, " is not a .uf2 file")
                     exit()
 
-               if blocksRead % 28 == 0:               
+                if blocksRead % 28 == 0:               
                     output.write("\n' ===============================\n".format(bank))
-                    output.write("BANK {0}\n".format(bank))
+                    output.write("BANK {0}\n\n".format(bank))
+                    output.write("bank{0}Start:\n".format(bank))
+                    output.write("  DATA BYTE {0}\n".format(48 + bank))
                     bank += 1
                 
                 w = struct.unpack("<IIIIIIII", inpbuf[0:32])
                 output.write("\n ' Block: {0}\n".format(w[5]))
                 output.write(" ' Addr: {0}\n".format(hex(w[3])))
-                output.write(" ' Num blocks: {0}\n".format(w[6]))
                 for h in range (0, 32, 4):
                     byteStr = []
                     for b in inpbuf[h:h + 4]:
