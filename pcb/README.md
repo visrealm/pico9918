@@ -1,10 +1,10 @@
 # PICO9918 PCBs
 
-Here you will find schematics and gerbers for all working revisions of the PICO9918. There are two main variants of the hardware:
+Here you will find schematics and gerbers for all working revisions of the PICO9918. There are two main variants of the hardware. Due to a minor difference in RP2040 GPIO pinouts, firmware binaries aren't compatible between the two, however both are fully supported with latest firmware updates and separate firmware packages are provided for each.
 
 #### DIY Piggybacked board (v0.3)
 
-This version is relatively cheap and easy to build and is powered by a piggybacked Pi Pico USB-C module.
+This version is relatively cheap and easy to build and is powered by a piggybacked Pi Pico USB-C module. Recommended for a DIY project.
 
 <p align="left"><img src="../img/pico9918_v0_3_sm.jpg" alt="PICO9918 v0.3" width="240px"></p>
 
@@ -12,7 +12,7 @@ See [PICO9918 v0.3](v0.3)
 
 #### Fully integrated single board (v0.4 - v1.1+)
 
-From v0.4 the RP2040 has been integrated onto the PICO9918 PCB, making a much smaller small form factor.
+From v0.4 the RP2040 has been integrated onto the PICO9918 PCB, making a much smaller small form factor. This revision has many small (0402) components and can be challenging (and more expensive) to build. They can be purchased too.
 
 <p align="left"><a href="../img/pico9918_v1_0_sm.png"><img src="../img/pico9918_v1_0_sm.png" 
 alt="PICO9918 v1.0" width="240px"></a></p>
