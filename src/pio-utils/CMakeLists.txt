@@ -10,4 +10,6 @@ add_library(${LIBRARY} STATIC pio_utils.c)
 
 target_include_directories (${LIBRARY} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${LIBRARY} PUBLIC hardware_pio)
+target_link_libraries(${LIBRARY} PUBLIC hardware_pio pico_stdlib)
+
+target_compile_options(${PROJECT_NAME} PUBLIC -include pico/platform/compiler.h)
