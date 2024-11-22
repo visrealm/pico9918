@@ -18,6 +18,13 @@ This is the first "public" version and is powered by a piggy-backed USB-C Pi Pic
 * [PICO9918 v0.3 BOM](pico9918_v0_3_bom.xlsx)
 * [PICO9918 v0.3 Pick and place](pico9918_v0_3_picknplace.csv)
 
+#### VGA dongle PCB
+
+<p align="left"><img src="pico9918_v0_3_vga.jpg" alt="PICO9918 v0.3 VGA PCB" width="720px"></p>
+
+* [PICO9918 v0.3 VGA Gerber](pico9918_v0_3_vga_gerber.zip)
+* [VGA connector](https://www.lcsc.com/product-detail/D-Sub-DVI-HDMI-Connectors_TXGA-FDB1519-F0DB300U1KA_C2834384.html)
+
 ### Changelog
 - Switched to use USB-C Pi Pico module instead of genuine Pi Pico.
 - Added CPUCLK and GROMCLK.
