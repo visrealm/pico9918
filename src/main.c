@@ -265,7 +265,7 @@ static inline void disableTmsPioInterrupts()
 
 #if PICO_RP2040
   #define PICO_MODEL 1
-#elif PICO_2350
+#elif PICO_RP2350
   #define PICO_MODEL 2
 #endif
 
@@ -283,6 +283,10 @@ typedef enum
   CONF_CRT_SCANLINES    = 8,
   CONF_SCANLINE_SPRITES = 9,
   CONF_CLOCK_PRESET_ID  = 10,
+
+  CONF_PALETTE_IDX_0    = 128,
+  CONF_PALETTE_IDX_15   = CONF_PALETTE_IDX_0 + 32,//  16x 2 bytes
+
   CONF_SAVE_TO_FLASH    = 255,
 } Pico9918Options;
 
@@ -297,6 +301,14 @@ static void applyConfig()
     TMS_REGISTER(tms9918, 50) &= ~0x04;
 
   TMS_REGISTER(tms9918, 30) = 1 << (tms9918->config[CONF_SCANLINE_SPRITES] + 2);
+
+  // apply default palette
+  for (int i = 0; i < 16; ++i)
+  {
+    uint16_t rgb = (tms9918->config[CONF_PALETTE_IDX_0 + (i * 2)] << 8) |
+                    tms9918->config[CONF_PALETTE_IDX_0 + (i * 2) + 1];
+    tms9918->vram.map.pram[i] = __builtin_bswap16(rgb);
+  }
 }
 
 #define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash
@@ -312,7 +324,9 @@ void readConfig(uint8_t config[CONFIG_BYTES])
       config[CONF_DISP_DRIVER] != PICO9918_DISP_DRIVER ||
       config[CONF_CLOCK_PRESET_ID] > 2 ||
       config[CONF_CRT_SCANLINES] > 1 ||
-      config[CONF_SCANLINE_SPRITES] > 3) // not initialised
+      config[CONF_SCANLINE_SPRITES] > 3 ||
+      config[CONF_PALETTE_IDX_0] != 0x00 ||
+      config[CONF_PALETTE_IDX_0 + 2] & 0xf0 != 0xf0) // not initialised
   {
     memset(config, 0, CONFIG_BYTES);
 
@@ -325,6 +339,15 @@ void readConfig(uint8_t config[CONFIG_BYTES])
     config[CONF_CRT_SCANLINES] = 0;
     config[CONF_SCANLINE_SPRITES] = 0;
     config[CONF_CLOCK_PRESET_ID] = 0;
+
+    config[CONF_PALETTE_IDX_0] = 0;
+    config[CONF_PALETTE_IDX_0 + 1] = 0;
+    for (int i = 1; i < 16; ++i)
+    {
+      uint16_t rgb = 0xf000 | vrEmuTms9918DefaultPalette(i);
+      config[CONF_PALETTE_IDX_0 + (i * 2)] = rgb >> 8;
+      config[CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xff;
+    }
   }
 
   config[CONF_SAVE_TO_FLASH] = 0;
@@ -335,6 +358,8 @@ void readConfig(uint8_t config[CONFIG_BYTES])
     config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
     config[CONF_SAVE_TO_FLASH] = 1;
   }  
+
+  tms9918->configDirty = true;  // so we apply it
 }
 
 void writeConfig(uint8_t config[CONFIG_BYTES])
@@ -344,6 +369,16 @@ void writeConfig(uint8_t config[CONFIG_BYTES])
   config[CONF_PICO_MODEL] = PICO_MODEL;
   config[CONF_HW_VERSION] = PICO9918_PCB_VERSION;
   config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
+
+  // sanity checking the palette 0 always 0, others always alpha 0xf
+  config[CONF_PALETTE_IDX_0] = 0;
+  config[CONF_PALETTE_IDX_0 + 1] = 0;
+  for (int i = 1; i < 16; ++i)
+  {
+    uint16_t rgb = 0xf000 | vrEmuTms9918DefaultPalette(i);
+    config[CONF_PALETTE_IDX_0 + (i * 2)] = rgb >> 8;
+    config[CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xff;
+  }
 
   int attempts = 5;
 retry:
@@ -1037,8 +1072,6 @@ int main(void)
     tms9918->config[CONF_CLOCK_PRESET_ID] = wantedClock;
   }
 
-  tms9918->configDirty = true;
-  
   clockPresetIndex = tms9918->config[CONF_CLOCK_PRESET_ID];
 
   clockSettings = clockPresets[clockPresetIndex];
