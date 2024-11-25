@@ -44,6 +44,7 @@
 
     CONST MENU_TITLE_ROW   = 3
     CONST MENU_TOP_ROW     = MENU_TITLE_ROW + 3
+    CONST MENU_HELP_ROW    = 18
 
     CONST MENU_ID_MAIN     = 0
     CONST MENU_ID_INFO     = 1
@@ -60,6 +61,10 @@
     CONST PATT_IDX_BORDER_TR  = 25
     CONST PATT_IDX_BORDER_BL  = 26
     CONST PATT_IDX_BORDER_BR  = 27
+    CONST PATT_IDX_SWATCH     = PATT_IDX_SELECTED_L + 128
+    CONST PATT_IDX_SLIDER     = PATT_IDX_BORDER_H + 128
+    CONST PATT_IDX_BORDER_HTL = PATT_IDX_BORDER_TL + 128
+    CONST PATT_IDX_BORDER_HTR = PATT_IDX_BORDER_TR + 128
     CONST PATT_IDX_BOX_TL     = 28
     CONST PATT_IDX_BOX_TR     = 29
     CONST PATT_IDX_BOX_BL     = 30
@@ -107,15 +112,24 @@
     CONST CONF_MENU_SAVE        = 250
     CONST CONF_MENU_FIRMWARE    = 249
 
+    ' VDP constants
+    CONST #VDP_NAME_TAB     = $1800
+    CONST #VDP_SPRITE_ATTR  = $1B00
+
+    CONST NAV_NONE = 0
+    CONST NAV_DOWN = 1
+    CONST NAV_UP = 2
+    CONST NAV_LEFT = 4
+    CONST NAV_RIGHT = 8
+    CONST NAV_OK = 16
+    CONST NAV_CANCEL = 32
+
     ' name table helpers
     DEF FN XY(X, Y) = ((Y) * 32 + (X))                      ' PRINT AT XY(1, 2), ...
 
-    CONST #VDP_NAME_TAB  = $1800
     DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))   ' DEFINE VRAM NAME_TAB_XY(1, 2), ...
     DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C     ' place a byte in the name table
     DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))          ' read a byte from the name table
-
-    CONST #VDP_SPRITE_ATTR = $1B00
 
     ' menu helpers
     DEF FN MENU_DATA(I, C) = configMenuData((I) * CONF_STRUCT_LEN + (C))
@@ -259,6 +273,33 @@ drawTitleBox: PROCEDURE
 
     END
 
+
+' -----------------------------------------------------------------------------
+' centralised navigation handling for kb and joystick
+' -----------------------------------------------------------------------------
+getNavButton: PROCEDURE
+    g_nav = NAV_NONE
+
+    ' <DOWN> or <X>
+    IF CONT.DOWN OR (CONT1.KEY = "X") THEN g_nav = g_nav OR NAV_DOWN
+
+    ' <UP> or <E>
+    IF CONT.UP OR (CONT1.KEY = "E") THEN g_nav = g_nav OR NAV_UP
+
+    ' <RIGHT> or <D> or (<.> [>])
+    IF CONT.RIGHT OR (CONT1.KEY = "D") OR (CONT1.KEY = ".") THEN g_nav = g_nav OR NAV_RIGHT
+
+    ' <LEFT> or <S> or (<,> [<])
+    IF CONT.LEFT OR (CONT1.KEY = "S") OR (CONT1.KEY = ",") THEN g_nav = g_nav OR NAV_LEFT
+
+    ' <LBUTTON> or <SPACE> OR <ENTER>
+    IF CONT.BUTTON OR (CONT1.KEY = " ") OR (CONT1.KEY = 11) THEN g_nav = g_nav OR NAV_OK
+
+    ' <RBUTTON> or <Q> OR <ESC>
+    IF CONT.BUTTON2 OR (CONT1.KEY = "Q") OR (CONT1.KEY = 27) THEN g_nav = g_nav OR NAV_CANCEL
+    END
+
+
 ' -----------------------------------------------------------------------------
 ' the top-level menu
 ' -----------------------------------------------------------------------------
@@ -284,8 +325,10 @@ mainMenu: PROCEDURE
         lastMenuIndex = g_currentMenuIndex
         valueChanged = FALSE
 
+        GOSUB getNavButton
+
         ' <down> button pressed?
-        IF CONT.DOWN THEN  
+        IF g_nav AND NAV_DOWN THEN  
             WHILE 1
                 g_currentMenuIndex = g_currentMenuIndex + 1
                 IF g_currentMenuIndex >= CONF_COUNT THEN g_currentMenuIndex = 0
@@ -295,7 +338,7 @@ mainMenu: PROCEDURE
             WEND
         
         ' <up> button pressed?
-        ELSEIF CONT.UP THEN  
+        ELSEIF g_nav AND NAV_UP THEN  
             WHILE 1
                 g_currentMenuIndex = g_currentMenuIndex - 1
                 IF g_currentMenuIndex >= CONF_COUNT THEN g_currentMenuIndex = CONF_COUNT - 1
@@ -316,7 +359,7 @@ mainMenu: PROCEDURE
             END IF
 
         ' <fire>, <space> or <right> pressed? - next option value
-        ELSEIF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.RIGHT THEN 
+        ELSEIF (g_nav AND NAV_OK) OR (g_nav AND NAV_RIGHT) THEN 
             IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
                 tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
                 currentValueIndex = tempConfigValues(g_currentMenuIndex)
@@ -327,7 +370,7 @@ mainMenu: PROCEDURE
             valueChanged = TRUE
 
         ' <left> pressed - previous option value
-        ELSEIF CONT.LEFT THEN 
+        ELSEIF (g_nav AND NAV_LEFT) THEN 
             IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
                 tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
                 currentValueIndex = tempConfigValues(g_currentMenuIndex)
@@ -389,35 +432,63 @@ firmwareMenu: PROCEDURE
 
     VDP_ENABLE_INT
     GOSUB delay
+    I = 0
+    FOR B = 1 TO 5
+        ON B FAST GOSUB ,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10
+        DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + B), 32, VARPTR bank1Start(289)
+    NEXT B
 
-    BANK SELECT 1
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 0), 32, bank1Start
-    BANK SELECT 2
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 1), 32, bank2Start
-    BANK SELECT 3
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 2), 32, bank3Start
-    BANK SELECT 4
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 3), 32, bank4Start
-    BANK SELECT 5
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 4), 32, bank5Start
-    BANK SELECT 6
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 5), 32, bank6Start
-    BANK SELECT 7
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 6), 32, bank7Start
-    BANK SELECT 8
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 7), 32, bank8Start
-    BANK SELECT 9
-    DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + 8), 32, bank9Start
+    BANK SELECT 0
 
     WHILE 1
         WAIT
-        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
+        GOSUB getNavButton
 
+        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
     WEND
 
     g_currentMenu = MENU_ID_MAIN
-
     END    
+
+selectBank1:
+    BANK SELECT 1
+    RETURN
+
+selectBank2:
+    BANK SELECT 2
+    RETURN
+
+selectBank3:
+    BANK SELECT 3
+    RETURN
+
+selectBank4:
+    BANK SELECT 4
+    RETURN
+
+selectBank5:
+    BANK SELECT 5
+    RETURN
+
+selectBank6:
+    BANK SELECT 6
+    RETURN
+
+selectBank7:
+    BANK SELECT 7
+    RETURN
+
+selectBank8:
+    BANK SELECT 8
+    RETURN
+
+selectBank9:
+    BANK SELECT 9
+    RETURN
+
+selectBank10:
+    BANK SELECT 10
+    RETURN
 
 deviceInfoMenu: PROCEDURE
     const PICO_MODEL_RP2040 = 1
@@ -483,7 +554,9 @@ deviceInfoMenu: PROCEDURE
 
     WHILE 1
         WAIT
-        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
+
+        GOSUB getNavButton
+        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
 
         VDP_DISABLE_INT
 
@@ -496,7 +569,7 @@ deviceInfoMenu: PROCEDURE
             tempDec = optValue AND $03
             tempDec = tempDec * 25
 
-            PRINT AT XY(21,MENU_TOP_ROW + c), tempC, ".", <2>tempDec, "`C  "
+            PRINT AT XY(21, MENU_TOP_ROW + 6), tempC, ".", <2>tempDec, "`C  "
 
             #optValueF = optValue
             #optValueF = #optValueF * 9
@@ -506,7 +579,7 @@ deviceInfoMenu: PROCEDURE
             #tempDec = #optValueF AND $03
             #tempDec = #tempDec * 25
 
-            PRINT AT XY(19,MENU_TOP_ROW + 7), ": ",#tempC, ".", <2>#tempDec, "`F  "
+            PRINT AT XY(19, MENU_TOP_ROW + 7), ": ",#tempC, ".", <2>#tempDec, "`F  "
         END IF
 
         VDP_ENABLE_INT
@@ -526,7 +599,8 @@ diagMenu: PROCEDURE
 
     WHILE 1
         WAIT
-        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
+        GOSUB getNavButton
+        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
     WEND
 
     g_currentMenu = MENU_ID_MAIN
@@ -538,29 +612,29 @@ paletteMenu: PROCEDURE
 
     DIM bmpBuf(64)
 
-    FOR I = 0 TO 15
+    FOR I = 0 TO 14
         bmpBuf(I * 2) = PATT_IDX_BOX_TL
         bmpBuf(I * 2 + 1) = PATT_IDX_BOX_TR
         bmpBuf(32 + I * 2) = PATT_IDX_BOX_BL
         bmpBuf(32 + I * 2 + 1) = PATT_IDX_BOX_BR
     NEXT I
 
-    I = 0
-    DEFINE VRAM NAME_TAB_XY(0, 8), 32, VARPTR bmpBuf(I)
-    DEFINE VRAM NAME_TAB_XY(0, 9), 32, VARPTR bmpBuf(I + 32)
+    DEFINE VRAM NAME_TAB_XY(1, 8), 30, VARPTR bmpBuf(0)
+    DEFINE VRAM NAME_TAB_XY(1, 9), 30, VARPTR bmpBuf(32)
 
     FOR I = 0 TO 64
         bmpBuf(I) = 0
     NEXT I
 
-
     CONST BITMAP_WIDTH  = 16 * 15
     CONST BITMAP_HEIGHT = 13
 
     ' Bitmap layer
+    ' Total VRAM required is:
+    '   BITMAP_WIDTH / 4 * BITMAP_HEIGHT: 60 * 13 = 780 B
     VDP(31) = $f0           ' bml en, pri, trans, fat, pal = 0
-    VDP(32) = $70           ' $1C00
-    VDP(33) = 18            ' x
+    VDP(32) = $70           ' $1C00 >> 6 
+    VDP(33) = 10            ' x
     VDP(34) = 65            ' y
     VDP(35) = BITMAP_WIDTH  ' w
     VDP(36) = BITMAP_HEIGHT ' h
@@ -579,19 +653,150 @@ paletteMenu: PROCEDURE
         DEFINE VRAM $1C00 + (R * PAL_SWATCH_STRIDE), PAL_SWATCH_STRIDE, VARPTR bmpBuf(0)
     NEXT R
 
+    FOR I = 1 TO 15
+        PUT_XY( I * 2 - 1, 7, hexChar(I))
+    NEXT I
+
+    bmpBuf(0) = PATT_IDX_BOX_TL
+    bmpBuf(1) = PATT_IDX_BOX_TR
+    bmpBuf(2) = PATT_IDX_BOX_BL
+    bmpBuf(3) = PATT_IDX_BOX_BR
+    bmpBuf(4) = PATT_IDX_BOX_TL + 128
+    bmpBuf(5) = PATT_IDX_BOX_TR + 128
+    bmpBuf(6) = PATT_IDX_BOX_BL + 128
+    bmpBuf(7) = PATT_IDX_BOX_BR + 128
+
+    PRINT AT XY(1,11), "Red:"
+    PRINT AT XY(1,13), "Green:"
+    PRINT AT XY(1,15), "Blue:"
+
+    FOR I = 11 to 15
+        PRINT AT XY(26, I) , "\148\148\148\148\148"
+    NEXT I
+
+    FOR I = 11 to 15 STEP 2
+        DEFINE VRAM NAME_TAB_XY(8, I), 16, horzBar
+    NEXT I
+
+    PRINT AT XY(10,17) , "Reset to defaults"
+    PRINT AT XY(10,18),  "Save settings"
+
+    currentIndex = 1
+    lastIndex = 15
+
+    currentMenu = 0 ' 0 = pal, 1 = r, 2 = g, 3 = b
+    lastMenu    = 0
+    r = 0
+    g = 0
+    b = 0
+
     VDP_ENABLE_INT
 
     GOSUB delay
 
+    DIM currentColor(2)
+
     WHILE 1
         WAIT
-        IF CONT.BUTTON OR (CONT1.KEY = 32) OR (CONT1.KEY = 11) OR CONT.LEFT THEN EXIT WHILE
+        
+        'DEFINE VRAM NAME_TAB_XY(15,15), 1, VARPTR I
+
+
+        IF currentMenu = 0 THEN
+            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
+            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
+            IF lastIndex <> currentIndex THEN
+                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0)
+                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2)
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0 + 4)
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2 + 4)
+
+                VDP_DISABLE_INT
+
+                VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
+                VDP(58) = 128 + currentIndex * 2
+                currentColor(0) = VDP_READ_STATUS
+                VDP(58) = 128 + currentIndex * 2 + 1
+                currentColor(1) = VDP_READ_STATUS            
+                VDP_RESET_STATUS_REG
+
+                currentColor(0) = defPal(currentIndex * 2)
+                currentColor(1) = defPal(currentIndex * 2 + 1)
+
+                r = currentColor(0) AND $0f
+                g = currentColor(1) / 16
+                b = currentColor(1) AND $0f
+
+                VDP(47) = $c0 + 16 + 10 ' palette data port from pal 2 index #10
+                DEFINE VRAM 0, 2, VARPTR currentColor(0)
+                VDP(47) = $40
+                VDP_ENABLE_INT
+
+                PUT_XY(0, 5, hexChar(r))
+                PUT_XY(1, 5, hexChar(g))
+                PUT_XY(2, 5, hexChar(b))
+
+                FOR I = 11 to 15 STEP 2
+                    DEFINE VRAM NAME_TAB_XY(8, I), 16, horzBar
+                NEXT I
+
+                PUT_XY(8 + r, 11, PATT_IDX_SLIDER)            
+                PUT_XY(8 + g, 13, PATT_IDX_SLIDER)            
+                PUT_XY(8 + b, 15, PATT_IDX_SLIDER)            
+            
+                lastIndex = currentIndex
+                GOSUB delay
+            END IF
+        END IF
+
+        IF lastMenu <> currentMenu THEN
+            GOSUB delay
+            lastMenu = currentMenu
+        END IF
+
+        GOSUB getNavButton
+
+'        IF (CONT1.KEY > 0 AND CONT1.KEY < 10) THEN
+'            currentIndex = CONT1.KEY
+        IF currentMenu = 0 THEN
+            IF g_nav AND NAV_LEFT THEN
+                currentIndex = currentIndex - 1
+                if currentIndex = 0 THEN currentIndex = 15
+            ELSEIF g_nav AND NAV_RIGHT THEN
+                currentIndex = currentIndex + 1
+                if currentIndex > 15 THEN currentIndex = 1
+            ELSEIF g_nav AND NAV_DOWN THEN
+                currentMenu = currentMenu + 1
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0)
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2)
+            END IF
+
+        ELSEIF currentMenu < 4 THEN
+            IF g_nav AND NAV_DOWN THEN
+                currentMenu = currentMenu + 1
+            ELSEIF g_nav AND NAV_UP THEN
+                currentMenu = currentMenu - 1
+            ELSEIF g_nav AND NAV_LEFT THEN
+                currentIndex = currentIndex - 1
+                if currentIndex = 0 THEN currentIndex = 15
+            ELSEIF g_nav AND NAV_RIGHT THEN
+                currentIndex = currentIndex + 1
+                if currentIndex > 15 THEN currentIndex = 1
+            END IF
+        END IF
+
+        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
     WEND
 
     VDP(31) = $00   ' bml en, pri, trans, fat, pal = 0
     
     g_currentMenu = MENU_ID_MAIN
     END
+
+defPal:
+  DATA BYTE $00, $00, $F0, $00, $F2, $C3, $F5, $D6, $F5, $4F, $F7, $6F, $FD, $54, $F4, $EF, $FF, $54, $FF, $76, $FD, $C3, $FE, $D6, $F2, $B2, $FC, $5C, $FC, $CC, $FF, $FF
+
+
 
 ' -----------------------------------------------------------------------------
 ' delay between user input (1/6 second)
@@ -624,7 +829,7 @@ saveOptions: PROCEDURE
     NEXT I
 
     IF NOT configChanged THEN
-        PRINT AT XY(0, 19), "  Skipped! No changes to save   "
+        PRINT AT XY(0, MENU_HELP_ROW), "  Skipped! No changes to save   "
         RETURN
     END IF
 
@@ -641,9 +846,9 @@ saveOptions: PROCEDURE
 
     ' if the clock frequency has changed... inform reboot
     IF clockChanged THEN
-        PRINT AT XY(0, 19), " Success! ** Reboot required ** "
+        PRINT AT XY(0, MENU_HELP_ROW), " Success! ** Reboot required ** "
     ELSE
-        PRINT AT XY(0, 19), "  Success! Configuration saved  "
+        PRINT AT XY(0, MENU_HELP_ROW), "  Success! Configuration saved  "
     END IF
     END
 
@@ -661,8 +866,10 @@ setupTiles: PROCEDURE
 
     DEFINE CHAR PATT_IDX_BORDER_H, 6, lineSegments  '   border segments
     DEFINE CHAR PATT_IDX_BORDER_H + 128, 6, lineSegments
+    DEFINE CHAR PATT_IDX_SLIDER, 1, sliderButton
 
     DEFINE CHAR PATT_IDX_BOX_TL, 4, palBox
+    DEFINE CHAR PATT_IDX_BOX_TL + 128, 4, palBox
 
     DEFINE CHAR PATT_IDX_SELECTED_L, 1, highlightLeft   ' ends of selection bar
     DEFINE CHAR PATT_IDX_SELECTED_R, 1, highlightRight
@@ -688,8 +895,15 @@ setupTiles: PROCEDURE
     DEFINE COLOR PATT_IDX_BORDER_TL, 1, colorLineSegH                  
     DEFINE COLOR PATT_IDX_BORDER_TR, 1, colorLineSegH                  
 
+    DEFINE COLOR PATT_IDX_BOX_TL + 128, 1, colorPalBoxSel
+    DEFINE COLOR PATT_IDX_BOX_TR + 128, 1, colorPalBoxSel
+    DEFINE COLOR PATT_IDX_BOX_BL + 128, 1, colorPalBoxSel2
+    DEFINE COLOR PATT_IDX_BOX_BR + 128, 1, colorPalBoxSel2
+
     DEFINE COLOR PATT_IDX_SELECTED_L, 1, highlight    ' selection bar ends
     DEFINE COLOR PATT_IDX_SELECTED_R, 1, highlight
+    DEFINE COLOR PATT_IDX_SLIDER, 1, highlight
+    DEFINE COLOR PATT_IDX_SWATCH, 1, colorSwatch
 
     DEFINE SPRITE 0, 7, logoSprites  ' set up logo sprites used for 'scanline sprites' demo
 
@@ -707,7 +921,7 @@ setupHeader: PROCEDURE
 
     PRINT AT XY(28, 0),"v1.0"
     PRINT AT XY(20, 1),"Configurator"
-    PRINT AT XY(5, 23), "(C) 2024 Troy Schrapel"    
+    PRINT AT XY(6, 23), "{}2024 Troy Schrapel"    
 
     DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
     'DEFINE VRAM NAME_TAB_XY(0, 4), 32, horzBar
@@ -790,7 +1004,7 @@ highlightMenuRow: PROCEDURE
     VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 31 - MENU_START_X), PATT_IDX_SELECTED_R
 
     ' output help line for the active menu item
-    DEFINE VRAM #VDP_NAME_TAB + XY(0, 18), 32, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_HELP)
+    DEFINE VRAM #VDP_NAME_TAB + XY(0, MENU_HELP_ROW), 32, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_HELP)
     END
 
 ' -----------------------------------------------------------------------------
@@ -863,7 +1077,7 @@ updatePalette: PROCEDURE
     PRINT "\2\47"
     PRINT "\4\79"
     PRINT "\7\127"
-    PRINT "\15\255"
+    PRINT "\10\0"
     PRINT "\15\255"
     PRINT "\15\255"
     PRINT "\15\255"
@@ -1009,6 +1223,8 @@ lineSegments:
 '    DATA BYTE $00, $00, $00, $E0, $F0, $38, $18, $18 ' tr
     DATA BYTE $18, $18, $1C, $0F, $07, $00, $00, $00 ' bl
     DATA BYTE $18, $18, $38, $F0, $E0, $00, $00, $00 ' br
+sliderButton:
+    DATA BYTE $00, $3C, $7E, $FF, $FF, $7E, $3C, $00
 
 colorLineSegH:
     DATA BYTE $00, $00, $00, $77, $44, $50, $50, $50
@@ -1044,6 +1260,12 @@ inv_white:
     DATA BYTE $f9, $f8, $f7, $f6, $f5, $f4, $f3, $f2
 highlight: 
     DATA BYTE $90, $80, $70, $60, $50, $40, $30, $20
+colorPalBoxSel: 
+    DATA BYTE $90, $90, $80, $80, $80, $70, $70, $70
+colorPalBoxSel2: 
+    DATA BYTE $60, $60, $60, $50, $50, $30, $30, $20
+colorSwatch:
+    DATA BYTE $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a
 
 font:
     DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00 ' <SPACE$
@@ -1137,9 +1359,9 @@ font:
     DATA BYTE $00, $00, $C6, $6C, $38, $6C, $C6, $00 ' x
     DATA BYTE $00, $00, $C6, $C6, $C6, $7E, $06, $FC ' y
     DATA BYTE $00, $00, $FE, $0C, $38, $60, $FE, $00 ' z
-    DATA BYTE $0E, $18, $18, $70, $18, $18, $0E, $00 ' {
+    DATA BYTE $3F, $60, $CF, $D8, $D8, $CF, $60, $3F
     DATA BYTE $18, $18, $18, $00, $18, $18, $18, $00 ' |
-    DATA BYTE $70, $18, $18, $0E, $18, $18, $70, $00 ' }
+    DATA BYTE $C0, $60, $30, $30, $30, $30, $60, $C0
     DATA BYTE $76, $DC, $00, $00, $00, $00, $00, $00 ' ~
     DATA BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF '  
 
