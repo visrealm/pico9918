@@ -20,6 +20,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
   * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
   * [Casio PV-16](https://www.msx.org/wiki/Casio_PV-16)
   * [Gradiente Expert XP-800](https://www.msx.org/wiki/Gradiente_Expert_XP-800)
+  * [National CF-2700](https://www.msx.org/wiki/National_CF-2700)
   * [Sharp HB-8000](https://www.msx.org/wiki/Sharp_HB-8000)
   * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
