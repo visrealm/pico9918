@@ -24,8 +24,10 @@ CONST PATT_IDX_BORDER_BL  = 26
 CONST PATT_IDX_BORDER_BR  = 27
 CONST PATT_IDX_SWATCH     = PATT_IDX_SELECTED_L + 128
 CONST PATT_IDX_SLIDER     = PATT_IDX_BORDER_H + 128
-CONST PATT_IDX_BORDER_HTL = PATT_IDX_BORDER_TL + 128
-CONST PATT_IDX_BORDER_HTR = PATT_IDX_BORDER_TR + 128
+CONST PATT_IDX_BORDER_HD  = PATT_IDX_BORDER_TL + 128
+CONST PATT_IDX_BORDER_HU  = PATT_IDX_BORDER_TR + 128
+CONST PATT_IDX_BORDER_VL  = PATT_IDX_BORDER_BL + 128
+CONST PATT_IDX_BORDER_VR  = PATT_IDX_BORDER_BR + 128
 CONST PATT_IDX_BOX_TL     = 28
 CONST PATT_IDX_BOX_TR     = 29
 CONST PATT_IDX_BOX_BL     = 30
@@ -44,7 +46,7 @@ setupTiles: PROCEDURE
     DEFINE CHAR 1 + 128, 19, logo2  ' second row of top left logo
 
     DEFINE CHAR PATT_IDX_BORDER_H, 6, lineSegments  '   border segments
-    DEFINE CHAR PATT_IDX_BORDER_H + 128, 6, lineSegments
+    DEFINE CHAR PATT_IDX_BORDER_H + 130, 4, lineSegmentJoiners
     DEFINE CHAR PATT_IDX_SLIDER, 1, sliderButton
 
     DEFINE CHAR PATT_IDX_BOX_TL, 4, palBox
@@ -69,6 +71,7 @@ setupTiles: PROCEDURE
     DEFINE COLOR PATT_IDX_BORDER_H, 1, colorLineSegH     ' horizontal divideborder color
     FOR I = PATT_IDX_BORDER_V TO PATT_IDX_BORDER_BR
         DEFINE COLOR I, 1, colorLineSeg                  ' other border colors
+        DEFINE COLOR I + 128, 1, colorLineSeg                  ' other border colors
     NEXT I    
 
     DEFINE COLOR PATT_IDX_BORDER_TL, 1, colorLineSegH                  
@@ -138,19 +141,24 @@ highlightRight:
     DATA BYTE $FC, $FE, $FF, $FF, $FF, $FF, $FE, $FC
 
 lineSegments:
-    DATA BYTE $00, $00, $00, $ff, $ff, $00, $00, $00
+    DATA BYTE $00, $00, $00, $ff, $ff, $00, $00, $00 ' horz
     DATA BYTE $18, $18, $18, $18, $18, $18, $18, $18 ' vert
-    DATA BYTE $00, $00, $00, $ff, $fF, $3C, $18, $18 ' tl
-    DATA BYTE $00, $00, $00, $ff, $Ff, $3c, $18, $18 ' tr
- '   DATA BYTE $00, $00, $00, $07, $0F, $1C, $18, $18 ' tl
-'    DATA BYTE $00, $00, $00, $E0, $F0, $38, $18, $18 ' tr
+    DATA BYTE $00, $00, $00, $07, $0F, $1C, $18, $18 ' tl
+    DATA BYTE $00, $00, $00, $E0, $F0, $38, $18, $18 ' tr
     DATA BYTE $18, $18, $1C, $0F, $07, $00, $00, $00 ' bl
     DATA BYTE $18, $18, $38, $F0, $E0, $00, $00, $00 ' br
+
+lineSegmentJoiners:
+    DATA BYTE $00, $00, $00, $ff, $ff, $3c, $18, $18 ' hd
+    DATA BYTE $18, $18, $3c, $ff, $ff, $00, $00, $00 ' hu
+    DATA BYTE $18, $18, $38, $f8, $f8, $38, $18, $18 ' vl
+    DATA BYTE $18, $18, $1c, $1f, $1f, $1c, $18, $18 ' vr
+
 sliderButton:
     DATA BYTE $00, $3C, $7E, $FF, $FF, $7E, $3C, $00
 
 colorLineSegH:
-    DATA BYTE $00, $00, $00, $77, $44, $50, $50, $50
+    DATA BYTE $50, $50, $50, $50, $50, $50, $50, $50
 colorLineSeg:
     DATA BYTE $50, $50, $50, $50, $50, $50, $50, $50
 
@@ -165,6 +173,10 @@ horzBar:
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
+vBar:   
+    DATA BYTE PATT_IDX_BORDER_V
+emptyRow:
+    DATA BYTE "                                "
 
 ' PICO9918 logo name table entries (rows 1 and 2)
 logoNames:
@@ -173,6 +185,7 @@ logoNames2:
     DATA BYTE 129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147
 
 ' color entries for an entire tile
+    DATA BYTE $f0, $f0, $f0, $f0, $f0, $f0, $f0, $f0
 white: 
     DATA BYTE $f0, $f0, $f0, $f0, $f0, $f0, $f0, $f0
 grey: 

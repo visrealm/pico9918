@@ -174,7 +174,7 @@ paletteMenu: PROCEDURE
             lastMenu = currentMenu
         END IF
 
-        GOSUB getNavButton
+        GOSUB updateNavInput
 
 '        IF (CONT1.KEY > 0 AND CONT1.KEY < 10) THEN
 '            currentIndex = CONT1.KEY

@@ -54,7 +54,8 @@ def main() -> int:
         output.write("  DATA BYTE \"{0}\"\n".format(filename.ljust(32)))
 
         BLOCK_SIZE = 8 * 4 + 256    # 9 ints and 256 bytes of data
-        BANK_SIZE = 1024 * args['banksize']
+        BANK_OVERHEAD = 48          # bank overhead. we can't use it all :(
+        BANK_SIZE = (1024 * args['banksize']) - BANK_OVERHEAD
         BLOCKS_PER_BANK = int(BANK_SIZE / BLOCK_SIZE)
 
         print("Bank size: {0} bytes".format(BANK_SIZE))

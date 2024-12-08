@@ -75,11 +75,12 @@
 GOTO main
 
 INCLUDE "vdp-utils.bas"
-INCLUDE "config.bas"
 INCLUDE "patterns.bas"
 
 INCLUDE "ui.bas"
 INCLUDE "input.bas"
+
+INCLUDE "config.bas"
 
 INCLUDE "menu-main.bas"
 INCLUDE "menu-firmware.bas"
@@ -97,9 +98,13 @@ main:
     g_currentMenuIndex = 0                  ' current menu index
 
     ' setup the screen
-    BORDER 0
+    BORDER 1
+    SCREEN DISABLE
+
     GOSUB setupTiles
     GOSUB setupHeader
+
+    SCREEN ENABLE
     
     ' what are we working with?
     GOSUB vdpDetect
@@ -137,12 +142,13 @@ main:
     isPico9918 = isF18ACompatible   ' FOR TESTING
 
     IF NOT isPico9918 THEN
-        PRINT AT XY(7, 6 + (isF18ACompatible AND 3)), "PICO9918 not found"
+        PRINT AT XY(7, 6 + (isF18ACompatible AND 4)), "PICO9918 not found"
         IF NOT isF18ACompatible THEN
             PRINT AT XY(15, 9), "OR"
             PRINT AT XY(3, 12), "PICO9918 firmware too old"
             PRINT AT XY(4, 14), "Firmware v1.0+ required"
-            PRINT AT XY(4, 16), "Update manually via USB"
+            PRINT AT XY(2, 16), "Update manually via USB from"
+            PRINT AT XY(2, 18), "github.com/visrealm/pico9918"
         END IF
     ELSE
         ' We are a PICO9918, set up the menu

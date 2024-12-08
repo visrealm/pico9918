@@ -5,6 +5,11 @@ mkdir build 2> NUL
 mkdir build\asm 2> NUL
 mkdir build\bin 2> NUL
 
+python3 tools\uf2cvb.py -b 8 -o src\firmware_8k.bas pico9918-vga-build-v1-2-diag.uf2
+python3 tools\uf2cvb.py -b 16 -o src\firmware_16k.bas pico9918-vga-build-v1-2-diag.uf2
+
+if %errorlevel% neq 0 exit /b %errorlevel%
+
 pushd build
 
 set PATH=..\tools\cvbasic;%PATH%

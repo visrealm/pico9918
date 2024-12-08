@@ -111,7 +111,7 @@ mainMenu: PROCEDURE
         lastMenuIndex = g_currentMenuIndex
         valueChanged = FALSE
 
-        GOSUB getNavButton
+        GOSUB updateNavInput
 
         ' <down> button pressed?
         IF g_nav AND NAV_DOWN THEN  
@@ -204,13 +204,56 @@ mainMenu: PROCEDURE
             ELSEIF vdpOptId = CONF_MENU_RESET THEN
                 GOSUB resetOptions
             ELSEIF vdpOptId = CONF_MENU_SAVE THEN
-                GOSUB saveOptions
+                GOSUB saveOptionsMenu
             END IF
             GOSUB delay
         END IF
         
     WEND
     END
+
+' -----------------------------------------------------------------------------
+' save configuration
+' -----------------------------------------------------------------------------
+saveOptionsMenu: PROCEDURE
+
+    configChanged = FALSE
+    FOR I = 0 TO CONF_COUNT - 1
+        IF savedConfigValues(I) <> tempConfigValues(I) THEN configChanged = TRUE
+    NEXT I
+
+    IF NOT configChanged THEN
+        PRINT AT XY(0, MENU_HELP_ROW), "  Skipped! No changes to save   "
+        RETURN
+    END IF
+
+    ' prompt first
+    I = g_currentMenuIndex
+    g_currentMenuIndex = 0
+    RENDER_MENU_ROW(I)
+    g_currentMenuIndex = I
+
+'    GOSUB clearScreen
+
+    DRAW_POPUP(" Save Changes? ", 15, 6)
+    PRINT AT XY((32 - a_titleLen) / 2 + 2, a_popupTop + 3), "1. Save"
+    PRINT AT XY((32 - a_titleLen) / 2 + 2, a_popupTop + 5), "2. Cancel"
+
+    GOSUB delay
+    
+    WHILE 1
+        WAIT
+        GOSUB updateNavInput
+        IF g_nav AND (NAV_CANCEL OR NAV_OK) THEN EXIT WHILE
+    WEND
+
+    GOSUB clearScreen
+    GOSUB renderMenu
+
+    IF g_nav AND NAV_OK THEN GOSUB saveOptions
+
+    END
+
 
 INCLUDE "conf-scanline-sprites.bas"
 
@@ -222,7 +265,7 @@ configMenuData:
     DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites", 2, 4, "                                "
     DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, " RP2040 clock (requires reboot) "
     DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
-    DATA BYTE CONF_MENU_SAVE,       "Save Settings   ", 0, 0, " Save configuration to PICO9918 "
+    DATA BYTE CONF_MENU_SAVE,       "Save settings   ", 0, 0, " Save configuration to PICO9918 "
     DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
     DATA BYTE CONF_MENU_DIAG,       "Diagnostics  >>>", 0, 0, "   Manage diagnostics options   "
     DATA BYTE CONF_MENU_PALETTE,    "Palette      >>>", 0, 0, "     Change default palette     "
@@ -242,3 +285,10 @@ configMenuOptionValueData:
     DATA BYTE "252MHz"
     DATA BYTE "302MHz"
     DATA BYTE "352MHz"
+
+' -----------------------------------------------------------------------------
+' popup option values label[8], value
+' -----------------------------------------------------------------------------
+configMenuPopupValueData:
+    DATA BYTE "Save    ", 1
+    DATA BYTE "Cancel  ", 0

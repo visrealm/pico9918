@@ -31,16 +31,6 @@ resetOptions: PROCEDURE
 ' save the current config to PICO9918 flash
 ' -----------------------------------------------------------------------------
 saveOptions: PROCEDURE
-    
-    configChanged = FALSE
-    FOR I = 0 TO CONF_COUNT - 1
-        IF savedConfigValues(I) <> tempConfigValues(I) THEN configChanged = TRUE
-    NEXT I
-
-    IF NOT configChanged THEN
-        PRINT AT XY(0, MENU_HELP_ROW), "  Skipped! No changes to save   "
-        RETURN
-    END IF
 
     ' instruct the pico9918 to commit config to flash
     VDP_WRITE_CONFIG(CONF_SAVE_TO_FLASH, 1)

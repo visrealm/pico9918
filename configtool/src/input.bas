@@ -24,7 +24,7 @@ CONST NAV_CANCEL = 32
 ' -----------------------------------------------------------------------------
 ' centralised navigation handling for kb and joystick
 ' -----------------------------------------------------------------------------
-getNavButton: PROCEDURE
+updateNavInput: PROCEDURE
     g_nav = NAV_NONE
 
     ' <DOWN> or <X>

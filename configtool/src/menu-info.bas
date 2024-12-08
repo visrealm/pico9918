@@ -79,7 +79,7 @@ deviceInfoMenu: PROCEDURE
     WHILE 1
         WAIT
 
-        GOSUB getNavButton
+        GOSUB updateNavInput
         IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
 
         VDP_DISABLE_INT
