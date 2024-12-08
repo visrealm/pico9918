@@ -165,7 +165,8 @@ const uint tmsCpuClkSm = 3;
 
 static int frameCount = 0;
 static int logoOffset = 100;
-static bool doneInt = false;  // interrupt raised this frame?
+static bool validWrites = false;  // has the VDP display been enabled at all?
+static bool doneInt = false;      // interrupt raised this frame?
 
 static const uint32_t dma32 = 2; // memset 32bit
 /*
@@ -569,6 +570,7 @@ static __attribute__ ((noinline)) uint32_t toBcd(uint32_t number)
 
 inline uint32_t bigRgb2LittleBgr(uint32_t val)
 {
+  val &= 0xff0f;
   return val | ((val >> 12) << 4);
 }
 
@@ -612,6 +614,13 @@ static void tmsPorch()
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
+  
+  if (!validWrites)
+  {
+    // has the display been enabled?
+    validWrites = !(TMS_REGISTER(tms9918, 1) & 0x40);
+  }
+
 
 #if TIMING_DIAG
   const uint32_t framesPerUpdate = 1 << 2;
@@ -644,13 +653,10 @@ static void outputSplash(uint16_t y, uint32_t vBorder, uint32_t vPixels, uint16_
 
   if (y == 0)
   {
-    // TODO: I think the splash should remain shown until we have confirmed we're
-    //       getting good data (registers set, etc.)
-
     if (frameCount & 0x01)
     {
       if (frameCount < 200 && logoOffset > (22 - splashHeight)) --logoOffset;
-      else if (frameCount > 500) ++logoOffset;
+      else if (validWrites && frameCount > 500) ++logoOffset;
     }
   }
 
@@ -796,8 +802,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
   uint32_t* dPixels = (uint32_t*)pixels;
-  //bg = bigRgb2LittleBgr(tms9918->vram.map.pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
-  bg = (currentHwVersion == HWVer_0_3) ? 0x0f00 : 0x00f0;
+  bg = bigRgb2LittleBgr(tms9918->vram.map.pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
   bg = bg | (bg << 16);
 
   if (y == 0)
@@ -822,7 +827,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     renderDiagnostics(y, pixels); // TODO: This won't display in ROW30 mode
 #endif
 
-    if (frameCount < 600)
+    if (!validWrites || (frameCount < 600))
     {
       outputSplash(y, vBorder, vPixels, pixels);
 
@@ -1032,7 +1037,7 @@ void proc1Entry()
     gpio_set_irq_enabled(GPIO_RESET, GPIO_IRQ_EDGE_FALL, true);
     irq_set_enabled(IO_IRQ_BANK0, true);
   }
-  
+
   tms9918->config[CONF_HW_VERSION] = currentHwVersion;
 
   // wait until everything else is ready, then run the vga loop
@@ -1082,9 +1087,12 @@ int main(void)
 
   if (tms9918->config[CONF_CLOCK_PRESET_ID] != clockPresetIndex)
   {
+    // we do this now rather than at boot to ensure a fast (133MHz?) flash clock
+    // for the transfer of the firmware to RAM at startup
+
     ssi_hw->ssienr = 0; // change (reduce) flash SPI clock rate
     ssi_hw->baudr = 0;
-    ssi_hw->baudr = 4;
+    ssi_hw->baudr = 4;  // clock divider (must be even and result in a max of 133MHz)
     ssi_hw->ssienr = 1;    
 
     clockPresetIndex = tms9918->config[CONF_CLOCK_PRESET_ID];
@@ -1092,10 +1100,10 @@ int main(void)
 
     vreg_set_voltage(clockSettings.voltage);
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
-
-    //updateClock(tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
-    //updateClock(tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
   }
+
+  initClock((currentHwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL, tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
+  initClock((currentHwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL, tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
   dma_channel_config cfg = dma_channel_get_default_config(dma32);
   channel_config_set_read_increment(&cfg, false);
@@ -1135,10 +1143,6 @@ int main(void)
 #if PICO9918_DIAG
   analogReadTempSetup();
 #endif
-
-
-  initClock((currentHwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL, tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
-  initClock((currentHwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL, tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
   /* signal proc1 that we're ready to start the display */
   multicore_fifo_push_blocking(0);

@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.13)
 # compile-time options
 
 set(PICO9918_MAJOR_VER 1)
-set(PICO9918_MINOR_VER 0)
+set(PICO9918_MINOR_VER 2)
 
 # SCART RGBs options
 set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
@@ -36,7 +36,7 @@ else()
   set(PICO9918_OUTPUT_STR "vga")
 endif()
 
-set(PICO9918_VERSION   "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}")
+set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
 if (NOT ${PICO_BOARD} STREQUAL "pico9918")
@@ -88,7 +88,6 @@ add_definitions(-DPICO9918_SCART_PAL=${PICO9918_SCART_PAL})
 add_definitions(-DPICO9918_DIAG=${PICO9918_DIAG})
 
 add_definitions(-DPICO_DISABLE_SHARED_IRQ_HANDLERS=1)
-#add_definitions(-DPICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1)
 add_definitions(-DPICO_PANIC_FUNCTION=)
 
 target_link_libraries(${PROGRAM} PUBLIC        
