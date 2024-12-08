@@ -133,7 +133,7 @@ static bool buildSyncData()
   rgbDataBuffer[1] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
 #endif
 
-  vgaParams.params.pioDivider = /*roundflt*/(sysClockKHz / (float)minClockKHz);
+  vgaParams.params.pioDivider = roundflt(sysClockKHz / (float)minClockKHz);
   vgaParams.params.pioFreqKHz = sysClockKHz / vgaParams.params.pioDivider;
 
   vgaParams.params.pioClocksPerPixel = vgaParams.params.pioFreqKHz / (float)vgaParams.params.pixelClockKHz;

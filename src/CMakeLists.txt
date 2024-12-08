@@ -6,9 +6,6 @@ cmake_minimum_required(VERSION 3.13)
 set(PICO9918_MAJOR_VER 1)
 set(PICO9918_MINOR_VER 0)
 
-set(PICO9918_PCB_MAJOR_VER 1)
-set(PICO9918_PCB_MINOR_VER 0)
-
 # SCART RGBs options
 set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
 set(PICO9918_SCART_PAL  0)  # 1 for PAL 576i, 0 for NTSC 480i
@@ -42,7 +39,11 @@ endif()
 set(PICO9918_VERSION   "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
-set(PICO9918_BINARY_SUFFIX -pcb-${PICO_BOARD}-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_OUTPUT_STR}-build-v${PICO9918_VERSION_STR})
+if (NOT ${PICO_BOARD} STREQUAL "pico9918")
+  set(PICO_BOARD_STR -${PICO_BOARD})
+endif()
+
+set(PICO9918_BINARY_SUFFIX ${PICO_BOARD_STR}-${PICO9918_OUTPUT_STR}-build-v${PICO9918_VERSION_STR})
 
 if (${PICO9918_DIAG})
   set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-diag)
@@ -56,7 +57,7 @@ target_sources(${PROGRAM} PRIVATE main.c clocks.pio.h tms9918.pio.h)
 
 pico_set_program_name(${PROGRAM} "pico9918")
 pico_set_program_version(${PROGRAM} ${PICO9918_VERSION})
-pico_set_program_description(${PROGRAM} "PICO9918 VDP for PCB v${PICO9918_PCB_MAJOR_VER}.${PICO9918_PCB_MINOR_VER}")
+pico_set_program_description(${PROGRAM} "PICO9918 VDP")
 pico_set_program_url(${PROGRAM} "https://github.com/visrealm/pico9918")
 
 # generate image array source files from png images
@@ -82,8 +83,6 @@ add_definitions(-DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH})
 add_definitions(-DPICO9918_VERSION="${PICO9918_VERSION}")
 add_definitions(-DPICO9918_MAJOR_VER=${PICO9918_MAJOR_VER})
 add_definitions(-DPICO9918_MINOR_VER=${PICO9918_MINOR_VER})
-add_definitions(-DPICO9918_PCB_MAJOR_VER=${PICO9918_PCB_MAJOR_VER})
-add_definitions(-DPICO9918_PCB_MINOR_VER=${PICO9918_PCB_MINOR_VER})
 add_definitions(-DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS})
 add_definitions(-DPICO9918_SCART_PAL=${PICO9918_SCART_PAL})
 add_definitions(-DPICO9918_DIAG=${PICO9918_DIAG})
