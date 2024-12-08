@@ -13,6 +13,14 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
+CONST NAV_NONE = 0
+CONST NAV_DOWN = 1
+CONST NAV_UP = 2
+CONST NAV_LEFT = 4
+CONST NAV_RIGHT = 8
+CONST NAV_OK = 16
+CONST NAV_CANCEL = 32
+
 ' -----------------------------------------------------------------------------
 ' centralised navigation handling for kb and joystick
 ' -----------------------------------------------------------------------------

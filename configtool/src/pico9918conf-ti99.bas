@@ -13,6 +13,13 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
+' The TI-99 implementation only has 8kB Banks, so we need a separate wrapper
+' for it. Other implementations have 16kB banks.
+
+BANK ROM 256
+
 CONST BANK_SIZE = 8
 
 INCLUDE "core.bas"
+
+INCLUDE "firmware_8k.bas"

@@ -13,6 +13,23 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
+' pattern indices
+CONST PATT_IDX_SELECTED_L = 20
+CONST PATT_IDX_SELECTED_R = 21
+CONST PATT_IDX_BORDER_H   = 22
+CONST PATT_IDX_BORDER_V   = 23
+CONST PATT_IDX_BORDER_TL  = 24
+CONST PATT_IDX_BORDER_TR  = 25
+CONST PATT_IDX_BORDER_BL  = 26
+CONST PATT_IDX_BORDER_BR  = 27
+CONST PATT_IDX_SWATCH     = PATT_IDX_SELECTED_L + 128
+CONST PATT_IDX_SLIDER     = PATT_IDX_BORDER_H + 128
+CONST PATT_IDX_BORDER_HTL = PATT_IDX_BORDER_TL + 128
+CONST PATT_IDX_BORDER_HTR = PATT_IDX_BORDER_TR + 128
+CONST PATT_IDX_BOX_TL     = 28
+CONST PATT_IDX_BOX_TR     = 29
+CONST PATT_IDX_BOX_BL     = 30
+CONST PATT_IDX_BOX_BR     = 31
 
 ' -----------------------------------------------------------------------------
 ' set up the various tile patters and colors

@@ -23,7 +23,8 @@ firmwareMenu: PROCEDURE
     GOSUB delay
     I = 0
     FOR B = 1 TO 5
-        ON B FAST GOSUB ,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10
+        ON B FAST GOSUB ,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5
+        ',selectBank6',selectBank7',selectBank8,selectBank9,selectBank10
         DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + B), 32, VARPTR bank1Start(289)
     NEXT B
 
@@ -59,22 +60,22 @@ selectBank5:
     BANK SELECT 5
     RETURN
 
-selectBank6:
-    BANK SELECT 6
-    RETURN
+'selectBank6:
+    'BANK SELECT 6
+    'RETURN
 
-selectBank7:
-    BANK SELECT 7
-    RETURN
+'selectBank7:
+    'BANK SELECT 7
+    'RETURN
 
-selectBank8:
-    BANK SELECT 8
-    RETURN
+'selectBank8:
+    'BANK SELECT 8
+    'RETURN
+'
+'selectBank9:
+    'BANK SELECT 9
+    'RETURN
 
-selectBank9:
-    BANK SELECT 9
-    RETURN
-
-selectBank10:
-    BANK SELECT 10
-    RETURN
+'selectBank10:
+    'BANK SELECT 10
+    'RETURN

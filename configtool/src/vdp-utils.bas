@@ -13,6 +13,10 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
+' VDP constants
+CONST #VDP_NAME_TAB     = $1800
+CONST #VDP_SPRITE_ATTR  = $1B00
+
 ' VDP helpers
 DEF FN VDP_DISABLE_INT = VDP(1) = $C2
 DEF FN VDP_ENABLE_INT = VDP(1) = $E2

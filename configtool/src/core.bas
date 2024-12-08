@@ -12,30 +12,6 @@
 ' -----------------------------------------------------------------------------
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
-'
-' BUILDING INSTRUCTIONS:
-'
-' 1. create ./asm and ./bin directories
-' 2. cvbasic, gasm80 and xdt99 in path
-'
-' -- TI-99 --
-'   > cvbasic --ti994a pico9918tool.bas asm/pico9918tool99.a99 lib
-'   > xas99.py -b -R asm/pico9918tool99.a99
-'   > linkticart.py asm/pico9918tool99.bin bin/pico9918tool99_8.bin "PICO9918 CONFIG TOOL"
-'
-' -- ColecoVision --
-'   > cvbasic pico9918tool.bas asm/pico9918tool_cv.asm lib
-'   > gasm80 asm/pico9918tool_cv.asm -o bin/pico9918tool_cv.rom
-'
-' -- MSX --
-'   > cvbasic --msx pico9918tool.bas asm/pico9918tool_msx.asm lib
-'   > gasm80 asm/pico9918tool_msx.asm -o bin/pico9918tool_msx.rom
-'
-' Cartridge images will be in the ./bin directory
-'
-' -----------------------------------------------------------------------------
-
-BANK ROM 256
 
     ' helper constants
     CONST TRUE           = -1
@@ -50,24 +26,6 @@ BANK ROM 256
     CONST MENU_ID_DIAG     = 2
     CONST MENU_ID_PALETTE  = 3
     CONST MENU_ID_FIRMWARE = 4
-
-    ' pattern indixes
-    CONST PATT_IDX_SELECTED_L = 20
-    CONST PATT_IDX_SELECTED_R = 21
-    CONST PATT_IDX_BORDER_H   = 22
-    CONST PATT_IDX_BORDER_V   = 23
-    CONST PATT_IDX_BORDER_TL  = 24
-    CONST PATT_IDX_BORDER_TR  = 25
-    CONST PATT_IDX_BORDER_BL  = 26
-    CONST PATT_IDX_BORDER_BR  = 27
-    CONST PATT_IDX_SWATCH     = PATT_IDX_SELECTED_L + 128
-    CONST PATT_IDX_SLIDER     = PATT_IDX_BORDER_H + 128
-    CONST PATT_IDX_BORDER_HTL = PATT_IDX_BORDER_TL + 128
-    CONST PATT_IDX_BORDER_HTR = PATT_IDX_BORDER_TR + 128
-    CONST PATT_IDX_BOX_TL     = 28
-    CONST PATT_IDX_BOX_TR     = 29
-    CONST PATT_IDX_BOX_BL     = 30
-    CONST PATT_IDX_BOX_BR     = 31
 
     ' Pico9918Options index, name[16], values index, num values,help[32]
     CONST CONF_COUNT      = 10
@@ -111,18 +69,6 @@ BANK ROM 256
     CONST CONF_MENU_SAVE        = 250
     CONST CONF_MENU_FIRMWARE    = 249
 
-    ' VDP constants
-    CONST #VDP_NAME_TAB     = $1800
-    CONST #VDP_SPRITE_ATTR  = $1B00
-
-    CONST NAV_NONE = 0
-    CONST NAV_DOWN = 1
-    CONST NAV_UP = 2
-    CONST NAV_LEFT = 4
-    CONST NAV_RIGHT = 8
-    CONST NAV_OK = 16
-    CONST NAV_CANCEL = 32
-
     DEF FN MENU_DATA(I, C) = configMenuData((I) * CONF_STRUCT_LEN + (C))
 
 
@@ -130,6 +76,7 @@ GOTO main
 
 INCLUDE "vdp-utils.bas"
 INCLUDE "config.bas"
+INCLUDE "patterns.bas"
 
 INCLUDE "ui.bas"
 INCLUDE "input.bas"
@@ -255,7 +202,3 @@ delay: PROCEDURE
 
 hexChar:
     DATA BYTE "0123456789ABCDEF"
-
-INCLUDE "patterns.bas"
-
-INCLUDE "firmware.bas"

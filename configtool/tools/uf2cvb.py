@@ -30,7 +30,7 @@ def main() -> int:
         description='Convert .UF2 file to banked CVBasic source file of binary data.',
         epilog="GitHub: https://github.com/visrealm/pico9918")
     parser.add_argument('-b', '--banksize', help='bank size (8 or 16)', default=8, type=int, choices=[8,16])
-    parser.add_argument('-o', '--outfile', help='output file - defaults to base input file name with .bas extension', default='')
+    parser.add_argument('-o', '--outfile', help='output file - defaults to base input file name with .bas extension', default='firmware.bas')
     parser.add_argument('uf2file')
     args = vars(parser.parse_args())
 
@@ -47,13 +47,13 @@ def main() -> int:
     #    uint8_t  data [476];
     #    uint32_t magicEnd;
 
-    with open("firmware.bas", mode='w') as output:
+    with open(args['outfile'], mode='w') as output:
 
         output.write("\n' ===============================\n")
         output.write("firmwareFilename:\n")
         output.write("  DATA BYTE \"{0}\"\n".format(filename.ljust(32)))
 
-        BLOCK_SIZE = 9 * 4 + 256    # 9 ints and 256 bytes of data
+        BLOCK_SIZE = 8 * 4 + 256    # 9 ints and 256 bytes of data
         BANK_SIZE = 1024 * args['banksize']
         BLOCKS_PER_BANK = int(BANK_SIZE / BLOCK_SIZE)
 
@@ -81,6 +81,7 @@ def main() -> int:
                     w = struct.unpack("<IIIIIIII", inpbuf[0:32])
                     output.write("\n ' Block: {0}\n".format(w[5]))
                     output.write(" ' Addr: {0}\n".format(hex(w[3])))
+                    output.write(" ' Bank: {0}\n".format(bank - 1))
                     for h in range (0, 32, 4):
                         byteStr = []
                         for b in inpbuf[h:h + 4]:
@@ -93,10 +94,10 @@ def main() -> int:
                             byteStr.append("${0}".format(b.to_bytes().hex()))
                         output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
 
-                    byteStr = []
-                    for b in inpbuf[508:512]:
-                        byteStr.append("${0}".format(b.to_bytes().hex()))
-                    output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
+                    #byteStr = []
+                    #for b in inpbuf[508:512]:
+                    #    byteStr.append("${0}".format(b.to_bytes().hex()))
+                    #output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
 
                     inpbuf = uf2.read(512)
                     blocksRead += 1

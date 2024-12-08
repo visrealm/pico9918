@@ -18,7 +18,7 @@ copy /Y ..\src\lib lib
 
 :: TI-99
 cvbasic --ti994a pico9918conf-ti99.bas asm\pico9918tool_ti99.a99 %LIBPATH%
-call assm asm/pico9918tool_ti99.a99
+python c:\tools\xdt99\xas99.py -b -R asm/pico9918tool_ti99.a99
 if %errorlevel% neq 0 exit /b %errorlevel%
 linkticart.py pico9918tool_ti99_b00.bin bin\pico9918tool_ti99_8.bin "PICO9918 CONFIG TOOL"
 copy /Y bin\pico9918tool_ti99_8.bin c:\tools\Classic99

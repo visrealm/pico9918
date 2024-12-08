@@ -93,9 +93,7 @@ paletteMenu: PROCEDURE
 
     currentMenu = 0 ' 0 = pal, 1 = r, 2 = g, 3 = b
     lastMenu    = 0
-    r = 0
-    g = 0
-    b = 0
+    DIM rgb(3)
 
     VDP_ENABLE_INT
 
@@ -130,30 +128,45 @@ paletteMenu: PROCEDURE
                 currentColor(0) = defPal(currentIndex * 2)
                 currentColor(1) = defPal(currentIndex * 2 + 1)
 
-                r = currentColor(0) AND $0f
-                g = currentColor(1) / 16
-                b = currentColor(1) AND $0f
+                rgb(0) = currentColor(0) AND $0f
+                rgb(1) = currentColor(1) / 16
+                rgb(2) = currentColor(1) AND $0f
 
                 VDP(47) = $c0 + 16 + 10 ' palette data port from pal 2 index #10
                 DEFINE VRAM 0, 2, VARPTR currentColor(0)
                 VDP(47) = $40
                 VDP_ENABLE_INT
 
-                PUT_XY(0, 5, hexChar(r))
-                PUT_XY(1, 5, hexChar(g))
-                PUT_XY(2, 5, hexChar(b))
+                PUT_XY(0, 5, hexChar(rgb(0)))
+                PUT_XY(1, 5, hexChar(rgb(1)))
+                PUT_XY(2, 5, hexChar(rgb(2)))
 
                 FOR I = 11 to 15 STEP 2
                     DEFINE VRAM NAME_TAB_XY(8, I), 16, horzBar
                 NEXT I
 
-                PUT_XY(8 + r, 11, PATT_IDX_SLIDER)            
-                PUT_XY(8 + g, 13, PATT_IDX_SLIDER)            
-                PUT_XY(8 + b, 15, PATT_IDX_SLIDER)            
+                PUT_XY(8 + rgb(0), 11, PATT_IDX_SLIDER)            
+                PUT_XY(8 + rgb(1), 13, PATT_IDX_SLIDER)            
+                PUT_XY(8 + rgb(2), 15, PATT_IDX_SLIDER)            
             
                 lastIndex = currentIndex
                 GOSUB delay
             END IF
+        ELSEIF currentMenu < 4 THEN
+                cc1 = rgb(1) * 16 + rgb(2)
+                IF currentColor(0) <> rgb(0) OR currentColor(1) <> cc1 THEN 
+                    DEFINE VRAM NAME_TAB_XY(8, 9 + (currentMenu * 2)), 16, horzBar
+                    PUT_XY(8 + rgb(currentMenu - 1), 9 + (currentMenu * 2), PATT_IDX_SLIDER)            
+
+                    currentColor(0) = rgb(0)
+                    currentColor(1) = cc1
+
+                    VDP(47) = $c0 + 16 + 10 ' palette data port from pal 2 index #10
+                    DEFINE VRAM 0, 2, VARPTR currentColor(0)
+                    VDP(47) = $40
+                    VDP_ENABLE_INT
+                    GOSUB delay
+                END IF
         END IF
 
         IF lastMenu <> currentMenu THEN
@@ -179,16 +192,15 @@ paletteMenu: PROCEDURE
             END IF
 
         ELSEIF currentMenu < 4 THEN
+            rgbIndex = currentMenu - 1
             IF g_nav AND NAV_DOWN THEN
                 currentMenu = currentMenu + 1
             ELSEIF g_nav AND NAV_UP THEN
                 currentMenu = currentMenu - 1
-            ELSEIF g_nav AND NAV_LEFT THEN
-                currentIndex = currentIndex - 1
-                if currentIndex = 0 THEN currentIndex = 15
-            ELSEIF g_nav AND NAV_RIGHT THEN
-                currentIndex = currentIndex + 1
-                if currentIndex > 15 THEN currentIndex = 1
+            ELSEIF g_nav AND NAV_LEFT AND rgb(rgbIndex) > 0 THEN
+                rgb(rgbIndex) = rgb(rgbIndex) - 1
+            ELSEIF g_nav AND NAV_RIGHT  AND rgb(rgbIndex) < 15 THEN
+                rgb(rgbIndex) = rgb(rgbIndex) + 1
             END IF
         END IF
 
