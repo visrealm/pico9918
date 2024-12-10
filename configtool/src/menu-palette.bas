@@ -108,6 +108,7 @@ paletteMenu: PROCEDURE
 
 
         IF currentMenu = 0 THEN
+            SPRITE 0, $d0, 0,0,0
             DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
             DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
             IF lastIndex <> currentIndex THEN
@@ -153,6 +154,8 @@ paletteMenu: PROCEDURE
                 GOSUB delay
             END IF
         ELSEIF currentMenu < 4 THEN
+                SPRITE 0, 8 * (9 + (currentMenu * 2)) - 1, 8 * (8 + rgb(currentMenu - 1)),32,(FRAME AND 8)+7
+
                 cc1 = rgb(1) * 16 + rgb(2)
                 IF currentColor(0) <> rgb(0) OR currentColor(1) <> cc1 THEN 
                     DEFINE VRAM NAME_TAB_XY(8, 9 + (currentMenu * 2)), 16, horzBar
@@ -209,7 +212,7 @@ paletteMenu: PROCEDURE
 
     VDP(31) = $00   ' bml en, pri, trans, fat, pal = 0
     
-    g_currentMenu = MENU_ID_MAIN
+    SET_MENU(MENU_ID_MAIN)
     END
 
 defPal:

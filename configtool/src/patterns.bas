@@ -37,8 +37,6 @@ CONST PATT_IDX_BOX_BR     = 31
 ' set up the various tile patters and colors
 ' -----------------------------------------------------------------------------
 setupTiles: PROCEDURE
-    VDP(1) = $82  ' disable interrupts and display
-
     DEFINE CHAR 32, 96, font        ' font standard
     DEFINE CHAR 32 + 128, 96, font  ' font highlighted
 
@@ -88,6 +86,7 @@ setupTiles: PROCEDURE
     DEFINE COLOR PATT_IDX_SWATCH, 1, colorSwatch
 
     DEFINE SPRITE 0, 7, logoSprites  ' set up logo sprites used for 'scanline sprites' demo
+    DEFINE SPRITE 8, 1, sliderButtonH
 
     SPRITE FLICKER OFF
     END
@@ -156,6 +155,12 @@ lineSegmentJoiners:
 
 sliderButton:
     DATA BYTE $00, $3C, $7E, $FF, $FF, $7E, $3C, $00
+
+sliderButtonH:
+    DATA BYTE $3C, $42, $81, $81, $81, $81, $42, $3C
+    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00
+    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00
+    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00
 
 colorLineSegH:
     DATA BYTE $50, $50, $50, $50, $50, $50, $50, $50

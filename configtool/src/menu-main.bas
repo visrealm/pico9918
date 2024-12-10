@@ -32,7 +32,7 @@ renderMenuRow: PROCEDURE
     CONST MENU_START_X = 0
 
     ' don't render special index 255
-    IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN RETURN
+    IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + a_menuIndexToRender), 32, emptyRow : RETURN
 
     ' pre-compute row offset. we'll need this a few times
     #ROWOFFSET = XY(0, MENU_TOP_ROW + a_menuIndexToRender)
@@ -190,16 +190,16 @@ mainMenu: PROCEDURE
             ELSEIF vdpOptId = CONF_SCANLINE_SPRITES THEN
                 VDP(30) = pow2(currentValueIndex + 2)
             ELSEIF vdpOptId = CONF_MENU_FIRMWARE THEN
-                g_currentMenu = MENU_ID_FIRMWARE
+                SET_MENU(MENU_ID_FIRMWARE)
                 EXIT WHILE
             ELSEIF vdpOptId = CONF_MENU_INFO THEN
-                g_currentMenu = MENU_ID_INFO
+                SET_MENU(MENU_ID_INFO)
                 EXIT WHILE
             ELSEIF vdpOptId = CONF_MENU_DIAG THEN
-                g_currentMenu = MENU_ID_DIAG
+                SET_MENU(MENU_ID_DIAG)
                 EXIT WHILE
             ELSEIF vdpOptId = CONF_MENU_PALETTE THEN
-                g_currentMenu = MENU_ID_PALETTE
+                SET_MENU(MENU_ID_PALETTE)
                 EXIT WHILE
             ELSEIF vdpOptId = CONF_MENU_RESET THEN
                 GOSUB resetOptions
@@ -247,7 +247,6 @@ saveOptionsMenu: PROCEDURE
         IF g_nav AND (NAV_CANCEL OR NAV_OK) THEN EXIT WHILE
     WEND
 
-    GOSUB clearScreen
     GOSUB renderMenu
 
     IF g_nav AND NAV_OK THEN GOSUB saveOptions

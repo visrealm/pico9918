@@ -70,4 +70,5 @@ animateSprites: PROCEDURE
 ' -----------------------------------------------------------------------------
 hideSprites: PROCEDURE
     SPRITE 0,$d0,0,0,0
+    SPRITE 1,$d0,0,0,0
     END

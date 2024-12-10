@@ -20,6 +20,8 @@ CONST #VDP_SPRITE_ATTR  = $1B00
 ' VDP helpers
 DEF FN VDP_DISABLE_INT = VDP(1) = $C2
 DEF FN VDP_ENABLE_INT = VDP(1) = $E2
+DEF FN VDP_DISABLE_INT_DISP_OFF = VDP(1) = $82
+DEF FN VDP_ENABLE_INT_DISP_OFF = VDP(1) = $A2
 DEF FN VDP_WRITE_CONFIG(I, V) = VDP(58) = I : VDP(59) = V
 DEF FN VDP_READ_STATUS = USR RDVST
 DEF FN VDP_SET_CURRENT_STATUS_REG(R) = VDP(15) = R
@@ -48,10 +50,10 @@ vdpDetect: PROCEDURE
 ' unlock F18A mode
 ' -----------------------------------------------------------------------------
 vdpUnlock: PROCEDURE
-    VDP_DISABLE_INT
+    VDP_DISABLE_INT_DISP_OFF
     VDP(57) = $1C                       ' unlock
     VDP(57) = $1C                       ' unlock... again
-    VDP_ENABLE_INT
+    VDP_ENABLE_INT_DISP_OFF
     END
 
 ' -----------------------------------------------------------------------------

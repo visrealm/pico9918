@@ -37,7 +37,7 @@ firmwareMenu: PROCEDURE
         IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
     WEND
 
-    g_currentMenu = MENU_ID_MAIN
+    SET_MENU(MENU_ID_MAIN)
     END    
 
 selectBank1:

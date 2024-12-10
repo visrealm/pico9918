@@ -109,6 +109,6 @@ deviceInfoMenu: PROCEDURE
         VDP_ENABLE_INT
     WEND
 
-    g_currentMenu = MENU_ID_MAIN
+    SET_MENU(MENU_ID_MAIN)
 
     END

@@ -86,13 +86,13 @@ def main() -> int:
                     for h in range (0, 32, 4):
                         byteStr = []
                         for b in inpbuf[h:h + 4]:
-                            byteStr.append("${0}".format(b.to_bytes().hex()))
+                            byteStr.append("${:02x}".format(b))
                         output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
 
                     for r in range(0, 256, 16):
                         byteStr = []
                         for b in inpbuf[32 + r:32 + r + 16]:
-                            byteStr.append("${0}".format(b.to_bytes().hex()))
+                            byteStr.append("${:02x}".format(b))
                         output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
 
                     #byteStr = []
