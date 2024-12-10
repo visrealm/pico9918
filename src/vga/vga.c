@@ -490,8 +490,6 @@ void vgaInit(VgaInitParams params)
 
   pio_sm_set_enabled(VGA_PIO, SYNC_SM, true);
   pio_sm_set_enabled(VGA_PIO, RGB_SM, true);
-
-  //multicore_launch_core1(vgaLoop);
 }
 
 VgaInitParams *vgaCurrentParams()

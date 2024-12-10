@@ -18,7 +18,10 @@
 #include "impl/vrEmuTms9918Priv.h"
 #include "vrEmuTms9918Util.h"
 
+#include "gpio.h"
 #include "gpu.h"
+#include "config.h"
+#include "temperature.h"
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
@@ -26,60 +29,9 @@
 #include "pico/binary_info.h"
 
 #include "hardware/dma.h"
-#include "hardware/pio.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
-#include "hardware/adc.h"
-#include "hardware/flash.h"
-#include "hardware/watchdog.h"
 #include "hardware/structs/ssi.h"
-
- /*
-  * Pin mapping
-  *
-  * Pico Pin  | GPIO (v0.3) | GPIO (v0.4+) | Name      | TMS9918A Pin
-  * ----------+-------------+--------------+-----------+-------------
-  *     19    |     14      |     14       |  CD7      |  24
-  *     20    |     15      |     15       |  CD6      |  23
-  *     21    |     16      |     16       |  CD5      |  22
-  *     22    |     17      |     17       |  CD4      |  21
-  *     24    |     18      |     18       |  CD3      |  20
-  *     25    |     19      |     19       |  CD2      |  19
-  *     26    |     20      |     20       |  CD1      |  18
-  *     27    |     21      |     21       |  CD0      |  17
-  *     29    |     22      |     22       |  /INT     |  16
-  *     30    |     RUN     |     23       |  RST      |  34
-  *     31    |     26      |     26       |  /CSR     |  15
-  *     32    |     27      |     27       |  /CSW     |  14
-  *     34    |     28      |     28       |  MODE     |  13
-  *     --    |     --      |     29       |  MODE 1   |  --
-  *     35    |     29      |     25       |  GROMCLK  |  37
-  *     37    |     23      |     24       |  CPUCLK   |  38
-  *
-  *
-  * Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29
-  *       a genuine Raspberry Pi Pico can't be used.
-  *       v0.3 of the PCB is designed for the DWEII?
-  *       RP2040 USB-C module which exposes these additional
-  *       GPIOs. A future pico9918 revision (v0.4+) will do without
-  *       an external RP2040 board and use the RP2040 directly.
-  * 
-  * Note: Hardware v0.3 has different GPIO mappings for GROMCL and CPUCL
-  *       Hardware v0.3 doesn't have a soft reset GPIO either
-  * 
-  * Purchase links for v0.3 Pi Pico module:
-  *       https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
-  *       https://www.aliexpress.com/item/1005007066733934.html
-  */
-
-
-#define PICO9918_SW_VERSION ((PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER)
-
-#if PICO9918_SCART_RGBS // 0 = VGA, 1 = NTSC, 2 = PAL
-    #define PICO9918_DISP_DRIVER (1 + PICO9918_SCART_PAL)
-#else
-    #define PICO9918_DISP_DRIVER 0
-#endif
 
 // compile-options to ease development between Jason and I
 #ifndef PICO9918_NO_SPLASH
@@ -97,30 +49,7 @@
 #define TIMING_DIAG PICO9918_DIAG
 #define REG_DIAG PICO9918_DIAG
 
-#define GPIO_CD7 14
-#define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
-#define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio
-#define GPIO_MODE 28
-#define GPIO_INT 22
-
-#define GPIO_GROMCL 25
-#define GPIO_CPUCL 24
-#define GPIO_RESET 23
-#define GPIO_MODE1 29
-#define GPIO_GROMCL_V03 29
-#define GPIO_CPUCL_V03 23
-
-#define GPIO_CD_MASK (0xff << GPIO_CD7)
-#define GPIO_CSR_MASK (0x01 << GPIO_CSR)
-#define GPIO_CSW_MASK (0x01 << GPIO_CSW)
-#define GPIO_MODE_MASK (0x01 << GPIO_MODE)
-#define GPIO_MODE1_MASK (0x01 << GPIO_MODE1)
-#define GPIO_INT_MASK (0x01 << GPIO_INT)
-
-#define GPIO_RESET_MASK (0x01 << GPIO_RESET)
-
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
-
 
 bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
 bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
@@ -258,167 +187,6 @@ static inline void disableTmsPioInterrupts()
   irq_set_enabled(TMS_IRQ, false);
 }
 
-#if PICO_RP2040
-  #define PICO_MODEL 1
-#elif PICO_RP2350
-  #define PICO_MODEL 2
-#endif
-
-
-typedef enum 
-{
-  // not settable via registers
-  CONF_PICO_MODEL       = 0,
-  CONF_HW_VERSION       = 1,
-  CONF_SW_VERSION       = 2,
-  CONF_CLOCK_TESTED     = 4,
-  CONF_DISP_DRIVER      = 5,
-
-  // settable via registers
-  CONF_CRT_SCANLINES    = 8,
-  CONF_SCANLINE_SPRITES = 9,
-  CONF_CLOCK_PRESET_ID  = 10,
-
-  CONF_PALETTE_IDX_0    = 128,
-  CONF_PALETTE_IDX_15   = CONF_PALETTE_IDX_0 + 32,//  16x 2 bytes
-
-  CONF_SAVE_TO_FLASH    = 255,
-} Pico9918Options;
-
-typedef enum
-{
-  HWVer_0_3 = 0x03,
-  HWVer_1_x = 0x10,
-} Pico9918HardwareVersion;
-
-static Pico9918HardwareVersion detectHardwareVersion()
-{
-  Pico9918HardwareVersion version = HWVer_1_x;
-
-  // check if RESET pin is being driven externally (on v0.4+, it is, on v0.3 it isn't)
-  gpio_set_dir_masked(GPIO_RESET_MASK, 0 << GPIO_RESET);  // reset input
-  gpio_pull_up(GPIO_RESET);
-  sleep_us(10);  
-  if (gpio_get(GPIO_RESET)) // following pull... ok
-  {
-    gpio_pull_down(GPIO_RESET);
-    sleep_us(10);  
-    if (!gpio_get(GPIO_RESET))
-    {
-      version = HWVer_0_3;
-    }
-  }
-  return version;
-}
-
-
-static Pico9918HardwareVersion currentHwVersion = HWVer_1_x;
-
-static void applyConfig()
-{
-  vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES];
-
-  if (tms9918->config[CONF_CRT_SCANLINES])
-    TMS_REGISTER(tms9918, 50) |= 0x04;
-  else
-    TMS_REGISTER(tms9918, 50) &= ~0x04;
-
-  TMS_REGISTER(tms9918, 30) = 1 << (tms9918->config[CONF_SCANLINE_SPRITES] + 2);
-
-  // apply default palette
-  for (int i = 0; i < 16; ++i)
-  {
-    uint16_t rgb = (tms9918->config[CONF_PALETTE_IDX_0 + (i * 2)] << 8) |
-                    tms9918->config[CONF_PALETTE_IDX_0 + (i * 2) + 1];
-    tms9918->vram.map.pram[i] = __builtin_bswap16(rgb);
-  }
-}
-
-#define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash
-#define CONFIG_FLASH_ADDR   (uint8_t*)(XIP_BASE + CONFIG_FLASH_OFFSET) // in the top 4kB of a 2MB flash
-#define CONFIG_BYTES 256
-
-void readConfig(uint8_t config[CONFIG_BYTES])
-{
-  memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
-
-  if (config[CONF_PICO_MODEL] != PICO_MODEL ||
-      config[CONF_DISP_DRIVER] != PICO9918_DISP_DRIVER ||
-      config[CONF_CLOCK_PRESET_ID] > 2 ||
-      config[CONF_CRT_SCANLINES] > 1 ||
-      config[CONF_SCANLINE_SPRITES] > 3 ||
-      config[CONF_PALETTE_IDX_0] != 0x00 ||
-      (config[CONF_PALETTE_IDX_0 + 2] & 0xf0) != 0xf0) // not initialised
-  {
-    memset(config, 0, CONFIG_BYTES);
-
-    config[CONF_PICO_MODEL] = PICO_MODEL;
-    config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
-    config[CONF_HW_VERSION] = currentHwVersion;
-    config[CONF_DISP_DRIVER] = PICO9918_DISP_DRIVER;
-    config[CONF_CLOCK_TESTED] = 0;
-
-    config[CONF_CRT_SCANLINES] = 0;
-    config[CONF_SCANLINE_SPRITES] = 0;
-    config[CONF_CLOCK_PRESET_ID] = 0;
-
-    config[CONF_PALETTE_IDX_0] = 0;
-    config[CONF_PALETTE_IDX_0 + 1] = 0;
-    for (int i = 1; i < 16; ++i)
-    {
-      uint16_t rgb = 0xf000 | vrEmuTms9918DefaultPalette(i);
-      config[CONF_PALETTE_IDX_0 + (i * 2)] = rgb >> 8;
-      config[CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xff;
-    }
-  }
-
-  config[CONF_SAVE_TO_FLASH] = 0;
-
-    // looks like we've just upgraded
-  if (config[CONF_SW_VERSION] != PICO9918_SW_VERSION)
-  {
-    config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
-    config[CONF_SAVE_TO_FLASH] = 1;
-  }  
-
-  tms9918->configDirty = true;  // so we apply it
-}
-
-void writeConfig(uint8_t config[CONFIG_BYTES])
-{
-  flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
-
-  config[CONF_PICO_MODEL] = PICO_MODEL;
-  config[CONF_HW_VERSION] = currentHwVersion;
-  config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
-
-  // sanity checking the palette 0 always 0, others always alpha 0xf
-  config[CONF_PALETTE_IDX_0] = 0;
-  config[CONF_PALETTE_IDX_0 + 1] = 0;
-  for (int i = 1; i < 16; ++i)
-  {
-    uint16_t rgb = 0xf000 | vrEmuTms9918DefaultPalette(i);
-    config[CONF_PALETTE_IDX_0 + (i * 2)] = rgb >> 8;
-    config[CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xff;
-  }
-
-  int attempts = 5;
-retry:
-  flash_range_program(CONFIG_FLASH_OFFSET, (const void*)tms9918->config, 256);
-
-  // flush
-  int i = 0;
-  while (i < 256) {
-    *((volatile uint32_t *)(CONFIG_FLASH_ADDR) + i) = 0;
-    i += sizeof(uint32_t);
-  }
-
-  if (--attempts && memcmp(CONFIG_FLASH_ADDR, (const void*)tms9918->config, 256) != 0)
-  {
-    goto retry;    
-  }
-}
-
 /*
  * handle reset pin going active (low)
  */
@@ -469,25 +237,7 @@ static const ClockSettings clockPresets[] = {
 static int clockPresetIndex = 0;
 static bool testingClock = false;
 
-uint32_t temperature = 0;
-
-static void analogReadTempSetup() {
-  adc_init();
-  adc_set_temp_sensor_enabled(true);
-
-#if PICO_RP2040
-  adc_select_input(4); // Temperature sensor
-#else
-  adc_select_input(8); // RP2350 QFN80 package only... 
-#endif
-}
-
-static float analogReadTemp(float vref) {
-  int v = adc_read();
-  float t = 27.0f - ((v * vref / 4096.0f) - 0.706f) / 0.001721f; // From the datasheet
-  return t;
-}
-
+uint32_t temperatureBcd = 0;
 
 static void eofInterrupt()
 {
@@ -500,11 +250,11 @@ static void eofInterrupt()
 
   if ((frameCount & 0x0f) == 0) // every 16th frame
   {
-    float tempC = analogReadTemp(3.3f);
+    float tempC = coreTemperatureC();
     uint32_t t = (int)(tempC * 10.0f);
     uint32_t i = (t / 100);
     t -= (i * 100);
-    temperature = (i << 12) | ((t / 10) << 8) | (0x0A << 4) | (t % 10);
+    temperatureBcd = (i << 12) | ((t / 10) << 8) | (0x0e << 4) | (t % 10);
     uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
     TMS_STATUS(tms9918, 13) = t4;
   }
@@ -693,33 +443,52 @@ static void outputSplash(uint16_t y, uint32_t vBorder, uint32_t vPixels, uint16_
 
 #if PICO9918_DIAG
 
+#define CHAR_HEIGHT 8
+#define CHAR_WIDTH  6
+
 /* render a bcd value scanline */
-void __attribute__ ((noinline))  renderBcd(uint16_t scanline, uint32_t bcd, uint16_t x, uint16_t y, uint16_t color, uint16_t* pixels)
+void __attribute__ ((noinline))  renderText(uint16_t scanline, const char *text, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
 {
   int fontY = scanline - y;
-  if (fontY < 0 || fontY >= 7) return;
+  if (fontY < 0 || fontY >= CHAR_HEIGHT) return;
 
-  uint32_t mask = 0xc0;
-  if (fontY == 0) { mask = 0; } else { --fontY;}
-
-  uint8_t *imgOffset = fontsubset + 16 * (6 + fontY);
-  bool haveNonZero = false;
-  for (int i = 0; i < 8; ++i)
+  char c = 0;
+  while (c = *text)
   {
-    int digit = (bcd >> (28 - (4 * i))) & 0xf;
-    if (haveNonZero || digit)
+    c -= 32;
+    char b = fontsubset[(c & 0x30) * 8 + (c & 0xf) + (fontY * 16)];
+    for (int i = 0; i < 6; ++i)
     {
-      haveNonZero = true;
-      uint8_t digitBits = imgOffset[digit];
-      for (int j = 0; j < 4; ++j)
-      {
-        pixels[x++] = (digitBits & mask) ? color : 0x000;
-        digitBits <<= 2;
-      }
+      pixels[x++] = (b & 0x80) ? fg : bg;
+      b <<= 1;
     }
+
+    ++text;
   }
-  pixels[x++] = 0x000;
 }
+
+
+/* render a bcd value scanline */
+void __attribute__ ((noinline))  renderBcd(uint16_t scanline, uint32_t bcd, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
+{
+  int fontY = scanline - y;
+  if (fontY < 0 || fontY >= CHAR_HEIGHT) return;
+
+  char buffer[12];
+  int width = 0;
+  char *p = buffer + 8;
+  *p = 0;
+
+  while (bcd)
+  {
+    char c = (bcd & 0xf);
+    *(--p) = c + ((c < 10) ? '0' : ' ');
+    bcd >>= 4;
+  }
+
+  renderText(scanline, p, x, y, fg, bg, pixels);
+}
+
 
 void renderDiagnostics(uint16_t y, uint16_t* pixels)
 {
@@ -732,13 +501,15 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
 
   int xPos = 2;
   int yPos = 2;
-  renderBcd(y, frameTimeBcd, xPos, yPos, 0x0f40, pixels);
-  renderBcd(y, totalTimePerScanlineBcd, xPos + 28, yPos, 0x004f, pixels); yPos += 8;
+  renderBcd(y, frameTimeBcd, xPos, yPos, 0x0f40, 0, pixels);
+  renderBcd(y, totalTimePerScanlineBcd, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
 
-  renderBcd(y, renderTimeBcd, xPos, yPos, 0x0f40, pixels);
-  renderBcd(y, renderTimePerScanlineBcd, xPos + 28, yPos, 0x004f, pixels); yPos += 8;
+  renderBcd(y, renderTimeBcd, xPos, yPos, 0x0f40, 0, pixels);
+  renderBcd(y, renderTimePerScanlineBcd, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
 
-  renderBcd(y, temperature, xPos, yPos, 0x004f, pixels); yPos += 8;
+  renderBcd(y, temperatureBcd, xPos, yPos, 0x004f, 0, pixels); yPos += 8;
+  
+  //renderText(y, "HELLO :)", xPos, yPos, 0x0fff, 0, pixels);
 #endif
 
 #if REG_DIAG
@@ -984,12 +755,12 @@ void tmsPioInit()
 
   uint tmsWriteProgram = pio_add_program(TMS_PIO, &tmsWrite_program);
 
-  pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
-  sm_config_set_in_pins(&writeConfig, GPIO_CD7);
-  sm_config_set_in_shift(&writeConfig, false, true, 16); // L shift, autopush @ 16 bits
-  sm_config_set_clkdiv(&writeConfig, 1.0f);
+  pio_sm_config writePioConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
+  sm_config_set_in_pins(&writePioConfig, GPIO_CD7);
+  sm_config_set_in_shift(&writePioConfig, false, true, 16); // L shift, autopush @ 16 bits
+  sm_config_set_clkdiv(&writePioConfig, 1.0f);
 
-  pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
+  pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writePioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
   pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
 
@@ -1000,15 +771,15 @@ void tmsPioInit()
     pio_gpio_init(TMS_PIO, GPIO_CD7 + i);
   }
 
-  pio_sm_config readConfig = tmsRead_program_get_default_config(tmsReadProgram);
-  sm_config_set_in_pins(&readConfig, GPIO_CSR);
-  sm_config_set_jmp_pin(&readConfig, GPIO_MODE);
-  sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
-  sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
-  sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readConfig, 4.0f);
+  pio_sm_config readPioConfig = tmsRead_program_get_default_config(tmsReadProgram);
+  sm_config_set_in_pins(&readPioConfig, GPIO_CSR);
+  sm_config_set_jmp_pin(&readPioConfig, GPIO_MODE);
+  sm_config_set_out_pins(&readPioConfig, GPIO_CD7, 8);
+  sm_config_set_in_shift(&readPioConfig, false, false, 32); // L shift
+  sm_config_set_out_shift(&readPioConfig, true, false, 32); // R shift
+  sm_config_set_clkdiv(&readPioConfig, 4.0f);
 
-  pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
+  pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
   pio_set_irq0_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
 
@@ -1028,9 +799,9 @@ void proc1Entry()
 
   tmsPioInit();
 
-  currentHwVersion = detectHardwareVersion();
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
 
-  if (currentHwVersion != HWVer_0_3)
+  if (hwVersion != HWVer_0_3)
   {
     // set up reset gpio interrupt handler
     irq_set_exclusive_handler(IO_IRQ_BANK0, gpioIrqHandler);
@@ -1038,7 +809,7 @@ void proc1Entry()
     irq_set_enabled(IO_IRQ_BANK0, true);
   }
 
-  tms9918->config[CONF_HW_VERSION] = currentHwVersion;
+  tms9918->config[CONF_HW_VERSION] = hwVersion;
 
   // wait until everything else is ready, then run the vga loop
   multicore_fifo_pop_blocking();
@@ -1069,11 +840,11 @@ int main(void)
 
   /* we could set clock freq here from options */
   readConfig(tms9918->config);
+  
   /*
    * if we're trying out a new clock rate, we need to have a failsafe 
    * we test it first 
    */
-
   if (tms9918->config[CONF_CLOCK_PRESET_ID] != 0 && 
       tms9918->config[CONF_CLOCK_PRESET_ID] != tms9918->config[CONF_CLOCK_TESTED])
   {
@@ -1102,8 +873,9 @@ int main(void)
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
   }
 
-  initClock((currentHwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL, tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
-  initClock((currentHwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL, tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
+  initClock((hwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL, tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
+  initClock((hwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL, tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
   dma_channel_config cfg = dma_channel_get_default_config(dma32);
   channel_config_set_read_increment(&cfg, false);
@@ -1138,11 +910,6 @@ int main(void)
   const char *version = PICO9918_VERSION;
 
   vgaInit(params);
-
-
-#if PICO9918_DIAG
-  analogReadTempSetup();
-#endif
 
   /* signal proc1 that we're ready to start the display */
   multicore_fifo_push_blocking(0);
