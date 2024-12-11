@@ -13,6 +13,8 @@
 #include "vga.pio.h"
 #include "pio_utils.h"
 
+#include "../display.h"
+
 #include "pico/multicore.h"
 #include "pico/binary_info.h"
 
@@ -20,26 +22,11 @@
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
- // compile options
-#define VGA_HARDCODED_640 !PICO9918_SCART_RGBS
-#define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
+ #define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
 
 #define VGA_NO_MALLOC 1
 
 #define VGA_SCANLINE_CB_ENABLE 0
-
-
- // a number of compiile-time optimisations can occur 
- // if it knows some of the VGA parameters 
-#if VGA_HARDCODED_640
-#define VIRTUAL_PIXELS_X 640
-#define VIRTUAL_PIXELS_Y 240
-#else
-#include "pico/divider.h"
-#define VIRTUAL_PIXELS_X vgaParams.params.hVirtualPixels
-#define VIRTUAL_PIXELS_Y vgaParams.params.vVirtualPixels
-#endif
-
 
 // avoid bringing in math.h
 int roundflt(float x)
@@ -345,14 +332,9 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     dma_hw->ints0 = rgbDmaChanMask;
 
     currentDisplayLine++;
-#if VGA_HARDCODED_640
-    uint32_t pxLine = currentDisplayLine >> 1;
-    uint32_t pxLineRpt = currentDisplayLine & 0x01;
-#else
-    divmod_result_t pxLineVal = divmod_u32u32(currentDisplayLine, vgaParams.params.vPixelScale);
-    uint32_t pxLine = to_quotient_u32(pxLineVal);
-    uint32_t pxLineRpt = to_remainder_u32(pxLineVal);
-#endif
+
+    uint32_t pxLine = currentDisplayLine / DISPLAY_YSCALE;
+    uint32_t pxLineRpt = currentDisplayLine & (DISPLAY_YSCALE - 1);
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
 

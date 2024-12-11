@@ -49,24 +49,32 @@
   *       https://www.aliexpress.com/item/1005007066733934.html
   */
 
-#define GPIO_CD7 14
-#define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
-#define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio
-#define GPIO_MODE 28
-#define GPIO_INT 22
+ #pragma once
 
+ #include "tms9918.pio.h"
+
+#define GPIO_CD7 14
+#define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio.h
+#define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio.h
+#define GPIO_MODE 28
+#define GPIO_MODE1 29
+#define GPIO_INT 22
+#define GPIO_RESET 23
+
+// default mappings (v0.4+)
 #define GPIO_GROMCL 25
 #define GPIO_CPUCL 24
-#define GPIO_RESET 23
-#define GPIO_MODE1 29
+
+// v0.3-specific pins mappings
 #define GPIO_GROMCL_V03 29
 #define GPIO_CPUCL_V03 23
 
+// gpio masks
 #define GPIO_CD_MASK (0xff << GPIO_CD7)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
 #define GPIO_CSW_MASK (0x01 << GPIO_CSW)
 #define GPIO_MODE_MASK (0x01 << GPIO_MODE)
 #define GPIO_MODE1_MASK (0x01 << GPIO_MODE1)
 #define GPIO_INT_MASK (0x01 << GPIO_INT)
-
 #define GPIO_RESET_MASK (0x01 << GPIO_RESET)
+

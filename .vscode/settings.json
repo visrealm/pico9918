@@ -50,6 +50,8 @@
         "gpu.h": "c",
         "random": "c",
         "dma.h": "c",
-        "ssi.h": "c"
+        "ssi.h": "c",
+        "vremutms9918priv.h": "c",
+        "tms9918.pio.h": "c"
     }
 }

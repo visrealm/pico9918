@@ -13,69 +13,32 @@
 #include "vga-modes.h"
 
 #include "clocks.pio.h"
-#include "tms9918.pio.h"
 
 #include "impl/vrEmuTms9918Priv.h"
 #include "vrEmuTms9918Util.h"
 
+#include "display.h"
+#include "diag.h"
 #include "gpio.h"
 #include "gpu.h"
 #include "config.h"
+#include "splash.h"
 #include "temperature.h"
 
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
-#include "pico/divider.h"
-#include "pico/binary_info.h"
 
 #include "hardware/dma.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
 #include "hardware/structs/ssi.h"
 
-// compile-options to ease development between Jason and I
-#ifndef PICO9918_NO_SPLASH
-#define PICO9918_NO_SPLASH      0
-#endif
 
-#if !PICO9918_NO_SPLASH
-#include "splash.h"
-#endif
-
-#if PICO9918_DIAG
-  #include "font.h"  
-#endif
-
-#define TIMING_DIAG PICO9918_DIAG
-#define REG_DIAG PICO9918_DIAG
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
-bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
-bi_decl(bi_pin_mask_with_names(GPIO_CD_MASK, "CPU Data (CD7 - CD0)"));
-bi_decl(bi_1pin_with_name(GPIO_CSR, "Read"));
-bi_decl(bi_1pin_with_name(GPIO_CSW, "Write"));
-bi_decl(bi_1pin_with_name(GPIO_MODE, "Mode"));
-bi_decl(bi_1pin_with_name(GPIO_INT, "Interrupt"));
-
-bi_decl(bi_1pin_with_name(GPIO_RESET, "Host Reset"));
-bi_decl(bi_1pin_with_name(GPIO_MODE1, "Mode 1 (V9938)"));
-
 #define TMS_PIO pio1
 #define TMS_IRQ PIO1_IRQ_0
-
-#define VIRTUAL_PIXELS_X 640
-#define VIRTUAL_PIXELS_Y 240
-
-bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
-bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
-bi_decl(bi_pin_mask_with_names(GPIO_CD_MASK, "CPU Data (CD7 - CD0)"));
-bi_decl(bi_1pin_with_name(GPIO_CSR, "Read"));
-bi_decl(bi_1pin_with_name(GPIO_CSW, "Write"));
-bi_decl(bi_1pin_with_name(GPIO_MODE, "Mode"));
-bi_decl(bi_1pin_with_name(GPIO_INT, "Interrupt"));
-
 
 /* file globals */
 
@@ -93,7 +56,6 @@ const uint tmsGromClkSm = 2;
 const uint tmsCpuClkSm = 3;
 
 static int frameCount = 0;
-static int logoOffset = 100;
 static bool validWrites = false;  // has the VDP display been enabled at all?
 static bool doneInt = false;      // interrupt raised this frame?
 
@@ -212,7 +174,7 @@ void __not_in_flash_func(gpioIrqHandler)()
   updateTmsReadAhead();  
   
   frameCount = 0;
-  logoOffset = 100;
+  resetSplash();
   gpio_put(GPIO_INT, !currentInt);
   enableTmsPioInterrupts();
 }
@@ -237,8 +199,6 @@ static const ClockSettings clockPresets[] = {
 static int clockPresetIndex = 0;
 static bool testingClock = false;
 
-uint32_t temperatureBcd = 0;
-
 static void eofInterrupt()
 {
   doneInt = true;
@@ -254,7 +214,7 @@ static void eofInterrupt()
     uint32_t t = (int)(tempC * 10.0f);
     uint32_t i = (t / 100);
     t -= (i * 100);
-    temperatureBcd = (i << 12) | ((t / 10) << 8) | (0x0e << 4) | (t % 10);
+    diagSetTemperatureBcd((i << 12) | ((t / 10) << 8) | (0x0e << 4) | (t % 10));
     uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
     TMS_STATUS(tms9918, 13) = t4;
   }
@@ -289,34 +249,11 @@ static void updateInterrupts(uint8_t tempStatus)
   enableTmsPioInterrupts();
 }
 
-/* for diagnostics / statistics */
-uint32_t renderTimeBcd = 0;
-uint32_t frameTimeBcd = 0;
-uint32_t renderTimePerScanlineBcd = 0;
-uint32_t totalTimePerScanlineBcd = 0;
-
-uint32_t accumulatedRenderTime = 0;
-uint32_t accumulatedFrameTime = 0;
-uint32_t accumulatedScanlines = 0;
-
-/* convert an integer to bcd (two digits per byte)*/
-static __attribute__ ((noinline)) uint32_t toBcd(uint32_t number)
-{
-  uint32_t result = 0;
-  for (int i = 0; i < 8; ++i)
-  {
-    divmod_result_t dmResult = divmod_u32u32(number, 10);
-    result |= to_remainder_u32(dmResult) << (i * 4);
-    number = to_quotient_u32(dmResult);
-  }
-  return result;
-}
-
 
 /* F18A palette entries are big-endian 0x0RGB which looks like
    0xGB0R to our RP2040. our vga code is expecting 0x0BGR
    so we've got B and R correct by pure chance. just need to shift G
-   over. this function does that. note: msbs are ignore so... */
+   over. this function does that.   */
 
 inline uint32_t bigRgb2LittleBgr(uint32_t val)
 {
@@ -369,20 +306,12 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   {
     // has the display been enabled?
     validWrites = !(TMS_REGISTER(tms9918, 1) & 0x40);
+
+    allowSplashHide();
   }
 
+  updateDiagnostics(frameCount);
 
-#if TIMING_DIAG
-  const uint32_t framesPerUpdate = 1 << 2;
-  if ((frameCount & (framesPerUpdate - 1)) == 0)
-  {
-    renderTimeBcd = toBcd(accumulatedRenderTime / framesPerUpdate);
-    frameTimeBcd = toBcd(accumulatedFrameTime / framesPerUpdate);
-    renderTimePerScanlineBcd = toBcd(accumulatedRenderTime / accumulatedScanlines);
-    totalTimePerScanlineBcd = toBcd(accumulatedFrameTime / accumulatedScanlines);
-    accumulatedRenderTime = accumulatedFrameTime = accumulatedScanlines = 0;
-  }
-#endif
 
   // here, we catch the case where the last row(s) were
   // missed and we never raised an interrupt. do it now  
@@ -392,175 +321,6 @@ static void tmsEndOfFrame(uint32_t frameNumber)
     updateInterrupts(STATUS_INT);
   }
 }
-
-/*
- * output the PICO9918 splash logo / firmware version at the bottom of the screen
- */
-static void outputSplash(uint16_t y, uint32_t vBorder, uint32_t vPixels, uint16_t* pixels)
-{
-#if !PICO9918_NO_SPLASH
-  #define VIRTUAL_PIXELS_Y 240
-
-  if (y == 0)
-  {
-    if (frameCount & 0x01)
-    {
-      if (frameCount < 200 && logoOffset > (22 - splashHeight)) --logoOffset;
-      else if (validWrites && frameCount > 500) ++logoOffset;
-    }
-  }
-
-  if (y < (VIRTUAL_PIXELS_Y - 1))
-  {
-    y -= vBorder + vPixels + logoOffset;
-    if (y < splashHeight)
-    {
-      /* the source image is 2bpp, so 4 pixels in a byte
-       * this doesn't need to be overly performant as it only
-       * gets called in the first few seconds of startup (or reset)
-       */
-      const int leftBorderPx = 4;
-      const int splashBpp = 2;
-      const int splashPixPerByte = 8 / splashBpp;
-      uint8_t* splashPtr = splash + (y * splashWidth / splashPixPerByte);
-
-      for (int x = leftBorderPx; x < leftBorderPx + splashWidth; x += splashPixPerByte)
-      {
-        uint8_t c = *(splashPtr++);
-        uint8_t pixMask = 0xc0;
-        uint8_t offset = 6;
-
-        for (int px = 0; px < 4; ++px, offset -= 2, pixMask >>= 2)
-        {
-          uint8_t palIndex = (c & pixMask) >> offset;
-          if (palIndex) pixels[x + px] = splash_pal[palIndex];
-        }
-      }
-    }
-  }
-#endif
-}
-
-#if PICO9918_DIAG
-
-#define CHAR_HEIGHT 8
-#define CHAR_WIDTH  6
-
-/* render a bcd value scanline */
-void __attribute__ ((noinline))  renderText(uint16_t scanline, const char *text, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
-{
-  int fontY = scanline - y;
-  if (fontY < 0 || fontY >= CHAR_HEIGHT) return;
-
-  char c = 0;
-  while (c = *text)
-  {
-    c -= 32;
-    char b = fontsubset[(c & 0x30) * 8 + (c & 0xf) + (fontY * 16)];
-    for (int i = 0; i < 6; ++i)
-    {
-      pixels[x++] = (b & 0x80) ? fg : bg;
-      b <<= 1;
-    }
-
-    ++text;
-  }
-}
-
-
-/* render a bcd value scanline */
-void __attribute__ ((noinline))  renderBcd(uint16_t scanline, uint32_t bcd, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
-{
-  int fontY = scanline - y;
-  if (fontY < 0 || fontY >= CHAR_HEIGHT) return;
-
-  char buffer[12];
-  int width = 0;
-  char *p = buffer + 8;
-  *p = 0;
-
-  while (bcd)
-  {
-    char c = (bcd & 0xf);
-    *(--p) = c + ((c < 10) ? '0' : ' ');
-    bcd >>= 4;
-  }
-
-  renderText(scanline, p, x, y, fg, bg, pixels);
-}
-
-
-void renderDiagnostics(uint16_t y, uint16_t* pixels)
-{
-#if TIMING_DIAG   
-  // Output average render time in microseconds (just vrEmuTms9918ScanLine())
-  // We only have ~16K microseconds to do everything for an entire frame.
-  // blanking takes around 10% of that, leaving ~14K microseconds
-  // ROW30 mode will inflate this figure since... more scanlines 
-  dma_channel_wait_for_finish_blocking(dma32);
-
-  int xPos = 2;
-  int yPos = 2;
-  renderBcd(y, frameTimeBcd, xPos, yPos, 0x0f40, 0, pixels);
-  renderBcd(y, totalTimePerScanlineBcd, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
-
-  renderBcd(y, renderTimeBcd, xPos, yPos, 0x0f40, 0, pixels);
-  renderBcd(y, renderTimePerScanlineBcd, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
-
-  renderBcd(y, temperatureBcd, xPos, yPos, 0x004f, 0, pixels); yPos += 8;
-  
-  //renderText(y, "HELLO :)", xPos, yPos, 0x0fff, 0, pixels);
-#endif
-
-#if REG_DIAG
-
-  /* Register diagnostics. with this enabled, we overlay a binary 
-   * representation of the VDP registers to the right-side of the screen */
-
-  dma_channel_wait_for_finish_blocking(dma32);
-
-  const int diagBitWidth = 4;
-  const int diagBitSpacing = 2;
-  const int diagRightMargin = 6;
-
-  const int16_t diagBitOn = 0x2e2;
-  const int16_t diagBitOff = 0x222;
-
-  uint8_t reg = y / 3;
-  if (reg < 64)
-  {
-    if (y % 3 != 0)
-    {
-      int8_t regValue = TMS_REGISTER(tms9918, reg);
-      int x = VIRTUAL_PIXELS_X - ((8 * (diagBitWidth + diagBitSpacing)) + diagRightMargin);
-      for (int i = 0; i < 8; ++i)
-      {
-        const bool on = regValue < 0;
-        for (int xi = 0; xi < diagBitWidth; ++xi)
-        {
-          pixels[x++] = on ? diagBitOn : diagBitOff;
-        }
-        x += diagBitSpacing + (i == 3) * diagBitSpacing;
-        regValue <<= 1;
-      }
-    }
-    else if ((reg & 0x07) == 0)
-    {
-      int x = VIRTUAL_PIXELS_X - diagRightMargin + 1;
-
-      for (int xi = 0; xi < diagBitWidth; ++xi)
-      {
-        pixels[x++] ^= pixels[x];
-      }
-    }
-  }
-
-#endif  
-}
-
-#endif
-
-
 
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
@@ -600,7 +360,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     if (!validWrites || (frameCount < 600))
     {
-      outputSplash(y, vBorder, vPixels, pixels);
+      outputSplash(y, frameCount, vBorder, vPixels, pixels);
 
       if (testingClock && frameCount == 599)
       {
@@ -631,10 +391,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /*** main display region ***/
 
   /* generate the scanline */
-  uint32_t renderStart  = time_us_32();
+  uint32_t renderTime  = time_us_32();
   uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
-  accumulatedRenderTime += time_us_32() - renderStart;
-  ++accumulatedScanlines;
+  renderTime = time_us_32() - renderTime;
 
   /*** interrupt signal? ***/
   const int interruptThreshold = 1;
@@ -738,9 +497,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   //dma_channel_wait_for_finish_blocking(dma32);
   dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
 
-  accumulatedFrameTime += time_us_32() - frameStart;
+  updateRenderTime(renderTime,  time_us_32() - frameStart);
 
 #if PICO9918_DIAG
+    dma_channel_wait_for_finish_blocking(dma32);
+
     renderDiagnostics(y + vBorder, pixels);
 #endif
 }
@@ -885,22 +646,10 @@ int main(void)
 
   dma_channel_set_read_addr(dma32, &bg, false);
 
-
   /* then set up VGA output */
   VgaInitParams params = { 0 };
-
-#if PICO9918_SCART_RGBS
-  #if PICO9918_SCART_PAL
-    params.params = vgaGetParams(RGBS_PAL_720_576i_50HZ);
-  #else
-    params.params = vgaGetParams(RGBS_NTSC_720_480i_60HZ);
-  #endif
-#else // VGA
-  params.params = vgaGetParams(VGA_640_480_60HZ);
-
-  /* virtual size will be 640 x 240 */
-  setVgaParamsScaleY(&params.params, 2);
-#endif
+  params.params = vgaGetParams(DISPLAY_MODE);
+  setVgaParamsScaleY(&params.params, DISPLAY_YSCALE);
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
