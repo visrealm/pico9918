@@ -23,6 +23,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
   * [National CF-2700](https://www.msx.org/wiki/National_CF-2700)
   * [Sharp HB-8000](https://www.msx.org/wiki/Sharp_HB-8000)
   * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)
+  * [Toshiba HX-10](https://www.msx.org/wiki/Toshiba_HX-10)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
   * [Yamaha YIS-503](https://www.msx.org/wiki/Yamaha_YIS-503)
 * [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
