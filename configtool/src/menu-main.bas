@@ -20,6 +20,7 @@ DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow
 ' render all menu rows
 ' -----------------------------------------------------------------------------
 renderMenu: PROCEDURE
+    MENU_START_X = 1
     FOR a_menuIndexToRender = 0 TO CONF_COUNT - 1
         GOSUB renderMenuRow
     NEXT a_menuIndexToRender
@@ -29,8 +30,6 @@ renderMenu: PROCEDURE
 ' render a menu row. Arguments: a_menuIndexToRender
 ' -----------------------------------------------------------------------------
 renderMenuRow: PROCEDURE
-    CONST MENU_START_X = 0
-
     ' don't render special index 255
     IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + a_menuIndexToRender), 32, emptyRow : RETURN
 
@@ -51,7 +50,7 @@ renderMenuRow: PROCEDURE
         currentValueOffset = tempConfigValues(a_menuIndexToRender)
 
         ' output option value
-        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 23, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
+        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 22, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
     END IF
 
     ' if the config option is "dirty" output an asterix next to it
@@ -235,9 +234,9 @@ saveOptionsMenu: PROCEDURE
 
 '    GOSUB clearScreen
 
-    DRAW_POPUP(" Save Changes? ", 15, 6)
+    DRAW_POPUP(" Save Changes? ", 15, 5)
     PRINT AT XY((32 - a_titleLen) / 2 + 2, a_popupTop + 3), "1. Save"
-    PRINT AT XY((32 - a_titleLen) / 2 + 2, a_popupTop + 5), "2. Cancel"
+    PRINT AT XY((32 - a_titleLen) / 2 + 2, a_popupTop + 4), "2. Cancel"
 
     GOSUB delay
     
@@ -263,13 +262,16 @@ configMenuData:
     DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ", 0, 2, "    Faux CRT scanline effect    "
     DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites", 2, 4, "                                "
     DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, " RP2040 clock (requires reboot) "
-    DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
-    DATA BYTE CONF_MENU_SAVE,       "Save settings   ", 0, 0, " Save configuration to PICO9918 "
-    DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
     DATA BYTE CONF_MENU_DIAG,       "Diagnostics  >>>", 0, 0, "   Manage diagnostics options   "
     DATA BYTE CONF_MENU_PALETTE,    "Palette      >>>", 0, 0, "     Change default palette     "
     DATA BYTE CONF_MENU_INFO,       "Device info. >>>", 0, 0, "    View device information     "
     DATA BYTE CONF_MENU_FIRMWARE,   "Firmware     >>>", 0, 0, "        Update firmware         "
+    DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
+    DATA BYTE CONF_MENU_SAVE,       "Save settings   ", 0, 0, " Save configuration to PICO9918 "
+    DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
+
+    DATA BYTE CONF_MENU_OK,         "Confirm         ", 0, 0, "      Update firmware now?      "
+    DATA BYTE CONF_MENU_CANCEL,     "Cancel          ", 0, 0, "        Back to main menu       "
 
 ' -----------------------------------------------------------------------------
 ' Pico9918Option values. Indexed from options()

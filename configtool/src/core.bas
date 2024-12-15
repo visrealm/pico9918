@@ -28,7 +28,7 @@ CONST MENU_ID_PALETTE  = 3
 CONST MENU_ID_FIRMWARE = 4
 
 ' Pico9918Options index, name[16], values index, num values,help[32]
-CONST CONF_COUNT      = 10
+CONST CONF_COUNT      = 9
 CONST CONF_INDEX      = 0
 CONST CONF_LABEL      = 1
 CONST CONF_LABEL_LEN  = 16
@@ -68,6 +68,8 @@ CONST CONF_MENU_RESET       = 254
 CONST CONF_MENU_EMPTY       = 255
 CONST CONF_MENU_SAVE        = 250
 CONST CONF_MENU_FIRMWARE    = 249
+CONST CONF_MENU_OK          = 248
+CONST CONF_MENU_CANCEL      = 247
 
 DEF FN MENU_DATA(I, C) = configMenuData((I) * CONF_STRUCT_LEN + (C))
 DEF FN SET_MENU(I) = g_currentMenu = I
@@ -182,7 +184,7 @@ main:
         SET_MENU(MENU_ID_MAIN)
 
         ' palette for sprites and tile 1 layer
-        VDP(24) = $11
+        VDP(24) = $10
 
         WHILE 1
             ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu

@@ -15,7 +15,7 @@
 
 ' passing in L since I'm seeing issues using LEN(T) here. Possibly a bug?
 DEF FN DRAW_TITLE(T, L) = a_titleLen = L : PRINT AT XY((32 - a_titleLen) / 2, MENU_TITLE_ROW), T : GOSUB drawTitleBox
-DEF FN DRAW_POPUP(T, L, H) = a_titleLen = L : a_popupHeight = H : a_popupTop = (22 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
+DEF FN DRAW_POPUP(T, L, H) = a_titleLen = L : a_popupHeight = H : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
 
 clearScreen: PROCEDURE
     DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
@@ -74,9 +74,9 @@ setupHeader: PROCEDURE
     DEFINE VRAM NAME_TAB_XY(0, 0), LOGO_WIDTH, logoNames
     DEFINE VRAM NAME_TAB_XY(0, 1), LOGO_WIDTH, logoNames2
 
-    PRINT AT XY(28, 0),"v1.0"
+    PRINT AT XY(28, 0),"v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER
     PRINT AT XY(20, 1),"Configurator"
-    PRINT AT XY(6, 23), "{}2024 Troy Schrapel"    
+    PRINT AT XY(6, 23), "{}",#FIRMWARE_YEAR," Troy Schrapel"    
 
     DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
     'DEFINE VRAM NAME_TAB_XY(0, 4), 32, horzBar

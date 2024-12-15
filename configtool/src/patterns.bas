@@ -163,9 +163,9 @@ sliderButtonH:
     DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00
 
 colorLineSegH:
-    DATA BYTE $50, $50, $50, $50, $50, $50, $50, $50
+    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
 colorLineSeg:
-    DATA BYTE $50, $50, $50, $50, $50, $50, $50, $50
+    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
 
 palBox:
     DATA BYTE $3F, $51, $62, $44, $48, $51, $62, $44
@@ -198,13 +198,13 @@ grey:
 blue: 
     DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
 inv_white: 
-    DATA BYTE $f9, $f8, $f7, $f6, $f5, $f4, $f3, $f2
+    DATA BYTE $f4, $f4, $f4, $f4, $f4, $f4, $f4, $f4
 highlight: 
-    DATA BYTE $90, $80, $70, $60, $50, $40, $30, $20
+    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
 colorPalBoxSel: 
-    DATA BYTE $90, $90, $80, $80, $80, $70, $70, $70
+    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
 colorPalBoxSel2: 
-    DATA BYTE $60, $60, $60, $50, $50, $30, $30, $20
+    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
 colorSwatch:
     DATA BYTE $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a
 

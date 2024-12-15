@@ -20,6 +20,8 @@ BANK ROM 256
 
 CONST BANK_SIZE = 8
 
+INCLUDE "firmware_8k.h.bas"
+
 INCLUDE "core.bas"
 
 INCLUDE "firmware_8k.bas"
