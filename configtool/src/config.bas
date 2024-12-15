@@ -43,12 +43,6 @@ saveOptions: PROCEDURE
     NEXT I
     GOSUB renderMenu
 
-    ' if the clock frequency has changed... inform reboot
-    IF clockChanged THEN
-        PRINT AT XY(0, MENU_HELP_ROW), " Success! ** Reboot required ** "
-    ELSE
-        PRINT AT XY(0, MENU_HELP_ROW), "  Success! Configuration saved  "
-    END IF
     END
 
 ' -----------------------------------------------------------------------------

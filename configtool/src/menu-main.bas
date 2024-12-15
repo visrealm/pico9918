@@ -20,10 +20,15 @@ DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow
 ' render all menu rows
 ' -----------------------------------------------------------------------------
 renderMenu: PROCEDURE
+    MENU_INDEX_OFFSET = 0
+    MENU_INDEX_COUNT = 9
     MENU_START_X = 1
-    FOR a_menuIndexToRender = 0 TO CONF_COUNT - 1
+    menuTopRow = MENU_TITLE_ROW + 3
+
+    FOR a_menuIndexToRender = MENU_INDEX_OFFSET TO MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
         GOSUB renderMenuRow
     NEXT a_menuIndexToRender
+    DEFINE VRAM NAME_TAB_XY(0, menuTopRow + MENU_INDEX_COUNT), 32, emptyRow
     END
 
 ' -----------------------------------------------------------------------------
@@ -31,17 +36,19 @@ renderMenu: PROCEDURE
 ' -----------------------------------------------------------------------------
 renderMenuRow: PROCEDURE
     ' don't render special index 255
-    IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN DEFINE VRAM NAME_TAB_XY(0, MENU_TOP_ROW + a_menuIndexToRender), 32, emptyRow : RETURN
+    MENU_INDEX_POSITION = a_menuIndexToRender - MENU_INDEX_OFFSET
+
+    IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN DEFINE VRAM NAME_TAB_XY(0, menuTopRow + MENU_INDEX_POSITION), 32, emptyRow : RETURN
 
     ' pre-compute row offset. we'll need this a few times
-    #ROWOFFSET = XY(0, MENU_TOP_ROW + a_menuIndexToRender)
+    #ROWOFFSET = XY(0, menuTopRow + MENU_INDEX_POSITION)
 
     ' output menu number (index + 1)
-    PRINT AT #ROWOFFSET + MENU_START_X, " ", a_menuIndexToRender + 1, ". "
+    PRINT AT #ROWOFFSET + MENU_START_X, " ", MENU_INDEX_POSITION + 1, ". "
 
     ' output menu label
     DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 4, CONF_LABEL_LEN, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_LABEL)
-    PRINT AT #ROWOFFSET + MENU_START_X + 20, "            "
+    IF MENU_START_X < 2 THEN PRINT AT #ROWOFFSET + MENU_START_X + 20, "            "
 
     ' determine and output config option value label
     valuesCount = MENU_DATA(a_menuIndexToRender, CONF_NUM_VALUES)
@@ -84,6 +91,86 @@ highlightMenuRow: PROCEDURE
     DEFINE VRAM #VDP_NAME_TAB + XY(0, MENU_HELP_ROW), 32, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_HELP)
     END
 
+menuLoop: PROCEDURE
+
+    key = CONT.KEY
+    IF key >= $30 THEN key = key - $30
+
+    lastMenuIndex = g_currentMenuIndex
+    valueChanged = FALSE
+
+    MIN_MENU_INDEX = MENU_INDEX_OFFSET
+    MAX_MENU_INDEX = MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
+
+    GOSUB updateNavInput
+
+    ' <down> button pressed?
+    IF g_nav AND NAV_DOWN THEN  
+        WHILE 1
+            g_currentMenuIndex  = g_currentMenuIndex + 1
+            IF g_currentMenuIndex > MAX_MENU_INDEX THEN g_currentMenuIndex = MIN_MENU_INDEX
+            IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) <> 255 THEN
+                EXIT WHILE
+            END IF
+        WEND
+    
+    ' <up> button pressed?
+    ELSEIF g_nav AND NAV_UP THEN  
+        WHILE 1
+            IF g_currentMenuIndex = MIN_MENU_INDEX THEN
+                g_currentMenuIndex = MAX_MENU_INDEX
+            ELSE
+                g_currentMenuIndex = g_currentMenuIndex - 1
+            END IF
+            IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) <> 255 THEN
+                EXIT WHILE
+            END IF
+        WEND
+
+    ' number button pressed?
+    ELSEIF key > 0 AND key <= MENU_INDEX_COUNT THEN
+        I = MENU_DATA(MIN_MENU_INDEX + key - 1, CONF_INDEX)
+        IF I <> 255 THEN
+            g_currentMenuIndex = MIN_MENU_INDEX + key - 1
+
+            IF I > 200 THEN
+                valueChanged = TRUE
+            END IF
+        END IF
+
+    ' <fire>, <space> or <right> pressed? - next option value
+    ELSEIF (g_nav AND NAV_OK) OR (g_nav AND NAV_RIGHT) THEN 
+        IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
+            tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
+            currentValueIndex = tempConfigValues(g_currentMenuIndex)
+            currentValueIndex = currentValueIndex + 1
+            IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = 0
+            tempConfigValues(g_currentMenuIndex) = currentValueIndex
+        END IF
+        valueChanged = TRUE
+
+    ' <left> pressed - previous option value
+    ELSEIF (g_nav AND NAV_LEFT) THEN 
+        IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
+            tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
+            currentValueIndex = tempConfigValues(g_currentMenuIndex)
+            currentValueIndex = currentValueIndex - 1
+            IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = tempConfigValuesCount - 1
+            tempConfigValues(g_currentMenuIndex) = currentValueIndex
+            valueChanged = TRUE
+        END IF
+    END IF
+    
+    ' have we changed menu items?
+    IF g_currentMenuIndex <> lastMenuIndex THEN
+        RENDER_MENU_ROW(lastMenuIndex)
+        RENDER_MENU_ROW(g_currentMenuIndex)
+
+        IF g_currentMenuIndex <> 1 THEN GOSUB hideSprites
+        IF NOT valueChanged THEN GOSUB delay
+    END IF
+    END
+
 
 ' -----------------------------------------------------------------------------
 ' the top-level menu
@@ -91,6 +178,8 @@ highlightMenuRow: PROCEDURE
 mainMenu: PROCEDURE 
     
     DRAW_TITLE("MAIN MENU", 9)
+
+    g_currentMenuIndex = 0
 
     GOSUB renderMenu
     GOSUB initSprites
@@ -104,76 +193,7 @@ mainMenu: PROCEDURE
 
         IF g_currentMenuIndex = 1 THEN GOSUB animateSprites  ' do this first to ensure it's done within a frame
 
-        key = CONT.KEY
-        IF key >= $30 THEN key = key - $30
-
-        lastMenuIndex = g_currentMenuIndex
-        valueChanged = FALSE
-
-        GOSUB updateNavInput
-
-        ' <down> button pressed?
-        IF g_nav AND NAV_DOWN THEN  
-            WHILE 1
-                g_currentMenuIndex = g_currentMenuIndex + 1
-                IF g_currentMenuIndex >= CONF_COUNT THEN g_currentMenuIndex = 0
-                IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) <> 255 THEN
-                    EXIT WHILE
-                END IF
-            WEND
-        
-        ' <up> button pressed?
-        ELSEIF g_nav AND NAV_UP THEN  
-            WHILE 1
-                g_currentMenuIndex = g_currentMenuIndex - 1
-                IF g_currentMenuIndex >= CONF_COUNT THEN g_currentMenuIndex = CONF_COUNT - 1
-                IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) <> 255 THEN
-                    EXIT WHILE
-                END IF
-            WEND
-
-        ' number button pressed?
-        ELSEIF key > 0 AND key <= CONF_COUNT THEN
-            I = MENU_DATA(key - 1, CONF_INDEX)
-            IF I <> 255 THEN
-                g_currentMenuIndex = key - 1
-
-                IF I > 200 THEN
-                    valueChanged = TRUE
-                END IF
-            END IF
-
-        ' <fire>, <space> or <right> pressed? - next option value
-        ELSEIF (g_nav AND NAV_OK) OR (g_nav AND NAV_RIGHT) THEN 
-            IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
-                tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
-                currentValueIndex = tempConfigValues(g_currentMenuIndex)
-                currentValueIndex = currentValueIndex + 1
-                IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = 0
-                tempConfigValues(g_currentMenuIndex) = currentValueIndex
-            END IF
-            valueChanged = TRUE
-
-        ' <left> pressed - previous option value
-        ELSEIF (g_nav AND NAV_LEFT) THEN 
-            IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
-                tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
-                currentValueIndex = tempConfigValues(g_currentMenuIndex)
-                currentValueIndex = currentValueIndex - 1
-                IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = tempConfigValuesCount - 1
-                tempConfigValues(g_currentMenuIndex) = currentValueIndex
-                valueChanged = TRUE
-            END IF
-        END IF
-        
-        ' have we changed menu items?
-        IF g_currentMenuIndex <> lastMenuIndex THEN
-            RENDER_MENU_ROW(lastMenuIndex)
-            RENDER_MENU_ROW(g_currentMenuIndex)
-
-            IF g_currentMenuIndex <> 1 THEN GOSUB hideSprites
-            IF NOT valueChanged THEN GOSUB delay
-        END IF
+        GOSUB menuLoop
 
         ' has the value changed for this config option? (or we selected a submenu by number)
         IF valueChanged THEN
@@ -211,6 +231,8 @@ mainMenu: PROCEDURE
     WEND
     END
 
+
+
 ' -----------------------------------------------------------------------------
 ' save configuration
 ' -----------------------------------------------------------------------------
@@ -226,29 +248,66 @@ saveOptionsMenu: PROCEDURE
         RETURN
     END IF
 
+    oldIndex = g_currentMenuIndex
+
     ' prompt first
+
+    ' remove highlight from main menu
     I = g_currentMenuIndex
     g_currentMenuIndex = 0
     RENDER_MENU_ROW(I)
     g_currentMenuIndex = I
 
-'    GOSUB clearScreen
+    DRAW_POPUP("     Save Changes?", 22, 5)
 
-    DRAW_POPUP(" Save Changes? ", 15, 5)
-    PRINT AT XY((32 - a_titleLen) / 2 + 2, a_popupTop + 3), "1. Save"
-    PRINT AT XY((32 - a_titleLen) / 2 + 2, a_popupTop + 4), "2. Cancel"
+    menuTopRow = MENU_TITLE_ROW + 9
+    MENU_INDEX_OFFSET = 10
+    MENU_INDEX_COUNT = 2
+    MENU_START_X = 6
+    g_currentMenuIndex = 10
 
+    FOR a_menuIndexToRender = MENU_INDEX_OFFSET TO MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
+        GOSUB renderMenuRow
+    NEXT a_menuIndexToRender
+
+    VDP_ENABLE_INT
     GOSUB delay
-    
+
+    didSave = FALSE
+
+    ' main menu loop
     WHILE 1
         WAIT
-        GOSUB updateNavInput
-        IF g_nav AND (NAV_CANCEL OR NAV_OK) THEN EXIT WHILE
+
+        GOSUB menuLoop
+
+        IF valueChanged THEN
+            vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
+
+            IF vdpOptId = CONF_MENU_OK THEN
+                GOSUB saveOptions
+                didSave = TRUE
+            END IF
+
+            EXIT WHILE
+        END IF
+        
+        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
+
     WEND
+
+    g_currentMenuIndex = oldIndex
 
     GOSUB renderMenu
 
-    IF g_nav AND NAV_OK THEN GOSUB saveOptions
+    IF didSave THEN
+        ' if the clock frequency has changed... inform reboot
+        IF clockChanged THEN
+            PRINT AT XY(0, MENU_HELP_ROW), " Success! ** Reboot required ** "
+        ELSE
+            PRINT AT XY(0, MENU_HELP_ROW), "  Success! Configuration saved  "
+        END IF
+    END IF
 
     END
 
@@ -270,8 +329,10 @@ configMenuData:
     DATA BYTE CONF_MENU_SAVE,       "Save settings   ", 0, 0, " Save configuration to PICO9918 "
     DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
 
-    DATA BYTE CONF_MENU_OK,         "Confirm         ", 0, 0, "      Update firmware now?      "
+    DATA BYTE CONF_MENU_OK,         "Confirm         ", 0, 0, " Save configuration to PICO9918 "
     DATA BYTE CONF_MENU_CANCEL,     "Cancel          ", 0, 0, "        Back to main menu       "
+    
+    DATA BYTE CONF_MENU_OK,         "OK              ", 0, 0, "        Back to main menu       "
 
 ' -----------------------------------------------------------------------------
 ' Pico9918Option values. Indexed from options()
