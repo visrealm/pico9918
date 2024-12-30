@@ -16,7 +16,7 @@ The PCB is the supported by the printed enclosure:
 
 There is now a single PCB (v1.3) for both JST and FFC connector types.
 
-See [pcb/](pcb/)
+See [ti99/pcb/](ti99/pcb/)
 
 To install the PCB, first remove the A/V connector from your TI-99/4A. Then install using the 3D printed spacer: [stl/pico9918-nocut-ti99-pcb-spacer.stl](stl/pico9918-nocut-ti99-pcb-spacer.stl)
 
