@@ -14,7 +14,7 @@ The PCB is the supported by the printed enclosure:
 
 ### PCB
 
-There are two versions of the PCB. One for v0.4 - v1.1 boards with JST connectors and another for v1.2+ boards with an FFC connector.
+There is now a single PCB (v1.3) for both JST and FFC connector types.
 
 See [pcb/](pcb/)
 
