@@ -48,11 +48,18 @@ int roundflt(float x)
     return (int)(x + 0.5f);
 }
 
-
+#ifdef PICO9918_SYNC_PINS_START
+#define SYNC_PINS_START	PICO9918_SYNC_PINS_START
+#else
 #define SYNC_PINS_START 0        // first sync pin gpio number
+#endif
 #define SYNC_PINS_COUNT 2        // number of sync pins (h and v)
 
+#ifdef PICO9918_RGB_PINS_START
+#define RGB_PINS_START	PICO9918_RGB_PINS_START
+#else
 #define RGB_PINS_START  2        // first rgb pin gpio number
+#endif
 #define RGB_PINS_COUNT 12        // number of rgb pins
 
 #define VGA_PIO         pio0_hw  // which pio are we using for vga?

@@ -7,11 +7,45 @@ set(PICO9918_VERSION   "0.4.3")
 set(PICO9918_PCB_MAJOR_VER 0)
 set(PICO9918_PCB_MINOR_VER 4)
 
-set(PICO9918_SCANLINES 1)
+if (DEFINED PICO9918_SCANLINES)
+  message("Using PICO9918_SCANLINES '${PICO9918_SCANLINES}' from config file")
+else()
+  set(PICO9918_SCANLINES 1)
+endif()
 
 # SCART RGBs options
-set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
-set(PICO9918_SCART_PAL  0)  # 1 for PAL 576i, 0 for NTSC 480i
+if (DEFINED PICO9918_SCART_RGBS)
+  message("Using PICO9918_SCART_RGBS '${PICO9918_SCART_RGBS}' from config file")
+else()
+  set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
+endif()
+
+if (DEFINED PICO9918_SCART_PAL)
+  message("Using PICO9918_SCART_PAL '${PICO9918_SCART_PAL}' from config file")
+else()
+  set(PICO9918_SCART_PAL  0)  # 1 for PAL 576i, 0 for NTSC 480i
+endif()
+
+# options for other pico9918 hardware configurations
+if (DEFINED PICO9918_INT_ACTIVE_HIGH)
+  message("Using active-high interrupt output per config file")
+  add_definitions(-DPICO9918_INT_ACTIVE_HIGH)
+endif()
+
+if (DEFINED PICO9918_NO_CLOCKS)
+  message("Disabling clock outputs per config file")
+  add_definitions(-DPICO9918_NO_CLOCKS)
+endif()
+
+if (DEFINED PICO9918_SYNC_PINS_START)
+    message("Using PICO9918_SYNC_PINS_START '${PICO9918_SYNC_PINS_START}' from config file")
+  add_definitions(-DPICO9918_SYNC_PINS_START=${PICO9918_SYNC_PINS_START})
+endif()
+
+if (DEFINED PICO9918_RGB_PINS_START)
+  message("Using PICO9918_RGB_PINS_START '${PICO9918_RGB_PINS_START}' from config file")
+  add_definitions(-DPICO9918_RGB_PINS_START=${PICO9918_RGB_PINS_START})
+endif()
 
 # end compile-time options
 
@@ -37,7 +71,13 @@ endif()
 
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
-set(PICO9918_BINARY_SUFFIX -pcb-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER}-${PICO9918_OUTPUT_STR}-build-${PICO9918_VERSION_STR})
+if (DEFINED PICO9918_PRODUCT)
+  message("Using PICO9918_PRODUCT '${PICO9918_PRODUCT}' from config file")
+else()
+  set(PICO9918_PRODUCT pcb-v${PICO9918_PCB_MAJOR_VER}-${PICO9918_PCB_MINOR_VER})
+endif()
+
+set(PICO9918_BINARY_SUFFIX -${PICO9918_PRODUCT}-${PICO9918_OUTPUT_STR}-build-${PICO9918_VERSION_STR})
 
 if (${PICO9918_SCANLINES})
   set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-sl)
