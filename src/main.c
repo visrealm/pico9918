@@ -12,7 +12,9 @@
 #include "vga.h"
 #include "vga-modes.h"
 
+#ifndef PICO9918_NO_CLOCKS
 #include "clocks.pio.h"
+#endif
 #include "tms9918.pio.h"
 
 #include "palette.h"
@@ -88,6 +90,11 @@
 #define GPIO_MODE1 29
 #endif
 
+#ifdef PICO9918_NO_CLOCKS
+#undef GPIO_GROMCL
+#undef GPIO_CPUCL
+#endif
+
 
 #define GPIO_CD_MASK (0xff << GPIO_CD7)
 #define GPIO_CSR_MASK (0x01 << GPIO_CSR)
@@ -112,8 +119,10 @@
 #define TMS_PIO pio1
 #define TMS_IRQ PIO1_IRQ_0
 
+#ifndef PICO9918_NO_CLOCKS
 bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
 bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
+#endif
 bi_decl(bi_pin_mask_with_names(GPIO_CD_MASK, "CPU Data (CD7 - CD0)"));
 bi_decl(bi_1pin_with_name(GPIO_CSR, "Read"));
 bi_decl(bi_1pin_with_name(GPIO_CSW, "Write"));
@@ -131,6 +140,18 @@ static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
+
+/*
+ * update the interrupt output
+ */
+inline static void updateInterruptOutput(void)
+{
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put(GPIO_INT, currentInt);
+#else
+  gpio_put(GPIO_INT, !currentInt);
+#endif
+}
 
 /*
  * update the value send to the read PIO
@@ -157,7 +178,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     {
       vrEmuTms9918WriteAddrImpl(writeVal & 0xff);
       currentInt = vrEmuTms9918InterruptStatusImpl();
-      gpio_put(GPIO_INT, !currentInt);
+      updateInterruptOutput();
     }
     else // write data
     {
@@ -181,7 +202,7 @@ void  __not_in_flash_func(pio_irq_handler)()
       currentStatus = 0x1f;
       vrEmuTms9918SetStatusImpl(currentStatus);
       currentInt = false;
-      gpio_put(GPIO_INT, !currentInt);
+      updateInterruptOutput();
     }
     updateTmsReadAhead();
   }
@@ -303,7 +324,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     updateTmsReadAhead();
 
     currentInt = vrEmuTms9918InterruptStatusImpl();
-    gpio_put(GPIO_INT, !currentInt);
+    updateInterruptOutput();
   }
   enableTmsPioInterrupts();
 
@@ -341,6 +362,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
 }
 
+#ifndef PICO9918_NO_CLOCKS
 /*
  * initialise a clock output using PIO
  */
@@ -368,6 +390,7 @@ uint initClock(uint gpio, float freqHz)
 
   return clkSm++;
 }
+#endif
 
 /*
  * Set up PIOs for TMS9918 <-> CPU interface
@@ -418,14 +441,20 @@ void proc1Entry()
 {
   // set up gpio pins
   gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put_all(0);
+#else
   gpio_put_all(GPIO_INT_MASK);
+#endif
   gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
 
   tmsPioInit();
 
+#ifndef PICO9918_NO_CLOCKS
   // set up the GROMCLK and CPUCLK signals
   initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
   initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
+#endif
 
   // wait until everything else is ready, then run the vga loop
   multicore_fifo_pop_blocking();
