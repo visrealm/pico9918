@@ -38,6 +38,7 @@ Homebrews:
 * Troy Schrapel's [HBC-56](https://github.com/visrealm/hbc-56)
 * Stuart Connor's [TM990](http://www.stuartconner.me.uk/tm990/tm990.htm)
 * John Winans' [Z80-Retro](https://github.com/Z80-Retro)
+* Martin's [Z80Ardu](https://www.dev-tronic.de/?p=74)
 
 If you have tested the PICO9918 on any other device, please let me know and I'll happily update this list. :)
 
