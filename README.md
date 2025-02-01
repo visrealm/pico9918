@@ -56,9 +56,9 @@ Pre-release firmware for F18A compatibility mode is available in [Releases](http
 
 ## Purchasing options
 
-Fully assembled and tested PICO9918 v1.1s are available on my Tindie store:
+Fully assembled and tested PICO9918 v1.2s are available on my Tindie store:
 
-<a href="https://www.tindie.com/products/visrealm/pico9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
+<a href="https://www.tindie.com/search/?q=PICO9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
 
 Also (more convenient for North America)
 
@@ -69,9 +69,9 @@ Also (more convenient for North America)
 
 There are two main variants of the hardware. 
 
-### v1.1 (formerly v1.0 and v0.4)
+### v1.x (v1.2, v1.1, v1.0 and v0.4)
 
-PICO9918 v1.1 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
+PICO9918 v1.2 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
 
 <p align="left"><a href="img/pico9918_v1_0_sm.png"><img src="img/pico9918_v1_0_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
 
