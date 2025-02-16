@@ -10,15 +10,15 @@
  */
 
 #include "hardware/adc.h"
+#include "pico/divider.h"
+
 
 #include <stdbool.h>
-
-static bool tempInitialised = false;
 
 /*
  * initialise temperature hardware
  */
-static void analogReadTempSetup()
+void initTemperature()
 {
   adc_init();
   adc_set_temp_sensor_enabled(true);
@@ -28,8 +28,6 @@ static void analogReadTempSetup()
 #else
   adc_select_input(8); // RP2350 QFN80 package only... 
 #endif
-    
-  tempInitialised = true;
 }
 
 /*
@@ -37,10 +35,8 @@ static void analogReadTempSetup()
  */
 float coreTemperatureC()
 {
-  if (!tempInitialised) analogReadTempSetup();
-
-  const float vref = 3.3f;
   int v = adc_read();
+  const float vref = 3.3f;
   float t = 27.0f - ((v * vref / 4096.0f) - 0.706f) / 0.001721f; // From the datasheet
   return t;
 }

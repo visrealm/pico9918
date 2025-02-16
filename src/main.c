@@ -63,7 +63,7 @@ static const uint32_t dma32 = 2; // memset 32bit
 /*
  * update the value send to the read PIO
  */
-inline static void updateTmsReadAhead()
+static void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
@@ -211,10 +211,7 @@ static void eofInterrupt()
   if ((frameCount & 0x0f) == 0) // every 16th frame
   {
     float tempC = coreTemperatureC();
-    uint32_t t = (int)(tempC * 10.0f);
-    uint32_t i = (t / 100);
-    t -= (i * 100);
-    diagSetTemperatureBcd((i << 12) | ((t / 10) << 8) | (0x0e << 4) | (t % 10));
+    diagSetTemperature(tempC);
     uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
     TMS_STATUS(tms9918, 13) = t4;
   }
@@ -362,12 +359,27 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     {
       outputSplash(y, frameCount, vBorder, vPixels, pixels);
 
-      if (testingClock && frameCount == 599)
+      if (testingClock)
       {
-        // new clock lasted 10 seconds... let's accept it
-        tms9918->config[CONF_CLOCK_TESTED] = tms9918->config[CONF_CLOCK_PRESET_ID];
-        tms9918->config[CONF_SAVE_TO_FLASH] = 1;
-        testingClock = false;
+        if (frameCount < 400)
+        {
+          renderText(y, "TESTING NEW CLOCK FREQUENCY...", 231, 8, 0x0fff, 0x0222, pixels);
+        }
+        else if (frameCount < 500)
+        {
+          renderText(y, "TEST COMPLETED SUCCESSFULLY!", 234, 8, 0x04f4, 0x0444, pixels);
+        }
+        else if (frameCount < 599)
+        {
+          renderText(y, "WRITING CONFIGURATION TO FLASH...", 222, 8, 0x0fff, 0x0444, pixels);
+        }
+        else
+        {
+          // new clock lasted 10 seconds... let's accept it
+          tms9918->config[CONF_CLOCK_TESTED] = tms9918->config[CONF_CLOCK_PRESET_ID];
+          tms9918->config[CONF_SAVE_TO_FLASH] = 1;
+          testingClock = false;
+        }
       }
     }
     if (TMS_REGISTER(tms9918, 0x32) & 0x40)
@@ -497,12 +509,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   //dma_channel_wait_for_finish_blocking(dma32);
   dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
 
+#if PICO9918_DIAG
   updateRenderTime(renderTime,  time_us_32() - frameStart);
 
-#if PICO9918_DIAG
-    dma_channel_wait_for_finish_blocking(dma32);
+  dma_channel_wait_for_finish_blocking(dma32);
 
-    renderDiagnostics(y + vBorder, pixels);
+  renderDiagnostics(y + vBorder, pixels);
 #endif
 }
 
@@ -555,11 +567,13 @@ void proc1Entry()
 {
   // set up gpio pins
   gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_MODE1_MASK | GPIO_INT_MASK | GPIO_RESET_MASK);
-  gpio_put_all(GPIO_INT_MASK);
+  gpio_put_all(0);
   gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
 
   tmsPioInit();
 
+  gpio_put_all(GPIO_INT_MASK);
+  
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
   if (hwVersion != HWVer_0_3)
@@ -643,7 +657,6 @@ int main(void)
   channel_config_set_write_increment(&cfg, true);
   channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
   dma_channel_set_config(dma32, &cfg, false);
-
   dma_channel_set_read_addr(dma32, &bg, false);
 
   /* then set up VGA output */
@@ -659,6 +672,11 @@ int main(void)
   const char *version = PICO9918_VERSION;
 
   vgaInit(params);
+
+  initTemperature();
+
+  initDiagnostics();
+
 
   /* signal proc1 that we're ready to start the display */
   multicore_fifo_push_blocking(0);

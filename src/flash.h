@@ -11,12 +11,4 @@
 
 #pragma once
 
-
-/* initialise temperature sensor */
-void initTemperature();
-
-/* read temperature (celsius) */
-float coreTemperatureC();
-
-/* read temperature (fahrenheit) */
-float coreTemperatureF();
+void flashSector();

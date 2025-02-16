@@ -24,6 +24,7 @@ typedef enum
   CONF_SW_VERSION       = 2,
   CONF_CLOCK_TESTED     = 4,
   CONF_DISP_DRIVER      = 5,
+  CONF_FLASH_STATUS     = 6,
 
   // settable via registers
   CONF_CRT_SCANLINES    = 8,

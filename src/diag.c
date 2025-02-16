@@ -27,48 +27,115 @@
 #define TIMING_DIAG PICO9918_DIAG
 #define REG_DIAG PICO9918_DIAG
 
+typedef struct 
+{
+  union {
+    uint32_t words[3];
+    char digits[sizeof(uint32_t) * 3];
+  };
+  int start;
+} IntString;
+
+static void clear(IntString *number)
+{
+  number->start = 0;
+  number->words[0] = 0;
+  number->words[1] = 0;
+  number->words[2] = 0;
+}
+
 
 /* for diagnostics / statistics */
-uint32_t renderTimeBcd = 0;
-uint32_t frameTimeBcd = 0;
-uint32_t renderTimePerScanlineBcd = 0;
-uint32_t totalTimePerScanlineBcd = 0;
-uint32_t temperatureBcd = 0;
+IntString renderTimeStr = {0};
+IntString frameTimeStr = {0};
+IntString renderTimePerScanlineStr = {0};
+IntString totalTimePerScanlineStr = {0};
+IntString temperatureStr = {0};
 
 uint32_t accumulatedRenderTime = 0;
 uint32_t accumulatedFrameTime = 0;
 uint32_t accumulatedScanlines = 0;
 
-void diagSetTemperatureBcd(uint32_t tempBcd)
-{
- temperatureBcd = tempBcd;
-}
+static float precLookup[] = {1.0f, 10.0f, 100.0f, 1000.0f};
 
-
-/* convert an integer to bcd (two digits per byte)*/
-static __attribute__ ((noinline)) uint32_t toBcd(uint32_t number)
+/* convert a float to a string */
+static void flt2Str(float flt, int prec, IntString *out)
 {
-  uint32_t result = 0;
-  for (int i = 0; number && (i < 8); ++i)
+  if (prec > 3) prec = 3;
+  flt *= precLookup[prec];
+  uint32_t number = (uint32_t)(flt + 0.5f);
+
+  out->start = sizeof(out->digits) - 1;
+  out->digits[out->start] = '\0';
+  while (prec--)
   {
     divmod_result_t dmResult = divmod_u32u32(number, 10);
-    result |= to_remainder_u32(dmResult) << (i * 4);
     number = to_quotient_u32(dmResult);
+    out->digits[--out->start] = '0' + to_remainder_u32(dmResult);
   }
-  return result;
+  out->digits[--out->start] = '.';
+  if (!number)
+  {
+    out->digits[--out->start] = '0';
+  }
+  else
+  {
+    while (number && out->start)
+    {
+      divmod_result_t dmResult = divmod_u32u32(number, 10);
+      number = to_quotient_u32(dmResult);
+      out->digits[--out->start] = '0' + to_remainder_u32(dmResult);
+    }  
+  }
 }
 
+/* convert an integer to string */
+static void uint2Str(uint32_t number, IntString *out)
+{
+  out->start = sizeof(out->digits) - 1;
+  out->digits[out->start] = '\0';
+  if (!number)
+  {
+    out->digits[--out->start] = '0';
+  }
+  else
+  {
+    while (number && out->start)
+    {
+      divmod_result_t dmResult = divmod_u32u32(number, 10);
+      number = to_quotient_u32(dmResult);
+      out->digits[--out->start] = '0' + to_remainder_u32(dmResult);
+    }  
+  }
+}
 
+void initDiagnostics()
+{
+  clear(&renderTimeStr);
+  clear(&frameTimeStr);
+  clear(&renderTimePerScanlineStr);
+  clear(&totalTimePerScanlineStr);
+  clear(&temperatureStr);
+}
+
+/* set the temperature value to display */
+void diagSetTemperature(float tempC)
+{
+  flt2Str(tempC, 2, &temperatureStr);
+}
+
+/* update diagnostics values */
 void updateDiagnostics(uint32_t frameCount)
 {
 #if TIMING_DIAG
   const uint32_t framesPerUpdate = 1 << 2;
   if ((frameCount & (framesPerUpdate - 1)) == 0)
   {
-    renderTimeBcd = toBcd(accumulatedRenderTime / framesPerUpdate);
-    frameTimeBcd = toBcd(accumulatedFrameTime / framesPerUpdate);
-    renderTimePerScanlineBcd = toBcd(accumulatedRenderTime / accumulatedScanlines);
-    totalTimePerScanlineBcd = toBcd(accumulatedFrameTime / accumulatedScanlines);
+    uint2Str(accumulatedRenderTime / framesPerUpdate, &renderTimeStr);
+    uint2Str(accumulatedFrameTime / framesPerUpdate, &frameTimeStr);
+    uint2Str(accumulatedRenderTime / accumulatedScanlines, &renderTimePerScanlineStr);
+    uint2Str(accumulatedFrameTime / accumulatedScanlines, &totalTimePerScanlineStr);
+
     accumulatedRenderTime = accumulatedFrameTime = accumulatedScanlines = 0;
   }
 #endif
@@ -81,17 +148,18 @@ void updateDiagnostics(uint32_t frameCount)
 #define CHAR_WIDTH  6
 
 /* render a debug text scanline */
-void __attribute__ ((noinline)) renderText(uint16_t scanline, const char *text, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
+void renderText(uint16_t scanline, const char *text, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
 {
   int fontY = scanline - y;
   if (fontY < 0 || fontY >= CHAR_HEIGHT) return;
 
   fontY <<= 1;
   char c = 0;
+  pixels[x++] = bg;
   while (c = *text)
   {
     c -= 32;
-    char b = font[((c & 0x30) + fontY) << 3 + (c & 0xf)];
+    char b = font[(((c & 0x30) + fontY) << 3) + (c & 0xf)];
     for (int i = 0; i < 6; ++i)
     {
       pixels[x++] = (b & 0x80) ? fg : bg;
@@ -104,24 +172,9 @@ void __attribute__ ((noinline)) renderText(uint16_t scanline, const char *text, 
 
 
 /* render a bcd value scanline */
-void __attribute__ ((noinline))  renderBcd(uint16_t scanline, uint32_t bcd, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
+inline void renderStr(uint16_t scanline, IntString *str, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
 {
-  int fontY = scanline - y;
-  if (fontY < 0 || fontY >= CHAR_HEIGHT) return;
-
-  char buffer[12];
-  int width = 0;
-  char *p = buffer + 8;
-  *p = 0;
-
-  while (bcd)
-  {
-    char c = (bcd & 0xf);
-    *(--p) = c + ((c < 10) ? '0' : ' ');
-    bcd >>= 4;
-  }
-
-  renderText(scanline, p, x, y, fg, bg, pixels);
+  renderText(scanline, str->digits + str->start, x, y, fg, bg, pixels);
 }
 
 
@@ -141,15 +194,15 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   // ROW30 mode will inflate this figure since... more scanlines 
   int xPos = 2;
   int yPos = 2;
-  renderBcd(y, frameTimeBcd, xPos, yPos, 0x0f40, 0, pixels);
-  renderBcd(y, totalTimePerScanlineBcd, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
+  renderStr(y, &frameTimeStr, xPos, yPos, 0x0f40, 0, pixels);
+  renderStr(y, &totalTimePerScanlineStr, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
 
-  renderBcd(y, renderTimeBcd, xPos, yPos, 0x0f40, 0, pixels);
-  renderBcd(y, renderTimePerScanlineBcd, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
+  renderStr(y, &renderTimeStr, xPos, yPos, 0x0f40, 0, pixels);
+  renderStr(y, &renderTimePerScanlineStr, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
 
-  renderBcd(y, temperatureBcd, xPos, yPos, 0x004f, 0, pixels); yPos += 8;
+  renderStr(y, &temperatureStr, xPos, yPos, 0x004f, 0, pixels); yPos += 8;
   
-  //renderText(y, "HELLO :)", xPos, yPos, 0x0fff, 0, pixels);
+  renderText(y, "HELLO", xPos, yPos, 0x0fff, 0, pixels);
 #endif
 
 #if REG_DIAG
