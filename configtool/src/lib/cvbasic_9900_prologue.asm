@@ -934,6 +934,8 @@ int_handler
     li r12,>1100
     czc r12,r11
     jne .noquit
+    li r0,>3280        ; reset PICO9918 vdp registers
+    bl @WRTVDP
     clr @intwsr2
     blwp @>0000
 .noquit    
