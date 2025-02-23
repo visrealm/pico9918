@@ -32,6 +32,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * [Sord M5](https://en.wikipedia.org/wiki/Sord_M5)
 * [Tomy Pyūta / Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor)
 * [Tomy Pyūta Jr](http://videogamekraken.com/pyuta-jr-by-tomy)
+* [VTech CreatiVision / Dick Smith Wizzard](https://en.wikipedia.org/wiki/VTech_CreatiVision)
 
 Homebrews:
 
