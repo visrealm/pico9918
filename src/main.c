@@ -158,9 +158,9 @@ void __not_in_flash_func(gpioIrqHandler)()
 
   disableTmsPioInterrupts();
 
-  readConfig(tms9918->config);
+  vrEmuTms9918Reset();  // resets palette to factory
 
-  vrEmuTms9918Reset();
+  readConfig(tms9918->config);  // re-load config palette
 
   irq_clear(TMS_IRQ);
   pio_sm_clear_fifos(TMS_PIO, tmsReadSm);
@@ -567,12 +567,12 @@ void proc1Entry()
 {
   // set up gpio pins
   gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_MODE1_MASK | GPIO_INT_MASK | GPIO_RESET_MASK);
-  gpio_put_all(0);
-  gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
+  gpio_put_all(0); // we want to kep /INT held low for now
+  gpio_set_dir_all_bits(GPIO_INT_MASK); // /INT is an output
 
   tmsPioInit();
 
-  gpio_put_all(GPIO_INT_MASK);
+  gpio_put_all(GPIO_INT_MASK);	// ok, we can release /INT now
   
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 

@@ -42,7 +42,7 @@ static Pico9918HardwareVersion detectHardwareVersion()
   Pico9918HardwareVersion version = HWVer_1_x;
 
 #if PICO_RP2040
-  // check if RESET pin is being driven externally (on v0.4+, it is, on v0.3 it isn't)
+  // check if RESET pin is being driven externally (on v0.4+, it is, on v0.3 it isn't since it's CPUCL)
   gpio_set_dir_masked(GPIO_RESET_MASK, 0 << GPIO_RESET);  // reset input
   gpio_pull_up(GPIO_RESET);
   sleep_us(10);  
@@ -50,7 +50,7 @@ static Pico9918HardwareVersion detectHardwareVersion()
   {
     gpio_pull_down(GPIO_RESET);
     sleep_us(10);  
-    if (!gpio_get(GPIO_RESET))
+    if (!gpio_get(GPIO_RESET)) // still following pull... must be v0.3
     {
       version = HWVer_0_3;
     }
@@ -164,9 +164,7 @@ bool writeConfig(uint8_t config[CONFIG_BYTES])
   config[CONF_PALETTE_IDX_0 + 1] = 0;
   for (int i = 1; i < 16; ++i)
   {
-    uint16_t rgb = 0xf000 | vrEmuTms9918DefaultPalette(i);
-    config[CONF_PALETTE_IDX_0 + (i * 2)] = rgb >> 8;
-    config[CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xff;
+    config[CONF_PALETTE_IDX_0 + (i * 2)] |= 0xf0;
   }
 
   bool success = false;
