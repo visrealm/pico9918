@@ -1,7 +1,3 @@
-## PICO9918 STLs
-
-Any 3D print or CAD files related to the PICO9918.
-
 ## TI-99/4A no-cut mod
 
 The no-cut mod for the TI-99/4A consists of a custom PCB which replaces the original A/V DIN socket:
