@@ -26,4 +26,6 @@ The vent holes on the black versus beige TI-99/4As are slightly different. For t
 
 ![ti99 no cut print layout](./ti99/img/pico9918-nocut-ti99-build-plate.png)
 
+The case is held together with 4x screws. The screw hole diameter is 2.4mm (3/32"). I use 4G x 3/8 self-tapping screws, but there is some flexibility in screw sizes.
+
 See [ti99/stl/](ti99/stl/)
