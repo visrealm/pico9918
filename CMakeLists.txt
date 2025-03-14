@@ -24,8 +24,34 @@ if (EXISTS ${picoVscode})
 endif()
 # ====================================================================================
 
+if (PICO9918_CONFIG)
+  message("Using PICO9918_CONFIG '${PICO9918_CONFIG}'")
+  include(${PICO9918_CONFIG})
+endif()
+
+#
+# Defaults if they're not set in the config file.
+#
+if (DEFINED PICO9918_RESTRICTED_HW_RPI_PICO)
+  #
+  # This is short-hand for "this is going to be run in a genuine
+  # Raspberry Pi Pico".  Force the board type to "pico" in this
+  # case, and disable the clock outputs (the Pico doesn't have
+  # enough GPIO pins for that).
+  #
+  message("PICO9918_RESTRICTED_HW_RPI_PICO specified in config file")
+  set(PICO9918_BOARD "pico")
+  set(PICO9918_NO_CLOCKS 1)
+endif()
+
+if (DEFINED PICO9918_BOARD)
+  message("Using PICO9918_BOARD '${PICO9918_BOARD}' from config file")
+else()
+  set(PICO9918_BOARD "pico9918_v04")
+endif()
+
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
-set(PICO_BOARD "pico9918_v04" CACHE STRING "Board type")
+set(PICO_BOARD ${PICO9918_BOARD} CACHE STRING "Board type")
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
