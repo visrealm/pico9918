@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.13)
 
 # compile-time options
 
-set(PICO9918_VERSION   "0.4.3")
+set(PICO9918_VERSION   "0.4.4")
 set(PICO9918_PCB_MAJOR_VER 0)
 set(PICO9918_PCB_MINOR_VER 4)
 
-set(PICO9918_SCANLINES 1)
+set(PICO9918_SCANLINES 0)
 
 # SCART RGBs options
 set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA

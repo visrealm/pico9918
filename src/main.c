@@ -152,16 +152,18 @@ void  __not_in_flash_func(pio_irq_handler)()
   if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsWriteSm))) == 0) // write?
   {
     uint32_t writeVal = TMS_PIO->rxf[tmsWriteSm];
+    uint8_t dataVal = writeVal & 0xff;
+    writeVal >>= ((GPIO_MODE - GPIO_CD7) + 16);
 
-    if (writeVal & (GPIO_MODE_MASK >> GPIO_CD7)) // write reg/addr
+    if (writeVal & 0x01) // write reg/addr
     {
-      vrEmuTms9918WriteAddrImpl(writeVal & 0xff);
+      vrEmuTms9918WriteAddrImpl(dataVal);
       currentInt = vrEmuTms9918InterruptStatusImpl();
       gpio_put(GPIO_INT, !currentInt);
     }
     else // write data
     {
-      vrEmuTms9918WriteDataImpl(writeVal & 0xff);
+      vrEmuTms9918WriteDataImpl(dataVal);
     }
 
     nextValue = vrEmuTms9918ReadDataNoIncImpl();
@@ -381,7 +383,7 @@ void tmsPioInit()
 
   pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writeConfig, GPIO_CD7);
-  sm_config_set_in_shift(&writeConfig, false, true, 16); // L shift, autopush @ 16 bits
+  sm_config_set_in_shift(&writeConfig, false, true, 32); // L shift, autopush @ 16 bits
   sm_config_set_clkdiv(&writeConfig, 1.0f);
 
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
