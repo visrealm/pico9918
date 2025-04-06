@@ -18,7 +18,16 @@ The 5P/6P jumper is used to connect the correct DIN pin to the ground plane of t
 
 See [ti99/pcb/](ti99/pcb/)
 
-To install the PCB, first remove the A/V connector from your TI-99/4A. Then install using the 3D printed spacer: [stl/pico9918-nocut-ti99-pcb-spacer.stl](stl/pico9918-nocut-ti99-pcb-spacer.stl)
+To install the PCB:
+1. Print and assemble the PCB spacer.
+   - Print the 3D printed spacer: [stl/pico9918-nocut-ti99-pcb-spacer.stl](stl/pico9918-nocut-ti99-pcb-spacer.stl)
+   - Print 2x copies of the assembly spacer jig: [stl/pico9918-nocut-ti99-pcb-spacer-jig.stl](stl/pico9918-nocut-ti99-pcb-spacer-jig.stl)
+   - Insert 8x standard dupont pins from a male pin header into the spacer's 8x holes.
+   - Using the assembly jigs on either side of the spacer, clamp the entire assembly together in a vice. This will space the pins centrally in the spacer.
+2. Fit and solder the spacer assembly to the BOTTOM side of the no-cut PCB's DIN1 socket.
+3. Desolder and remove the A/V connector from your TI-99/4A main board.
+4. Fit and solder the original A/V connector to the TOP side no-cut PCB DIN2 socket.
+5. Fit and solder the entire no-cut assembly to your TI-99/4A main board via the spacer.
 
 ### Enclosure
 
