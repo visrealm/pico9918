@@ -12,6 +12,10 @@ The PCB is the supported by the printed enclosure:
 
 There is now a single PCB (v1.3) for both JST and FFC connector types.
 
+#### Configuration
+
+The 5P/6P jumper is used to connect the correct DIN pin to the ground plane of the no-cut PCB. For 5-pin DINs (most US models), place a jumper between the 5P and middle pin. For 6-pin DINs (most EU/AUS models), place a jumper between the 6P and middle pin.
+
 See [ti99/pcb/](ti99/pcb/)
 
 To install the PCB, first remove the A/V connector from your TI-99/4A. Then install using the 3D printed spacer: [stl/pico9918-nocut-ti99-pcb-spacer.stl](stl/pico9918-nocut-ti99-pcb-spacer.stl)
