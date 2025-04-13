@@ -1,0 +1,26 @@
+diff --git "a/src/rp2_common/pico_crt0/crt0.S" "b/src/rp2_common/pico_crt0/crt0.S"
+index 9bf1263..63006c6 100644
+--- "a/src/rp2_common/pico_crt0/crt0.S"
++++ "b/src/rp2_common/pico_crt0/crt0.S"
+@@ -14,6 +14,7 @@
+ #include "pico/binary_info/defs.h"
+ #include "boot/picobin.h"
+ #include "pico/bootrom.h"
++#include "hardware/regs/rosc.h"
+ 
+ #ifdef NDEBUG
+ #ifndef COLLAPSE_IRQS
+@@ -233,6 +234,13 @@ hold_non_core0_in_bootrom:
+     b _enter_vtable_in_r0
+ 1:
+ 
++    // visrealm: Increase initial rosc speed for copy to ram
++    //           see https://github.com/raspberrypi/pico-sdk/issues/959#issuecomment-1206134071
++    ldr r0, =(ROSC_BASE + ROSC_DIV_OFFSET)
++    ldr r1, =0xaa4
++    str r1, [r0]
++    // ---- end visrealm
++
+ #if !PICO_RP2040 && PICO_EMBED_XIP_SETUP && !PICO_NO_FLASH
+     // Execute boot2 on the core 0 stack (it also gets copied into BOOTRAM due
+     // to inclusion in the data copy table below). Note the reference
