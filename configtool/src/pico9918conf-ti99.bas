@@ -22,6 +22,8 @@ CONST BANK_SIZE = 8
 
 INCLUDE "firmware_8k.h.bas"
 
+INCLUDE "banksel.bas"
+
 INCLUDE "core.bas"
 
 INCLUDE "firmware_8k.bas"

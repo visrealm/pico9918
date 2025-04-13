@@ -53,13 +53,50 @@ firmwareMenu: PROCEDURE
 
     PRINT " v", FIRMWARE_MAJOR_VER, ".", FIRMWARE_MINOR_VER, "?"
 
-    'I = 0
-    'FOR B = 1 TO 5
-    '    ON B FAST GOSUB ,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12
-    '    DEFINE VRAM NAME_TAB_XY(0, menuTopRow + B), 32, VARPTR bank1Start(289)
-    'NEXT B
+    #FWBLOCK = 0
 
-    'BANK SELECT 0
+    I = 0
+    FOR B = 1 TO FIRMWARE_BANKS
+        ON B FAST GOSUB ,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12
+        #FWOFFSET = 0
+        FOR BL = 1 TO FIRMWARE_BLOCKS_PER_BANK
+
+            VDP_DISABLE_INT
+
+            DEFINE VRAM #VDP_FIRMWARE_DATA, #FIRMWARE_BLOCK_BYTES, VARPTR bank1Start(#FWOFFSET)
+            DEFINE VRAM NAME_TAB_XY(0, menuTopRow + 6), 32, VARPTR bank1Start(#FWOFFSET)
+
+            FWST = $c0 OR (#VDP_FIRMWARE_DATA / 256)
+
+            PRINT AT XY(2, menuTopRow + 7), "Writing block ", #FWBLOCK + 1,"/",#FIRMWARE_BLOCKS
+
+            PRINT AT XY(2, menuTopRow + 8), " SET REG                    "
+            VDP($3F) = FWST
+            R = 0
+            WHILE (FWST AND $80)
+                VDP_SET_CURRENT_STATUS_REG(2)
+                FWST = VDP_READ_STATUS
+                VDP_RESET_STATUS_REG
+                PRINT AT XY(2, menuTopRow + 8), " REG OK ", R, " ",FWST,"   "
+                R = R + 1
+            WEND
+
+            PRINT AT XY(2, menuTopRow + 9), FWST,"   "
+            'EXIT FOR
+
+            VDP_ENABLE_INT
+
+            WAIT
+
+            #FWOFFSET = #FWOFFSET + #FIRMWARE_BLOCK_BYTES
+            #FWBLOCK = #FWBLOCK + 1
+            IF #FWBLOCK = #FIRMWARE_BLOCKS THEN EXIT FOR
+        NEXT BL
+    NEXT B
+
+    BANK SELECT 0
+
+    PRINT AT XY(2, menuTopRow + 7), "          DONE!            "
 
     WHILE 1
         WAIT
@@ -80,51 +117,3 @@ firmwareMenu: PROCEDURE
 
     SET_MENU(MENU_ID_MAIN)
     END    
-
-selectBank1:
-    BANK SELECT 1
-    RETURN
-
-selectBank2:
-    BANK SELECT 2
-    RETURN
-
-selectBank3:
-    BANK SELECT 3
-    RETURN
-
-selectBank4:
-    BANK SELECT 4
-    RETURN
-
-selectBank5:
-    BANK SELECT 5
-    RETURN
-
-selectBank6:
-    BANK SELECT 6
-    RETURN
-
-selectBank7:
-    BANK SELECT 7
-    RETURN
-
-selectBank8:
-    BANK SELECT 8
-    RETURN
-
-selectBank9:
-    BANK SELECT 9
-    RETURN
-
-selectBank10:
-    BANK SELECT 10
-    RETURN
-
-selectBank11:
-    BANK SELECT 11
-    RETURN
-
-selectBank12:
-    BANK SELECT 12
-    RETURN

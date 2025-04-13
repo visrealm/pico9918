@@ -27,16 +27,11 @@ struct UF2_Block { // 32 byte header, payload & magicEnd
     uint32_t blockNo;
     uint32_t numBlocks;
     uint32_t familyID;
-    uint8_t  data [476];
+    uint8_t  data [256];//476]; // Pico .UF2 files only use 256 byte blocks, so I omit the extra 220 unused bytes
     uint32_t magicEnd;
 } UF2_Block;
 typedef struct UF2_Block * UF2_Block_Ptr;
 
-static uint8_t hexvalues [] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-static inline uint8_t hexv (uint32_t v) {
-  return hexvalues [v & 0x0F];
-}
 
 /*
 #define RP2040_FAMILY_ID            0xe48bff56u
@@ -63,23 +58,63 @@ static inline uint8_t hexv (uint32_t v) {
 #define SUCCESSPOWER     "SUCCESS - POWER CYCLE NEEDED"
 #define SUCCESSFLASH     "SUCCESS - FLASH IS THE SAME"
 
-void flashSector () {
+#define FLASH_STATUS_IDLE         0
+#define FLASH_STATUS_VALIDATING   1
+#define FLASH_STATUS_ERASING      2
+#define FLASH_STATUS_WRITING      3
+#define FLASH_STATUS_VERIFYING    4
+
+#define FLASH_ERROR_OK            0
+#define FLASH_ERROR_HEADER        1
+#define FLASH_ERROR_SEQUENCE      2
+#define FLASH_ERROR_SIZE          3
+#define FLASH_ERROR_VERIFY        4
+#define FLASH_ERROR_BUSY          5
+
+#define STATUS_BYTE(R, E, S) 0x80 | ((R & 3) << 5) | ((E & 7) << 2) | (S & 3)
+
+void setFlashStatusRetry(int retry)
+{
+  TMS_STATUS(tms9918, 2) = (TMS_STATUS(tms9918, 2) & ~0x60) | ((retry & 3) << 5);
+}
+
+void setFlashStatusError(uint8_t error)
+{
+  TMS_STATUS(tms9918, 2) = (TMS_STATUS(tms9918, 2) & ~0x1c) | ((error & 7) << 2);
+}
+
+void setFlashStatusCode(uint8_t status)
+{
+  TMS_STATUS(tms9918, 2) = (TMS_STATUS(tms9918, 2) & ~0x03) | ((status & 3));
+}
+
+void doFlashSector()
+{
   static uint32_t flashing = 0;
-  static uint32_t repeat = 0;
   int i;
   int retry = 0;
 
   // vram address where uf2 block is stored is set in vreg(0x3f)[5:0] (256 byte boundaries)
   uint8_t flashReg = TMS_REGISTER(tms9918, 0x3f);
+
+  // Status Reg #2 for flasing status (shared with GPU status)
+  // bit  7:   running or not
+  // bit  6-5: retry count
+  // bits 4-2: error code
+  // bits 1-0: status
   
   const int vramAddr = (flashReg & 0x3f) << 8;
   const bool write = flashReg & 0x40;
   const bool verify = !write;
 
+  uint8_t statusRetryCount = 0;
+  setFlashStatusCode(FLASH_STATUS_VALIDATING);
+  
   UF2_Block_Ptr p = (UF2_Block_Ptr)(tms9918->vram.bytes + vramAddr);
 
-  tms9918->vram.bytes [767] = 0x00; // Wait
+  //tms9918->vram.bytes [767] = 0x00; // Wait
   tms9918->flash = 0;
+
   if ((p->magicStart0 != 0x0A324655) || // UF2\n
       (p->magicStart1 != 0x9E5D5157) ||
       (p->magicEnd    != 0x0AB16F30) ||
@@ -89,36 +124,46 @@ void flashSector () {
       (p->targetAddr  <  0x10000000) || // Flash address
       (p->targetAddr  >= 0x10040000) || // +256KB
       ((p->targetAddr & 0xFF) != 0)  || // Target must be 256 byte aligned
-      (p->payloadSize != PAYLOAD)) {    // Only support standard size
-    strcpy (&(tms9918->vram.bytes [736]), SKIPPING);
-    tms9918->vram.bytes [767] = 0x01; // Ignored - continue
+      (p->payloadSize != PAYLOAD))
+  {    // Only support standard size
+    setFlashStatusError(FLASH_ERROR_HEADER);
     return;
   }
-  if (p->blockNo == 0) {
+
+  const uint32_t writeOffset = 0;//0x100000; //TEMP: Add 1MB
+  uint32_t originalTargetAddr = p->targetAddr & ~(XIP_BASE);
+  p->targetAddr += writeOffset; 
+
+  if (p->blockNo == 0)
+  {
+    setFlashStatusCode(FLASH_STATUS_ERASING);
     flashing = 1;
-    if (tms9918->vram.bytes [766] == 0) {
-      strcpy (&(tms9918->vram.bytes [736]), ERASING);
-      flash_range_erase (0, ((PAYLOAD * p->numBlocks) + 0xFFF) & ~0xFFF);
-    }
-  } else if (!flashing) {
-    strcpy (&(tms9918->vram.bytes [736]), FAILEDSEQUENCE);
-    tms9918->vram.bytes [767] = 0x05; // Failed - sequence
-    tms9918->lockedMask = 0x07;
+    flash_range_erase (writeOffset, ((PAYLOAD * p->numBlocks) + 0xFFF) & ~0xFFF);
+  }
+  else if (!flashing)
+  {
+    setFlashStatusError(FLASH_ERROR_SEQUENCE);
+    //tms9918->lockedMask = 0x07;
     return;
   }
-  uint32_t a = (p->targetAddr - (intptr_t)XIP_BASE);
-  uint32_t b = a >> 12; // Get 4KB block number
-  if (b >= 64) { // Only support loading 256KB of flash (RAM size)
-    strcpy (&(tms9918->vram.bytes [736]), FAILEDSIZE);
-    tms9918->vram.bytes [767] = 0x04; // Failed - size
+
+  uint32_t a = (p->targetAddr & ~(XIP_BASE));
+  uint32_t b = originalTargetAddr >> 12; // Get 4KB block number
+  if (b >= 64)
+  {
+    setFlashStatusError(FLASH_ERROR_SIZE);
     flashing = 0;
-    tms9918->lockedMask = 0x07;
+    //tms9918->lockedMask = 0x07;
     return;
-  }
-  if (tms9918->vram.bytes [766] == 0) {
-    strcpy (&(tms9918->vram.bytes [736]), PROGRAMMING);
-    retry = 3;
-retry:
+  }  
+
+  if (write)
+  {
+  //  strcpy (&(tms9918->vram.bytes [736]), PROGRAMMING);
+    //retry = 3;
+//retry:
+    setFlashStatusCode(FLASH_STATUS_WRITING);
+    
     flash_range_program (a, p->data, PAYLOAD);
 
     // This cache flush may be unstable over 133MHz
@@ -132,48 +177,58 @@ retry:
       *(volatile uint32_t *)(XIP_BASE + a + i) = 0;
       i += sizeof(uint32_t);
     }
-  } else
-    strcpy (&(tms9918->vram.bytes [736]), VALIDATING);
-
-  if (memcmp ((void *)(XIP_BASE + a), p->data, PAYLOAD) != 0) {
-    if (retry) {
-      retry--;
-      repeat++;
-      tms9918->vram.bytes [729] = 'R';
-      tms9918->vram.bytes [730] = 'E';
-      tms9918->vram.bytes [731] = 'P';
-      tms9918->vram.bytes [732] = ':';
-      tms9918->vram.bytes [733] = hexv (repeat >>  8);
-      tms9918->vram.bytes [734] = hexv (repeat >>  4);
-      tms9918->vram.bytes [735] = hexv (repeat >>  0);
-      goto retry;
-    }
-    strcpy (&(tms9918->vram.bytes [736]), FAILEDCOMPARISON);
-    tms9918->vram.bytes [756] = hexv (a >> 20);
-    tms9918->vram.bytes [757] = hexv (a >> 16);
-    tms9918->vram.bytes [758] = hexv (a >> 12);
-    tms9918->vram.bytes [759] = hexv (a >>  8);
-    tms9918->vram.bytes [760] = hexv (a >>  4);
-    tms9918->vram.bytes [761] = hexv (a >>  0);
-    int i = 0;
-    while (i < 728) {
-      b = *(uint8_t *)(XIP_BASE + a++);
-      tms9918->vram.bytes [i++] = hexv (b >> 4);
-      tms9918->vram.bytes [i++] = hexv (b);
-    }
-    tms9918->vram.bytes [767] = 0x03; // Failed - comparison
-    flashing = 0;
-    tms9918->lockedMask = 0x07;
-    return;
   }
-  if (p->blockNo + 1 == p->numBlocks) {
-    if (tms9918->vram.bytes [766] == 0)
-      strcpy (&(tms9918->vram.bytes [736]), SUCCESSPOWER);
-    else
-      strcpy (&(tms9918->vram.bytes [736]), SUCCESSFLASH);
-    tms9918->vram.bytes [767] = 0x02; // Success - power cycle needed
+  setFlashStatusCode(FLASH_STATUS_VERIFYING);
+
+   //else
+    //strcpy (&(tms9918->vram.bytes [736]), VALIDATING);
+  if (verify)
+  {
+    if (memcmp ((const void *)(XIP_BASE + a), (const void*)p->data, PAYLOAD) != 0)
+    {
+  //    if (retry)
+    //  {
+      //  retry--;
+        //setFlashStatusRetry(++statusRetryCount);
+
+        //goto retry;
+      //}
+
+      setFlashStatusError(FLASH_ERROR_VERIFY);
+
+      //strcpy (&(tms9918->vram.bytes [736]), FAILEDCOMPARISON);
+
+      //int i = 0;
+      //while (i < 728) {
+      //  b = *(uint8_t *)(XIP_BASE + a++);
+      //  tms9918->vram.bytes [i++] = hexv (b >> 4);
+      // tms9918->vram.bytes [i++] = hexv (b);
+      //}
+      //tms9918->vram.bytes [767] = 0x03; // Failed - comparison
+
+      //flashing = 0;
+      //tms9918->lockedMask = 0x07;
+      return;
+    }
+  }
+  
+  if ((p->blockNo + 1) == p->numBlocks)
+  {
     flashing = 0;
-    tms9918->lockedMask = 0x07;
-  } else
-    tms9918->vram.bytes [767] = 0x01; // Success - continue
+    //tms9918->lockedMask = 0x07;
+    setFlashStatusError(FLASH_ERROR_OK);
+  }
+  else
+  {
+    setFlashStatusError(FLASH_ERROR_OK);
+  }
 }
+
+void __attribute__ ((noinline)) flashSector () {
+
+  doFlashSector();
+
+  TMS_STATUS(tms9918, 2) &= ~0x80; // Stopped
+  TMS_REGISTER(tms9918, 0x38) = 0;
+}
+

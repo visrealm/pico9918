@@ -85,6 +85,7 @@ def main() -> int:
                     header.write("  CONST #FIRMWARE_BLOCKS = {0}\n".format(w[6]))
                     header.write("  CONST FIRMWARE_BANKS = {0}\n".format(int(w[6] / BLOCKS_PER_BANK) + 1))
                     header.write("  CONST FIRMWARE_BLOCKS_PER_BANK = {0}\n".format(BLOCKS_PER_BANK))
+                    header.write("  CONST #FIRMWARE_BLOCK_BYTES = {0}\n".format((4 * 9) + 256))
                     header.write("  CONST FIRMWARE_MAJOR_VER = {0}\n".format(majorVer))
                     header.write("  CONST FIRMWARE_MINOR_VER = {0}\n".format(minorVer))
 

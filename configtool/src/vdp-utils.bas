@@ -14,8 +14,9 @@
 ' -----------------------------------------------------------------------------
 
 ' VDP constants
-CONST #VDP_NAME_TAB     = $1800
-CONST #VDP_SPRITE_ATTR  = $1B00
+CONST #VDP_NAME_TAB      = $1800
+CONST #VDP_SPRITE_ATTR   = $1B00
+CONST #VDP_FIRMWARE_DATA = $1D00
 
 ' VDP helpers
 DEF FN VDP_DISABLE_INT = VDP(1) = $C2

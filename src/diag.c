@@ -17,9 +17,9 @@
 
 #include "pico/divider.h"
 
-#if PICO9918_DIAG
+//#if PICO9918_DIAG
   #include "bmp_font.h"  
-#endif
+//#endif
 
 #include <stdbool.h>
 
@@ -142,8 +142,6 @@ void updateDiagnostics(uint32_t frameCount)
 }
 
 
-#if PICO9918_DIAG
-
 #define CHAR_HEIGHT 8
 #define CHAR_WIDTH  6
 
@@ -247,6 +245,4 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
 
 #endif  
 }
-
-#endif
 
