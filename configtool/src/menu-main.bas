@@ -19,16 +19,19 @@ DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow
 ' -----------------------------------------------------------------------------
 ' render all menu rows
 ' -----------------------------------------------------------------------------
-renderMenu: PROCEDURE
+renderMainMenu: PROCEDURE
     MENU_INDEX_OFFSET = 0
     MENU_INDEX_COUNT = 9
     MENU_START_X = 1
     menuTopRow = MENU_TITLE_ROW + 3
+    GOSUB renderMenu
+    DEFINE VRAM NAME_TAB_XY(0, menuTopRow + MENU_INDEX_COUNT), 32, emptyRow
+    END
 
+renderMenu: PROCEDURE
     FOR a_menuIndexToRender = MENU_INDEX_OFFSET TO MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
         GOSUB renderMenuRow
     NEXT a_menuIndexToRender
-    DEFINE VRAM NAME_TAB_XY(0, menuTopRow + MENU_INDEX_COUNT), 32, emptyRow
     END
 
 ' -----------------------------------------------------------------------------
@@ -179,9 +182,9 @@ mainMenu: PROCEDURE
     
     DRAW_TITLE("MAIN MENU", 9)
 
-    g_currentMenuIndex = 0
+    g_currentMenuIndex = oldIndex
 
-    GOSUB renderMenu
+    GOSUB renderMainMenu
     GOSUB initSprites
 
     VDP_ENABLE_INT
@@ -229,6 +232,9 @@ mainMenu: PROCEDURE
         END IF
         
     WEND
+
+    oldIndex = g_currentMenuIndex
+
     END
 
 
@@ -266,9 +272,7 @@ saveOptionsMenu: PROCEDURE
     MENU_START_X = 6
     g_currentMenuIndex = 10
 
-    FOR a_menuIndexToRender = MENU_INDEX_OFFSET TO MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
-        GOSUB renderMenuRow
-    NEXT a_menuIndexToRender
+    GOSUB renderMenu
 
     VDP_ENABLE_INT
     GOSUB delay
@@ -298,7 +302,7 @@ saveOptionsMenu: PROCEDURE
 
     g_currentMenuIndex = oldIndex
 
-    GOSUB renderMenu
+    GOSUB renderMainMenu
 
     IF didSave THEN
         ' if the clock frequency has changed... inform reboot
@@ -320,7 +324,7 @@ INCLUDE "conf-scanline-sprites.bas"
 configMenuData:
     DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ", 0, 2, "    Faux CRT scanline effect    "
     DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites", 2, 4, "                                "
-    DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, " RP2040 clock (requires reboot) "
+    DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, "  MCU clock  (requires reboot)  "
     DATA BYTE CONF_MENU_DIAG,       "Diagnostics  >>>", 0, 0, "   Manage diagnostics options   "
     DATA BYTE CONF_MENU_PALETTE,    "Palette      >>>", 0, 0, "     Change default palette     "
     DATA BYTE CONF_MENU_INFO,       "Device info. >>>", 0, 0, "    View device information     "
@@ -337,7 +341,7 @@ configMenuData:
 ' -----------------------------------------------------------------------------
 ' Pico9918Option values. Indexed from options()
 ' -----------------------------------------------------------------------------
-configMenuOptionValueData:
+configMenuOptionValueData: 
     DATA BYTE "Off   "
     DATA BYTE "On    "
     DATA BYTE "4     "

@@ -177,6 +177,8 @@ main:
 
         GOSUB applyConfigValues
 
+        oldIndex = 0
+
         ' render the menu
         GOSUB updatePalette
 

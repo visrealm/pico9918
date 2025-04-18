@@ -14,7 +14,9 @@
 ' -----------------------------------------------------------------------------
 
 
-
+' -----------------------------------------------------------------------------
+' open the firmware menu
+' -----------------------------------------------------------------------------
 firmwareMenu: PROCEDURE
 
     menuTopRow = MENU_TITLE_ROW + 3
@@ -53,14 +55,98 @@ firmwareMenu: PROCEDURE
 
     PRINT " v", FIRMWARE_MAJOR_VER, ".", FIRMWARE_MINOR_VER, "?"
 
+    GOSUB verifyCartridgeFirmware
+
+    GOSUB firmwareWriteAndVerify
+
+    PRINT AT XY(2, menuTopRow + 7), "          DONE!            "
+
+    WHILE 1
+        WAIT
+
+        GOSUB updateNavInput
+
+        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
+    WEND
+
+
+    DRAW_POPUP ("Update progress", 30, 9)
+
+    WHILE 1
+        WAIT
+        GOSUB updateNavInput
+
+        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
+    WEND
+
+    SET_MENU(MENU_ID_MAIN)
+    END    
+
+
+' -----------------------------------------------------------------------------
+' verify the firmware on this cart can be read in full
+' -----------------------------------------------------------------------------
+verifyCartridgeFirmware: PROCEDURE
+
+    #FWBLOCK = 0
+    STATUS = 1
+
+    I = 0
+    FOR B = 1 TO FIRMWARE_BANKS
+        BANKSEL(B)
+        #FWOFFSET = 0
+        PRINT AT XY(1, 18), "CHECKING BANK: ", B
+        FOR BL = 1 TO FIRMWARE_BLOCKS_PER_BANK
+
+            FOR #UF2OFFSET = 0 TO 8
+                IF bank1Start(#FWOFFSET + #UF2OFFSET) <> uf2Header(#UF2OFFSET) THEN
+                    PRINT AT XY(1, 19), "VERIFY FAILED FOR BLOCK ", #FWBLOCK
+                    STATUS = 0
+                    EXIT FOR
+                END IF
+            NEXT #UF2OFFSET
+
+            #UF2BLOCK = bank1Start(#FWOFFSET + 20) + (bank1Start(#FWOFFSET + 21) * 256)
+
+            IF #UF2BLOCK <> #FWBLOCK THEN
+                PRINT AT XY(1, 19), "VERIFY FAILED FOR BLOCK ", #FWBLOCK
+                STATUS = 0
+            END IF
+
+            FOR #UF2OFFSET = #FIRMWARE_BLOCK_BYTES - 4 TO #FIRMWARE_BLOCK_BYTES - 1
+                IF bank1Start(#FWOFFSET + #UF2OFFSET) <> uf2Header(#UF2OFFSET - 256) THEN
+                    PRINT AT XY(1, 19), "VERIFY FAILED FOR BLOCK ", #FWBLOCK
+                    STATUS = 0
+                    EXIT FOR
+                END IF
+            NEXT #UF2OFFSET
+
+            #FWOFFSET = #FWOFFSET + #FIRMWARE_BLOCK_BYTES
+            #FWBLOCK = #FWBLOCK + 1
+            IF #FWBLOCK = #FIRMWARE_BLOCKS THEN EXIT FOR
+        NEXT BL
+    NEXT B
+
+    BANKSEL(0)
+
+    IF STATUS = 1 THEN
+        PRINT AT XY(1, 19), "VERIFY PASSED FOR ALL BLOCKS"
+    END IF
+
+    END
+
+' -----------------------------------------------------------------------------
+' write the firmware
+' -----------------------------------------------------------------------------
+firmwareWriteAndVerify: PROCEDURE
+
     #FWBLOCK = 0
 
     I = 0
     FOR B = 1 TO FIRMWARE_BANKS
-        ON B FAST GOSUB ,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12
+        BANKSEL(B)
         #FWOFFSET = 0
         FOR BL = 1 TO FIRMWARE_BLOCKS_PER_BANK
-
             VDP_DISABLE_INT
 
             DEFINE VRAM #VDP_FIRMWARE_DATA, #FIRMWARE_BLOCK_BYTES, VARPTR bank1Start(#FWOFFSET)
@@ -94,26 +180,19 @@ firmwareMenu: PROCEDURE
         NEXT BL
     NEXT B
 
-    BANK SELECT 0
+    BANKSEL(0)
 
-    PRINT AT XY(2, menuTopRow + 7), "          DONE!            "
+    END
 
-    WHILE 1
-        WAIT
-        GOSUB updateNavInput
+uf2Header:
+  DATA BYTE $55, $46, $32, $0a ' magic start 0
+  DATA BYTE $57, $51, $5d, $9e ' magic start 1
 
-        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
-    WEND
+  DATA BYTE $00, $20, $00, $00 ' flags
+  DATA BYTE $00, $00, $00, $10 ' target address
+  DATA BYTE $00, $01, $00, $00 ' payload size (256)
+  DATA BYTE $00, $00, $00, $00 ' block No
+  DATA BYTE $ef, $00, $00, $00 ' block count
+  DATA BYTE $56, $ff, $8b, $e4 ' family Id
 
-
-    DRAW_POPUP ("Update progress", 30, 9)
-
-    WHILE 1
-        WAIT
-        GOSUB updateNavInput
-
-        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
-    WEND
-
-    SET_MENU(MENU_ID_MAIN)
-    END    
+  DATA BYTE $30, $6f, $b1, $0a ' magic end
