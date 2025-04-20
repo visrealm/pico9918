@@ -18,7 +18,7 @@ CONST TRUE           = -1
 CONST FALSE          = 0
 
 CONST MENU_TITLE_ROW   = 3
-CONST MENU_HELP_ROW    = 18
+CONST MENU_HELP_ROW    = 19
 
 CONST MENU_ID_MAIN     = 0
 CONST MENU_ID_INFO     = 1
@@ -98,6 +98,7 @@ main:
 
     ' GLOBALS    
     g_currentMenuIndex = 0                  ' current menu index
+    g_paletteDirty = FALSE
 
     ' setup the screen
     VDP_DISABLE_INT_DISP_OFF
@@ -152,6 +153,7 @@ main:
             PRINT AT XY(2, 16), "Update manually via USB from"
             PRINT AT XY(2, 18), "github.com/visrealm/pico9918"
         END IF
+        VDP_ENABLE_INT
     ELSE
         ' We are a PICO9918, set up the menu
         WAIT
@@ -185,7 +187,7 @@ main:
         SET_MENU(MENU_ID_MAIN)
 
         ' palette for sprites and tile 1 layer
-        VDP(24) = $10
+        VDP(24) = $11
 
         WHILE 1
             ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu
@@ -201,13 +203,12 @@ main:
 exit:
     WAIT
     GOTO exit
-
     
 ' -----------------------------------------------------------------------------
-' delay between user input (1/6 second)
+' delay between user input (2/15th second)
 ' -----------------------------------------------------------------------------
 delay: PROCEDURE
-    FOR del = 1 TO 10
+    FOR del = 1 TO 8
         WAIT
     NEXT del
     END

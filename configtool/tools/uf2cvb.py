@@ -52,7 +52,7 @@ def main() -> int:
     BLOCK_SIZE = 9 * 4 + 256    # 9 ints and 256 bytes of data
     BANK_OVERHEAD = 48          # bank overhead. we can't use it all :(
     BANK_SIZE = (1024 * args['banksize']) - BANK_OVERHEAD
-    BLOCKS_PER_BANK = int(BANK_SIZE / BLOCK_SIZE)
+    BLOCKS_PER_BANK = int((BANK_SIZE - 1) / BLOCK_SIZE)
 
     majorVer = 0
     minorVer = 0
@@ -104,6 +104,8 @@ def main() -> int:
                             output.write("\n' ===============================\n")
                             output.write("BANK {0}\n\n".format(bank))
                             output.write("bank{0}Start:\n".format(bank))
+                            output.write("  DATA BYTE {0}\n".format("${:02x}".format(bank)))
+                            output.write("bank{0}Data:\n".format(bank))
                             bank += 1
                         
                         w = struct.unpack("<IIIIIIII", inpbuf[0:32])

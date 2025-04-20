@@ -3,6 +3,8 @@
 BANK 1
 
 bank1Start:
+  DATA BYTE $01
+bank1Data:
 
  ' Block: 0
  ' Addr: 0x10000000
@@ -791,6 +793,8 @@ bank1Start:
 BANK 2
 
 bank2Start:
+  DATA BYTE $02
+bank2Data:
 
  ' Block: 27
  ' Addr: 0x10001b00
@@ -1579,6 +1583,8 @@ bank2Start:
 BANK 3
 
 bank3Start:
+  DATA BYTE $03
+bank3Data:
 
  ' Block: 54
  ' Addr: 0x10003600
@@ -2367,6 +2373,8 @@ bank3Start:
 BANK 4
 
 bank4Start:
+  DATA BYTE $04
+bank4Data:
 
  ' Block: 81
  ' Addr: 0x10005100
@@ -3155,6 +3163,8 @@ bank4Start:
 BANK 5
 
 bank5Start:
+  DATA BYTE $05
+bank5Data:
 
  ' Block: 108
  ' Addr: 0x10006c00
@@ -3943,6 +3953,8 @@ bank5Start:
 BANK 6
 
 bank6Start:
+  DATA BYTE $06
+bank6Data:
 
  ' Block: 135
  ' Addr: 0x10008700
@@ -4731,6 +4743,8 @@ bank6Start:
 BANK 7
 
 bank7Start:
+  DATA BYTE $07
+bank7Data:
 
  ' Block: 162
  ' Addr: 0x1000a200
@@ -5519,6 +5533,8 @@ bank7Start:
 BANK 8
 
 bank8Start:
+  DATA BYTE $08
+bank8Data:
 
  ' Block: 189
  ' Addr: 0x1000bd00
@@ -6307,6 +6323,8 @@ bank8Start:
 BANK 9
 
 bank9Start:
+  DATA BYTE $09
+bank9Data:
 
  ' Block: 216
  ' Addr: 0x1000d800

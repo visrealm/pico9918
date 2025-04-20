@@ -23,6 +23,19 @@ deviceInfoMenu: PROCEDURE
 
     DRAW_TITLE("DEVICE INFO", 11)
 
+    oldMenuTopRow = menuTopRow
+    oldIndex = g_currentMenuIndex
+
+    menuTopRow = MENU_TITLE_ROW + 14
+    MENU_INDEX_OFFSET = 13
+    MENU_INDEX_COUNT = 1
+    MENU_START_X = 6
+    g_currentMenuIndex = MENU_INDEX_OFFSET
+
+    GOSUB renderMenu
+
+    menuTopRow = oldMenuTopRow
+
     PRINT AT XY(2, menuTopRow + 0), "Processor family : "
     PRINT AT XY(2, menuTopRow + 1), "Hardware version : "
     PRINT AT XY(2, menuTopRow + 2), "Software version : "
@@ -83,7 +96,8 @@ deviceInfoMenu: PROCEDURE
         WAIT
 
         GOSUB updateNavInput
-        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
+        IF (g_nav AND NAV_CANCEL) OR (g_nav AND NAV_OK) OR (g_nav AND NAV_LEFT) THEN EXIT WHILE
+        IF CONT.KEY > 0 AND CONT.KEY <= MENU_INDEX_COUNT THEN EXIT WHILE
 
         VDP_DISABLE_INT
 
@@ -111,6 +125,8 @@ deviceInfoMenu: PROCEDURE
 
         VDP_ENABLE_INT
     WEND
+
+    g_currentMenuIndex = oldIndex
 
     SET_MENU(MENU_ID_MAIN)
 

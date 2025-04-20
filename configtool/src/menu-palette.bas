@@ -26,8 +26,8 @@ paletteMenu: PROCEDURE
         bmpBuf(32 + I * 2 + 1) = PATT_IDX_BOX_BR
     NEXT I
 
-    DEFINE VRAM NAME_TAB_XY(1, 8), 30, VARPTR bmpBuf(0)
-    DEFINE VRAM NAME_TAB_XY(1, 9), 30, VARPTR bmpBuf(32)
+    DEFINE VRAM NAME_TAB_XY(1, 7), 30, VARPTR bmpBuf(0)
+    DEFINE VRAM NAME_TAB_XY(1, 8), 30, VARPTR bmpBuf(32)
 
     FOR I = 0 TO 64
         bmpBuf(I) = 0
@@ -42,7 +42,7 @@ paletteMenu: PROCEDURE
     VDP(31) = $f0           ' bml en, pri, trans, fat, pal = 0
     VDP(32) = $70           ' $1C00 >> 6 
     VDP(33) = 10            ' x
-    VDP(34) = 65            ' y
+    VDP(34) = 57            ' y
     VDP(35) = BITMAP_WIDTH  ' w
     VDP(36) = BITMAP_HEIGHT ' h
 
@@ -61,7 +61,7 @@ paletteMenu: PROCEDURE
     NEXT R
 
     FOR I = 1 TO 15
-        PUT_XY( I * 2 - 1, 7, hexChar(I))
+        PUT_XY( I * 2 - 1, 6, hexChar(I))
     NEXT I
 
     bmpBuf(0) = PATT_IDX_BOX_TL
@@ -73,23 +73,33 @@ paletteMenu: PROCEDURE
     bmpBuf(6) = PATT_IDX_BOX_BL + 128
     bmpBuf(7) = PATT_IDX_BOX_BR + 128
 
-    PRINT AT XY(1,11), "Red:"
-    PRINT AT XY(1,13), "Green:"
-    PRINT AT XY(1,15), "Blue:"
+    PRINT AT XY(1,10), "Red:"
+    PRINT AT XY(1,12), "Green:"
+    PRINT AT XY(1,14), "Blue:"
 
-    FOR I = 11 to 15
+    FOR I = 10 to 14
         PRINT AT XY(26, I) , "\148\148\148\148\148"
     NEXT I
 
-    FOR I = 11 to 15 STEP 2
+    FOR I = 10 to 14 STEP 2
         DEFINE VRAM NAME_TAB_XY(8, I), 16, horzBar
     NEXT I
 
-    PRINT AT XY(10,17) , "Reset to defaults"
-    PRINT AT XY(10,18),  "Save settings"
+    oldMenuTopRow = menuTopRow
+    oldIndex = g_currentMenuIndex
+
+    menuTopRow = MENU_TITLE_ROW + 13
+    MENU_INDEX_OFFSET = 12
+    MENU_INDEX_COUNT = 2
+    MENU_START_X = 6
+    g_currentMenuIndex = 0
+
+    GOSUB renderMenu
 
     currentIndex = 1
     lastIndex = 15
+
+    'PUT_XY( currentIndex * 2 - 1, 6, hexChar(currentIndex) + 128)
 
     currentMenu = 0 ' 0 = pal, 1 = r, 2 = g, 3 = b
     lastMenu    = 0
@@ -98,7 +108,7 @@ paletteMenu: PROCEDURE
     VDP_ENABLE_INT
 
     GOSUB delay
-
+    
     DIM currentColor(2)
 
     WHILE 1
@@ -108,16 +118,18 @@ paletteMenu: PROCEDURE
 
 
         IF currentMenu = 0 THEN
-            SPRITE 0, $d0, 0,0,0
-            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
-            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
+            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
+            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
             IF lastIndex <> currentIndex THEN
-                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0)
-                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2)
-                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0 + 4)
-                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2 + 4)
+                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0)
+                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2)
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0 + 4)
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2 + 4)
 
                 VDP_DISABLE_INT
+
+                'PUT_XY( lastIndex * 2 - 1, 6, hexChar(lastIndex))
+                'PUT_XY( currentIndex * 2 - 1, 6, hexChar(currentIndex) + 128)
 
                 VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
                 VDP(58) = 128 + currentIndex * 2
@@ -133,41 +145,49 @@ paletteMenu: PROCEDURE
                 rgb(1) = currentColor(1) / 16
                 rgb(2) = currentColor(1) AND $0f
 
-                VDP(47) = $c0 + 16 + 10 ' palette data port from pal 2 index #10
+                ' update live palette
+                VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
                 DEFINE VRAM 0, 2, VARPTR currentColor(0)
                 VDP(47) = $40
+
                 VDP_ENABLE_INT
 
-                PUT_XY(0, 5, hexChar(rgb(0)))
-                PUT_XY(1, 5, hexChar(rgb(1)))
-                PUT_XY(2, 5, hexChar(rgb(2)))
+                'PUT_XY(0, 5, hexChar(rgb(0)))
+                'PUT_XY(1, 5, hexChar(rgb(1)))
+                'PUT_XY(2, 5, hexChar(rgb(2)))
 
-                FOR I = 11 to 15 STEP 2
+                FOR I = 10 to 14 STEP 2
                     DEFINE VRAM NAME_TAB_XY(8, I), 16, horzBar
                 NEXT I
 
-                PUT_XY(8 + rgb(0), 11, PATT_IDX_SLIDER)            
-                PUT_XY(8 + rgb(1), 13, PATT_IDX_SLIDER)            
-                PUT_XY(8 + rgb(2), 15, PATT_IDX_SLIDER)            
+                PUT_XY(8 + rgb(0), 10, PATT_IDX_SLIDER)            
+                PUT_XY(8 + rgb(1), 12, PATT_IDX_SLIDER)            
+                PUT_XY(8 + rgb(2), 14, PATT_IDX_SLIDER)            
             
                 lastIndex = currentIndex
                 GOSUB delay
             END IF
         ELSEIF currentMenu < 4 THEN
-                SPRITE 0, 8 * (9 + (currentMenu * 2)) - 1, 8 * (8 + rgb(currentMenu - 1)),32,(FRAME AND 8)+7
+                SPRITE 0, 8 * (8 + (currentMenu * 2)) - 1, 8 * (8 + rgb(currentMenu - 1)),32,(FRAME AND 8)+7
 
                 cc1 = rgb(1) * 16 + rgb(2)
                 IF currentColor(0) <> rgb(0) OR currentColor(1) <> cc1 THEN 
-                    DEFINE VRAM NAME_TAB_XY(8, 9 + (currentMenu * 2)), 16, horzBar
-                    PUT_XY(8 + rgb(currentMenu - 1), 9 + (currentMenu * 2), PATT_IDX_SLIDER)            
+                    DEFINE VRAM NAME_TAB_XY(8, 8 + (currentMenu * 2)), 16, horzBar
+                    PUT_XY(8 + rgb(currentMenu - 1), 8 + (currentMenu * 2), PATT_IDX_SLIDER)            
 
                     currentColor(0) = rgb(0)
                     currentColor(1) = cc1
 
-                    VDP(47) = $c0 + 16 + 10 ' palette data port from pal 2 index #10
+                    VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
                     VDP(47) = $40
+
+                    ' update config palette
+                    VDP_WRITE_CONFIG(128 + currentIndex * 2, currentColor(0))
+                    VDP_WRITE_CONFIG(128 + currentIndex * 2 + 1, currentColor(1))                   
+
                     VDP_ENABLE_INT
+
                     GOSUB delay
                 END IF
         END IF
@@ -190,21 +210,43 @@ paletteMenu: PROCEDURE
                 if currentIndex > 15 THEN currentIndex = 1
             ELSEIF g_nav AND NAV_DOWN THEN
                 currentMenu = currentMenu + 1
-                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(0)
-                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 9), 2, VARPTR bmpBuf(2)
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0 + 4)
+                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2 + 4)
             END IF
 
         ELSEIF currentMenu < 4 THEN
             rgbIndex = currentMenu - 1
             IF g_nav AND NAV_DOWN THEN
                 currentMenu = currentMenu + 1
+                GOSUB hideSprites
             ELSEIF g_nav AND NAV_UP THEN
                 currentMenu = currentMenu - 1
+                GOSUB hideSprites
             ELSEIF g_nav AND NAV_LEFT AND rgb(rgbIndex) > 0 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) - 1
+                g_paletteDirty = TRUE
             ELSEIF g_nav AND NAV_RIGHT  AND rgb(rgbIndex) < 15 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) + 1
+                g_paletteDirty = TRUE
             END IF
+        ELSE
+            IF g_nav AND NAV_DOWN AND currentMenu < (3 + MENU_INDEX_COUNT) THEN
+                currentMenu = currentMenu + 1
+            ELSEIF g_nav AND NAV_UP THEN
+                currentMenu = currentMenu - 1
+            ELSEIF g_nav AND NAV_OK THEN
+                IF currentMenu = 4 THEN' reset
+                    GOSUB resetPalette
+                ELSEIF currentMenu = 5 THEN' back
+                    g_nav = NAV_CANCEL
+                END IF
+            END IF
+        END IF
+
+        cm = currentMenu + MENU_INDEX_OFFSET - 4
+        IF g_currentMenuIndex <> cm THEN
+            g_currentMenuIndex = cm
+            GOSUB renderMenu
         END IF
 
         IF g_nav AND NAV_CANCEL THEN EXIT WHILE
@@ -212,7 +254,28 @@ paletteMenu: PROCEDURE
 
     VDP(31) = $00   ' bml en, pri, trans, fat, pal = 0
     
+    GOSUB hideSprites
+
+    menuTopRow = oldMenuTopRow
+    g_currentMenuIndex = oldIndex
+
     SET_MENU(MENU_ID_MAIN)
+    END
+
+
+resetPalette: PROCEDURE
+
+    VDP(47) = $c0 + 16 ' palette data port from pal 2 index #10
+    DEFINE VRAM 0, 32, defPal
+    VDP(47) = $40
+
+    ' update config palette
+    FOR I = 0 TO 31
+        VDP_WRITE_CONFIG(128 + I, defPal(I))
+    NEXT I
+
+    g_paletteDirty = TRUE
+
     END
 
 defPal:

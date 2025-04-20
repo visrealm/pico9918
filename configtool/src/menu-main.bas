@@ -63,8 +63,13 @@ renderMenuRow: PROCEDURE
         DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 22, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
     END IF
 
+    optId = MENU_DATA(a_menuIndexToRender, CONF_INDEX)
+    configDirty = configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_NUM_VALUES) > 0
+    configDirty = configDirty AND (savedConfigValues(a_menuIndexToRender) <> tempConfigValues(a_menuIndexToRender))
+    configDirty = configDirty OR ((optId = CONF_MENU_PALETTE) AND g_paletteDirty)
+    
     ' if the config option is "dirty" output an asterix next to it
-    IF savedConfigValues(a_menuIndexToRender) <> tempConfigValues(a_menuIndexToRender) THEN
+    IF configDirty THEN
         PRINT AT #ROWOFFSET + 30 - MENU_START_X, "*"
     END IF    
 
@@ -192,9 +197,13 @@ mainMenu: PROCEDURE
 
     ' main menu loop
     WHILE 1
-        WAIT
 
-        IF g_currentMenuIndex = 1 THEN GOSUB animateSprites  ' do this first to ensure it's done within a frame
+        IF g_currentMenuIndex = 1 THEN
+            GOSUB animateSprites  ' do this first to ensure it's done within a frame
+        ELSE
+            WAIT
+        END IF
+
 
         GOSUB menuLoop
 
@@ -249,7 +258,7 @@ saveOptionsMenu: PROCEDURE
         IF savedConfigValues(I) <> tempConfigValues(I) THEN configChanged = TRUE
     NEXT I
 
-    IF NOT configChanged THEN
+    IF NOT g_paletteDirty AND NOT configChanged THEN
         PRINT AT XY(0, MENU_HELP_ROW), "  Skipped! No changes to save   "
         RETURN
     END IF
@@ -270,7 +279,7 @@ saveOptionsMenu: PROCEDURE
     MENU_INDEX_OFFSET = 10
     MENU_INDEX_COUNT = 2
     MENU_START_X = 6
-    g_currentMenuIndex = 10
+    g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
 
@@ -316,6 +325,36 @@ saveOptionsMenu: PROCEDURE
     END
 
 
+' -----------------------------------------------------------------------------
+' go back to main menu
+' -----------------------------------------------------------------------------
+backOptionsMenu: PROCEDURE
+
+    oldIndex = g_currentMenuIndex
+
+    menuTopRow = MENU_TITLE_ROW + 9
+    MENU_INDEX_OFFSET = 12
+    MENU_INDEX_COUNT = 1
+    MENU_START_X = 6
+    g_currentMenuIndex = MENU_INDEX_OFFSET
+
+    GOSUB renderMenu
+
+    VDP_ENABLE_INT
+    GOSUB delay
+
+    ' main menu loop
+    WHILE 1
+        WAIT
+        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
+        IF g_nav AND NAV_OK THEN EXIT WHILE
+    WEND
+
+    g_currentMenuIndex = oldIndex
+
+    END
+
+
 INCLUDE "conf-scanline-sprites.bas"
 
 ' -----------------------------------------------------------------------------
@@ -335,8 +374,10 @@ configMenuData:
 
     DATA BYTE CONF_MENU_OK,         "Confirm         ", 0, 0, " Save configuration to PICO9918 "
     DATA BYTE CONF_MENU_CANCEL,     "Cancel          ", 0, 0, "        Back to main menu       "
+
+    DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
     
-    DATA BYTE CONF_MENU_OK,         "OK              ", 0, 0, "        Back to main menu       "
+    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
 ' -----------------------------------------------------------------------------
 ' Pico9918Option values. Indexed from options()
@@ -351,10 +392,3 @@ configMenuOptionValueData:
     DATA BYTE "252MHz"
     DATA BYTE "302MHz"
     DATA BYTE "352MHz"
-
-' -----------------------------------------------------------------------------
-' popup option values label[8], value
-' -----------------------------------------------------------------------------
-configMenuPopupValueData:
-    DATA BYTE "Save    ", 1
-    DATA BYTE "Cancel  ", 0

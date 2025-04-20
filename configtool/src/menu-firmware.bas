@@ -13,6 +13,8 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
+' convert .UF2 block number to name table location for visualization
+DEF FN BLOCK_XY(#I) = XY(#I % 30 + 1, #I / 30 + a_popupTop + 2)
 
 ' -----------------------------------------------------------------------------
 ' open the firmware menu
@@ -26,8 +28,8 @@ firmwareMenu: PROCEDURE
     VDP_ENABLE_INT
     GOSUB delay
 
-    PRINT AT XY(2, menuTopRow + 0), "Current version :  v"
-    PRINT AT XY(2, menuTopRow + 1), "New version     :  v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER
+    PRINT AT XY(4, menuTopRow + 0), "Current version : v"
+    PRINT AT XY(4, menuTopRow + 1), "New version     : v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER
 
     VDP_SET_CURRENT_STATUS_REG(12)  ' config
     VDP(58) = CONF_SW_VERSION
@@ -36,7 +38,7 @@ firmwareMenu: PROCEDURE
     'verMin = optValue AND $0f
     VDP_RESET_STATUS_REG
 
-    PRINT AT XY(22, menuTopRow + 0), verMaj, ".", verMin
+    PRINT AT XY(23, menuTopRow + 0), verMaj, ".", verMin
 
     isUpgrade = 0
     IF verMaj < FIRMWARE_MAJOR_VER OR verMaj = FIRMWARE_MAJOR_VER AND verMin < FIRMWARE_MINOR_VER THEN
@@ -45,21 +47,36 @@ firmwareMenu: PROCEDURE
         isUpgrade = -1
     END IF
 
-    IF isUpgrade = 0 THEN
-        PRINT AT XY(2, menuTopRow + 5), "Re-install firmware"
-    ELSEIF isUpgrade = 1 THEN
-        PRINT AT XY(2, menuTopRow + 5), "Upgrade firmware to"
-    ELSE
-        PRINT AT XY(2, menuTopRow + 5), "Downgrade firmware to"
-    END IF
-
-    PRINT " v", FIRMWARE_MAJOR_VER, ".", FIRMWARE_MINOR_VER, "?"
-
     GOSUB verifyCartridgeFirmware
 
-    GOSUB firmwareWriteAndVerify
+    CONST FWROWS = (#FIRMWARE_BLOCKS - 1) / 30 + 2
+    STATUS = TRUE
 
-    PRINT AT XY(2, menuTopRow + 7), "          DONE!            "
+    IF STATUS THEN
+
+        DRAW_POPUP2(FWROWS, "      Upgrading firmware      ", 30)
+
+        FOR #I = 0 TO #FIRMWARE_BLOCKS - 1
+            PRINT AT BLOCK_XY(#I), "\001"
+        NEXT #I
+
+        IF 0 THEN
+
+            IF isUpgrade = 0 THEN
+                PRINT AT XY(2, menuTopRow + 5), "Re-install firmware"
+            ELSEIF isUpgrade = 1 THEN
+                PRINT AT XY(2, menuTopRow + 5), "Upgrade firmware to"
+            ELSE
+                PRINT AT XY(2, menuTopRow + 5), "Downgrade firmware to"
+            END IF
+
+            PRINT " v", FIRMWARE_MAJOR_VER, ".", FIRMWARE_MINOR_VER, "?"
+
+            GOSUB firmwareWriteAndVerify
+
+            PRINT AT XY(2, menuTopRow + 7), "          DONE!            "
+        END IF
+    END IF
 
     WHILE 1
         WAIT
@@ -91,46 +108,67 @@ verifyCartridgeFirmware: PROCEDURE
     #FWBLOCK = 0
     STATUS = 1
 
+    PRINT AT XY(2, menuTopRow + 3), "Verifying new firmware data..."
+
     I = 0
     FOR B = 1 TO FIRMWARE_BANKS
         BANKSEL(B)
         #FWOFFSET = 0
-        PRINT AT XY(1, 18), "CHECKING BANK: ", B
-        FOR BL = 1 TO FIRMWARE_BLOCKS_PER_BANK
+        PRINT AT XY(8, menuTopRow + 5), "Checking Bank: ", B
 
-            FOR #UF2OFFSET = 0 TO 8
-                IF bank1Start(#FWOFFSET + #UF2OFFSET) <> uf2Header(#UF2OFFSET) THEN
-                    PRINT AT XY(1, 19), "VERIFY FAILED FOR BLOCK ", #FWBLOCK
-                    STATUS = 0
-                    EXIT FOR
+        IF bank1Start(0) <> B THEN
+            STATUS = 0            
+            PRINT AT XY(2, menuTopRow + 5), "Bank marker mismatch: ", bank1Start(0), " <> ", B
+        ELSE
+            FOR BL = 1 TO FIRMWARE_BLOCKS_PER_BANK
+
+                blockFailed = FALSE
+
+                FOR #UF2OFFSET = 0 TO 8
+                    IF bank1Data(#FWOFFSET + #UF2OFFSET) <> uf2Header(#UF2OFFSET) THEN
+                        blockFailed = TRUE
+                        PRINT AT XY(2, menuTopRow + 7), "Block start marker not found"
+                        EXIT FOR
+                    END IF
+                NEXT #UF2OFFSET
+
+                #UF2BLOCK = bank1Data(#FWOFFSET + 20) + (bank1Data(#FWOFFSET + 21) * 256)
+
+                IF #UF2BLOCK <> #FWBLOCK THEN
+                    PRINT AT XY(1, menuTopRow + 7), "Block seq. mismatch: ", #UF2BLOCK, " <> ", #FWBLOCK
+                    blockFailed = TRUE
                 END IF
-            NEXT #UF2OFFSET
 
-            #UF2BLOCK = bank1Start(#FWOFFSET + 20) + (bank1Start(#FWOFFSET + 21) * 256)
+                FOR #UF2OFFSET = #FIRMWARE_BLOCK_BYTES - 4 TO #FIRMWARE_BLOCK_BYTES - 1
+                    IF bank1Data(#FWOFFSET + #UF2OFFSET) <> uf2Header(#UF2OFFSET - 256) THEN
+                        blockFailed = TRUE
+                        PRINT AT XY(2, menuTopRow + 7), "Block end marker not found"
+                        EXIT FOR
+                    END IF
+                NEXT #UF2OFFSET
 
-            IF #UF2BLOCK <> #FWBLOCK THEN
-                PRINT AT XY(1, 19), "VERIFY FAILED FOR BLOCK ", #FWBLOCK
-                STATUS = 0
-            END IF
-
-            FOR #UF2OFFSET = #FIRMWARE_BLOCK_BYTES - 4 TO #FIRMWARE_BLOCK_BYTES - 1
-                IF bank1Start(#FWOFFSET + #UF2OFFSET) <> uf2Header(#UF2OFFSET - 256) THEN
-                    PRINT AT XY(1, 19), "VERIFY FAILED FOR BLOCK ", #FWBLOCK
+                IF blockFailed THEN
+                    PRINT AT XY(2, menuTopRow + 5), "Bank: ", B, ", Block: ", #FWBLOCK, " FAILED!"
                     STATUS = 0
-                    EXIT FOR
                 END IF
-            NEXT #UF2OFFSET
 
-            #FWOFFSET = #FWOFFSET + #FIRMWARE_BLOCK_BYTES
-            #FWBLOCK = #FWBLOCK + 1
-            IF #FWBLOCK = #FIRMWARE_BLOCKS THEN EXIT FOR
-        NEXT BL
+                IF STATUS = 0 THEN EXIT FOR
+
+                #FWOFFSET = #FWOFFSET + #FIRMWARE_BLOCK_BYTES
+                #FWBLOCK = #FWBLOCK + 1
+                IF #FWBLOCK = #FIRMWARE_BLOCKS THEN EXIT FOR
+            NEXT BL
+            
+        END IF
+        IF STATUS = 0 THEN EXIT FOR
     NEXT B
-
+    
     BANKSEL(0)
 
     IF STATUS = 1 THEN
-        PRINT AT XY(1, 19), "VERIFY PASSED FOR ALL BLOCKS"
+        PRINT AT XY(1, menuTopRow + 3), "  New firmware data is valid   "
+    ELSE
+        PRINT AT XY(1, menuTopRow + 3), " New firmware data is invalid  "
     END IF
 
     END
@@ -149,26 +187,21 @@ firmwareWriteAndVerify: PROCEDURE
         FOR BL = 1 TO FIRMWARE_BLOCKS_PER_BANK
             VDP_DISABLE_INT
 
-            DEFINE VRAM #VDP_FIRMWARE_DATA, #FIRMWARE_BLOCK_BYTES, VARPTR bank1Start(#FWOFFSET)
-            DEFINE VRAM NAME_TAB_XY(0, menuTopRow + 6), 32, VARPTR bank1Start(#FWOFFSET)
+            DEFINE VRAM #VDP_FIRMWARE_DATA, #FIRMWARE_BLOCK_BYTES, VARPTR bank1Data(#FWOFFSET)
+            DEFINE VRAM NAME_TAB_XY(0, menuTopRow + 6), 32, VARPTR bank1Data(#FWOFFSET)
 
             FWST = $c0 OR (#VDP_FIRMWARE_DATA / 256)
 
             PRINT AT XY(2, menuTopRow + 7), "Writing block ", #FWBLOCK + 1,"/",#FIRMWARE_BLOCKS
 
-            PRINT AT XY(2, menuTopRow + 8), " SET REG                    "
             VDP($3F) = FWST
             R = 0
             WHILE (FWST AND $80)
                 VDP_SET_CURRENT_STATUS_REG(2)
                 FWST = VDP_READ_STATUS
                 VDP_RESET_STATUS_REG
-                PRINT AT XY(2, menuTopRow + 8), " REG OK ", R, " ",FWST,"   "
                 R = R + 1
             WEND
-
-            PRINT AT XY(2, menuTopRow + 9), FWST,"   "
-            'EXIT FOR
 
             VDP_ENABLE_INT
 

@@ -88,6 +88,22 @@ setupTiles: PROCEDURE
     DEFINE SPRITE 0, 7, logoSprites  ' set up logo sprites used for 'scanline sprites' demo
     DEFINE SPRITE 8, 1, sliderButtonH
 
+    DEFINE VRAM #VDP_PATT_TAB2, 8, block
+    DEFINE VRAM #VDP_PATT_TAB2 + 8, 8, block
+    DEFINE VRAM #VDP_PATT_TAB2 + 16, 8, block
+
+    DEFINE VRAM #VDP_PATT_TAB3, 8, block
+    DEFINE VRAM #VDP_PATT_TAB3 + 8, 8, block
+    DEFINE VRAM #VDP_PATT_TAB3 + 16, 8, block
+
+    DEFINE VRAM #VDP_COLOR_TAB2, 8, blockGreen
+    DEFINE VRAM #VDP_COLOR_TAB2 + 8, 8, blockYellow
+    DEFINE VRAM #VDP_COLOR_TAB2 + 16, 8, blockRed
+
+    DEFINE VRAM #VDP_COLOR_TAB3, 8, blockGreen
+    DEFINE VRAM #VDP_COLOR_TAB3 + 8, 8, blockYellow
+    DEFINE VRAM #VDP_COLOR_TAB3 + 16, 8, blockRed
+
     SPRITE FLICKER OFF
     END
 
@@ -206,7 +222,7 @@ colorPalBoxSel:
 colorPalBoxSel2: 
     DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
 colorSwatch:
-    DATA BYTE $0a, $0a, $0a, $0a, $0a, $0a, $0a, $0a
+    DATA BYTE $01, $01, $01, $01, $01, $01, $01, $01
 
 font:
     DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00 ' <SPACE$
@@ -380,3 +396,13 @@ sine: ' sine wave values for scanline sprite animation
 
 pow2: ' 1 << INDEX
     DATA BYTE $01, $02, $04, $08, $10, $20, $40, $80
+
+block:
+    DATA BYTE $FE, $FE, $FE, $FE, $FE, $FE, $FE, $00
+
+blockGreen:
+    DATA BYTE $C0, $C0, $C0, $C0, $C0, $C0, $C0, $00
+blockYellow:
+    DATA BYTE $A0, $A0, $A0, $A0, $A0, $A0, $A0, $00
+blockRed:
+    DATA BYTE $80, $80, $80, $80, $80, $80, $80, $00        

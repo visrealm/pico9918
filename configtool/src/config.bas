@@ -24,7 +24,7 @@ resetOptions: PROCEDURE
         tempConfigValues(I) = 0
     NEXT I
     GOSUB applyConfigValues
-    GOSUB renderMenu
+    GOSUB renderMainMenu
     END
 
 ' -----------------------------------------------------------------------------
@@ -41,7 +41,10 @@ saveOptions: PROCEDURE
     FOR I = 0 TO CONF_COUNT - 1
         savedConfigValues(I) = tempConfigValues(I)
     NEXT I
-    GOSUB renderMenu
+
+    g_paletteDirty = FALSE
+
+    GOSUB renderMainMenu
 
     END
 

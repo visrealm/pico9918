@@ -16,6 +16,7 @@
 ' passing in L since I'm seeing issues using LEN(T) here. Possibly a bug?
 DEF FN DRAW_TITLE(T, L) = a_titleLen = L : PRINT AT XY((32 - a_titleLen) / 2, MENU_TITLE_ROW), T : GOSUB drawTitleBox
 DEF FN DRAW_POPUP(T, L, H) = a_titleLen = L : a_popupHeight = H : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
+DEF FN DRAW_POPUP2(H, T, L) = a_titleLen = L : a_popupHeight = H : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
 
 clearScreen: PROCEDURE
     DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
@@ -90,19 +91,25 @@ setupHeader: PROCEDURE
 ' -----------------------------------------------------------------------------
 updatePalette: PROCEDURE    
     WAIT
-    VDP(47) = $c0 + 18 ' palette data port from index #2
-    PRINT "\0\7"
-    PRINT "\0\10"
-    PRINT "\0\12"
-    PRINT "\0\15"
-    PRINT "\0\15"
-    PRINT "\2\47"
-    PRINT "\4\79"
-    PRINT "\7\127"
-    PRINT "\10\0"
-    PRINT "\15\255"
-    PRINT "\15\255"
-    PRINT "\15\255"
-    PRINT "\9\153"
+    VDP(47) = $c0 + 16 ' palette data port from index #2
+    DEFINE VRAM 0, 32, defPal
+    'FOR I = 0 TO 31 
+    '    PRINT defPal(I)
+    'NEXT I
     VDP(47) = $40
     END
+
+    
+'    PRINT "\0\7"
+'    PRINT "\0\10"
+'    PRINT "\0\12"
+'    PRINT "\0\15"
+'    PRINT "\0\15"
+'    PRINT "\245\79"   '0xF54F
+'    PRINT "\4\79"
+'    PRINT "\7\127"
+'    PRINT "\10\0"
+'    PRINT "\15\255"
+'    PRINT "\15\255"
+'    PRINT "\15\255"
+'    PRINT "\9\153"

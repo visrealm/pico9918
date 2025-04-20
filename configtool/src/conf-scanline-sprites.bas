@@ -34,7 +34,6 @@ initSprites: PROCEDURE
         IF (I AND $07) = 7 THEN xPos = xPos + 8  ' small gap
     NEXT I
 
-    spriteAttr(NUM_SPRITES * 4) = $d0
     END
 
 ' -----------------------------------------------------------------------------
@@ -56,19 +55,23 @@ animateSprites: PROCEDURE
     s_startSpriteIndex = s_startSpriteIndex + 1
     if s_startSpriteIndex >= NUM_SPRITES THEN s_startSpriteIndex = 0
 
+    WAIT
+
     ' dump it to vram (sprite attribute table)
     DEFINE VRAM #VDP_SPRITE_ATTR, (NUM_SPRITES - s_startSpriteIndex) * 4, VARPTR spriteAttr(s_startSpriteIndex * 4)
     IF s_startSpriteIndex > 0 THEN
         DEFINE VRAM #VDP_SPRITE_ATTR + (NUM_SPRITES - s_startSpriteIndex) * 4, s_startSpriteIndex * 4, VARPTR spriteAttr(0)
     END IF
 
-    END    
+    SPRITE NUM_SPRITES, $d0, 0,0,0
 
+    END    
 
 ' -----------------------------------------------------------------------------
 ' hide the sprites when 'scanline sprites' option no longer selected
 ' -----------------------------------------------------------------------------
 hideSprites: PROCEDURE
-    SPRITE 0,$d0,0,0,0
-    SPRITE 1,$d0,0,0,0
+    FOR I = 0 TO 1
+        SPRITE I,$d0,0,0,0
+    NEXT I
     END
