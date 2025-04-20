@@ -262,20 +262,20 @@ static void vgaInitRgb()
 
   sm_config_set_fifo_join(&rgbConfig, PIO_FIFO_JOIN_TX);
 
-  sm_config_set_out_shift(&rgbConfig, true, true, 16); // R shift, autopull @ 16 bits
+  sm_config_set_out_shift(&rgbConfig, true, true, 32); // R shift, autopull @ 16 bits
   pio_sm_init(VGA_PIO, RGB_SM, rgbProgOffset, &rgbConfig);
 
   // initialise rgb dma
   rgbDmaChan = 1;//dma_claim_unused_channel(true);
   rgbDmaChanMask = 0x01 << rgbDmaChan;
   dma_channel_config rgbDmaChanConfig = dma_channel_get_default_config(rgbDmaChan);
-  channel_config_set_transfer_data_size(&rgbDmaChanConfig, DMA_SIZE_16);  // transfer 16 bits at a time
+  channel_config_set_transfer_data_size(&rgbDmaChanConfig, DMA_SIZE_32);  // transfer 32 bits at a time (2 pixels)
   channel_config_set_read_increment(&rgbDmaChanConfig, true);             // increment read
   channel_config_set_write_increment(&rgbDmaChanConfig, false);           // don't increment write
   channel_config_set_dreq(&rgbDmaChanConfig, pio_get_dreq(VGA_PIO, RGB_SM, true));
 
   // setup the dma channel and set it going
-  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], VIRTUAL_PIXELS_X, false);
+  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], VIRTUAL_PIXELS_X / 2, false);
   dma_channel_set_irq0_enabled(rgbDmaChan, true);
 }
 
