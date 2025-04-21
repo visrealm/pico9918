@@ -23,7 +23,7 @@ firmwareMenu: PROCEDURE
 
     menuTopRow = MENU_TITLE_ROW + 3
     
-    DRAW_TITLE("FIRMWARE UPDATE", 15)
+    DRAW_TITLE("FIRMWARE UPDATE")
 
     VDP_ENABLE_INT
     GOSUB delay
@@ -54,7 +54,7 @@ firmwareMenu: PROCEDURE
 
     IF STATUS THEN
 
-        DRAW_POPUP2(FWROWS, "      Upgrading firmware      ", 30)
+        DRAW_POPUP_W("Upgrading firmware", FWROWS, 30)
 
         FOR #I = 0 TO #FIRMWARE_BLOCKS - 1
             PRINT AT BLOCK_XY(#I), "\001"
@@ -87,7 +87,7 @@ firmwareMenu: PROCEDURE
     WEND
 
 
-    DRAW_POPUP ("Update progress", 30, 9)
+    DRAW_POPUP ("Update progress", 9)
 
     WHILE 1
         WAIT

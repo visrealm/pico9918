@@ -50,7 +50,8 @@ renderMenuRow: PROCEDURE
     PRINT AT #ROWOFFSET + MENU_START_X, " ", MENU_INDEX_POSITION + 1, ". "
 
     ' output menu label
-    DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 4, CONF_LABEL_LEN, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_LABEL)
+    #addr = #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X
+    DEFINE VRAM #addr + 4, CONF_LABEL_LEN, VARPTR configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_LABEL)
     IF MENU_START_X < 2 THEN PRINT AT #ROWOFFSET + MENU_START_X + 20, "            "
 
     ' determine and output config option value label
@@ -60,7 +61,7 @@ renderMenuRow: PROCEDURE
         currentValueOffset = tempConfigValues(a_menuIndexToRender)
 
         ' output option value
-        DEFINE VRAM #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 22, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
+        DEFINE VRAM #addr + 22, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
     END IF
 
     optId = MENU_DATA(a_menuIndexToRender, CONF_INDEX)
@@ -185,7 +186,7 @@ menuLoop: PROCEDURE
 ' -----------------------------------------------------------------------------
 mainMenu: PROCEDURE 
     
-    DRAW_TITLE("MAIN MENU", 9)
+    DRAW_TITLE("MAIN MENU")
 
     g_currentMenuIndex = oldIndex
 
@@ -273,7 +274,7 @@ saveOptionsMenu: PROCEDURE
     RENDER_MENU_ROW(I)
     g_currentMenuIndex = I
 
-    DRAW_POPUP("     Save Changes?", 22, 5)
+    DRAW_POPUP_W("Save Changes?", 5, 20)
 
     menuTopRow = MENU_TITLE_ROW + 9
     MENU_INDEX_OFFSET = 10

@@ -21,7 +21,7 @@ deviceInfoMenu: PROCEDURE
     menuTopRow = MENU_TITLE_ROW + 3
 
 
-    DRAW_TITLE("DEVICE INFO", 11)
+    DRAW_TITLE("DEVICE INFO")
 
     oldMenuTopRow = menuTopRow
     oldIndex = g_currentMenuIndex
@@ -36,48 +36,51 @@ deviceInfoMenu: PROCEDURE
 
     menuTopRow = oldMenuTopRow
 
-    PRINT AT XY(2, menuTopRow + 0), "Processor family : "
-    PRINT AT XY(2, menuTopRow + 1), "Hardware version : "
-    PRINT AT XY(2, menuTopRow + 2), "Software version : "
-    PRINT AT XY(2, menuTopRow + 3), "Display driver   : "
-    PRINT AT XY(2, menuTopRow + 4), "Resolution       : "
-    PRINT AT XY(2, menuTopRow + 5), "F18A version     : "
-    PRINT AT XY(2, menuTopRow + 6), "Core temperature : Error"
+    #addr = XY(2, menuTopRow)
+    PRINT AT #addr,       "Processor family : "
+    PRINT AT #addr + 32,  "Hardware version : "
+    PRINT AT #addr + 64,  "Software version : "
+    PRINT AT #addr + 96,  "Display driver   : "
+    PRINT AT #addr + 128, "Resolution       : "
+    PRINT AT #addr + 160, "F18A version     : "
+    PRINT AT #addr + 192, "Core temperature : Error"
 
     VDP_SET_CURRENT_STATUS_REG(12)  ' config
 
     VDP(58) = CONF_PICO_MODEL
     optValue = VDP_READ_STATUS
+    #addr = XY(21, menuTopRow + 0)
     IF optValue = PICO_MODEL_RP2350 THEN
-        PRINT AT XY(21, menuTopRow + 0), "RP2350"
+        PRINT AT #addr, "RP2350"
     ELSE
-        PRINT AT XY(21, menuTopRow + 0), "RP2040"
+        PRINT AT #addr, "RP2040"
     END IF
 
     VDP(58) = CONF_HW_VERSION
     optValue = VDP_READ_STATUS
     verMaj = optValue / 16
     verMin = optValue AND $0f
-    PRINT AT XY(21, menuTopRow + 1), verMaj, ".", verMin
+    PRINT AT  #addr + 32, verMaj, ".", verMin
     IF verMaj = 1 THEN PRINT AT XY(24, menuTopRow + 1), "+"
 
     VDP(58) = CONF_SW_VERSION
     optValue = VDP_READ_STATUS
     verMaj = optValue / 16
     verMin = optValue AND $0f
-    PRINT AT XY(21, menuTopRow + 2), verMaj, ".", verMin
+    PRINT AT #addr + 64, verMaj, ".", verMin
 
     VDP(58) = CONF_DISP_DRIVER
     optValue = VDP_READ_STATUS
+    #addr = #addr + 96
     IF optValue = 1 THEN
-        PRINT AT XY(21, menuTopRow + 3), "RGBs NTSC"
-        PRINT AT XY(21, menuTopRow + 4), "480i 60Hz"
+        PRINT AT #addr, "RGBs NTSC"
+        PRINT AT #addr + 32, "480i 60Hz"
     ELSEIF optValue = 2 THEN
-        PRINT AT XY(21, menuTopRow + 3), "RGBs PAL"
-        PRINT AT XY(21, menuTopRow + 4), "576i 50Hz"
+        PRINT AT #addr, "RGBs PAL"
+        PRINT AT #addr + 32, "576i 50Hz"
     ELSE
-        PRINT AT XY(21, menuTopRow + 3), "VGA"
-        PRINT AT XY(21, menuTopRow + 4), "480p 60Hz"
+        PRINT AT #addr, "VGA"
+        PRINT AT #addr + 32, "480p 60Hz"
     END IF
 
     VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version

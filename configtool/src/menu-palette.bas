@@ -15,7 +15,7 @@
 
 paletteMenu: PROCEDURE
 
-    DRAW_TITLE("PALETTE", 7)
+    DRAW_TITLE("PALETTE")
 
     DIM bmpBuf(64)
 
@@ -26,8 +26,9 @@ paletteMenu: PROCEDURE
         bmpBuf(32 + I * 2 + 1) = PATT_IDX_BOX_BR
     NEXT I
 
-    DEFINE VRAM NAME_TAB_XY(1, 7), 30, VARPTR bmpBuf(0)
-    DEFINE VRAM NAME_TAB_XY(1, 8), 30, VARPTR bmpBuf(32)
+    #addr = NAME_TAB_XY(1, 7)
+    DEFINE VRAM #addr, 30, VARPTR bmpBuf(0)
+    DEFINE VRAM #addr + 32, 30, VARPTR bmpBuf(32)
 
     FOR I = 0 TO 64
         bmpBuf(I) = 0
@@ -118,13 +119,15 @@ paletteMenu: PROCEDURE
 
 
         IF currentMenu = 0 THEN
-            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
-            DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
+            #addr = NAME_TAB_XY(currentIndex * 2 - 1, 7)
+            DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
+            DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
             IF lastIndex <> currentIndex THEN
-                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0)
-                DEFINE VRAM NAME_TAB_XY(lastIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2)
-                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0 + 4)
-                DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2 + 4)
+                DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + 4)
+                DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + 4)
+                #addr = NAME_TAB_XY(lastIndex * 2 - 1, 7)
+                DEFINE VRAM #addr, 2, VARPTR bmpBuf(0)
+                DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
 
                 VDP_DISABLE_INT
 

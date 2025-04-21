@@ -14,9 +14,10 @@
 ' -----------------------------------------------------------------------------
 
 ' passing in L since I'm seeing issues using LEN(T) here. Possibly a bug?
-DEF FN DRAW_TITLE(T, L) = a_titleLen = L : PRINT AT XY((32 - a_titleLen) / 2, MENU_TITLE_ROW), T : GOSUB drawTitleBox
-DEF FN DRAW_POPUP(T, L, H) = a_titleLen = L : a_popupHeight = H : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
-DEF FN DRAW_POPUP2(H, T, L) = a_titleLen = L : a_popupHeight = H : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
+DEF FN DRAW_TITLE(T) = a_titleLen = LEN(T) : PRINT AT XY((32 - a_titleLen) / 2, MENU_TITLE_ROW), T : GOSUB drawTitleBox
+
+DEF FN DRAW_POPUP_W(T, H, W) = a_titleLen = LEN(T) : a_popupHeight = H : a_popupWidth = W : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
+DEF FN DRAW_POPUP(T, H) = DRAW_POPUP_W(T, H, LEN(T))
 
 clearScreen: PROCEDURE
     DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
@@ -43,25 +44,25 @@ drawTitleBox: PROCEDURE
     END
 
 drawPopup: PROCEDURE
-    L = a_titleLen
+    W = a_popupWidth
     H = a_popupHeight
     T = a_popupTop
-    X = (32 - L) / 2
+    X = (32 - W) / 2
 
-    DEFINE VRAM NAME_TAB_XY(X, T - 1), L, horzBar
+    DEFINE VRAM NAME_TAB_XY(X, T - 1), W, horzBar
     FOR Y = T TO T + H
-        DEFINE VRAM NAME_TAB_XY(X - 1, Y), L + 1, vBar
-        VPOKE NAME_TAB_XY(X + L, Y), PATT_IDX_BORDER_V
+        DEFINE VRAM NAME_TAB_XY(X - 1, Y), W + 1, vBar
+        VPOKE NAME_TAB_XY(X + W, Y), PATT_IDX_BORDER_V
     NEXT Y
-    DEFINE VRAM NAME_TAB_XY(X, T + 1), L, horzBar
-    DEFINE VRAM NAME_TAB_XY(X, T + H + 1), L, horzBar
+    DEFINE VRAM NAME_TAB_XY(X, T + 1), W, horzBar
+    DEFINE VRAM NAME_TAB_XY(X, T + H + 1), W, horzBar
 
     VPOKE NAME_TAB_XY(X - 1, T - 1), PATT_IDX_BORDER_TL
-    VPOKE NAME_TAB_XY(X + L, T - 1), PATT_IDX_BORDER_TR
+    VPOKE NAME_TAB_XY(X + W, T - 1), PATT_IDX_BORDER_TR
     VPOKE NAME_TAB_XY(X - 1, T + 1), PATT_IDX_BORDER_VR
-    VPOKE NAME_TAB_XY(X + L, T + 1), PATT_IDX_BORDER_VL
+    VPOKE NAME_TAB_XY(X + W, T + 1), PATT_IDX_BORDER_VL
     VPOKE NAME_TAB_XY(X - 1, T + H + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(X + L, T + H + 1), PATT_IDX_BORDER_BR
+    VPOKE NAME_TAB_XY(X + W, T + H + 1), PATT_IDX_BORDER_BR
 
     END
 
