@@ -25,7 +25,7 @@ initSprites: PROCEDURE
     xPos = 16
 
     FOR I = 0 TO NUM_SPRITES - 1
-        spritePattIndex = logoSpriteIndices(I AND $07)
+        spritePattIndex = I AND $07
         spriteAttr(I * 4 + 0) = $d0
         spriteAttr(I * 4 + 1) = xPos
         spriteAttr(I * 4 + 2) = spritePattIndex * 4

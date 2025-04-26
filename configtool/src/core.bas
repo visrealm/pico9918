@@ -17,6 +17,8 @@
 CONST TRUE           = -1
 CONST FALSE          = 0
 
+CONST F18A_TESTING   = 1
+
 CONST MENU_TITLE_ROW   = 3
 CONST MENU_HELP_ROW    = 19
 
@@ -90,7 +92,6 @@ INCLUDE "menu-info.bas"
 INCLUDE "menu-diag.bas"
 INCLUDE "menu-palette.bas"
 
-
     ' =========================================================================
     ' PROGRAM ENTRY
     ' -------------------------------------------------------------------------
@@ -118,35 +119,44 @@ main:
 
         VDP_SET_CURRENT_STATUS_REG(1)       ' SR1: ID
         statReg = VDP_READ_STATUS
-        VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
-        verReg = VDP_READ_STATUS
-        VDP_RESET_STATUS_REG
-        VDP_ENABLE_INT_DISP_OFF
 
-        verMaj = verReg / 16
-        verMin = verReg AND $0f
         IF (statReg AND $E8) = $E8 THEN
+            VDP_SET_CURRENT_STATUS_REG(12)  ' config
+            VDP(58) = CONF_SW_VERSION
+            optValue = VDP_READ_STATUS
+            verMaj = optValue / 16
+            verMin = optValue AND $0f
             PRINT AT XY(3, 21), "Detected: PICO9918 ver ", verMaj, ".", verMin
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
+            VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
+            verReg = VDP_READ_STATUS
+            verMaj = verReg / 16
+            verMin = verReg AND $0f
             PRINT AT XY(5, 21), "Detected: F18A ver  ."
             PUT_XY(5 + 19, 21, hexChar(verMaj))
             PUT_XY(5 + 21, 21, hexChar(verMin))
         ELSE
             PRINT AT XY(8, 21), "Detected UNKNOWN SR1 = ", <>statReg
         END IF
-        
+
+        VDP_RESET_STATUS_REG
+        VDP_ENABLE_INT_DISP_OFF
+    ELSEIF isV9938 THEN
+        PRINT AT XY(8, 21), "Detected: V9938"
     ELSE
         PRINT AT XY(6, 21), "Detected: LEGACY VDP"
     END IF
 
-    isPico9918 = isF18ACompatible   ' FOR TESTING
+    IF F18A_TESTING THEN
+        isPico9918 = isF18ACompatible   ' FOR TESTING
+    END IF
 
     VDP_ENABLE_INT_DISP_OFF
 
     IF NOT isPico9918 THEN
         PRINT AT XY(7, 6 + (isF18ACompatible AND 4)), "PICO9918 not found"
-        IF NOT isF18ACompatible THEN
+        IF NOT isF18ACompatible AND NOT isV9938 THEN
             PRINT AT XY(15, 9), "OR"
             PRINT AT XY(3, 12), "PICO9918 firmware too old"
             PRINT AT XY(4, 14), "Firmware v1.0+ required"

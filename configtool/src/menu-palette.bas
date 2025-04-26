@@ -82,9 +82,11 @@ paletteMenu: PROCEDURE
         PRINT AT XY(26, I) , "\148\148\148\148\148"
     NEXT I
 
-    FOR I = 10 to 14 STEP 2
-        DEFINE VRAM NAME_TAB_XY(8, I), 16, horzBar
-    NEXT I
+    BX = 8
+    BW = 16
+    FOR BR = 10 to 14 STEP 2
+        GOSUB horzBarRWX
+    NEXT BR
 
     oldMenuTopRow = menuTopRow
     oldIndex = g_currentMenuIndex
@@ -134,15 +136,17 @@ paletteMenu: PROCEDURE
                 'PUT_XY( lastIndex * 2 - 1, 6, hexChar(lastIndex))
                 'PUT_XY( currentIndex * 2 - 1, 6, hexChar(currentIndex) + 128)
 
-                VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
-                VDP(58) = 128 + currentIndex * 2
-                currentColor(0) = VDP_READ_STATUS
-                VDP(58) = 128 + currentIndex * 2 + 1
-                currentColor(1) = VDP_READ_STATUS            
-                VDP_RESET_STATUS_REG
-
-                currentColor(0) = defPal(currentIndex * 2)
-                currentColor(1) = defPal(currentIndex * 2 + 1)
+                IF F18A_TESTING THEN
+                    currentColor(0) = defPal(currentIndex * 2)
+                    currentColor(1) = defPal(currentIndex * 2 + 1)
+                ELSE
+                    VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
+                    VDP(58) = 128 + currentIndex * 2
+                    currentColor(0) = VDP_READ_STATUS
+                    VDP(58) = 128 + currentIndex * 2 + 1
+                    currentColor(1) = VDP_READ_STATUS            
+                    VDP_RESET_STATUS_REG
+                END IF
 
                 rgb(0) = currentColor(0) AND $0f
                 rgb(1) = currentColor(1) / 16
@@ -158,10 +162,10 @@ paletteMenu: PROCEDURE
                 'PUT_XY(0, 5, hexChar(rgb(0)))
                 'PUT_XY(1, 5, hexChar(rgb(1)))
                 'PUT_XY(2, 5, hexChar(rgb(2)))
-
-                FOR I = 10 to 14 STEP 2
-                    DEFINE VRAM NAME_TAB_XY(8, I), 16, horzBar
-                NEXT I
+                
+                FOR BR = 10 to 14 STEP 2
+                    GOSUB horzBarRWX
+                NEXT BR
 
                 PUT_XY(8 + rgb(0), 10, PATT_IDX_SLIDER)            
                 PUT_XY(8 + rgb(1), 12, PATT_IDX_SLIDER)            
@@ -174,8 +178,8 @@ paletteMenu: PROCEDURE
                 SPRITE 0, 8 * (8 + (currentMenu * 2)) - 1, 8 * (8 + rgb(currentMenu - 1)),32,(FRAME AND 8)+7
 
                 cc1 = rgb(1) * 16 + rgb(2)
-                IF currentColor(0) <> rgb(0) OR currentColor(1) <> cc1 THEN 
-                    DEFINE VRAM NAME_TAB_XY(8, 8 + (currentMenu * 2)), 16, horzBar
+                IF currentColor(0) <> rgb(0) OR currentColor(1) <> cc1 THEN
+                    BR = 8 + currentMenu * 2: GOSUB horzBarRWX
                     PUT_XY(8 + rgb(currentMenu - 1), 8 + (currentMenu * 2), PATT_IDX_SLIDER)            
 
                     currentColor(0) = rgb(0)
@@ -240,6 +244,7 @@ paletteMenu: PROCEDURE
             ELSEIF g_nav AND NAV_OK THEN
                 IF currentMenu = 4 THEN' reset
                     GOSUB resetPalette
+                    lastIndex = (currentIndex + 1) AND $0f  ' force sliders to update
                 ELSEIF currentMenu = 5 THEN' back
                     g_nav = NAV_CANCEL
                 END IF

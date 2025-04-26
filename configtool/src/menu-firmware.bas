@@ -28,22 +28,13 @@ firmwareMenu: PROCEDURE
     VDP_ENABLE_INT
     GOSUB delay
 
-    PRINT AT XY(4, menuTopRow + 0), "Current version : v"
+    PRINT AT XY(4, menuTopRow + 0), "Current version : v",verMaj, ".", verMin
     PRINT AT XY(4, menuTopRow + 1), "New version     : v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER
 
-    VDP_SET_CURRENT_STATUS_REG(12)  ' config
-    VDP(58) = CONF_SW_VERSION
-    optValue = VDP_READ_STATUS
-    'verMaj = optValue / 16
-    'verMin = optValue AND $0f
-    VDP_RESET_STATUS_REG
-
-    PRINT AT XY(23, menuTopRow + 0), verMaj, ".", verMin
-
     isUpgrade = 0
-    IF verMaj < FIRMWARE_MAJOR_VER OR verMaj = FIRMWARE_MAJOR_VER AND verMin < FIRMWARE_MINOR_VER THEN
+    IF verMaj < FIRMWARE_MAJOR_VER OR (verMaj = FIRMWARE_MAJOR_VER AND verMin < FIRMWARE_MINOR_VER) THEN
         isUpgrade = 1
-    ELSEIF verMaj > FIRMWARE_MAJOR_VER OR verMaj = FIRMWARE_MAJOR_VER AND verMin > FIRMWARE_MINOR_VER THEN
+    ELSEIF verMaj > FIRMWARE_MAJOR_VER OR (verMaj = FIRMWARE_MAJOR_VER AND verMin > FIRMWARE_MINOR_VER) THEN
         isUpgrade = -1
     END IF
 

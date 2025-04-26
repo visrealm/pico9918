@@ -25,7 +25,8 @@ renderMainMenu: PROCEDURE
     MENU_START_X = 1
     menuTopRow = MENU_TITLE_ROW + 3
     GOSUB renderMenu
-    DEFINE VRAM NAME_TAB_XY(0, menuTopRow + MENU_INDEX_COUNT), 32, emptyRow
+    R = menuTopRow + MENU_INDEX_COUNT
+    GOSUB emptyRowR
     END
 
 renderMenu: PROCEDURE
@@ -41,7 +42,7 @@ renderMenuRow: PROCEDURE
     ' don't render special index 255
     MENU_INDEX_POSITION = a_menuIndexToRender - MENU_INDEX_OFFSET
 
-    IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN DEFINE VRAM NAME_TAB_XY(0, menuTopRow + MENU_INDEX_POSITION), 32, emptyRow : RETURN
+    IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN R= menuTopRow + MENU_INDEX_POSITION : GOSUB emptyRowR : RETURN
 
     ' pre-compute row offset. we'll need this a few times
     #ROWOFFSET = XY(0, menuTopRow + MENU_INDEX_POSITION)

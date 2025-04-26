@@ -53,6 +53,12 @@ vdpDetect: PROCEDURE
     VDP($36) = $3F                       ' set gpu start address msb
     VDP($37) = $00                       ' set gpu start address lsb (triggers)
     isF18ACompatible = VPEEK($3F00) = 0  ' check result
+    isV9938 = FALSE
+    IF isF18ACompatible = FALSE THEN
+        VDP_SET_CURRENT_STATUS_REG(4)
+        isV9938 = ((VDP_READ_STATUS AND $fe) = $fe)
+        VDP_RESET_STATUS_REG
+    END IF
     END
     
 ' -----------------------------------------------------------------------------

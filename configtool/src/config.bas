@@ -69,6 +69,6 @@ vdpLoadConfigValues: PROCEDURE
 ' apply current options to the PICO9918
 ' -----------------------------------------------------------------------------
 applyConfigValues: PROCEDURE
-    VDP(50) = tempConfigValues(0) * $04       ' set crt scanlines
+    VDP(50) = tempConfigValues(0) * 4         ' set crt scanlines
     VDP(30) = pow2(tempConfigValues(1) + 2)   ' set scanline sprites
     END

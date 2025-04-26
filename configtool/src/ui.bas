@@ -19,71 +19,87 @@ DEF FN DRAW_TITLE(T) = a_titleLen = LEN(T) : PRINT AT XY((32 - a_titleLen) / 2, 
 DEF FN DRAW_POPUP_W(T, H, W) = a_titleLen = LEN(T) : a_popupHeight = H : a_popupWidth = W : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
 DEF FN DRAW_POPUP(T, H) = DRAW_POPUP_W(T, H, LEN(T))
 
+emptyRowR: PROCEDURE
+    DEFINE VRAM NAME_TAB_XY(0, R), 32, emptyRow
+    END
+
+horzBarR:
+    BW = 32
+horzBarRW:
+    BX = 0
+horzBarRWX:
+    DEFINE VRAM NAME_TAB_XY(BX, BR), BW, horzBar
+    RETURN
+
 clearScreen: PROCEDURE
-    DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
+    BR = 2 : GOSUB horzBarR
     FOR R = 3 TO 19
-        DEFINE VRAM NAME_TAB_XY(0, R), 32, emptyRow
+        GOSUB emptyRowR
     NEXT R
     END
 
 drawTitleBox: PROCEDURE
-    L = a_titleLen
-    X = (32 - L) / 2
+    X = (32 - a_titleLen) / 2
 
-    DEFINE VRAM NAME_TAB_XY(X - 1, MENU_TITLE_ROW - 1), L + 2, horzBar
-    DEFINE VRAM NAME_TAB_XY(X - 1, MENU_TITLE_ROW + 1), L + 2, horzBar
+    BW = a_titleLen + 2
+    BX = X - 1
+    BR = MENU_TITLE_ROW - 1 : GOSUB horzBarRWX
+    BR = MENU_TITLE_ROW + 1 : GOSUB horzBarRWX
     
     VPOKE NAME_TAB_XY(X - 2, MENU_TITLE_ROW), PATT_IDX_BORDER_V
-    VPOKE NAME_TAB_XY(X + L + 1, MENU_TITLE_ROW), PATT_IDX_BORDER_V
+    VPOKE NAME_TAB_XY(X + a_titleLen + 1, MENU_TITLE_ROW), PATT_IDX_BORDER_V
 
     VPOKE NAME_TAB_XY(X - 2, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_HD
-    VPOKE NAME_TAB_XY(X + L + 1, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_HD
+    VPOKE NAME_TAB_XY(X + a_titleLen + 1, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_HD
     VPOKE NAME_TAB_XY(X - 2, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(X + L + 1, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
+    VPOKE NAME_TAB_XY(X + a_titleLen + 1, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
 
     END
 
 drawPopup: PROCEDURE
-    W = a_popupWidth
-    H = a_popupHeight
-    T = a_popupTop
-    X = (32 - W) / 2
+    X = (32 - a_popupWidth) / 2
 
-    DEFINE VRAM NAME_TAB_XY(X, T - 1), W, horzBar
-    FOR Y = T TO T + H
-        DEFINE VRAM NAME_TAB_XY(X - 1, Y), W + 1, vBar
-        VPOKE NAME_TAB_XY(X + W, Y), PATT_IDX_BORDER_V
+    BW = a_popupWidth
+    BX = X
+
+    BR = a_popupTop - 1: GOSUB horzBarRWX
+    FOR Y = a_popupTop TO a_popupTop + a_popupHeight
+        DEFINE VRAM NAME_TAB_XY(X - 1, Y), a_popupWidth + 1, vBar
+        VPOKE NAME_TAB_XY(X + a_popupWidth, Y), PATT_IDX_BORDER_V
     NEXT Y
-    DEFINE VRAM NAME_TAB_XY(X, T + 1), W, horzBar
-    DEFINE VRAM NAME_TAB_XY(X, T + H + 1), W, horzBar
+    BR = BR + 2: GOSUB horzBarRWX
+    BR = BR + a_popupHeight: GOSUB horzBarRWX
 
-    VPOKE NAME_TAB_XY(X - 1, T - 1), PATT_IDX_BORDER_TL
-    VPOKE NAME_TAB_XY(X + W, T - 1), PATT_IDX_BORDER_TR
-    VPOKE NAME_TAB_XY(X - 1, T + 1), PATT_IDX_BORDER_VR
-    VPOKE NAME_TAB_XY(X + W, T + 1), PATT_IDX_BORDER_VL
-    VPOKE NAME_TAB_XY(X - 1, T + H + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(X + W, T + H + 1), PATT_IDX_BORDER_BR
+    VPOKE NAME_TAB_XY(X - 1, a_popupTop - 1), PATT_IDX_BORDER_TL
+    VPOKE NAME_TAB_XY(X + a_popupWidth, a_popupTop - 1), PATT_IDX_BORDER_TR
+    VPOKE NAME_TAB_XY(X - 1, a_popupTop + 1), PATT_IDX_BORDER_VR
+    VPOKE NAME_TAB_XY(X + a_popupWidth, a_popupTop + 1), PATT_IDX_BORDER_VL
+    VPOKE NAME_TAB_XY(X - 1, a_popupTop + a_popupHeight + 1), PATT_IDX_BORDER_BL
+    VPOKE NAME_TAB_XY(X + a_popupWidth, a_popupTop + a_popupHeight + 1), PATT_IDX_BORDER_BR
 
     END
-
 
 ' -----------------------------------------------------------------------------
 ' set up the menu header (and footer)
 ' -----------------------------------------------------------------------------
 setupHeader: PROCEDURE
-    
+
+    ' output top-left logo    
     CONST LOGO_WIDTH = 19
-    DEFINE VRAM NAME_TAB_XY(0, 0), LOGO_WIDTH, logoNames
-    DEFINE VRAM NAME_TAB_XY(0, 1), LOGO_WIDTH, logoNames2
+    #addr = #VDP_NAME_TAB
+    FOR I = 1 TO LOGO_WIDTH
+        VPOKE #addr, I
+        VPOKE #addr + 32, I + 128
+        #addr = #addr + 1
+    NEXT I
 
     PRINT AT XY(28, 0),"v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER
     PRINT AT XY(20, 1),"Configurator"
     PRINT AT XY(6, 23), "{}",#FIRMWARE_YEAR," Troy Schrapel"    
 
-    DEFINE VRAM NAME_TAB_XY(0, 2), 32, horzBar
-    'DEFINE VRAM NAME_TAB_XY(0, 4), 32, horzBar
-    DEFINE VRAM NAME_TAB_XY(0, 20), 32, horzBar
-    DEFINE VRAM NAME_TAB_XY(0, 22), 32, horzBar
+    BR = 2: GOSUB horzBarR
+    BR = 20: GOSUB horzBarR
+    BR = 22: GOSUB horzBarR
 
     END
 

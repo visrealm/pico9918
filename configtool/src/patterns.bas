@@ -33,15 +33,29 @@ CONST PATT_IDX_BOX_TR     = 29
 CONST PATT_IDX_BOX_BL     = 30
 CONST PATT_IDX_BOX_BR     = 31
 
+setWhite: PROCEDURE
+    DEFINE COLOR I, 1, white    ' title color
+    END
+
+#fontTable:
+    DATA $0100, $0900, $1100, $0500, $0D00, $1500
+
 ' -----------------------------------------------------------------------------
 ' set up the various tile patters and colors
 ' -----------------------------------------------------------------------------
 setupTiles: PROCEDURE
-    DEFINE CHAR 32, 96, font        ' font standard
-    DEFINE CHAR 32 + 128, 96, font  ' font highlighted
+    FOR I = 0 TO 5
+        DEFINE VRAM PLETTER #fontTable(I), $300, font
+    NEXT I
 
-    DEFINE CHAR 1, 19, logo         ' first row of top left logo
-    DEFINE CHAR 1 + 128, 19, logo2  ' second row of top left logo
+    DEFINE COLOR 0, 3, blockGreen
+    FOR I = 0 TO 2
+        DEFINE CHAR I, 1, block
+        DEFINE VRAM #VDP_COLOR_TAB1 + (I * 8), 8, white
+    NEXT I    
+
+    DEFINE VRAM PLETTER #VDP_PATT_TAB1 + 1 * 8, 19 * 8, logo
+    DEFINE VRAM PLETTER #VDP_PATT_TAB1 + 129 * 8, 19 * 8, logo2
 
     DEFINE CHAR PATT_IDX_BORDER_H, 6, lineSegments  '   border segments
     DEFINE CHAR PATT_IDX_BORDER_H + 130, 4, lineSegmentJoiners
@@ -53,14 +67,14 @@ setupTiles: PROCEDURE
     DEFINE CHAR PATT_IDX_SELECTED_L, 1, highlightLeft   ' ends of selection bar
     DEFINE CHAR PATT_IDX_SELECTED_R, 1, highlightRight
     
-    FOR I = 0 TO 31
-        DEFINE COLOR I, 1, white    ' title color
+    FOR I = 3 TO 31
+        GOSUB setWhite
     NEXT I
     FOR I = 32 TO 127
         DEFINE COLOR I, 1, grey     ' normal text color
     NEXT I
     FOR I = 128 TO 147
-        DEFINE COLOR I, 1, white    ' title row 2 color
+        GOSUB setWhite
     NEXT I
     FOR I = 148 TO 250
         DEFINE COLOR I, 1, inv_white ' selected (highlighted) colors
@@ -85,70 +99,52 @@ setupTiles: PROCEDURE
     DEFINE COLOR PATT_IDX_SLIDER, 1, highlight
     DEFINE COLOR PATT_IDX_SWATCH, 1, colorSwatch
 
-    DEFINE SPRITE 0, 7, logoSprites  ' set up logo sprites used for 'scanline sprites' demo
+    DEFINE VRAM PLETTER $3800,$e0,logoSprites
     DEFINE SPRITE 8, 1, sliderButtonH
-
-    DEFINE VRAM #VDP_PATT_TAB2, 8, block
-    DEFINE VRAM #VDP_PATT_TAB2 + 8, 8, block
-    DEFINE VRAM #VDP_PATT_TAB2 + 16, 8, block
-
-    DEFINE VRAM #VDP_PATT_TAB3, 8, block
-    DEFINE VRAM #VDP_PATT_TAB3 + 8, 8, block
-    DEFINE VRAM #VDP_PATT_TAB3 + 16, 8, block
-
-    DEFINE VRAM #VDP_COLOR_TAB2, 8, blockGreen
-    DEFINE VRAM #VDP_COLOR_TAB2 + 8, 8, blockYellow
-    DEFINE VRAM #VDP_COLOR_TAB2 + 16, 8, blockRed
-
-    DEFINE VRAM #VDP_COLOR_TAB3, 8, blockGreen
-    DEFINE VRAM #VDP_COLOR_TAB3 + 8, 8, blockYellow
-    DEFINE VRAM #VDP_COLOR_TAB3 + 16, 8, blockRed
 
     SPRITE FLICKER OFF
     END
 
 
+
+
 ' PICO9918 logo pattern
 logo:
-    DATA BYTE $1f, $3f, $7f, $ff, $00, $00, $00, $00
-    DATA BYTE $ff, $ff, $ff, $ff, $03, $01, $01, $03
-    DATA BYTE $03, $c3, $e3, $f3, $f3, $f3, $f3, $f3
-    DATA BYTE $e0, $e0, $e1, $e3, $e3, $e7, $e7, $e7
-    DATA BYTE $1f, $7f, $ff, $ff, $f8, $e0, $c0, $c0
-    DATA BYTE $ff, $fe, $fc, $f8, $00, $00, $00, $00
-    DATA BYTE $00, $03, $0f, $1f, $1f, $3f, $3e, $3e
-    DATA BYTE $7f, $ff, $ff, $ff, $c0, $00, $00, $00
-    DATA BYTE $80, $f0, $fc, $fe, $fe, $3f, $1f, $1f
-    DATA BYTE $07, $18, $20, $20, $41, $42, $41, $20
-    DATA BYTE $ff, $00, $00, $00, $ff, $00, $ff, $00
-    DATA BYTE $80, $60, $10, $08, $05, $85, $85, $04
-    DATA BYTE $1f, $60, $80, $80, $07, $08, $07, $80
-    DATA BYTE $fe, $01, $00, $00, $fc, $02, $fe, $00
-    DATA BYTE $00, $81, $42, $24, $17, $10, $10, $10
-    DATA BYTE $fc, $04, $04, $04, $84, $84, $84, $84
-    DATA BYTE $1f, $60, $80, $80, $83, $84, $43, $20
-    DATA BYTE $ff, $00, $00, $00, $fc, $02, $fc, $00
-    DATA BYTE $80, $60, $10, $10, $10, $10, $20, $40
+    DATA BYTE $01, $1f, $3f, $7f, $ff, $00, $8c, $00
+    DATA BYTE $ff, $00, $00, $03, $01, $01, $03, $03
+    DATA BYTE $c3, $e3, $f3, $e0, $00, $e0, $e0, $e1
+    DATA BYTE $e3, $22, $e3, $e7, $00, $1f, $7f, $17
+    DATA BYTE $00, $f8, $e0, $c0, $c0, $ff, $fe, $fc
+    DATA BYTE $f8, $70, $00, $00, $03, $0f, $1f, $8a
+    DATA BYTE $33, $3e, $3e, $16, $00, $60, $c0, $0e
+    DATA BYTE $80, $f0, $fc, $10, $fe, $fe, $3f, $12
+    DATA BYTE $07, $18, $20, $03, $20, $41, $42, $41
+    DATA BYTE $20, $ff, $a8, $4b, $01, $17, $60, $10
+    DATA BYTE $00, $08, $05, $85, $85, $04, $1f, $60
+    DATA BYTE $80, $01, $80, $07, $08, $07, $80, $fe
+    DATA BYTE $01, $08, $17, $fc, $02, $fe, $04, $81
+    DATA BYTE $42, $11, $24, $17, $10, $00, $fc, $04
+    DATA BYTE $33, $00, $84, $00, $86, $1f, $83, $84
+    DATA BYTE $43, $93, $37, $1f, $fc, $b0, $37, $00
+    DATA BYTE $20, $40, $ff, $ff, $ff, $ff, $c0
+
 logo2:
-    DATA BYTE $ff, $ff, $ff, $ff, $f8, $f8, $f8, $f8
-    DATA BYTE $ff, $ff, $ff, $fe, $00, $00, $00, $00
-    DATA BYTE $f3, $e3, $c3, $03, $03, $03, $03, $03
-    DATA BYTE $e7, $e7, $e7, $e3, $e3, $e1, $e0, $e0
-    DATA BYTE $c0, $c0, $e0, $f8, $ff, $ff, $7f, $1f
-    DATA BYTE $00, $00, $00, $00, $ff, $fe, $fc, $f8
-    DATA BYTE $3e, $3e, $3f, $1f, $1f, $0f, $03, $00
-    DATA BYTE $00, $00, $00, $c0, $ff, $ff, $ff, $ff
-    DATA BYTE $1f, $1f, $3f, $fe, $fe, $fc, $f0, $80
-    DATA BYTE $18, $07, $00, $07, $08, $10, $20, $3f
-    DATA BYTE $00, $ff, $00, $ff, $00, $00, $00, $ff
-    DATA BYTE $04, $84, $84, $08, $08, $10, $60, $80
-    DATA BYTE $60, $1f, $00, $1f, $20, $40, $80, $ff
-    DATA BYTE $00, $fe, $02, $fc, $00, $00, $01, $fe
-    DATA BYTE $10, $10, $10, $20, $20, $40, $80, $00
-    DATA BYTE $84, $84, $84, $84, $84, $84, $84, $fc
-    DATA BYTE $40, $83, $84, $83, $80, $80, $60, $1f
-    DATA BYTE $00, $fc, $02, $fc, $00, $00, $00, $ff
-    DATA BYTE $20, $10, $10, $10, $10, $10, $60, $80
+    DATA BYTE $18, $ff, $00, $f8, $cc, $00, $06, $30
+    DATA BYTE $fe, $00, $00, $f3, $e3, $39, $c3, $03
+    DATA BYTE $00, $e7, $00, $00, $e3, $e3, $e1, $e0
+    DATA BYTE $e0, $c0, $c0, $61, $e0, $1b, $7f, $1f
+    DATA BYTE $d0, $1b, $21, $fc, $f8, $3e, $03, $3e
+    DATA BYTE $3f, $1f, $1f, $0f, $03, $9d, $0e, $c0
+    DATA BYTE $3b, $10, $0c, $3f, $fe, $16, $f0, $80
+    DATA BYTE $18, $01, $07, $00, $07, $08, $10, $20
+    DATA BYTE $3f, $5c, $24, $01, $2a, $04, $10, $84
+    DATA BYTE $84, $08, $0f, $60, $80, $60, $82, $39
+    DATA BYTE $1f, $20, $40, $80, $13, $10, $fe, $02
+    DATA BYTE $fc, $16, $01, $fe, $10, $58, $10, $24
+    DATA BYTE $0f, $00, $6c, $84, $00, $fc, $07, $40
+    DATA BYTE $83, $84, $83, $80, $3a, $25, $fc, $1f
+    DATA BYTE $37, $3a, $20, $10, $00, $37, $ff, $ff
+    DATA BYTE $ff, $ff, $c0
 
 highlightLeft:
     DATA BYTE $3F, $7F, $FF, $FF, $FF, $FF, $7F, $3F
@@ -195,15 +191,9 @@ horzBar:
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
 vBar:   
-    DATA BYTE PATT_IDX_BORDER_V
+    DATA BYTE PATT_IDX_BORDER_V ' intentional flow-through to emptyRow used
 emptyRow:
     DATA BYTE "                                "
-
-' PICO9918 logo name table entries (rows 1 and 2)
-logoNames:
-    DATA BYTE 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19
-logoNames2:
-    DATA BYTE 129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147
 
 ' color entries for an entire tile
     DATA BYTE $f0, $f0, $f0, $f0, $f0, $f0, $f0, $f0
@@ -224,157 +214,104 @@ colorPalBoxSel2:
 colorSwatch:
     DATA BYTE $01, $01, $01, $01, $01, $01, $01, $01
 
-font:
-    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00 ' <SPACE$
-    DATA BYTE $18, $18, $18, $18, $18, $00, $18, $00 ' !
-    DATA BYTE $6C, $6C, $6C, $00, $00, $00, $00, $00 ' "
-    DATA BYTE $6C, $6C, $FE, $6C, $FE, $6C, $6C, $00 ' #
-    DATA BYTE $18, $7E, $C0, $7C, $06, $FC, $18, $00 ' $
-    DATA BYTE $00, $C6, $CC, $18, $30, $66, $C6, $00 ' %
-    DATA BYTE $38, $6C, $38, $76, $DC, $CC, $76, $00 ' &
-    DATA BYTE $30, $30, $60, $00, $00, $00, $00, $00 ' '
-    DATA BYTE $0C, $18, $30, $30, $30, $18, $0C, $00 ' (
-    DATA BYTE $30, $18, $0C, $0C, $0C, $18, $30, $00 ' )
-    DATA BYTE $00, $66, $3C, $FF, $3C, $66, $00, $00 ' *
-    DATA BYTE $00, $18, $18, $7E, $18, $18, $00, $00 ' +
-    DATA BYTE $00, $00, $00, $00, $00, $18, $18, $30 ' ,
-    DATA BYTE $00, $00, $00, $7E, $00, $00, $00, $00 ' -
-    DATA BYTE $00, $00, $00, $00, $00, $18, $18, $00 ' .
-    DATA BYTE $06, $0C, $18, $30, $60, $C0, $80, $00 ' /
-    DATA BYTE $7C, $CE, $DE, $F6, $E6, $C6, $7C, $00 ' 0
-    DATA BYTE $18, $38, $18, $18, $18, $18, $7E, $00 ' 1
-    DATA BYTE $7C, $C6, $06, $7C, $C0, $C0, $FE, $00 ' 2
-    DATA BYTE $FC, $06, $06, $3C, $06, $06, $FC, $00 ' 3
-    DATA BYTE $0C, $CC, $CC, $CC, $FE, $0C, $0C, $00 ' 4
-    DATA BYTE $FE, $C0, $FC, $06, $06, $C6, $7C, $00 ' 5
-    DATA BYTE $7C, $C0, $C0, $FC, $C6, $C6, $7C, $00 ' 6
-    DATA BYTE $FE, $06, $06, $0C, $18, $30, $30, $00 ' 7
-    DATA BYTE $7C, $C6, $C6, $7C, $C6, $C6, $7C, $00 ' 8
-    DATA BYTE $7C, $C6, $C6, $7E, $06, $06, $7C, $00 ' 9
-    DATA BYTE $00, $18, $18, $00, $00, $18, $18, $00 ' :
-    DATA BYTE $00, $18, $18, $00, $00, $18, $18, $30 ' ;
-    DATA BYTE $0C, $18, $30, $60, $30, $18, $0C, $00 ' <
-    DATA BYTE $00, $00, $7E, $00, $7E, $00, $00, $00 ' =
-    DATA BYTE $30, $18, $0C, $06, $0C, $18, $30, $00 ' >
-    DATA BYTE $3C, $66, $0C, $18, $18, $00, $18, $00 ' ?
-    DATA BYTE $7C, $C6, $DE, $DE, $DE, $C0, $7E, $00 ' @
-    DATA BYTE $38, $6C, $C6, $C6, $FE, $C6, $C6, $00 ' A
-    DATA BYTE $FC, $C6, $C6, $FC, $C6, $C6, $FC, $00 ' B
-    DATA BYTE $7C, $C6, $C0, $C0, $C0, $C6, $7C, $00 ' C
-    DATA BYTE $F8, $CC, $C6, $C6, $C6, $CC, $F8, $00 ' D
-    DATA BYTE $FE, $C0, $C0, $F8, $C0, $C0, $FE, $00 ' E
-    DATA BYTE $FE, $C0, $C0, $F8, $C0, $C0, $C0, $00 ' F
-    DATA BYTE $7C, $C6, $C0, $C0, $CE, $C6, $7C, $00 ' G
-    DATA BYTE $C6, $C6, $C6, $FE, $C6, $C6, $C6, $00 ' H
-    DATA BYTE $7E, $18, $18, $18, $18, $18, $7E, $00 ' I
-    DATA BYTE $06, $06, $06, $06, $06, $C6, $7C, $00 ' J
-    DATA BYTE $C6, $CC, $D8, $F0, $D8, $CC, $C6, $00 ' K
-    DATA BYTE $C0, $C0, $C0, $C0, $C0, $C0, $FE, $00 ' L
-    DATA BYTE $C6, $EE, $FE, $FE, $D6, $C6, $C6, $00 ' M
-    DATA BYTE $C6, $E6, $F6, $DE, $CE, $C6, $C6, $00 ' N
-    DATA BYTE $7C, $C6, $C6, $C6, $C6, $C6, $7C, $00 ' O
-    DATA BYTE $FC, $C6, $C6, $FC, $C0, $C0, $C0, $00 ' P
-    DATA BYTE $7C, $C6, $C6, $C6, $D6, $DE, $7C, $06 ' Q
-    DATA BYTE $FC, $C6, $C6, $FC, $D8, $CC, $C6, $00 ' R
-    DATA BYTE $7C, $C6, $C0, $7C, $06, $C6, $7C, $00 ' S
-    DATA BYTE $FF, $18, $18, $18, $18, $18, $18, $00 ' T
-    DATA BYTE $C6, $C6, $C6, $C6, $C6, $C6, $FE, $00 ' U
-    DATA BYTE $C6, $C6, $C6, $C6, $C6, $7C, $38, $00 ' V
-    DATA BYTE $C6, $C6, $C6, $C6, $D6, $FE, $6C, $00 ' W
-    DATA BYTE $C6, $C6, $6C, $38, $6C, $C6, $C6, $00 ' X
-    DATA BYTE $C6, $C6, $C6, $7C, $18, $30, $E0, $00 ' Y
-    DATA BYTE $FE, $06, $0C, $18, $30, $60, $FE, $00 ' Z
-    DATA BYTE $3C, $30, $30, $30, $30, $30, $3C, $00 ' [
-    DATA BYTE $C0, $60, $30, $18, $0C, $06, $02, $00 ' \
-    DATA BYTE $3C, $0C, $0C, $0C, $0C, $0C, $3C, $00 ' ]
-    DATA BYTE $10, $38, $6C, $C6, $00, $00, $00, $00 ' ^
-    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $FF ' _
-    DATA BYTE $18, $24, $24, $18, $00, $00, $00, $00 ' ` 
-    DATA BYTE $00, $00, $7C, $06, $7E, $C6, $7E, $00 ' a
-    DATA BYTE $C0, $C0, $C0, $FC, $C6, $C6, $FC, $00 ' b
-    DATA BYTE $00, $00, $7C, $C6, $C0, $C6, $7C, $00 ' c
-    DATA BYTE $06, $06, $06, $7E, $C6, $C6, $7E, $00 ' d
-    DATA BYTE $00, $00, $7C, $C6, $FE, $C0, $7C, $00 ' e
-    DATA BYTE $1C, $36, $30, $78, $30, $30, $78, $00 ' f
-    DATA BYTE $00, $00, $7E, $C6, $C6, $7E, $06, $FC ' g
-    DATA BYTE $C0, $C0, $FC, $C6, $C6, $C6, $C6, $00 ' h
-    DATA BYTE $18, $00, $38, $18, $18, $18, $3C, $00 ' i
-    DATA BYTE $06, $00, $06, $06, $06, $06, $C6, $7C ' j
-    DATA BYTE $C0, $C0, $CC, $D8, $F8, $CC, $C6, $00 ' k
-    DATA BYTE $38, $18, $18, $18, $18, $18, $3C, $00 ' l
-    DATA BYTE $00, $00, $CC, $FE, $FE, $D6, $D6, $00 ' m
-    DATA BYTE $00, $00, $FC, $C6, $C6, $C6, $C6, $00 ' n
-    DATA BYTE $00, $00, $7C, $C6, $C6, $C6, $7C, $00 ' o
-    DATA BYTE $00, $00, $FC, $C6, $C6, $FC, $C0, $C0 ' p
-    DATA BYTE $00, $00, $7E, $C6, $C6, $7E, $06, $06 ' q
-    DATA BYTE $00, $00, $FC, $C6, $C0, $C0, $C0, $00 ' r
-    DATA BYTE $00, $00, $7E, $C0, $7C, $06, $FC, $00 ' s
-    DATA BYTE $18, $18, $7E, $18, $18, $18, $0E, $00 ' t
-    DATA BYTE $00, $00, $C6, $C6, $C6, $C6, $7E, $00 ' u
-    DATA BYTE $00, $00, $C6, $C6, $C6, $7C, $38, $00 ' v
-    DATA BYTE $00, $00, $C6, $C6, $D6, $FE, $6C, $00 ' w
-    DATA BYTE $00, $00, $C6, $6C, $38, $6C, $C6, $00 ' x
-    DATA BYTE $00, $00, $C6, $C6, $C6, $7E, $06, $FC ' y
-    DATA BYTE $00, $00, $FE, $0C, $38, $60, $FE, $00 ' z
-    DATA BYTE $3F, $60, $CF, $D8, $D8, $CF, $60, $3F
-    DATA BYTE $18, $18, $18, $00, $18, $18, $18, $00 ' |
-    DATA BYTE $C0, $60, $30, $30, $30, $30, $60, $C0
-    DATA BYTE $76, $DC, $00, $00, $00, $00, $00, $00 ' ~
-    DATA BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF '  
+font:   ' pletter compressed font data (32-127)
+    DATA BYTE $3e, $00, $39, $00, $18, $00, $00, $2d
+    DATA BYTE $01, $6c, $00, $25, $0f, $06, $fe, $01
+    DATA BYTE $40, $0b, $11, $7e, $c0, $7c, $06, $fc
+    DATA BYTE $40, $18, $10, $c6, $cc, $18, $30, $66
+    DATA BYTE $00, $c6, $00, $38, $6c, $38, $76, $dc
+    DATA BYTE $cc, $06, $76, $00, $30, $30, $60, $8a
+    DATA BYTE $27, $0c, $15, $00, $2a, $18, $0c, $0f
+    DATA BYTE $03, $00, $a0, $0b, $10, $66, $3c, $ff
+    DATA BYTE $3c, $75, $66, $50, $39, $7d, $50, $5c
+    DATA BYTE $c3, $18, $00, $7e, $00, $58, $6c, $00
+    DATA BYTE $06, $a0, $2c, $41, $c0, $80, $00, $7c
+    DATA BYTE $02, $ce, $de, $f6, $e6, $c6, $7c, $12
+    DATA BYTE $65, $38, $7f, $32, $00, $0f, $c6, $06
+    DATA BYTE $7c, $c0, $c0, $fe, $00, $05, $fc, $06
+    DATA BYTE $06, $3c, $06, $78, $22, $5f, $cc, $00
+    DATA BYTE $fe, $0c, $5f, $33, $fe, $c0, $11, $29
+    DATA BYTE $27, $1c, $08, $c6, $57, $07, $0f, $0d
+    DATA BYTE $57, $7a, $2f, $0c, $71, $02, $07, $7e
+    DATA BYTE $06, $76, $3a, $5b, $f3, $03, $30, $b8
+    DATA BYTE $66, $9f, $ee, $7e, $80, $33, $0b, $91
+    DATA BYTE $38, $00, $a3, $71, $05, $ef, $25, $37
+    DATA BYTE $de, $00, $c0, $19, $12, $d7, $40, $fe
+    DATA BYTE $02, $ae, $77, $03, $02, $c5, $17, $c0
+    DATA BYTE $00, $85, $57, $f8, $cc, $0d, $0a, $fa
+    DATA BYTE $f8, $7f, $0d, $71, $f8, $97, $b3, $07
+    DATA BYTE $c0, $46, $1f, $ce, $5d, $1f, $1d, $36
+    DATA BYTE $46, $37, $ec, $c3, $bf, $06, $b8, $00
+    DATA BYTE $17, $cc, $d8, $13, $f0, $d8, $cc, $17
+    DATA BYTE $c0, $a8, $00, $37, $0f, $ee, $fe, $28
+    DATA BYTE $fe, $d6, $27, $07, $e6, $f6, $55, $de
+    DATA BYTE $37, $07, $3f, $d7, $00, $27, $6d, $6c
+    DATA BYTE $4f, $13, $00, $d6, $de, $ea, $dd, $0f
+    DATA BYTE $37, $8e, $5f, $7c, $47, $75, $ff, $57
+    DATA BYTE $00, $dc, $67, $6a, $00, $d9, $36, $38
+    DATA BYTE $d5, $07, $2f, $a0, $63, $07, $6c, $87
+    DATA BYTE $ba, $00, $43, $15, $d6, $e0, $1e, $97
+    DATA BYTE $f1, $23, $27, $3c, $30, $93, $00, $3c
+    DATA BYTE $7f, $60, $84, $f1, $02, $0f, $0c, $e9
+    DATA BYTE $00, $0f, $10, $5a, $2d, $2c, $d1, $00
+    DATA BYTE $5e, $24, $24, $e5, $a5, $27, $6e, $7e
+    DATA BYTE $c2, $8e, $af, $ff, $3a, $0f, $81, $2e
+    DATA BYTE $7f, $cf, $2c, $16, $17, $e8, $0f, $fb
+    DATA BYTE $81, $0f, $1c, $36, $30, $78, $30, $67
+    DATA BYTE $02, $0f, $46, $16, $ae, $99, $2e, $7f
+    DATA BYTE $74, $44, $c0, $3c, $9b, $2f, $00, $34
+    DATA BYTE $80, $17, $80, $e3, $bb, $a7, $15, $4c
+    DATA BYTE $17, $00, $cc, $80, $59, $d6, $07, $b7
+    DATA BYTE $2f, $70, $4f, $ff, $00, $f1, $81, $f2
+    DATA BYTE $4f, $3e, $b9, $0f, $f9, $ee, $5f, $f8
+    DATA BYTE $f6, $c6, $cc, $18, $0e, $0f, $ee, $36
+    DATA BYTE $87, $36, $ff, $3b, $07, $8c, $ff, $07
+    DATA BYTE $e7, $80, $6b, $17, $3f, $0b, $b8, $ad
+    DATA BYTE $60, $38, $ff, $3f, $01, $60, $cf, $d8
+    DATA BYTE $d8, $cf, $60, $3f, $cf, $bb, $63, $03
+    DATA BYTE $87, $96, $00, $f1, $76, $78, $dc, $f8
+    DATA BYTE $79, $00, $ff, $ff, $ff, $ff, $80
 
-logoSprites: ' logo sprites for 'scanline sprites' demo
-    DATA BYTE $3F, $7F, $FF, $00, $00, $FF, $FF, $FF    ' P
-    DATA BYTE $E0, $E0, $E0, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $E0, $F8, $FC, $3C, $3C, $FC, $F8, $F0    ' 
-    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $F0, $F0, $F0, $F0, $F0, $F0, $F0, $F0    ' I
-    DATA BYTE $F0, $F0, $F0, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $0F, $3F, $7F, $F0, $E0, $E0, $E0, $F0    ' C
-    DATA BYTE $7F, $3F, $0F, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $F8, $F0, $E0, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $F8, $F0, $E0, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $0F, $3F, $7F, $F0, $E0, $E0, $E0, $F0    ' O
-    DATA BYTE $7F, $3F, $0F, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $E0, $F8, $FC, $1E, $0E, $0E, $0E, $1E    ' 
-    DATA BYTE $FC, $F8, $E0, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $3F, $40, $8F, $90, $8F, $40, $3F, $00    ' 9
-    DATA BYTE $3F, $40, $FF, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $F0, $08, $C4, $24, $E4, $04, $E4, $24    ' 
-    DATA BYTE $C4, $08, $F0, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $3C, $44, $84, $E4, $24, $24, $24, $24    ' 1
-    DATA BYTE $24, $24, $3C, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $3F, $40, $8F, $90, $4F, $40, $8F, $90    ' 8
-    DATA BYTE $8F, $40, $3F, $00, $00, $00, $00, $00    ' 
-    DATA BYTE $F0, $08, $C4, $24, $C8, $08, $C4, $24    ' 
-    DATA BYTE $C4, $08, $F0, $00, $00, $00, $00, $00    ' 
+
+logoSprites: ' pletter compressed logo sprites for 'scanline sprites' demo
+    DATA BYTE $00, $3f, $7f, $ff, $00, $00, $ff, $93
+    DATA BYTE $00, $e0, $00, $00, $80, $00, $e0, $f8
+    DATA BYTE $fc, $3c, $3c, $fc, $1e, $f8, $f0, $00
+    DATA BYTE $35, $00, $f0, $9a, $00, $00, $f2, $00
+    DATA BYTE $0f, $40, $60, $f0, $3b, $f0, $7f, $3f
+    DATA BYTE $68, $0f, $0f, $f8, $bd, $0d, $3f, $07
+    DATA BYTE $b0, $1f, $5f, $1e, $0e, $96, $00, $1e
+    DATA BYTE $62, $c0, $1f, $3f, $40, $8f, $90, $8f
+    DATA BYTE $31, $40, $3f, $07, $ff, $b0, $6f, $08
+    DATA BYTE $c4, $24, $03, $e4, $04, $e4, $24, $c4
+    DATA BYTE $08, $61, $6f, $3c, $44, $84, $68, $0c
+    DATA BYTE $00, $3c, $dd, $39, $7f, $3f, $4f, $e7
+    DATA BYTE $43, $cc, $3f, $c8, $03, $fb, $3f, $ff
+    DATA BYTE $ff, $ff, $ff
 
 logoSpriteWidths:
     DATA BYTE 14, 4, 13, 15, 14, 6, 14
 
-logoSpriteIndices:  ' P, I, C, O, 9, 9, 1, 8
-    DATA BYTE 0, 1, 2, 3, 4, 4,5, 6
+'logoSpriteIndices:  ' P, I, C, O, 9, 9, 1, 8
+'    DATA BYTE 0, 1, 2, 3, 4, 4,5, 6
 
-palette: ' not currently used, but I'd prefer to use it. It stays!
-    DATA BYTE $00, $00
-    DATA BYTE $00, $00
-    DATA BYTE $02, $C3
-    DATA BYTE $05, $00
-    DATA BYTE $05, $4F
-    DATA BYTE $07, $6F
-    DATA BYTE $0D, $54
-    DATA BYTE $04, $EF
-    DATA BYTE $0F, $54
-    DATA BYTE $0F, $76
-    DATA BYTE $0D, $C3
-    DATA BYTE $0E, $D6
-    DATA BYTE $02, $B2
-    DATA BYTE $0C, $5C
-    DATA BYTE $08, $88
-    DATA BYTE $0F, $FF
+'palette: ' not currently used, but I'd prefer to use it. It stays!
+'    DATA BYTE $00, $00
+'    DATA BYTE $00, $00
+'    DATA BYTE $02, $C3
+'    DATA BYTE $05, $00
+'    DATA BYTE $05, $4F
+'    DATA BYTE $07, $6F
+'    DATA BYTE $0D, $54
+'    DATA BYTE $04, $EF
+'    DATA BYTE $0F, $54
+'    DATA BYTE $0F, $76
+'    DATA BYTE $0D, $C3
+'    DATA BYTE $0E, $D6
+'    DATA BYTE $02, $B2
+'    DATA BYTE $0C, $5C
+'    DATA BYTE $08, $88
+'    DATA BYTE $0F, $FF
   
 sine: ' sine wave values for scanline sprite animation
     DATA BYTE $10, $10, $11, $11, $12, $12, $12, $13
@@ -406,3 +343,97 @@ blockYellow:
     DATA BYTE $A0, $A0, $A0, $A0, $A0, $A0, $A0, $00
 blockRed:
     DATA BYTE $80, $80, $80, $80, $80, $80, $80, $00        
+
+
+
+dummy: ' sine wave values for scanline sprite animation
+    DATA BYTE $10, $10, $11, $11, $12, $12, $12, $13
+    DATA BYTE $13, $13, $14, $14, $14, $15, $15, $15
+    DATA BYTE $16, $16, $16, $16, $17, $17, $17, $17
+    DATA BYTE $17, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $18, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $17, $17, $17, $17, $17, $16, $16, $16
+    DATA BYTE $16, $15, $15, $15, $14, $14, $14, $13
+    DATA BYTE $13, $13, $12, $12, $12, $11, $11, $10
+    DATA BYTE $10, $10, $0F, $0F, $0E, $0E, $0E, $0D
+    DATA BYTE $0D, $0D, $0C, $0C, $0C, $0B, $0B, $0B
+    DATA BYTE $0A, $0A, $0A, $0A, $09, $09, $09, $09
+    DATA BYTE $09, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $08, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $09, $09, $09, $09, $09, $0A, $0A, $0A
+    DATA BYTE $0A, $0B, $0B, $0B, $0C, $0C, $0C, $0D
+    DATA BYTE $0D, $0D, $0E, $0E, $0E, $0F, $0F, $10
+    DATA BYTE $10, $10, $11, $11, $12, $12, $12, $13
+    DATA BYTE $13, $13, $14, $14, $14, $15, $15, $15
+    DATA BYTE $16, $16, $16, $16, $17, $17, $17, $17
+    DATA BYTE $17, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $18, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $17, $17, $17, $17, $17, $16, $16, $16
+    DATA BYTE $16, $15, $15, $15, $14, $14, $14, $13
+    DATA BYTE $13, $13, $12, $12, $12, $11, $11, $10
+    DATA BYTE $10, $10, $0F, $0F, $0E, $0E, $0E, $0D
+    DATA BYTE $0D, $0D, $0C, $0C, $0C, $0B, $0B, $0B
+    DATA BYTE $0A, $0A, $0A, $0A, $09, $09, $09, $09
+    DATA BYTE $09, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $08, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $09, $09, $09, $09, $09, $0A, $0A, $0A
+    DATA BYTE $0A, $0B, $0B, $0B, $0C, $0C, $0C, $0D
+    DATA BYTE $0D, $0D, $0E, $0E, $0E, $0F, $0F, $10
+    DATA BYTE $10, $10, $11, $11, $12, $12, $12, $13
+    DATA BYTE $13, $13, $14, $14, $14, $15, $15, $15
+    DATA BYTE $16, $16, $16, $16, $17, $17, $17, $17
+    DATA BYTE $17, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $18, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $17, $17, $17, $17, $17, $16, $16, $16
+    DATA BYTE $16, $15, $15, $15, $14, $14, $14, $13
+    DATA BYTE $13, $13, $12, $12, $12, $11, $11, $10
+    DATA BYTE $10, $10, $0F, $0F, $0E, $0E, $0E, $0D
+    DATA BYTE $0D, $0D, $0C, $0C, $0C, $0B, $0B, $0B
+    DATA BYTE $0A, $0A, $0A, $0A, $09, $09, $09, $09
+    DATA BYTE $09, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $08, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $09, $09, $09, $09, $09, $0A, $0A, $0A
+    DATA BYTE $0A, $0B, $0B, $0B, $0C, $0C, $0C, $0D
+    DATA BYTE $0D, $0D, $0E, $0E, $0E, $0F, $0F, $10
+    DATA BYTE $10, $10, $11, $11, $12, $12, $12, $13
+    DATA BYTE $13, $13, $14, $14, $14, $15, $15, $15
+    DATA BYTE $16, $16, $16, $16, $17, $17, $17, $17
+    DATA BYTE $17, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $18, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $17, $17, $17, $17, $17, $16, $16, $16
+    DATA BYTE $16, $15, $15, $15, $14, $14, $14, $13
+    DATA BYTE $13, $13, $12, $12, $12, $11, $11, $10
+    DATA BYTE $10, $10, $0F, $0F, $0E, $0E, $0E, $0D
+    DATA BYTE $0D, $0D, $0C, $0C, $0C, $0B, $0B, $0B
+    DATA BYTE $0A, $0A, $0A, $0A, $09, $09, $09, $09
+    DATA BYTE $09, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $08, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $09, $09, $09, $09, $09, $0A, $0A, $0A
+    DATA BYTE $0A, $0B, $0B, $0B, $0C, $0C, $0C, $0D
+    DATA BYTE $0D, $0D, $0E, $0E, $0E, $0F, $0F, $10
+    DATA BYTE $16, $15, $15, $15, $14, $14, $14, $13
+    DATA BYTE $13, $13, $12, $12, $12, $11, $11, $10
+    DATA BYTE $10, $10, $0F, $0F, $0E, $0E, $0E, $0D
+    DATA BYTE $0D, $0D, $0C, $0C, $0C, $0B, $0B, $0B
+    DATA BYTE $0A, $0A, $0A, $0A, $09, $09, $09, $09
+    DATA BYTE $09, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $08, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $09, $09, $09, $09, $09, $0A, $0A, $0A
+    DATA BYTE $0A, $0B, $0B, $0B, $0C, $0C, $0C, $0D
+    DATA BYTE $0D, $0D, $0E, $0E, $0E, $0F, $0F, $10
+    DATA BYTE $10, $10, $11, $11, $12, $12, $12, $13
+    DATA BYTE $13, $13, $14, $14, $14, $15, $15, $15
+    DATA BYTE $16, $16, $16, $16, $17, $17, $17, $17
+    DATA BYTE $17, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $18, $18, $18, $18, $18, $18, $18, $18
+    DATA BYTE $17, $17, $17, $17, $17, $16, $16, $16
+    DATA BYTE $16, $15, $15, $15, $14, $14, $14, $13
+    DATA BYTE $13, $13, $12, $12, $12, $11, $11, $10
+    DATA BYTE $10, $10, $0F, $0F, $0E, $0E, $0E, $0D
+    DATA BYTE $0D, $0D, $0C, $0C, $0C, $0B, $0B, $0B
+    DATA BYTE $0A, $0A, $0A, $0A, $09, $09, $09, $09
+    DATA BYTE $09, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $08, $08, $08, $08, $08, $08, $08, $08
+    DATA BYTE $09, $09, $09, $09, $09, $0A, $0A, $0A
+    DATA BYTE $0A, $0B, $0B, $0B, $0C, $0C, $0C, $0D
+    DATA BYTE $0D, $0D, $0E, $0E, $0E, $0F, $0F, $10

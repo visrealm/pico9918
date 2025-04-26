@@ -50,10 +50,11 @@ deviceInfoMenu: PROCEDURE
     VDP(58) = CONF_PICO_MODEL
     optValue = VDP_READ_STATUS
     #addr = XY(21, menuTopRow + 0)
+    PRINT AT #addr, "RP2"
     IF optValue = PICO_MODEL_RP2350 THEN
-        PRINT AT #addr, "RP2350"
+        PRINT "350"
     ELSE
-        PRINT AT #addr, "RP2040"
+        PRINT "040"
     END IF
 
     VDP(58) = CONF_HW_VERSION
