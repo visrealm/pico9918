@@ -25,7 +25,6 @@ firmwareMenu: PROCEDURE
     
     DRAW_TITLE("FIRMWARE UPDATE")
 
-    VDP_ENABLE_INT
     GOSUB delay
 
     PRINT AT XY(4, menuTopRow + 0), "Current version : v",verMaj, ".", verMin
@@ -53,12 +52,13 @@ firmwareMenu: PROCEDURE
 
         IF 0 THEN
 
+            PRINT AT XY(1, menuTopRow + 5), " "
             IF isUpgrade = 0 THEN
-                PRINT AT XY(2, menuTopRow + 5), "Re-install firmware"
+                PRINT "Re-install firmware"
             ELSEIF isUpgrade = 1 THEN
-                PRINT AT XY(2, menuTopRow + 5), "Upgrade firmware to"
+                PRINT "Upgrade firmware to"
             ELSE
-                PRINT AT XY(2, menuTopRow + 5), "Downgrade firmware to"
+                PRINT "Downgrade firmware to"
             END IF
 
             PRINT " v", FIRMWARE_MAJOR_VER, ".", FIRMWARE_MINOR_VER, "?"

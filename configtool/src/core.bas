@@ -110,6 +110,7 @@ main:
     ' what are we working with?
     GOSUB vdpDetect
 
+    PRINT AT XY(5, 21), "Detected: "
 
     IF isF18ACompatible THEN
 
@@ -126,26 +127,26 @@ main:
             optValue = VDP_READ_STATUS
             verMaj = optValue / 16
             verMin = optValue AND $0f
-            PRINT AT XY(3, 21), "Detected: PICO9918 ver ", verMaj, ".", verMin
+            PRINT "PICO9918 v", verMaj, ".", verMin
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
             VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
             verReg = VDP_READ_STATUS
             verMaj = verReg / 16
             verMin = verReg AND $0f
-            PRINT AT XY(5, 21), "Detected: F18A ver  ."
+            PRINT "   F18A v ."
             PUT_XY(5 + 19, 21, hexChar(verMaj))
             PUT_XY(5 + 21, 21, hexChar(verMin))
         ELSE
-            PRINT AT XY(8, 21), "Detected UNKNOWN SR1 = ", <>statReg
+            PRINT " UNKNOWN SR1 = ", <>statReg
         END IF
 
         VDP_RESET_STATUS_REG
         VDP_ENABLE_INT_DISP_OFF
     ELSEIF isV9938 THEN
-        PRINT AT XY(8, 21), "Detected: V9938"
+        PRINT "Yamaha V9938"
     ELSE
-        PRINT AT XY(6, 21), "Detected: LEGACY VDP"
+        PRINT "  TI TMS99x8"
     END IF
 
     IF F18A_TESTING THEN
@@ -201,8 +202,8 @@ main:
 
         WHILE 1
             ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu
-            GOSUB clearScreen
             VDP_DISABLE_INT
+            GOSUB clearScreen
         WEND
 
     END IF
@@ -218,6 +219,7 @@ exit:
 ' delay between user input (2/15th second)
 ' -----------------------------------------------------------------------------
 delay: PROCEDURE
+    VDP_ENABLE_INT
     FOR del = 1 TO 8
         WAIT
     NEXT del

@@ -93,7 +93,6 @@ deviceInfoMenu: PROCEDURE
     PUT_XY(23, menuTopRow + 5, hexChar(verMin))
     VDP_RESET_STATUS_REG
 
-    VDP_ENABLE_INT
     GOSUB delay
 
     WHILE 1

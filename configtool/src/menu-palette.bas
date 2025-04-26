@@ -15,6 +15,8 @@
 
 paletteMenu: PROCEDURE
 
+    VDP_DISABLE_INT
+
     DRAW_TITLE("PALETTE")
 
     DIM bmpBuf(64)
@@ -82,12 +84,6 @@ paletteMenu: PROCEDURE
         PRINT AT XY(26, I) , "\148\148\148\148\148"
     NEXT I
 
-    BX = 8
-    BW = 16
-    FOR BR = 10 to 14 STEP 2
-        GOSUB horzBarRWX
-    NEXT BR
-
     oldMenuTopRow = menuTopRow
     oldIndex = g_currentMenuIndex
 
@@ -108,7 +104,9 @@ paletteMenu: PROCEDURE
     lastMenu    = 0
     DIM rgb(3)
 
-    VDP_ENABLE_INT
+    ' horz bar settings
+    BX = 8
+    BW = 16
 
     GOSUB delay
     
@@ -119,19 +117,20 @@ paletteMenu: PROCEDURE
         
         'DEFINE VRAM NAME_TAB_XY(15,15), 1, VARPTR I
 
+        VDP_DISABLE_INT
 
         IF currentMenu = 0 THEN
             #addr = NAME_TAB_XY(currentIndex * 2 - 1, 7)
             DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
             DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
             IF lastIndex <> currentIndex THEN
+
                 DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + 4)
                 DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + 4)
                 #addr = NAME_TAB_XY(lastIndex * 2 - 1, 7)
                 DEFINE VRAM #addr, 2, VARPTR bmpBuf(0)
                 DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
 
-                VDP_DISABLE_INT
 
                 'PUT_XY( lastIndex * 2 - 1, 6, hexChar(lastIndex))
                 'PUT_XY( currentIndex * 2 - 1, 6, hexChar(currentIndex) + 128)
@@ -157,8 +156,6 @@ paletteMenu: PROCEDURE
                 DEFINE VRAM 0, 2, VARPTR currentColor(0)
                 VDP(47) = $40
 
-                VDP_ENABLE_INT
-
                 'PUT_XY(0, 5, hexChar(rgb(0)))
                 'PUT_XY(1, 5, hexChar(rgb(1)))
                 'PUT_XY(2, 5, hexChar(rgb(2)))
@@ -172,6 +169,7 @@ paletteMenu: PROCEDURE
                 PUT_XY(8 + rgb(2), 14, PATT_IDX_SLIDER)            
             
                 lastIndex = currentIndex
+
                 GOSUB delay
             END IF
         ELSEIF currentMenu < 4 THEN
@@ -179,6 +177,7 @@ paletteMenu: PROCEDURE
 
                 cc1 = rgb(1) * 16 + rgb(2)
                 IF currentColor(0) <> rgb(0) OR currentColor(1) <> cc1 THEN
+
                     BR = 8 + currentMenu * 2: GOSUB horzBarRWX
                     PUT_XY(8 + rgb(currentMenu - 1), 8 + (currentMenu * 2), PATT_IDX_SLIDER)            
 
@@ -192,12 +191,11 @@ paletteMenu: PROCEDURE
                     ' update config palette
                     VDP_WRITE_CONFIG(128 + currentIndex * 2, currentColor(0))
                     VDP_WRITE_CONFIG(128 + currentIndex * 2 + 1, currentColor(1))                   
-
-                    VDP_ENABLE_INT
-
                     GOSUB delay
                 END IF
         END IF
+        
+        VDP_ENABLE_INT
 
         IF lastMenu <> currentMenu THEN
             GOSUB delay
@@ -206,8 +204,10 @@ paletteMenu: PROCEDURE
 
         GOSUB updateNavInput
 
-'        IF (CONT1.KEY > 0 AND CONT1.KEY < 10) THEN
-'            currentIndex = CONT1.KEY
+        IF (CONT1.KEY > 0 AND CONT1.KEY < 3) THEN
+            currentMenu = CONT1.KEY + 3
+            g_nav = NAV_OK
+        END IF
         IF currentMenu = 0 THEN
             IF g_nav AND NAV_LEFT THEN
                 currentIndex = currentIndex - 1

@@ -18,8 +18,6 @@ diagMenu: PROCEDURE
 
     DRAW_TITLE("DIAGNOSTICS")
 
-    VDP_ENABLE_INT
-
     GOSUB delay
 
     WHILE 1
