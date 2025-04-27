@@ -33,12 +33,40 @@ CONST PATT_IDX_BOX_TR     = 29
 CONST PATT_IDX_BOX_BL     = 30
 CONST PATT_IDX_BOX_BR     = 31
 
-setWhite: PROCEDURE
-    DEFINE COLOR I, 1, white    ' title color
+DIM pattBuf(8)
+
+fillBuff: PROCEDURE
+    FOR T = 0 TO 7
+        pattBuf(T) = C
+    NEXT T
     END
+
+createPattern: PROCEDURE
+    GOSUB fillBuff
+    DEFINE CHAR I, 1, VARPTR pattBuf(0)
+    END
+
+
 
 #fontTable:
     DATA $0100, $0900, $1100, $0500, $0D00, $1500
+
+blockColors:
+    DATA BYTE 1, $c0    ' 0
+    DATA BYTE 1, $a0    ' 1
+    DATA BYTE 1, $80    ' 2
+    DATA BYTE 17, $f0   ' 3 - 19
+    DATA BYTE 8, $40    ' 20 - 27
+    DATA BYTE 4, $f0    ' 28 - 31
+    DATA BYTE 96, $e0   ' 32 - 127
+    DATA BYTE 20, $f0   ' 128 - 147
+    DATA BYTE 1, $01    ' 148
+    DATA BYTE 11, $40   ' 149 - 160
+    DATA BYTE 91, $f4   ' 160 - 251
+    DATA BYTE 5, $f0    ' 251 - 255
+
+patterns:
+    DATA BYTE $01, $80, $00, $00
 
 ' -----------------------------------------------------------------------------
 ' set up the various tile patters and colors
@@ -48,14 +76,32 @@ setupTiles: PROCEDURE
         DEFINE VRAM PLETTER #fontTable(I), $300, font
     NEXT I
 
-    DEFINE COLOR 0, 3, blockGreen
+    I = 0
+    FOR R = 0 TO 23 STEP 2
+        G = blockColors(R)
+        C = blockColors(R + 1)
+        GOSUB fillBuff
+        WHILE G
+            DEFINE COLOR I, 1, VARPTR pattBuf(0)
+            G = G - 1 : I = I + 1
+        WEND
+    NEXT R
+
     FOR I = 0 TO 2
         DEFINE CHAR I, 1, block
-        DEFINE VRAM #VDP_COLOR_TAB1 + (I * 8), 8, white
-    NEXT I    
+        DEFINE VRAM #VDP_COLOR_TAB1 + (I * 8), 8, VARPTR pattBuf(0) 
+    NEXT I
+
+    FOR I = 3 TO 6
+        C = patterns(I - 3)
+        GOSUB createPattern
+    NEXT I
+    VPOKE #VDP_PATT_TAB2 + 5 * 8 + 7, $ff
+    VPOKE #VDP_PATT_TAB2 + 6 * 8, $ff
 
     DEFINE VRAM PLETTER #VDP_PATT_TAB1 + 1 * 8, 19 * 8, logo
     DEFINE VRAM PLETTER #VDP_PATT_TAB1 + 129 * 8, 19 * 8, logo2
+    DEFINE VRAM PLETTER #VDP_SPRITE_PATT, $e0, logoSprites
 
     DEFINE CHAR PATT_IDX_BORDER_H, 6, lineSegments  '   border segments
     DEFINE CHAR PATT_IDX_BORDER_H + 130, 4, lineSegmentJoiners
@@ -64,49 +110,12 @@ setupTiles: PROCEDURE
     DEFINE CHAR PATT_IDX_BOX_TL, 4, palBox
     DEFINE CHAR PATT_IDX_BOX_TL + 128, 4, palBox
 
-    DEFINE CHAR PATT_IDX_SELECTED_L, 1, highlightLeft   ' ends of selection bar
-    DEFINE CHAR PATT_IDX_SELECTED_R, 1, highlightRight
-    
-    FOR I = 3 TO 31
-        GOSUB setWhite
-    NEXT I
-    FOR I = 32 TO 127
-        DEFINE COLOR I, 1, grey     ' normal text color
-    NEXT I
-    FOR I = 128 TO 147
-        GOSUB setWhite
-    NEXT I
-    FOR I = 148 TO 250
-        DEFINE COLOR I, 1, inv_white ' selected (highlighted) colors
-    NEXT I
+    DEFINE CHAR PATT_IDX_SELECTED_L, 2, highlightLeft   ' ends of selection bar
 
-    DEFINE COLOR PATT_IDX_BORDER_H, 1, colorLineSegH     ' horizontal divideborder color
-    FOR I = PATT_IDX_BORDER_V TO PATT_IDX_BORDER_BR
-        DEFINE COLOR I, 1, colorLineSeg                  ' other border colors
-        DEFINE COLOR I + 128, 1, colorLineSeg                  ' other border colors
-    NEXT I    
-
-    DEFINE COLOR PATT_IDX_BORDER_TL, 1, colorLineSegH                  
-    DEFINE COLOR PATT_IDX_BORDER_TR, 1, colorLineSegH                  
-
-    DEFINE COLOR PATT_IDX_BOX_TL + 128, 1, colorPalBoxSel
-    DEFINE COLOR PATT_IDX_BOX_TR + 128, 1, colorPalBoxSel
-    DEFINE COLOR PATT_IDX_BOX_BL + 128, 1, colorPalBoxSel2
-    DEFINE COLOR PATT_IDX_BOX_BR + 128, 1, colorPalBoxSel2
-
-    DEFINE COLOR PATT_IDX_SELECTED_L, 1, highlight    ' selection bar ends
-    DEFINE COLOR PATT_IDX_SELECTED_R, 1, highlight
-    DEFINE COLOR PATT_IDX_SLIDER, 1, highlight
-    DEFINE COLOR PATT_IDX_SWATCH, 1, colorSwatch
-
-    DEFINE VRAM PLETTER $3800,$e0,logoSprites
     DEFINE SPRITE 8, 1, sliderButtonH
 
     SPRITE FLICKER OFF
     END
-
-
-
 
 ' PICO9918 logo pattern
 logo:
@@ -174,11 +183,6 @@ sliderButtonH:
     DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00
     DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00
 
-colorLineSegH:
-    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
-colorLineSeg:
-    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
-
 palBox:
     DATA BYTE $3F, $51, $62, $44, $48, $51, $62, $44
     DATA BYTE $FC, $12, $22, $46, $8A, $12, $22, $46
@@ -194,25 +198,6 @@ vBar:
     DATA BYTE PATT_IDX_BORDER_V ' intentional flow-through to emptyRow used
 emptyRow:
     DATA BYTE "                                "
-
-' color entries for an entire tile
-    DATA BYTE $f0, $f0, $f0, $f0, $f0, $f0, $f0, $f0
-white: 
-    DATA BYTE $f0, $f0, $f0, $f0, $f0, $f0, $f0, $f0
-grey: 
-    DATA BYTE $e0, $e0, $e0, $e0, $e0, $e0, $e0, $e0
-blue: 
-    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
-inv_white: 
-    DATA BYTE $f4, $f4, $f4, $f4, $f4, $f4, $f4, $f4
-highlight: 
-    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
-colorPalBoxSel: 
-    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
-colorPalBoxSel2: 
-    DATA BYTE $40, $40, $40, $40, $40, $40, $40, $40
-colorSwatch:
-    DATA BYTE $01, $01, $01, $01, $01, $01, $01, $01
 
 font:   ' pletter compressed font data (32-127)
     DATA BYTE $3e, $00, $39, $00, $18, $00, $00, $2d
@@ -291,27 +276,6 @@ logoSprites: ' pletter compressed logo sprites for 'scanline sprites' demo
 
 logoSpriteWidths:
     DATA BYTE 14, 4, 13, 15, 14, 6, 14
-
-'logoSpriteIndices:  ' P, I, C, O, 9, 9, 1, 8
-'    DATA BYTE 0, 1, 2, 3, 4, 4,5, 6
-
-'palette: ' not currently used, but I'd prefer to use it. It stays!
-'    DATA BYTE $00, $00
-'    DATA BYTE $00, $00
-'    DATA BYTE $02, $C3
-'    DATA BYTE $05, $00
-'    DATA BYTE $05, $4F
-'    DATA BYTE $07, $6F
-'    DATA BYTE $0D, $54
-'    DATA BYTE $04, $EF
-'    DATA BYTE $0F, $54
-'    DATA BYTE $0F, $76
-'    DATA BYTE $0D, $C3
-'    DATA BYTE $0E, $D6
-'    DATA BYTE $02, $B2
-'    DATA BYTE $0C, $5C
-'    DATA BYTE $08, $88
-'    DATA BYTE $0F, $FF
   
 sine: ' sine wave values for scanline sprite animation
     DATA BYTE $10, $10, $11, $11, $12, $12, $12, $13
@@ -336,11 +300,3 @@ pow2: ' 1 << INDEX
 
 block:
     DATA BYTE $FE, $FE, $FE, $FE, $FE, $FE, $FE, $00
-
-blockGreen:
-    DATA BYTE $C0, $C0, $C0, $C0, $C0, $C0, $C0, $00
-blockYellow:
-    DATA BYTE $A0, $A0, $A0, $A0, $A0, $A0, $A0, $00
-blockRed:
-    DATA BYTE $80, $80, $80, $80, $80, $80, $80, $00        
-

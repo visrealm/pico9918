@@ -80,8 +80,10 @@ paletteMenu: PROCEDURE
     PRINT AT XY(1,12), "Green:"
     PRINT AT XY(1,14), "Blue:"
 
+    PRINT AT XY(26, 9) , "\5\5\5\5\5"
+    PRINT AT XY(26, 15) , "\6\6\6\6\6"
     FOR I = 10 to 14
-        PRINT AT XY(26, I) , "\148\148\148\148\148"
+        PRINT AT XY(25, I) , "\3\148\148\148\148\148\4"
     NEXT I
 
     oldMenuTopRow = menuTopRow
@@ -107,6 +109,7 @@ paletteMenu: PROCEDURE
     ' horz bar settings
     BX = 8
     BW = 16
+    GOSUB renderSliders                
 
     GOSUB delay
     
@@ -127,13 +130,11 @@ paletteMenu: PROCEDURE
 
                 DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + 4)
                 DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + 4)
-                #addr = NAME_TAB_XY(lastIndex * 2 - 1, 7)
-                DEFINE VRAM #addr, 2, VARPTR bmpBuf(0)
-                DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
-
-
-                'PUT_XY( lastIndex * 2 - 1, 6, hexChar(lastIndex))
-                'PUT_XY( currentIndex * 2 - 1, 6, hexChar(currentIndex) + 128)
+                IF lastIndex > 0 THEN
+                    #addr = NAME_TAB_XY(lastIndex * 2 - 1, 7)
+                    DEFINE VRAM #addr, 2, VARPTR bmpBuf(0)
+                    DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
+                END IF
 
                 IF F18A_TESTING THEN
                     currentColor(0) = defPal(currentIndex * 2)
@@ -156,17 +157,7 @@ paletteMenu: PROCEDURE
                 DEFINE VRAM 0, 2, VARPTR currentColor(0)
                 VDP(47) = $40
 
-                'PUT_XY(0, 5, hexChar(rgb(0)))
-                'PUT_XY(1, 5, hexChar(rgb(1)))
-                'PUT_XY(2, 5, hexChar(rgb(2)))
-                
-                FOR BR = 10 to 14 STEP 2
-                    GOSUB horzBarRWX
-                NEXT BR
-
-                PUT_XY(8 + rgb(0), 10, PATT_IDX_SLIDER)            
-                PUT_XY(8 + rgb(1), 12, PATT_IDX_SLIDER)            
-                PUT_XY(8 + rgb(2), 14, PATT_IDX_SLIDER)            
+                GOSUB renderSliders                
             
                 lastIndex = currentIndex
 
@@ -178,12 +169,14 @@ paletteMenu: PROCEDURE
                 cc1 = rgb(1) * 16 + rgb(2)
                 IF currentColor(0) <> rgb(0) OR currentColor(1) <> cc1 THEN
 
-                    BR = 8 + currentMenu * 2: GOSUB horzBarRWX
-                    PUT_XY(8 + rgb(currentMenu - 1), 8 + (currentMenu * 2), PATT_IDX_SLIDER)            
+                    I = currentMenu - 1
+                    GOSUB renderSlider
 
                     currentColor(0) = rgb(0)
                     currentColor(1) = cc1
 
+                    VDP(47) = $c0 + currentIndex' palette data port from pal 2 index #10
+                    DEFINE VRAM 0, 2, VARPTR currentColor(0)
                     VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
                     VDP(47) = $40
@@ -232,7 +225,7 @@ paletteMenu: PROCEDURE
             ELSEIF g_nav AND NAV_LEFT AND rgb(rgbIndex) > 0 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) - 1
                 g_paletteDirty = TRUE
-            ELSEIF g_nav AND NAV_RIGHT  AND rgb(rgbIndex) < 15 THEN
+            ELSEIF g_nav AND NAV_RIGHT AND rgb(rgbIndex) < 15 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) + 1
                 g_paletteDirty = TRUE
             END IF
@@ -244,7 +237,7 @@ paletteMenu: PROCEDURE
             ELSEIF g_nav AND NAV_OK THEN
                 IF currentMenu = 4 THEN' reset
                     GOSUB resetPalette
-                    lastIndex = (currentIndex + 1) AND $0f  ' force sliders to update
+                    'lastIndex = ((currentIndex + 2) AND $0e) + 1  ' force sliders to update
                 ELSEIF currentMenu = 5 THEN' back
                     g_nav = NAV_CANCEL
                 END IF
@@ -270,10 +263,26 @@ paletteMenu: PROCEDURE
     SET_MENU(MENU_ID_MAIN)
     END
 
+sliderPos:
+    DATA BYTE 10,12,14
+
+renderSlider:
+    BR = sliderPos(I)
+    GOSUB horzBarRWX
+    PUT_XY(8 + rgb(I), BR, PATT_IDX_SLIDER)            
+    RETURN
+
+renderSliders:
+    FOR I = 0 to 2
+        GOSUB renderSlider
+    NEXT I
+    RETURN
+
 
 resetPalette: PROCEDURE
 
-    VDP(47) = $c0 + 16 ' palette data port from pal 2 index #10
+    VDP(47) = $c0 ' palette data port from pal 2 index #10
+    DEFINE VRAM 0, 32, defPal
     DEFINE VRAM 0, 32, defPal
     VDP(47) = $40
 
@@ -282,10 +291,26 @@ resetPalette: PROCEDURE
         VDP_WRITE_CONFIG(128 + I, defPal(I))
     NEXT I
 
+    lastIndex = 0 : currentMenu = 0
     g_paletteDirty = TRUE
 
     END
 
 defPal:
-  DATA BYTE $00, $00, $F0, $00, $F2, $C3, $F5, $D6, $F5, $4F, $F7, $6F, $FD, $54, $F4, $EF, $FF, $54, $FF, $76, $FD, $C3, $FE, $D6, $F2, $B2, $FC, $5C, $FC, $CC, $FF, $FF
+  DATA BYTE $00, $00
+  DATA BYTE $F0, $00
+  DATA BYTE $F2, $C3
+  DATA BYTE $F5, $D6
+  DATA BYTE $F5, $4F
+  DATA BYTE $F7, $6F
+  DATA BYTE $FD, $54
+  DATA BYTE $F4, $EF
+  DATA BYTE $FF, $54
+  DATA BYTE $FF, $76
+  DATA BYTE $FD, $C3
+  DATA BYTE $FE, $D6
+  DATA BYTE $F2, $B2
+  DATA BYTE $FC, $5C
+  DATA BYTE $FC, $CC
+  DATA BYTE $FF, $FF
 
