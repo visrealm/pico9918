@@ -26,6 +26,15 @@ CONST NAV_CANCEL = 32
 ' -----------------------------------------------------------------------------
 updateNavInput: PROCEDURE
     g_nav = NAV_NONE
+    g_key = CONT1.key
+
+    IF g_key >= 48 AND g_key <= 57 THEN 
+        g_key = g_key - 48
+    ELSEIF g_key >= 65 AND g_key <= 90 THEN 
+        g_key = g_key - 55
+    ELSEIF g_key > 9 THEN
+        g_key = 0
+    END IF
 
     ' <DOWN> or <X>
     IF CONT.DOWN OR (CONT1.KEY = "X") THEN g_nav = g_nav OR NAV_DOWN
@@ -40,8 +49,8 @@ updateNavInput: PROCEDURE
     IF CONT.LEFT OR (CONT1.KEY = "S") OR (CONT1.KEY = ",") THEN g_nav = g_nav OR NAV_LEFT
 
     ' <LBUTTON> or <SPACE> OR <ENTER>
-    IF CONT.BUTTON OR (CONT1.KEY = " ") OR (CONT1.KEY = 11) THEN g_nav = g_nav OR NAV_OK
+    IF CONT.BUTTON2 OR (CONT1.KEY = " ") OR (CONT1.KEY = 11) THEN g_nav = g_nav OR NAV_OK
 
     ' <RBUTTON> or <Q> OR <ESC>
-    IF CONT.BUTTON2 OR (CONT1.KEY = "Q") OR (CONT1.KEY = 27) THEN g_nav = g_nav OR NAV_CANCEL
+    IF CONT.BUTTON OR (CONT1.KEY = "Q") OR (CONT1.KEY = 27) THEN g_nav = g_nav OR NAV_CANCEL
     END

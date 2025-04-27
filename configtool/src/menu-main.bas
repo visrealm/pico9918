@@ -102,9 +102,6 @@ highlightMenuRow: PROCEDURE
 
 menuLoop: PROCEDURE
 
-    key = CONT.KEY
-    IF key >= $30 THEN key = key - $30
-
     lastMenuIndex = g_currentMenuIndex
     valueChanged = FALSE
 
@@ -137,10 +134,10 @@ menuLoop: PROCEDURE
         WEND
 
     ' number button pressed?
-    ELSEIF key > 0 AND key <= MENU_INDEX_COUNT THEN
-        I = MENU_DATA(MIN_MENU_INDEX + key - 1, CONF_INDEX)
+    ELSEIF g_key > 0 AND g_key <= MENU_INDEX_COUNT THEN
+        I = MENU_DATA(MIN_MENU_INDEX + g_key - 1, CONF_INDEX)
         IF I <> 255 THEN
-            g_currentMenuIndex = MIN_MENU_INDEX + key - 1
+            g_currentMenuIndex = MIN_MENU_INDEX + g_key - 1
 
             IF I > 200 THEN
                 valueChanged = TRUE

@@ -175,6 +175,7 @@ paletteMenu: PROCEDURE
                     currentColor(0) = rgb(0)
                     currentColor(1) = cc1
 
+
                     VDP(47) = $c0 + currentIndex' palette data port from pal 2 index #10
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
                     VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
@@ -228,6 +229,9 @@ paletteMenu: PROCEDURE
             ELSEIF g_nav AND NAV_RIGHT AND rgb(rgbIndex) < 15 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) + 1
                 g_paletteDirty = TRUE
+            ELSEIF g_key > 0 AND g_key < 16 THEN
+                rgb(rgbIndex) = g_key
+                g_paletteDirty = TRUE
             END IF
         ELSE
             IF g_nav AND NAV_DOWN AND currentMenu < (3 + MENU_INDEX_COUNT) THEN
@@ -270,6 +274,12 @@ renderSlider:
     BR = sliderPos(I)
     GOSUB horzBarRWX
     PUT_XY(8 + rgb(I), BR, PATT_IDX_SLIDER)            
+
+    #addr = NAME_TAB_XY(27, 12)
+    VPOKE #addr, hexChar(rgb(0))
+    VPOKE #addr + 1, hexChar(rgb(1))
+    VPOKE #addr + 2, hexChar(rgb(2))
+
     RETURN
 
 renderSliders:
