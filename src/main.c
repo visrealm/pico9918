@@ -223,13 +223,6 @@ static void eofInterrupt()
     tms9918->configDirty = false;
     applyConfig();  // apply config option to device now
   }
-
-  // request to save config? let's do that
-  if (tms9918->config[CONF_SAVE_TO_FLASH])
-  {
-    tms9918->config[CONF_SAVE_TO_FLASH] = 0;
-    writeConfig(tms9918->config);
-  }
 }
 
 static void updateInterrupts(uint8_t tempStatus)

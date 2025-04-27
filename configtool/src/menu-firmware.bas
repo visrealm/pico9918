@@ -14,7 +14,11 @@
 ' -----------------------------------------------------------------------------
 
 ' convert .UF2 block number to name table location for visualization
-DEF FN BLOCK_XY(#I) = XY(#I % 30 + 1, #I / 30 + a_popupTop + 2)
+'DEF FN BLOCK_XY(#I) = 
+
+blockPos: PROCEDURE
+    #addr = XY(#FWBLOCK % 30 + 1, #FWBLOCK / 30 + a_popupTop + 2)
+    END
 
 ' -----------------------------------------------------------------------------
 ' open the firmware menu
@@ -27,45 +31,41 @@ firmwareMenu: PROCEDURE
 
     GOSUB delay
 
-    PRINT AT XY(4, menuTopRow + 0), "Current version : v",verMaj, ".", verMin
-    PRINT AT XY(4, menuTopRow + 1), "New version     : v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER
+    PRINT AT XY(4, menuTopRow + 0), "Current version : v",verMajor, ".", verMinor, ".", verPatch
+    PRINT AT XY(4, menuTopRow + 1), "New version     : v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER,".",FIRMWARE_PATCH_VER
 
-    isUpgrade = 0
-    IF verMaj < FIRMWARE_MAJOR_VER OR (verMaj = FIRMWARE_MAJOR_VER AND verMin < FIRMWARE_MINOR_VER) THEN
-        isUpgrade = 1
-    ELSEIF verMaj > FIRMWARE_MAJOR_VER OR (verMaj = FIRMWARE_MAJOR_VER AND verMin > FIRMWARE_MINOR_VER) THEN
-        isUpgrade = -1
-    END IF
+    'isUpgrade = 0
+    'IF verMajor < FIRMWARE_MAJOR_VER OR (verMajor = FIRMWARE_MAJOR_VER AND verMinor < FIRMWARE_MINOR_VER) THEN
+    '    isUpgrade = 1
+    'ELSEIF verMajor > FIRMWARE_MAJOR_VER OR (verMajor = FIRMWARE_MAJOR_VER AND verMinor > FIRMWARE_MINOR_VER) THEN
+    '    isUpgrade = -1
+    'END IF
 
     GOSUB verifyCartridgeFirmware
 
+
     CONST FWROWS = (#FIRMWARE_BLOCKS - 1) / 30 + 2
-    STATUS = TRUE
+    'STATUS = TRUE
 
     IF STATUS THEN
 
-        DRAW_POPUP_W("Upgrading firmware", FWROWS, 30)
+        DRAW_POPUP_W("Update firmware?", 5, 20)
 
-        FOR #I = 0 TO #FIRMWARE_BLOCKS - 1
-            PRINT AT BLOCK_XY(#I), "\001"
-        NEXT #I
+        GOSUB confirmationMenuLoop
 
-        IF 0 THEN
+        R = 19: GOSUB emptyRowR
 
-            PRINT AT XY(1, menuTopRow + 5), " "
-            IF isUpgrade = 0 THEN
-                PRINT "Re-install firmware"
-            ELSEIF isUpgrade = 1 THEN
-                PRINT "Upgrade firmware to"
-            ELSE
-                PRINT "Downgrade firmware to"
-            END IF
+        IF confirm THEN
 
-            PRINT " v", FIRMWARE_MAJOR_VER, ".", FIRMWARE_MINOR_VER, "?"
+            DRAW_POPUP_W("Upgrading firmware :        ", FWROWS, 30)
+
+            FOR #FWBLOCK = 0 TO #FIRMWARE_BLOCKS - 1
+                GOSUB blockPos
+                PRINT AT #addr, "\001"
+            NEXT #FWBLOCK
 
             GOSUB firmwareWriteAndVerify
 
-            PRINT AT XY(2, menuTopRow + 7), "          DONE!            "
         END IF
     END IF
 
@@ -74,17 +74,7 @@ firmwareMenu: PROCEDURE
 
         GOSUB updateNavInput
 
-        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
-    WEND
-
-
-    DRAW_POPUP ("Update progress", 9)
-
-    WHILE 1
-        WAIT
-        GOSUB updateNavInput
-
-        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
+        IF (g_nav) THEN EXIT WHILE
     WEND
 
     SET_MENU(MENU_ID_MAIN)
@@ -99,7 +89,7 @@ verifyCartridgeFirmware: PROCEDURE
     #FWBLOCK = 0
     STATUS = 1
 
-    PRINT AT XY(2, menuTopRow + 3), "Verifying new firmware data..."
+    PRINT AT XY(2, menuTopRow + 11), "Verifying new firmware data..."
 
     I = 0
     FOR B = 1 TO FIRMWARE_BANKS
@@ -157,9 +147,9 @@ verifyCartridgeFirmware: PROCEDURE
     BANKSEL(0)
 
     IF STATUS = 1 THEN
-        PRINT AT XY(1, menuTopRow + 3), "  New firmware data is valid   "
+        PRINT AT XY(1, menuTopRow + 11), "  New firmware data is valid   "
     ELSE
-        PRINT AT XY(1, menuTopRow + 3), " New firmware data is invalid  "
+        PRINT AT XY(1, menuTopRow + 11), " New firmware data is invalid  "
     END IF
 
     END
@@ -171,7 +161,8 @@ firmwareWriteAndVerify: PROCEDURE
 
     #FWBLOCK = 0
 
-    I = 0
+    STATUS = 1
+
     FOR B = 1 TO FIRMWARE_BANKS
         BANKSEL(B)
         #FWOFFSET = 0
@@ -179,11 +170,9 @@ firmwareWriteAndVerify: PROCEDURE
             VDP_DISABLE_INT
 
             DEFINE VRAM #VDP_FIRMWARE_DATA, #FIRMWARE_BLOCK_BYTES, VARPTR bank1Data(#FWOFFSET)
-            DEFINE VRAM NAME_TAB_XY(0, menuTopRow + 6), 32, VARPTR bank1Data(#FWOFFSET)
+            PRINT AT XY(23, a_popupTop), <3>(#FWBLOCK + 1),"/",#FIRMWARE_BLOCKS
 
             FWST = $c0 OR (#VDP_FIRMWARE_DATA / 256)
-
-            PRINT AT XY(2, menuTopRow + 7), "Writing block ", #FWBLOCK + 1,"/",#FIRMWARE_BLOCKS
 
             VDP($3F) = FWST
             R = 0
@@ -194,7 +183,19 @@ firmwareWriteAndVerify: PROCEDURE
                 R = R + 1
             WEND
 
+            GOSUB blockPos
+
+            IF FWST AND $06 THEN
+                PRINT AT #addr, "\002"
+                STATUS = 0
+            ELSE
+                PRINT AT #addr, "\000"
+            END IF
+
+
             VDP_ENABLE_INT
+
+            I = I + 1
 
             WAIT
 
@@ -205,6 +206,17 @@ firmwareWriteAndVerify: PROCEDURE
     NEXT B
 
     BANKSEL(0)
+
+    'PRINT AT XY(5, a_popupTop), "Firmware write "
+    IF STATUS THEN
+     '   PRINT "success"
+        clockChanged = TRUE
+        GOSUB successMessage
+    ELSE
+      '  PRINT "failed"
+        GOSUB failedMessage
+    END IF
+
 
     END
 

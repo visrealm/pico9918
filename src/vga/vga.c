@@ -340,7 +340,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
 
     if (vgaParams.scanlines && pxLineRpt != 0)
     {
-      for (int i = 0; i < 5; ++i)
+      for (int i = 0; i < 8; ++i)
       {
         currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }
@@ -365,7 +365,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
       int end = VIRTUAL_PIXELS_X / 2;
-      for (int i = 5; i < end; ++i)
+      for (int i = 8; i < end; ++i)
       {
         currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }

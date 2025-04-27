@@ -139,9 +139,11 @@ void readConfig(uint8_t config[CONFIG_BYTES])
   config[CONF_SAVE_TO_FLASH] = 0;
 
     // looks like we've just upgraded
-  if (config[CONF_SW_VERSION] != PICO9918_SW_VERSION)
+  if (config[CONF_SW_VERSION] != PICO9918_SW_VERSION ||
+      config[CONF_SW_PATCH_VERSION] != PICO9918_PATCH_VER)
   {
     config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
+    config[CONF_SW_PATCH_VERSION] = PICO9918_PATCH_VER;
     config[CONF_SAVE_TO_FLASH] = 1;
   }  
 

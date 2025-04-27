@@ -4,7 +4,8 @@ cmake_minimum_required(VERSION 3.13)
 # compile-time options
 
 set(PICO9918_MAJOR_VER 1)
-set(PICO9918_MINOR_VER 2)
+set(PICO9918_MINOR_VER 0)
+set(PICO9918_PATCH_VER 1)
 
 # SCART RGBs options
 set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
@@ -12,7 +13,7 @@ set(PICO9918_SCART_PAL  0)  # 1 for PAL 576i, 0 for NTSC 480i
 
 
 set(PICO9918_NO_SPLASH 0)
-set(PICO9918_DIAG 1)
+set(PICO9918_DIAG 0)
 
 # end compile-time options
 
@@ -36,7 +37,7 @@ else()
   set(PICO9918_OUTPUT_STR "vga")
 endif()
 
-set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}")
+set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
 if (NOT ${PICO_BOARD} STREQUAL "pico9918")
@@ -65,9 +66,9 @@ if (PICO9918_NO_SPLASH EQUAL 0)
 visrealm_generate_image_source_ram(${PROGRAM} bmp_splash res/splash.png )
 endif()
 
-if (PICO9918_DIAG)
+#if (PICO9918_DIAG)
 visrealm_generate_image_source_ram(${PROGRAM} bmp_font res/font.png )
-endif()
+#endif()
 
 # generate header file from pio
 pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/clocks.pio)
@@ -83,6 +84,7 @@ add_definitions(-DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH})
 add_definitions(-DPICO9918_VERSION="${PICO9918_VERSION}")
 add_definitions(-DPICO9918_MAJOR_VER=${PICO9918_MAJOR_VER})
 add_definitions(-DPICO9918_MINOR_VER=${PICO9918_MINOR_VER})
+add_definitions(-DPICO9918_PATCH_VER=${PICO9918_PATCH_VER})
 add_definitions(-DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS})
 add_definitions(-DPICO9918_SCART_PAL=${PICO9918_SCART_PAL})
 add_definitions(-DPICO9918_DIAG=${PICO9918_DIAG})

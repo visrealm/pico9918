@@ -216,27 +216,32 @@ mainMenu: PROCEDURE
                 VDP_WRITE_CONFIG(vdpOptId, currentValueIndex)
             END IF
 
-            IF vdpOptId = CONF_CRT_SCANLINES THEN
-                VDP(50) = currentValueIndex * $04
-            ELSEIF vdpOptId = CONF_SCANLINE_SPRITES THEN
-                VDP(30) = pow2(currentValueIndex + 2)
-            ELSEIF vdpOptId = CONF_MENU_FIRMWARE THEN
-                SET_MENU(MENU_ID_FIRMWARE)
+            menu = 0
+
+            SELECT CASE vdpOptId
+                CASE CONF_CRT_SCANLINES
+                    VDP(50) = currentValueIndex * $04
+                CASE CONF_SCANLINE_SPRITES
+                    VDP(30) = pow2(currentValueIndex + 2)
+            	CASE CONF_MENU_FIRMWARE
+                    menu = MENU_ID_FIRMWARE
+            	CASE CONF_MENU_INFO
+                    menu = MENU_ID_INFO
+            	CASE CONF_MENU_DIAG
+                    menu = MENU_ID_DIAG
+            	CASE CONF_MENU_PALETTE
+                    menu = MENU_ID_PALETTE
+            	CASE CONF_MENU_RESET
+                    GOSUB resetOptions
+            	CASE CONF_MENU_SAVE
+                    GOSUB saveOptionsMenu
+            END SELECT
+
+            IF menu THEN
+                SET_MENU(menu)
                 EXIT WHILE
-            ELSEIF vdpOptId = CONF_MENU_INFO THEN
-                SET_MENU(MENU_ID_INFO)
-                EXIT WHILE
-            ELSEIF vdpOptId = CONF_MENU_DIAG THEN
-                SET_MENU(MENU_ID_DIAG)
-                EXIT WHILE
-            ELSEIF vdpOptId = CONF_MENU_PALETTE THEN
-                SET_MENU(MENU_ID_PALETTE)
-                EXIT WHILE
-            ELSEIF vdpOptId = CONF_MENU_RESET THEN
-                GOSUB resetOptions
-            ELSEIF vdpOptId = CONF_MENU_SAVE THEN
-                GOSUB saveOptionsMenu
             END IF
+
             GOSUB delay
         END IF
         
@@ -246,7 +251,56 @@ mainMenu: PROCEDURE
 
     END
 
+confirmationMenuLoop: PROCEDURE
 
+    menuTopRow = MENU_TITLE_ROW + 9
+    MENU_INDEX_OFFSET = 10
+    MENU_INDEX_COUNT = 2
+    MENU_START_X = 6
+    g_currentMenuIndex = MENU_INDEX_OFFSET
+
+    GOSUB renderMenu
+
+    GOSUB delay
+
+    confirm = FALSE
+
+    ' main menu loop
+    WHILE 1
+        WAIT
+
+        GOSUB menuLoop
+
+        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
+
+        IF valueChanged THEN
+            vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
+
+            IF vdpOptId = CONF_MENU_OK THEN
+                confirm = TRUE
+            END IF
+
+            EXIT WHILE
+        END IF
+        
+    WEND
+
+    END
+
+successMessage: PROCEDURE
+    ' if the clock frequency has changed... inform reboot
+    PRINT AT XY(0, MENU_HELP_ROW), " Success! "
+    IF clockChanged THEN
+        PRINT "** Reboot required ** "
+    ELSE
+        PRINT " Configuration saved  "
+    END IF
+    END
+
+
+failedMessage: PROCEDURE
+    PRINT AT XY(0, MENU_HELP_ROW), "Error! ** USB update required **"
+    END
 
 ' -----------------------------------------------------------------------------
 ' save configuration
@@ -275,51 +329,15 @@ saveOptionsMenu: PROCEDURE
 
     DRAW_POPUP_W("Save Changes?", 5, 20)
 
-    menuTopRow = MENU_TITLE_ROW + 9
-    MENU_INDEX_OFFSET = 10
-    MENU_INDEX_COUNT = 2
-    MENU_START_X = 6
-    g_currentMenuIndex = MENU_INDEX_OFFSET
-
-    GOSUB renderMenu
-
-    GOSUB delay
-
-    didSave = FALSE
-
-    ' main menu loop
-    WHILE 1
-        WAIT
-
-        GOSUB menuLoop
-
-        IF valueChanged THEN
-            vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
-
-            IF vdpOptId = CONF_MENU_OK THEN
-                GOSUB saveOptions
-                didSave = TRUE
-            END IF
-
-            EXIT WHILE
-        END IF
-        
-        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
-
-    WEND
+    GOSUB confirmationMenuLoop
 
     g_currentMenuIndex = oldIndex
 
     GOSUB renderMainMenu
 
-    IF didSave THEN
-        ' if the clock frequency has changed... inform reboot
-        PRINT AT XY(0, MENU_HELP_ROW), " Success! "
-        IF clockChanged THEN
-            PRINT "** Reboot required ** "
-        ELSE
-            PRINT " Configuration saved  "
-        END IF
+    IF confirm THEN
+        GOSUB saveOptions
+        GOSUB successMessage
     END IF
 
     END
@@ -375,7 +393,9 @@ configMenuData:
     DATA BYTE CONF_MENU_CANCEL,     "Cancel          ", 0, 0, "        Back to main menu       "
 
     DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
-    
+    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
+
+    DATA BYTE CONF_MENU_FIRMWARE,   "Update firmware ", 0, 0, "   Write firmware to PICO9918   "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
 

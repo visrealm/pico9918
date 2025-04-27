@@ -46,13 +46,17 @@ drawTitleBox: PROCEDURE
     BR = MENU_TITLE_ROW - 1 : GOSUB horzBarRWX
     BR = MENU_TITLE_ROW + 1 : GOSUB horzBarRWX
     
-    VPOKE NAME_TAB_XY(X - 2, MENU_TITLE_ROW), PATT_IDX_BORDER_V
-    VPOKE NAME_TAB_XY(X + a_titleLen + 1, MENU_TITLE_ROW), PATT_IDX_BORDER_V
+    x1 = X - 2 : x2 = X + a_titleLen + 1
 
-    VPOKE NAME_TAB_XY(X - 2, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_HD
-    VPOKE NAME_TAB_XY(X + a_titleLen + 1, MENU_TITLE_ROW - 1), PATT_IDX_BORDER_HD
-    VPOKE NAME_TAB_XY(X - 2, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(X + a_titleLen + 1, MENU_TITLE_ROW + 1), PATT_IDX_BORDER_BR
+    #addr = NAME_TAB_XY(x1, MENU_TITLE_ROW)
+    VPOKE #addr, PATT_IDX_BORDER_V
+    VPOKE #addr - 32, PATT_IDX_BORDER_HD
+    VPOKE #addr + 32, PATT_IDX_BORDER_BL
+
+    #addr = NAME_TAB_XY(x2, MENU_TITLE_ROW)
+    VPOKE #addr, PATT_IDX_BORDER_V
+    VPOKE #addr - 32, PATT_IDX_BORDER_HD
+    VPOKE #addr + 32, PATT_IDX_BORDER_BR
 
     END
 
@@ -63,19 +67,24 @@ drawPopup: PROCEDURE
     BX = X
 
     BR = a_popupTop - 1: GOSUB horzBarRWX
-    FOR Y = a_popupTop TO a_popupTop + a_popupHeight
-        DEFINE VRAM NAME_TAB_XY(X - 1, Y), a_popupWidth + 1, vBar
-        VPOKE NAME_TAB_XY(X + a_popupWidth, Y), PATT_IDX_BORDER_V
+    #addr = NAME_TAB_XY(X - 1, a_popupTop)
+    FOR Y = 0 TO a_popupHeight
+        DEFINE VRAM #addr, a_popupWidth + 1, vBar
+        VPOKE #addr + a_popupWidth + 1, PATT_IDX_BORDER_V
+        #addr = #addr + 32
     NEXT Y
     BR = BR + 2: GOSUB horzBarRWX
     BR = BR + a_popupHeight: GOSUB horzBarRWX
 
-    VPOKE NAME_TAB_XY(X - 1, a_popupTop - 1), PATT_IDX_BORDER_TL
-    VPOKE NAME_TAB_XY(X + a_popupWidth, a_popupTop - 1), PATT_IDX_BORDER_TR
-    VPOKE NAME_TAB_XY(X - 1, a_popupTop + 1), PATT_IDX_BORDER_VR
-    VPOKE NAME_TAB_XY(X + a_popupWidth, a_popupTop + 1), PATT_IDX_BORDER_VL
-    VPOKE NAME_TAB_XY(X - 1, a_popupTop + a_popupHeight + 1), PATT_IDX_BORDER_BL
-    VPOKE NAME_TAB_XY(X + a_popupWidth, a_popupTop + a_popupHeight + 1), PATT_IDX_BORDER_BR
+    x2 = X + a_popupWidth
+    #addr = NAME_TAB_XY(X - 1, a_popupTop + 1)
+    VPOKE #addr - 64, PATT_IDX_BORDER_TL
+    VPOKE #addr, PATT_IDX_BORDER_VR
+    VPOKE #addr + a_popupHeight * 32, PATT_IDX_BORDER_BL
+    #addr = NAME_TAB_XY(X + a_popupWidth, a_popupTop + 1)
+    VPOKE #addr - 64, PATT_IDX_BORDER_TR
+    VPOKE #addr, PATT_IDX_BORDER_VL
+    VPOKE #addr + a_popupHeight * 32, PATT_IDX_BORDER_BR
 
     END
 
@@ -93,7 +102,7 @@ setupHeader: PROCEDURE
         #addr = #addr + 1
     NEXT I
 
-    PRINT AT XY(28, 0),"v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER
+    PRINT AT XY(26, 0),"v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER,".",FIRMWARE_PATCH_VER
     PRINT AT XY(20, 1),"Configurator"
     PRINT AT XY(6, 23), "{}",#FIRMWARE_YEAR," Troy Schrapel"    
 

@@ -20,6 +20,8 @@ diagMenu: PROCEDURE
 
     GOSUB delay
 
+    PRINT AT XY(9, 10), "Coming soon..."
+
     WHILE 1
         WAIT
         GOSUB updateNavInput

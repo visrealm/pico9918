@@ -20,6 +20,7 @@
 #include <string.h> // memcpy
 
 #include "../flash.h"
+#include "../config.h"
 
 
 /* run9900() implemented in Thumb9900.S */
@@ -175,5 +176,11 @@ void gpuLoop()
       volatileHack ();
     if (tms9918->flash)
       flashSector ();
+    if (tms9918->config[CONF_SAVE_TO_FLASH])
+    {
+      tms9918->config[CONF_SAVE_TO_FLASH] = 0;
+      writeConfig(tms9918->config);
+    }
+
   }
 }

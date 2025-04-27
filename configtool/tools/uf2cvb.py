@@ -56,13 +56,15 @@ def main() -> int:
 
     majorVer = 0
     minorVer = 0
+    patchVer = 0
 
-    match = re.search(r".*-v(\d*)-(\d*)", filename)
+    match = re.search(r".*-v(\d*)-(\d*)-(\d*)", filename)
     if (match):
         majorVer = match.group(1)
         minorVer = match.group(2)
+        patchVer = match.group(3)
 
-    print("Firmware version: {0}.{1}".format(majorVer, minorVer))
+    print("Firmware version: {0}.{1}.{2}".format(majorVer, minorVer, patchVer))
     print("Bank size: {0} bytes".format(BANK_SIZE))
     print("Block size: {0} bytes".format(BLOCK_SIZE))
     print("Blocks per bank: {0}".format(BLOCKS_PER_BANK))
@@ -80,7 +82,7 @@ def main() -> int:
                     header.write("\n' ===============================\n")
                     header.write("  GOTO CONFTOOL_START\n")
                     header.write("firmwareFilename:\n")
-                    header.write("  DATA BYTE \"{0}\"\n".format(filename.ljust(32)))
+                    header.write("  DATA BYTE \"{0}\"\n".format(os.path.basename(filename.ljust(32))))
                     header.write("\n\n")
                     header.write("  CONST #FIRMWARE_BLOCKS = {0}\n".format(w[6]))
                     header.write("  CONST FIRMWARE_BANKS = {0}\n".format(int(w[6] / BLOCKS_PER_BANK) + 1))
@@ -88,6 +90,7 @@ def main() -> int:
                     header.write("  CONST #FIRMWARE_BLOCK_BYTES = {0}\n".format((4 * 9) + 256))
                     header.write("  CONST FIRMWARE_MAJOR_VER = {0}\n".format(majorVer))
                     header.write("  CONST FIRMWARE_MINOR_VER = {0}\n".format(minorVer))
+                    header.write("  CONST FIRMWARE_PATCH_VER = {0}\n".format(patchVer))
 
                     fwDate = datetime.fromtimestamp(os.path.getmtime(filename))
                     header.write("  CONST #FIRMWARE_YEAR = {0}\n".format(fwDate.year))

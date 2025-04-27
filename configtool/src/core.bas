@@ -17,7 +17,7 @@
 CONST TRUE           = -1
 CONST FALSE          = 0
 
-CONST F18A_TESTING   = 1
+CONST F18A_TESTING   = 0
 
 CONST MENU_TITLE_ROW   = 3
 CONST MENU_HELP_ROW    = 19
@@ -48,6 +48,7 @@ CONST CONF_VALUE_LABEL_LEN = 6
 CONST CONF_PICO_MODEL       = 0
 CONST CONF_HW_VERSION       = 1
 CONST CONF_SW_VERSION       = 2
+CONST CONF_SW_PATCH_VERSION = 3
 CONST CONF_CLOCK_TESTED     = 4
 CONST CONF_DISP_DRIVER      = 5
 ' ^^^ read only
@@ -110,7 +111,7 @@ main:
     ' what are we working with?
     GOSUB vdpDetect
 
-    PRINT AT XY(5, 21), "Detected: "
+    PRINT AT XY(4, 21), "Detected: "
 
     IF isF18ACompatible THEN
 
@@ -121,24 +122,28 @@ main:
         VDP_SET_CURRENT_STATUS_REG(1)       ' SR1: ID
         statReg = VDP_READ_STATUS
 
+        verPatch = 0
+
         IF (statReg AND $E8) = $E8 THEN
             VDP_SET_CURRENT_STATUS_REG(12)  ' config
             VDP(58) = CONF_SW_VERSION
             optValue = VDP_READ_STATUS
-            verMaj = optValue / 16
-            verMin = optValue AND $0f
-            PRINT "PICO9918 v", verMaj, ".", verMin
+            verMajor = optValue / 16
+            verMinor = optValue AND $0f
+            VDP(58) = CONF_SW_PATCH_VERSION
+            verPatch = VDP_READ_STATUS
+            PRINT "PICO9918 v", verMajor, ".", verMinor, ".", verPatch
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
             VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
             verReg = VDP_READ_STATUS
-            verMaj = verReg / 16
-            verMin = verReg AND $0f
-            PRINT "   F18A v ."
-            PUT_XY(5 + 19, 21, hexChar(verMaj))
-            PUT_XY(5 + 21, 21, hexChar(verMin))
+            verMajor = verReg / 16
+            verMinor = verReg AND $0f
+            PRINT "    F18A v ."
+            PUT_XY(5 + 19, 21, hexChar(verMajor))
+            PUT_XY(5 + 21, 21, hexChar(verMinor))
         ELSE
-            PRINT " UNKNOWN SR1 = ", <>statReg
+            PRINT "  UNKNOWN SR1 = ", <>statReg
         END IF
 
         VDP_RESET_STATUS_REG

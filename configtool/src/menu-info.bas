@@ -59,16 +59,16 @@ deviceInfoMenu: PROCEDURE
 
     VDP(58) = CONF_HW_VERSION
     optValue = VDP_READ_STATUS
-    verMaj = optValue / 16
-    verMin = optValue AND $0f
-    PRINT AT  #addr + 32, verMaj, ".", verMin
-    IF verMaj = 1 THEN PRINT AT XY(24, menuTopRow + 1), "+"
+    verMajor = optValue / 16
+    verMinor = optValue AND $0f
+    PRINT AT  #addr + 32, verMajor, ".", verMinor
+    IF verMajor = 1 THEN PRINT AT XY(24, menuTopRow + 1), "+"
 
     VDP(58) = CONF_SW_VERSION
     optValue = VDP_READ_STATUS
-    verMaj = optValue / 16
-    verMin = optValue AND $0f
-    PRINT AT #addr + 64, verMaj, ".", verMin
+    verMajor = optValue / 16
+    verMinor = optValue AND $0f
+    PRINT AT #addr + 64, verMajor, ".", verMinor
 
     VDP(58) = CONF_DISP_DRIVER
     optValue = VDP_READ_STATUS
@@ -86,11 +86,11 @@ deviceInfoMenu: PROCEDURE
 
     VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
     optValue = VDP_READ_STATUS
-    verMaj = optValue / 16
-    verMin = optValue AND $0f
-    PUT_XY(21, menuTopRow + 5, hexChar(verMaj))
+    verMajor = optValue / 16
+    verMinor = optValue AND $0f
+    PUT_XY(21, menuTopRow + 5, hexChar(verMajor))
     PUT_XY(22, menuTopRow + 5, ".")
-    PUT_XY(23, menuTopRow + 5, hexChar(verMin))
+    PUT_XY(23, menuTopRow + 5, hexChar(verMinor))
     VDP_RESET_STATUS_REG
 
     GOSUB delay

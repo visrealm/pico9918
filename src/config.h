@@ -22,6 +22,7 @@ typedef enum
   CONF_PICO_MODEL       = 0,
   CONF_HW_VERSION       = 1,
   CONF_SW_VERSION       = 2,
+  CONF_SW_PATCH_VERSION = 3,
   CONF_CLOCK_TESTED     = 4,
   CONF_DISP_DRIVER      = 5,
   CONF_FLASH_STATUS     = 6,

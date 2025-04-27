@@ -47,17 +47,6 @@ typedef struct UF2_Block * UF2_Block_Ptr;
 
 #define PAYLOAD 256
 
-//                       'NO PICO9918 DETECTED'
-#define SKIPPING         "SKIPPING...         "
-#define ERASING          "ERASING...          "
-#define VALIDATING       "VALIDATING...       "
-#define PROGRAMMING      "PROGRAMMING...      "
-#define FAILEDSEQUENCE   "FAILED - SEQUENCE   "
-#define FAILEDSIZE       "FAILED - SIZE       "
-#define FAILEDCOMPARISON "FAILED - COMPARISON "
-#define SUCCESSPOWER     "SUCCESS - POWER CYCLE NEEDED"
-#define SUCCESSFLASH     "SUCCESS - FLASH IS THE SAME"
-
 #define FLASH_STATUS_IDLE         0
 #define FLASH_STATUS_VALIDATING   1
 #define FLASH_STATUS_ERASING      2
