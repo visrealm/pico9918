@@ -65,17 +65,8 @@ firmwareMenu: PROCEDURE
             NEXT #FWBLOCK
 
             GOSUB firmwareWriteAndVerify
-
         END IF
     END IF
-
-    WHILE 1
-        WAIT
-
-        GOSUB updateNavInput
-
-        IF (g_nav) THEN EXIT WHILE
-    WEND
 
     SET_MENU(MENU_ID_MAIN)
     END    
@@ -217,6 +208,7 @@ firmwareWriteAndVerify: PROCEDURE
         GOSUB failedMessage
     END IF
 
+    GOSUB waitForInput
 
     END
 

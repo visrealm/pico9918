@@ -90,9 +90,7 @@ deviceInfoMenu: PROCEDURE
     optValue = VDP_READ_STATUS
     tmpMajor = optValue / 16
     tmpMinor = optValue AND $0f
-    PUT_XY(21, menuTopRow + 5, hexChar(tmpMajor))
-    PUT_XY(22, menuTopRow + 5, ".")
-    PUT_XY(23, menuTopRow + 5, hexChar(tmpMinor))
+    PRINT AT XY(21, menuTopRow + 5), CHR$(hexChar(tmpMajor)), ".", CHR$(hexChar(tmpMinor))
     VDP_RESET_STATUS_REG
 
     GOSUB delay

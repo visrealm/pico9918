@@ -22,11 +22,7 @@ diagMenu: PROCEDURE
 
     PRINT AT XY(9, 10), "Coming soon..."
 
-    WHILE 1
-        WAIT
-        GOSUB updateNavInput
-        IF (g_nav AND NAV_CANCEL) THEN EXIT WHILE
-    WEND
+    GOSUB waitForInput
 
     SET_MENU(MENU_ID_MAIN)
     END

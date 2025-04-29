@@ -2,7 +2,7 @@
 ' ===============================
   GOTO CONFTOOL_START
 firmwareFilename:
-  DATA BYTE "pico9918-vga-build-v1-0-1.uf2   "
+  DATA BYTE "pico9918-vga-build-v1-0-0.uf2   "
 
 
   CONST #FIRMWARE_BLOCKS = 242
@@ -11,7 +11,7 @@ firmwareFilename:
   CONST #FIRMWARE_BLOCK_BYTES = 292
   CONST FIRMWARE_MAJOR_VER = 1
   CONST FIRMWARE_MINOR_VER = 0
-  CONST FIRMWARE_PATCH_VER = 1
+  CONST FIRMWARE_PATCH_VER = 0
   CONST #FIRMWARE_YEAR = 2025
   CONST FIRMWARE_MONTH = 4
   CONST FIRMWARE_DAY = 27
