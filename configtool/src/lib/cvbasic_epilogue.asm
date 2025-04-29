@@ -19,10 +19,15 @@
 	; Revision date: Aug/02/2024. Added rom_end label for Memotech.
 	; Revision date: Aug/15/2024. Added support for Tatung Einstein.
 	; Revision date: Nov/12/2024. Added vdp_status.
+	; Revision date: Feb/03/2025. Round final ROM size to 8K multiples.
 	;
 
 rom_end:
 
+	; ROM final size rounding
+    if MSX+COLECO+SG1000+SMS+SVI+SORD
+        TIMES (($+$1FFF)&$1e000)-$ DB $ff
+    endif
     if MEMOTECH+EINSTEIN+NABU
 	; Align following data to a 256-byte page.
         TIMES $100-($&$ff) DB $4f
@@ -30,13 +35,31 @@ rom_end:
     if PV2000
 	TIMES $10000-$ DB $ff
     endif
-    if COLECO+SG1000+MSX+SVI+SORD+PV2000
+    if SG1000+SMS
+      if CVBASIC_BANK_SWITCHING
+        forg CVBASIC_BANK_ROM_SIZE*1024-1	; Force final ROM size
+	db $ff
+      endif
+	forg $7FF0
+	org $7FF0
+	db "TMR SEGA"
+	db 0,0
+	db 0,0		; Checksum
+	db $11,$78	; Product code
+	db $00		; Version
+	db $4c		; SMS Export + 32KB for checksum
+    endif
+    if COLECO+SG1000+SMS+MSX+SVI+SORD+PV2000
 	org BASE_RAM
     endif
 ram_start:
 
 sprites:
+    if SMS
+	rb 256
+    else
 	rb 128
+    endif
 sprite_data:
 	rb 4
 frame:

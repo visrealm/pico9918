@@ -17,8 +17,6 @@
 CONST TRUE           = -1
 CONST FALSE          = 0
 
-CONST F18A_TESTING   = 0
-
 CONST MENU_TITLE_ROW   = 3
 CONST MENU_HELP_ROW    = 19
 
