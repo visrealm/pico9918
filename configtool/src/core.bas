@@ -27,7 +27,8 @@ CONST MENU_ID_PALETTE  = 3
 CONST MENU_ID_FIRMWARE = 4
 
 ' Pico9918Options index, name[16], values index, num values,help[32]
-CONST CONF_COUNT      = 9
+CONST CONF_OFFSET     = 8   ' config index 0 in temp/savedConfigValues
+CONST CONF_COUNT      = 3   ' number of primary config options
 CONST CONF_INDEX      = 0
 CONST CONF_LABEL      = 1
 CONST CONF_LABEL_LEN  = 16
@@ -74,6 +75,8 @@ CONST CONF_MENU_CANCEL      = 247
 DEF FN MENU_DATA(I, C) = configMenuData((I) * CONF_STRUCT_LEN + (C))
 DEF FN SET_MENU(I) = g_currentMenu = I
 
+DIM tempConfigValues(CONF_COUNT)
+DIM savedConfigValues(CONF_COUNT)
 
 GOTO main
 

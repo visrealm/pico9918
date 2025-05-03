@@ -13,9 +13,6 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
-DIM tempConfigValues(CONF_COUNT)
-DIM savedConfigValues(CONF_COUNT)
-
 ' -----------------------------------------------------------------------------
 ' reset options to defaults
 ' -----------------------------------------------------------------------------
@@ -35,7 +32,7 @@ saveOptions: PROCEDURE
     ' instruct the pico9918 to commit config to flash
     VDP_WRITE_CONFIG(CONF_SAVE_TO_FLASH, 1)
 
-    clockChanged = savedConfigValues(2) <> tempConfigValues(2)
+    clockChanged = savedConfigValues(CONF_CLOCK_PRESET_ID - CONF_OFFSET) <> tempConfigValues(CONF_CLOCK_PRESET_ID - CONF_OFFSET)
 
     ' update device values again
     FOR I = 0 TO CONF_COUNT - 1
@@ -69,6 +66,6 @@ vdpLoadConfigValues: PROCEDURE
 ' apply current options to the PICO9918
 ' -----------------------------------------------------------------------------
 applyConfigValues: PROCEDURE
-    VDP(50) = tempConfigValues(0) * 4         ' set crt scanlines
-    VDP(30) = pow2(tempConfigValues(1) + 2)   ' set scanline sprites
+    VDP(50) = tempConfigValues(CONF_CRT_SCANLINES) * 4         ' set crt scanlines
+    VDP(30) = pow2(tempConfigValues(CONF_SCANLINE_SPRITES) + 2)   ' set scanline sprites
     END

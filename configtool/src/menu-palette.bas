@@ -32,7 +32,7 @@ paletteMenu: PROCEDURE
     DEFINE VRAM #addr, 30, VARPTR bmpBuf(0)
     DEFINE VRAM #addr + 32, 30, VARPTR bmpBuf(32)
 
-    FOR I = 0 TO 64
+    FOR I = 0 TO 63
         bmpBuf(I) = 0
     NEXT I
 
@@ -162,6 +162,7 @@ paletteMenu: PROCEDURE
             currentMenu = CONT1.KEY + 3
             g_nav = NAV_OK
         END IF
+
         IF currentMenu = 0 THEN
             IF g_nav AND NAV_LEFT THEN
                 currentIndex = currentIndex - 1
@@ -201,7 +202,6 @@ paletteMenu: PROCEDURE
             ELSEIF g_nav AND NAV_OK THEN
                 IF currentMenu = 4 THEN' reset
                     GOSUB resetPalette
-                    'lastIndex = ((currentIndex + 2) AND $0e) + 1  ' force sliders to update
                 ELSEIF currentMenu = 5 THEN' back
                     g_nav = NAV_CANCEL
                 END IF
@@ -288,6 +288,9 @@ renderSliders:
 
 
 resetPalette: PROCEDURE
+    WAIT
+
+    GOSUB hideSprites
 
     VDP(47) = $c0 ' palette data port from pal 2 index #10
     DEFINE VRAM 0, 32, defPal

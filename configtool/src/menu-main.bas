@@ -41,8 +41,10 @@ renderMenuRow: PROCEDURE
     ' don't render special index 255
     MENU_INDEX_POSITION = a_menuIndexToRender - MENU_INDEX_OFFSET
 
-    IF MENU_DATA(a_menuIndexToRender, CONF_INDEX) = 255 THEN R = menuTopRow + MENU_INDEX_POSITION : GOSUB emptyRowR : RETURN
-
+    optId = MENU_DATA(a_menuIndexToRender, CONF_INDEX)
+    confIndex = optId - CONF_OFFSET
+    IF optId = 255 THEN R = menuTopRow + MENU_INDEX_POSITION : GOSUB emptyRowR : RETURN
+    
     ' pre-compute row offset. we'll need this a few times
     #ROWOFFSET = XY(0, menuTopRow + MENU_INDEX_POSITION)
 
@@ -58,15 +60,16 @@ renderMenuRow: PROCEDURE
     valuesCount = MENU_DATA(a_menuIndexToRender, CONF_NUM_VALUES)
     IF valuesCount > 0 THEN
         valuesBaseIndex = MENU_DATA(a_menuIndexToRender, CONF_VALUES_IND)
-        currentValueOffset = tempConfigValues(a_menuIndexToRender)
+        currentValueOffset = tempConfigValues(confIndex)
 
         ' output option value
         DEFINE VRAM #addr + 22, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
     END IF
 
-    optId = MENU_DATA(a_menuIndexToRender, CONF_INDEX)
     configDirty = configMenuData(a_menuIndexToRender * CONF_STRUCT_LEN + CONF_NUM_VALUES) > 0
-    configDirty = configDirty AND (savedConfigValues(a_menuIndexToRender) <> tempConfigValues(a_menuIndexToRender))
+    IF confIndex < CONF_COUNT THEN
+        configDirty = configDirty AND (savedConfigValues(confIndex) <> tempConfigValues(confIndex))
+    END IF
     configDirty = configDirty OR ((optId = CONF_MENU_PALETTE) AND g_paletteDirty)
     
     ' if the config option is "dirty" output an asterix next to it
@@ -92,7 +95,7 @@ highlightMenuRow: PROCEDURE
         VPOKE (#VDP_NAME_TAB + #ROWOFFSET + R), C
     NEXT R
 
-    ' ends of highlight bar
+   ' ends of highlight bar
     VPOKE (#VDP_NAME_TAB + #ROWOFFSET + MENU_START_X),  PATT_IDX_SELECTED_L
     VPOKE (#VDP_NAME_TAB + #ROWOFFSET + 31 - MENU_START_X), PATT_IDX_SELECTED_R
 
@@ -148,10 +151,12 @@ menuLoop: PROCEDURE
     ELSEIF (g_nav AND NAV_OK) OR (g_nav AND NAV_RIGHT) THEN 
         IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
             tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
-            currentValueIndex = tempConfigValues(g_currentMenuIndex)
-            currentValueIndex = currentValueIndex + 1
-            IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = 0
-            tempConfigValues(g_currentMenuIndex) = currentValueIndex
+            IF tempConfigValuesCount THEN
+                currentValueIndex = tempConfigValues(g_currentMenuIndex)
+                currentValueIndex = currentValueIndex + 1
+                IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = 0
+                tempConfigValues(g_currentMenuIndex) = currentValueIndex
+            END IF
         END IF
         valueChanged = TRUE
 
@@ -159,11 +164,13 @@ menuLoop: PROCEDURE
     ELSEIF (g_nav AND NAV_LEFT) THEN 
         IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
             tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
-            currentValueIndex = tempConfigValues(g_currentMenuIndex)
-            currentValueIndex = currentValueIndex - 1
-            IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = tempConfigValuesCount - 1
-            tempConfigValues(g_currentMenuIndex) = currentValueIndex
-            valueChanged = TRUE
+            IF tempConfigValuesCount THEN
+                currentValueIndex = tempConfigValues(g_currentMenuIndex)
+                currentValueIndex = currentValueIndex - 1
+                IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = tempConfigValuesCount - 1
+                tempConfigValues(g_currentMenuIndex) = currentValueIndex
+                valueChanged = TRUE
+            END IF
         END IF
     END IF
     
