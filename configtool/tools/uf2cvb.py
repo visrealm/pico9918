@@ -65,9 +65,12 @@ def main() -> int:
         patchVer = match.group(3)
 
     print("Firmware version: {0}.{1}.{2}".format(majorVer, minorVer, patchVer))
-    print("Bank size: {0} bytes".format(BANK_SIZE))
-    print("Block size: {0} bytes".format(BLOCK_SIZE))
-    print("Blocks per bank: {0}".format(BLOCKS_PER_BANK))
+    print("Bank size       : {0} bytes".format(BANK_SIZE))
+    print("Block size      : {0} bytes".format(BLOCK_SIZE))
+    print("Blocks per bank : {0}".format(BLOCKS_PER_BANK))
+
+    nettBytes = 0
+    grossBytes = 0
 
     with open(args['outfile'] + ".h.bas", mode='w') as header:
         with open(args['outfile'] + ".bas", mode='w') as output:
@@ -132,11 +135,11 @@ def main() -> int:
                             byteStr.append("${0}".format(b.to_bytes().hex()))
                         output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
 
+                        nettBytes += 256
+                        grossBytes += BLOCK_SIZE
+                        
                         inpbuf = uf2.read(512)
                         blocksRead += 1
-                    #output.write("\n' ===============================\n")
-                    #output.write("BANK 0\n\n")
-                    #output.write("DATA BYTE 0\n\n")
                             
             except FileNotFoundError:
                 print("The file '{0}' was not found.".format(filename))
@@ -144,6 +147,11 @@ def main() -> int:
             except IOError:
                 print("An error occurred while reading the file '{0}'.".format(filename))
                 exit()
+
+    print("Nett payload    : {0} bytes".format(nettBytes))
+    print("Gross payload   : {0} bytes".format(grossBytes))
+    print("Total banks     : {0}".format(bank - 1))
+    print("Total blocks    : {0}".format(blocksRead))
                 
     return
 

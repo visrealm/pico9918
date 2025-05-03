@@ -100,8 +100,6 @@ paletteMenu: PROCEDURE
     currentIndex = 1
     lastIndex = 15
 
-    'PUT_XY( currentIndex * 2 - 1, 6, hexChar(currentIndex) + 128)
-
     currentMenu = 0 ' 0 = pal, 1 = r, 2 = g, 3 = b
     lastMenu    = 0
     DIM rgb(3)
@@ -118,8 +116,6 @@ paletteMenu: PROCEDURE
     WHILE 1
         WAIT
         
-        'DEFINE VRAM NAME_TAB_XY(15,15), 1, VARPTR I
-
         VDP_DISABLE_INT
 
         IF currentMenu = 0 THEN
@@ -136,17 +132,17 @@ paletteMenu: PROCEDURE
                     DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
                 END IF
 
-                IF F18A_TESTING THEN
-                    currentColor(0) = defPal(currentIndex * 2)
-                    currentColor(1) = defPal(currentIndex * 2 + 1)
-                ELSE
-                    VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
-                    VDP(58) = 128 + currentIndex * 2
-                    currentColor(0) = VDP_READ_STATUS
-                    VDP(58) = 128 + currentIndex * 2 + 1
-                    currentColor(1) = VDP_READ_STATUS            
-                    VDP_RESET_STATUS_REG
-                END IF
+#if F18A_TESTING
+                currentColor(0) = defPal(currentIndex * 2)
+                currentColor(1) = defPal(currentIndex * 2 + 1)
+#else
+                VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
+                VDP(58) = 128 + currentIndex * 2
+                currentColor(0) = VDP_READ_STATUS
+                VDP(58) = 128 + currentIndex * 2 + 1
+                currentColor(1) = VDP_READ_STATUS            
+                VDP_RESET_STATUS_REG
+#endif
 
                 rgb(0) = currentColor(0) AND $0f
                 rgb(1) = currentColor(1) / 16

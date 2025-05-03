@@ -54,3 +54,14 @@ updateNavInput: PROCEDURE
     ' <RBUTTON> or <Q> OR <ESC>
     IF CONT.BUTTON OR (CONT1.KEY = "Q") OR (CONT1.KEY = 27) THEN g_nav = g_nav OR NAV_CANCEL
     END
+
+
+waitForInput: PROCEDURE
+    WHILE 1
+        WAIT
+
+        GOSUB updateNavInput
+
+        IF (g_nav) THEN EXIT WHILE
+    WEND
+    END

@@ -13,17 +13,30 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
-' The TI-99 implementation only has 8kB Banks, so we need a separate wrapper
-' for it. Other implementations have 16kB banks.
+' The TI-99 implementation only has 8kB Banks
+' Other implementations have 16kB banks.
 
-BANK ROM 256
+BANK ROM 128
 
-CONST BANK_SIZE = 16
+#if TI994A
+    CONST BANK_SIZE = 8
+    INCLUDE "firmware_8k.h.bas"
+    #INFO "TI-99/4A - 8KB BANK SIZE"
+#else
+    CONST BANK_SIZE = 16
+    INCLUDE "firmware_16k.h.bas"
+    #INFO "Other - 16KB BANK SIZE"
+#endif
 
-INCLUDE "firmware_16k.h.bas"
+#if F18A_TESTING
+    #INFO "F18A testing mode"
+#endif
 
 INCLUDE "banksel.bas"
-
 INCLUDE "core.bas"
 
-INCLUDE "firmware_16k.bas"
+#if TI994A
+    INCLUDE "firmware_8k.bas"
+#else
+    INCLUDE "firmware_16k.bas"
+#endif
