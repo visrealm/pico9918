@@ -56,6 +56,11 @@
         "temperature.h": "c",
         "bmp_splash.h": "c",
         "flash.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "bmp_font.h": "c",
+        "compare": "c",
+        "algorithm": "c",
+        "format": "c",
+        "span": "c"
     }
 }

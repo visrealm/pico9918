@@ -10,18 +10,19 @@
  */
 
 #include "diag.h"
-
 #include "display.h"
+#include "config.h"
+#include "bmp_font.h"  
+#include "gpu.h"
 
 #include "impl/vrEmuTms9918Priv.h"
 
 #include "pico/divider.h"
 
-//#if PICO9918_DIAG
-  #include "bmp_font.h"  
-//#endif
-
 #include <stdbool.h>
+
+#define CHAR_WIDTH 6
+#define CHAR_HEIGHT 6
 
 
 #define TIMING_DIAG PICO9918_DIAG
@@ -51,10 +52,24 @@ IntString frameTimeStr = {0};
 IntString renderTimePerScanlineStr = {0};
 IntString totalTimePerScanlineStr = {0};
 IntString temperatureStr = {0};
+IntString gpuPctStr = {0};
+IntString clockMhzStr = {0};
+IntString modeStr = {0};
+
+IntString nameTabStr = {0};
+IntString colorTabStr = {0};
+IntString pattTabStr = {0};
+IntString sprAttTabStr = {0};
+IntString sprPattTabStr = {0};
 
 uint32_t accumulatedRenderTime = 0;
-uint32_t accumulatedFrameTime = 0;
+uint32_t accumulatedFrameTime = 0; 
 uint32_t accumulatedScanlines = 0;
+uint32_t lastUpdateTime = 0;
+
+const uint16_t labelColor = 0x0ff7;
+const uint16_t valueColor = 0x0fff;
+const uint16_t unitsColor = 0x0888;
 
 static float precLookup[] = {1.0f, 10.0f, 100.0f, 1000.0f};
 
@@ -90,22 +105,44 @@ static void flt2Str(float flt, int prec, IntString *out)
 }
 
 /* convert an integer to string */
-static void uint2Str(uint32_t number, IntString *out)
+static void uint2Str(uint32_t number, int width, IntString *out)
 {
   out->start = sizeof(out->digits) - 1;
   out->digits[out->start] = '\0';
-  if (!number)
+  while (number && out->start)
+  {
+    divmod_result_t dmResult = divmod_u32u32(number, 10);
+    number = to_quotient_u32(dmResult);
+    out->digits[--out->start] = '0' + to_remainder_u32(dmResult);
+    --width;
+  }
+  
+  while (width-- > 0)
   {
     out->digits[--out->start] = '0';
   }
-  else
+}
+
+
+/* convert an integer to hex string */
+static void uint2hexStr(uint32_t number, int width, IntString *out)
+{
+  out->start = sizeof(out->digits) - 1;
+  out->digits[out->start] = '\0';
+  while (number && out->start)
   {
-    while (number && out->start)
-    {
-      divmod_result_t dmResult = divmod_u32u32(number, 10);
-      number = to_quotient_u32(dmResult);
+    divmod_result_t dmResult = divmod_u32u32(number, 16);
+    number = to_quotient_u32(dmResult);
+    if (to_remainder_u32(dmResult) < 10)
       out->digits[--out->start] = '0' + to_remainder_u32(dmResult);
-    }  
+    else
+      out->digits[--out->start] = 'A' - 10 + to_remainder_u32(dmResult);
+    --width;
+  }
+  
+  while (width-- > 0)
+  {
+    out->digits[--out->start] = '0';
   }
 }
 
@@ -113,10 +150,26 @@ void initDiagnostics()
 {
   clear(&renderTimeStr);
   clear(&frameTimeStr);
+  clear(&gpuPctStr);
   clear(&renderTimePerScanlineStr);
   clear(&totalTimePerScanlineStr);
   clear(&temperatureStr);
+  clear(&gpuPctStr);
+  
+  clear(&nameTabStr);
+  clear(&colorTabStr);
+  clear(&pattTabStr);
+  clear(&sprAttTabStr);
+  clear(&sprPattTabStr);
 }
+
+const char *modeNames[] = {
+  "GFX I",
+  "GFX II",
+  "TEXT",
+  "MULTI",
+  "80 COL",
+};
 
 /* set the temperature value to display */
 void diagSetTemperature(float tempC)
@@ -124,55 +177,97 @@ void diagSetTemperature(float tempC)
   flt2Str(tempC, 2, &temperatureStr);
 }
 
-/* update diagnostics values */
-void updateDiagnostics(uint32_t frameCount)
+void diagSetClockHz(float clockHz)
 {
-#if TIMING_DIAG
-  const uint32_t framesPerUpdate = 1 << 2;
-  if ((frameCount & (framesPerUpdate - 1)) == 0)
-  {
-    uint2Str(accumulatedRenderTime / framesPerUpdate, &renderTimeStr);
-    uint2Str(accumulatedFrameTime / framesPerUpdate, &frameTimeStr);
-    uint2Str(accumulatedRenderTime / accumulatedScanlines, &renderTimePerScanlineStr);
-    uint2Str(accumulatedFrameTime / accumulatedScanlines, &totalTimePerScanlineStr);
-
-    accumulatedRenderTime = accumulatedFrameTime = accumulatedScanlines = 0;
-  }
-#endif
+  flt2Str(clockHz / 1000000.0f, 1, &clockMhzStr);
 }
 
 
-#define CHAR_HEIGHT 8
-#define CHAR_WIDTH  6
+/* update diagnostics values */
+void updateDiagnostics(uint32_t frameCount)
+{
+  const uint32_t framesPerUpdate = 1 << 2;
+  if ((frameCount & (framesPerUpdate - 1)) == 0)
+  {
+    flt2Str((float)(accumulatedRenderTime / framesPerUpdate) / 1000.0f, 3, &renderTimeStr);
+    flt2Str((float)(accumulatedFrameTime / framesPerUpdate) / 1000.0f, 3, &frameTimeStr);
+    uint2Str(accumulatedRenderTime / accumulatedScanlines, 1, &renderTimePerScanlineStr);
+    uint2Str(accumulatedFrameTime / accumulatedScanlines, 1, &totalTimePerScanlineStr);
+
+    accumulatedRenderTime = accumulatedFrameTime = accumulatedScanlines = 0;
+
+    uint32_t currentTime = time_us_32();
+    uint32_t totalTime = lastUpdateTime - currentTime;
+
+    float gpuPct = (gpuTime(totalTime) / (float)(lastUpdateTime - currentTime)) * 100.0f;
+    flt2Str(gpuPct, 4, &gpuPctStr);
+    resetGpuTime();
+
+    lastUpdateTime = currentTime;
+  }
+
+  if ((++frameCount & (framesPerUpdate - 1)) == 0)
+  {
+    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_NAME_TABLE) & 0x0f) << 10, 4, &nameTabStr);
+
+    uint8_t mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
+    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_COLOR_TABLE) & mask) << 6, 4, &colorTabStr);
+
+    mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
+    uint2hexStr(((TMS_REGISTER(tms9918, TMS_REG_PATTERN_TABLE) & mask) << 11) & 0xffff, 4, &pattTabStr);
+
+    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_SPRITE_ATTR_TABLE) & 0x7f) << 7, 4, &sprAttTabStr);
+    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_SPRITE_PATT_TABLE) & 0x07) << 11, 4, &sprPattTabStr);
+
+    const char *s = modeNames[vrEmuTms9918DisplayMode()];
+    char *d = modeStr.digits;
+    while (*s)
+    {
+      *d++ = *s++;
+    }
+    *d = 0;
+  }
+}
+
+static inline int darken(int x, uint16_t* pixels)
+{
+  pixels[x++] = (pixels[x] >> 2) & 0x333;
+  return x;
+}
+
 
 /* render a debug text scanline */
-void renderText(uint16_t scanline, const char *text, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
+int renderText(uint16_t scanline, const char *text, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
 {
   int fontY = scanline - y;
-  if (fontY < 0 || fontY >= CHAR_HEIGHT) return;
+  if (fontY < 0 || fontY >= CHAR_HEIGHT) return x;
 
   fontY <<= 1;
   char c = 0;
-  pixels[x++] = bg;
+  x = darken(x, pixels);
   while (c = *text)
   {
     c -= 32;
     char b = font[(((c & 0x30) + fontY) << 3) + (c & 0xf)];
-    for (int i = 0; i < 6; ++i)
+    for (int i = 0; i < CHAR_WIDTH; ++i)
     {
-      pixels[x++] = (b & 0x80) ? fg : bg;
+      if (b & 0x80)
+        pixels[x++] = fg;
+      else
+      x = darken(x, pixels);
       b <<= 1;
     }
 
     ++text;
   }
+  return x;
 }
 
 
 /* render a bcd value scanline */
-inline void renderStr(uint16_t scanline, IntString *str, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
+inline int renderNum(uint16_t scanline, IntString *str, uint16_t x, uint16_t y, uint16_t fg, uint16_t bg, uint16_t* pixels)
 {
-  renderText(scanline, str->digits + str->start, x, y, fg, bg, pixels);
+  return renderText(scanline, str->digits + str->start, x, y, fg, bg, pixels);
 }
 
 
@@ -183,66 +278,182 @@ void updateRenderTime(uint32_t renderTime, uint32_t frameTime)
   accumulatedFrameTime += frameTime;
 }
 
-void renderDiagnostics(uint16_t y, uint16_t* pixels)
+
+static int backgroundPixels(int xPos, int count, uint16_t* pixels)
 {
-#if TIMING_DIAG   
-  // Output average render time in microseconds (just vrEmuTms9918ScanLine())
-  // We only have ~16K microseconds to do everything for an entire frame.
-  // blanking takes around 10% of that, leaving ~14K microseconds
-  // ROW30 mode will inflate this figure since... more scanlines 
-  int xPos = 2;
-  int yPos = 2;
-  renderStr(y, &frameTimeStr, xPos, yPos, 0x0f40, 0, pixels);
-  renderStr(y, &totalTimePerScanlineStr, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
-
-  renderStr(y, &renderTimeStr, xPos, yPos, 0x0f40, 0, pixels);
-  renderStr(y, &renderTimePerScanlineStr, xPos + 36, yPos, 0x004f, 0, pixels); yPos += 8;
-
-  renderStr(y, &temperatureStr, xPos, yPos, 0x004f, 0, pixels); yPos += 8;
-  
-  renderText(y, "HELLO", xPos, yPos, 0x0fff, 0, pixels);
-#endif
-
-#if REG_DIAG
-
-  /* Register diagnostics. with this enabled, we overlay a binary 
-   * representation of the VDP registers to the right-side of the screen */
-  const int diagBitWidth = 4;
-  const int diagBitSpacing = 2;
-  const int diagRightMargin = 6;
-
-  const int16_t diagBitOn = 0x2e2;
-  const int16_t diagBitOff = 0x222;
-
-  uint8_t reg = y / 3;
-  if (reg < 64)
+  for (int i = 0; i < count; ++i)
   {
-    if (y % 3 != 0)
-    {
-      int8_t regValue = TMS_REGISTER(tms9918, reg);
-      int x = VIRTUAL_PIXELS_X - ((8 * (diagBitWidth + diagBitSpacing)) + diagRightMargin);
-      for (int i = 0; i < 8; ++i)
-      {
-        const bool on = regValue < 0;
-        for (int xi = 0; xi < diagBitWidth; ++xi)
-        {
-          pixels[x++] = on ? diagBitOn : diagBitOff;
-        }
-        x += diagBitSpacing + (i == 3) * diagBitSpacing;
-        regValue <<= 1;
-      }
-    }
-    else if ((reg & 0x07) == 0)
-    {
-      int x = VIRTUAL_PIXELS_X - diagRightMargin + 1;
+    xPos = darken(xPos, pixels);
+  }
+  return xPos;
+}
 
-      for (int xi = 0; xi < diagBitWidth; ++xi)
+
+static const char *nibbleBinStr[] = 
+{
+  "((((", "((()", "(()(", "(())",
+  "()((", "()()", "())(", "()))",
+  ")(((", ")(()", ")()(", ")())",
+  "))((", "))()", ")))(", "))))",
+};
+
+// register numbers to render
+static const int extReg[] = { 10, 11, 15, 19, 24, 25, 26, 27,
+                              28, 29, 30, 31, 32, 33, 34, 35,
+                              36, 37, 38, 49, 50, 51, 54, 55,
+                              56, 57, 58, 59, 63 };
+
+const uint32_t leftXPos = 2;
+
+static void renderLeft(const char *label, IntString *val, const char *units, uint16_t row, uint16_t* pixels)
+{
+  uint32_t xPos = leftXPos;
+  xPos = renderText(row, label, xPos, 0, labelColor, 0, pixels);
+  xPos = renderNum(row, val, xPos, 0, valueColor, 0, pixels);
+  xPos = renderText(row, units, xPos, 0, unitsColor, 0, pixels);
+  xPos = backgroundPixels(xPos, 102 - xPos, pixels);
+}
+
+static void diagRenderTime(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("FRAME : ", &frameTimeStr, "&S", row, pixels);
+}
+
+static void diagGpuTime(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("GPU   : ", &gpuPctStr, "%", row, pixels);
+}
+
+static void diagTemp(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("TEMP  : ", &temperatureStr, "^C", row, pixels);
+}
+
+static void diagClock(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("CLOCK : ", &clockMhzStr, "MHZ", row, pixels);
+}
+
+static void diagNameTab(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("NAME  : >", &nameTabStr, "", row, pixels);
+}
+ 
+static void diagColorTab(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("COLOR : >", &colorTabStr, "", row, pixels);
+}
+
+static void diagPattTab(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("PATT  : >", &pattTabStr, "", row, pixels);
+}
+ 
+static void diagSprAttrTab(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("SP ATR: >", &sprAttTabStr, "", row, pixels);
+}
+
+static void diagSprPattTab(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("SP PAT: >", &sprPattTabStr, "", row, pixels);
+}
+
+static void diagMode(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("MODE  : ", &modeStr, "", row, pixels);
+}
+
+static void diagEmpty(uint16_t row, uint16_t* pixels)
+{
+}
+
+typedef void (*DiagPtr)(uint16_t, uint16_t*);
+
+DiagPtr leftDiags[] =
+{
+  &diagClock,
+  &diagRenderTime,
+  &diagGpuTime,
+  &diagTemp,
+  &diagEmpty,
+  &diagMode,
+  &diagNameTab,
+  &diagColorTab,
+  &diagPattTab,
+  &diagSprAttrTab,
+  &diagSprPattTab
+};
+
+static void renderPalette(int y, uint16_t *pixels)
+{
+  divmod_result_t dmResult = divmod_u32u32(y, 6);
+  int regIndex = to_quotient_u32(dmResult);
+  int row = to_remainder_u32(dmResult);
+
+  int palette = (y - 216) / 6;
+  if (palette < 4)
+  {
+    char buf[] = "PALETTE 0:"; buf[8] = '0' + palette;
+    renderText(row, buf, leftXPos, 0, labelColor, 0, pixels);
+    uint32_t xPos = 32;
+    uint32_t *pix32 = (uint32_t *)pixels;
+    if (row < 5)
+    {
+      for (int c = 0 ; c < 16; ++c)
       {
-        pixels[x++] ^= pixels[x];
+        uint32_t color = tms9918->vram.map.pram[palette * 16 + c] & 0xFF0F;
+        color |= (color & 0xf000) >> 8;
+        color &= 0xfff;
+        color |= color << 16;
+        for (int i = 0; i < 15; ++i)
+        {
+          pix32[xPos++] = color;
+        }
+        xPos++;
       }
     }
   }
+}
 
-#endif  
+
+void renderDiagnostics(uint16_t y, uint16_t* pixels)
+{
+  y -= 1; // vertical border
+  
+  if (y > 213) renderPalette(y + 2, pixels);
+
+  divmod_result_t dmResult = divmod_u32u32(y, 6);
+  int regIndex = to_quotient_u32(dmResult);
+  int row = to_remainder_u32(dmResult);
+
+  int maxReg = 8;
+  if (tms9918->isUnlocked)
+  {
+    maxReg += sizeof(extReg) / sizeof(int);
+  }
+  
+  if (regIndex < sizeof(leftDiags) / sizeof(DiagPtr))
+  {
+    leftDiags[regIndex](row, pixels);
+  }
+
+  if (regIndex < maxReg)
+  {
+    if (regIndex >= 8)
+    {
+      regIndex = extReg[regIndex - 8];
+    }
+
+    dmResult = divmod_u32u32(regIndex, 10);
+    int xPos = 636 - (CHAR_WIDTH * 13);
+    char buf[] = "R00:"; buf[1] = '0' + to_quotient_u32(dmResult); buf[2] = '0' + to_remainder_u32(dmResult);
+    xPos = renderText(row, buf, xPos, 0, labelColor, 0, pixels);
+    xPos = backgroundPixels(xPos, 2, pixels);
+    xPos = renderText(row, nibbleBinStr[TMS_REGISTER(tms9918, regIndex) >> 4], xPos, 0, valueColor, 0, pixels);
+    xPos = backgroundPixels(xPos, 2, pixels);
+    xPos = renderText(row, nibbleBinStr[TMS_REGISTER(tms9918, regIndex) & 0xf], xPos, 0, valueColor, 0, pixels);
+  }
+
 }
 

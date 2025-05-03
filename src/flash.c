@@ -91,7 +91,7 @@ void doFlashSector()
   // bit  6-5: retry count
   // bits 4-2: error code
   // bits 1-0: status
-  
+ 
   const int vramAddr = (flashReg & 0x3f) << 8;
   const bool write = flashReg & 0x40;
   const bool verify = !write;
@@ -101,7 +101,6 @@ void doFlashSector()
   
   UF2_Block_Ptr p = (UF2_Block_Ptr)(tms9918->vram.bytes + vramAddr);
 
-  //tms9918->vram.bytes [767] = 0x00; // Wait
   tms9918->flash = 0;
 
   if ((p->magicStart0 != 0x0A324655) || // UF2\n
@@ -132,7 +131,6 @@ void doFlashSector()
   else if (!flashing)
   {
     setFlashStatusError(FLASH_ERROR_SEQUENCE);
-    //tms9918->lockedMask = 0x07;
     return;
   }
 
@@ -142,23 +140,14 @@ void doFlashSector()
   {
     setFlashStatusError(FLASH_ERROR_SIZE);
     flashing = 0;
-    //tms9918->lockedMask = 0x07;
     return;
   }  
 
   if (write)
   {
-  //  strcpy (&(tms9918->vram.bytes [736]), PROGRAMMING);
-    //retry = 3;
-//retry:
     setFlashStatusCode(FLASH_STATUS_WRITING);
     
     flash_range_program (a, p->data, PAYLOAD);
-
-    // This cache flush may be unstable over 133MHz
-    //xip_ctrl_hw->flush = 1;
-    //while (!(xip_ctrl_hw->stat & XIP_STAT_FLUSH_READY_BITS))
-    //  tight_loop_contents();
 
     // Alternate 'local' cache flush
     i = 0;
@@ -169,42 +158,15 @@ void doFlashSector()
   }
   setFlashStatusCode(FLASH_STATUS_VERIFYING);
 
-   //else
-    //strcpy (&(tms9918->vram.bytes [736]), VALIDATING);
   if (verify)
   {
-    if (memcmp ((const void *)(XIP_BASE + a), (const void*)p->data, PAYLOAD) != 0)
-    {
-  //    if (retry)
-    //  {
-      //  retry--;
-        //setFlashStatusRetry(++statusRetryCount);
-
-        //goto retry;
-      //}
-
-      setFlashStatusError(FLASH_ERROR_VERIFY);
-
-      //strcpy (&(tms9918->vram.bytes [736]), FAILEDCOMPARISON);
-
-      //int i = 0;
-      //while (i < 728) {
-      //  b = *(uint8_t *)(XIP_BASE + a++);
-      //  tms9918->vram.bytes [i++] = hexv (b >> 4);
-      // tms9918->vram.bytes [i++] = hexv (b);
-      //}
-      //tms9918->vram.bytes [767] = 0x03; // Failed - comparison
-
-      //flashing = 0;
-      //tms9918->lockedMask = 0x07;
-      return;
-    }
+    setFlashStatusError(FLASH_ERROR_OK);
+    return;
   }
   
   if ((p->blockNo + 1) == p->numBlocks)
   {
     flashing = 0;
-    //tms9918->lockedMask = 0x07;
     setFlashStatusError(FLASH_ERROR_OK);
   }
   else

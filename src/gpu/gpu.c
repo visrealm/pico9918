@@ -67,7 +67,8 @@ static int didFault = 0;
 /*
  * hardfault handler (triggered by MPU for GPU DMA requests)
  */
-void isr_hardfault () {
+void isr_hardfault ()
+{
   didFault = 1;
   TMS_REGISTER(tms9918, 0x38) = 0; // Stop the GPU
   mpu_hw->ctrl = 0; // Turn off memory protection - all models
@@ -104,7 +105,8 @@ static void triggerGpuDma()
 /*
  * set up the MPU to guard a 32 byte page from a given address
  */
-static void guard(void* a) {
+static void guard(void* a)
+{
   uintptr_t addr = (uintptr_t)a;
 #if PICO_RP2040 // Old memory protection unit
   mpu_hw->rbar = (addr & (uint)~0xff) | M0PLUS_MPU_RBAR_VALID_BITS | 0;
@@ -119,30 +121,36 @@ static void guard(void* a) {
 /*
  * TMS9900 GPU main loop implementation
  */
-static void __attribute__ ((noinline)) volatileHack () {
+static void __attribute__ ((noinline)) volatileHack ()
+{
   tms9918->restart = 0;
-  if ((tms9918->gpuAddress & 1) == 0) { // Odd addresses will cause the RP2040 to crash
+  if ((tms9918->gpuAddress & 1) == 0) // Odd addresses will cause the RP2040 to crash
+  { 
     uint16_t lastAddress = tms9918->gpuAddress;
 restart:
     TMS_REGISTER(tms9918, 0x38) = 1;
     TMS_STATUS(tms9918, 2) |= 0x80; // Running
 
-#if PICO_RP2040 // Old memory protection unit
+    #if PICO_RP2040 // Old memory protection unit
     mpu_hw->ctrl = M0PLUS_MPU_CTRL_PRIVDEFENA_BITS | M0PLUS_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
 #else
     mpu_hw->ctrl = M33_MPU_CTRL_PRIVDEFENA_BITS | M33_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
 #endif
+    
     lastAddress = run9900 (tms9918->vram.bytes, lastAddress, 0xFFFE, &TMS_REGISTER(tms9918, 0x38));
     mpu_hw->ctrl = 0; // Turn off memory protection - all models
-
-    if (TMS_REGISTER(tms9918, 0x38) & 1) { // GPU program decided to stop itself?
+    
+    if (TMS_REGISTER(tms9918, 0x38) & 1)  // GPU program decided to stop itself?
+    {
       tms9918->gpuAddress = lastAddress;
       tms9918->restart = 0;
     }
-    if (tms9918->vram.bytes[0x8008]){
+    if (tms9918->vram.bytes[0x8008])
+    {
       triggerGpuDma();
     }
-    if (didFault) {
+    if (didFault)
+    {
       didFault = 0;
       goto restart;
     }
@@ -165,6 +173,23 @@ void gpuInit()
   guard(&(tms9918->vram.bytes [0x8000]));
 }
 
+bool reportedBack = 1;
+uint32_t gpuTimeUs = 0;
+
+/* GPU runtime in microseconds */
+uint32_t gpuTime(uint32_t totalTime)
+{
+  if (!reportedBack)
+    return totalTime;
+  return gpuTimeUs;
+}
+
+/* reset the internal gpu time to 0 */
+void resetGpuTime()
+{
+  gpuTimeUs = 0;  
+}
+
 /*
  * TMS9900 GPU main loop 
  */
@@ -173,14 +198,23 @@ void gpuLoop()
   while (1)
   {
     if (tms9918->restart)
-      volatileHack ();
+    {
+      reportedBack = 0;
+      uint32_t gpuStart = time_us_32();
+      volatileHack();
+      gpuTimeUs += time_us_32() - gpuStart;
+    }
+    reportedBack = 1;
+      
     if (tms9918->flash)
-      flashSector ();
+    {
+      flashSector();
+    }
+
     if (tms9918->config[CONF_SAVE_TO_FLASH])
     {
       tms9918->config[CONF_SAVE_TO_FLASH] = 0;
       writeConfig(tms9918->config);
     }
-
   }
 }

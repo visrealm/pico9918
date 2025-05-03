@@ -201,6 +201,8 @@ static const ClockSettings clockPresets[] = {
 static int clockPresetIndex = 0;
 static bool testingClock = false;
 
+
+
 static void eofInterrupt()
 {
   doneInt = true;
@@ -210,12 +212,15 @@ static void eofInterrupt()
     gpuTrigger();
   }
 
-  if ((frameCount & 0x0f) == 0) // every 16th frame
+  static float tempC = 0.0f;
+  tempC += coreTemperatureC();
+  if ((frameCount & 0x3f) == 0) // every 16th frame
   {
-    float tempC = coreTemperatureC();
+    tempC /= 64.0f;
     diagSetTemperature(tempC);
     uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
     TMS_STATUS(tms9918, 13) = t4;
+    tempC = 0.0f;
   }
 
   if (tms9918->configDirty)
@@ -259,6 +264,7 @@ void updateClock(uint pioSm, float freqHz)
   float clockDiv = ((float)clockPresets[clockPresetIndex].clockHz) / (freqHz * 2.0f);
   pio_sm_set_clkdiv(pio0, pioSm, clockDiv);
   pio_sm_set_enabled(pio0, pioSm, true);
+  diagSetClockHz(clockPresets[clockPresetIndex].clockHz);
 }
 
 /*
@@ -297,12 +303,12 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   if (!validWrites)
   {
     // has the display been enabled?
-    validWrites = !(TMS_REGISTER(tms9918, 1) & 0x40);
-
-    allowSplashHide();
+    if (validWrites = (TMS_REGISTER(tms9918, 1) & 0x40))
+      allowSplashHide();
   }
 
-  updateDiagnostics(frameCount);
+  if (tms9918->config[CONF_DIAG] || 1)
+    updateDiagnostics(frameCount);
 
 
   // here, we catch the case where the last row(s) were
@@ -311,6 +317,16 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   {
     eofInterrupt();
     updateInterrupts(STATUS_INT);
+  }
+}
+
+
+void renderDiag(int y, uint16_t *pixels)
+{
+  if (tms9918->config[CONF_DIAG] || 1)
+  {
+    dma_channel_wait_for_finish_blocking(dma32);
+    renderDiagnostics(y, pixels);
   }
 }
 
@@ -346,9 +362,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     }
     dma_channel_wait_for_finish_blocking(dma32);
 
-#if PICO9918_DIAG
-    renderDiagnostics(y, pixels); // TODO: This won't display in ROW30 mode
-#endif
+    renderDiag(y, pixels);
 
     if (!validWrites || (frameCount < 600))
     {
@@ -362,7 +376,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
         else if (frameCount < 500)
         {
-          renderText(y, "TEST COMPLETED SUCCESSFULLY!", 234, 8, 0x04f4, 0x0444, pixels);
+          renderText(y, "TEST COMPLETED SUCCESSFULLY!", 234, 8, 0x07f7, 0x0444, pixels);
         }
         else if (frameCount < 599)
         {
@@ -377,10 +391,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
       }
     }
+
     if (TMS_REGISTER(tms9918, 0x32) & 0x40)
     {
       gpuTrigger();
     }
+    
     return;
   }
 
@@ -501,16 +517,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 
   /*** right border ***/
-  //dma_channel_wait_for_finish_blocking(dma32);
   dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
 
-#if PICO9918_DIAG
-  updateRenderTime(renderTime,  time_us_32() - frameStart);
+  if (tms9918->config[CONF_DIAG_PERFORMANCE] || 1)
+    updateRenderTime(renderTime,  time_us_32() - frameStart);
 
-  dma_channel_wait_for_finish_blocking(dma32);
-
-  renderDiagnostics(y + vBorder, pixels);
-#endif
+  renderDiag(y + vBorder, pixels);
 }
 
 /*
