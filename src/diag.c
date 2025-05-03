@@ -420,8 +420,8 @@ static void renderPalette(int y, uint16_t *pixels)
 void renderDiagnostics(uint16_t y, uint16_t* pixels)
 {
   y -= 1; // vertical border
-  
-  if (y > 213) renderPalette(y + 2, pixels);
+
+  if (tms9918->config[CONF_DIAG_PALETTE] && (y > 213)) renderPalette(y + 2, pixels);
 
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int regIndex = to_quotient_u32(dmResult);
@@ -433,12 +433,12 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
     maxReg += sizeof(extReg) / sizeof(int);
   }
   
-  if (regIndex < sizeof(leftDiags) / sizeof(DiagPtr))
+  if (tms9918->config[CONF_DIAG_PERFORMANCE] && (regIndex < sizeof(leftDiags) / sizeof(DiagPtr)))
   {
     leftDiags[regIndex](row, pixels);
   }
 
-  if (regIndex < maxReg)
+  if (tms9918->config[CONF_DIAG_REGISTERS] && (regIndex < maxReg))
   {
     if (regIndex >= 8)
     {

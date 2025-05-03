@@ -94,6 +94,12 @@ void applyConfig()
                     tms9918->config[CONF_PALETTE_IDX_0 + (i * 2) + 1];
     tms9918->vram.map.pram[i] = __builtin_bswap16(rgb);
   }
+  
+  tms9918->config[CONF_DIAG] = tms9918->config[CONF_DIAG_ADDRESS] ||
+                               tms9918->config[CONF_DIAG_PALETTE] ||
+                               tms9918->config[CONF_DIAG_PERFORMANCE] ||
+                               tms9918->config[CONF_DIAG_REGISTERS];
+  
 }
 
 #define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash

@@ -307,7 +307,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
       allowSplashHide();
   }
 
-  if (tms9918->config[CONF_DIAG] || 1)
+  if (tms9918->config[CONF_DIAG])
     updateDiagnostics(frameCount);
 
 
@@ -323,7 +323,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
 
 void renderDiag(int y, uint16_t *pixels)
 {
-  if (tms9918->config[CONF_DIAG] || 1)
+  if (tms9918->config[CONF_DIAG])
   {
     dma_channel_wait_for_finish_blocking(dma32);
     renderDiagnostics(y, pixels);
@@ -389,6 +389,15 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
           tms9918->config[CONF_SAVE_TO_FLASH] = 1;
           testingClock = false;
         }
+      }
+      
+      if (frameCount > 600)
+      {
+        tms9918->config[CONF_DIAG] = true;
+        tms9918->config[CONF_DIAG_REGISTERS] = true;
+        tms9918->config[CONF_DIAG_PERFORMANCE] = true;
+        tms9918->config[CONF_DIAG_PALETTE] = true;
+        tms9918->config[CONF_DIAG_ADDRESS] = true;
       }
     }
 
