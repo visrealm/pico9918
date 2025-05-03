@@ -122,43 +122,7 @@ paletteMenu: PROCEDURE
             #addr = NAME_TAB_XY(currentIndex * 2 - 1, 7)
             DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + (FRAME AND 8) / 2)
             DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + (FRAME AND 8) / 2)
-            IF lastIndex <> currentIndex THEN
-
-                DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + 4)
-                DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + 4)
-                IF lastIndex > 0 THEN
-                    #addr = NAME_TAB_XY(lastIndex * 2 - 1, 7)
-                    DEFINE VRAM #addr, 2, VARPTR bmpBuf(0)
-                    DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
-                END IF
-
-#if F18A_TESTING
-                currentColor(0) = defPal(currentIndex * 2)
-                currentColor(1) = defPal(currentIndex * 2 + 1)
-#else
-                VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
-                VDP(58) = 128 + currentIndex * 2
-                currentColor(0) = VDP_READ_STATUS
-                VDP(58) = 128 + currentIndex * 2 + 1
-                currentColor(1) = VDP_READ_STATUS            
-                VDP_RESET_STATUS_REG
-#endif
-
-                rgb(0) = currentColor(0) AND $0f
-                rgb(1) = currentColor(1) / 16
-                rgb(2) = currentColor(1) AND $0f
-
-                ' update live palette
-                VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
-                DEFINE VRAM 0, 2, VARPTR currentColor(0)
-                VDP(47) = $40
-
-                GOSUB renderSliders                
-            
-                lastIndex = currentIndex
-
-                GOSUB delay
-            END IF
+            IF lastIndex <> currentIndex THEN GOSUB updateRGB
         ELSEIF currentMenu < 4 THEN
                 SPRITE 0, 8 * (8 + (currentMenu * 2)) - 1, 8 * (8 + rgb(currentMenu - 1)),32,(FRAME AND 8)+7
 
@@ -263,6 +227,44 @@ paletteMenu: PROCEDURE
     SET_MENU(MENU_ID_MAIN)
     END
 
+updateRGB:
+    #addr = NAME_TAB_XY(currentIndex * 2 - 1, 7)
+    DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + 4)
+    DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + 4)
+    IF lastIndex > 0 THEN
+        #addr = NAME_TAB_XY(lastIndex * 2 - 1, 7)
+        DEFINE VRAM #addr, 2, VARPTR bmpBuf(0)
+        DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
+    END IF
+
+    #if F18A_TESTING
+    currentColor(0) = defPal(currentIndex * 2)
+    currentColor(1) = defPal(currentIndex * 2 + 1)
+    #else
+    VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
+    VDP(58) = 128 + currentIndex * 2
+    currentColor(0) = VDP_READ_STATUS
+    VDP(58) = 128 + currentIndex * 2 + 1
+    currentColor(1) = VDP_READ_STATUS            
+    VDP_RESET_STATUS_REG
+    #endif
+
+    rgb(0) = currentColor(0) AND $0f
+    rgb(1) = currentColor(1) / 16
+    rgb(2) = currentColor(1) AND $0f
+
+    ' update live palette
+    VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
+    DEFINE VRAM 0, 2, VARPTR currentColor(0)
+    VDP(47) = $40
+
+    GOSUB renderSliders                
+
+    lastIndex = currentIndex
+
+    GOSUB delay
+    RETURN
+
 sliderPos:
     DATA BYTE 10,12,14
 
@@ -297,7 +299,8 @@ resetPalette: PROCEDURE
         VDP_WRITE_CONFIG(128 + I, defPal(I))
     NEXT I
 
-    lastIndex = 0 : currentMenu = 0
+    lastIndex = 0
+    GOSUB updateRGB
     g_paletteDirty = TRUE
 
     END

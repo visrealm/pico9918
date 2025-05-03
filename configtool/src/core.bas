@@ -152,9 +152,9 @@ main:
         PRINT "  TI TMS99x8"
     END IF
 
-#IF F18A_TESTING
+#if F18A_TESTING
         isPico9918 = isF18ACompatible   ' FOR TESTING
-#ENDIF
+#endif
 
     VDP_ENABLE_INT_DISP_OFF
 

@@ -34,18 +34,10 @@ firmwareMenu: PROCEDURE
     PRINT AT XY(4, menuTopRow + 0), "Current version : v",verMajor, ".", verMinor, ".", verPatch
     PRINT AT XY(4, menuTopRow + 1), "New version     : v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER,".",FIRMWARE_PATCH_VER
 
-    'isUpgrade = 0
-    'IF verMajor < FIRMWARE_MAJOR_VER OR (verMajor = FIRMWARE_MAJOR_VER AND verMinor < FIRMWARE_MINOR_VER) THEN
-    '    isUpgrade = 1
-    'ELSEIF verMajor > FIRMWARE_MAJOR_VER OR (verMajor = FIRMWARE_MAJOR_VER AND verMinor > FIRMWARE_MINOR_VER) THEN
-    '    isUpgrade = -1
-    'END IF
-
     GOSUB verifyCartridgeFirmware
 
 
     CONST FWROWS = (#FIRMWARE_BLOCKS - 1) / 30 + 2
-    'STATUS = TRUE
 
     IF STATUS THEN
 
