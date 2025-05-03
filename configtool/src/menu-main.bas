@@ -42,7 +42,7 @@ renderMenuRow: PROCEDURE
     MENU_INDEX_POSITION = a_menuIndexToRender - MENU_INDEX_OFFSET
 
     optId = MENU_DATA(a_menuIndexToRender, CONF_INDEX)
-    confIndex = optId - CONF_OFFSET
+    confIndex = optId
     IF optId = 255 THEN R = menuTopRow + MENU_INDEX_POSITION : GOSUB emptyRowR : RETURN
     
     ' pre-compute row offset. we'll need this a few times
@@ -71,6 +71,7 @@ renderMenuRow: PROCEDURE
         configDirty = configDirty AND (savedConfigValues(confIndex) <> tempConfigValues(confIndex))
     END IF
     configDirty = configDirty OR ((optId = CONF_MENU_PALETTE) AND g_paletteDirty)
+    configDirty = configDirty OR ((optId = CONF_MENU_DIAG) AND g_diagDirty)
     
     ' if the config option is "dirty" output an asterix next to it
     IF configDirty THEN
@@ -111,6 +112,8 @@ menuLoop: PROCEDURE
     MIN_MENU_INDEX = MENU_INDEX_OFFSET
     MAX_MENU_INDEX = MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
 
+    currentOptionIndex = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
+
     GOSUB updateNavInput
 
     ' <down> button pressed?
@@ -149,29 +152,29 @@ menuLoop: PROCEDURE
 
     ' <fire>, <space> or <right> pressed? - next option value
     ELSEIF (g_nav AND NAV_OK) OR (g_nav AND NAV_RIGHT) THEN 
-        IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
+        IF currentOptionIndex - 1 < 200 THEN
             tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
             IF tempConfigValuesCount THEN
-                currentValueIndex = tempConfigValues(g_currentMenuIndex)
+                currentValueIndex = tempConfigValues(currentOptionIndex)
                 currentValueIndex = currentValueIndex + 1
                 IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = 0
-                tempConfigValues(g_currentMenuIndex) = currentValueIndex
+                tempConfigValues(currentOptionIndex) = currentValueIndex
             END IF
         END IF
         valueChanged = TRUE
 
     ' <left> pressed - previous option value
     ELSEIF (g_nav AND NAV_LEFT) THEN 
-        IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) - 1 < 200 THEN
+        IF currentOptionIndex - 1 < 200 THEN
             tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
             IF tempConfigValuesCount THEN
-                currentValueIndex = tempConfigValues(g_currentMenuIndex)
+                currentValueIndex = tempConfigValues(currentOptionIndex)
                 currentValueIndex = currentValueIndex - 1
                 IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = tempConfigValuesCount - 1
-                tempConfigValues(g_currentMenuIndex) = currentValueIndex
-                valueChanged = TRUE
+                tempConfigValues(currentOptionIndex) = currentValueIndex
             END IF
         END IF
+        valueChanged = TRUE
     END IF
     
     ' have we changed menu items?
@@ -316,7 +319,7 @@ saveOptionsMenu: PROCEDURE
         IF savedConfigValues(I) <> tempConfigValues(I) THEN configChanged = TRUE
     NEXT I
 
-    IF NOT g_paletteDirty AND NOT configChanged THEN
+    IF NOT (g_paletteDirty OR g_diagDirty OR configChanged) THEN
         PRINT AT XY(0, MENU_HELP_ROW), "  Skipped! No changes to save   "
         RETURN
     END IF
@@ -401,6 +404,13 @@ configMenuData:
 
     DATA BYTE CONF_MENU_FIRMWARE,   "Update firmware ", 0, 0, "   Write firmware to PICO9918   "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
+
+    DATA BYTE CONF_DIAG_REGISTERS,  "Registers       ", 0, 2, "      Show VDP registers        "
+    DATA BYTE CONF_DIAG_PERFORMANCE,"Performance     ", 0, 2, "     Show performance data      "
+    DATA BYTE CONF_DIAG_ADDRESS,    "Addresses       ", 0, 2, "      Show VRAM addresses       "
+    DATA BYTE CONF_DIAG_PALETTE,    "Palette         ", 0, 2, "        Show palettes           "
+    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
+
 
 
 

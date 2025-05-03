@@ -32,7 +32,7 @@ saveOptions: PROCEDURE
     ' instruct the pico9918 to commit config to flash
     VDP_WRITE_CONFIG(CONF_SAVE_TO_FLASH, 1)
 
-    clockChanged = savedConfigValues(CONF_CLOCK_PRESET_ID - CONF_OFFSET) <> tempConfigValues(CONF_CLOCK_PRESET_ID - CONF_OFFSET)
+    clockChanged = savedConfigValues(CONF_CLOCK_PRESET_ID) <> tempConfigValues(CONF_CLOCK_PRESET_ID)
 
     ' update device values again
     FOR I = 0 TO CONF_COUNT - 1
@@ -40,6 +40,7 @@ saveOptions: PROCEDURE
     NEXT I
 
     g_paletteDirty = FALSE
+    g_diagDirty = FALSE
 
     GOSUB renderMainMenu
 
@@ -51,14 +52,12 @@ saveOptions: PROCEDURE
 vdpLoadConfigValues: PROCEDURE
     VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
     FOR I = 0 TO CONF_COUNT - 1
-        a_menuIndexToRender = MENU_DATA(I, CONF_INDEX)
-        IF a_menuIndexToRender > 0 THEN
-            VDP(58) = a_menuIndexToRender
-            optValue = VDP_READ_STATUS            
-            tempConfigValues(I) = optValue
-            savedConfigValues(I) = optValue
-        END IF
+        VDP(58) = I
+        optValue = VDP_READ_STATUS            
+        tempConfigValues(I) = optValue
+        savedConfigValues(I) = optValue
     NEXT I
+
     VDP_RESET_STATUS_REG
     END
 

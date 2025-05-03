@@ -27,8 +27,7 @@ CONST MENU_ID_PALETTE  = 3
 CONST MENU_ID_FIRMWARE = 4
 
 ' Pico9918Options index, name[16], values index, num values,help[32]
-CONST CONF_OFFSET     = 8   ' config index 0 in temp/savedConfigValues
-CONST CONF_COUNT      = 3   ' number of primary config options
+CONST CONF_COUNT      = 128   ' number of primary config options
 CONST CONF_INDEX      = 0
 CONST CONF_LABEL      = 1
 CONST CONF_LABEL_LEN  = 16
@@ -56,6 +55,11 @@ CONST CONF_DISP_DRIVER      = 5
 CONST CONF_CRT_SCANLINES    = 8         ' 0 (off) or 1 (on)
 CONST CONF_SCANLINE_SPRITES = 9         ' 0 - 3 where value = (1 << (x + 2))
 CONST CONF_CLOCK_PRESET_ID  = 10        ' 0 - 2 see ClockSettings in main.c
+CONST CONF_DIAG             = 64
+CONST CONF_DIAG_REGISTERS   = 65
+CONST CONF_DIAG_PERFORMANCE = 66
+CONST CONF_DIAG_PALETTE     = 67
+CONST CONF_DIAG_ADDRESS     = 68
 ' ^^^ read/write config IDs
 
 ' now the "special" config IDs
@@ -102,6 +106,7 @@ main:
     ' GLOBALS    
     g_currentMenuIndex = 0                  ' current menu index
     g_paletteDirty = FALSE
+    g_diagDirty = FALSE
 
     ' setup the screen
     VDP_DISABLE_INT_DISP_OFF
@@ -192,9 +197,13 @@ main:
 
         GOSUB vdpUnlock ' reset locked the vdp. unlock it again
 
+        VDP_DISABLE_INT_DISP_OFF
+
         GOSUB vdpLoadConfigValues  ' load config values from VDP
 
         GOSUB applyConfigValues
+
+        VDP_ENABLE_INT_DISP_OFF
 
         oldIndex = 0
 
