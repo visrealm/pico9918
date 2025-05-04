@@ -108,6 +108,27 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 gasm80 asm\%BASENAME%.asm -o bin\%BASENAME%.rom
 echo Output: bin\%BASENAME%.rom
 
+
+:: NABU
+
+echo.
+echo ---------------------------------------------------------------------
+echo   Compiling for NABU
+echo ---------------------------------------------------------------------
+
+set BASENAME=pico9918_%VERSION%_nabu
+cvbasic --nabu pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
+if %errorlevel% neq 0 exit /b %errorlevel%
+gasm80 asm\%BASENAME%.asm -o asm\000001.nabu
+pushd asm
+tar.exe -a -c -f ..\bin\%BASENAME%.zip 000001.nabu
+popd
+pushd bin
+ren %BASENAME%.zip %BASENAME%.npz
+popd
+echo Output: bin\%BASENAME%.rom
+
+
 :: CreatiVision
 ::cvbasic --creativision pico9918conf-nobank.bas asm\pico9918tool_crv.asm %LIBPATH%
     
