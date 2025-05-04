@@ -63,17 +63,20 @@ endPart:
 ; tmsWrite - monitor the CSW pin and pass on pin state via FIFO
 ;           
 ;            very simple grab the data and send it through...
+;            state at CSW going low in the high 16-bits
+;            state at CSW going high in the low 16-bits
 ;
-; fifo isr   0b|x|m|w|r|xxxx|dddddddd|
-;              | |o|r|e|    |  CD0-7 |
-;              | |d|i|a|    |        |
-;              | |e|t|d|    |        |
-;              | | |e| |    |        |
+; fifo isr   0b|x|m|w|r|xxxx|dddddddd|x|m|w|r|xxxx|dddddddd|
+;              | |o|r|e|    |  CD0-7 | | | | |    |  CD0-7 |
+;              | |d|i|a|    | ignore | | | | |    |        |
+;              | |e|t|d|    |        | | | | |    |        |
+;              | | |e| |    |        | | | | |    |        |
 
 .program tmsWrite
 .define public CSW_PIN 27
 
-  wait 0 gpio CSW_PIN [12]   ; wait for CSW to go active (low)
-  in pins, 16                ; grab the data CD0-7 and auto-push
-  wait 1 gpio CSW_PIN [12]   ; wait for CSW high (inactive)
+  wait 0 gpio CSW_PIN [8]  ; wait for CSW to go active (low)
+  in pins, 16         [4]  ; grab the initial state
+  wait 1 gpio CSW_PIN      ; wait for CSW inactive (high)
+  in pins, 16              ; grab the final state
 .wrap

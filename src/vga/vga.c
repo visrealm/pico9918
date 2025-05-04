@@ -13,6 +13,8 @@
 #include "vga.pio.h"
 #include "pio_utils.h"
 
+#include "../display.h"
+
 #include "pico/multicore.h"
 #include "pico/binary_info.h"
 
@@ -20,27 +22,11 @@
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
- // compile options
-#define VGA_CRT_EFFECT PICO9918_SCANLINES
-#define VGA_HARDCODED_640 !PICO9918_SCART_RGBS
-#define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
+ #define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
 
 #define VGA_NO_MALLOC 1
 
 #define VGA_SCANLINE_CB_ENABLE 0
-
-
- // a number of compiile-time optimisations can occur 
- // if it knows some of the VGA parameters 
-#if VGA_HARDCODED_640
-#define VIRTUAL_PIXELS_X 640
-#define VIRTUAL_PIXELS_Y 240
-#else
-#include "pico/divider.h"
-#define VIRTUAL_PIXELS_X vgaParams.params.hVirtualPixels
-#define VIRTUAL_PIXELS_Y vgaParams.params.vVirtualPixels
-#endif
-
 
 // avoid bringing in math.h
 int roundflt(float x)
@@ -134,7 +120,7 @@ static bool buildSyncData()
   rgbDataBuffer[1] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
 #endif
 
-  vgaParams.params.pioDivider = /*roundflt*/(sysClockKHz / (float)minClockKHz);
+  vgaParams.params.pioDivider = roundflt(sysClockKHz / (float)minClockKHz);
   vgaParams.params.pioFreqKHz = sysClockKHz / vgaParams.params.pioDivider;
 
   vgaParams.params.pioClocksPerPixel = vgaParams.params.pioFreqKHz / (float)vgaParams.params.pixelClockKHz;
@@ -276,20 +262,20 @@ static void vgaInitRgb()
 
   sm_config_set_fifo_join(&rgbConfig, PIO_FIFO_JOIN_TX);
 
-  sm_config_set_out_shift(&rgbConfig, true, true, 16); // R shift, autopull @ 16 bits
+  sm_config_set_out_shift(&rgbConfig, true, true, 32); // R shift, autopull @ 16 bits
   pio_sm_init(VGA_PIO, RGB_SM, rgbProgOffset, &rgbConfig);
 
   // initialise rgb dma
   rgbDmaChan = 1;//dma_claim_unused_channel(true);
   rgbDmaChanMask = 0x01 << rgbDmaChan;
   dma_channel_config rgbDmaChanConfig = dma_channel_get_default_config(rgbDmaChan);
-  channel_config_set_transfer_data_size(&rgbDmaChanConfig, DMA_SIZE_16);  // transfer 16 bits at a time
+  channel_config_set_transfer_data_size(&rgbDmaChanConfig, DMA_SIZE_32);  // transfer 32 bits at a time (2 pixels)
   channel_config_set_read_increment(&rgbDmaChanConfig, true);             // increment read
   channel_config_set_write_increment(&rgbDmaChanConfig, false);           // don't increment write
   channel_config_set_dreq(&rgbDmaChanConfig, pio_get_dreq(VGA_PIO, RGB_SM, true));
 
   // setup the dma channel and set it going
-  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], VIRTUAL_PIXELS_X, false);
+  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], VIRTUAL_PIXELS_X / 2, false);
   dma_channel_set_irq0_enabled(rgbDmaChan, true);
 }
 
@@ -346,26 +332,19 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     dma_hw->ints0 = rgbDmaChanMask;
 
     currentDisplayLine++;
-#if VGA_HARDCODED_640
-    uint32_t pxLine = currentDisplayLine >> 1;
-    uint32_t pxLineRpt = currentDisplayLine & 0x01;
-#else
-    divmod_result_t pxLineVal = divmod_u32u32(currentDisplayLine, vgaParams.params.vPixelScale);
-    uint32_t pxLine = to_quotient_u32(pxLineVal);
-    uint32_t pxLineRpt = to_remainder_u32(pxLineVal);
-#endif
+
+    uint32_t pxLine = currentDisplayLine / DISPLAY_YSCALE;
+    uint32_t pxLineRpt = currentDisplayLine & (DISPLAY_YSCALE - 1);
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
 
-#if VGA_CRT_EFFECT
     if (vgaParams.scanlines && pxLineRpt != 0)
     {
-      for (int i = 0; i < 5; ++i)
+      for (int i = 0; i < 8; ++i)
       {
         currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }
     }
-#endif
 
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
@@ -383,16 +362,14 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
       }
     }
-#if VGA_CRT_EFFECT
     else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
       int end = VIRTUAL_PIXELS_X / 2;
-      for (int i = 5; i < end; ++i)
+      for (int i = 8; i < end; ++i)
       {
         currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
       }
     }
-#endif
   }
 }
 
@@ -495,8 +472,6 @@ void vgaInit(VgaInitParams params)
 
   pio_sm_set_enabled(VGA_PIO, SYNC_SM, true);
   pio_sm_set_enabled(VGA_PIO, RGB_SM, true);
-
-  //multicore_launch_core1(vgaLoop);
 }
 
 VgaInitParams *vgaCurrentParams()
