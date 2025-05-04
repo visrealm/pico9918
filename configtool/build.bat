@@ -5,7 +5,7 @@ mkdir build 2> NUL
 mkdir build\asm 2> NUL
 mkdir build\bin 2> NUL
 
-set VERSION=v1-0-0
+set VERSION=v1-0-1
 set FRIENDLYVER=%VERSION:-=.%
 
 echo.

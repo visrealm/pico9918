@@ -56,6 +56,7 @@ IntString temperatureStr = {0};
 IntString gpuPctStr = {0};
 IntString clockMhzStr = {0};
 IntString modeStr = {0};
+IntString fpsStr = {0};
 
 IntString nameTabStr = {0};
 IntString colorTabStr = {0};
@@ -183,6 +184,7 @@ void diagSetClockHz(float clockHz)
   flt2Str(clockHz / 1000000.0f, 1, &clockMhzStr);
 }
 
+extern int droppedFramesCount;
 
 /* update diagnostics values */
 void updateDiagnostics(uint32_t frameCount)
@@ -228,6 +230,11 @@ void updateDiagnostics(uint32_t frameCount)
     }
     *d = 0;
   }
+
+  if ((++frameCount & (framesPerUpdate - 1)) == 0)
+  {
+    flt2Str((16.0f - droppedFramesCount) * 3.75f, 2, &fpsStr);
+  }  
 }
 
 static inline int darken(int x, uint16_t* pixels)
@@ -325,6 +332,11 @@ static void diagGpuTime(uint16_t row, uint16_t* pixels)
   renderLeft("GPU   : ", &gpuPctStr, "%", row, pixels);
 }
 
+static void diagFPS(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("FPS   : ", &fpsStr, "FPS", row, pixels);
+}
+
 static void diagTemp(uint16_t row, uint16_t* pixels)
 {
   renderLeft("TEMP  : ", &temperatureStr, "^C", row, pixels);
@@ -373,6 +385,7 @@ int leftDiagRows = 0;
 DiagPtr performanceDiags[] = {
   &diagClock,
   &diagRenderTime,
+  &diagFPS,
   &diagGpuTime,
   &diagTemp};
 

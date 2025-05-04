@@ -59,6 +59,9 @@ static int frameCount = 0;
 static bool validWrites = false;  // has the VDP display been enabled at all?
 static bool doneInt = false;      // interrupt raised this frame?
 
+static bool droppedFrames[16] = {0};
+int droppedFramesCount = 0;
+
 static const uint32_t dma32 = 2; // memset 32bit
 /*
  * update the value send to the read PIO
@@ -454,6 +457,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     eofInterrupt();
     tempStatus |= STATUS_INT;
+
+    // keep track of the number of dropped frames in the past 64 frames
+    bool droppedFrame = currentStatus & STATUS_INT;
+    droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
+    droppedFrames[frameCount & 0xf] = droppedFrame;
   }
 
   updateInterrupts(tempStatus);
