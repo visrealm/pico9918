@@ -30,6 +30,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
 * [Powertran Cortex](http://powertrancortex.com/)
 * [Sega SG-1000 / SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
+* [Sega SG-1000 II](https://segaretro.org/SG-1000_II)
 * [Sord M5](https://en.wikipedia.org/wiki/Sord_M5)
 * [Tomy Pyūta / Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor)
 * [Tomy Pyūta Jr](http://videogamekraken.com/pyuta-jr-by-tomy)
