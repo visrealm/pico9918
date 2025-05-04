@@ -51,12 +51,20 @@ saveOptions: PROCEDURE
 ' -----------------------------------------------------------------------------
 vdpLoadConfigValues: PROCEDURE
     VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
+    
     FOR I = 0 TO CONF_COUNT - 1
         VDP(58) = I
         optValue = VDP_READ_STATUS            
         tempConfigValues(I) = optValue
         savedConfigValues(I) = optValue
     NEXT I
+
+#if F18A_TESTING
+    FOR I = 0 TO 31
+        tempConfigValues(128 + I) = defPal(I)
+        savedConfigValues(128 + I) = defPal(I)
+    NEXT I    
+#endif
 
     VDP_RESET_STATUS_REG
     END

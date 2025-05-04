@@ -135,7 +135,6 @@ paletteMenu: PROCEDURE
                     currentColor(0) = rgb(0)
                     currentColor(1) = cc1
 
-
                     VDP(47) = $c0 + currentIndex' palette data port from pal 2 index #10
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
                     VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
@@ -143,8 +142,13 @@ paletteMenu: PROCEDURE
                     VDP(47) = $40
 
                     ' update config palette
-                    VDP_WRITE_CONFIG(128 + currentIndex * 2, currentColor(0))
-                    VDP_WRITE_CONFIG(128 + currentIndex * 2 + 1, currentColor(1))                   
+                    IDX = 128 + currentIndex * 2
+                    VDP_WRITE_CONFIG(IDX, currentColor(0))
+                    VDP_WRITE_CONFIG(IDX + 1, currentColor(1))
+
+                    tempConfigValues(IDX) = currentColor(0)
+                    tempConfigValues(IDX + 1) = currentColor(1)
+
                     GOSUB delay
                 END IF
         END IF
@@ -186,13 +190,10 @@ paletteMenu: PROCEDURE
                 GOSUB hideSprites
             ELSEIF g_nav AND NAV_LEFT AND rgb(rgbIndex) > 0 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) - 1
-                g_paletteDirty = TRUE
             ELSEIF g_nav AND NAV_RIGHT AND rgb(rgbIndex) < 15 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) + 1
-                g_paletteDirty = TRUE
             ELSEIF g_key > 0 AND g_key < 16 THEN
                 rgb(rgbIndex) = g_key
-                g_paletteDirty = TRUE
             END IF
         ELSE
             IF g_nav AND NAV_DOWN AND currentMenu < (3 + MENU_INDEX_COUNT) THEN
@@ -221,6 +222,15 @@ paletteMenu: PROCEDURE
     
     GOSUB hideSprites
 
+    g_paletteDirty = FALSE
+    FOR I = 128 to 159
+        IF tempConfigValues(I) <> savedConfigValues(I) THEN
+            g_paletteDirty = TRUE
+            EXIT FOR
+        END IF
+    NEXT I
+
+
     menuTopRow = oldMenuTopRow
     g_currentMenuIndex = oldIndex
 
@@ -237,16 +247,18 @@ updateRGB:
         DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2)
     END IF
 
+    I = 128 + currentIndex * 2
+
     #if F18A_TESTING
-    currentColor(0) = defPal(currentIndex * 2)
-    currentColor(1) = defPal(currentIndex * 2 + 1)
+        currentColor(0) = tempConfigValues(I)
+        currentColor(1) = tempConfigValues(I + 1)
     #else
-    VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
-    VDP(58) = 128 + currentIndex * 2
-    currentColor(0) = VDP_READ_STATUS
-    VDP(58) = 128 + currentIndex * 2 + 1
-    currentColor(1) = VDP_READ_STATUS            
-    VDP_RESET_STATUS_REG
+        VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
+        VDP(58) = I
+        currentColor(0) = VDP_READ_STATUS
+        VDP(58) = I + 1
+        currentColor(1) = VDP_READ_STATUS            
+        VDP_RESET_STATUS_REG
     #endif
 
     rgb(0) = currentColor(0) AND $0f
@@ -300,11 +312,11 @@ resetPalette: PROCEDURE
     ' update config palette
     FOR I = 0 TO 31
         VDP_WRITE_CONFIG(128 + I, defPal(I))
+        tempConfigValues(128 + I) = defPal(I)
     NEXT I
 
     lastIndex = 0
     GOSUB updateRGB
-    g_paletteDirty = TRUE
 
     END
 

@@ -27,7 +27,7 @@ CONST MENU_ID_PALETTE  = 3
 CONST MENU_ID_FIRMWARE = 4
 
 ' Pico9918Options index, name[16], values index, num values,help[32]
-CONST CONF_COUNT      = 128   ' number of primary config options
+CONST CONF_COUNT      = 160 ' number of primary config options
 CONST CONF_INDEX      = 0
 CONST CONF_LABEL      = 1
 CONST CONF_LABEL_LEN  = 16
@@ -55,11 +55,11 @@ CONST CONF_DISP_DRIVER      = 5
 CONST CONF_CRT_SCANLINES    = 8         ' 0 (off) or 1 (on)
 CONST CONF_SCANLINE_SPRITES = 9         ' 0 - 3 where value = (1 << (x + 2))
 CONST CONF_CLOCK_PRESET_ID  = 10        ' 0 - 2 see ClockSettings in main.c
-CONST CONF_DIAG             = 64
-CONST CONF_DIAG_REGISTERS   = 65
-CONST CONF_DIAG_PERFORMANCE = 66
-CONST CONF_DIAG_PALETTE     = 67
-CONST CONF_DIAG_ADDRESS     = 68
+CONST CONF_DIAG             = 16
+CONST CONF_DIAG_REGISTERS   = 17
+CONST CONF_DIAG_PERFORMANCE = 18
+CONST CONF_DIAG_PALETTE     = 19
+CONST CONF_DIAG_ADDRESS     = 20
 ' ^^^ read/write config IDs
 
 ' now the "special" config IDs
