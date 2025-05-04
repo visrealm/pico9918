@@ -1,5 +1,5 @@
 /*
- * Project: pico9918 - palette
+ * Project: pico9918
  *
  * Copyright (c) 2024 Troy Schrapel
  *
@@ -11,7 +11,4 @@
 
 #pragma once
 
- /* palette of 12-bit BGR values
-  * Format: 0000BBBBGGGGRRRR */
-
-extern uint16_t tms9918PaletteBGR12[16];
+void flashSector();

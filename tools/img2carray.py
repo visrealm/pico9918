@@ -227,9 +227,16 @@ def imageToArrayContents(src, pix, bpp) -> str:
                     value = 0
                 else:
                     value <<= bpp
-            else:  # 2bpp
+            elif bpp == 2:
                 value = value | col
                 if (x & 3) == 3:
+                    row.append("{0:#0{1}x}".format(value, 4))
+                    value = 0
+                else:
+                    value <<= bpp
+            else:  # 1bpp
+                value = value | col
+                if (x & 7) == 7:
                     row.append("{0:#0{1}x}".format(value, 4))
                     value = 0
                 else:
@@ -264,7 +271,9 @@ def processImageFile(infile, srcOutput, hdrOutput, args, inRam) -> None:
 
         bpp = 16
         if src.palette:
-            if len(src.palette.tobytes()) <= (4 * 3):
+            if len(src.palette.tobytes()) <= (2 * 3):
+                bpp = 1
+            elif len(src.palette.tobytes()) <= (4 * 3):
                 bpp = 2
             else:
                 bpp = 4 if len(src.palette.tobytes()) <= (16 * 3) else 8

@@ -1,0 +1,20 @@
+ src/rp2040/boot_stage2/boot2_w25q080.S | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/rp2040/boot_stage2/boot2_w25q080.S b/src/rp2040/boot_stage2/boot2_w25q080.S
+index c35fb81..7597273 100644
+--- a/src/rp2040/boot_stage2/boot2_w25q080.S
++++ b/src/rp2040/boot_stage2/boot2_w25q080.S
+@@ -100,6 +100,12 @@ pico_default_asm_setup
+ regular_func _stage2_boot
+     push {lr}
+ 
++    // ROSC to full speed (testing)
++    ldr r3, =0x40060AA1
++    uxth r2,r3
++    bics r3,r2
++    str r2, [r3, #16]
++
+     // Set pad configuration:
+     // - SCLK 8mA drive, no slew limiting
+     // - SDx disable input Schmitt to reduce delay

@@ -13,113 +13,32 @@
 #include "vga-modes.h"
 
 #include "clocks.pio.h"
-#include "tms9918.pio.h"
-
-#include "palette.h"
-
-#include "splash.h"
 
 #include "impl/vrEmuTms9918Priv.h"
 #include "vrEmuTms9918Util.h"
 
+#include "display.h"
+#include "diag.h"
+#include "gpio.h"
+#include "gpu.h"
+#include "config.h"
+#include "splash.h"
+#include "temperature.h"
+
 #include "pico/stdlib.h"
 #include "pico/multicore.h"
-#include "pico/binary_info.h"
 
-#include "hardware/pio.h"
+#include "hardware/dma.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
-
- /*
-  * Pin mapping (PCB v0.3)
-  *
-  * Pin  | GPIO | Name      | TMS9918A Pin
-  * -----+------+-----------+-------------
-  *  19  |  14  |  CD7      |  24
-  *  20  |  15  |  CD6      |  23
-  *  21  |  16  |  CD5      |  22
-  *  22  |  17  |  CD4      |  21
-  *  24  |  18  |  CD3      |  20
-  *  25  |  19  |  CD2      |  19
-  *  26  |  20  |  CD1      |  18
-  *  27  |  21  |  CD0      |  17
-  *  29  |  22  |  /INT     |  16
-  *  30  |  RUN |  RST      |  34
-  *  31  |  26  |  /CSR     |  15
-  *  32  |  27  |  /CSW     |  14
-  *  34  |  28  |  MODE     |  13
-  *  35  |  29  |  GROMCLK  |  37
-  *  37  |  23  |  CPUCLK   |  38
-  *
-  * Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29
-  *       a genuine Raspberry Pi Pico can't be used.
-  *       v0.3 of the PCB is designed for the DWEII?
-  *       RP2040 USB-C module which exposes these additional
-  *       GPIOs. A future pico9918 revision (v0.4+) will do without
-  *       an external RP2040 board and use the RP2040 directly.
-  *
-  * Purchase links:
-  *       https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
-  *       https://www.aliexpress.com/item/1005007066733934.html
-  */
-
-#define PCB_MAJOR_VERSION PICO9918_PCB_MAJOR_VER
-#define PCB_MINOR_VERSION PICO9918_PCB_MINOR_VER
-
-#define GPIO_CD7 14
-#define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio
-#define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio
-#define GPIO_MODE 28
-#define GPIO_INT 22
-
-#if PCB_MAJOR_VERSION != 0
-#error "Time traveller?"
-#endif
-
-  // pin-mapping for gromclk and cpuclk changed in PCB v0.4
-  // in order to have MODE and MODE1 sequential
-#if PCB_MINOR_VERSION < 4
-#define GPIO_GROMCL 29
-#define GPIO_CPUCL 23
-#else
-#define GPIO_GROMCL 25
-#define GPIO_CPUCL 24
-#define GPIO_RESET 23
-#define GPIO_MODE1 29
-#endif
+#include "hardware/structs/ssi.h"
 
 
-#define GPIO_CD_MASK (0xff << GPIO_CD7)
-#define GPIO_CSR_MASK (0x01 << GPIO_CSR)
-#define GPIO_CSW_MASK (0x01 << GPIO_CSW)
-#define GPIO_MODE_MASK (0x01 << GPIO_MODE)
-#define GPIO_INT_MASK (0x01 << GPIO_INT)
 
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
-#if PICO9918_SCART_RGBS // for 15kHz
-  #define PICO_CLOCK_PLL 1536000000
-  #define PICO_CLOCK_PLL_DIV1 3
-  #define PICO_CLOCK_PLL_DIV2 2
-#else // for 31.46875 kHz
-  #define PICO_CLOCK_PLL 1260000000
-  #define PICO_CLOCK_PLL_DIV1 5
-  #define PICO_CLOCK_PLL_DIV2 1
-#endif
-
-#define PICO_CLOCK_HZ (PICO_CLOCK_PLL / PICO_CLOCK_PLL_DIV1 / PICO_CLOCK_PLL_DIV2)
-
 #define TMS_PIO pio1
 #define TMS_IRQ PIO1_IRQ_0
-
-bi_decl(bi_1pin_with_name(GPIO_GROMCL, "GROM Clock"));
-bi_decl(bi_1pin_with_name(GPIO_CPUCL, "CPU Clock"));
-bi_decl(bi_pin_mask_with_names(GPIO_CD_MASK, "CPU Data (CD7 - CD0)"));
-bi_decl(bi_1pin_with_name(GPIO_CSR, "Read"));
-bi_decl(bi_1pin_with_name(GPIO_CSW, "Write"));
-bi_decl(bi_1pin_with_name(GPIO_MODE, "Mode"));
-bi_decl(bi_1pin_with_name(GPIO_INT, "Interrupt"));
-
 
 /* file globals */
 
@@ -127,19 +46,31 @@ static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0x1f; /* current status register value */
 
-static uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X];
+static __attribute__((section(".scratch_y.buffer"))) uint32_t bg; 
+
+static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(4) tmsScanlineBuffer[TMS9918_PIXELS_X + 8];
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
+const uint tmsGromClkSm = 2;
+const uint tmsCpuClkSm = 3;
 
+static int frameCount = 0;
+static bool validWrites = false;  // has the VDP display been enabled at all?
+static bool doneInt = false;      // interrupt raised this frame?
+
+static bool droppedFrames[16] = {0};
+int droppedFramesCount = 0;
+
+static const uint32_t dma32 = 2; // memset 32bit
 /*
  * update the value send to the read PIO
  */
-inline static void updateTmsReadAhead()
+static void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
-  readAhead |= currentStatus << 16;
+  readAhead |= (TMS_STATUS(tms9918, TMS_REGISTER(tms9918, 0x0F) & 0x0F)) << 16;
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
@@ -180,10 +111,27 @@ void  __not_in_flash_func(pio_irq_handler)()
     }
     else // read status
     {
-      currentStatus = 0x1f;
-      vrEmuTms9918SetStatusImpl(currentStatus);
-      currentInt = false;
-      gpio_put(GPIO_INT, !currentInt);
+      readVal >>= (3 + 16); // What status was read?
+      tms9918->regWriteStage = 0;
+      switch (TMS_REGISTER(tms9918, 0x0F) & 0x0F)
+      {
+        case 0:
+          readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
+          currentStatus &= ~readVal; // Switch off any 3 high bits which have just been read
+          if (readVal & STATUS_5S) // Was 5th Sprite read?
+            currentStatus |= 0x1f;
+          vrEmuTms9918SetStatusImpl(currentStatus);
+          if (readVal & STATUS_INT)  // Was Interrupt read?
+          {
+            currentInt = false;
+            gpio_put(GPIO_INT, !currentInt);
+          }
+          break;
+        case 1:
+          if (readVal << 31)
+            TMS_STATUS(tms9918, 0x01) &= ~0x01;
+          break;
+      }
     }
     updateTmsReadAhead();
   }
@@ -195,9 +143,7 @@ void  __not_in_flash_func(pio_irq_handler)()
  */
 static inline void enableTmsPioInterrupts()
 {
-  __dmb();
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = 1u << TMS_IRQ;
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = 1u << TMS_IRQ;
+  irq_set_enabled(TMS_IRQ, true);
 }
 
 /*
@@ -205,97 +151,91 @@ static inline void enableTmsPioInterrupts()
  */
 static inline void disableTmsPioInterrupts()
 {
-  *((io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = 1u << TMS_IRQ;
-  __dmb();
+  irq_set_enabled(TMS_IRQ, false);
 }
 
 /*
- * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
+ * handle reset pin going active (low)
  */
-static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
+void __not_in_flash_func(gpioIrqHandler)()
 {
+  gpio_acknowledge_irq(GPIO_RESET, GPIO_IRQ_EDGE_FALL);
 
-#if 0
-  // better compile-time optimizations if we hard-code these
-#define VIRTUAL_PIXELS_X 640
-#define VIRTUAL_PIXELS_Y 240
-#else 
-#define VIRTUAL_PIXELS_X params->hVirtualPixels
-#define VIRTUAL_PIXELS_Y params->vVirtualPixels
-#endif
+  disableTmsPioInterrupts();
+
+  vrEmuTms9918Reset();  // resets palette to factory
+
+  readConfig(tms9918->config);  // re-load config palette
+
+  irq_clear(TMS_IRQ);
+  pio_sm_clear_fifos(TMS_PIO, tmsReadSm);
+  pio_sm_clear_fifos(TMS_PIO, tmsWriteSm);
+
+  nextValue = 0;
+  currentStatus = 0x1f;
+  vrEmuTms9918SetStatusImpl(currentStatus);
+  currentInt = false;
+  doneInt = true;
+  updateTmsReadAhead();  
+  
+  frameCount = 0;
+  resetSplash();
+  gpio_put(GPIO_INT, !currentInt);
+  enableTmsPioInterrupts();
+}
+
+typedef struct
+{
+  int pll;
+  int pllDiv1;
+  int pllDiv2;
+  int voltage;
+  int clockHz;
+} ClockSettings;
+
+#define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
+
+static const ClockSettings clockPresets[] = {
+  CLOCK_PRESET(1260000000, 5, 1, VREG_VOLTAGE_1_15),    // 252
+  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_15),    // 302.4
+  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
+};
+
+static int clockPresetIndex = 0;
+static bool testingClock = false;
 
 
-  const uint32_t vBorder = (VIRTUAL_PIXELS_Y - TMS9918_PIXELS_Y) / 2;
-  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
-  static int frameCount = 0;
-  static int logoOffset = 100;
-
-  uint16_t bg = tms9918PaletteBGR12[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
-
-  /*** top and bottom borders ***/
-  if (y < vBorder || y >= (vBorder + TMS9918_PIXELS_Y))
+static void eofInterrupt()
+{
+  doneInt = true;
+  TMS_STATUS(tms9918, 0x01) |=  0x02;
+  if (TMS_REGISTER(tms9918, 0x32) & 0x20)
   {
-    for (int x = 0; x < VIRTUAL_PIXELS_X; ++x)
-    {
-      pixels[x] = bg;
-    }
-
-    /* source: C:/Users/troy/OneDrive/Documents/projects/pico9918/src/res/splash.png
-     * size  : 172px x 10px
-     *       : 430 bytes
-     * format: 16-bit abgr palette, 2bpp indexed image
-     */
-    if (frameCount < 600)
-    {
-      if (y == 0)
-      {
-        ++frameCount;
-        if (frameCount & 0x01)
-        {
-          if (frameCount < 200 && logoOffset > 12) --logoOffset;
-          else if (frameCount > 500) ++logoOffset;
-        }
-      }
-
-      if (y < (VIRTUAL_PIXELS_Y - 1))
-      {
-        y -= vBorder + TMS9918_PIXELS_Y + logoOffset;
-        if (y < splashHeight)
-        {
-          uint8_t* splashPtr = splash + (y * splashWidth / 4);
-          for (int x = 4; x < 4 + splashWidth; x += 4)
-          {
-            uint8_t c = *(splashPtr++);
-            uint8_t p0 = (c & 0xc0);
-            uint8_t p1 = (c & 0x30);
-            uint8_t p2 = (c & 0x0c);
-            uint8_t p3 = (c & 0x03);
-
-            if (p0) { pixels[x] = splash_pal[(p0 >> 6)]; }
-            if (p1) { pixels[x + 1] = splash_pal[(p1 >> 4)]; }
-            if (p2) { pixels[x + 2] = splash_pal[(p2 >> 2)]; }
-            if (p3) { pixels[x + 3] = splash_pal[p3]; }
-          }
-        }
-      }
-    }
-    return;
+    gpuTrigger();
   }
 
-  y -= vBorder;
-
-  /*** main display region ***/
-
-  /* generate the scanline */
-  uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
-
-  /*** interrupt signal? ***/
-  if (y == TMS9918_PIXELS_Y - 1)
+  static float tempC = 0.0f;
+  tempC += coreTemperatureC();
+  if ((frameCount & 0x3f) == 0) // every 16th frame
   {
-    tempStatus |= STATUS_INT;
+    tempC /= 64.0f;
+    diagSetTemperature(tempC);
+    uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
+    TMS_STATUS(tms9918, 13) = t4;
+    tempC = 0.0f;
   }
 
+  if (tms9918->configDirty)
+  {
+    tms9918->configDirty = false;
+    applyConfig();  // apply config option to device now
+    diagnosticsConfigUpdated();
+  }
+}
+
+static void updateInterrupts(uint8_t tempStatus)
+{
   disableTmsPioInterrupts();
   if ((currentStatus & STATUS_INT) == 0)
   {
@@ -308,45 +248,33 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     gpio_put(GPIO_INT, !currentInt);
   }
   enableTmsPioInterrupts();
-
-  /*** left border ***/
-  for (int x = 0; x < hBorder; ++x)
-  {
-    pixels[x] = bg;
-  }
-
-  /* convert from palette to bgr12 */
-  int tmsX = 0;
-  if (tms9918->mode == TMS_MODE_TEXT80)
-  {
-    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
-    {
-      pixels[x] = tms9918PaletteBGR12[(tmsScanlineBuffer[tmsX] & 0xf0) >> 4];
-      pixels[x + 1] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX] & 0x0f];
-    }
-  }
-  else
-  {
-    for (int x = hBorder; x < hBorder + TMS9918_PIXELS_X * 2; x += 2, ++tmsX)
-    {
-      pixels[x] = tms9918PaletteBGR12[tmsScanlineBuffer[tmsX]];
-      pixels[x + 1] = pixels[x];
-    }
-  }
+}
 
 
-  /*** right border ***/
-  for (int x = hBorder + TMS9918_PIXELS_X * 2; x < VIRTUAL_PIXELS_X; ++x)
-  {
-    pixels[x] = bg;
-  }
+/* F18A palette entries are big-endian 0x0RGB which looks like
+   0xGB0R to our RP2040. our vga code is expecting 0x0BGR
+   so we've got B and R correct by pure chance. just need to shift G
+   over. this function does that.   */
 
+inline uint32_t bigRgb2LittleBgr(uint32_t val)
+{
+  val &= 0xff0f;
+  return val | ((val >> 12) << 4);
+}
+
+
+void updateClock(uint pioSm, float freqHz)
+{
+  float clockDiv = ((float)clockPresets[clockPresetIndex].clockHz) / (freqHz * 2.0f);
+  pio_sm_set_clkdiv(pio0, pioSm, clockDiv);
+  pio_sm_set_enabled(pio0, pioSm, true);
+  diagSetClockHz(clockPresets[clockPresetIndex].clockHz);
 }
 
 /*
  * initialise a clock output using PIO
  */
-uint initClock(uint gpio, float freqHz)
+void initClock(uint gpio, uint pioSm, float freqHz)
 {
   static uint clocksPioOffset = -1;
 
@@ -355,20 +283,264 @@ uint initClock(uint gpio, float freqHz)
     clocksPioOffset = pio_add_program(pio0, &clock_program);
   }
 
-  static uint clkSm = 2;
-
   pio_gpio_init(pio0, gpio);
-  pio_sm_set_consecutive_pindirs(pio0, clkSm, gpio, 1, true);
+  pio_sm_set_consecutive_pindirs(pio0, pioSm, gpio, 1, true);
   pio_sm_config c = clock_program_get_default_config(clocksPioOffset);
   sm_config_set_set_pins(&c, gpio, 1);
 
-  pio_sm_init(pio0, clkSm, clocksPioOffset, &c);
+  pio_sm_init(pio0, pioSm, clocksPioOffset, &c);
 
-  float clockDiv = (float)PICO_CLOCK_HZ / (freqHz * 2.0f);
-  pio_sm_set_clkdiv(pio0, clkSm, clockDiv);
-  pio_sm_set_enabled(pio0, clkSm, true);
+  updateClock(pioSm, freqHz);
+}
 
-  return clkSm++;
+static void tmsPorch()
+{
+  tms9918->vram.map.blanking = 1; // V
+  tms9918->vram.map.scanline = 255; // F18A value for vsync
+  TMS_STATUS(tms9918, 0x03) = 255;
+}
+
+static void tmsEndOfFrame(uint32_t frameNumber)
+{
+  ++frameCount;
+  
+  if (!validWrites)
+  {
+    // has the display been enabled?
+    if (validWrites = (TMS_REGISTER(tms9918, 1) & 0x40))
+      allowSplashHide();
+  }
+
+  if (tms9918->config[CONF_DIAG])
+    updateDiagnostics(frameCount);
+
+
+  // here, we catch the case where the last row(s) were
+  // missed and we never raised an interrupt. do it now  
+  if (!doneInt)
+  {
+    eofInterrupt();
+    updateInterrupts(STATUS_INT);
+  }
+}
+
+
+void renderDiag(int y, uint16_t *pixels)
+{
+  if (tms9918->config[CONF_DIAG])
+  {
+    dma_channel_wait_for_finish_blocking(dma32);
+    renderDiagnostics(y, pixels);
+  }
+}
+
+/*
+ * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
+ */
+static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
+{
+  int vPixels = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 * 8 : 24 * 8;
+
+  const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
+  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
+
+  uint32_t* dPixels = (uint32_t*)pixels;
+  bg = bigRgb2LittleBgr(tms9918->vram.map.pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
+  bg = bg | (bg << 16);
+
+  if (y == 0)
+  {
+    doneInt = false;
+  }
+
+  /*** top and bottom borders ***/
+  if (y < vBorder || y >= (vBorder + vPixels))  // TODO: Note of this runs in ROW30 mode
+  {
+    dma_channel_set_write_addr(dma32, dPixels, false);
+    dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
+    tms9918->vram.map.blanking = 1; // V
+    if ((y >= vBorder + vPixels))
+    {
+      tms9918->vram.map.scanline = y - vBorder;
+      TMS_STATUS(tms9918, 0x03) = tms9918->vram.map.scanline;
+    }
+    dma_channel_wait_for_finish_blocking(dma32);
+
+    renderDiag(y, pixels);
+
+    if (!validWrites || (frameCount < 600))
+    {
+      outputSplash(y, frameCount, vBorder, vPixels, pixels);
+
+      if (testingClock)
+      {
+        if (frameCount < 400)
+        {
+          renderText(y, "TESTING NEW CLOCK FREQUENCY...", 231, 8, 0x0fff, 0x0222, pixels);
+        }
+        else if (frameCount < 500)
+        {
+          renderText(y, "TEST COMPLETED SUCCESSFULLY!", 234, 8, 0x07f7, 0x0444, pixels);
+        }
+        else if (frameCount < 599)
+        {
+          renderText(y, "WRITING CONFIGURATION TO FLASH...", 222, 8, 0x0fff, 0x0444, pixels);
+        }
+        else
+        {
+          // new clock lasted 10 seconds... let's accept it
+          tms9918->config[CONF_CLOCK_TESTED] = tms9918->config[CONF_CLOCK_PRESET_ID];
+          tms9918->config[CONF_SAVE_TO_FLASH] = 1;
+          testingClock = false;
+        }
+      }
+      
+      if (frameCount > 600)
+      {
+        tms9918->config[CONF_DIAG] = true;
+        tms9918->config[CONF_DIAG_REGISTERS] = true;
+        tms9918->config[CONF_DIAG_PERFORMANCE] = true;
+        tms9918->config[CONF_DIAG_PALETTE] = true;
+        tms9918->config[CONF_DIAG_ADDRESS] = true;
+      }
+    }
+
+    if (TMS_REGISTER(tms9918, 0x32) & 0x40)
+    {
+      gpuTrigger();
+    }
+    
+    return;
+  }
+
+  uint32_t frameStart = time_us_32();
+
+  y -= vBorder;
+  tms9918->vram.map.blanking = 0;
+  tms9918->vram.map.scanline = y;
+  TMS_STATUS(tms9918, 0x03) = y;
+
+  /*** left border ***/
+  dma_channel_set_write_addr(dma32, dPixels, false);
+  dma_channel_set_trans_count(dma32, hBorder / 2, true);
+
+  /*** main display region ***/
+
+  /* generate the scanline */
+  uint32_t renderTime  = time_us_32();
+  uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+  renderTime = time_us_32() - renderTime;
+
+  /*** interrupt signal? ***/
+  const int interruptThreshold = 1;
+  if (y < vPixels - interruptThreshold)
+  {
+    TMS_STATUS(tms9918, 0x01) &= ~0x03;
+  }
+  else
+  {
+    TMS_STATUS(tms9918, 0x01) &= ~0x01;
+  }
+
+  if (tms9918->vram.map.scanline && (TMS_REGISTER(tms9918, 0x13) == tms9918->vram.map.scanline))
+  {
+    TMS_STATUS(tms9918, 0x01) |= 0x01;
+    tempStatus |= STATUS_INT;
+  }
+
+  if (TMS_REGISTER(tms9918, 0x32) & 0x40)
+  {
+    gpuTrigger();
+  }
+
+  if (!doneInt && y >= vPixels - interruptThreshold)
+  {
+    eofInterrupt();
+    tempStatus |= STATUS_INT;
+
+    // keep track of the number of dropped frames in the past 64 frames
+    bool droppedFrame = currentStatus & STATUS_INT;
+    droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
+    droppedFrames[frameCount & 0xf] = droppedFrame;
+  }
+
+  updateInterrupts(tempStatus);
+
+  /* convert from  palette to bgr12 */
+  if (vrEmuTms9918DisplayMode(tms9918) == TMS_MODE_TEXT80)
+  {
+    uint32_t pram[256];
+    uint32_t data;
+    for (int i = 0, x = 0; i < 16; ++i)
+    {
+      uint32_t c = tms9918->vram.map.pram[i] & 0xFF0F;
+      for (int j = 0; j < 16; ++j, ++x)
+      {
+        data = ((tms9918->vram.map.pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
+      }
+    }
+    tms9918->vram.map.blanking = 1; // H
+
+    uint8_t* src = &(tmsScanlineBuffer [0]);
+    uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
+    uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
+
+    while (src < end)
+    {
+      dP [0] = pram[src [0]];
+      dP [1] = pram[src [1]];
+      dP [2] = pram[src [2]];
+      dP [3] = pram[src [3]];
+      dP [4] = pram[src [4]];
+      dP [5] = pram[src [5]];
+      dP [6] = pram[src [6]];
+      dP [7] = pram[src [7]];
+      dP += 8;
+      src += 8;
+    }
+  }
+  else
+  {
+    uint8_t* src = &(tmsScanlineBuffer [0]);
+    uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
+    uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
+    uint32_t pram [64];
+    uint32_t data;
+    for (int i = 0; i < 64; i += 8)
+    {
+      data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
+      data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+    }
+    tms9918->vram.map.blanking = 1; // H
+
+    while (src < end)
+    {
+      dP [0] = pram[src [0]];
+      dP [1] = pram[src [1]];
+      dP [2] = pram[src [2]];
+      dP [3] = pram[src [3]];
+      dP [4] = pram[src [4]];
+      dP [5] = pram[src [5]];
+      dP [6] = pram[src [6]];
+      dP [7] = pram[src [7]];
+      dP += 8;
+      src += 8;
+    }
+  }
+
+  /*** right border ***/
+  dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
+
+  if (tms9918->config[CONF_DIAG_PERFORMANCE] || 1)
+    updateRenderTime(renderTime,  time_us_32() - frameStart);
+
+  renderDiag(y + vBorder, pixels);
 }
 
 /*
@@ -381,12 +553,12 @@ void tmsPioInit()
 
   uint tmsWriteProgram = pio_add_program(TMS_PIO, &tmsWrite_program);
 
-  pio_sm_config writeConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
-  sm_config_set_in_pins(&writeConfig, GPIO_CD7);
-  sm_config_set_in_shift(&writeConfig, false, true, 32); // L shift, autopush @ 16 bits
-  sm_config_set_clkdiv(&writeConfig, 1.0f);
+  pio_sm_config writePioConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
+  sm_config_set_in_pins(&writePioConfig, GPIO_CD7);
+  sm_config_set_in_shift(&writePioConfig, false, true, 32); // L shift, autopush @ 32 bits
+  sm_config_set_clkdiv(&writePioConfig, 1.0f);
 
-  pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writeConfig);
+  pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writePioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
   pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
 
@@ -397,15 +569,15 @@ void tmsPioInit()
     pio_gpio_init(TMS_PIO, GPIO_CD7 + i);
   }
 
-  pio_sm_config readConfig = tmsRead_program_get_default_config(tmsReadProgram);
-  sm_config_set_in_pins(&readConfig, GPIO_CSR);
-  sm_config_set_jmp_pin(&readConfig, GPIO_MODE);
-  sm_config_set_out_pins(&readConfig, GPIO_CD7, 8);
-  sm_config_set_in_shift(&readConfig, false, false, 32); // L shift
-  sm_config_set_out_shift(&readConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readConfig, 4.0f);
+  pio_sm_config readPioConfig = tmsRead_program_get_default_config(tmsReadProgram);
+  sm_config_set_in_pins(&readPioConfig, GPIO_CSR);
+  sm_config_set_jmp_pin(&readPioConfig, GPIO_MODE);
+  sm_config_set_out_pins(&readPioConfig, GPIO_CD7, 8);
+  sm_config_set_in_shift(&readPioConfig, false, false, 32); // L shift
+  sm_config_set_out_shift(&readPioConfig, true, false, 32); // R shift
+  sm_config_set_clkdiv(&readPioConfig, 4.0f);
 
-  pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readConfig);
+  pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
   pio_set_irq0_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
 
@@ -419,21 +591,30 @@ void tmsPioInit()
 void proc1Entry()
 {
   // set up gpio pins
-  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_INT_MASK);
-  gpio_put_all(GPIO_INT_MASK);
-  gpio_set_dir_all_bits(GPIO_INT_MASK); // int is an output
+  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_MODE1_MASK | GPIO_INT_MASK | GPIO_RESET_MASK);
+  gpio_put_all(0); // we want to kep /INT held low for now
+  gpio_set_dir_all_bits(GPIO_INT_MASK); // /INT is an output
 
   tmsPioInit();
 
-  // set up the GROMCLK and CPUCLK signals
-  initClock(GPIO_GROMCL, TMS_CRYSTAL_FREQ_HZ / 24.0f);
-  initClock(GPIO_CPUCL, TMS_CRYSTAL_FREQ_HZ / 3.0f);
+  gpio_put_all(GPIO_INT_MASK);	// ok, we can release /INT now
+  
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
+
+  if (hwVersion != HWVer_0_3)
+  {
+    // set up reset gpio interrupt handler
+    irq_set_exclusive_handler(IO_IRQ_BANK0, gpioIrqHandler);
+    gpio_set_irq_enabled(GPIO_RESET, GPIO_IRQ_EDGE_FALL, true);
+    irq_set_enabled(IO_IRQ_BANK0, true);
+  }
+
+  tms9918->config[CONF_HW_VERSION] = hwVersion;
 
   // wait until everything else is ready, then run the vga loop
   multicore_fifo_pop_blocking();
   vgaLoop();
 }
-
 
 /*
  * main entry point
@@ -445,7 +626,11 @@ int main(void)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
 
-  set_sys_clock_pll(PICO_CLOCK_PLL, PICO_CLOCK_PLL_DIV1, PICO_CLOCK_PLL_DIV2);   // 252000
+  /* the initial "safe" clock speed */
+
+  ClockSettings clockSettings = clockPresets[clockPresetIndex];
+  vreg_set_voltage(clockSettings.voltage);
+  set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
 
   /* we need one of these. it's the main guy */
   vrEmuTms9918Init();
@@ -453,36 +638,79 @@ int main(void)
   /* launch core 1 which handles TMS9918<->CPU and rendering scanlines */
   multicore_launch_core1(proc1Entry);
 
+  /* we could set clock freq here from options */
+  readConfig(tms9918->config);
+  
+  /*
+   * if we're trying out a new clock rate, we need to have a failsafe 
+   * we test it first 
+   */
+  if (tms9918->config[CONF_CLOCK_PRESET_ID] != 0 && 
+      tms9918->config[CONF_CLOCK_PRESET_ID] != tms9918->config[CONF_CLOCK_TESTED])
+  {
+    testingClock = true;
+    int wantedClock = tms9918->config[CONF_CLOCK_PRESET_ID];
+    tms9918->config[CONF_CLOCK_PRESET_ID] = 0;
+    tms9918->config[CONF_CLOCK_TESTED] = 0;
+    writeConfig(tms9918->config);
+    tms9918->config[CONF_CLOCK_PRESET_ID] = wantedClock;
+  }
+
+  if (tms9918->config[CONF_CLOCK_PRESET_ID] != clockPresetIndex)
+  {
+    // we do this now rather than at boot to ensure a fast (133MHz?) flash clock
+    // for the transfer of the firmware to RAM at startup
+
+    ssi_hw->ssienr = 0; // change (reduce) flash SPI clock rate
+    ssi_hw->baudr = 0;
+    ssi_hw->baudr = 4;  // clock divider (must be even and result in a max of 133MHz)
+    ssi_hw->ssienr = 1;    
+
+    clockPresetIndex = tms9918->config[CONF_CLOCK_PRESET_ID];
+    clockSettings = clockPresets[clockPresetIndex];
+
+    vreg_set_voltage(clockSettings.voltage);
+    set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
+  }
+
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
+  initClock((hwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL, tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
+  initClock((hwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL, tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
+
+  dma_channel_config cfg = dma_channel_get_default_config(dma32);
+  channel_config_set_read_increment(&cfg, false);
+  channel_config_set_write_increment(&cfg, true);
+  channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
+  dma_channel_set_config(dma32, &cfg, false);
+  dma_channel_set_read_addr(dma32, &bg, false);
+
   /* then set up VGA output */
   VgaInitParams params = { 0 };
-
-#if PICO9918_SCART_RGBS
-  #if PICO9918_SCART_PAL
-    params.params = vgaGetParams(RGBS_PAL_720_576i_50HZ);
-  #else
-    params.params = vgaGetParams(RGBS_NTSC_720_480i_60HZ);
-  #endif
-#else // VGA
-  params.params = vgaGetParams(VGA_640_480_60HZ);
-
-  /* virtual size will be 640 x 240 to accomodate 80-column mode */
-  setVgaParamsScaleY(&params.params, 2);
-#endif
+  params.params = vgaGetParams(DISPLAY_MODE);
+  setVgaParamsScaleY(&params.params, DISPLAY_YSCALE);
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
+  params.endOfFrameFn = tmsEndOfFrame;
+  params.porchFn = tmsPorch;
+
+  const char *version = PICO9918_VERSION;
 
   vgaInit(params);
+
+  initTemperature();
+
+  initDiagnostics();
+
 
   /* signal proc1 that we're ready to start the display */
   multicore_fifo_push_blocking(0);
 
-  /* twiddle our thumbs - everything from this point on
-     is handled by interrupts and PIOs */;
-  while (1)
-  {
-    tight_loop_contents();
-  }
+  /* initialize the GPU */
+  gpuInit();
+
+  /* pass control of core0 over to the TMS9900 GPU */
+  gpuLoop();
 
   return 0;
 }

@@ -43,6 +43,7 @@ typedef struct
 
 typedef void (*vgaScanlineRgbFn)(uint16_t y, VgaParams* params, uint16_t* pixels);
 typedef void (*vgaEndOfFrameFn)(uint32_t frameNumber);
+typedef void (*vgaPorchFn)();
 typedef void (*vgaInitFn)();
 typedef void (*vgaEndOfScanlineFn)();
 
@@ -55,10 +56,12 @@ typedef struct
   vgaScanlineRgbFn scanlineFn;
   vgaEndOfFrameFn endOfFrameFn;
   vgaEndOfScanlineFn endOfScanlineFn;
+  vgaPorchFn porchFn;
+  bool scanlines;
 } VgaInitParams;
 
 void vgaLoop();
 
 void vgaInit(VgaInitParams params);
 
-VgaInitParams vgaCurrentParams();
+VgaInitParams *vgaCurrentParams();

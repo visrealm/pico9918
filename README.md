@@ -14,6 +14,7 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision)
 * [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam)
 * [AtariBits CV-NUC+](https://ataribits.weebly.com/cv-nuc.html)
+* [Bit Dina 2 in one](https://segaretro.org/Dina_2_in_one)
 * [Memotech MTX500](https://en.wikipedia.org/wiki/Memotech_MTX)
 * [MSX](https://en.wikipedia.org/wiki/MSX)
   * [Casio MX-10](https://www.msx.org/wiki/Casio_MX-10)
