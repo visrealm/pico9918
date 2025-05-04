@@ -19,6 +19,8 @@ void diagSetTemperature(float tempC);
 
 void diagSetClockHz(float clockHz);
 
+void diagnosticsConfigUpdated();
+
 void updateDiagnostics(uint32_t frameCount);
 
 void updateRenderTime(uint32_t renderTime, uint32_t frameTime);

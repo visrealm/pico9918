@@ -227,6 +227,7 @@ static void eofInterrupt()
   {
     tms9918->configDirty = false;
     applyConfig();  // apply config option to device now
+    diagnosticsConfigUpdated();
   }
 }
 

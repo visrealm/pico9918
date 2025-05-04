@@ -99,7 +99,6 @@ void applyConfig()
                                tms9918->config[CONF_DIAG_PALETTE] ||
                                tms9918->config[CONF_DIAG_PERFORMANCE] ||
                                tms9918->config[CONF_DIAG_REGISTERS];
-  
 }
 
 #define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash

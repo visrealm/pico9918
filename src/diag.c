@@ -20,6 +20,7 @@
 #include "pico/divider.h"
 
 #include <stdbool.h>
+#include <string.h>
 
 #define CHAR_WIDTH 6
 #define CHAR_HEIGHT 6
@@ -364,31 +365,52 @@ static void diagMode(uint16_t row, uint16_t* pixels)
   renderLeft("MODE  : ", &modeStr, "", row, pixels);
 }
 
-static void diagEmpty(uint16_t row, uint16_t* pixels)
-{
-}
-
 typedef void (*DiagPtr)(uint16_t, uint16_t*);
 
-DiagPtr leftDiags[] =
-{
+DiagPtr leftDiags[32] = {0};
+int leftDiagRows = 0;
+
+DiagPtr performanceDiags[] = {
   &diagClock,
   &diagRenderTime,
   &diagGpuTime,
-  &diagTemp,
-  &diagEmpty,
+  &diagTemp};
+
+DiagPtr addressDiags[] = {
   &diagMode,
   &diagNameTab,
   &diagColorTab,
   &diagPattTab,
   &diagSprAttrTab,
-  &diagSprPattTab
-};
+  &diagSprPattTab};
+
+void diagnosticsConfigUpdated()
+{
+  memset(leftDiags, 0, sizeof(leftDiags));
+
+  leftDiagRows= 0;
+  if (tms9918->config[CONF_DIAG_PERFORMANCE])
+  {
+    for (int j = 0; j < sizeof(performanceDiags) / sizeof(void*); ++j)
+    {
+      leftDiags[leftDiagRows++] = performanceDiags[j];
+    }
+    leftDiagRows++;
+  }
+
+  if (tms9918->config[CONF_DIAG_ADDRESS])
+  {
+    for (int j = 0; j < sizeof(addressDiags) / sizeof(void*); ++j)
+    {
+      leftDiags[leftDiagRows++] = addressDiags[j];
+    }
+    leftDiagRows++;
+  }
+}
 
 static void renderPalette(int y, uint16_t *pixels)
 {
   divmod_result_t dmResult = divmod_u32u32(y, 6);
-  int regIndex = to_quotient_u32(dmResult);
   int row = to_remainder_u32(dmResult);
 
   int palette = (y - 216) / 6;
@@ -421,10 +443,11 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
 {
   y -= 1; // vertical border
 
+  // palette
   if (tms9918->config[CONF_DIAG_PALETTE] && (y > 213)) renderPalette(y + 2, pixels);
 
   divmod_result_t dmResult = divmod_u32u32(y, 6);
-  int regIndex = to_quotient_u32(dmResult);
+  int diagRow = to_quotient_u32(dmResult);
   int row = to_remainder_u32(dmResult);
 
   int maxReg = 8;
@@ -433,26 +456,28 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
     maxReg += sizeof(extReg) / sizeof(int);
   }
   
-  if (tms9918->config[CONF_DIAG_PERFORMANCE] && (regIndex < sizeof(leftDiags) / sizeof(DiagPtr)))
+  // left panels
+  if (diagRow < leftDiagRows)
   {
-    leftDiags[regIndex](row, pixels);
+    if (leftDiags[diagRow]) leftDiags[diagRow](row, pixels);
   }
 
-  if (tms9918->config[CONF_DIAG_REGISTERS] && (regIndex < maxReg))
+  // registers
+  if (tms9918->config[CONF_DIAG_REGISTERS] && (diagRow < maxReg))
   {
-    if (regIndex >= 8)
+    if (diagRow >= 8)
     {
-      regIndex = extReg[regIndex - 8];
+      diagRow = extReg[diagRow - 8];
     }
 
-    dmResult = divmod_u32u32(regIndex, 10);
+    dmResult = divmod_u32u32(diagRow, 10);
     int xPos = 636 - (CHAR_WIDTH * 13);
     char buf[] = "R00:"; buf[1] = '0' + to_quotient_u32(dmResult); buf[2] = '0' + to_remainder_u32(dmResult);
     xPos = renderText(row, buf, xPos, 0, labelColor, 0, pixels);
     xPos = backgroundPixels(xPos, 2, pixels);
-    xPos = renderText(row, nibbleBinStr[TMS_REGISTER(tms9918, regIndex) >> 4], xPos, 0, valueColor, 0, pixels);
+    xPos = renderText(row, nibbleBinStr[TMS_REGISTER(tms9918, diagRow) >> 4], xPos, 0, valueColor, 0, pixels);
     xPos = backgroundPixels(xPos, 2, pixels);
-    xPos = renderText(row, nibbleBinStr[TMS_REGISTER(tms9918, regIndex) & 0xf], xPos, 0, valueColor, 0, pixels);
+    xPos = renderText(row, nibbleBinStr[TMS_REGISTER(tms9918, diagRow) & 0xf], xPos, 0, valueColor, 0, pixels);
   }
 
 }

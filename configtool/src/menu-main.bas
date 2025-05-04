@@ -411,9 +411,6 @@ configMenuData:
     DATA BYTE CONF_DIAG_PALETTE,    "Palette         ", 0, 2, "        Show palettes           "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
-
-
-
 ' -----------------------------------------------------------------------------
 ' Pico9918Option values. Indexed from options()
 ' -----------------------------------------------------------------------------
