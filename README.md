@@ -8,28 +8,39 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 
 This is a list of devices the PICO9918 has been tested and confirmed to work on. 
 
-* [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A) (NTSC and PAL)
+* [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A)
 * [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
 * [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
-* [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision) (NTSC and PAL)
-* [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam) (NTSC)
+* [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision)
+* [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam)
+* [AtariBits CV-NUC+](https://ataribits.weebly.com/cv-nuc.html)
+* [Bit Dina 2 in one](https://segaretro.org/Dina_2_in_one)
+* [Memotech MTX500](https://en.wikipedia.org/wiki/Memotech_MTX)
 * [MSX](https://en.wikipedia.org/wiki/MSX)
   * [Casio MX-10](https://www.msx.org/wiki/Casio_MX-10)
   * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
+  * [Casio PV-16](https://www.msx.org/wiki/Casio_PV-16)
+  * [Gradiente Expert XP-800](https://www.msx.org/wiki/Gradiente_Expert_XP-800)
+  * [National CF-2700](https://www.msx.org/wiki/National_CF-2700)
+  * [Sharp HB-8000](https://www.msx.org/wiki/Sharp_HB-8000)
   * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)
+  * [Toshiba HX-10](https://www.msx.org/wiki/Toshiba_HX-10)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
+  * [Yamaha YIS-503](https://www.msx.org/wiki/Yamaha_YIS-503)
 * [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
 * [Powertran Cortex](http://powertrancortex.com/)
 * [Sega SG-1000 / SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
 * [Sord M5](https://en.wikipedia.org/wiki/Sord_M5)
 * [Tomy Pyūta / Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor)
 * [Tomy Pyūta Jr](http://videogamekraken.com/pyuta-jr-by-tomy)
+* [VTech CreatiVision / Dick Smith Wizzard](https://en.wikipedia.org/wiki/VTech_CreatiVision)
 
 Homebrews:
 
 * Troy Schrapel's [HBC-56](https://github.com/visrealm/hbc-56)
 * Stuart Connor's [TM990](http://www.stuartconner.me.uk/tm990/tm990.htm)
 * John Winans' [Z80-Retro](https://github.com/Z80-Retro)
+* Martin's [Z80Ardu](https://www.dev-tronic.de/?p=74)
 
 If you have tested the PICO9918 on any other device, please let me know and I'll happily update this list. :)
 
@@ -47,48 +58,36 @@ Pre-release firmware for F18A compatibility mode is available in [Releases](http
 
 ## Purchasing options
 
-Fully assembled and tested PICO9918 v1.0s are available on my Tindie store:
+Fully assembled and tested PICO9918 v1.2s are available on my Tindie store:
 
-<a href="https://www.tindie.com/products/visrealm/pico9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
+<a href="https://www.tindie.com/search/?q=PICO9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
 
 Also (more convenient for North America)
 
-<a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=Pico9918"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
+<a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=*PICO9918*"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
 
 
 ## Hardware
 
-There are two main variants of the hardware.
+There are two main variants of the hardware. 
 
-### v1.0 (formerly v0.4)
+### v1.x (v1.2, v1.1, v1.0 and v0.4)
 
-PICO9918 v1.0 is the single board version which doesn't require a piggy-backed Pi Pico. It is in the process of being manufactured now and is based on v0.4 seen below:
+PICO9918 v1.2 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
 
-<p align="left"><a href="img/pico9918_v0_4_sm.png"><img src="img/pico9918_v0_4_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
-
-Once I have tested v1.0 and made it available, I will publish the schematics and gerbers for this version.
+<p align="left"><a href="img/pico9918_v1_0_sm.png"><img src="img/pico9918_v1_0_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
 
 ### v0.3
 
-v0.3 schematic and gerber available now. This revision has been tested on my two TI-99/4As (PAL and NTSC) and my HBC-56 and is fully functional, however it is not representative of the final PCB design which will include the RP2040 directly on the PCB.
+v0.3 is relatively cheap and easy to build, schematic and gerbers are available. This version makes use of an external Pi Pico module piggy-backed onto the PICO9918 PCB.
 
-<p align="left"><a href="pcb/v0.3/pico9918_v0_3_schematic.png"><img src="pcb/v0.3/pico9918_v0_3_schematic.png" alt="PICO9918 v0.3" width="720px"></a></p>
+<p align="left"><a href="img/pico9918_v0_3_sm.jpg"><img src="img/pico9918_v0_3_sm.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
 
-<p align="left"><a href="pcb/v0.3/pico9918_v0_3_pcb.png"><img src="pcb/v0.3/pico9918_v0_3_pcb.png" alt="PICO9918 v0.3" width="720px"></a></p>
+<p align="left"><a href="img/pico9918_v0_3_sm2.jpg"><img src="img/pico9918_v0_3_sm2.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
 
-### PCB v0.3 Notes
+### Schematics
 
-There are a number of 0Ohm resistors (jumpers). You may need to omit the RST resistor. On some machines, the extra time is required to bootstrap the Pico. This will be changed to a soft reset on v0.4.
-
-### Raspberry Pi Pico Module
-
-Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29, a genuine Raspberry Pi Pico can't be used. v0.3 of the PCB is designed for the DWEII? RP2040 USB-C module which exposes these additional GPIOs. A future pico9918 revision will do without an external RP2040 board and use the RP2040 directly.
-
-Purchase links:
- * https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
- * https://www.aliexpress.com/item/1005007066733934.html
-
-I could reduce the VGA bit depth to 9-bit or 10-bit to allow the use of a genuine Raspberry Pi Pico board, but given the longer-term plan is to use the RP2040 directly, I've decided to go this way for the prototype.
+Schematics and Gerbers are available in [/pcb](pcb)
 
 ## Firmware
 
@@ -98,15 +97,15 @@ To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico i
 
 ## Development environment
 
-To set up your development environment for the Raspberry Pi Pico, follow the [Raspberry Pi C/C++ SDK Setup](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) instructions.
+To set up your development environment for the Raspberry Pi Pico, follow the [Raspberry Pi C/C++ SDK Setup](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) instructions. The latest PICO9918 source can be configured and built using the official [Raspberry Pi Pico VSCode plugin](https://github.com/raspberrypi/pico-vscode).
 
 #### Windows
-
-For Windows users, there is a pre-packaged installer provided by the Raspberry Pi Foundation: https://github.com/raspberrypi/pico-setup-windows/releases/. Once installed, just open the pre-configured "Pico - Visual Studio Code" from your start menu.
 
 The build system expects `python3` to be available. If you have installed Python 3 outside of the Microsoft Store, you may need to alias your Python executable.
 
 You can do this from an elevated (Administator) command prompt in your python directory e.g. `C:\Program Files\Python310\` by creating a symlink with the command: `mklink python3.exe python.exe`.
+
+The custom python build tools are used to convert binary data (images) into code. These also require the [pillow](https://pypi.org/project/pillow/) library - ([Installation instructions for pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html))
 
 ## Discussion
 
