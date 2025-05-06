@@ -9,12 +9,12 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 This is a list of devices the PICO9918 has been tested and confirmed to work on. 
 
 * [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A)
-* [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
-* [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
+  * [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
+  * [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
 * [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision)
-* [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam)
-* [AtariBits CV-NUC+](https://ataribits.weebly.com/cv-nuc.html)
-* [Bit Dina 2 in one](https://segaretro.org/Dina_2_in_one)
+  * [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam)
+  * [AtariBits CV-NUC+](https://ataribits.weebly.com/cv-nuc.html)
+  * [Bit Dina 2 in one](https://segaretro.org/Dina_2_in_one)
 * [Memotech MTX500](https://en.wikipedia.org/wiki/Memotech_MTX)
 * [MSX](https://en.wikipedia.org/wiki/MSX)
   * [Casio MX-10](https://www.msx.org/wiki/Casio_MX-10)
