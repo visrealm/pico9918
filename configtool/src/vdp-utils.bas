@@ -28,21 +28,29 @@ CONST #VDP_COLOR_TAB1    = $2000
 CONST #VDP_COLOR_TAB2    = #VDP_COLOR_TAB1 + $0800
 CONST #VDP_COLOR_TAB3    = #VDP_COLOR_TAB2 + $0800
 
-' VDP helpers
-DEF FN VDP_DISABLE_INT = VDP(1) = $C2
-DEF FN VDP_ENABLE_INT = VDP(1) = $E2
-DEF FN VDP_DISABLE_INT_DISP_OFF = VDP(1) = $82
-DEF FN VDP_ENABLE_INT_DISP_OFF = VDP(1) = $A2
-DEF FN VDP_WRITE_CONFIG(I, V) = VDP(58) = I : VDP(59) = V
-DEF FN VDP_READ_STATUS = USR RDVST
-DEF FN VDP_SET_CURRENT_STATUS_REG(R) = VDP(15) = R
-DEF FN VDP_RESET_STATUS_REG = VDP_SET_CURRENT_STATUS_REG(0)
 
+#if TMS9918_TESTING
+    DEF FN VDP_REG(VR) = IF (VR < 8) THEN VDP(VR)
+    DEF FN VDP_STATUS = 0
+#else
+    DEF FN VDP_REG(VR) = VDP(VR)
+    DEF FN VDP_STATUS = USR RDVST
+#endif
+
+DEF FN VDP_CONFIG(I) = VDP_REG(58) = I : VDP_REG(59) ' = xxx
+DEF FN VDP_STATUS_REG = VDP_REG(15)
+DEF FN VDP_STATUS_REG0 = VDP_STATUS_REG = 0
+
+' VDP helpers
+DEF FN VDP_DISABLE_INT = VDP_REG(1) = $C2
+DEF FN VDP_ENABLE_INT = VDP_REG(1) = $E2
+DEF FN VDP_DISABLE_INT_DISP_OFF = VDP_REG(1) = $82
+DEF FN VDP_ENABLE_INT_DISP_OFF = VDP_REG(1) = $A2
 ' name table helpers
 DEF FN XY(X, Y) = ((Y) * 32 + (X))                      ' PRINT AT XY(1, 2), ...
 
 DEF FN NAME_TAB_XY(X, Y) = (#VDP_NAME_TAB + XY(X, Y))   ' DEFINE VRAM NAME_TAB_XY(1, 2), ...
-DEF FN PUT_XY(X, Y, C) = VPOKE NAME_TAB_XY(X, Y), C     ' place a byte in the name table
+DEF FN PUT_XY(X, Y) = VPOKE NAME_TAB_XY(X, Y)     ' place a byte in the name table
 DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))          ' read a byte from the name table
 
 
@@ -52,14 +60,14 @@ DEF FN GET_XY(X, Y) = VPEEK(NAME_TAB_XY(X, Y))          ' read a byte from the n
 vdpDetect: PROCEDURE
     GOSUB vdpUnlock
     DEFINE VRAM $3F00, 6, vdpGpuDetect
-    VDP($36) = $3F                       ' set gpu start address msb
-    VDP($37) = $00                       ' set gpu start address lsb (triggers)
+    VDP_REG($36) = $3F                       ' set gpu start address msb
+    VDP_REG($37) = $00                       ' set gpu start address lsb (triggers)
     isF18ACompatible = VPEEK($3F00) = 0  ' check result
     isV9938 = FALSE
     IF isF18ACompatible = FALSE THEN
-        VDP_SET_CURRENT_STATUS_REG(4)
-        isV9938 = ((VDP_READ_STATUS AND $fe) = $fe)
-        VDP_RESET_STATUS_REG
+        VDP_STATUS_REG = 4
+        isV9938 = ((VDP_STATUS AND $fe) = $fe)
+        VDP_STATUS_REG0
     END IF
     END
     
@@ -68,8 +76,8 @@ vdpDetect: PROCEDURE
 ' -----------------------------------------------------------------------------
 vdpUnlock: PROCEDURE
     VDP_DISABLE_INT_DISP_OFF
-    VDP(57) = $1C                       ' unlock
-    VDP(57) = $1C                       ' unlock... again
+    VDP_REG(57) = $1C                       ' unlock
+    VDP_REG(57) = $1C                       ' unlock... again
     VDP_ENABLE_INT_DISP_OFF
     END
 

@@ -23,6 +23,12 @@ echo ---------------
 python3 tools\uf2cvb.py -b 16 -o src\firmware_16k pico9918-vga-build-%VERSION%.uf2
 if %errorlevel% neq 0 exit /b %errorlevel%
 
+echo.
+echo NO BANKS:
+echo ---------------
+python3 tools\uf2cvb.py -b 0 -o src\firmware pico9918-vga-build-%VERSION%.uf2
+if %errorlevel% neq 0 exit /b %errorlevel%
+
 pushd build
 
 echo.
@@ -116,18 +122,24 @@ echo ---------------------------------------------------------------------
 echo   Compiling for NABU
 echo ---------------------------------------------------------------------
 
-set BASENAME=pico9918_%VERSION%_nabu
-cvbasic --nabu pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
+set BASENAME=pico9918_%VERSION%_nabu_mame
+cvbasic --nabu -DTMS9918_TESTING=1 pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-gasm80 asm\%BASENAME%.asm -o asm\000001.nabu
-pushd asm
-tar.exe -a -c -f ..\bin\%BASENAME%.zip 000001.nabu
-popd
+gasm80 asm\%BASENAME%.asm -o bin\000001.nabu
 pushd bin
-ren %BASENAME%.zip %BASENAME%.npz
+tar.exe -a -c -f %BASENAME%.zip 000001.nabu
+copy /Y %BASENAME%.zip %BASENAME%.npz
+del %BASENAME%.zip
+del 000001.nabu
 popd
-echo Output: bin\%BASENAME%.rom
+echo Output: bin\%BASENAME%.npz
 
+
+set BASENAME=pico9918_%VERSION%
+cvbasic --nabu pico9918conf.bas asm/%BASENAME%_nabu.asm %LIBPATH%
+if %errorlevel% neq 0 exit /b %errorlevel%
+gasm80 asm\%BASENAME%_nabu.asm -o bin\%BASENAME%.nabu
+echo Output: bin\%BASENAME%.nabu
 
 :: CreatiVision
 ::cvbasic --creativision pico9918conf-nobank.bas asm\pico9918tool_crv.asm %LIBPATH%

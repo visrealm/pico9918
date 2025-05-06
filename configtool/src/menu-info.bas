@@ -18,15 +18,15 @@ deviceInfoMenu: PROCEDURE
     const PICO_MODEL_RP2040 = 1
     const PICO_MODEL_RP2350 = 2
 
-    menuTopRow = MENU_TITLE_ROW + 3
+    g_menuTopRow = MENU_TITLE_ROW + 3
 
 
     DRAW_TITLE("DEVICE INFO")
 
-    oldMenuTopRow = menuTopRow
+    oldMenuTopRow = g_menuTopRow
     oldIndex = g_currentMenuIndex
 
-    menuTopRow = MENU_TITLE_ROW + 14
+    g_menuTopRow = MENU_TITLE_ROW + 14
     MENU_INDEX_OFFSET = 13
     MENU_INDEX_COUNT = 1
     MENU_START_X = 6
@@ -34,9 +34,9 @@ deviceInfoMenu: PROCEDURE
 
     GOSUB renderMenu
 
-    menuTopRow = oldMenuTopRow
+    g_menuTopRow = oldMenuTopRow
 
-    #addr = XY(2, menuTopRow)
+    #addr = XY(2, g_menuTopRow)
     PRINT AT #addr,       "Processor family : "
     PRINT AT #addr + 32,  "Hardware version : "
     PRINT AT #addr + 64,  "Software version : "
@@ -45,11 +45,11 @@ deviceInfoMenu: PROCEDURE
     PRINT AT #addr + 160, "F18A version     : "
     PRINT AT #addr + 192, "Core temperature : Error"
 
-    VDP_SET_CURRENT_STATUS_REG(12)  ' config
+    VDP_STATUS_REG = 12  ' config
 
-    VDP(58) = CONF_PICO_MODEL
-    optValue = VDP_READ_STATUS
-    #addr = XY(21, menuTopRow + 0)
+    VDP_REG(58) = CONF_PICO_MODEL
+    optValue = VDP_STATUS
+    #addr = XY(21, g_menuTopRow + 0)
     PRINT AT #addr, "RP2"
     IF optValue = PICO_MODEL_RP2350 THEN
         PRINT "350"
@@ -57,23 +57,23 @@ deviceInfoMenu: PROCEDURE
         PRINT "040"
     END IF
 
-    VDP(58) = CONF_HW_VERSION
-    optValue = VDP_READ_STATUS
+    VDP_REG(58) = CONF_HW_VERSION
+    optValue = VDP_STATUS
     tmpMajor = optValue / 16
     tmpMinor = optValue AND $0f
     PRINT AT  #addr + 32, tmpMajor, ".", tmpMinor
-    IF verMajor = 1 THEN PRINT AT XY(24, menuTopRow + 1), "+"
+    IF verMajor = 1 THEN PRINT AT XY(24, g_menuTopRow + 1), "+"
 
-    VDP(58) = CONF_SW_VERSION
-    optValue = VDP_READ_STATUS
+    VDP_REG(58) = CONF_SW_VERSION
+    optValue = VDP_STATUS
     tmpMajor = optValue / 16
     tmpMinor = optValue AND $0f
-    VDP(58) = CONF_SW_PATCH_VERSION
-    tmpPatch = VDP_READ_STATUS
+    VDP_REG(58) = CONF_SW_PATCH_VERSION
+    tmpPatch = VDP_STATUS
     PRINT AT #addr + 64, tmpMajor, ".", tmpMinor, ".", tmpPatch
 
-    VDP(58) = CONF_DISP_DRIVER
-    optValue = VDP_READ_STATUS
+    VDP_REG(58) = CONF_DISP_DRIVER
+    optValue = VDP_STATUS
     #addr = #addr + 96
     IF optValue = 1 THEN
         PRINT AT #addr, "RGBs NTSC"
@@ -86,12 +86,12 @@ deviceInfoMenu: PROCEDURE
         PRINT AT #addr + 32, "480p 60Hz"
     END IF
 
-    VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
-    optValue = VDP_READ_STATUS
+    VDP_STATUS_REG = 14      ' SR14: Version
+    optValue = VDP_STATUS
     tmpMajor = optValue / 16
     tmpMinor = optValue AND $0f
-    PRINT AT XY(21, menuTopRow + 5), CHR$(hexChar(tmpMajor)), ".", CHR$(hexChar(tmpMinor))
-    VDP_RESET_STATUS_REG
+    PRINT AT XY(21, g_menuTopRow + 5), CHR$(hexChar(tmpMajor)), ".", CHR$(hexChar(tmpMinor))
+    VDP_STATUS_REG0
 
     GOSUB delay
 
@@ -104,16 +104,16 @@ deviceInfoMenu: PROCEDURE
 
         VDP_DISABLE_INT
 
-        VDP_SET_CURRENT_STATUS_REG(13)      ' SR13: Temperature
-        optValue = VDP_READ_STATUS
-        VDP_RESET_STATUS_REG
+        VDP_STATUS_REG = 13      ' SR13: Temperature
+        optValue = VDP_STATUS
+        VDP_STATUS_REG0
 
         IF optValue > 0 THEN
             tempC = optValue / 4
             tempDec = optValue AND $03
             tempDec = tempDec * 25
 
-            PRINT AT XY(21, menuTopRow + 6), tempC, ".", <2>tempDec, "`C  "
+            PRINT AT XY(21, g_menuTopRow + 6), tempC, ".", <2>tempDec, "`C  "
 
             #optValueF = optValue
             #optValueF = #optValueF * 9
@@ -123,7 +123,7 @@ deviceInfoMenu: PROCEDURE
             #tempDec = #optValueF AND $03
             #tempDec = #tempDec * 25
 
-            PRINT AT XY(19, menuTopRow + 7), ": ",#tempC, ".", <2>#tempDec, "`F  "
+            PRINT AT XY(19, g_menuTopRow + 7), ": ",#tempC, ".", <2>#tempDec, "`F  "
         END IF
 
         VDP_ENABLE_INT

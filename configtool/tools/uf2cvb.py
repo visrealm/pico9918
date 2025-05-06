@@ -31,7 +31,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description='Convert .UF2 file to banked CVBasic source file of binary data.',
         epilog="GitHub: https://github.com/visrealm/pico9918")
-    parser.add_argument('-b', '--banksize', help='bank size (8 or 16)', default=8, type=int, choices=[8,16])
+    parser.add_argument('-b', '--banksize', help='bank size (0, 8 or 16)', default=8, type=int, choices=[0,8,16])
     parser.add_argument('-o', '--outfile', help='output file - defaults to base input file name with .bas extension', default='firmware')
     parser.add_argument('uf2file')
     args = vars(parser.parse_args())
@@ -51,7 +51,10 @@ def main() -> int:
 
     BLOCK_SIZE = 9 * 4 + 256    # 9 ints and 256 bytes of data
     BANK_OVERHEAD = 48          # bank overhead. we can't use it all :(
-    BANK_SIZE = (1024 * args['banksize']) - BANK_OVERHEAD
+    if (args['banksize']):
+        BANK_SIZE = (1024 * args['banksize']) - BANK_OVERHEAD
+    else:
+        BANK_SIZE = 1024 * 128
     BLOCKS_PER_BANK = int((BANK_SIZE - 1) / BLOCK_SIZE)
 
     majorVer = 0
@@ -79,6 +82,7 @@ def main() -> int:
                 with open(filename, mode='rb') as uf2:
                     blocksRead = 0
                     bank = 1
+
                     inpbuf = uf2.read(512)
                     w = struct.unpack("<IIIIIIII", inpbuf[0:32])
 
@@ -108,9 +112,11 @@ def main() -> int:
 
                         if blocksRead % BLOCKS_PER_BANK == 0:               
                             output.write("\n' ===============================\n")
-                            output.write("BANK {0}\n\n".format(bank))
-                            output.write("bank{0}Start:\n".format(bank))
-                            output.write("  DATA BYTE {0}\n".format("${:02x}".format(bank)))
+                            if (args['banksize']):
+                                output.write("BANK {0}\n\n".format(bank))
+                                output.write("bank{0}Start:\n".format(bank))
+                                output.write("  DATA BYTE {0}\n".format("${:02x}".format(bank)))
+                                
                             output.write("bank{0}Data:\n".format(bank))
                             bank += 1
                         

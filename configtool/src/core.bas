@@ -125,43 +125,53 @@ main:
         
         VDP_DISABLE_INT_DISP_OFF
 
-        VDP_SET_CURRENT_STATUS_REG(1)       ' SR1: ID
-        statReg = VDP_READ_STATUS
+        VDP_STATUS_REG = 1       ' SR1: ID
+        statReg = VDP_STATUS
 
         verPatch = 0
 
         IF (statReg AND $E8) = $E8 THEN
-            VDP_SET_CURRENT_STATUS_REG(12)  ' config
-            VDP(58) = CONF_SW_VERSION
-            optValue = VDP_READ_STATUS
+            VDP_STATUS_REG = 12  ' config
+            VDP_REG(58) = CONF_SW_VERSION
+            optValue = VDP_STATUS
             verMajor = optValue / 16
             verMinor = optValue AND $0f
-            VDP(58) = CONF_SW_PATCH_VERSION
-            verPatch = VDP_READ_STATUS
+            VDP_REG(58) = CONF_SW_PATCH_VERSION
+            verPatch = VDP_STATUS
             PRINT "PICO9918 v", verMajor, ".", verMinor, ".", verPatch
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
-            VDP_SET_CURRENT_STATUS_REG(14)      ' SR14: Version
-            verReg = VDP_READ_STATUS
+            VDP_STATUS_REG = 14      ' SR14: Version
+            verReg = VDP_STATUS
             verMajor = verReg / 16
             verMinor = verReg AND $0f
             PRINT "    F18A v ."
-            PUT_XY(5 + 19, 21, hexChar(verMajor))
-            PUT_XY(5 + 21, 21, hexChar(verMinor))
+            PUT_XY(5 + 19, 21), hexChar(verMajor)
+            PUT_XY(5 + 21, 21), hexChar(verMinor)
         ELSE
             PRINT "  UNKNOWN SR1 = ", <>statReg
         END IF
 
-        VDP_RESET_STATUS_REG
+        VDP_STATUS_REG0
         VDP_ENABLE_INT_DISP_OFF
+#if TMS9918_TESTING
+    ELSE
+        PRINT " Emu Test Build"
+#else
     ELSEIF isV9938 THEN
         PRINT "Yamaha V9938"
     ELSE
-        PRINT "  TI TMS99x8"
+        PRINT "  TI TMS99xxA"
+#endif
     END IF
 
+#if TMS9918_TESTING
+    isF18ACompatible = TRUE
+    isPico9918 = isF18ACompatible
+#endif
+
 #if F18A_TESTING
-        isPico9918 = isF18ACompatible   ' FOR TESTING
+    isPico9918 = isF18ACompatible   ' FOR TESTING
 #endif
 
     VDP_ENABLE_INT_DISP_OFF
@@ -179,15 +189,15 @@ main:
     ELSE
         ' We are a PICO9918, set up the menu
         WAIT
-        VDP(50) = $80  ' reset VDP registers to boot values
-        VDP(7) = defaultReg(7)
-        VDP(0) = defaultReg(0)  ' VDP() doesn't accept variables, so...
-        VDP(1) = defaultReg(1)
-        VDP(2) = defaultReg(2)
-        VDP(3) = defaultReg(3)
-        VDP(4) = defaultReg(4)
-        VDP(5) = defaultReg(5)
-        VDP(6) = defaultReg(6)
+        VDP_REG(50) = $80  ' reset VDP registers to boot values
+        VDP_REG(7) = defaultReg(7)
+        VDP_REG(0) = defaultReg(0)  ' VDP_REG() doesn't accept variables, so...
+        VDP_REG(1) = defaultReg(1)
+        VDP_REG(2) = defaultReg(2)
+        VDP_REG(3) = defaultReg(3)
+        VDP_REG(4) = defaultReg(4)
+        VDP_REG(5) = defaultReg(5)
+        VDP_REG(6) = defaultReg(6)
 
           ' enable interrupts (so we can wait)
         VDP_ENABLE_INT_DISP_OFF
@@ -213,7 +223,7 @@ main:
         SET_MENU(MENU_ID_MAIN)
 
         ' palette for sprites and tile 1 layer
-        VDP(24) = $11
+        VDP_REG(24) = $11
 
         WHILE 1
             ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu

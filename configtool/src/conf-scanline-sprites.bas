@@ -13,8 +13,8 @@
 ' CVBasic source file. See: github.com/nanochess/CVBasic
 ' -----------------------------------------------------------------------------
 
-
-
+spriteIndices:
+DATA BYTE 0,1,2,3,4,4,5,6
 ' -----------------------------------------------------------------------------
 ' initialise the sprite attributes
 ' -----------------------------------------------------------------------------
@@ -25,13 +25,13 @@ initSprites: PROCEDURE
     xPos = 16
 
     FOR I = 0 TO NUM_SPRITES - 1
-        spritePattIndex = I AND $07
+        spritePattIndex = spriteIndices(I AND 7)
         spriteAttr(I * 4 + 0) = $d0
         spriteAttr(I * 4 + 1) = xPos
         spriteAttr(I * 4 + 2) = spritePattIndex * 4
         spriteAttr(I * 4 + 3) = 15
         xPos = xPos + logoSpriteWidths(spritePattIndex) + 1
-        IF (I AND $07) = 7 THEN xPos = xPos + 8  ' small gap
+        IF (I AND 7) = 7 THEN xPos = xPos + 8  ' small gap
     NEXT I
 
     END

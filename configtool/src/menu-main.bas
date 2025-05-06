@@ -23,9 +23,9 @@ renderMainMenu: PROCEDURE
     MENU_INDEX_OFFSET = 0
     MENU_INDEX_COUNT = 9
     MENU_START_X = 1
-    menuTopRow = MENU_TITLE_ROW + 3
+    g_menuTopRow = MENU_TITLE_ROW + 3
     GOSUB renderMenu
-    R = menuTopRow + MENU_INDEX_COUNT : GOSUB emptyRowR
+    R = g_menuTopRow + MENU_INDEX_COUNT : GOSUB emptyRowR
     END
 
 renderMenu: PROCEDURE
@@ -43,10 +43,10 @@ renderMenuRow: PROCEDURE
 
     optId = MENU_DATA(a_menuIndexToRender, CONF_INDEX)
     confIndex = optId
-    IF optId = 255 THEN R = menuTopRow + MENU_INDEX_POSITION : GOSUB emptyRowR : RETURN
+    IF optId = 255 THEN R = g_menuTopRow + MENU_INDEX_POSITION : GOSUB emptyRowR : RETURN
     
     ' pre-compute row offset. we'll need this a few times
-    #ROWOFFSET = XY(0, menuTopRow + MENU_INDEX_POSITION)
+    #ROWOFFSET = XY(0, g_menuTopRow + MENU_INDEX_POSITION)
 
     ' output menu number (index + 1)
     PRINT AT #ROWOFFSET + MENU_START_X, " ", MENU_INDEX_POSITION + 1, ". "
@@ -152,9 +152,9 @@ menuLoop: PROCEDURE
 
     ' <fire>, <space> or <right> pressed? - next option value
     ELSEIF (g_nav AND NAV_OK) OR (g_nav AND NAV_RIGHT) THEN 
-        IF currentOptionIndex - 1 < 200 THEN
-            tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
-            IF tempConfigValuesCount THEN
+        tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
+        IF tempConfigValuesCount > 0 THEN
+            IF currentOptionIndex < 200 THEN
                 currentValueIndex = tempConfigValues(currentOptionIndex)
                 currentValueIndex = currentValueIndex + 1
                 IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = 0
@@ -165,9 +165,9 @@ menuLoop: PROCEDURE
 
     ' <left> pressed - previous option value
     ELSEIF (g_nav AND NAV_LEFT) THEN 
-        IF currentOptionIndex - 1 < 200 THEN
-            tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
-            IF tempConfigValuesCount THEN
+        tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
+        IF tempConfigValuesCount > 0 THEN
+            IF currentOptionIndex < 200 THEN
                 currentValueIndex = tempConfigValues(currentOptionIndex)
                 currentValueIndex = currentValueIndex - 1
                 IF currentValueIndex >= tempConfigValuesCount THEN currentValueIndex = tempConfigValuesCount - 1
@@ -220,16 +220,16 @@ mainMenu: PROCEDURE
             WAIT
             vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
             IF vdpOptId < 200 THEN
-                VDP_WRITE_CONFIG(vdpOptId, currentValueIndex)
+                VDP_CONFIG(vdpOptId) = currentValueIndex
             END IF
 
             menu = 0
 
             SELECT CASE vdpOptId
                 CASE CONF_CRT_SCANLINES
-                    VDP(50) = currentValueIndex * $04
+                    VDP_REG(50) = currentValueIndex * $04
                 CASE CONF_SCANLINE_SPRITES
-                    VDP(30) = pow2(currentValueIndex + 2)
+                    VDP_REG(30) = pow2(currentValueIndex + 2)
             	CASE CONF_MENU_FIRMWARE
                     menu = MENU_ID_FIRMWARE
             	CASE CONF_MENU_INFO
@@ -260,7 +260,7 @@ mainMenu: PROCEDURE
 
 confirmationMenuLoop: PROCEDURE
 
-    menuTopRow = MENU_TITLE_ROW + 9
+    g_menuTopRow = MENU_TITLE_ROW + 9
     MENU_INDEX_OFFSET = 10
     MENU_INDEX_COUNT = 2
     MENU_START_X = 6
@@ -357,7 +357,7 @@ backOptionsMenu: PROCEDURE
 
     oldIndex = g_currentMenuIndex
 
-    menuTopRow = MENU_TITLE_ROW + 9
+    g_menuTopRow = MENU_TITLE_ROW + 9
     MENU_INDEX_OFFSET = 12
     MENU_INDEX_COUNT = 1
     MENU_START_X = 6
@@ -391,10 +391,15 @@ configMenuData:
     DATA BYTE CONF_MENU_DIAG,       "Diagnostics  >>>", 0, 0, "   Manage diagnostics options   "
     DATA BYTE CONF_MENU_PALETTE,    "Palette      >>>", 0, 0, "     Change default palette     "
     DATA BYTE CONF_MENU_INFO,       "Device info. >>>", 0, 0, "    View device information     "
+#if BANK_SIZE
     DATA BYTE CONF_MENU_FIRMWARE,   "Firmware     >>>", 0, 0, "        Update firmware         "
+#endif
     DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
     DATA BYTE CONF_MENU_SAVE,       "Save settings   ", 0, 0, " Save configuration to PICO9918 "
     DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
+#if NOT BANK_SIZE
+    DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
+#endif
 
     DATA BYTE CONF_MENU_OK,         "Confirm         ", 0, 0, " Save configuration to PICO9918 "
     DATA BYTE CONF_MENU_CANCEL,     "Cancel          ", 0, 0, "        Back to main menu       "

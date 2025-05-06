@@ -17,6 +17,7 @@
 ' reset options to defaults
 ' -----------------------------------------------------------------------------
 resetOptions: PROCEDURE
+    VDP_DISABLE_INT
     FOR I = 0 TO CONF_COUNT - 1
         tempConfigValues(I) = 0
     NEXT I
@@ -32,6 +33,7 @@ resetOptions: PROCEDURE
 
     GOSUB applyConfigValues
     GOSUB renderMainMenu
+    VDP_ENABLE_INT
     END
 
 ' -----------------------------------------------------------------------------
@@ -40,7 +42,7 @@ resetOptions: PROCEDURE
 saveOptions: PROCEDURE
 
     ' instruct the pico9918 to commit config to flash
-    VDP_WRITE_CONFIG(CONF_SAVE_TO_FLASH, 1)
+    VDP_CONFIG(CONF_SAVE_TO_FLASH) = 1
 
     clockChanged = savedConfigValues(CONF_CLOCK_PRESET_ID) <> tempConfigValues(CONF_CLOCK_PRESET_ID)
 
@@ -70,14 +72,14 @@ vdpLoadConfigValues: PROCEDURE
         savedConfigValues(128 + I) = defPal(I)
     NEXT I
 #else
-    VDP_SET_CURRENT_STATUS_REG(12)    ' read config register
+    VDP_STATUS_REG = 12    ' read config register
     FOR I = 0 TO CONF_COUNT - 1
-        VDP(58) = I
-        optValue = VDP_READ_STATUS            
+        VDP_REG(58) = I
+        optValue = VDP_STATUS            
         tempConfigValues(I) = optValue
         savedConfigValues(I) = optValue
     NEXT I
-    VDP_RESET_STATUS_REG
+    VDP_STATUS_REG0
 #endif
     END
 
@@ -85,11 +87,11 @@ vdpLoadConfigValues: PROCEDURE
 ' apply current options to the PICO9918
 ' -----------------------------------------------------------------------------
 applyConfigValues: PROCEDURE
-    VDP(50) = tempConfigValues(CONF_CRT_SCANLINES) * 4         ' set crt scanlines
-    VDP(30) = pow2(tempConfigValues(CONF_SCANLINE_SPRITES) + 2)   ' set scanline sprites
+    VDP_REG(50) = tempConfigValues(CONF_CRT_SCANLINES) * 4         ' set crt scanlines
+    VDP_REG(30) = pow2(tempConfigValues(CONF_SCANLINE_SPRITES) + 2)   ' set scanline sprites
 
-    VDP(47) = $c0
+    VDP_REG(47) = $c0
     DEFINE VRAM 0, 32, VARPTR tempConfigValues(128)
-    VDP(47) = $40
+    VDP_REG(47) = $40
 
     END

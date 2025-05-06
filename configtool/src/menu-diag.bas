@@ -23,13 +23,11 @@ diagMenu: PROCEDURE
 
     DRAW_TITLE("DIAGNOSTICS")
 
-    'menuTopRow = MENU_TITLE_ROW + 14
     MENU_INDEX_OFFSET = 16
     MENU_INDEX_COUNT = 5
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
-
 
     GOSUB delay
 
@@ -44,7 +42,7 @@ diagMenu: PROCEDURE
             WAIT
             vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
             IF vdpOptId < 200 THEN
-                VDP_WRITE_CONFIG(vdpOptId, currentValueIndex)    
+                VDP_CONFIG(vdpOptId) = currentValueIndex
             END IF
 
             optionIndex = MENU_DATA(g_currentMenuIndex, CONF_INDEX)

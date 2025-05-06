@@ -14,7 +14,8 @@
 ' -----------------------------------------------------------------------------
 
 ' passing in L since I'm seeing issues using LEN(T) here. Possibly a bug?
-DEF FN DRAW_TITLE(T) = a_titleLen = LEN(T) : PRINT AT XY((32 - a_titleLen) / 2, MENU_TITLE_ROW), T : GOSUB drawTitleBox
+DEF FN DRAW_TITLE_AT(T, R) = a_titleLen = LEN(T) : PRINT AT XY((32 - a_titleLen) / 2, R), T : GOSUB drawTitleBox
+DEF FN DRAW_TITLE(T) = DRAW_TITLE_AT(T, MENU_TITLE_ROW)
 
 DEF FN DRAW_POPUP_W(T, H, W) = a_titleLen = LEN(T) : a_popupHeight = H : a_popupWidth = W : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
 DEF FN DRAW_POPUP(T, H) = DRAW_POPUP_W(T, H, LEN(T))
@@ -115,14 +116,14 @@ setupHeader: PROCEDURE
 ' -----------------------------------------------------------------------------
 ' update the PICO9918 palette (shades of blue)
 ' -----------------------------------------------------------------------------
-updatePalette: PROCEDURE    
+updatePalette: PROCEDURE
     WAIT
-    VDP(47) = $c0 + 16 ' palette data port from index #2
+    VDP_REG(47) = $c0 + 16 ' palette data port from index #2
     DEFINE VRAM 0, 32, defPal
     'FOR I = 0 TO 31 
     '    PRINT defPal(I)
     'NEXT I
-    VDP(47) = $40
+    VDP_REG(47) = $40
     END
 
     

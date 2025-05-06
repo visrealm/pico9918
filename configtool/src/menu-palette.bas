@@ -42,12 +42,12 @@ paletteMenu: PROCEDURE
     ' Bitmap layer
     ' Total VRAM required is:
     '   BITMAP_WIDTH / 4 * BITMAP_HEIGHT: 60 * 13 = 780 B
-    VDP(31) = $f0           ' bml en, pri, trans, fat, pal = 0
-    VDP(32) = $70           ' $1C00 >> 6 
-    VDP(33) = 10            ' x
-    VDP(34) = 57            ' y
-    VDP(35) = BITMAP_WIDTH  ' w
-    VDP(36) = BITMAP_HEIGHT ' h
+    VDP_REG(31) = $f0           ' bml en, pri, trans, fat, pal = 0
+    VDP_REG(32) = $70           ' $1C00 >> 6 
+    VDP_REG(33) = 10            ' x
+    VDP_REG(34) = 57            ' y
+    VDP_REG(35) = BITMAP_WIDTH  ' w
+    VDP_REG(36) = BITMAP_HEIGHT ' h
 
     CONST PAL_SWATCH_STRIDE = (BITMAP_WIDTH / 4)
 
@@ -64,7 +64,7 @@ paletteMenu: PROCEDURE
     NEXT R
 
     FOR currentIndex = 1 TO 15
-        PUT_XY(currentIndex * 2 - 1, 6, hexChar(currentIndex))
+        PUT_XY(currentIndex * 2 - 1, 6), hexChar(currentIndex)
         GOSUB checkDirty
     NEXT currentIndex
 
@@ -87,10 +87,10 @@ paletteMenu: PROCEDURE
         PRINT AT XY(25, I) , "\3\148\148\148\148\148\4"
     NEXT I
 
-    oldMenuTopRow = menuTopRow
+    oldMenuTopRow = g_menuTopRow
     oldIndex = g_currentMenuIndex
 
-    menuTopRow = MENU_TITLE_ROW + 13
+    g_menuTopRow = MENU_TITLE_ROW + 13
     MENU_INDEX_OFFSET = 12
     MENU_INDEX_COUNT = 2
     MENU_START_X = 6
@@ -135,16 +135,16 @@ paletteMenu: PROCEDURE
                     currentColor(0) = $f0 OR rgb(0)
                     currentColor(1) = cc1
 
-                    VDP(47) = $c0 + currentIndex' palette data port from pal 2 index #10
+                    VDP_REG(47) = $c0 + currentIndex' palette data port from pal 2 index #10
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
-                    VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
+                    VDP_REG(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
-                    VDP(47) = $40
+                    VDP_REG(47) = $40
 
                     ' update config palette
                     IDX = 128 + currentIndex * 2
-                    VDP_WRITE_CONFIG(IDX, currentColor(0))
-                    VDP_WRITE_CONFIG(IDX + 1, currentColor(1))
+                    VDP_CONFIG(IDX) = currentColor(0)
+                    VDP_CONFIG(IDX + 1) = currentColor(1)
 
                     GOSUB checkDirty
 
@@ -224,7 +224,7 @@ paletteMenu: PROCEDURE
         IF g_nav AND NAV_CANCEL THEN EXIT WHILE
     WEND
 
-    VDP(31) = $00   ' bml en, pri, trans, fat, pal = 0
+    VDP_REG(31) = $00   ' bml en, pri, trans, fat, pal = 0
     
     GOSUB hideSprites
 
@@ -236,7 +236,7 @@ paletteMenu: PROCEDURE
         END IF
     NEXT I
 
-    menuTopRow = oldMenuTopRow
+    g_menuTopRow = oldMenuTopRow
     g_currentMenuIndex = oldIndex
 
     SET_MENU(MENU_ID_MAIN)
@@ -262,9 +262,9 @@ updateRGB:
     rgb(2) = currentColor(1) AND $0f
 
     ' update live palette
-    VDP(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
+    VDP_REG(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
     DEFINE VRAM 0, 2, VARPTR currentColor(0)
-    VDP(47) = $40
+    VDP_REG(47) = $40
 
     GOSUB renderSliders                
 
@@ -274,10 +274,10 @@ updateRGB:
     RETURN
 
 checkDirty:
-    PUT_XY(currentIndex * 2, 6, " ")
+    PUT_XY(currentIndex * 2, 6), " "
     IDX = 128 + currentIndex * 2
     IF (tempConfigValues(IDX) <> savedConfigValues(IDX)) OR tempConfigValues(IDX + 1) <> savedConfigValues(IDX + 1) THEN
-        PUT_XY(currentIndex * 2, 6, "*")
+        PUT_XY(currentIndex * 2, 6), "*"
     END IF
     RETURN
 
@@ -287,7 +287,7 @@ sliderPos:
 renderSlider:
     BR = sliderPos(I)
     GOSUB horzBarRWX
-    PUT_XY(8 + rgb(I), BR, PATT_IDX_SLIDER)            
+    PUT_XY(8 + rgb(I), BR), PATT_IDX_SLIDER
 
     #addr = NAME_TAB_XY(27, 12)
     VPOKE #addr, hexChar(rgb(0))
@@ -308,14 +308,14 @@ resetPalette: PROCEDURE
 
     GOSUB hideSprites
 
-    VDP(47) = $c0 ' palette data port from pal 2 index #10
+    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
     DEFINE VRAM 0, 32, defPal
     DEFINE VRAM 0, 32, defPal
-    VDP(47) = $40
+    VDP_REG(47) = $40
 
     ' update config palette
     FOR I = 0 TO 31
-        VDP_WRITE_CONFIG(128 + I, defPal(I))
+        VDP_CONFIG(128 + I) = defPal(I)
         tempConfigValues(128 + I) = defPal(I)
     NEXT I
 

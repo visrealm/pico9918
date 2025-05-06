@@ -1,9 +1,10 @@
+GOTO ENDBANKSEL
+
+#if BANK_SIZE
 
 g_currentBank = 0
 
-GOTO ENDBANKSEL
-
-DEF FN BANKSEL(BANK) = g_currentBank = BANK : GOSUB selectBank
+    DEF FN BANKSEL(BANK) = g_currentBank = BANK : GOSUB selectBank
 
 selectBank0:
     BANK SELECT 0
@@ -60,5 +61,8 @@ selectBank12:
 selectBank:
     ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12
     RETURN
+#else
+    DEF FN BANKSEL(BANK) = B = BANK
+#endif
 
 ENDBANKSEL:
