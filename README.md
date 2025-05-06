@@ -8,9 +8,6 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 
 This is a list of devices the PICO9918 has been tested and confirmed to work on. 
 
-* [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A)
-  * [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
-  * [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
 * [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision)
   * [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam)
   * [AtariBits CV-NUC+](https://ataribits.weebly.com/cv-nuc.html)
@@ -32,6 +29,9 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
 * [Sega SG-1000 / SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
 * [Sega SG-1000 II](https://segaretro.org/SG-1000_II)
 * [Sord M5](https://en.wikipedia.org/wiki/Sord_M5)
+* [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A)
+  * [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
+  * [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
 * [Tomy Pyūta / Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor)
 * [Tomy Pyūta Jr](http://videogamekraken.com/pyuta-jr-by-tomy)
 * [VTech CreatiVision / Dick Smith Wizzard](https://en.wikipedia.org/wiki/VTech_CreatiVision)
