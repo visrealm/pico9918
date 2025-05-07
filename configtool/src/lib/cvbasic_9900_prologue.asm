@@ -263,14 +263,14 @@ FILVRM
 ; Read VRAM - address in R0, CPU data at R2, count in R3
 ; Inline address set to avoid needing to cache r11
 LDIRMV
-    swpb r2
-    movb r2,@VDPWADR
-    swpb r2
-    movb r2,@VDPWADR
-    swpb r2
-    swpb r2
+    swpb r0
+    movb r0,@VDPWADR
+    swpb r0
+    movb r0,@VDPWADR
+    swpb r0
+    swpb r0
 !1
-    movb @VDPDATA,*r0+
+    movb @VDPDATA,*r2+
     dec r3
     jne -!1
     b *r11

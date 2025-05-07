@@ -18,6 +18,8 @@ CONST NAV_RIGHT = 8
 CONST NAV_OK = 16
 CONST NAV_CANCEL = 32
 
+DEF FN NAV(v) = (g_nav AND (v))
+
 ' -----------------------------------------------------------------------------
 ' centralised navigation handling for kb and joystick
 ' -----------------------------------------------------------------------------

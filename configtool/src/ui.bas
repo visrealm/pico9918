@@ -30,9 +30,9 @@ horzBarR:
     BW = 32
 horzBarRW:
     BX = 0
-horzBarRWX:
+horzBarRWX: PROCEDURE
     DEFINE VRAM NAME_TAB_XY(BX, BR), BW, horzBar
-    RETURN
+    END
 
 ' -----------------------------------------------------------------------------
 ' clear the screen (rows 3 to 19 anyway...)

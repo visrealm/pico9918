@@ -169,42 +169,42 @@ paletteMenu: PROCEDURE
         END IF
 
         IF currentMenu = 0 THEN
-            IF g_nav AND NAV_LEFT THEN
+            IF NAV(NAV_LEFT) THEN
                 currentIndex = currentIndex - 1
                 if currentIndex = 0 THEN currentIndex = 15
-            ELSEIF g_nav AND NAV_RIGHT THEN
+            ELSEIF NAV(NAV_RIGHT) THEN
                 currentIndex = currentIndex + 1
                 if currentIndex > 15 THEN currentIndex = 1
-            ELSEIF g_nav AND NAV_DOWN THEN
+            ELSEIF NAV(NAV_DOWN) THEN
                 currentMenu = currentMenu + 1
                 DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 7), 2, VARPTR bmpBuf(0 + 4)
                 DEFINE VRAM NAME_TAB_XY(currentIndex * 2 - 1, 8), 2, VARPTR bmpBuf(2 + 4)
-            ELSEIF g_nav AND NAV_UP THEN
+            ELSEIF NAV(NAV_UP) THEN
                 currentMenu = (3 + MENU_INDEX_COUNT)
             END IF
 
         ELSEIF currentMenu < 4 THEN
             rgbIndex = currentMenu - 1
-            IF g_nav AND NAV_DOWN THEN
+            IF NAV(NAV_DOWN) THEN
                 currentMenu = currentMenu + 1
                 GOSUB hideSprites
-            ELSEIF g_nav AND NAV_UP THEN
+            ELSEIF NAV(NAV_UP) THEN
                 currentMenu = currentMenu - 1
                 GOSUB hideSprites
-            ELSEIF g_nav AND NAV_LEFT AND rgb(rgbIndex) > 0 THEN
+            ELSEIF NAV(NAV_LEFT) AND rgb(rgbIndex) > 0 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) - 1
-            ELSEIF g_nav AND NAV_RIGHT AND rgb(rgbIndex) < 15 THEN
+            ELSEIF NAV(NAV_RIGHT) AND rgb(rgbIndex) < 15 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) + 1
             ELSEIF g_key > 0 AND g_key < 16 THEN
                 rgb(rgbIndex) = g_key
             END IF
         ELSE
-            IF g_nav AND NAV_DOWN THEN
+            IF NAV(NAV_DOWN) THEN
                 currentMenu = currentMenu + 1
                 IF (currentMenu > (3 + MENU_INDEX_COUNT)) THEN currentMenu = 0
-            ELSEIF g_nav AND NAV_UP THEN
+            ELSEIF NAV(NAV_UP) THEN
                 currentMenu = currentMenu - 1
-            ELSEIF g_nav AND NAV_OK THEN
+            ELSEIF g_nav THEN
                 IF currentMenu = 4 THEN' reset
                     GOSUB resetPalette
                 ELSEIF currentMenu = 5 THEN' back
@@ -219,7 +219,7 @@ paletteMenu: PROCEDURE
             GOSUB renderMenu
         END IF
 
-        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
+        IF NAV(NAV_CANCEL) THEN EXIT WHILE
     WEND
 
     VDP_REG(31) = $00   ' bml en, pri, trans, fat, pal = 0
@@ -240,7 +240,7 @@ paletteMenu: PROCEDURE
     SET_MENU(MENU_ID_MAIN)
     END
 
-updateRGB:
+updateRGB: PROCEDURE
     #addr = NAME_TAB_XY(currentIndex * 2 - 1, 7)
     DEFINE VRAM #addr, 2, VARPTR bmpBuf(0 + 4)
     DEFINE VRAM #addr + 32, 2, VARPTR bmpBuf(2 + 4)
@@ -269,34 +269,32 @@ updateRGB:
     lastIndex = currentIndex
 
     GOSUB delay
-    RETURN
+    END
 
-checkDirty:
+checkDirty: PROCEDURE
     PUT_XY(currentIndex * 2, 6), " "
     IDX = 128 + currentIndex * 2
     IF (tempConfigValues(IDX) <> savedConfigValues(IDX)) OR tempConfigValues(IDX + 1) <> savedConfigValues(IDX + 1) THEN
         PUT_XY(currentIndex * 2, 6), "*"
     END IF
-    RETURN
+    END
 
 sliderPos:
     DATA BYTE 10,12,14
 
-renderSlider:
+renderSlider: PROCEDURE
     BR = sliderPos(I)
     GOSUB horzBarRWX
     PUT_XY(8 + rgb(I), BR), PATT_IDX_SLIDER
 
     PRINT AT XY(27, 12), CHR$(hexChar(rgb(0))), CHR$(hexChar(rgb(1))), CHR$(hexChar(rgb(2)))
+    END
 
-    RETURN
-
-renderSliders:
+renderSliders: PROCEDURE
     FOR I = 0 to 2
         GOSUB renderSlider
     NEXT I
-    RETURN
-
+    END
 
 resetPalette: PROCEDURE
     WAIT

@@ -47,7 +47,7 @@ diagMenu: PROCEDURE
             GOSUB delay
         END IF
 
-        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
+        IF NAV(NAV_CANCEL) THEN EXIT WHILE
         
     WEND
 

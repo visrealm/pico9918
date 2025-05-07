@@ -38,6 +38,8 @@
     #INFO "F18A testing mode"
 #endif
 
+GOTO main
+
 INCLUDE "banksel.bas"
 INCLUDE "core.bas"
 

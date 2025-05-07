@@ -79,8 +79,6 @@ DEF FN SET_MENU(I) = g_currentMenu = I
 DIM tempConfigValues(CONF_COUNT)
 DIM savedConfigValues(CONF_COUNT)
 
-GOTO main
-
 INCLUDE "vdp-utils.bas"
 INCLUDE "patterns.bas"
 
@@ -98,7 +96,7 @@ INCLUDE "menu-palette.bas"
     ' =========================================================================
     ' PROGRAM ENTRY
     ' -------------------------------------------------------------------------
-main:
+main: PROCEDURE
 
     ' GLOBALS    
     g_currentMenuIndex = 0                  ' current menu index
@@ -229,13 +227,7 @@ main:
         WEND
 
     END IF
-
-' -----------------------------------------------------------------------------
-' end it all 
-' -----------------------------------------------------------------------------
-exit:
-    WAIT
-    GOTO exit
+    END
     
 ' -----------------------------------------------------------------------------
 ' delay between user input (2/15th second)

@@ -87,11 +87,22 @@ renderMenuRow: PROCEDURE
 highlightMenuRow: PROCEDURE
     ' Set MSB bit for all characters in this row which selects the
     ' "highlight" versions of the patterns
+#if 1
+    DIM rowBuffer(32)
+    #addr = #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X + 1
+    length = 30 - (MENU_START_X * 2)
+    DEFINE VRAM READ #addr, length, VARPTR rowBuffer(0)
+    FOR I = 0 TO length
+        rowBuffer(I) = rowBuffer(I) OR 128
+    NEXT I
+    DEFINE VRAM #addr, length, VARPTR rowBuffer(0)
+#else
     FOR R = MENU_START_X + 1 TO 31 - MENU_START_X
         C = VPEEK(#VDP_NAME_TAB + #ROWOFFSET+ R)
         C = C OR 128
         VPOKE (#VDP_NAME_TAB + #ROWOFFSET + R), C
     NEXT R
+#endif
 
    ' ends of highlight bar
     VPOKE (#VDP_NAME_TAB + #ROWOFFSET + MENU_START_X),  PATT_IDX_SELECTED_L
@@ -114,7 +125,7 @@ menuLoop: PROCEDURE
     GOSUB updateNavInput
 
     ' <down> button pressed?
-    IF g_nav AND NAV_DOWN THEN  
+    IF NAV(NAV_DOWN) THEN  
         WHILE 1
             g_currentMenuIndex  = g_currentMenuIndex + 1
             IF g_currentMenuIndex > MAX_MENU_INDEX THEN g_currentMenuIndex = MIN_MENU_INDEX
@@ -124,7 +135,7 @@ menuLoop: PROCEDURE
         WEND
     
     ' <up> button pressed?
-    ELSEIF g_nav AND NAV_UP THEN  
+    ELSEIF NAV(NAV_UP) THEN  
         WHILE 1
             IF g_currentMenuIndex = MIN_MENU_INDEX THEN
                 g_currentMenuIndex = MAX_MENU_INDEX
@@ -148,7 +159,7 @@ menuLoop: PROCEDURE
         END IF
 
     ' <fire>, <space> or <right> pressed? - next option value
-    ELSEIF (g_nav AND NAV_OK) OR (g_nav AND NAV_RIGHT) THEN 
+    ELSEIF NAV(NAV_OK OR NAV_RIGHT) THEN 
         tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
         IF tempConfigValuesCount > 0 THEN
             IF currentOptionIndex < 200 THEN
@@ -161,7 +172,7 @@ menuLoop: PROCEDURE
         valueChanged = TRUE
 
     ' <left> pressed - previous option value
-    ELSEIF (g_nav AND NAV_LEFT) THEN 
+    ELSEIF NAV(NAV_LEFT) THEN 
         tempConfigValuesCount = MENU_DATA(g_currentMenuIndex, CONF_NUM_VALUES)
         IF tempConfigValuesCount > 0 THEN
             IF currentOptionIndex < 200 THEN
@@ -275,7 +286,7 @@ confirmationMenuLoop: PROCEDURE
 
         GOSUB menuLoop
 
-        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
+        IF NAV(NAV_CANCEL) THEN EXIT WHILE
 
         IF valueChanged THEN
             vdpOptId = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
@@ -367,8 +378,7 @@ backOptionsMenu: PROCEDURE
     ' main menu loop
     WHILE 1
         WAIT
-        IF g_nav AND NAV_CANCEL THEN EXIT WHILE
-        IF g_nav AND NAV_OK THEN EXIT WHILE
+        IF NAV(NAV_CANCEL OR NAV_OK) THEN EXIT WHILE
     WEND
 
     g_currentMenuIndex = oldIndex

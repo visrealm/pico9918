@@ -1,68 +1,65 @@
-GOTO ENDBANKSEL
-
 #if BANK_SIZE
 
 g_currentBank = 0
 
     DEF FN BANKSEL(BANK) = g_currentBank = BANK : GOSUB selectBank
 
-selectBank0:
+selectBank0: PROCEDURE
     BANK SELECT 0
-    RETURN
+    END
 
-selectBank1:
+selectBank1: PROCEDURE
     BANK SELECT 1
-    RETURN
+    END
 
-selectBank2:
+selectBank2: PROCEDURE
     BANK SELECT 2
-    RETURN
+    END
 
-selectBank3:
+selectBank3: PROCEDURE
     BANK SELECT 3
-    RETURN
+    END
 
-selectBank4:
+selectBank4: PROCEDURE
     BANK SELECT 4
-    RETURN
+    END
 
-selectBank5:
+selectBank5: PROCEDURE
     BANK SELECT 5
-    RETURN
+    END
 
-selectBank6:
+selectBank6: PROCEDURE
     BANK SELECT 6
-    RETURN
+    END
 
-selectBank7:
+selectBank7: PROCEDURE
     BANK SELECT 7
-    RETURN
+    END
 
-selectBank8:
+selectBank8: PROCEDURE
     BANK SELECT 8
-    RETURN
+    END
 
-selectBank9:
+selectBank9: PROCEDURE
     BANK SELECT 9
-    RETURN
+    END
 
-selectBank10:
+selectBank10: PROCEDURE
     BANK SELECT 10
-    RETURN
+    END
 
-selectBank11:
+selectBank11: PROCEDURE
     BANK SELECT 11
-    RETURN
+    END
 
-selectBank12:
+selectBank12: PROCEDURE
     BANK SELECT 12
-    RETURN
+    END
 
-selectBank:
+selectBank: PROCEDURE
     ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12
-    RETURN
-#else
+    END
+
+#else   ' No banking
     DEF FN BANKSEL(BANK) = B = BANK
 #endif
-
-ENDBANKSEL:
