@@ -9,9 +9,6 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' -----------------------------------------------------------------------------
-' CVBasic source file. See: github.com/nanochess/CVBasic
-' -----------------------------------------------------------------------------
 
 #if BANK_SIZE
 ' convert .UF2 block number to name table location for visualization
@@ -26,7 +23,6 @@ CONST FWROWS = (#FIRMWARE_BLOCKS - 1) / 30 + 2
 ' -----------------------------------------------------------------------------
 firmwareMenu: PROCEDURE
 
-    VDP_DISABLE_INT
 
     g_menuTopRow = MENU_TITLE_ROW + 3   ' WTF? For some reason I need this line twice???? At least on TI-99
 
@@ -35,7 +31,6 @@ firmwareMenu: PROCEDURE
     PRINT AT XY(4, g_menuTopRow + 0), "Current version : v",verMajor, ".", verMinor, ".", verPatch
     PRINT AT XY(4, g_menuTopRow + 1), "New version     : v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER,".",FIRMWARE_PATCH_VER
 
-    VDP_ENABLE_INT
 
 #if BANK_SIZE
 
@@ -56,7 +51,7 @@ firmwareMenu: PROCEDURE
             WAIT
 
             FOR #FWBLOCK = 0 TO #FIRMWARE_BLOCKS - 1
-                PRINT AT BLOCKPOS(#FWBLOCK), "\001"
+                PRINT AT BLOCKPOS(#FWBLOCK), CHR$(1)
             NEXT #FWBLOCK
 
             GOSUB firmwareWriteAndVerify

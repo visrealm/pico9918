@@ -9,9 +9,6 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' -----------------------------------------------------------------------------
-' CVBasic source file. See: github.com/nanochess/CVBasic
-' -----------------------------------------------------------------------------
 
 
 deviceInfoMenu: PROCEDURE

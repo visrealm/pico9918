@@ -9,9 +9,6 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' -----------------------------------------------------------------------------
-' CVBasic source file. See: github.com/nanochess/CVBasic
-' -----------------------------------------------------------------------------
 
 CONST NAV_NONE = 0
 CONST NAV_DOWN = 1

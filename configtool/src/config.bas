@@ -9,9 +9,6 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' -----------------------------------------------------------------------------
-' CVBasic source file. See: github.com/nanochess/CVBasic
-' -----------------------------------------------------------------------------
 
 ' -----------------------------------------------------------------------------
 ' reset options to defaults
@@ -21,14 +18,20 @@ resetOptions: PROCEDURE
     FOR I = 0 TO CONF_COUNT - 1
         tempConfigValues(I) = 0
     NEXT I
+    
     g_paletteDirty = FALSE
     FOR I = 0 TO 31
         tempConfigValues(128 + I) = defPal(I)
         IF tempConfigValues(128 + I) <> savedConfigValues(128 + I) THEN g_paletteDirty = TRUE
     NEXT I
 
+    g_diagDirty = FALSE
     FOR I = CONF_DIAG TO CONF_DIAG_ADDRESS
         IF tempConfigValues(I) <> savedConfigValues(I) THEN g_diagDirty = TRUE
+    NEXT I
+
+    FOR I = 0 TO CONF_COUNT - 1
+        VDP_CONFIG(I) = tempConfigValues(I)
     NEXT I
 
     GOSUB applyConfigValues

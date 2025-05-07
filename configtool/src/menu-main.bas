@@ -9,9 +9,6 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' -----------------------------------------------------------------------------
-' CVBasic source file. See: github.com/nanochess/CVBasic
-' -----------------------------------------------------------------------------
 
 ' menu helpers
 DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow

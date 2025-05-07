@@ -9,11 +9,9 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' -----------------------------------------------------------------------------
-' CVBasic source file. See: github.com/nanochess/CVBasic
-' -----------------------------------------------------------------------------
 
 paletteMenu: PROCEDURE
+
 
     VDP_DISABLE_INT
 
@@ -289,10 +287,7 @@ renderSlider:
     GOSUB horzBarRWX
     PUT_XY(8 + rgb(I), BR), PATT_IDX_SLIDER
 
-    #addr = NAME_TAB_XY(27, 12)
-    VPOKE #addr, hexChar(rgb(0))
-    VPOKE #addr + 1, hexChar(rgb(1))
-    VPOKE #addr + 2, hexChar(rgb(2))
+    PRINT AT XY(27, 12), CHR$(hexChar(rgb(0))), CHR$(hexChar(rgb(1))), CHR$(hexChar(rgb(2)))
 
     RETURN
 

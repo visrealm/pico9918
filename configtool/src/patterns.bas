@@ -9,9 +9,6 @@
 '
 ' https://github.com/visrealm/pico9918
 '
-' -----------------------------------------------------------------------------
-' CVBasic source file. See: github.com/nanochess/CVBasic
-' -----------------------------------------------------------------------------
 
 ' pattern indices
 CONST PATT_IDX_SELECTED_L = 20
@@ -194,8 +191,7 @@ horzBar:
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
     DATA BYTE PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H,PATT_IDX_BORDER_H
-vBar:   
-    DATA BYTE PATT_IDX_BORDER_V ' intentional flow-through to emptyRow used
+
 emptyRow:
     DATA BYTE "                                "
 
