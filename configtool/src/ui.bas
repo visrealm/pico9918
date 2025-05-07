@@ -81,8 +81,7 @@ drawPopup: PROCEDURE
     BR = a_popupTop - 1: GOSUB horzBarRWX
     #addr = NAME_TAB_XY(X - 1, a_popupTop)
     FOR Y = 0 TO a_popupHeight
-        VPOKE #addr, PATT_IDX_BORDER_V
-        DEFINE VRAM #addr + 1, a_popupWidth, emptyRow
+        DEFINE VRAM #addr, a_popupWidth, vBar
         VPOKE #addr + a_popupWidth + 1, PATT_IDX_BORDER_V
         #addr = #addr + 32
     NEXT Y
