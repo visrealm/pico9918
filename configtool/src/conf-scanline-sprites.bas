@@ -12,6 +12,8 @@
 
 spriteIndices:
 DATA BYTE 0,1,2,3,4,4,5,6
+'         P I C O 9 9 1 8
+
 ' -----------------------------------------------------------------------------
 ' initialise the sprite attributes
 ' -----------------------------------------------------------------------------
@@ -22,11 +24,12 @@ initSprites: PROCEDURE
     xPos = 16
 
     FOR I = 0 TO NUM_SPRITES - 1
+        spriteAttrIdx = I * 4
         spritePattIndex = spriteIndices(I AND 7)
-        spriteAttr(I * 4 + 0) = $d0
-        spriteAttr(I * 4 + 1) = xPos
-        spriteAttr(I * 4 + 2) = spritePattIndex * 4
-        spriteAttr(I * 4 + 3) = 15
+        spriteAttr(spriteAttrIdx) = $d0
+        spriteAttr(spriteAttrIdx + 1) = xPos
+        spriteAttr(spriteAttrIdx + 2) = spritePattIndex * 4
+        spriteAttr(spriteAttrIdx + 3) = 15
         xPos = xPos + logoSpriteWidths(spritePattIndex) + 1
         IF (I AND 7) = 7 THEN xPos = xPos + 8  ' small gap
     NEXT I
@@ -68,7 +71,6 @@ animateSprites: PROCEDURE
 ' hide the sprites when 'scanline sprites' option no longer selected
 ' -----------------------------------------------------------------------------
 hideSprites: PROCEDURE
-    FOR I = 0 TO 1
-        SPRITE I,$d0,0,0,0
-    NEXT I
+    SPRITE 0,$d0,0,0,0
+    SPRITE 1,$d0,0,0,0
     END

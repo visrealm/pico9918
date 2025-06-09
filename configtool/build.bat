@@ -150,8 +150,14 @@ echo ---------------------------------------------------------------------
 echo   Compiling for MSX
 echo ---------------------------------------------------------------------
 
-set BASENAME=pico9918_%VERSION%_msx
+set BASENAME=pico9918_%VERSION%_msx_asc16
 cvbasic --msx pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
+if %errorlevel% neq 0 exit /b %errorlevel%
+gasm80 asm\%BASENAME%.asm -o bin\%BASENAME%.rom
+echo Output: bin\%BASENAME%.rom
+
+set BASENAME=pico9918_%VERSION%_msx_konami
+cvbasic --msx -konami pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
 gasm80 asm\%BASENAME%.asm -o bin\%BASENAME%.rom
 echo Output: bin\%BASENAME%.rom

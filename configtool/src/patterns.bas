@@ -103,6 +103,7 @@ setupTiles: PROCEDURE
     DEFINE CHAR PATT_IDX_BORDER_H, 6, lineSegments  '   border segments
     DEFINE CHAR PATT_IDX_BORDER_H + 130, 4, lineSegmentJoiners
     DEFINE CHAR PATT_IDX_SLIDER, 1, sliderButton
+    DEFINE CHAR 148, 1, palBlock
 
     DEFINE CHAR PATT_IDX_BOX_TL, 4, palBox
     DEFINE CHAR PATT_IDX_BOX_TL + 128, 4, palBox
@@ -298,3 +299,5 @@ pow2: ' 1 << INDEX
 
 block:
     DATA BYTE $FE, $FE, $FE, $FE, $FE, $FE, $FE, $00
+palBlock:
+    DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00    

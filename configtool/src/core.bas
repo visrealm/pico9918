@@ -234,7 +234,7 @@ main: PROCEDURE
 ' -----------------------------------------------------------------------------
 delay: PROCEDURE
     VDP_ENABLE_INT
-    FOR del = 1 TO 6
+    FOR del = 1 TO 8
         WAIT
     NEXT del
     END

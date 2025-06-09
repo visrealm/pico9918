@@ -429,9 +429,6 @@ print_digit
 !3
     andi r5,>00ff
     ori r5,>0100
-    jmp print_char2
-print_char1
-    mov r11,r6
 print_char2
     mov @cursor,r0      ; get cursor
     andi r0,>07ff       ; enforce position - large range for two screen pages
@@ -442,12 +439,9 @@ print_char2
     inc @cursor         ; track it
     b *r6
 print_char
-    mov r11,r4
-    swpb r2
-    limi 0
-    bl @print_char1
-    limi 2
-    b *r4
+    mov r11,r6
+	swpb r2
+    b @print_char2
 
 ; Load sprite definitions: Sprite number in R4, CPU data in R0, count of sprites in R5 (MSB)
 ; Original: pointer = sprite number, temp = CPU address, a = number sprites
