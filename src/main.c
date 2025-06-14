@@ -196,7 +196,7 @@ typedef struct
 #define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
 
 static const ClockSettings clockPresets[] = {
-  CLOCK_PRESET(1260000000, 5, 1, VREG_VOLTAGE_1_15),    // 252
+  CLOCK_PRESET(1260000000, 5, 1, VREG_VOLTAGE_1_10),    // 252
   CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_15),    // 302.4
   CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
 };
@@ -627,7 +627,6 @@ int main(void)
    * but this'll do for now. */
 
   /* the initial "safe" clock speed */
-
   ClockSettings clockSettings = clockPresets[clockPresetIndex];
   vreg_set_voltage(clockSettings.voltage);
   set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
@@ -658,14 +657,6 @@ int main(void)
 
   if (tms9918->config[CONF_CLOCK_PRESET_ID] != clockPresetIndex)
   {
-    // we do this now rather than at boot to ensure a fast (133MHz?) flash clock
-    // for the transfer of the firmware to RAM at startup
-
-    ssi_hw->ssienr = 0; // change (reduce) flash SPI clock rate
-    ssi_hw->baudr = 0;
-    ssi_hw->baudr = 4;  // clock divider (must be even and result in a max of 133MHz)
-    ssi_hw->ssienr = 1;    
-
     clockPresetIndex = tms9918->config[CONF_CLOCK_PRESET_ID];
     clockSettings = clockPresets[clockPresetIndex];
 
