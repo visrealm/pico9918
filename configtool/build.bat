@@ -8,18 +8,17 @@ echo.
 
 echo Setting up build directories
 echo.
-echo Intermediates: build\asm
-echo Binaries:      build\bin
+echo Intermediates: build\tmp\asm
+echo Binaries:      build
 echo.
 
 mkdir build 2> NUL
-mkdir build\asm 2> NUL
-mkdir build\bin 2> NUL
+mkdir build\tmp 2> NUL
+mkdir build\tmp\asm 2> NUL
 
-if exist asm\* del asm\*
-if exist asm\* del asm\*
+del /Q /S build\*
 
-set VERSION=v1-0-1
+set VERSION=v1-0-2
 set FRIENDLYVER=%VERSION:-=.%
 
 if exist *.uf2 del /Q *.uf2
@@ -57,18 +56,18 @@ echo ---------------
 python3 tools\uf2cvb.py -b 0 -o src\firmware pico9918-vga-build-%VERSION%.uf2
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-pushd build
+pushd build\tmp
 
 echo.
 echo ---------------------------------------------------------------------
 echo Finding CVBasic compiler...
 
 
-set PATH=..\tools\cvbasic;%PATH%
+set PATH=..\..\tools\cvbasic;%PATH%
 
 :: This is where I have my CVBasic fork, so grab it from here if available
-set PATH=..\..\..\CVBasic\build\Release;%PATH%  
-set LIBPATH=..\src\lib
+set PATH=..\..\..\..\CVBasic\build\Release;%PATH%  
+set LIBPATH=..\..\src\lib
 for %%D in ("%LIBPATH%") do set LIBPATH=%%~fD
 
 where cvbasic.exe
@@ -95,8 +94,8 @@ echo ---------------------------------------------------------------------
 
 
 del *.bas
-copy /Y ..\src\*.bas .
-copy /Y ..\src\lib lib
+copy /Y ..\..\src\*.bas .
+copy /Y ..\..\src\lib lib
 
 :: TI-99
 
@@ -110,8 +109,8 @@ cvbasic --ti994a pico9918conf.bas asm\%BASENAME%.a99 %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
 python3.13 c:\tools\xdt99\xas99.py -b -R asm/%BASENAME%.a99
 if %errorlevel% neq 0 exit /b %errorlevel%
-linkticart.py %BASENAME%_b00.bin bin\%BASENAME%_8.bin "PICO9918 %FRIENDLYVER%"
-echo Output: bin\%BASENAME%_8.bin
+linkticart.py %BASENAME%_b00.bin ..\%BASENAME%_8.bin "PICO9918 %FRIENDLYVER%"
+echo Output: build\%BASENAME%_8.bin
 
 echo.
 echo ---------------------------------------------------------------------
@@ -121,10 +120,10 @@ echo ---------------------------------------------------------------------
 set BASENAME=pico9918_%VERSION%_ti99_f18a
 cvbasic --ti994a -dF18A_TESTING=1 pico9918conf.bas asm\%BASENAME%.a99 %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-python3.13 c:\tools\xdt99\xas99.py -b -R asm/%BASENAME%.a99 -L bin/%BASENAME%.lst
+python3.13 c:\tools\xdt99\xas99.py -b -R asm/%BASENAME%.a99 -L ..\%BASENAME%.lst
 if %errorlevel% neq 0 exit /b %errorlevel%
-linkticart.py %BASENAME%_b00.bin bin\%BASENAME%_8.bin "PICO9918 %FRIENDLYVER%"
-echo Output: bin\%BASENAME%_8.bin
+linkticart.py %BASENAME%_b00.bin ..\%BASENAME%_8.bin "PICO9918 %FRIENDLYVER%"
+echo Output: build\%BASENAME%_8.bin
 
 
 :: ColecoVision
@@ -137,10 +136,10 @@ echo ---------------------------------------------------------------------
 set BASENAME=pico9918_%VERSION%_cv
 cvbasic pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-gasm80 asm\%BASENAME%.asm -o bin\%BASENAME%.rom
-copy /Y bin\%BASENAME%.rom c:\tools\Classic99Phoenix
+gasm80 asm\%BASENAME%.asm -o ..\%BASENAME%.rom
+copy /Y ..\%BASENAME%.rom c:\tools\Classic99Phoenix
 echo.
-echo Output: bin\%BASENAME%.rom
+echo Output: build\%BASENAME%.rom
 
 
 :: MSX
@@ -153,14 +152,14 @@ echo ---------------------------------------------------------------------
 set BASENAME=pico9918_%VERSION%_msx_asc16
 cvbasic --msx pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-gasm80 asm\%BASENAME%.asm -o bin\%BASENAME%.rom
-echo Output: bin\%BASENAME%.rom
+gasm80 asm\%BASENAME%.asm -o ..\%BASENAME%.rom
+echo Output: build\%BASENAME%.rom
 
 set BASENAME=pico9918_%VERSION%_msx_konami
 cvbasic --msx -konami pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-gasm80 asm\%BASENAME%.asm -o bin\%BASENAME%.rom
-echo Output: bin\%BASENAME%.rom
+gasm80 asm\%BASENAME%.asm -o ..\%BASENAME%.rom
+echo Output: build\%BASENAME%.rom
 
 
 :: NABU
@@ -173,8 +172,8 @@ echo ---------------------------------------------------------------------
 set BASENAME=pico9918_%VERSION%
 cvbasic --nabu pico9918conf.bas asm/%BASENAME%_nabu.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-gasm80 asm\%BASENAME%_nabu.asm -o bin\%BASENAME%.nabu
-echo Output: bin\%BASENAME%.nabu
+gasm80 asm\%BASENAME%_nabu.asm -o ..\%BASENAME%.nabu
+echo Output: build\%BASENAME%.nabu
 
 echo.
 echo   Compiling for NABU (MAME)
@@ -184,14 +183,14 @@ echo   Compiling for NABU (MAME)
 set BASENAME=pico9918_%VERSION%_nabu_mame
 cvbasic --nabu -DTMS9918_TESTING=1 pico9918conf.bas asm/%BASENAME%.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-gasm80 asm\%BASENAME%.asm -o bin\000001.nabu
-pushd bin
+gasm80 asm\%BASENAME%.asm -o ..\000001.nabu
+pushd ..
 tar.exe -a -c -f %BASENAME%.zip 000001.nabu
 copy /Y %BASENAME%.zip %BASENAME%.npz
 del %BASENAME%.zip
 del 000001.nabu
 popd
-echo Output: bin\%BASENAME%.npz
+echo Output: build\%BASENAME%.npz
 
 
 :: CreatiVision
@@ -204,8 +203,8 @@ echo ---------------------------------------------------------------------
 set BASENAME=pico9918_%VERSION%_crv
 cvbasic --creativision pico9918conf.bas asm\%BASENAME%.asm %LIBPATH%
 if %errorlevel% neq 0 exit /b %errorlevel%
-gasm80 asm\%BASENAME%.asm -o bin\%BASENAME%.bin
-echo Output: bin\%BASENAME%.bin
+gasm80 asm\%BASENAME%.asm -o ..\%BASENAME%.bin
+echo Output: build\%BASENAME%.bin
     
 
 :: HBC56
