@@ -197,7 +197,7 @@ typedef struct
 
 static const ClockSettings clockPresets[] = {
   CLOCK_PRESET(1260000000, 5, 1, VREG_VOLTAGE_1_10),    // 252
-  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_15),    // 302.4
+  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4
   CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
 };
 
@@ -334,6 +334,8 @@ void renderDiag(int y, uint16_t *pixels)
   }
 }
 
+//static __attribute__((section(".scratch_y.buffer"))) uint32_t __aligned(4) pram [256];
+static uint32_t __aligned(4) pram [256];
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
  */
@@ -469,16 +471,22 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   /* convert from  palette to bgr12 */
   if (vrEmuTms9918DisplayMode(tms9918) == TMS_MODE_TEXT80)
   {
-    uint32_t pram[256];
+    //static uint32_t pram[256];
     uint32_t data;
-    for (int i = 0, x = 0; i < 16; ++i)
+    if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
     {
-      uint32_t c = tms9918->vram.map.pram[i] & 0xFF0F;
-      for (int j = 0; j < 16; ++j, ++x)
+      tms9918->palDirty = 0;
+
+      for (int i = 0, x = 0; i < 16; ++i)
       {
-        data = ((tms9918->vram.map.pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
+        uint32_t c = tms9918->vram.map.pram[i] & 0xFF0F;
+        for (int j = 0; j < 16; ++j, ++x)
+        {
+          data = ((tms9918->vram.map.pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
+        }
       }
     }
+
     tms9918->vram.map.blanking = 1; // H
 
     uint8_t* src = &(tmsScanlineBuffer [0]);
@@ -504,18 +512,21 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint8_t* src = &(tmsScanlineBuffer [0]);
     uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
     uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
-    uint32_t pram [64];
     uint32_t data;
-    for (int i = 0; i < 64; i += 8)
+    if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
     {
-      data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
-      data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
-      data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
-      data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
-      data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
-      data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
-      data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
-      data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+      tms9918->palDirty = 0;
+      for (int i = 0; i < 64; i += 8)
+      {
+        data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
+        data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
+        data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
+        data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
+        data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
+        data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
+        data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
+        data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+      }
     }
     tms9918->vram.map.blanking = 1; // H
 
@@ -556,6 +567,7 @@ void tmsPioInit()
   pio_sm_config writePioConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writePioConfig, GPIO_CD7);
   sm_config_set_in_shift(&writePioConfig, false, true, 32); // L shift, autopush @ 32 bits
+  sm_config_set_jmp_pin(&writePioConfig, GPIO_CSW);
   sm_config_set_clkdiv(&writePioConfig, 1.0f);
 
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writePioConfig);
