@@ -42,18 +42,18 @@ echo ---------------------------------------------------------------------
 echo.
 echo 8KB BANK SIZE:
 echo --------------
-python3 tools\uf2cvb.py -b 8 -o src\firmware_8k pico9918-vga-build-%VERSION%.uf2
+python3 tools\uf2cvb.py -b 8 -o build\tmp\firmware_8k pico9918-vga-build-%VERSION%.uf2
 
 echo.
 echo 16KB BANK SIZE:
 echo ---------------
-python3 tools\uf2cvb.py -b 16 -o src\firmware_16k pico9918-vga-build-%VERSION%.uf2
+python3 tools\uf2cvb.py -b 16 -o build\tmp\firmware_16k pico9918-vga-build-%VERSION%.uf2
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo.
 echo NO BANKS:
 echo ---------------
-python3 tools\uf2cvb.py -b 0 -o src\firmware pico9918-vga-build-%VERSION%.uf2
+python3 tools\uf2cvb.py -b 0 -o build\tmp\firmware pico9918-vga-build-%VERSION%.uf2
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 pushd build\tmp
