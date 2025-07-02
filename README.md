@@ -1,6 +1,8 @@
 # PICO9918
 
-A drop-in replacement for a classic TMS9918A VDP using a Raspberry Pi Pico.
+A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
+
+<p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="480px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="480px"></a></p>
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
 
@@ -53,11 +55,11 @@ So far, there aren't any.
 
 # F18A compatibility
 
-Work is being done to add F18A compatibility to the PICO9918. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
+The PICO9918 also includes F18A compatibility in v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
 
 [![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/TabTIPL1xQY)](https://youtu.be/TabTIPL1xQY)
 
-Pre-release firmware for F18A compatibility mode is available in [Releases](https://github.com/visrealm/pico9918/releases/tag/v0.4.1-f18a-preview1).
+Pre-release firmware for F18A compatibility mode is available in [Releases](https://github.com/visrealm/pico9918/releases/tag/v1.0.1a).
 
 ## Purchasing options
 
@@ -78,7 +80,7 @@ There are two main variants of the hardware.
 
 PICO9918 v1.2 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
 
-<p align="left"><a href="img/pico9918_v1_0_sm.png"><img src="img/pico9918_v1_0_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
+<p align="left"><a href="img/pico9918_v1_2_sm.jpg"><img src="img/pico9918_v1_2_sm.jpg" alt="PICO9918 v1.2" width="720px"></a></p>
 
 ### v0.3
 
