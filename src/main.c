@@ -347,8 +347,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
 
   uint32_t* dPixels = (uint32_t*)pixels;
-  bg = bigRgb2LittleBgr(tms9918->vram.map.pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f]);
-  bg = bg | (bg << 16);
+  bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   if (y == 0)
   {
@@ -366,12 +365,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       tms9918->vram.map.scanline = y - vBorder;
       TMS_STATUS(tms9918, 0x03) = tms9918->vram.map.scanline;
     }
-    dma_channel_wait_for_finish_blocking(dma32);
-
-    renderDiag(y, pixels);
 
     if (!validWrites || (frameCount < 600))
     {
+      dma_channel_wait_for_finish_blocking(dma32);
+
       outputSplash(y, frameCount, vBorder, vPixels, pixels);
 
       if (testingClock)
@@ -411,145 +409,145 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     {
       gpuTrigger();
     }
-    
-    return;
-  }
-
-  uint32_t frameStart = time_us_32();
-
-  y -= vBorder;
-  tms9918->vram.map.blanking = 0;
-  tms9918->vram.map.scanline = y;
-  TMS_STATUS(tms9918, 0x03) = y;
-
-  /*** left border ***/
-  dma_channel_set_write_addr(dma32, dPixels, false);
-  dma_channel_set_trans_count(dma32, hBorder / 2, true);
-
-  /*** main display region ***/
-
-  /* generate the scanline */
-  uint32_t renderTime  = time_us_32();
-  uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
-  renderTime = time_us_32() - renderTime;
-
-  /*** interrupt signal? ***/
-  const int interruptThreshold = 1;
-  if (y < vPixels - interruptThreshold)
-  {
-    TMS_STATUS(tms9918, 0x01) &= ~0x03;
   }
   else
   {
-    TMS_STATUS(tms9918, 0x01) &= ~0x01;
-  }
+    uint32_t frameStart = time_us_32();
 
-  if (tms9918->vram.map.scanline && (TMS_REGISTER(tms9918, 0x13) == tms9918->vram.map.scanline))
-  {
-    TMS_STATUS(tms9918, 0x01) |= 0x01;
-    tempStatus |= STATUS_INT;
-  }
+    y -= vBorder;
+    tms9918->vram.map.blanking = 0;
+    tms9918->vram.map.scanline = y;
+    TMS_STATUS(tms9918, 0x03) = y;
 
-  if (TMS_REGISTER(tms9918, 0x32) & 0x40)
-  {
-    gpuTrigger();
-  }
+    /*** left border ***/
+    dma_channel_set_write_addr(dma32, dPixels, false);
+    dma_channel_set_trans_count(dma32, hBorder / 2, true);
 
-  if (!doneInt && y >= vPixels - interruptThreshold)
-  {
-    eofInterrupt();
-    tempStatus |= STATUS_INT;
+    /*** main display region ***/
 
-    // keep track of the number of dropped frames in the past 64 frames
-    bool droppedFrame = currentStatus & STATUS_INT;
-    droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
-    droppedFrames[frameCount & 0xf] = droppedFrame;
-  }
+    /* generate the scanline */
+    uint32_t renderTime  = time_us_32();
+    uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+    renderTime = time_us_32() - renderTime;
 
-  updateInterrupts(tempStatus);
-
-  /* convert from  palette to bgr12 */
-  if (vrEmuTms9918DisplayMode(tms9918) == TMS_MODE_TEXT80)
-  {
-    //static uint32_t pram[256];
-    uint32_t data;
-    if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
+    /*** interrupt signal? ***/
+    const int interruptThreshold = 1;
+    if (y < vPixels - interruptThreshold)
     {
-      tms9918->palDirty = 0;
+      TMS_STATUS(tms9918, 0x01) &= ~0x03;
+    }
+    else
+    {
+      TMS_STATUS(tms9918, 0x01) &= ~0x01;
+    }
 
-      for (int i = 0, x = 0; i < 16; ++i)
+    if (tms9918->vram.map.scanline && (TMS_REGISTER(tms9918, 0x13) == tms9918->vram.map.scanline))
+    {
+      TMS_STATUS(tms9918, 0x01) |= 0x01;
+      tempStatus |= STATUS_INT;
+    }
+
+    if (TMS_REGISTER(tms9918, 0x32) & 0x40)
+    {
+      gpuTrigger();
+    }
+
+    if (!doneInt && y >= vPixels - interruptThreshold)
+    {
+      eofInterrupt();
+      tempStatus |= STATUS_INT;
+
+      // keep track of the number of dropped frames in the past 64 frames
+      bool droppedFrame = currentStatus & STATUS_INT;
+      droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
+      droppedFrames[frameCount & 0xf] = droppedFrame;
+    }
+
+    updateInterrupts(tempStatus);
+
+    /* convert from  palette to bgr12 */
+    if (vrEmuTms9918DisplayMode(tms9918) == TMS_MODE_TEXT80)
+    {
+      //static uint32_t pram[256];
+      uint32_t data;
+      if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
       {
-        uint32_t c = tms9918->vram.map.pram[i] & 0xFF0F;
-        for (int j = 0; j < 16; ++j, ++x)
+        tms9918->palDirty = 0;
+
+        for (int i = 0, x = 0; i < 16; ++i)
         {
-          data = ((tms9918->vram.map.pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
+          uint32_t c = tms9918->vram.map.pram[i] & 0xFF0F;
+          for (int j = 0; j < 16; ++j, ++x)
+          {
+            data = ((tms9918->vram.map.pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
+          }
         }
       }
-    }
 
-    tms9918->vram.map.blanking = 1; // H
+      tms9918->vram.map.blanking = 1; // H
 
-    uint8_t* src = &(tmsScanlineBuffer [0]);
-    uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
-    uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
+      uint8_t* src = &(tmsScanlineBuffer [0]);
+      uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
+      uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
 
-    while (src < end)
-    {
-      dP [0] = pram[src [0]];
-      dP [1] = pram[src [1]];
-      dP [2] = pram[src [2]];
-      dP [3] = pram[src [3]];
-      dP [4] = pram[src [4]];
-      dP [5] = pram[src [5]];
-      dP [6] = pram[src [6]];
-      dP [7] = pram[src [7]];
-      dP += 8;
-      src += 8;
-    }
-  }
-  else
-  {
-    uint8_t* src = &(tmsScanlineBuffer [0]);
-    uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
-    uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
-    uint32_t data;
-    if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
-    {
-      tms9918->palDirty = 0;
-      for (int i = 0; i < 64; i += 8)
+      while (src < end)
       {
-        data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
-        data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
-        data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
-        data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
-        data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
-        data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
-        data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
-        data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+        dP [0] = pram[src [0]];
+        dP [1] = pram[src [1]];
+        dP [2] = pram[src [2]];
+        dP [3] = pram[src [3]];
+        dP [4] = pram[src [4]];
+        dP [5] = pram[src [5]];
+        dP [6] = pram[src [6]];
+        dP [7] = pram[src [7]];
+        dP += 8;
+        src += 8;
       }
     }
-    tms9918->vram.map.blanking = 1; // H
-
-    while (src < end)
+    else
     {
-      dP [0] = pram[src [0]];
-      dP [1] = pram[src [1]];
-      dP [2] = pram[src [2]];
-      dP [3] = pram[src [3]];
-      dP [4] = pram[src [4]];
-      dP [5] = pram[src [5]];
-      dP [6] = pram[src [6]];
-      dP [7] = pram[src [7]];
-      dP += 8;
-      src += 8;
-    }
-  }
+      uint8_t* src = &(tmsScanlineBuffer [0]);
+      uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
+      uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
+      uint32_t data;
+      if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
+      {
+        tms9918->palDirty = 0;
+        for (int i = 0; i < 64; i += 8)
+        {
+          data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
+          data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
+          data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
+          data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
+          data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
+          data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
+          data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
+          data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+        }
+      }
+      tms9918->vram.map.blanking = 1; // H
 
-  /*** right border ***/
-  dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
+      while (src < end)
+      {
+        dP [0] = pram[src [0]];
+        dP [1] = pram[src [1]];
+        dP [2] = pram[src [2]];
+        dP [3] = pram[src [3]];
+        dP [4] = pram[src [4]];
+        dP [5] = pram[src [5]];
+        dP [6] = pram[src [6]];
+        dP [7] = pram[src [7]];
+        dP += 8;
+        src += 8;
+      }
+    }
+
+    /*** right border ***/
+    dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
 
   if (tms9918->config[CONF_DIAG_PERFORMANCE] || 1)
-    updateRenderTime(renderTime,  time_us_32() - frameStart);
+    updateRenderTime(renderTime,  time_us_32() - frameStart);    
+  }
 
   renderDiag(y + vBorder, pixels);
 }
