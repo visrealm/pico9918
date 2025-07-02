@@ -10,7 +10,7 @@ This version is relatively cheap and easy to build and is powered by a piggyback
 
 See [PICO9918 v0.3](v0.3)
 
-### Fully integrated single board (v0.4 - v1.1+)
+### Fully integrated single board (v0.4 - v1.2+)
 
 From v0.4 the RP2040 has been integrated onto the PICO9918 PCB, making a much smaller small form factor. This revision has many small (0402) components and can be challenging (and more expensive) to build. They can be purchased too.
 
@@ -18,6 +18,13 @@ From v0.4 the RP2040 has been integrated onto the PICO9918 PCB, making a much sm
 alt="PICO9918 v1.0" width="240px"></a></p>
 
 # Revision history
+
+## [v1.2 (2024-11-26)](v1.2)
+
+<p align="left"><a href="../img/pico9918_v1_2_sm.jpg"><img src="../img/pico9918_v1_2_sm.jpg" alt="PICO9918 v1.2" width="720px"></a></p>
+
+### Changelog
+- Added 12-pin FFC connector with separate VGA dongle PCB
 
 ## [v1.1 (2024-09-12)](v1.1)
 
