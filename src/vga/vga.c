@@ -248,6 +248,7 @@ static void vgaInitRgb()
   for (uint i = 0; i < RGB_PINS_COUNT; ++i)
   {
     pio_gpio_init(VGA_PIO, RGB_PINS_START + i);
+    gpio_set_drive_strength(RGB_PINS_START + i, GPIO_DRIVE_STRENGTH_8MA); 
   }
 
   // add rgb pio program
