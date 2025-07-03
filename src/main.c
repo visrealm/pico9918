@@ -14,6 +14,13 @@
 
 #include "clocks.pio.h"
 
+#define PALCONV 1
+
+#if PALCONV
+#include "palconv.pio.h"
+#endif
+
+
 #include "impl/vrEmuTms9918Priv.h"
 #include "vrEmuTms9918Util.h"
 
@@ -38,6 +45,8 @@
 #define TMS_CRYSTAL_FREQ_HZ 10738635.0f
 
 #define TMS_PIO pio1
+#define CLOCK_PIO pio1
+
 #define TMS_IRQ PIO1_IRQ_0
 
 /* file globals */
@@ -55,6 +64,13 @@ const uint tmsReadSm = 1;
 const uint tmsGromClkSm = 2;
 const uint tmsCpuClkSm = 3;
 
+#if PALCONV
+#define PAL_PIO         pio0  // which pio are we using for vga?
+const uint palconvSm = 2;
+static const uint32_t dmapalOut = 5; // palette dma
+static const uint32_t dmapalIn  = 6; // palette dma
+#endif
+
 static int frameCount = 0;
 static bool validWrites = false;  // has the VDP display been enabled at all?
 static bool doneInt = false;      // interrupt raised this frame?
@@ -62,7 +78,7 @@ static bool doneInt = false;      // interrupt raised this frame?
 static bool droppedFrames[16] = {0};
 int droppedFramesCount = 0;
 
-static const uint32_t dma32 = 2; // memset 32bit
+static const uint32_t dma32 = 2;  // memset 32bit
 /*
  * update the value send to the read PIO
  */
@@ -70,7 +86,9 @@ static void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
-  readAhead |= (TMS_STATUS(tms9918, TMS_REGISTER(tms9918, 0x0F) & 0x0F)) << 16;
+  int vr = TMS_REGISTER(tms9918, 0x0F) & 0x0F;
+  readAhead |= (TMS_STATUS(tms9918, vr)) << 16;
+  readAhead |= vr << 24;
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
@@ -79,7 +97,6 @@ static void updateTmsReadAhead()
  */
 void  __not_in_flash_func(pio_irq_handler)()
 {
-
   if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsWriteSm))) == 0) // write?
   {
     uint32_t writeVal = TMS_PIO->rxf[tmsWriteSm];
@@ -112,8 +129,10 @@ void  __not_in_flash_func(pio_irq_handler)()
     else // read status
     {
       readVal >>= (3 + 16); // What status was read?
+      int readReg = (readVal >> 8) & 0x0f; // What status register was read?
+      readVal &= 0xff;
       tms9918->regWriteStage = 0;
-      switch (TMS_REGISTER(tms9918, 0x0F) & 0x0F)
+      switch (readReg)
       {
         case 0:
           readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
@@ -266,8 +285,8 @@ inline uint32_t bigRgb2LittleBgr(uint32_t val)
 void updateClock(uint pioSm, float freqHz)
 {
   float clockDiv = ((float)clockPresets[clockPresetIndex].clockHz) / (freqHz * 2.0f);
-  pio_sm_set_clkdiv(pio0, pioSm, clockDiv);
-  pio_sm_set_enabled(pio0, pioSm, true);
+  pio_sm_set_clkdiv(CLOCK_PIO, pioSm, clockDiv);
+  pio_sm_set_enabled(CLOCK_PIO, pioSm, true);
   diagSetClockHz(clockPresets[clockPresetIndex].clockHz);
 }
 
@@ -280,15 +299,15 @@ void initClock(uint gpio, uint pioSm, float freqHz)
 
   if (clocksPioOffset == -1)
   {
-    clocksPioOffset = pio_add_program(pio0, &clock_program);
+    clocksPioOffset = pio_add_program(CLOCK_PIO, &clock_program);
   }
 
-  pio_gpio_init(pio0, gpio);
-  pio_sm_set_consecutive_pindirs(pio0, pioSm, gpio, 1, true);
+  pio_gpio_init(CLOCK_PIO, gpio);
+  pio_sm_set_consecutive_pindirs(CLOCK_PIO, pioSm, gpio, 1, true);
   pio_sm_config c = clock_program_get_default_config(clocksPioOffset);
   sm_config_set_set_pins(&c, gpio, 1);
 
-  pio_sm_init(pio0, pioSm, clocksPioOffset, &c);
+  pio_sm_init(CLOCK_PIO, pioSm, clocksPioOffset, &c);
 
   updateClock(pioSm, freqHz);
 }
@@ -334,8 +353,37 @@ void renderDiag(int y, uint16_t *pixels)
   }
 }
 
-//static __attribute__((section(".scratch_y.buffer"))) uint32_t __aligned(4) pram [256];
-static uint32_t __aligned(4) pram [256];
+/*
+ * cache color lookup from color index to BGR16
+ */
+static __attribute__((section(".scratch_y.buffer"))) 
+uint32_t __aligned(4) pram [64];
+
+
+static __attribute__((noinline))  void generateRgbCache()
+{
+  /* convert from  palette to bgr12 */
+  uint32_t data;
+  tms9918->palDirty = 0;
+
+#if PALCONV
+  dma_channel_set_read_addr(dmapalOut, tms9918->vram.map.pram, true);
+  dma_channel_set_write_addr(dmapalIn, pram, true);
+#else
+  for (int i = 0; i < 64; i += 8)
+  {
+    data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
+    data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
+    data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
+    data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
+    data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
+    data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
+    data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
+    data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+  }
+#endif
+}
+
 /*
  * generate a single VGA scanline (called by vgaLoop(), runs on proc1)
  */
@@ -344,7 +392,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   int vPixels = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 * 8 : 24 * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
-  const uint32_t hBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 2;
+  const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80;
+
+  const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
@@ -353,6 +403,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   {
     doneInt = false;
   }
+
+  dma_channel_wait_for_finish_blocking(dma32);
 
   /*** top and bottom borders ***/
   if (y < vBorder || y >= (vBorder + vPixels))  // TODO: Note of this runs in ROW30 mode
@@ -409,6 +461,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     {
       gpuTrigger();
     }
+
+    y -= vBorder;
   }
   else
   {
@@ -421,9 +475,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     /*** left border ***/
     dma_channel_set_write_addr(dma32, dPixels, false);
-    dma_channel_set_trans_count(dma32, hBorder / 2, true);
+    dma_channel_set_trans_count(dma32, halfHBorder, true);
 
     /*** main display region ***/
+    if (tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
+      generateRgbCache();
 
     /* generate the scanline */
     uint32_t renderTime  = time_us_32();
@@ -458,6 +514,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       tempStatus |= STATUS_INT;
 
       // keep track of the number of dropped frames in the past 64 frames
+      // NOTE: this is unrelated to the PICO9918 - the same would occur on a 
+      // standard VDP when an interrupt is missed
       bool droppedFrame = currentStatus & STATUS_INT;
       droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
       droppedFrames[frameCount & 0xf] = droppedFrame;
@@ -465,88 +523,54 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     updateInterrupts(tempStatus);
 
-    /* convert from  palette to bgr12 */
-    if (vrEmuTms9918DisplayMode(tms9918) == TMS_MODE_TEXT80)
+    dma_channel_wait_for_finish_blocking(dma32);
+
+    uint8_t* src = tmsScanlineBuffer;
+    uint8_t* end = tmsScanlineBuffer + TMS9918_PIXELS_X;
+    uint32_t* dP = (uint32_t*)(pixels) + halfHBorder;
+
+    tms9918->vram.map.blanking = 1; // H
+
+    if (pixelsDoubled)
     {
-      //static uint32_t pram[256];
-      uint32_t data;
-      if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
-      {
-        tms9918->palDirty = 0;
-
-        for (int i = 0, x = 0; i < 16; ++i)
-        {
-          uint32_t c = tms9918->vram.map.pram[i] & 0xFF0F;
-          for (int j = 0; j < 16; ++j, ++x)
-          {
-            data = ((tms9918->vram.map.pram[j] & 0xFF0F) << 16) | c; data |= ((data >> 8) & 0x00f000f0); pram[x] = data;
-          }
-        }
-      }
-
-      tms9918->vram.map.blanking = 1; // H
-
-      uint8_t* src = &(tmsScanlineBuffer [0]);
-      uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
-      uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
-
+      // convert all pixel data from color index to BGR16
       while (src < end)
       {
-        dP [0] = pram[src [0]];
-        dP [1] = pram[src [1]];
-        dP [2] = pram[src [2]];
-        dP [3] = pram[src [3]];
-        dP [4] = pram[src [4]];
-        dP [5] = pram[src [5]];
-        dP [6] = pram[src [6]];
-        dP [7] = pram[src [7]];
+        dP [0] = pram[src[0]];
+        dP [1] = pram[src[1]];
+        dP [2] = pram[src[2]];
+        dP [3] = pram[src[3]];
+        dP [4] = pram[src[4]];
+        dP [5] = pram[src[5]];
+        dP [6] = pram[src[6]];
+        dP [7] = pram[src[7]];
         dP += 8;
         src += 8;
       }
     }
     else
     {
-      uint8_t* src = &(tmsScanlineBuffer [0]);
-      uint8_t* end = &(tmsScanlineBuffer[TMS9918_PIXELS_X]);
-      uint32_t* dP = (uint32_t*)&(pixels [hBorder]);
-      uint32_t data;
-      if (y == 0 || tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80))
-      {
-        tms9918->palDirty = 0;
-        for (int i = 0; i < 64; i += 8)
-        {
-          data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
-          data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
-          data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
-          data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
-          data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
-          data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
-          data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
-          data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
-        }
-      }
-      tms9918->vram.map.blanking = 1; // H
-
       while (src < end)
       {
-        dP [0] = pram[src [0]];
-        dP [1] = pram[src [1]];
-        dP [2] = pram[src [2]];
-        dP [3] = pram[src [3]];
-        dP [4] = pram[src [4]];
-        dP [5] = pram[src [5]];
-        dP [6] = pram[src [6]];
-        dP [7] = pram[src [7]];
+        register char p80;
+        p80 = src[0]; dP [0] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
+        p80 = src[1]; dP [1] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
+        p80 = src[2]; dP [2] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
+        p80 = src[3]; dP [3] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
+        p80 = src[4]; dP [4] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
+        p80 = src[5]; dP [5] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
+        p80 = src[6]; dP [6] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
+        p80 = src[7]; dP [7] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
         dP += 8;
         src += 8;
       }
     }
 
-    /*** right border ***/
-    dma_channel_set_write_addr(dma32, &(dPixels [(hBorder + TMS9918_PIXELS_X * 2) / 2]), true);
+    // right border
+    dma_channel_set_write_addr(dma32, dPixels + halfHBorder + TMS9918_PIXELS_X, true);    
 
-  if (tms9918->config[CONF_DIAG_PERFORMANCE] || 1)
-    updateRenderTime(renderTime,  time_us_32() - frameStart);    
+    if (tms9918->config[CONF_DIAG_PERFORMANCE] || 1)
+      updateRenderTime(renderTime,  time_us_32() - frameStart);    
   }
 
   renderDiag(y + vBorder, pixels);
@@ -585,7 +609,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readPioConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readPioConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readPioConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readPioConfig, 4.0f);
+  sm_config_set_clkdiv(&readPioConfig, 2.0f);
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
@@ -685,6 +709,41 @@ int main(void)
   dma_channel_set_config(dma32, &cfg, false);
   dma_channel_set_read_addr(dma32, &bg, false);
 
+#if PALCONV
+  uint palConvProgram = pio_add_program(PAL_PIO, &palconv_program);
+
+  pio_sm_config palconvPioConfig = palconv_program_get_default_config(palConvProgram);
+
+  sm_config_set_in_shift(&palconvPioConfig, false, true, 24);  // L shift
+  sm_config_set_out_shift(&palconvPioConfig, true, false, 12);  // R shift
+  pio_sm_init(PAL_PIO, palconvSm, palConvProgram, &palconvPioConfig);
+
+  cfg = dma_channel_get_default_config(dmapalOut);
+  channel_config_set_read_increment(&cfg, true);
+  channel_config_set_write_increment(&cfg, false);
+  channel_config_set_transfer_data_size(&cfg, DMA_SIZE_16);
+  channel_config_set_dreq(&cfg, pio_get_dreq(PAL_PIO, palconvSm, true)); 
+  dma_channel_set_read_addr(dmapalOut, tms9918->vram.map.pram, false);
+  dma_channel_set_write_addr(dmapalOut, &PAL_PIO->txf[palconvSm], false);
+  dma_channel_set_trans_count(dmapalOut, 64, false);
+  dma_channel_set_config(dmapalOut, &cfg, false);
+
+  cfg = dma_channel_get_default_config(dmapalIn);
+  channel_config_set_read_increment(&cfg, false);
+  channel_config_set_write_increment(&cfg, true);
+  channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
+  channel_config_set_dreq(&cfg, pio_get_dreq(PAL_PIO, palconvSm, false)); 
+
+  dma_channel_set_read_addr(dmapalIn, &PAL_PIO->rxf[palconvSm], false);
+  dma_channel_set_write_addr(dmapalIn, pram, false);
+  dma_channel_set_trans_count(dmapalIn, 64, false);
+  dma_channel_set_config(dmapalIn, &cfg, false);
+
+  pio_sm_set_enabled(PAL_PIO, palconvSm, true); 
+#endif
+
+  tms9918->palDirty = 1;
+
   /* then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(DISPLAY_MODE);
@@ -702,7 +761,6 @@ int main(void)
   initTemperature();
 
   initDiagnostics();
-
 
   /* signal proc1 that we're ready to start the display */
   multicore_fifo_push_blocking(0);

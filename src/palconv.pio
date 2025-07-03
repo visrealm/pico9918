@@ -1,0 +1,33 @@
+/*
+ * Project: pico9918
+ *
+ * Copyright (c) 2025 Troy Schrapel
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico9918
+ *
+ */
+
+/* convert 16-bit ggggbbbbxxxxrrrr to 16-bit 0000bbbbggggrrrr */
+
+.program palconv
+.wrap_target      // |  osr |  x   |    isr   |
+    pull          // | GBxR |      |          |
+    out x, 8      // |   GB |   xR |          |
+    out isr, 4    // |    G |   xR |        B |
+    in osr, 4     // |    G |   xR |       BG |
+    in x, 4       // |    G |   xR |      BGR |
+    mov x, isr    // |    G |  BGR |          |
+    in x, 16      // |    G |  BGR | 0BGR0BGR | 
+    // auto-push
+.wrap
+
+
+.program crt
+.wrap_target      
+    out null, 1
+    out x, 3
+    in null, 1
+    in x, 3
+.wrap
