@@ -34,7 +34,7 @@
 
 .wrap_target
   wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
-  mov osr, null       ; change CD0-7 pindirs to inputs
+  mov osr, null   [4] ; change CD0-7 pindirs to inputs
   out pindirs, 8
 
 pullLoop:
@@ -82,5 +82,5 @@ pollWriteLoop:
   jmp pin captureWrite      ; and wait for csw high
   jmp pollWriteLoop
 captureWrite:
-  in x, 16                  ; grab the final state prior to CSRW high
+  in x, 16           [4]    ; grab the final state prior to CSRW high
 .wrap

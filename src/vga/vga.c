@@ -87,6 +87,8 @@ static int rgbDmaChan = 0;
 static uint syncDmaChanMask = 0;
 static uint rgbDmaChanMask = 0;
 static VgaInitParams vgaParams = { 0 };
+static pio_sm_config rgbConfig;
+uint rgbProgOffset;
 
 uint32_t vgaMinimumPioClockKHz(VgaParams* params)
 {
@@ -255,13 +257,11 @@ static void vgaInitRgb()
   pio_sm_set_consecutive_pindirs(VGA_PIO, RGB_SM, RGB_PINS_START, RGB_PINS_COUNT, true);
   pio_set_y(VGA_PIO, RGB_SM, VIRTUAL_PIXELS_X - 1);
 
-  uint rgbProgOffset = pio_add_program(VGA_PIO, &rgbProgram);
-  pio_sm_config rgbConfig = vga_rgb_program_get_default_config(rgbProgOffset);
+  rgbProgOffset = pio_add_program(VGA_PIO, &rgbProgram);
+  rgbConfig = vga_rgb_program_get_default_config(rgbProgOffset);
 
   sm_config_set_out_pins(&rgbConfig, RGB_PINS_START, RGB_PINS_COUNT);
   sm_config_set_clkdiv(&rgbConfig, vgaParams.params.pioDivider);
-
-  sm_config_set_fifo_join(&rgbConfig, PIO_FIFO_JOIN_TX);
 
   sm_config_set_out_shift(&rgbConfig, true, true, 32); // R shift, autopull @ 16 bits
   pio_sm_init(VGA_PIO, RGB_SM, rgbProgOffset, &rgbConfig);
@@ -339,15 +339,15 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
 
+    // crt effect?
     if (vgaParams.scanlines && pxLineRpt != 0)
     {
-      for (int i = 0; i < 8; ++i)
-      {
-        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
-      }
+      for (int i = 0; i < 5; ++i)
+        currentBuffer[i] >>= 1;
     }
-
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
+
+    pio_sm_set_pindirs_with_mask(VGA_PIO, RGB_SM, (vgaParams.scanlines && pxLineRpt != 0) - 1, (1 << 5) | (1 << 9) | (1 << 13));
 
     // need a new line every X display lines
     if (pxLineRpt == 0)
@@ -366,10 +366,8 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
       int end = VIRTUAL_PIXELS_X / 2;
-      for (int i = 8; i < end; ++i)
-      {
-        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
-      }
+      for (int i = 5; i < end; ++i)
+        currentBuffer[i] >>= 1;
     }
   }
 }
@@ -457,7 +455,6 @@ void __time_critical_func(vgaLoop)()
     }
   }
 }
-
 
 /*
  * initialise the vga

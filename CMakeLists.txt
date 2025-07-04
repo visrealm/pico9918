@@ -43,7 +43,7 @@ add_definitions(-DVR_EMU_TMS9918_MODE=1)
 # SDK Flash write routines exit XIP mode and use boot2 to reenter it, so
 # boot2 needs to be properly configured for whatever speed we end up at.
 add_definitions(-DPICO_FLASH_SPI_CLKDIV=4)      # This could be 2, but then we can't write to firmware at higher clocks
-add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=16)
+add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=6)
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
