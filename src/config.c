@@ -45,11 +45,11 @@ static Pico9918HardwareVersion detectHardwareVersion()
   // check if RESET pin is being driven externally (on v0.4+, it is, on v0.3 it isn't since it's CPUCL)
   gpio_set_dir_masked(GPIO_RESET_MASK, 0 << GPIO_RESET);  // reset input
   gpio_pull_up(GPIO_RESET);
-  sleep_us(10);  
+  sleep_us(100);  
   if (gpio_get(GPIO_RESET)) // following pull... ok
   {
     gpio_pull_down(GPIO_RESET);
-    sleep_us(10);  
+    sleep_us(100);  
     if (!gpio_get(GPIO_RESET)) // still following pull... must be v0.3
     {
       version = HWVer_0_3;
