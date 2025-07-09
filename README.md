@@ -2,7 +2,7 @@
 
 A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
 
-<p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="480px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="480px"></a></p>
+<p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="420px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="420px"></a></p>
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
 
@@ -99,6 +99,25 @@ Schematics and Gerbers are available in [/pcb](pcb)
 If you're not interested in building the firmware yourself, you'll find the latest firmware in the [Releases](https://github.com/visrealm/pico9918/releases).
 
 To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
+
+## Configurator
+
+I have also developed software to configure and update your PICO9918. Dubbed the PICO9918 Configurator. You can use the configurator to:
+
+* Enable/disable CRT scanlines
+* Set maximum scanline sprites (4, 8, 16 or 32)
+* Change the RP2040 core clock speed
+* Add diagnostics overlays for (performance, registers, palette and addresses)
+* Change the default palette
+* Update the PICO9918 firmware (not available on Nabu and Sega)
+
+Here's the Configurator in action on my ColecoVision
+
+[![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/PBArYupT9qM)](https://youtu.be/PBArYupT9qM)
+
+Note: It requires a minimum firmware version of 1.0.0 in order to function. A manual firmware update is required first if you have 0.4.x firmware.
+
+I have ROM images for the TI-99/4A, ColecoVision, MSX, Nabu and Sega SG-1000/SC-3000 computers in the [Releases](https://github.com/visrealm/pico9918/releases).
 
 ## Development environment
 
