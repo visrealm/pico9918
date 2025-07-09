@@ -55,7 +55,7 @@ So far, there aren't any.
 
 # F18A compatibility
 
-The PICO9918 also includes F18A compatibility in v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
+The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
 
 [![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/TabTIPL1xQY)](https://youtu.be/TabTIPL1xQY)
 
@@ -111,6 +111,10 @@ The build system expects `python3` to be available. If you have installed Python
 You can do this from an elevated (Administator) command prompt in your python directory e.g. `C:\Program Files\Python310\` by creating a symlink with the command: `mklink python3.exe python.exe`.
 
 The custom python build tools are used to convert binary data (images) into code. These also require the [pillow](https://pypi.org/project/pillow/) library - ([Installation instructions for pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html))
+
+## Thanks
+
+Special thanks to [JasonACT (AtariAge)](https://forums.atariage.com/profile/82586-jasonact/) for hand-crafting the F18A mode's on-board TMS9900 "GPU" in ARM assembly and providing other valuable input to the project.
 
 ## Discussion
 
