@@ -215,15 +215,13 @@ typedef struct
 #define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
 
 static const ClockSettings clockPresets[] = {
-  CLOCK_PRESET(1260000000, 5, 1, VREG_VOLTAGE_1_20),    // 252
+  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252
   CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4
   CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
 };
 
 static int clockPresetIndex = 0;
 static bool testingClock = false;
-
-
 
 static void eofInterrupt()
 {
@@ -663,6 +661,7 @@ int main(void)
   /* the initial "safe" clock speed */
   ClockSettings clockSettings = clockPresets[clockPresetIndex];
   vreg_set_voltage(clockSettings.voltage);
+  sleep_ms(2);
   set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
 
   /* we need one of these. it's the main guy */
@@ -695,6 +694,7 @@ int main(void)
     clockSettings = clockPresets[clockPresetIndex];
 
     vreg_set_voltage(clockSettings.voltage);
+    sleep_ms(1);
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
   }
 

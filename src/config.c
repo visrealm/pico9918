@@ -102,7 +102,7 @@ void applyConfig()
 }
 
 #define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) // in the top 4kB of a 2MB flash
-#define CONFIG_FLASH_ADDR   (uint8_t*)(XIP_BASE + CONFIG_FLASH_OFFSET) // in the top 4kB of a 2MB flash
+#define CONFIG_FLASH_ADDR   (uint8_t*)(XIP_BASE + CONFIG_FLASH_OFFSET)
 
 /*
  * read current configuration from flash
