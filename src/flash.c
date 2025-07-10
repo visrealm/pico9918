@@ -55,6 +55,7 @@ typedef struct UF2_Block * UF2_Block_Ptr;
 #define FLASH_ERROR_OK            0
 #define FLASH_ERROR_HEADER        1
 #define FLASH_ERROR_SEQUENCE      2
+#define FLASH_ERROR_FULL          2
 #define FLASH_ERROR_SIZE          3
 #define FLASH_ERROR_VERIFY        4
 #define FLASH_ERROR_BUSY          5
@@ -187,24 +188,23 @@ void doFlashProgramData()
   int i;
   int retry = 0;
 
-  // vram address where uf2 block is stored is set in vreg(0x3f)[5:0] (256 byte boundaries)
   uint8_t flashReg = TMS_REGISTER(tms9918, 0x3f);
 
-  // Status Reg #2 for flasing status (shared with GPU status)
-  // bit  7:   running or not
-  // bit  6-5: retry count
-  // bits 4-2: error code
-  // bits 1-0: status
- 
   const int vramAddr = (flashReg & 0x3f) << 8;
   const bool write = flashReg & 0x80;
 
   uint8_t statusRetryCount = 0;
   setFlashStatusCode(FLASH_STATUS_VALIDATING);
 
+  // VDP flash block data format
+  // bytes 0-3    [4]   (little-endian block id). use 0xffffffff if unknown (first read)
+  // bytes 4-19   [16]  (128-bit GUID)
+  // bytes 20-35  [16]  (User-friendly name)
+  // bytes 36-255 [220] (Program data in any format)
+
+  // the last 4 bytes will get the block Id
   // VRAM block should have 16 byte GUID followed by 16 byte user-friendly name
   // followed by 220 bytes of data
-  // the last 4 bytes will get the block Id
   uint32_t *p = (uint32_t *)(tms9918->vram.bytes + vramAddr);
 
   // in flash, the blocks are stored with the blockId leading, then 
@@ -213,37 +213,70 @@ void doFlashProgramData()
   uint32_t *addr = PROGDATA_FLASH_ADDR;
 
   // for reading any block - just need a special GUID which includes the block ID
-  int emptyBlockIndex = -1;
-  int blockIndex = 0;
+  uint32_t emptyBlockIndex = -1;
+  uint32_t blockIndex = *p;
   bool foundBlock = false;
-  /*for (;blockIndex < PROGDATA_BLOCK_COUNT; ++blockIndex)
+
+  const int blockWords = 256 / sizeof(uint32_t);
+  const int guidBytes = 16;
+
+  // block index encoded in first word already?
+  if (blockIndex < PROGDATA_BLOCK_COUNT)
   {
-    if ((*addr == blockIndex) && (*(addr + 1) == *p))
+    uint32_t *tempAddr = addr + (blockWords * blockIndex);
+    if (*tempAddr == blockIndex)
     {
-      TMS_REGISTER(tms9918, 7) = 0xf2;  
-      if (memcmp(addr + 1, p, 16) == 0)
+      if (memcmp(addr + 1, p, guidBytes) == 0)
       {
         foundBlock = true;
-        // found it
-        break;
+        addr = tempAddr;
       }
     }
-    else if (emptyBlockIndex < 0)
-    {
-      emptyBlockIndex = blockIndex;
-    } 
+  }
+
   if (!foundBlock)
   {
-    blockIndex = emptyBlockIndex;
-    addr = PROGDATA_FLASH_ADDR + (emptyBlockIndex * 256 / sizeof(uint32_t));
-  //  TMS_REGISTER(tms9918, 7) = 0xf8;
+    for (blockIndex = 0;blockIndex < PROGDATA_BLOCK_COUNT; ++blockIndex, addr += blockWords)
+    {
+      if (*addr == blockIndex)
+      {
+        if (memcmp(addr + 1, p + 1, guidBytes) == 0)
+        {
+          foundBlock = true;
+          // found it
+          break;
+        }
+      }
+      else if (emptyBlockIndex == -1)
+      {
+        emptyBlockIndex = blockIndex;
+      }      
+    }
   }
-  else
-  {
-    TMS_REGISTER(tms9918, 7) = 0xf2;  
-  }*/
 
-  foundBlock = true;
+  // we didn't find the block, but we can allocate one
+  if (!foundBlock && emptyBlockIndex != -1)
+  {
+    blockIndex = emptyBlockIndex;
+    addr = PROGDATA_FLASH_ADDR + (emptyBlockIndex * blockWords);
+    foundBlock = true;
+
+    if (!write) // reading? just set the block id and return
+    {
+      p[0] = blockIndex;
+      setFlashStatusError(FLASH_ERROR_OK);
+      return;
+    }
+  }
+
+  if (!foundBlock)
+  {
+    setFlashStatusError(FLASH_ERROR_FULL);
+    return;
+  }
+
+  // set block index in VRAM
+  p[0] = blockIndex;
 
   if (write)
   {
@@ -253,12 +286,11 @@ void doFlashProgramData()
     memcpy(sectorBuffer, sectorPtr, 0x1000);
     
     uint32_t sectorOffset = ((uintptr_t)sectorPtr) & ~XIP_BASE;
-    uint32_t pageOffset = ((uintptr_t)sectorPtr) & 0xfff;
+    uint32_t pageOffset = ((uintptr_t)sectorPtr) & 0xf00;
     
     // write new block into sector
     uint32_t *blockDest = (uint32_t*)(sectorBuffer + pageOffset);
-    *blockDest = blockIndex;
-    memcpy(blockDest + 1, p, 0x100 - sizeof(uint32_t));
+    memcpy(blockDest, p, 0x100);
 
     flash_range_erase(sectorOffset, 0x1000);
 
@@ -268,29 +300,25 @@ void doFlashProgramData()
     int attempts = 5;  
     while (attempts--)
     {
-      flash_range_program(sectorOffset, (const void*)sectorBuffer, 0x100);
+      flash_range_program(sectorOffset, (const void*)sectorBuffer, 0x1000);
 
       // flush
-      int i = 0;
-      while (i < 0x100) {
-          *((volatile uint32_t *)(sectorPtr) + i) = 0;
-          i += sizeof(uint32_t);
+      for (i = pageOffset; i < (pageOffset + 0x100); ++i)
+      {
+        *((volatile uint32_t *)(sectorPtr) + i) = 0;
+        i += sizeof(uint32_t);
       }
 
-      if (memcmp(sectorPtr, (const void*)sectorBuffer, 0x100) == 0)
+      if (memcmp(sectorPtr + pageOffset, (const void*)sectorBuffer + pageOffset, 0x100) == 0)
       {
         success = true;
-        TMS_REGISTER(tms9918, 7) = 0xf7;
         break;
       }
     }
-    // write block Id back into VRAM at the end of the block
-    p[63] = blockIndex;
   }
   else  // read
   {
-    memcpy(p, addr + 1, 0x100 - sizeof(uint32_t));
-    p[63] = *addr;
+    memcpy(p + 1, addr + 1, 0x100 - sizeof(uint32_t));
   }
 
   setFlashStatusError(FLASH_ERROR_OK);
