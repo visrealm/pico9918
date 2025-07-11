@@ -90,6 +90,8 @@ v0.3 is relatively cheap and easy to build, schematic and gerbers are available.
 
 <p align="left"><a href="img/pico9918_v0_3_sm2.jpg"><img src="img/pico9918_v0_3_sm2.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
 
+I also have the [v0.3 board as a PCBWay Project](https://www.pcbway.com/project/shareproject/PICO9918_Drop_in_replacement_for_the_classic_TMS9918A_family_of_VDPs_fc11359a.html) you can order there.
+
 ### Schematics
 
 Schematics and Gerbers are available in [/pcb](pcb)
