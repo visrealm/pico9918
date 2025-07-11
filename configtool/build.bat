@@ -33,6 +33,16 @@ if not exist %FIRMWARE_FILE% (
     exit /b 1
 )
 
+
+echo.
+echo ---------------------------------------------------------------------
+echo   Copying source files to %CD%
+echo ---------------------------------------------------------------------
+
+del build\tmp\*.bas
+copy /Y src\*.bas build\tmp
+copy /Y src\lib build\tmp\lib
+
 copy /Y %FIRMWARE_FILE% .
 
 echo.
@@ -85,17 +95,6 @@ for /f "tokens=1 delims=" %%A in ('where cvbasic.exe') do (
 )
 :end
 echo ---------------------------------------------------------------------
-
-
-echo.
-echo ---------------------------------------------------------------------
-echo   Copying source files to %CD%
-echo ---------------------------------------------------------------------
-
-
-del *.bas
-copy /Y ..\..\src\*.bas .
-copy /Y ..\..\src\lib lib
 
 :: TI-99
 
