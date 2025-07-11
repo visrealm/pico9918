@@ -505,6 +505,21 @@ void flashAddressDiag(uint16_t row, uint16_t* pixels)
   }
 }
 
+void flashAddress2Diag(uint16_t row, uint16_t* pixels)
+{
+  IntString tempStr = {0};
+  uint8_t *addr = PROGDATA_FLASH_ADDR + 0x100;
+  int xPos = leftXPos;
+
+  for (int i = 0; i < 40; ++i)
+  {
+    uint2hexStr(addr[i], 2, &tempStr);
+    xPos = renderNum(row, &tempStr, xPos, 0, valueColor, 0, pixels);
+    if (i == 3 || i == 19 || i == 35)
+      xPos = backgroundPixels(xPos, 4, pixels);
+  }
+}
+
 void vramAddressDiag(uint16_t row, uint16_t* pixels)
 {
   IntString tempStr = {0};
@@ -528,7 +543,7 @@ void diagnosticsConfigUpdated()
   leftDiagRows= 0;
 
   leftDiags[leftDiagRows++] = flashAddressDiag;
-  leftDiagRows++;
+  leftDiags[leftDiagRows++] = flashAddress2Diag;
   leftDiags[leftDiagRows++] = vramAddressDiag;
 
   if (tms9918->config[CONF_DIAG_PERFORMANCE])

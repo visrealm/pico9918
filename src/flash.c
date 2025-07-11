@@ -190,6 +190,7 @@ void doFlashProgramData()
 
   uint8_t flashReg = TMS_REGISTER(tms9918, 0x3f);
 
+  // grab vram address. register 0x38's lowest 6 bits contains the MSB of the VRAM address
   const int vramAddr = (flashReg & 0x3f) << 8;
   const bool write = flashReg & 0x80;
 
@@ -197,12 +198,12 @@ void doFlashProgramData()
   setFlashStatusCode(FLASH_STATUS_VALIDATING);
 
   // VDP flash block data format
-  // bytes 0-3    [4]   (little-endian block id). use 0xffffffff if unknown (first read)
+  // bytes 0-3    [4]   (little-endian block id hint). use 0xffffffff if unknown (first read)
   // bytes 4-19   [16]  (128-bit GUID)
   // bytes 20-35  [16]  (User-friendly name)
   // bytes 36-255 [220] (Program data in any format)
 
-  // the last 4 bytes will get the block Id
+  // the last 4 bytes will get the block Id (hint). If the GUID doesn't match, it will be ignored
   // VRAM block should have 16 byte GUID followed by 16 byte user-friendly name
   // followed by 220 bytes of data
   uint32_t *p = (uint32_t *)(tms9918->vram.bytes + vramAddr);
@@ -226,7 +227,7 @@ void doFlashProgramData()
     uint32_t *tempAddr = addr + (blockWords * blockIndex);
     if (*tempAddr == blockIndex)
     {
-      if (memcmp(addr + 1, p, guidBytes) == 0)
+      if (memcmp(addr + 1, p + 1, guidBytes) == 0)
       {
         foundBlock = true;
         addr = tempAddr;
@@ -282,11 +283,11 @@ void doFlashProgramData()
   {
     setFlashStatusCode(FLASH_STATUS_ERASING); 
         
-    uint8_t *sectorPtr = (uint8_t*)(((int)addr) & 0xfffff000);
+    uint8_t *sectorPtr = (uint8_t*)(((uintptr_t)addr) & 0xfffff000);
     memcpy(sectorBuffer, sectorPtr, 0x1000);
     
     uint32_t sectorOffset = ((uintptr_t)sectorPtr) & ~XIP_BASE;
-    uint32_t pageOffset = ((uintptr_t)sectorPtr) & 0xf00;
+    uint32_t pageOffset = ((uintptr_t)addr) & 0xfff;
     
     // write new block into sector
     uint32_t *blockDest = (uint32_t*)(sectorBuffer + pageOffset);
@@ -315,13 +316,15 @@ void doFlashProgramData()
         break;
       }
     }
+
+    setFlashStatusError(success ? FLASH_ERROR_OK : FLASH_ERROR_VERIFY);
   }
   else  // read
   {
     memcpy(p + 1, addr + 1, 0x100 - sizeof(uint32_t));
+    setFlashStatusError(FLASH_ERROR_OK);
   }
 
-  setFlashStatusError(FLASH_ERROR_OK);
 }
 
 void __attribute__ ((noinline)) flashSector () {
