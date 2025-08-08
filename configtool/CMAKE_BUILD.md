@@ -9,22 +9,38 @@ This directory contains a CMake-based build system that replaces the Windows bat
 - **Better dependency tracking**: Only rebuilds what's changed
 - **IDE integration**: Works with VSCode CMake extensions
 - **Tool detection**: Automatically finds required compilers and tools
+- **Auto-build tools**: Can checkout and build CVBasic, gasm80, and XDT99 from source
 
 ## Prerequisites
 
+### Option 1: Use existing tools
 - CMake 3.13 or later
 - Python 3 (accessible as `python3`)
 - CVBasic compiler (`cvbasic.exe`)
 - GASM80 assembler (`gasm80.exe`) 
-- XDT99 XAS99 assembler (for TI-99 builds, Windows only)
+- XDT99 XAS99 assembler (for TI-99 builds)
+
+### Option 2: Auto-build tools (Linux/cross-platform)
+- CMake 3.13 or later
+- Python 3 (accessible as `python3`)
+- Git (for checking out tool repositories)
+- C compiler (GCC or Clang for building tools)
 
 ## Usage
 
-### Build All Platforms
+### Build All Platforms (with existing tools)
 ```bash
 cd configtool
 mkdir build && cd build
 cmake ..
+make configurator_all
+```
+
+### Build All Platforms (auto-build tools from source)
+```bash
+cd configtool
+mkdir build && cd build
+cmake .. -DBUILD_TOOLS_FROM_SOURCE=ON
 make configurator_all
 ```
 
@@ -42,7 +58,7 @@ make nabu_mame_package # NABU MAME (.npz)
 
 ### Build with Ninja (faster)
 ```bash
-cmake .. -G Ninja
+cmake .. -G Ninja [-DBUILD_TOOLS_FROM_SOURCE=ON]
 ninja configurator_all
 ```
 
@@ -66,11 +82,23 @@ ninja configurator_all
 
 ## Tool Detection
 
+### Default Mode (existing tools)
 The build system automatically searches for tools in:
 1. `configtool/tools/cvbasic/` (bundled tools)
 2. `../CVBasic/build/Release/` (local CVBasic build)  
 3. System PATH
-4. `c:/tools/xdt99/` (Windows XAS99 location)
+4. `c:/tools/xdt99/` (Windows) or `/usr/local/bin`, `/opt/xdt99` (Linux)
+
+### Auto-build Mode (`-DBUILD_TOOLS_FROM_SOURCE=ON`)
+When enabled, CMake will:
+1. Clone CVBasic from https://github.com/visrealm/CVBasic.git
+2. Clone gasm80 from https://github.com/visrealm/gasm80.git  
+3. Clone XDT99 from https://github.com/endlos99/xdt99.git
+4. Build CVBasic and gasm80 from source using their CMake systems
+5. Install tools to `build/external/` directory
+6. Use the locally-built tools for ROM generation
+
+This mode enables fully cross-platform builds without pre-installed tools.
 
 ## Comparison with Batch Build
 
