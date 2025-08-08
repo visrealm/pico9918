@@ -33,6 +33,7 @@ include(pico_sdk_import.cmake)
 
 # pull in helpers for my custom tools
 include(visrealm_tools.cmake)
+include(visrealm_cvbasic.cmake)
 
 project(pico9918 C CXX ASM)
 
