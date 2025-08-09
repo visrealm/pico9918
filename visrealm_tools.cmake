@@ -56,3 +56,4 @@ function(visrealm_generate_bindata_source TARGET DST SRC)
   target_include_directories(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
   target_sources(${TARGET} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/${DST}.c)
 endfunction()
+
