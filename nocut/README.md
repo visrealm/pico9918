@@ -15,6 +15,7 @@ There is now a single PCB (v1.3) for both JST and FFC connector types.
 #### Configuration
 
 The 5P/6P jumper is used to connect the correct DIN pin to the ground plane of the no-cut PCB. For 5-pin DINs (most US models), place a jumper between the 5P and middle pin. For 6-pin DINs (most EU/AUS models), place a jumper between the 6P and middle pin.
+You can run the board with no jumper at all however the ground for the audio connectors will then be provided via the PICO9918 cable.
 
 See [ti99/pcb/](ti99/pcb/)
 
