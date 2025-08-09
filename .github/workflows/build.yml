@@ -111,7 +111,7 @@ jobs:
       run: |
         mkdir -p build
         cd build
-        cmake -S .. -B . -G Ninja -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S ../configtool -B . -G Ninja -DBUILD_TOOLS_FROM_SOURCE=ON
         cmake --build . --target configurator_all
         
     - name: Upload Configurator Artifacts
