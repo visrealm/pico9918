@@ -2,9 +2,9 @@ name: Firmware
 
 on:
   push:
-    branches: [ main, cmake-configurator ]
+    branches: [ '**' ]
   pull_request:
-    branches: [ main ]
+    branches: [ '**' ]
 
 jobs:
   windows:
