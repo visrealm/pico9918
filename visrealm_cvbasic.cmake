@@ -90,8 +90,8 @@ function(setup_cvbasic_tools)
         )
         
         # Set tool paths for external builds
-        set(CVBASIC_EXE "${CMAKE_BINARY_DIR}/external/CVBasic/bin/cvbasic${CMAKE_EXECUTABLE_SUFFIX}" PARENT_SCOPE)
-        set(GASM80_EXE "${CMAKE_BINARY_DIR}/external/gasm80/bin/gasm80${CMAKE_EXECUTABLE_SUFFIX}" PARENT_SCOPE)
+        set(CVBASIC_EXE "${CMAKE_BINARY_DIR}/external/CVBasic/bin/cvbasic" PARENT_SCOPE)
+        set(GASM80_EXE "${CMAKE_BINARY_DIR}/external/gasm80/bin/gasm80" PARENT_SCOPE)
         set(XAS99_SCRIPT "${CMAKE_BINARY_DIR}/external/xdt99/xas99.py" PARENT_SCOPE)
         
         # Add dependencies to all CVBasic targets
