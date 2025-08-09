@@ -3,9 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 
 # compile-time options
 
-set(PICO9918_MAJOR_VER 1)
-set(PICO9918_MINOR_VER 0)
-set(PICO9918_PATCH_VER 2)
+# Version numbers now defined in root CMakeLists.txt
 
 # SCART RGBs options
 set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
@@ -105,6 +103,18 @@ target_link_libraries(${PROGRAM} PUBLIC
         vrEmuTms9918)
 
 pico_add_extra_outputs(${PROGRAM})
+
+# Copy final artifacts to dist directory for unified output
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/dist/${PROGRAM}.uf2
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/dist
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROGRAM}>/${PROGRAM}.uf2 ${CMAKE_BINARY_DIR}/dist/
+    DEPENDS ${PROGRAM}
+    COMMENT "Copying ${PROGRAM}.uf2 to dist/"
+)
+
+# Create a target for the dist uf2 file
+add_custom_target(${PROGRAM}_dist DEPENDS ${CMAKE_BINARY_DIR}/dist/${PROGRAM}.uf2)
 
 add_subdirectory(pio-utils)
 add_subdirectory(vga)

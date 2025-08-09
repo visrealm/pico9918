@@ -37,6 +37,13 @@ include(visrealm_cvbasic.cmake)
 
 project(pico9918 C CXX ASM)
 
+# PICO9918 Version Information
+set(PICO9918_MAJOR_VER 1)
+set(PICO9918_MINOR_VER 0)
+set(PICO9918_PATCH_VER 2)
+set(PICO9918_VERSION "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
+string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
+
 add_definitions(-DPICO_BUILD=1)
 add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 add_definitions(-DVR_EMU_TMS9918_MODE=1)
@@ -58,3 +65,4 @@ pico_sdk_init()
 add_subdirectory(submodules/vrEmuTms9918)
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(configtool)

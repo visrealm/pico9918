@@ -28,19 +28,26 @@ This directory contains a CMake-based build system that replaces the Windows bat
 
 ## Usage
 
-### Build All Platforms (with existing tools)
+### Integrated Build (Recommended)
+The configurator is now integrated into the main PICO9918 build system:
+
 ```bash
-cd configtool
+# Build from project root
 mkdir build && cd build
 cmake ..
-make configurator_all
+make                    # Build firmware
+make configurator_all   # Build all configurator ROMs
 ```
 
-### Build All Platforms (auto-build tools from source)
+All final artifacts will be in `build/dist/`:
+- **Firmware**: `pico9918-vga-build-v1-0-2.uf2`
+- **Configurator ROMs**: `pico9918_v1-0-2_*.rom` / `pico9918_v1-0-2_*.bin`
+
+### Standalone Build (Legacy)
 ```bash
 cd configtool
 mkdir build && cd build
-cmake .. -DBUILD_TOOLS_FROM_SOURCE=ON
+cmake .. [-DBUILD_TOOLS_FROM_SOURCE=ON]
 make configurator_all
 ```
 
