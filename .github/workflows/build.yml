@@ -34,12 +34,13 @@ jobs:
         git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
         cd pico-sdk
         git submodule update --init
+        cd ..
         
     - name: Configure CMake
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH=../pico-sdk -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
+        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
         
     - name: Debug available targets
       run: |
@@ -82,12 +83,13 @@ jobs:
         git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
         cd pico-sdk
         git submodule update --init
+        cd ..
         
     - name: Configure CMake
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH=../pico-sdk -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
+        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
         
     - name: Debug available targets
       run: |
