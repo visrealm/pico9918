@@ -1,4 +1,4 @@
-name: Build
+name: Firmware
 
 on:
   push:
@@ -7,9 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  windows-firmware:
+  windows:
     runs-on: windows-latest
-    name: Windows Firmware
     
     steps:
     - uses: actions/checkout@v4
@@ -54,9 +53,8 @@ jobs:
         name: firmware-windows
         path: build/dist/*.uf2
 
-  linux-firmware:
+  linux:
     runs-on: ubuntu-latest
-    name: Linux Firmware
     
     steps:
     - uses: actions/checkout@v4
@@ -93,73 +91,3 @@ jobs:
       with:
         name: firmware-linux
         path: build/dist/*.uf2
-
-  windows-configurator:
-    runs-on: windows-latest
-    name: Windows Configurator
-    needs: windows-firmware
-    
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pillow
-        
-    - name: Download firmware artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: firmware-windows
-        path: build/dist/
-        
-    - name: Setup build environment and build configurator
-      run: |
-        cd build
-        cmake -S .. -B . -G Ninja -DBUILD_TOOLS_FROM_SOURCE=ON -DCONFIGURATOR_ONLY=ON
-        cmake --build . --target configurator_all
-        
-    - name: Upload Configurator Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: configurator-windows
-        path: |
-          build/dist/*.rom
-          build/dist/*.bin
-          build/dist/*.nabu
-          build/dist/*.npz
-
-  linux-configurator:
-    runs-on: ubuntu-latest
-    name: Linux Configurator
-    needs: linux-firmware
-    
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        
-    - name: Download firmware artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: firmware-linux
-        path: build/dist/
-        
-    - name: Setup build environment and build configurator
-      run: |
-        mkdir -p build
-        cd build
-        cmake -S .. -B . -G Ninja -DBUILD_TOOLS_FROM_SOURCE=ON -DCONFIGURATOR_ONLY=ON
-        cmake --build . --target configurator_all
-        
-    - name: Upload Configurator Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: configurator-linux
-        path: |
-          build/dist/*.rom
-          build/dist/*.bin
-          build/dist/*.nabu
-          build/dist/*.npz
