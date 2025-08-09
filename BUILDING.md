@@ -94,6 +94,11 @@ Set build options in `.vscode/settings.json`:
 - **DMA**: Memory transfers and sprite processing
 - **Flash**: Configuration storage in upper 1MB
 
+### Automatic SDK Patches
+The build system automatically applies performance patches to the Pico SDK:
+- **Fast Boot**: Optimizes ROSC (Ring Oscillator) for faster boot times
+- Patches are applied automatically when using `PICO_SDK_FETCH_FROM_GIT=ON`
+
 ## Building Configurator
 
 The configurator creates ROM files for retro computers that can upload firmware to PICO9918.
