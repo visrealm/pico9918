@@ -42,15 +42,15 @@ jobs:
         cd build
         cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
         
-    - name: Debug available targets
+    - name: Build Firmware
       run: |
         cd build
-        ninja -t targets | findstr -v "phony" | head -20
+        cmake --build . --target firmware
         
-    - name: Build default target
+    - name: Build Configurator
       run: |
         cd build
-        cmake --build .
+        cmake --build . --target configurator_all
         
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -91,15 +91,15 @@ jobs:
         cd build
         cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
         
-    - name: Debug available targets
+    - name: Build Firmware
       run: |
         cd build
-        ninja -t targets | findstr -v "phony" | head -20
+        cmake --build . --target firmware
         
-    - name: Build default target
+    - name: Build Configurator
       run: |
         cd build
-        cmake --build .
+        cmake --build . --target configurator_all
         
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
