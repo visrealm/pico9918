@@ -47,14 +47,14 @@ if (NOT PICO_SDK_PATH)
                     GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
                     GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
                     GIT_SUBMODULES_RECURSE FALSE
-                    PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/picosdk-2.0.0-visrealm-fastboot.patch || true
+                    PATCH_COMMAND ""
             )
         else ()
             FetchContent_Declare(
                     pico_sdk
                     GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
                     GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
-                    PATCH_COMMAND git apply --ignore-whitespace ${CMAKE_SOURCE_DIR}/picosdk-2.0.0-visrealm-fastboot.patch || true
+                    PATCH_COMMAND ""
             )
         endif ()
 
