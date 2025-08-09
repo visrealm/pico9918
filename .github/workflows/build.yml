@@ -7,21 +7,33 @@ on:
     branches: [ main ]
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
-    name: Windows Build
+  firmware:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            name: Windows Firmware
+            artifact: firmware-windows
+          - os: ubuntu-latest
+            name: Linux Firmware
+            artifact: firmware-linux
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name }}
     
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
         
-    - name: Install Python dependencies
+    - name: Install Python dependencies (Windows)
+      if: matrix.os == 'windows-latest'
       run: |
         python -m pip install --upgrade pip
         pip install pillow
         
-    - name: Install ARM GNU Toolchain
+    - name: Install ARM GNU Toolchain (Windows)
+      if: matrix.os == 'windows-latest'
       run: |
         $url = "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip"
         $output = "arm-toolchain.zip"
@@ -29,51 +41,8 @@ jobs:
         Expand-Archive -Path $output -DestinationPath "C:\arm-toolchain"
         echo "C:\arm-toolchain\xpack-arm-none-eabi-gcc-13.2.1-1.1\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         
-    - name: Install Pico SDK 2.1.1 manually
-      run: |
-        git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
-        cd pico-sdk
-        git submodule update --init
-        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
-        cd ..
-        
-    - name: Configure CMake
-      run: |
-        mkdir build
-        cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
-        
-    - name: Build Firmware
-      run: |
-        cd build
-        cmake --build . --target firmware
-        
-    - name: Build Configurator
-      run: |
-        cd build
-        cmake --build . --target configurator_all
-        
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: pico9918-windows
-        path: |
-          build/dist/*.uf2
-          build/dist/*.rom
-          build/dist/*.bin
-          build/dist/*.nabu
-          build/dist/*.npz
-
-  build-linux:
-    runs-on: ubuntu-latest
-    name: Linux Build
-    
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        
-    - name: Install dependencies
+    - name: Install dependencies (Linux)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake python3 python3-pip git gcc-arm-none-eabi
@@ -98,17 +67,58 @@ jobs:
         cd build
         cmake --build . --target firmware
         
-    - name: Build Configurator
-      run: |
-        cd build
-        cmake --build . --target configurator_all
-        
-    - name: Upload Artifacts
+    - name: Upload Firmware Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: pico9918-linux
+        name: ${{ matrix.artifact }}
+        path: build/dist/*.uf2
+
+  configurator:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+            name: Windows Configurator
+            artifact: configurator-windows
+            firmware-artifact: firmware-windows
+          - os: ubuntu-latest
+            name: Linux Configurator  
+            artifact: configurator-linux
+            firmware-artifact: firmware-linux
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name }}
+    needs: firmware
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Install Python dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        python -m pip install --upgrade pip
+        pip install pillow
+        
+    - name: Download firmware artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ matrix.firmware-artifact }}
+        path: build/dist/
+        
+    - name: Setup build environment and build configurator
+      run: |
+        mkdir -p build
+        cd build
+        cmake -S .. -B . -G Ninja -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake --build . --target configurator_all
+        
+    - name: Upload Configurator Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact }}
         path: |
-          build/dist/*.uf2
           build/dist/*.rom
           build/dist/*.bin
           build/dist/*.nabu

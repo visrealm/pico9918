@@ -1,6 +1,6 @@
 # PICO9918
 
-[![Build](https://github.com/visrealm/pico9918/actions/workflows/build.yml/badge.svg)](https://github.com/visrealm/pico9918/actions/workflows/build.yml)
+[![Windows Firmware](https://github.com/visrealm/pico9918/actions/workflows/build.yml/badge.svg?job=firmware%20%28windows-latest%29)](https://github.com/visrealm/pico9918/actions/workflows/build.yml) [![Windows Configurator](https://github.com/visrealm/pico9918/actions/workflows/build.yml/badge.svg?job=configurator%20%28windows-latest%29)](https://github.com/visrealm/pico9918/actions/workflows/build.yml) [![Linux Firmware](https://github.com/visrealm/pico9918/actions/workflows/build.yml/badge.svg?job=firmware%20%28ubuntu-latest%29)](https://github.com/visrealm/pico9918/actions/workflows/build.yml) [![Linux Configurator](https://github.com/visrealm/pico9918/actions/workflows/build.yml/badge.svg?job=configurator%20%28ubuntu-latest%29)](https://github.com/visrealm/pico9918/actions/workflows/build.yml)
 
 A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
 
