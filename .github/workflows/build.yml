@@ -39,7 +39,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G Ninja -DPICO_SDK_PATH=../pico-sdk -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
+        cmake . -G Ninja -DPICO_SDK_PATH=./pico-sdk -DPICO_BOARD_HEADER_DIRS="./src/boards" -DPICO_BOARD=pico9918 -S .. -B .
         
     - name: Debug available targets
       run: |
@@ -87,7 +87,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -G Ninja -DPICO_SDK_PATH=../pico-sdk -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
+        cmake . -G Ninja -DPICO_SDK_PATH=./pico-sdk -DPICO_BOARD_HEADER_DIRS="./src/boards" -DPICO_BOARD=pico9918 -S .. -B .
         
     - name: Debug available targets
       run: |
