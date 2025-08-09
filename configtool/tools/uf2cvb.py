@@ -140,7 +140,7 @@ def main() -> int:
 
                         byteStr = []
                         for b in inpbuf[508:512]:
-                            byteStr.append("${0}".format(b.to_bytes().hex()))
+                            byteStr.append("${0:02X}".format(b))
                         output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
 
                         nettBytes += 256
