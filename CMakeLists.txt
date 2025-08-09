@@ -28,8 +28,11 @@ set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
 set(PICO_BOARD pico9918 CACHE STRING "Board type")
 #set(PICO_BOARD pimoroni_pga2350 CACHE STRING "Board type")
 
-# Pull in Raspberry Pi Pico SDK (must be before project)
-include(pico_sdk_import.cmake)
+# Check if building configurator only (skip Pico SDK setup)
+if(NOT CONFIGURATOR_ONLY)
+    # Pull in Raspberry Pi Pico SDK (must be before project)
+    include(pico_sdk_import.cmake)
+endif()
 
 # pull in helpers for my custom tools
 include(visrealm_tools.cmake)
@@ -66,17 +69,14 @@ add_definitions(-DPICO_FLASH_SPI_CLKDIV=4)      # This could be 2, but then we c
 add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=8)
 
 
-# Initialise the Raspberry Pi Pico SDK
-message(STATUS "About to initialize Pico SDK...")
-pico_sdk_init()
-message(STATUS "Pico SDK initialized successfully")
+if(CONFIGURATOR_ONLY)
+    add_subdirectory(configtool)
+else()
+    # Initialise the Raspberry Pi Pico SDK
+    pico_sdk_init()
 
-message(STATUS "Adding vrEmuTms9918 subdirectory...")
-add_subdirectory(submodules/vrEmuTms9918)
-message(STATUS "Adding src subdirectory...")
-add_subdirectory(src)
-message(STATUS "Adding test subdirectory...")
-add_subdirectory(test)
-message(STATUS "Adding configtool subdirectory...")
-add_subdirectory(configtool)
-message(STATUS "All subdirectories added successfully")
+    add_subdirectory(submodules/vrEmuTms9918)
+    add_subdirectory(src)
+    add_subdirectory(test)
+    add_subdirectory(configtool)
+endif()
