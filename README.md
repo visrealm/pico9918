@@ -2,7 +2,9 @@
 
 [![Build](https://github.com/visrealm/pico9918/actions/workflows/build.yml/badge.svg)](https://github.com/visrealm/pico9918/actions/workflows/build.yml)
 
-A drop-in replacement for a classic TMS9918A VDP using a Raspberry Pi Pico.
+A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
+
+<p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="400px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="406px"></a></p>
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
 
@@ -55,11 +57,11 @@ So far, there aren't any.
 
 # F18A compatibility
 
-Work is being done to add F18A compatibility to the PICO9918. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
+The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
 
 [![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/TabTIPL1xQY)](https://youtu.be/TabTIPL1xQY)
 
-Pre-release firmware for F18A compatibility mode is available in [Releases](https://github.com/visrealm/pico9918/releases/tag/v0.4.1-f18a-preview1).
+Pre-release firmware for F18A compatibility mode is available in [Releases](https://github.com/visrealm/pico9918/releases/tag/v1.0.1a).
 
 ## Purchasing options
 
@@ -80,7 +82,7 @@ There are two main variants of the hardware.
 
 PICO9918 v1.2 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
 
-<p align="left"><a href="img/pico9918_v1_0_sm.png"><img src="img/pico9918_v1_0_sm.png" alt="PICO9918 v0.4" width="720px"></a></p>
+<p align="left"><a href="img/pico9918_v1_2_sm.jpg"><img src="img/pico9918_v1_2_sm.jpg" alt="PICO9918 v1.2" width="720px"></a></p>
 
 ### v0.3
 
@@ -89,6 +91,8 @@ v0.3 is relatively cheap and easy to build, schematic and gerbers are available.
 <p align="left"><a href="img/pico9918_v0_3_sm.jpg"><img src="img/pico9918_v0_3_sm.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
 
 <p align="left"><a href="img/pico9918_v0_3_sm2.jpg"><img src="img/pico9918_v0_3_sm2.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
+
+I also have the [v0.3 board as a PCBWay Project](https://www.pcbway.com/project/shareproject/PICO9918_Drop_in_replacement_for_the_classic_TMS9918A_family_of_VDPs_fc11359a.html) you can order there.
 
 ### Schematics
 
@@ -113,6 +117,10 @@ cmake --build .
 Output in `build/dist/`: firmware `.uf2` file and configurator ROMs for all retro platforms.
 
 📖 **[Complete Build Instructions](BUILDING.md)** - includes development environment setup, configuration options, platform-specific builds, and troubleshooting.
+
+## Thanks
+
+Special thanks to [JasonACT (AtariAge)](https://forums.atariage.com/profile/82586-jasonact/) for hand-crafting the F18A mode's on-board TMS9900 "GPU" in ARM assembly and providing other valuable input to the project.
 
 ## Discussion
 
