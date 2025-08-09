@@ -25,7 +25,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
+        cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON
         
     - name: Build Firmware
       run: |
@@ -67,7 +67,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
+        cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON
         
     - name: Build Firmware
       run: |
