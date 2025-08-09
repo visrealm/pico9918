@@ -6,7 +6,7 @@ This document describes how to build the PICO9918 firmware and configurator ROMs
 
 ### Required Tools
 - **CMake 3.13+**: Build system generator
-- **Raspberry Pi Pico SDK**: Firmware compilation
+- **Raspberry Pi Pico SDK**: Firmware compilation (v2.1.1 recommended for compatibility)
 - **Python 3**: Build scripts and asset conversion
 - **Git**: For submodules and dependencies
 
@@ -64,7 +64,8 @@ cmake .. -DPICO9918_DIAG=ON -DPICO9918_NO_SPLASH=ON
 ```
 
 ### Firmware Targets
-- **`firmware`**: Build firmware and copy to `build/dist/`
+- **`firmware`**: Build firmware and copy to `build/dist/` (unified CMake system only)
+- **`pico9918-vga-build-<version>`**: Direct firmware target name (available in all builds)
 
 ### VSCode Firmware Build
 Use the Raspberry Pi Pico VSCode extension:
@@ -229,6 +230,21 @@ build/
 ```bash
 # Install Raspberry Pi Pico SDK
 # Set PICO_SDK_PATH environment variable
+```
+
+**SDK version compatibility issues**
+```bash
+# PICO9918 developed with Pico SDK 2.1.1
+# SDK 2.2.0 may cause linker errors and memory overflow
+# 
+# Recommended: manually install Pico SDK 2.1.1 and set PICO_SDK_PATH
+git clone -b 2.1.1 https://github.com/raspberrypi/pico-sdk.git
+cd pico-sdk && git submodule update --init
+export PICO_SDK_PATH=$PWD
+cd ../your-build-directory
+cmake ..
+
+# Note: PICO_SDK_FETCH_FROM_GIT_TAG has known issues with tag resolution
 ```
 
 **Missing splash/font assets**
