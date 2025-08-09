@@ -1,13 +1,17 @@
 # PICO9918
 
-**Main:** [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml)  
-**Dev:** [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml)
-
 A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
 
 <p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="400px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="406px"></a></p>
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
+
+## Build status
+
+| Branch | Firmware | Configurator |
+|--------|----------|--------------|
+| main | [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) | [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml) |
+| dev | [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) | [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml) |
 
 ## Supported devices
 
@@ -157,3 +161,4 @@ The hardware design files in this repository are licensed under the CERN-OHL-S. 
 
 ### Firmware
 The firmware code in this repository is licensed under the MIT License. See [LICENSE_FIRMWARE.md](LICENSE_FIRMWARE.md) for details.
+
