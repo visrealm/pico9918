@@ -57,26 +57,48 @@ function(setup_cvbasic_tools)
     option(BUILD_TOOLS_FROM_SOURCE "Build CVBasic, gasm80 and XDT99 from source" ON)
     
     if(BUILD_TOOLS_FROM_SOURCE)
-        # Build CVBasic from visrealm fork
+        # Use system default compilers for host builds
+        if(WIN32)
+            # On Windows, let CMake find the default system compiler
+            set(HOST_CMAKE_ARGS "")
+        else()
+            # On Unix, explicitly specify common compiler paths
+            set(HOST_CMAKE_ARGS 
+                "-DCMAKE_C_COMPILER=gcc"
+                "-DCMAKE_CXX_COMPILER=g++"
+            )
+        endif()
+        
+        # Build CVBasic from visrealm fork using separate process to avoid cross-compilation issues
         ExternalProject_Add(CVBasic_external
             GIT_REPOSITORY https://github.com/visrealm/CVBasic.git
             GIT_TAG master
-            CMAKE_ARGS
-                -DCMAKE_BUILD_TYPE=Release
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/CVBasic
-            BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release
-            INSTALL_COMMAND ${CMAKE_COMMAND} --install . --config Release
+            CONFIGURE_COMMAND ""
+            BUILD_COMMAND ""
+            INSTALL_COMMAND 
+                ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/external/CVBasic/bin &&
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> 
+                    ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/CVBasic -B build &&
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> 
+                    ${CMAKE_COMMAND} --build build --config Release &&
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>
+                    ${CMAKE_COMMAND} --install build --config Release
         )
         
-        # Build gasm80 from visrealm fork
+        # Build gasm80 from visrealm fork using separate process to avoid cross-compilation issues  
         ExternalProject_Add(gasm80_external
             GIT_REPOSITORY https://github.com/visrealm/gasm80.git
             GIT_TAG master
-            CMAKE_ARGS
-                -DCMAKE_BUILD_TYPE=Release
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/gasm80
-            BUILD_COMMAND ${CMAKE_COMMAND} --build . --config Release
-            INSTALL_COMMAND ${CMAKE_COMMAND} --install . --config Release
+            CONFIGURE_COMMAND ""
+            BUILD_COMMAND ""
+            INSTALL_COMMAND 
+                ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/external/gasm80/bin &&
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> 
+                    ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/gasm80 -B build &&
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> 
+                    ${CMAKE_COMMAND} --build build --config Release &&
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>
+                    ${CMAKE_COMMAND} --install build --config Release
         )
         
         # Build XDT99 tools (Python-based)

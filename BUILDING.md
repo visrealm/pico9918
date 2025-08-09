@@ -212,6 +212,13 @@ ninja
 - **Native**: Xcode command line tools  
 - **Dependencies**: `brew install cmake python3 git`
 
+### Continuous Integration
+The project includes GitHub Actions workflows that automatically build:
+- **Firmware**: `.uf2` files for Raspberry Pi Pico
+- **Configurator ROMs**: All retro platform ROM files
+- **Cross-platform**: Both Windows and Linux builds
+- **Artifacts**: Build outputs available for download from successful runs
+
 ## Output Structure
 
 ```

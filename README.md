@@ -1,5 +1,7 @@
 # PICO9918
 
+[![Build](https://github.com/visrealm/pico9918/actions/workflows/build.yml/badge.svg)](https://github.com/visrealm/pico9918/actions/workflows/build.yml)
+
 A drop-in replacement for a classic TMS9918A VDP using a Raspberry Pi Pico.
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here

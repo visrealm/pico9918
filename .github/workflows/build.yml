@@ -1,0 +1,91 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, cmake-configurator ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    name: Windows Build
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pillow
+        
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
+        
+    - name: Build Firmware
+      run: |
+        cd build
+        cmake --build . --target firmware
+        
+    - name: Build Configurator
+      run: |
+        cd build
+        cmake --build . --target configurator_all
+        
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: pico9918-windows
+        path: |
+          build/dist/*.uf2
+          build/dist/*.rom
+          build/dist/*.bin
+          build/dist/*.nabu
+          build/dist/*.npz
+
+  build-linux:
+    runs-on: ubuntu-latest
+    name: Linux Build
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake python3 python3-pip git
+        pip3 install pillow
+        
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
+        
+    - name: Build Firmware
+      run: |
+        cd build
+        cmake --build . --target firmware
+        
+    - name: Build Configurator
+      run: |
+        cd build
+        cmake --build . --target configurator_all
+        
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: pico9918-linux
+        path: |
+          build/dist/*.uf2
+          build/dist/*.rom
+          build/dist/*.bin
+          build/dist/*.nabu
+          build/dist/*.npz
