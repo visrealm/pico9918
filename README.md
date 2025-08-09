@@ -98,17 +98,19 @@ If you're not interested in building the firmware yourself, you'll find the late
 
 To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
 
-## Development environment
+## Building
 
-To set up your development environment for the Raspberry Pi Pico, follow the [Raspberry Pi C/C++ SDK Setup](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) instructions. The latest PICO9918 source can be configured and built using the official [Raspberry Pi Pico VSCode plugin](https://github.com/raspberrypi/pico-vscode).
+Build both firmware and configurator ROMs with the unified CMake system:
 
-#### Windows
+```bash
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
 
-The build system expects `python3` to be available. If you have installed Python 3 outside of the Microsoft Store, you may need to alias your Python executable.
+Output in `build/dist/`: firmware `.uf2` file and configurator ROMs for all retro platforms.
 
-You can do this from an elevated (Administator) command prompt in your python directory e.g. `C:\Program Files\Python310\` by creating a symlink with the command: `mklink python3.exe python.exe`.
-
-The custom python build tools are used to convert binary data (images) into code. These also require the [pillow](https://pypi.org/project/pillow/) library - ([Installation instructions for pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html))
+📖 **[Complete Build Instructions](BUILDING.md)** - includes development environment setup, configuration options, platform-specific builds, and troubleshooting.
 
 ## Discussion
 

@@ -16,6 +16,12 @@
     "cmake.configureOnOpen": false,
     "cmake.generator": "Ninja",
     "cmake.cmakePath": "${userHome}/.pico-sdk/cmake/v3.31.5/bin/cmake",
+    "cmake.configureArgs": [
+        "-DPICO9918_SCART_RGBS=OFF",
+        "-DPICO9918_SCART_PAL=OFF", 
+        "-DPICO9918_NO_SPLASH=OFF",
+        "-DPICO9918_DIAG=OFF"
+    ],
     "C_Cpp.debugShortcut": false,
     "terminal.integrated.env.windows": {
         "PICO_SDK_PATH": "${env:USERPROFILE}/.pico-sdk/sdk/2.1.1",

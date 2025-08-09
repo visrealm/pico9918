@@ -44,6 +44,12 @@ set(PICO9918_PATCH_VER 2)
 set(PICO9918_VERSION "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
+# PICO9918 Build Options
+option(PICO9918_SCART_RGBS "Enable SCART RGBs output (default: VGA)" OFF)
+option(PICO9918_SCART_PAL "Use PAL 576i timing (default: NTSC 480i)" OFF)
+option(PICO9918_NO_SPLASH "Disable splash screen" OFF)
+option(PICO9918_DIAG "Enable diagnostic mode" OFF)
+
 add_definitions(-DPICO_BUILD=1)
 add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 add_definitions(-DVR_EMU_TMS9918_MODE=1)
@@ -58,6 +64,7 @@ add_definitions(-DPLL_SYS_POSTDIV2=1)
 # boot2 needs to be properly configured for whatever speed we end up at.
 add_definitions(-DPICO_FLASH_SPI_CLKDIV=4)      # This could be 2, but then we can't write to firmware at higher clocks
 add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=8)
+
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()

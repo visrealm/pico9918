@@ -3,15 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 
 # compile-time options
 
-# Version numbers now defined in root CMakeLists.txt
-
-# SCART RGBs options
-set(PICO9918_SCART_RGBS 0)  # 1 for RGBs, 0 for VGA
-set(PICO9918_SCART_PAL  0)  # 1 for PAL 576i, 0 for NTSC 480i
-
-
-set(PICO9918_NO_SPLASH 0)
-set(PICO9918_DIAG 0)
+# Version numbers and build options now defined in root CMakeLists.txt
 
 # end compile-time options
 
@@ -60,13 +52,11 @@ pico_set_program_description(${PROGRAM} "PICO9918 VDP")
 pico_set_program_url(${PROGRAM} "https://github.com/visrealm/pico9918")
 
 # generate image array source files from png images
-if (PICO9918_NO_SPLASH EQUAL 0)
+if (NOT PICO9918_NO_SPLASH)
 visrealm_generate_image_source_ram(${PROGRAM} bmp_splash res/splash.png )
 endif()
 
-#if (PICO9918_DIAG)
 visrealm_generate_image_source_ram(${PROGRAM} bmp_font res/font.png )
-#endif()
 
 # generate header file from pio
 pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/clocks.pio)
@@ -79,17 +69,19 @@ pico_enable_stdio_usb(${PROGRAM} 0)
 
 pico_set_binary_type(${PROGRAM} copy_to_ram)
 
-add_definitions(-DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH})
-add_definitions(-DPICO9918_VERSION="${PICO9918_VERSION}")
-add_definitions(-DPICO9918_MAJOR_VER=${PICO9918_MAJOR_VER})
-add_definitions(-DPICO9918_MINOR_VER=${PICO9918_MINOR_VER})
-add_definitions(-DPICO9918_PATCH_VER=${PICO9918_PATCH_VER})
-add_definitions(-DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS})
-add_definitions(-DPICO9918_SCART_PAL=${PICO9918_SCART_PAL})
-add_definitions(-DPICO9918_DIAG=${PICO9918_DIAG})
+target_compile_definitions(${PROGRAM} PRIVATE
+    PICO9918_NO_SPLASH=$<BOOL:${PICO9918_NO_SPLASH}>
+    PICO9918_SCART_RGBS=$<BOOL:${PICO9918_SCART_RGBS}>
+    PICO9918_SCART_PAL=$<BOOL:${PICO9918_SCART_PAL}>
+    PICO9918_DIAG=$<BOOL:${PICO9918_DIAG}>
+    PICO9918_VERSION="${PICO9918_VERSION}"
+    PICO9918_MAJOR_VER=${PICO9918_MAJOR_VER}
+    PICO9918_MINOR_VER=${PICO9918_MINOR_VER}
+    PICO9918_PATCH_VER=${PICO9918_PATCH_VER}
+    PICO_DISABLE_SHARED_IRQ_HANDLERS=1
+    PICO_PANIC_FUNCTION=
+)
 
-add_definitions(-DPICO_DISABLE_SHARED_IRQ_HANDLERS=1)
-add_definitions(-DPICO_PANIC_FUNCTION=)
 
 target_link_libraries(${PROGRAM} PUBLIC        
         pico_stdlib
@@ -115,6 +107,9 @@ add_custom_command(
 
 # Create a target for the dist uf2 file
 add_custom_target(${PROGRAM}_dist DEPENDS ${CMAKE_BINARY_DIR}/dist/${PROGRAM}.uf2)
+
+# Create a generic firmware target for easier building
+add_custom_target(firmware DEPENDS ${CMAKE_BINARY_DIR}/dist/${PROGRAM}.uf2)
 
 add_subdirectory(pio-utils)
 add_subdirectory(vga)

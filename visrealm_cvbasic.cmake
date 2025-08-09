@@ -54,7 +54,7 @@ endfunction()
 
 # Setup CVBasic toolchain - either by finding existing tools or building from source
 function(setup_cvbasic_tools)
-    option(BUILD_TOOLS_FROM_SOURCE "Build CVBasic, gasm80 and XDT99 from source" OFF)
+    option(BUILD_TOOLS_FROM_SOURCE "Build CVBasic, gasm80 and XDT99 from source" ON)
     
     if(BUILD_TOOLS_FROM_SOURCE)
         # Build CVBasic from visrealm fork
