@@ -34,7 +34,7 @@ jobs:
         git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
         cd pico-sdk
         git submodule update --init
-        git apply --ignore-whitespace ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
+        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
         cd ..
         
     - name: Configure CMake
@@ -84,7 +84,7 @@ jobs:
         git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
         cd pico-sdk
         git submodule update --init
-        git apply --ignore-whitespace ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
+        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
         cd ..
         
     - name: Configure CMake
