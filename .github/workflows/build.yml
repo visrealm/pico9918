@@ -39,7 +39,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DPICO_SDK_PATH=../pico-sdk
+        cmake .. -G Ninja -DPICO_SDK_PATH=../pico-sdk
         
     - name: Build Firmware
       run: |
@@ -87,7 +87,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DPICO_SDK_PATH=../pico-sdk
+        cmake .. -G Ninja -DPICO_SDK_PATH=../pico-sdk
         
     - name: Build Firmware
       run: |
