@@ -67,9 +67,16 @@ add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=8)
 
 
 # Initialise the Raspberry Pi Pico SDK
+message(STATUS "About to initialize Pico SDK...")
 pico_sdk_init()
+message(STATUS "Pico SDK initialized successfully")
 
+message(STATUS "Adding vrEmuTms9918 subdirectory...")
 add_subdirectory(submodules/vrEmuTms9918)
+message(STATUS "Adding src subdirectory...")
 add_subdirectory(src)
+message(STATUS "Adding test subdirectory...")
 add_subdirectory(test)
+message(STATUS "Adding configtool subdirectory...")
 add_subdirectory(configtool)
+message(STATUS "All subdirectories added successfully")
