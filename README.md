@@ -1,6 +1,7 @@
 # PICO9918
 
-[![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml)
+**Main:** [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml)  
+**Dev:** [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml)
 
 A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
 
