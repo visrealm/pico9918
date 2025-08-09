@@ -41,15 +41,15 @@ jobs:
         cd build
         cmake .. -G Ninja -DPICO_SDK_PATH=../pico-sdk -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
         
-    - name: Build Firmware Target
+    - name: Debug available targets
       run: |
         cd build
-        cmake --build . --target pico9918-vga-build-v1-0-2
+        ninja -t targets | findstr -v "phony" | head -20
         
-    - name: Build All Configurator ROMs
+    - name: Build default target
       run: |
         cd build
-        cmake --build . --target ti99 --target coleco --target msx_asc16 --target nabu
+        cmake --build .
         
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -89,15 +89,15 @@ jobs:
         cd build
         cmake .. -G Ninja -DPICO_SDK_PATH=../pico-sdk -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
         
-    - name: Build Firmware Target
+    - name: Debug available targets
       run: |
         cd build
-        cmake --build . --target pico9918-vga-build-v1-0-2
+        ninja -t targets | findstr -v "phony" | head -20
         
-    - name: Build All Configurator ROMs
+    - name: Build default target
       run: |
         cd build
-        cmake --build . --target ti99 --target coleco --target msx_asc16 --target nabu
+        cmake --build .
         
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
