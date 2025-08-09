@@ -1,6 +1,3 @@
- src/rp2040/boot_stage2/boot2_w25q080.S | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
 diff --git a/src/rp2040/boot_stage2/boot2_w25q080.S b/src/rp2040/boot_stage2/boot2_w25q080.S
 index c35fb81..7597273 100644
 --- a/src/rp2040/boot_stage2/boot2_w25q080.S

@@ -53,6 +53,58 @@
             "windows": {
                 "command": "${env:USERPROFILE}/.pico-sdk/openocd/0.12.0+dev/openocd.exe",
             }
+        },
+        {
+            "label": "Build All Configurator ROMs",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "./build", "--target", "configurator_all"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$gcc",
+            "dependsOn": "Compile Project"
+        },
+        {
+            "label": "Build TI-99 Configurator",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "./build", "--target", "ti99"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$gcc",
+            "dependsOn": "Compile Project"
+        },
+        {
+            "label": "Build ColecoVision Configurator", 
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "./build", "--target", "coleco"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$gcc",
+            "dependsOn": "Compile Project"
+        },
+        {
+            "label": "Build MSX Configurator",
+            "type": "shell", 
+            "command": "cmake",
+            "args": ["--build", "./build", "--target", "msx_asc16"],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": "$gcc",
+            "dependsOn": "Compile Project"
         }
     ]
 }

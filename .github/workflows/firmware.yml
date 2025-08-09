@@ -1,0 +1,93 @@
+name: Firmware
+
+on:
+  push:
+    branches: [ main, cmake-configurator ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pillow
+        
+    - name: Install ARM GNU Toolchain
+      run: |
+        $url = "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip"
+        $output = "arm-toolchain.zip"
+        Invoke-WebRequest -Uri $url -OutFile $output
+        Expand-Archive -Path $output -DestinationPath "C:\arm-toolchain"
+        echo "C:\arm-toolchain\xpack-arm-none-eabi-gcc-13.2.1-1.1\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        
+    - name: Install Pico SDK 2.1.1 manually
+      run: |
+        git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
+        cd pico-sdk
+        git submodule update --init
+        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
+        cd ..
+        
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
+        
+    - name: Build Firmware
+      run: |
+        cd build
+        cmake --build . --target firmware
+        
+    - name: Upload Firmware Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-windows
+        path: build/dist/*.uf2
+
+  linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake python3 python3-pip git gcc-arm-none-eabi
+        pip3 install pillow
+        
+    - name: Install Pico SDK 2.1.1 manually
+      run: |
+        git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
+        cd pico-sdk
+        git submodule update --init
+        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
+        cd ..
+        
+    - name: Configure CMake
+      run: |
+        mkdir build
+        cd build
+        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918
+        
+    - name: Build Firmware
+      run: |
+        cd build
+        cmake --build . --target firmware
+        
+    - name: Upload Firmware Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-linux
+        path: build/dist/*.uf2

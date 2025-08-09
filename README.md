@@ -1,5 +1,7 @@
 # PICO9918
 
+[![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml)
+
 A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
 
 <p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="400px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="406px"></a></p>
@@ -102,36 +104,19 @@ If you're not interested in building the firmware yourself, you'll find the late
 
 To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
 
-## Configurator
+## Building
 
-I have also developed software to configure and update your PICO9918. Dubbed the PICO9918 Configurator. You can use the configurator to:
+Build both firmware and configurator ROMs with the unified CMake system:
 
-* Enable/disable CRT scanlines
-* Set maximum scanline sprites (4, 8, 16 or 32)
-* Change the RP2040 core clock speed
-* Add diagnostics overlays for (performance, registers, palette and addresses)
-* Change the default palette
-* Update the PICO9918 firmware (not available on Nabu and Sega)
+```bash
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
 
-Here's the Configurator in action on my ColecoVision
+Output in `build/dist/`: firmware `.uf2` file and configurator ROMs for all retro platforms.
 
-[![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/PBArYupT9qM)](https://youtu.be/PBArYupT9qM)
-
-Note: It requires a minimum firmware version of 1.0.0 in order to function. A manual firmware update is required first if you have 0.4.x firmware.
-
-I have ROM images for the TI-99/4A, ColecoVision, MSX, Nabu and Sega SG-1000/SC-3000 computers in the [Releases](https://github.com/visrealm/pico9918/releases).
-
-## Development environment
-
-To set up your development environment for the Raspberry Pi Pico, follow the [Raspberry Pi C/C++ SDK Setup](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) instructions. The latest PICO9918 source can be configured and built using the official [Raspberry Pi Pico VSCode plugin](https://github.com/raspberrypi/pico-vscode).
-
-#### Windows
-
-The build system expects `python3` to be available. If you have installed Python 3 outside of the Microsoft Store, you may need to alias your Python executable.
-
-You can do this from an elevated (Administator) command prompt in your python directory e.g. `C:\Program Files\Python310\` by creating a symlink with the command: `mklink python3.exe python.exe`.
-
-The custom python build tools are used to convert binary data (images) into code. These also require the [pillow](https://pypi.org/project/pillow/) library - ([Installation instructions for pillow](https://pillow.readthedocs.io/en/latest/installation/basic-installation.html))
+📖 **[Complete Build Instructions](BUILDING.md)** - includes development environment setup, configuration options, platform-specific builds, and troubleshooting.
 
 ## Thanks
 

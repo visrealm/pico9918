@@ -185,56 +185,64 @@ void diagSetClockHz(float clockHz)
 }
 
 extern int droppedFramesCount;
+static uint32_t cachedFrameCount = 0;
 
 /* update diagnostics values */
 void updateDiagnostics(uint32_t frameCount)
 {
+  cachedFrameCount = frameCount;
   const uint32_t framesPerUpdate = 1 << 2;
-  if ((frameCount & (framesPerUpdate - 1)) == 0)
+  if (tms9918->config[CONF_DIAG_PERFORMANCE])
   {
-    flt2Str((float)(accumulatedRenderTime / framesPerUpdate) / 1000.0f, 3, &renderTimeStr);
-    flt2Str((float)(accumulatedFrameTime / framesPerUpdate) / 1000.0f, 3, &frameTimeStr);
-    uint2Str(accumulatedRenderTime / accumulatedScanlines, 1, &renderTimePerScanlineStr);
-    uint2Str(accumulatedFrameTime / accumulatedScanlines, 1, &totalTimePerScanlineStr);
-
-    accumulatedRenderTime = accumulatedFrameTime = accumulatedScanlines = 0;
-
-    uint32_t currentTime = time_us_32();
-    uint32_t totalTime = lastUpdateTime - currentTime;
-
-    float gpuPct = (gpuTime(totalTime) / (float)(lastUpdateTime - currentTime)) * 100.0f;
-    flt2Str(gpuPct, 4, &gpuPctStr);
-    resetGpuTime();
-
-    lastUpdateTime = currentTime;
-  }
-
-  if ((++frameCount & (framesPerUpdate - 1)) == 0)
-  {
-    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_NAME_TABLE) & 0x0f) << 10, 4, &nameTabStr);
-
-    uint8_t mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
-    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_COLOR_TABLE) & mask) << 6, 4, &colorTabStr);
-
-    mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
-    uint2hexStr(((TMS_REGISTER(tms9918, TMS_REG_PATTERN_TABLE) & mask) << 11) & 0xffff, 4, &pattTabStr);
-
-    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_SPRITE_ATTR_TABLE) & 0x7f) << 7, 4, &sprAttTabStr);
-    uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_SPRITE_PATT_TABLE) & 0x07) << 11, 4, &sprPattTabStr);
-
-    const char *s = modeNames[vrEmuTms9918DisplayMode()];
-    char *d = modeStr.digits;
-    while (*s)
+    if ((frameCount & (framesPerUpdate - 1)) == 0)
     {
-      *d++ = *s++;
+      flt2Str((float)(accumulatedRenderTime / framesPerUpdate) / 1000.0f, 3, &renderTimeStr);
+      flt2Str((float)(accumulatedFrameTime / framesPerUpdate) / 1000.0f, 3, &frameTimeStr);
+      uint2Str(accumulatedRenderTime / accumulatedScanlines, 1, &renderTimePerScanlineStr);
+      uint2Str(accumulatedFrameTime / accumulatedScanlines, 1, &totalTimePerScanlineStr);
+
+      accumulatedRenderTime = accumulatedFrameTime = accumulatedScanlines = 0;
+
+      uint32_t currentTime = time_us_32();
+      uint32_t totalTime = lastUpdateTime - currentTime;
+
+      float gpuPct = (gpuTime(totalTime) / (float)(lastUpdateTime - currentTime)) * 100.0f;
+      flt2Str(gpuPct, 4, &gpuPctStr);
+      resetGpuTime();
+
+      lastUpdateTime = currentTime;
     }
-    *d = 0;
+
+    if ((++frameCount & (framesPerUpdate - 1)) == 0)
+    {
+      flt2Str((16.0f - droppedFramesCount) * 3.75f, 2, &fpsStr);
+    }
   }
 
-  if ((++frameCount & (framesPerUpdate - 1)) == 0)
+  if (tms9918->config[CONF_DIAG_ADDRESS])
   {
-    flt2Str((16.0f - droppedFramesCount) * 3.75f, 2, &fpsStr);
-  }  
+    if ((++frameCount & (framesPerUpdate - 1)) == 0)
+    {
+      uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_NAME_TABLE) & 0x0f) << 10, 4, &nameTabStr);
+
+      uint8_t mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
+      uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_COLOR_TABLE) & mask) << 6, 4, &colorTabStr);
+
+      mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
+      uint2hexStr(((TMS_REGISTER(tms9918, TMS_REG_PATTERN_TABLE) & mask) << 11) & 0xffff, 4, &pattTabStr);
+
+      uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_SPRITE_ATTR_TABLE) & 0x7f) << 7, 4, &sprAttTabStr);
+      uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_SPRITE_PATT_TABLE) & 0x07) << 11, 4, &sprPattTabStr);
+
+      const char *s = modeNames[vrEmuTms9918DisplayMode()];
+      char *d = modeStr.digits;
+      while (*s)
+      {
+        *d++ = *s++;
+      }
+      *d = 0;
+    }
+  }
 }
 
 static inline int darken(int x, uint16_t* pixels)
@@ -377,6 +385,78 @@ static void diagMode(uint16_t row, uint16_t* pixels)
   renderLeft("MODE  : ", &modeStr, "", row, pixels);
 }
 
+static void diagSprite(int spriteId, uint16_t row, uint16_t* pixels)
+{
+  spriteId = spriteId + ((cachedFrameCount >> 4) & 0x18);
+
+  static int lastSpriteId = -1;
+  static IntString strSpriteId = {0};
+  static IntString strSpriteY = {0};
+  static IntString strSpriteX = {0};
+  static IntString strPattId = {0};
+  static IntString strColor = {0};
+  if (spriteId != lastSpriteId)
+  {
+    uint8_t* spriteAttr = tms9918->vram.bytes +
+      ((TMS_REGISTER(tms9918, TMS_REG_SPRITE_ATTR_TABLE) & 0x7f) << 7) 
+      + (spriteId << 2);
+    
+    lastSpriteId = spriteId;
+    uint2Str(spriteId, 2, &strSpriteId);
+    uint2hexStr(spriteAttr[0], 2, &strSpriteY);
+    uint2hexStr(spriteAttr[1], 2, &strSpriteX);
+    uint2hexStr(spriteAttr[2], 2, &strPattId);
+    uint2hexStr(spriteAttr[3], 2, &strColor);
+  }
+  uint32_t xPos = leftXPos;
+  xPos = renderText(row, "SP#", xPos, 0, labelColor, 0, pixels);
+  xPos = renderNum(row, &strSpriteId, xPos, 0, valueColor, 0, pixels);
+  xPos = renderText(row, " $", xPos, 0, labelColor, 0, pixels);
+  xPos = renderNum(row, &strSpriteY, xPos, 0, valueColor, 0, pixels);
+  xPos = renderText(row, " $", xPos, 0, labelColor, 0, pixels);
+  xPos = renderNum(row, &strSpriteX, xPos, 0, valueColor, 0, pixels);
+  xPos = renderText(row, " $", xPos, 0, labelColor, 0, pixels);
+  xPos = renderNum(row, &strPattId, xPos, 0, valueColor, 0, pixels);
+  xPos = renderText(row, " $", xPos, 0, labelColor, 0, pixels);
+  xPos = renderNum(row, &strColor, xPos, 0, valueColor, 0, pixels);
+//  xPos = backgroundPixels(xPos, 102 - xPos, pixels);
+}
+
+static void diagSprite0(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(0, row, pixels);
+}
+static void diagSprite1(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(1, row, pixels);
+}
+static void diagSprite2(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(2, row, pixels);
+}
+static void diagSprite3(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(3, row, pixels);
+}
+static void diagSprite4(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(4, row, pixels);
+}
+static void diagSprite5(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(5, row, pixels);
+}
+static void diagSprite6(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(6, row, pixels);
+}
+static void diagSprite7(uint16_t row, uint16_t* pixels)
+{
+  diagSprite(7, row, pixels);
+}
+
+
+
 typedef void (*DiagPtr)(uint16_t, uint16_t*);
 
 DiagPtr leftDiags[32] = {0};
@@ -397,28 +477,94 @@ DiagPtr addressDiags[] = {
   &diagSprAttrTab,
   &diagSprPattTab};
 
+DiagPtr spriteDiags[] = {
+  &diagSprite0,
+  &diagSprite1,
+  &diagSprite2,
+  &diagSprite3,
+  &diagSprite4,
+  &diagSprite5,
+  &diagSprite6,
+  &diagSprite7};
+
+#define PROGDATA_FLASH_OFFSET (0x100000)    // Top 1MB of flash
+#define PROGDATA_FLASH_ADDR   (uint8_t*)(XIP_BASE + PROGDATA_FLASH_OFFSET)
+
+void flashAddressDiag(uint16_t row, uint16_t* pixels)
+{
+  IntString tempStr = {0};
+  uint8_t *addr = PROGDATA_FLASH_ADDR;
+  int xPos = leftXPos;
+
+  for (int i = 0; i < 40; ++i)
+  {
+    uint2hexStr(addr[i], 2, &tempStr);
+    xPos = renderNum(row, &tempStr, xPos, 0, valueColor, 0, pixels);
+    if (i == 3 || i == 19 || i == 35)
+      xPos = backgroundPixels(xPos, 4, pixels);
+  }
+}
+
+void flashAddress2Diag(uint16_t row, uint16_t* pixels)
+{
+  IntString tempStr = {0};
+  uint8_t *addr = PROGDATA_FLASH_ADDR + 0x100;
+  int xPos = leftXPos;
+
+  for (int i = 0; i < 40; ++i)
+  {
+    uint2hexStr(addr[i], 2, &tempStr);
+    xPos = renderNum(row, &tempStr, xPos, 0, valueColor, 0, pixels);
+    if (i == 3 || i == 19 || i == 35)
+      xPos = backgroundPixels(xPos, 4, pixels);
+  }
+}
+
+void vramAddressDiag(uint16_t row, uint16_t* pixels)
+{
+  IntString tempStr = {0};
+  uint8_t *addr = tms9918->vram.bytes + 0x1f00;
+  int xPos = leftXPos;
+
+  for (int i = 0; i < 40; ++i)
+  {
+    uint2hexStr(addr[i], 2, &tempStr);
+    xPos = renderNum(row, &tempStr, xPos, 0, valueColor, 0, pixels);
+    if (i == 15 || i == 31 || i == 35)
+      xPos = backgroundPixels(xPos, 4, pixels);
+  }
+}
+
+
 void diagnosticsConfigUpdated()
 {
   memset(leftDiags, 0, sizeof(leftDiags));
 
   leftDiagRows= 0;
+
+  leftDiags[leftDiagRows++] = flashAddressDiag;
+  leftDiags[leftDiagRows++] = flashAddress2Diag;
+  leftDiags[leftDiagRows++] = vramAddressDiag;
+
   if (tms9918->config[CONF_DIAG_PERFORMANCE])
   {
     for (int j = 0; j < sizeof(performanceDiags) / sizeof(void*); ++j)
-    {
       leftDiags[leftDiagRows++] = performanceDiags[j];
-    }
     leftDiagRows++;
   }
 
   if (tms9918->config[CONF_DIAG_ADDRESS])
   {
     for (int j = 0; j < sizeof(addressDiags) / sizeof(void*); ++j)
-    {
       leftDiags[leftDiagRows++] = addressDiags[j];
-    }
     leftDiagRows++;
   }
+
+
+
+  //for (int j = 0; j < sizeof(spriteDiags) / sizeof(void*); ++j)
+  //  leftDiags[leftDiagRows++] = spriteDiags[j];
+  //leftDiagRows++;
 }
 
 static void renderPalette(int y, uint16_t *pixels)
@@ -426,7 +572,7 @@ static void renderPalette(int y, uint16_t *pixels)
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int row = to_remainder_u32(dmResult);
 
-  int palette = (y - 216) / 6;
+  uint8_t palette = (y - 216) / 6;
   if (palette < 4)
   {
     char buf[] = "PALETTE 0:"; buf[8] = '0' + palette;
@@ -470,9 +616,9 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   }
   
   // left panels
-  if (diagRow < leftDiagRows)
+  if (diagRow < leftDiagRows && leftDiags[diagRow] != NULL)
   {
-    if (leftDiags[diagRow]) leftDiags[diagRow](row, pixels);
+    leftDiags[diagRow](row, pixels);
   }
 
   // registers

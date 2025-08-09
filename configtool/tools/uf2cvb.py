@@ -67,6 +67,7 @@ def main() -> int:
         minorVer = match.group(2)
         patchVer = match.group(3)
 
+    print("Output file     : {0}".format(args['outfile'] + ".bas"))
     print("Firmware version: {0}.{1}.{2}".format(majorVer, minorVer, patchVer))
     print("Bank size       : {0} bytes".format(BANK_SIZE))
     print("Block size      : {0} bytes".format(BLOCK_SIZE))
@@ -124,6 +125,7 @@ def main() -> int:
                         output.write("\n ' Block: {0}\n".format(w[5]))
                         output.write(" ' Addr: {0}\n".format(hex(w[3])))
                         output.write(" ' Bank: {0}\n".format(bank - 1))
+                        output.write("uf2Block{0}:\n".format(w[5]))
                         for h in range (0, 32, 4):
                             byteStr = []
                             for b in inpbuf[h:h + 4]:
@@ -138,7 +140,7 @@ def main() -> int:
 
                         byteStr = []
                         for b in inpbuf[508:512]:
-                            byteStr.append("${0}".format(b.to_bytes().hex()))
+                            byteStr.append("${0:02X}".format(b))
                         output.write("  DATA BYTE {0}\n".format(", ".join(byteStr)))
 
                         nettBytes += 256

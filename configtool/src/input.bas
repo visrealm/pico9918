@@ -48,7 +48,11 @@ updateNavInput: PROCEDURE
     IF CONT.LEFT OR (CONT1.KEY = "S") OR (CONT1.KEY = ",") THEN g_nav = g_nav OR NAV_LEFT
 
     ' <LBUTTON> or <SPACE> OR <ENTER>
+#if TI994A    ' TI-99: CTRL is CONT1.BUTTON2, FCTN is CTRL2.BUTTON2. Let's just ... not
+    IF (CONT1.KEY = " ") OR (CONT1.KEY = 11) THEN g_nav = g_nav OR NAV_OK
+#else
     IF CONT.BUTTON2 OR (CONT1.KEY = " ") OR (CONT1.KEY = 11) THEN g_nav = g_nav OR NAV_OK
+#endif
 
     ' <RBUTTON> or <Q> OR <ESC>
     IF CONT.BUTTON OR (CONT1.KEY = "Q") OR (CONT1.KEY = 27) THEN g_nav = g_nav OR NAV_CANCEL
