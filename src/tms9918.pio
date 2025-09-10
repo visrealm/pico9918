@@ -34,28 +34,28 @@
 
 .wrap_target
   wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
-  mov osr, null   [4] ; change CD0-7 pindirs to inputs
+  mov osr, null       ; change CD0-7 pindirs to inputs
   out pindirs, 8
+  mov isr, null
 
 pullLoop:
   pull noblock      ; continuously empty the tx fifo
   mov x, osr        ; since we want the latest value
-  mov isr, null
-  in pins, 1        ; hacky way to jmp based on the CSR pin
-  mov y, isr        ; since we can only have one jmp pin
-  jmp y--, pullLoop ; still 1? loop, otherwise, let's read
+  jmp pin pullLoop
+
+  in pins, 1          ; hacky way to jmp based on the CSR pin
+  mov y, isr          ; since we can only have one jmp pin
 
   out pindirs, 8    ; set up CD0-7 as outputs
-  jmp pin readStatus  ; if 'mode' is high, read status bits
-readData:
   out pins, 8       ; mode is low, send the data byte
-  jmp endPart
+
+  jmp !y, endPart ; still 1? loop, otherwise, let's read
+
 readStatus:  
-  out null, 8       ; skip data bits
   out pins, 8       ; output the status byte
   mov isr, x        ; make this status value available
 endPart:
-  in pins, 3        ; push CSR, CSW and MODE back through fifo
+  in pins, 1        ; push CSR, CSW and MODE back through fifo
   push              ; push ^^^ back to cpu to process
 .wrap
 
