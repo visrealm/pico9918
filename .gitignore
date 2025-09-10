@@ -2,6 +2,7 @@ CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
+Claude.md
 Testing
 Makefile
 cmake_install.cmake
@@ -12,3 +13,4 @@ _deps
 build/**
 testapps/**
 configtool/build/**
+configtool/CLAUDE.md
