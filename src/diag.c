@@ -228,7 +228,7 @@ void updateDiagnostics(uint32_t frameCount)
       uint8_t mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
       uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_COLOR_TABLE) & mask) << 6, 4, &colorTabStr);
 
-      mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
+      mask = (vrEmuTms9918DisplayMode() == TMS_MODE_GRAPHICS_II) ? 0x04 : 0x07;
       uint2hexStr(((TMS_REGISTER(tms9918, TMS_REG_PATTERN_TABLE) & mask) << 11) & 0xffff, 4, &pattTabStr);
 
       uint2hexStr((TMS_REGISTER(tms9918, TMS_REG_SPRITE_ATTR_TABLE) & 0x7f) << 7, 4, &sprAttTabStr);
@@ -316,7 +316,7 @@ static const char *nibbleBinStr[] =
 // register numbers to render
 static const int extReg[] = { 10, 11, 15, 19, 24, 25, 26, 27,
                               28, 29, 30, 31, 32, 33, 34, 35,
-                              36, 37, 38, 49, 50, 51, 54, 55,
+                              36, 37, 38, 48, 49, 50, 51, 54, 55,
                               56, 57, 58, 59, 63 };
 
 const uint32_t leftXPos = 2;
@@ -487,6 +487,8 @@ DiagPtr spriteDiags[] = {
   &diagSprite6,
   &diagSprite7};
 
+#if 0
+
 #define PROGDATA_FLASH_OFFSET (0x100000)    // Top 1MB of flash
 #define PROGDATA_FLASH_ADDR   (uint8_t*)(XIP_BASE + PROGDATA_FLASH_OFFSET)
 
@@ -535,6 +537,7 @@ void vramAddressDiag(uint16_t row, uint16_t* pixels)
   }
 }
 
+#endif
 
 void diagnosticsConfigUpdated()
 {
@@ -542,9 +545,11 @@ void diagnosticsConfigUpdated()
 
   leftDiagRows= 0;
 
+#if 0  
   leftDiags[leftDiagRows++] = flashAddressDiag;
   leftDiags[leftDiagRows++] = flashAddress2Diag;
   leftDiags[leftDiagRows++] = vramAddressDiag;
+#endif
 
   if (tms9918->config[CONF_DIAG_PERFORMANCE])
   {
