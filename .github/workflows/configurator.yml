@@ -5,6 +5,8 @@ on:
     workflows: ["Firmware"]
     types:
       - completed
+    branches:
+      - '**'
 
 jobs:
   windows:
@@ -14,6 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
+        ref: ${{ github.event.workflow_run.head_branch }}
         submodules: recursive
         
     - name: Install Python dependencies
@@ -70,6 +73,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
+        ref: ${{ github.event.workflow_run.head_branch }}
         submodules: recursive
         
     - name: Download firmware artifact from workflow
