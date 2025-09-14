@@ -60,7 +60,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1 -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
@@ -111,7 +111,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1 -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
@@ -168,7 +168,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1 -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
