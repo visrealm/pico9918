@@ -175,7 +175,10 @@ jobs:
         
     - name: Install ARM GNU Toolchain
       run: |
-        brew install --cask gcc-arm-embedded
+        # Use the same version as other platforms for consistency
+        curl -L "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-arm64.tar.gz" -o arm-toolchain.tar.gz
+        sudo tar -xzf arm-toolchain.tar.gz -C /opt
+        echo "/opt/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin" >> $GITHUB_PATH
         
     - name: Install Pico SDK 2.1.1 manually
       run: |
