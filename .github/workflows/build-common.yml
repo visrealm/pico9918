@@ -171,7 +171,7 @@ jobs:
     - name: Install dependencies
       run: |
         brew install cmake ninja python3 git
-        pip3 install pillow
+        pip3 install pillow --break-system-packages
         
     - name: Install ARM GNU Toolchain
       run: |
