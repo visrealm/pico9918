@@ -56,19 +56,11 @@ jobs:
         Expand-Archive -Path $output -DestinationPath "C:\arm-toolchain"
         echo "C:\arm-toolchain\xpack-arm-none-eabi-gcc-13.2.1-1.1\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         
-    - name: Install Pico SDK 2.1.1 manually
-      run: |
-        git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
-        cd pico-sdk
-        git submodule update --init
-        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
-        cd ..
-        
-    - name: Configure CMake
+    - name: Configure CMake (with automatic SDK fetch and patch)
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1 -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
@@ -115,19 +107,11 @@ jobs:
         sudo apt-get install -y build-essential cmake python3 python3-pip git gcc-arm-none-eabi
         pip3 install pillow
         
-    - name: Install Pico SDK 2.1.1 manually
-      run: |
-        git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
-        cd pico-sdk
-        git submodule update --init
-        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
-        cd ..
-        
-    - name: Configure CMake
+    - name: Configure CMake (with automatic SDK fetch and patch)
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1 -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
@@ -180,19 +164,11 @@ jobs:
         sudo tar -xzf arm-toolchain.tar.gz -C /opt
         echo "/opt/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin" >> $GITHUB_PATH
         
-    - name: Install Pico SDK 2.1.1 manually
-      run: |
-        git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
-        cd pico-sdk
-        git submodule update --init
-        git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch || echo "Patch failed or already applied"
-        cd ..
-        
-    - name: Configure CMake
+    - name: Configure CMake (with automatic SDK fetch and patch)
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_PATH="$PWD/../pico-sdk" -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1 -DPICO_BOARD_HEADER_DIRS="../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
