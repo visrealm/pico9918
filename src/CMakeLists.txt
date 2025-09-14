@@ -94,6 +94,9 @@ target_link_libraries(${PROGRAM} PUBLIC
         pico9918-gpu
         vrEmuTms9918)
 
+# Set the executable suffix to .elf for all platforms
+set_target_properties(${PROGRAM} PROPERTIES SUFFIX .elf)
+
 pico_add_extra_outputs(${PROGRAM})
 
 # Copy final artifacts to dist directory for unified output
