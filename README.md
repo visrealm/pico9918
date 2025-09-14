@@ -123,8 +123,9 @@ To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico i
 Quick start - build both firmware and configurator ROMs:
 
 ```bash
+# Automatic SDK download (recommended)
 mkdir build && cd build
-cmake ..
+cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
 cmake --build .
 ```
 

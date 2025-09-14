@@ -47,14 +47,14 @@ if (NOT PICO_SDK_PATH)
                     GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
                     GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
                     GIT_SUBMODULES_RECURSE FALSE
-                    PATCH_COMMAND ""
+                    PATCH_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> git apply --ignore-whitespace --ignore-space-change --3way ${CMAKE_SOURCE_DIR}/picosdk-2.0.0-visrealm-fastboot.patch || ${CMAKE_COMMAND} -E echo "PICO9918: SDK patch failed or already applied (this is normal)"
             )
         else ()
             FetchContent_Declare(
                     pico_sdk
                     GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
                     GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
-                    PATCH_COMMAND ""
+                    PATCH_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> git apply --ignore-whitespace --ignore-space-change --3way ${CMAKE_SOURCE_DIR}/picosdk-2.0.0-visrealm-fastboot.patch || ${CMAKE_COMMAND} -E echo "PICO9918: SDK patch failed or already applied (this is normal)"
             )
         endif ()
 

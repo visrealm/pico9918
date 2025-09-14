@@ -84,7 +84,17 @@ The latest PICO9918 source can be configured and built using the official [Raspb
 The PICO9918 firmware is the primary component - a TMS9918A VDP emulator for Raspberry Pi Pico.
 
 ### Quick Start - Firmware Only
+
+**Option 1: Automatic SDK Download (Recommended)**
 ```bash
+mkdir build && cd build
+cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
+cmake --build . --target firmware
+```
+
+**Option 2: Manual SDK Setup**
+```bash
+# First: Follow platform-specific setup above to install SDK
 mkdir build && cd build
 cmake ..
 cmake --build . --target firmware
@@ -152,20 +162,34 @@ Set build options in `.vscode/settings.json`:
 - **DMA**: Memory transfers and sprite processing
 - **Flash**: Configuration storage in upper 1MB
 
-### Automatic SDK Patches
-The build system automatically applies performance patches to the Pico SDK:
-- **Fast Boot**: Optimizes ROSC (Ring Oscillator) for faster boot times
-- Patches are applied automatically when using `PICO_SDK_FETCH_FROM_GIT=ON`
+### SDK Performance Patch
+
+> **✅ Automatic Patch Application**
+> 
+> A performance patch is automatically applied for optimal boot times:
+> - **Fast Boot**: Optimizes ROSC (Ring Oscillator) for faster startup  
+> - **Automatic**: Applied by CMake when using `PICO_SDK_FETCH_FROM_GIT=ON`
+> - **Manual Setup**: Still required when manually installing SDK (see platform instructions above)
+
+#### How It Works
+- **FetchContent builds**: CMake automatically applies `picosdk-2.0.0-visrealm-fastboot.patch` after downloading the SDK
+- **Manual SDK installs**: You must run the `git apply` command shown in platform setup above
+- **Safe Operation**: Patch command includes fallback - build continues even if patch fails
 
 ## Building Configurator
 
 The configurator creates ROM files for retro computers that can upload firmware to PICO9918.
 
 ### Prerequisites - Configurator
-In addition to firmware requirements:
-- **CVBasic**: Retro BASIC compiler (auto-built if missing)
-- **GASM80**: Z80 assembler (auto-built if missing)
-- **XDT99**: TI-99/4A tools (auto-built if missing)
+
+> **✅ No Manual Tool Installation Required!** 
+> 
+> The build system **automatically downloads and builds** all required tools:
+> - **CVBasic** (Retro BASIC compiler)
+> - **GASM80** (Z80 assembler)  
+> - **XDT99** (TI-99/4A development tools)
+>
+> Simply run the build commands below - all tools will be built from source automatically.
 
 ### Quick Start - Configurator
 ```bash
@@ -206,15 +230,21 @@ cmake --build . --target creativision      # CreatiVision
 All configurator tasks automatically depend on firmware build.
 
 ### Tool Auto-Building
-By default, the build system automatically builds CVBasic, GASM80, and XDT99 from source. This ensures builds work on any platform without pre-installed tools.
 
-The system will:
-1. Clone tool repositories from GitHub
-2. Build tools from source using CMake
-3. Cache built tools for subsequent builds
-4. Use locally-built tools for ROM generation
+> **🚀 Zero-Configuration Tool Management**
+>
+> **By default**, the build system automatically handles all configurator tools:
 
-To use existing tools instead (if available):
+The system will automatically:
+1. **Clone** tool repositories from GitHub
+2. **Build** tools from source using CMake  
+3. **Cache** built tools for subsequent builds
+4. **Use** locally-built tools for ROM generation
+
+**No manual tool installation needed!** Works on all platforms out-of-the-box.
+
+#### Advanced: Use Pre-installed Tools (Optional)
+If you have CVBasic, GASM80, and XDT99 already installed in PATH:
 ```bash
 cmake .. -DBUILD_TOOLS_FROM_SOURCE=OFF
 ```
@@ -326,6 +356,18 @@ cd ../your-build-directory
 cmake ..
 
 # Note: PICO_SDK_FETCH_FROM_GIT_TAG has known issues with tag resolution
+```
+
+**SDK patch issues**
+```bash
+# If patch fails to apply:
+git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch
+
+# If patch was already applied or conflicts:
+echo "Patch failed or already applied" # This is normal, firmware will still build
+
+# Patch is optional but improves boot performance
+# Firmware works without it, just boots slower
 ```
 
 **Missing splash/font assets**
