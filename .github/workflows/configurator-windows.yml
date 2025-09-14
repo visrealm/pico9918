@@ -1,0 +1,19 @@
+name: Configurator Windows
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-common.yml
+    with:
+      build-firmware: true
+      build-configurator: true
+      artifact-name-suffix: windows
+      run-windows: true
+      run-linux: false
+      run-macos: false
