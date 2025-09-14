@@ -6,20 +6,78 @@ This document describes how to build the PICO9918 firmware and configurator ROMs
 
 ### Required Tools
 - **CMake 3.13+**: Build system generator
+- **ARM GNU Toolchain**: Cross-compiler for ARM Cortex-M0+ (RP2040)
 - **Raspberry Pi Pico SDK**: Firmware compilation (v2.1.1 recommended for compatibility)
 - **Python 3**: Build scripts and asset conversion
 - **Git**: For submodules and dependencies
+
+### Platform-Specific Setup
+
+#### Windows
+```bash
+# Install dependencies
+# Download and install ARM GNU Toolchain 13.2.1-1.1 from:
+# https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip
+# Extract to C:\arm-toolchain\ and add to PATH
+
+# Python dependencies
+pip install pillow
+
+# Install Pico SDK 2.1.1
+git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
+cd pico-sdk
+git submodule update --init
+# Apply performance patches
+git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch
+cd ..
+```
+
+#### Linux (Ubuntu/Debian)
+```bash
+# Install system dependencies  
+sudo apt-get update
+sudo apt-get install -y build-essential cmake python3 python3-pip git gcc-arm-none-eabi
+
+# Python dependencies
+pip3 install pillow
+
+# Install Pico SDK 2.1.1
+git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
+cd pico-sdk
+git submodule update --init
+# Apply performance patches
+git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch
+cd ..
+```
+
+#### macOS
+```bash
+# Install dependencies via Homebrew
+brew install cmake ninja python3 git
+
+# Install ARM GNU Toolchain (same version as other platforms for consistency)
+curl -L "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-arm64.tar.gz" -o arm-toolchain.tar.gz
+sudo tar -xzf arm-toolchain.tar.gz -C /opt
+echo 'export PATH="/opt/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# Python dependencies (may require --break-system-packages on newer macOS)
+pip3 install pillow
+
+# Install Pico SDK 2.1.1
+git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
+cd pico-sdk
+git submodule update --init
+# Apply performance patches
+git apply --ignore-whitespace --ignore-space-change --3way ../picosdk-2.0.0-visrealm-fastboot.patch
+cd ..
+```
 
 ### Development Environment Setup
 
 To set up your development environment for the Raspberry Pi Pico, follow the [Raspberry Pi C/C++ SDK Setup](https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html) instructions.
 
 The latest PICO9918 source can be configured and built using the official [Raspberry Pi Pico VSCode plugin](https://github.com/raspberrypi/pico-vscode).
-
-### Python Dependencies
-```bash
-pip install pillow  # Image processing for splash screen and fonts
-```
 
 ## Building Firmware
 
@@ -200,24 +258,35 @@ ninja
 
 ## Cross-Platform Support
 
-### Windows
-- **Native**: MSYS2, Visual Studio, or Clang
-- **WSL**: Windows Subsystem for Linux
+All major platforms are supported with consistent toolchains and build processes. See the **Platform-Specific Setup** section above for detailed installation instructions.
 
-### Linux  
-- **Native**: GCC or Clang toolchain
-- **Dependencies**: `build-essential cmake python3 python3-pip git`
+### Platform Summary
+- **Windows**: Native build with ARM GNU Toolchain 13.2.1-1.1
+- **Linux**: Native build with `gcc-arm-none-eabi` package  
+- **macOS**: Native build with ARM GNU Toolchain 13.2.1-1.1 (for consistency)
+- **WSL**: Use Linux instructions within Windows Subsystem for Linux
 
-### macOS
-- **Native**: Xcode command line tools  
-- **Dependencies**: `brew install cmake python3 git`
+### Important Notes
+- **Toolchain Consistency**: All platforms use ARM GNU Toolchain 13.2.1-1.1 to ensure identical builds
+- **macOS Python**: May require `--break-system-packages` flag for pip on newer macOS versions
+- **SDK Version**: Use Pico SDK 2.1.1 specifically - newer versions may cause linker issues
 
 ### Continuous Integration
-The project includes GitHub Actions workflows that automatically build:
+The project includes GitHub Actions workflows that automatically build on every push:
+
+#### Individual Platform Workflows
+- **Firmware Windows**: `firmware-windows.yml` 
+- **Firmware Linux**: `firmware-linux.yml`
+- **Firmware macOS**: `firmware-macos.yml`
+- **Configurator Windows**: `configurator-windows.yml`
+- **Configurator Linux**: `configurator-linux.yml`
+- **Configurator macOS**: `configurator-macos.yml`
+
+#### Build Outputs
 - **Firmware**: `.uf2` files for Raspberry Pi Pico
 - **Configurator ROMs**: All retro platform ROM files
-- **Cross-platform**: Both Windows and Linux builds
 - **Artifacts**: Build outputs available for download from successful runs
+- **Badges**: Individual build status badges for each OS and build type
 
 ## Output Structure
 
