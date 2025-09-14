@@ -1,19 +1,23 @@
 name: Configurator
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["Firmware"]
     types:
       - completed
+    branches:
+      - '**'
 
 jobs:
   windows:
     runs-on: windows-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     
     steps:
     - uses: actions/checkout@v4
       with:
+        ref: ${{ github.event.workflow_run.head_branch }}
         submodules: recursive
         
     - name: Install Python dependencies
@@ -65,11 +69,12 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     
     steps:
     - uses: actions/checkout@v4
       with:
+        ref: ${{ github.event.workflow_run.head_branch }}
         submodules: recursive
         
     - name: Download firmware artifact from workflow
