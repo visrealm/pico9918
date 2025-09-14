@@ -8,10 +8,19 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 
 ## Build status
 
-| Branch | Firmware | Configurator |
-|--------|----------|--------------|
-| main | [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) | [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml) |
-| dev | [![Firmware](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/firmware.yml) | [![Configurator](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/configurator.yml) |
+### Main Branch
+
+| Build | Windows | Linux | macOS |
+|-------|---------|-------|-------|
+| Firmware | [![](https://github.com/visrealm/pico9918/actions/workflows/firmware-windows.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/firmware-windows.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/firmware-linux.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/firmware-linux.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/firmware-macos.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/firmware-macos.yml) |
+| Configurator | [![](https://github.com/visrealm/pico9918/actions/workflows/configurator-windows.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/configurator-windows.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/configurator-linux.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/configurator-linux.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/configurator-macos.yml/badge.svg?branch=main)](https://github.com/visrealm/pico9918/actions/workflows/configurator-macos.yml) |
+
+### Dev Branch
+
+| Build | Windows | Linux | macOS |
+|-------|---------|-------|-------|
+| Firmware | [![](https://github.com/visrealm/pico9918/actions/workflows/firmware-windows.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/firmware-windows.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/firmware-linux.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/firmware-linux.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/firmware-macos.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/firmware-macos.yml) |
+| Configurator | [![](https://github.com/visrealm/pico9918/actions/workflows/configurator-windows.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/configurator-windows.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/configurator-linux.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/configurator-linux.yml) | [![](https://github.com/visrealm/pico9918/actions/workflows/configurator-macos.yml/badge.svg?branch=dev)](https://github.com/visrealm/pico9918/actions/workflows/configurator-macos.yml) |
 
 ## Supported devices
 
@@ -111,7 +120,7 @@ To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico i
 
 ## Building
 
-Build both firmware and configurator ROMs with the unified CMake system:
+Quick start - build both firmware and configurator ROMs:
 
 ```bash
 mkdir build && cd build
@@ -121,7 +130,16 @@ cmake --build .
 
 Output in `build/dist/`: firmware `.uf2` file and configurator ROMs for all retro platforms.
 
-📖 **[Complete Build Instructions](BUILDING.md)** - includes development environment setup, configuration options, platform-specific builds, and troubleshooting.
+### Platform-Specific Setup Required
+
+Each platform requires specific toolchain installation:
+- **Windows**: ARM GNU Toolchain 13.2.1-1.1, Python with pillow
+- **Linux**: `build-essential cmake python3 python3-pip git gcc-arm-none-eabi`  
+- **macOS**: Homebrew + ARM GNU Toolchain 13.2.1-1.1, may need `--break-system-packages`
+
+All platforms use **Raspberry Pi Pico SDK 2.1.1** specifically (newer versions may cause issues).
+
+📖 **[Complete Build Instructions](BUILDING.md)** - includes detailed platform setup, development environment configuration, build options, individual platform builds, VSCode integration, and troubleshooting.
 
 ## Thanks
 
