@@ -10,7 +10,7 @@ This version is relatively cheap and easy to build and is powered by a piggyback
 
 See [PICO9918 v0.3](v0.3)
 
-### Fully integrated single board (v0.4 - v1.2+)
+### Fully integrated single board (v0.4 - v1.3+)
 
 From v0.4 the RP2040 has been integrated onto the PICO9918 PCB, making a much smaller small form factor. This revision has many small (0402) components and can be challenging (and more expensive) to build. They can be purchased too.
 
@@ -18,6 +18,13 @@ From v0.4 the RP2040 has been integrated onto the PICO9918 PCB, making a much sm
 alt="PICO9918 v1.0" width="240px"></a></p>
 
 # Revision history
+
+## [v1.3 (2025-07-02)](v1.2)
+
+### Changelog
+- Added LM66200 dual perfect diode to allow connecting USB while installed.
+- Replaced 74HC08 with a 74ACT126 to make data and interrupt lines float on reset.
+- Data lines remain active slightly longer after /CSR goes high.
 
 ## [v1.2 (2024-11-26)](v1.2)
 

@@ -92,9 +92,9 @@ Also (more convenient for North America)
 
 There are two main variants of the hardware. 
 
-### v1.x (v1.2, v1.1, v1.0 and v0.4)
+### v1.x (v1.3, v1.2, v1.1, v1.0 and v0.4)
 
-PICO9918 v1.2 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
+PICO9918 v1.3 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
 
 <p align="left"><a href="img/pico9918_v1_2_sm.jpg"><img src="img/pico9918_v1_2_sm.jpg" alt="PICO9918 v1.2" width="720px"></a></p>
 
