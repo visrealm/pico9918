@@ -510,11 +510,26 @@ define_color
 update_sprite
     srl r4,8            ; make word
     sla r4,2            ; x4 for address
+    .ifeq CVBASIC_DIRECT_SPRITES
     ai r4,sprites       ; sprite mirror address
     movb r5,*r4+        ; move bytes
     movb r6,*r4+        ; move bytes
     movb r7,*r4+        ; move bytes
     movb r0,*r4+        ; move bytes
+    .else
+    limi 0
+    ai r4,>5b00         ; >1b00 with the write bit added
+    swpb r4
+    movb r4,@VDPWADR   ; SAL address
+    swpb r4
+    movb r4,@VDPWADR   ; going to copy the sprite table to VDP
+    nop
+    movb r5,@VDPWDATA
+    movb r6,@VDPWDATA
+    movb r7,@VDPWDATA
+    movb r0,@VDPWDATA
+    limi 2
+    .endif
     b *r11
 
 ; SGN R0 - return 1, -1 or 0 as 16 bit
@@ -824,6 +839,7 @@ int_handler
     mov @>7ffe,@saved_bank  ; save bank switch page
     .endif
     
+    .ifeq CVBASIC_DIRECT_SPRITES
     li r11,>005b        ; >1b00 with the write bit added, and byte flipped
     movb r11,@VDPWADR   ; SAL address
     swpb r11
@@ -861,6 +877,7 @@ int_handler
     dec r12
     jne -!6
 !5
+    .endif  ; !CVBASIC_DIRECT_SPRITES
 
 ; next read the joysticks - output needs to be 21xxLDRU - 1 and 2 are button and button2 respectively
 ; We don't have a button 2. We also need to read the keyboard and fill in key1_data. key2_data we

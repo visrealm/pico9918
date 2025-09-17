@@ -170,7 +170,7 @@ firmwareWriteAndVerify: PROCEDURE
                 R = R + 1
             WEND
 
-            IF FWST AND $06 THEN
+            IF FWST AND $1c THEN
                 PRINT AT BLOCKPOS(#FWBLOCK), CHR$(2)
                 STATUS = 0
             ELSE
