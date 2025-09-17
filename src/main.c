@@ -14,7 +14,7 @@
 
 #include "clocks.pio.h"
 
-#define PALCONV 1
+#define PALCONV 0
 
 #if PALCONV
 #include "palconv.pio.h"
@@ -86,9 +86,16 @@ static void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;
-  int vr = TMS_REGISTER(tms9918, 0x0F) & 0x0F;
-  readAhead |= (TMS_STATUS(tms9918, vr)) << 16;
-  readAhead |= vr << 24;
+  if (tms9918->isUnlocked)
+  {
+    int vr = TMS_REGISTER(tms9918, 0x0F) & 0x0F;
+    readAhead |= (TMS_STATUS(tms9918, vr)) << 16;
+    readAhead |= vr << 24;
+  }
+  else
+  {
+    readAhead |= (TMS_STATUS(tms9918, 0)) << 16;
+  }
   pio_sm_put(TMS_PIO, tmsReadSm, readAhead);
 }
 
@@ -97,7 +104,52 @@ static void updateTmsReadAhead()
  */
 void  __not_in_flash_func(pio_irq_handler)()
 {
-  if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsWriteSm))) == 0) // write?
+  if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsReadSm))) == 0) // read?
+  {
+    uint32_t readVal = TMS_PIO->rxf[tmsReadSm];
+
+    if ((readVal & 0x01) == 0) // read data
+    {
+      nextValue = vrEmuTms9918ReadAheadDataImpl();
+    }
+    else // read status
+    {
+      if (!tms9918->isUnlocked)
+      {
+        currentStatus = 0x1f;
+        vrEmuTms9918SetStatusImpl(currentStatus);
+        currentInt = false;
+        gpio_put(GPIO_INT, !currentInt);
+      }
+      else
+      {
+        readVal >>= (1 + 16); // What status was read?
+        int readReg = (readVal >> 8) & 0x0f; // What status register was read?
+        readVal &= 0xff;
+        tms9918->regWriteStage = 0;
+        switch (readReg)
+        {
+          case 0:
+            readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
+            currentStatus &= ~readVal; // Switch off any 3 high bits which have just been read
+            if (readVal & STATUS_5S) // Was 5th Sprite read?
+              currentStatus |= 0x1f;
+            vrEmuTms9918SetStatusImpl(currentStatus);
+            if (readVal & STATUS_INT)  // Was Interrupt read?
+            {
+              currentInt = false;
+              gpio_put(GPIO_INT, !currentInt);
+            }
+            break;
+          case 1:
+            if (readVal << 31)
+              TMS_STATUS(tms9918, 0x01) &= ~0x01;
+            break;
+        }
+      }
+    }
+  }
+  else if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsWriteSm))) == 0) // write?
   {
     uint32_t writeVal = TMS_PIO->rxf[tmsWriteSm];
     uint8_t dataVal = writeVal & 0xff;
@@ -115,45 +167,9 @@ void  __not_in_flash_func(pio_irq_handler)()
     }
 
     nextValue = vrEmuTms9918ReadDataNoIncImpl();
-    updateTmsReadAhead();
   }
-  else if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsReadSm))) == 0) // read?
-  {
-    uint32_t readVal = TMS_PIO->rxf[tmsReadSm];
 
-    if ((readVal & 0x04) == 0) // read data
-    {
-      vrEmuTms9918ReadDataImpl();
-      nextValue = vrEmuTms9918ReadDataNoIncImpl();
-    }
-    else // read status
-    {
-      readVal >>= (3 + 16); // What status was read?
-      int readReg = (readVal >> 8) & 0x0f; // What status register was read?
-      readVal &= 0xff;
-      tms9918->regWriteStage = 0;
-      switch (readReg)
-      {
-        case 0:
-          readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
-          currentStatus &= ~readVal; // Switch off any 3 high bits which have just been read
-          if (readVal & STATUS_5S) // Was 5th Sprite read?
-            currentStatus |= 0x1f;
-          vrEmuTms9918SetStatusImpl(currentStatus);
-          if (readVal & STATUS_INT)  // Was Interrupt read?
-          {
-            currentInt = false;
-            gpio_put(GPIO_INT, !currentInt);
-          }
-          break;
-        case 1:
-          if (readVal << 31)
-            TMS_STATUS(tms9918, 0x01) &= ~0x01;
-          break;
-      }
-    }
-    updateTmsReadAhead();
-  }
+  updateTmsReadAhead();
 }
 
 
@@ -602,12 +618,12 @@ void tmsPioInit()
   }
 
   pio_sm_config readPioConfig = tmsRead_program_get_default_config(tmsReadProgram);
-  sm_config_set_in_pins(&readPioConfig, GPIO_CSR);
-  sm_config_set_jmp_pin(&readPioConfig, GPIO_MODE);
+  sm_config_set_jmp_pin(&readPioConfig, GPIO_CSR);
+  sm_config_set_in_pins(&readPioConfig, GPIO_MODE);
   sm_config_set_out_pins(&readPioConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readPioConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readPioConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readPioConfig, 2.0f);
+  sm_config_set_clkdiv(&readPioConfig, 1.0f);
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);

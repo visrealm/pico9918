@@ -19,6 +19,11 @@ setup_cvbasic_tools()
 
 # Firmware dependency (checked at build time, not configure time)
 set(FIRMWARE_FILE "${CMAKE_BINARY_DIR}/dist/pico9918-vga-build-${VERSION}.uf2")
+if(NOT CONFIGURATOR_ONLY)
+    set(FIRMWARE_TARGET "firmware")  # Target that builds the firmware
+else()
+    set(FIRMWARE_TARGET "")  # No target dependency when building configurator only
+endif()
 
 # Custom function to convert UF2 to CVBasic data
 function(convert_uf2_to_cvbasic BANK_SIZE OUTPUT_PREFIX)
@@ -51,6 +56,19 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
     file(MAKE_DIRECTORY "${ASM_DIR}")
     file(MAKE_DIRECTORY "${DIST_DIR}")
     
+    # Collect all CVBasic source files for dependency tracking
+    # This ensures any change to .bas files or .asm libraries triggers a rebuild
+    file(GLOB CVBASIC_SOURCE_FILES
+        "${CMAKE_SOURCE_DIR}/configtool/src/*.bas"
+        "${CMAKE_SOURCE_DIR}/configtool/src/lib/*.asm"
+    )
+
+    # Collect tools that affect the build
+    # Changes to these Python tools will trigger rebuilds
+    file(GLOB CVBASIC_TOOLS
+        "${CMAKE_SOURCE_DIR}/configtool/tools/*.py"
+    )
+
     # Copy source files and generated firmware data
     add_custom_command(
         OUTPUT "${SOURCE_DIR}/pico9918conf.bas"
@@ -61,7 +79,7 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.bas" "${SOURCE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware.h.bas" "${SOURCE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware.bas" "${SOURCE_DIR}/"
-        DEPENDS ${CMAKE_SOURCE_DIR}/configtool/src/pico9918conf.bas 
+        DEPENDS ${CVBASIC_SOURCE_FILES} ${CVBASIC_TOOLS}
                 "${CMAKE_BINARY_DIR}/intermediate/firmware_8k.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware_8k.bas"
                 "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.bas"
                 "${CMAKE_BINARY_DIR}/intermediate/firmware.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware.bas"
@@ -100,11 +118,11 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
             add_custom_command(
                 OUTPUT "${DIST_DIR}/${ROM_OUTPUT}"
                 COMMAND ${PYTHON} "${XAS99_SCRIPT}" -b -R "${ASM_DIR}/${ASM_OUTPUT}"
-                COMMAND ${PYTHON} "${CMAKE_SOURCE_DIR}/configtool/tools/cvbasic/linkticart.py" 
-                        "${ASM_DIR}/${ASM_NAME}_b00.bin" 
-                        "${DIST_DIR}/${ROM_OUTPUT}" 
+                COMMAND ${PYTHON} "${LINKTICART_SCRIPT}"
+                        "${ASM_DIR}/${ASM_NAME}_b00.bin"
+                        "${DIST_DIR}/${ROM_OUTPUT}"
                         "PICO9918 ${FRIENDLYVER}"
-                DEPENDS "${ASM_DIR}/${ASM_OUTPUT}"
+                DEPENDS "${ASM_DIR}/${ASM_OUTPUT}" ${TOOL_DEPENDENCIES}
                 WORKING_DIRECTORY "${ASM_DIR}"
                 COMMENT "Assembling ${DESCRIPTION}"
                 VERBATIM
@@ -130,7 +148,12 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
         )
     endif()
     
-    add_custom_target(${TARGET_NAME} DEPENDS "${DIST_DIR}/${ROM_OUTPUT}")
+    # Add firmware target dependency if building full project
+    if(FIRMWARE_TARGET)
+        add_custom_target(${TARGET_NAME} DEPENDS "${DIST_DIR}/${ROM_OUTPUT}" ${FIRMWARE_TARGET})
+    else()
+        add_custom_target(${TARGET_NAME} DEPENDS "${DIST_DIR}/${ROM_OUTPUT}")
+    endif()
 endfunction()
 
 # Define all platform targets
@@ -167,6 +190,7 @@ message(STATUS "PICO9918 Configurator CMake Configuration")
 message(STATUS "Version: ${FRIENDLYVER}")
 message(STATUS "CVBasic: ${CVBASIC_EXE}")
 message(STATUS "GASM80: ${GASM80_EXE}")
+message(STATUS "linkticart.py: ${LINKTICART_SCRIPT}")
 if(XAS99_SCRIPT)
     message(STATUS "XAS99: ${XAS99_SCRIPT}")
 else()

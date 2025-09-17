@@ -90,7 +90,7 @@ def main() -> int:
                     header.write("\n' ===============================\n")
                     header.write("  GOTO CONFTOOL_START\n")
                     header.write("firmwareFilename:\n")
-                    header.write("  DATA BYTE \"{0}\"\n".format(os.path.basename(filename.ljust(32))))
+                    header.write("  DATA BYTE \"{0}\"\n".format(os.path.basename(filename).ljust(32)))
                     header.write("\n\n")
                     header.write("  CONST #FIRMWARE_BLOCKS = {0}\n".format(w[6]))
                     header.write("  CONST FIRMWARE_BANKS = {0}\n".format(int(w[6] / BLOCKS_PER_BANK) + 1))

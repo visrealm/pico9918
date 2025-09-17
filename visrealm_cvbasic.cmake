@@ -53,8 +53,24 @@ function(find_cvbasic_tools)
 endfunction()
 
 # Setup CVBasic toolchain - either by finding existing tools or building from source
+#
+# Version control:
+# Use cmake cache variables to specify tool versions:
+#   -DCVBASIC_GIT_TAG=v1.2.3    (default: master)
+#   -DGASM80_GIT_TAG=v0.9.1     (default: master)
+#   -DXDT99_GIT_TAG=3.5.0       (default: master)
+#
+# Examples:
+#   cmake .. -DCVBASIC_GIT_TAG=v1.2.3
+#   cmake .. -DGASM80_GIT_TAG=v0.9.1 -DXDT99_GIT_TAG=3.5.0
+#
 function(setup_cvbasic_tools)
     option(BUILD_TOOLS_FROM_SOURCE "Build CVBasic, gasm80 and XDT99 from source" ON)
+
+    # Tool version/tag configuration
+    set(CVBASIC_GIT_TAG "master" CACHE STRING "CVBasic git tag/branch/commit")
+    set(GASM80_GIT_TAG "master" CACHE STRING "GASM80 git tag/branch/commit")
+    set(XDT99_GIT_TAG "master" CACHE STRING "XDT99 git tag/branch/commit")
     
     if(BUILD_TOOLS_FROM_SOURCE)
         # Use system default compilers for host builds
@@ -72,23 +88,24 @@ function(setup_cvbasic_tools)
         # Build CVBasic from visrealm fork using separate process to avoid cross-compilation issues
         ExternalProject_Add(CVBasic_external
             GIT_REPOSITORY https://github.com/visrealm/CVBasic.git
-            GIT_TAG master
+            GIT_TAG ${CVBASIC_GIT_TAG}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ""
-            INSTALL_COMMAND 
+            INSTALL_COMMAND
                 ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/external/CVBasic/bin &&
-                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> 
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>
                     ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/external/CVBasic -B build &&
-                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> 
+                ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>
                     ${CMAKE_COMMAND} --build build --config Release &&
                 ${CMAKE_COMMAND} -E chdir <SOURCE_DIR>
-                    ${CMAKE_COMMAND} --install build --config Release
+                    ${CMAKE_COMMAND} --install build --config Release &&
+                ${CMAKE_COMMAND} -E copy_if_different <SOURCE_DIR>/linkticart.py ${CMAKE_BINARY_DIR}/external/CVBasic/
         )
         
-        # Build gasm80 from visrealm fork using separate process to avoid cross-compilation issues  
+        # Build gasm80 from visrealm fork using separate process to avoid cross-compilation issues
         ExternalProject_Add(gasm80_external
             GIT_REPOSITORY https://github.com/visrealm/gasm80.git
-            GIT_TAG master
+            GIT_TAG ${GASM80_GIT_TAG}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ""
             INSTALL_COMMAND 
@@ -104,7 +121,7 @@ function(setup_cvbasic_tools)
         # Build XDT99 tools (Python-based)
         ExternalProject_Add(XDT99_external
             GIT_REPOSITORY https://github.com/endlos99/xdt99.git
-            GIT_TAG master
+            GIT_TAG ${XDT99_GIT_TAG}
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ""
             INSTALL_COMMAND 
@@ -115,15 +132,30 @@ function(setup_cvbasic_tools)
         set(CVBASIC_EXE "${CMAKE_BINARY_DIR}/external/CVBasic/bin/cvbasic" PARENT_SCOPE)
         set(GASM80_EXE "${CMAKE_BINARY_DIR}/external/gasm80/bin/gasm80" PARENT_SCOPE)
         set(XAS99_SCRIPT "${CMAKE_BINARY_DIR}/external/xdt99/xas99.py" PARENT_SCOPE)
+        set(LINKTICART_SCRIPT "${CMAKE_BINARY_DIR}/external/CVBasic/linkticart.py" PARENT_SCOPE)
         
         # Add dependencies to all CVBasic targets
         set(TOOL_DEPENDENCIES CVBasic_external gasm80_external XDT99_external PARENT_SCOPE)
-        
+
         message(STATUS "CVBasic tools will be built from source")
+        message(STATUS "CVBasic version/tag: ${CVBASIC_GIT_TAG}")
+        message(STATUS "GASM80 version/tag: ${GASM80_GIT_TAG}")
+        message(STATUS "XDT99 version/tag: ${XDT99_GIT_TAG}")
     else()
         # Find required tools (original behavior)
         find_program(CVBASIC_EXE cvbasic PATHS ${CMAKE_SOURCE_DIR}/configtool/tools/cvbasic ${CMAKE_SOURCE_DIR}/../CVBasic/build/Release REQUIRED)
         find_program(GASM80_EXE gasm80 PATHS ${CMAKE_SOURCE_DIR}/configtool/tools/cvbasic REQUIRED)
+
+        # Find linkticart.py in local CVBasic installation or fallback to bundled version
+        find_file(LINKTICART_SCRIPT linkticart.py
+            PATHS
+                ${CMAKE_SOURCE_DIR}/../CVBasic
+                ${CMAKE_SOURCE_DIR}/configtool/tools/cvbasic
+            DOC "CVBasic linkticart.py script"
+        )
+        if(NOT LINKTICART_SCRIPT)
+            set(LINKTICART_SCRIPT "${CMAKE_SOURCE_DIR}/configtool/tools/cvbasic/linkticart.py")
+        endif()
         
         # Platform-specific tool paths
         if(WIN32)
@@ -143,6 +175,7 @@ function(setup_cvbasic_tools)
         message(STATUS "Using existing CVBasic tools")
         message(STATUS "CVBasic: ${CVBASIC_EXE}")
         message(STATUS "GASM80: ${GASM80_EXE}")
+        message(STATUS "linkticart.py: ${LINKTICART_SCRIPT}")
         if(XAS99_SCRIPT)
             message(STATUS "XAS99: ${XAS99_SCRIPT}")
         else()
@@ -235,12 +268,11 @@ function(visrealm_xas99_assemble TARGET ASM_FILE BIN_OUTPUT CART_OUTPUT TITLE)
         VERBATIM
     )
     
-    # Link to TI cartridge format
-    set(LINKTICART ${CMAKE_SOURCE_DIR}/configtool/tools/cvbasic/linkticart.py)
+    # Link to TI cartridge format using configured linkticart script
     add_custom_command(
         OUTPUT ${CART_OUTPUT}
-        COMMAND ${PYTHON} ${LINKTICART} ${BIN_FILE} ${CART_OUTPUT} ${TITLE}
-        DEPENDS ${BIN_FILE} ${LINKTICART}
+        COMMAND ${PYTHON} ${LINKTICART_SCRIPT} ${BIN_FILE} ${CART_OUTPUT} ${TITLE}
+        DEPENDS ${BIN_FILE} ${LINKTICART_SCRIPT}
         COMMENT "Creating TI cartridge: ${CART_OUTPUT}"
         VERBATIM
     )
