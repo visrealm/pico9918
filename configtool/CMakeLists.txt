@@ -121,7 +121,7 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
                 COMMAND ${PYTHON} "${LINKTICART_SCRIPT}"
                         "${ASM_DIR}/${ASM_NAME}_b00.bin"
                         "${DIST_DIR}/${ROM_OUTPUT}"
-                        "PICO9918 ${FRIENDLYVER}"
+                        "PICO9918 V${FRIENDLYVER}"
                 DEPENDS "${ASM_DIR}/${ASM_OUTPUT}" ${TOOL_DEPENDENCIES}
                 WORKING_DIRECTORY "${ASM_DIR}"
                 COMMENT "Assembling ${DESCRIPTION}"
