@@ -17,22 +17,29 @@
 #if TI994A
     BANK ROM 128
     CONST BANK_SIZE = 8
-    INCLUDE "firmware_8k.h.bas"
     #INFO "TI-99/4A - 8KB BANK SIZE"
 #elif NABU
     CONST BANK_SIZE = 0
-    INCLUDE "firmware_16k.h.bas"
     #INFO "NABU - No banking"
 #elif CREATIVISION
     CONST BANK_SIZE = 0
-    INCLUDE "firmware_16k.h.bas"
     #INFO "CreatiVision - No banking"
+#elif SG1000
+    CONST BANK_SIZE = 0
+    #INFO "SG-1000/SC-3000 - No banking"
 #else
     BANK ROM 128
     CONST BANK_SIZE = 16
-    INCLUDE "firmware_16k.h.bas"
     #INFO "Other - 16KB BANK SIZE"
 #endif
+
+
+#if TI994A
+    INCLUDE "firmware_8k.h.bas"
+#else
+    INCLUDE "firmware_16k.h.bas"
+#endif
+
 
 #if F18A_TESTING
     #INFO "F18A testing mode"
