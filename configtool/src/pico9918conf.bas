@@ -33,6 +33,12 @@
     #INFO "Other - 16KB BANK SIZE"
 #endif
 
+#if CREATIVISION
+  CONST SPRITE_TEST = 0
+  #INFO "CreatiVision - No sprite test"
+#else
+  CONST SPRITE_TEST = 1
+#endif
 
 #if TI994A
     INCLUDE "firmware_8k.h.bas"

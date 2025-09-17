@@ -163,7 +163,7 @@ add_cvbasic_target(coleco "" "" "pico9918_${VERSION}_cv.asm" "pico9918_${VERSION
 add_cvbasic_target(msx_asc16 "--msx" "" "pico9918_${VERSION}_msx_asc16.asm" "pico9918_${VERSION}_msx_asc16.rom" "MSX ASCII16")
 add_cvbasic_target(msx_konami "--msx" "-konami" "pico9918_${VERSION}_msx_konami.asm" "pico9918_${VERSION}_msx_konami.rom" "MSX Konami")
 add_cvbasic_target(nabu "--nabu" "" "pico9918_${VERSION}_nabu.asm" "pico9918_${VERSION}.nabu" "NABU")
-add_cvbasic_target(creativision "--creativision" "" "pico9918_${VERSION}_crv.asm" "pico9918_${VERSION}_crv.bin" "CreatiVision")
+add_cvbasic_target(creativision "--creativision" "-rom16" "pico9918_${VERSION}_crv.asm" "pico9918_${VERSION}_crv.bin" "CreatiVision")
 add_cvbasic_target(sg1000 "--sg1000" "" "pico9918_${VERSION}_sg1000.asm" "pico9918_${VERSION}_sg1000.sg" "SG-1000/SC-3000")
 
 # Special NABU MAME target (different defines)

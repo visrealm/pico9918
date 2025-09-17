@@ -10,14 +10,20 @@
 ' https://github.com/visrealm/pico9918
 '
 
+#if SPRITE_TEST
+
 spriteIndices:
 DATA BYTE 0,1,2,3,4,4,5,6
 '         P I C O 9 9 1 8
+
+#endif
 
 ' -----------------------------------------------------------------------------
 ' initialise the sprite attributes
 ' -----------------------------------------------------------------------------
 initSprites: PROCEDURE
+
+#if SPRITE_TEST
     CONST NUM_SPRITES = 16
     DIM spriteAttr(NUM_SPRITES * 4)
 
@@ -33,13 +39,17 @@ initSprites: PROCEDURE
         xPos = xPos + logoSpriteWidths(spritePattIndex) + 1
         IF (I AND 7) = 7 THEN xPos = xPos + 8  ' small gap
     NEXT I
+#endif
 
     END
+
 
 ' -----------------------------------------------------------------------------
 ' animate the sprites for 'scanline sprites' option
 ' -----------------------------------------------------------------------------
 animateSprites: PROCEDURE
+
+#if SPRITE_TEST
 
     CONST spritePosY = 127
 
@@ -64,8 +74,10 @@ animateSprites: PROCEDURE
     END IF
 
     SPRITE NUM_SPRITES, $d0, 0,0,0
+#endif
 
     END    
+
 
 ' -----------------------------------------------------------------------------
 ' hide the sprites when 'scanline sprites' option no longer selected
