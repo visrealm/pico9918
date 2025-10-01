@@ -98,7 +98,10 @@ setupTiles: PROCEDURE
 
     DEFINE VRAM PLETTER #VDP_PATT_TAB1 + 1 * 8, 19 * 8, logo
     DEFINE VRAM PLETTER #VDP_PATT_TAB1 + 129 * 8, 19 * 8, logo2
+
+#if SPRITE_TEST
     DEFINE VRAM PLETTER #VDP_SPRITE_PATT, $e0, logoSprites
+#endif
 
     DEFINE CHAR PATT_IDX_BORDER_H, 6, lineSegments  '   border segments
     DEFINE CHAR PATT_IDX_BORDER_H + 130, 4, lineSegmentJoiners
@@ -256,6 +259,7 @@ font:   ' pletter compressed font data (32-127)
     DATA BYTE $87, $96, $00, $f1, $76, $78, $dc, $f8
     DATA BYTE $79, $00, $ff, $ff, $ff, $ff, $80
 
+#if SPRITE_TEST
 
 logoSprites: ' pletter compressed logo sprites for 'scanline sprites' demo
     DATA BYTE $00, $3f, $7f, $ff, $00, $00, $ff, $93
@@ -293,6 +297,8 @@ sine: ' sine wave values for scanline sprite animation
     DATA BYTE $09, $09, $09, $09, $09, $0A, $0A, $0A
     DATA BYTE $0A, $0B, $0B, $0B, $0C, $0C, $0C, $0D
     DATA BYTE $0D, $0D, $0E, $0E, $0E, $0F, $0F, $10
+
+#endif
 
 pow2: ' 1 << INDEX
     DATA BYTE $01, $02, $04, $08, $10, $20, $40, $80
