@@ -184,7 +184,7 @@ add_custom_command(
 add_custom_target(nabu_mame_package DEPENDS "${CMAKE_BINARY_DIR}/dist/pico9918_${VERSION}_nabu_mame.npz")
 
 # Master target to build all platforms
-add_custom_target(configurator_all DEPENDS ti99 ti99_f18a coleco msx_asc16 msx_konami nabu creativision nabu_mame_package)
+add_custom_target(configurator_all DEPENDS ti99 ti99_f18a coleco msx_asc16 msx_konami nabu creativision sg1000 nabu_mame_package)
 
 # Print build information
 message(STATUS "PICO9918 Configurator CMake Configuration")
