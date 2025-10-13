@@ -71,6 +71,8 @@ static const uint32_t dmapalOut = 5; // palette dma
 static const uint32_t dmapalIn  = 6; // palette dma
 #endif
 
+#define SHOW_DIAGNOSTICS_FRAMES 600
+
 static int frameCount = 0;
 static bool validWrites = false;  // has the VDP display been enabled at all?
 static bool doneInt = false;      // interrupt raised this frame?
@@ -341,7 +343,14 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   {
     // has the display been enabled?
     if (validWrites = (TMS_REGISTER(tms9918, 1) & 0x40))
+    {
       allowSplashHide();
+      if (frameCount > SHOW_DIAGNOSTICS_FRAMES)
+      {
+        // reset diganostics and other settings back to defaults
+        readConfig(tms9918->config);
+      }
+    }
   }
 
   if (tms9918->config[CONF_DIAG])
@@ -461,7 +470,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         }
       }
       
-      if (frameCount > 600)
+      if (frameCount > SHOW_DIAGNOSTICS_FRAMES)
       {
         tms9918->config[CONF_DIAG] = true;
         tms9918->config[CONF_DIAG_REGISTERS] = true;
