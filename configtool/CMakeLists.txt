@@ -18,7 +18,7 @@ set(FRIENDLYVER "${PICO9918_VERSION}")
 setup_cvbasic_tools()
 
 # Firmware dependency (checked at build time, not configure time)
-set(FIRMWARE_FILE "${CMAKE_BINARY_DIR}/dist/pico9918-vga-build-${VERSION}.uf2")
+set(FIRMWARE_PATH "${CMAKE_BINARY_DIR}/dist/${FIRMWARE_FILE}.uf2")
 if(NOT CONFIGURATOR_ONLY)
     set(FIRMWARE_TARGET "firmware")  # Target that builds the firmware
 else()
@@ -33,8 +33,8 @@ function(convert_uf2_to_cvbasic BANK_SIZE OUTPUT_PREFIX)
         COMMAND ${PYTHON} "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py" 
                 -b ${BANK_SIZE} 
                 -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}" 
-                "${FIRMWARE_FILE}"
-        DEPENDS "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py" "${FIRMWARE_FILE}"
+                "${FIRMWARE_PATH}"
+        DEPENDS "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py" "${FIRMWARE_PATH}"
         COMMENT "Converting UF2 to CVBasic data (${BANK_SIZE}KB banks)"
         VERBATIM
     )
@@ -197,4 +197,4 @@ if(XAS99_SCRIPT)
 else()
     message(STATUS "XAS99: NOT FOUND (TI-99 builds will be limited)")
 endif()
-message(STATUS "Firmware: ${FIRMWARE_FILE}")
+message(STATUS "Firmware: ${FIRMWARE_PATH}")

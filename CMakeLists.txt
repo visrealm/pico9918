@@ -70,6 +70,42 @@ add_definitions(-DPICO_FLASH_SPI_CLKDIV=4)      # This could be 2, but then we c
 add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=8)
 
 
+# set up variables for the build process
+
+execute_process(
+    COMMAND git symbolic-ref --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE PICO9918_GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if (PICO9918_SCART_RGBS)
+  if (PICO9918_SCART_PAL)
+    set(PICO9918_OUTPUT_STR "rgbs-pal576i")
+  else()
+    set(PICO9918_OUTPUT_STR "rgbs-ntsc480i")
+  endif()
+else()
+  set(PICO9918_OUTPUT_STR "vga")
+endif()
+
+set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
+string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
+
+if (NOT ${PICO_BOARD} STREQUAL "pico9918")
+  set(PICO_BOARD_STR -${PICO_BOARD})
+endif()
+
+set(PICO9918_BINARY_SUFFIX ${PICO_BOARD_STR}-${PICO9918_OUTPUT_STR}-build-v${PICO9918_VERSION_STR})
+
+if (PICO9918_DIAG)
+  set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-diag)
+endif()
+
+set(FIRMWARE_FILE pico9918${PICO9918_BINARY_SUFFIX})
+
+
+
 if(CONFIGURATOR_ONLY)
     add_subdirectory(configtool)
 else()
