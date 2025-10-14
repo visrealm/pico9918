@@ -104,8 +104,6 @@ v0.3 is relatively cheap and easy to build, schematic and gerbers are available.
 
 <p align="left"><a href="img/pico9918_v0_3_sm.jpg"><img src="img/pico9918_v0_3_sm.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
 
-<p align="left"><a href="img/pico9918_v0_3_sm2.jpg"><img src="img/pico9918_v0_3_sm2.jpg" alt="PICO9918 v0.3" width="720px"></a></p>
-
 I also have the [v0.3 board as a PCBWay Project](https://www.pcbway.com/project/shareproject/PICO9918_Drop_in_replacement_for_the_classic_TMS9918A_family_of_VDPs_fc11359a.html) you can order there.
 
 ### Schematics
@@ -117,6 +115,24 @@ Schematics and Gerbers are available in [/pcb](pcb)
 If you're not interested in building the firmware yourself, you'll find the latest firmware in the [Releases](https://github.com/visrealm/pico9918/releases).
 
 To install, just hold the 'BOOTSEL' (or 'BOOT') button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
+
+## Configurator
+
+The configurator is a software tool used to modify PICO9918 configuration options, including:
+
+* Clock rate
+* Scanline CRT effect
+* Scanline sprite limit
+* Default palette
+* Diagnostics overlays
+
+Additionally, firmware updates can be provided via the Configurator. The full configurator is available for the **TI-99/4A**, **ColecoVision** and **MSX**. With cut-down builds (without firmware updates) available for several other machines.
+
+See the configurator in action:
+
+[![PICO9918 Configurator - ColecoVision](https://img.visualrealmsoftware.com/youtube/thumb/PBArYupT9qM)](https://youtu.be/PBArYupT9qM?t=9)
+
+The configurator was written in a [custom fork of CVBasic](https://github.com/visrealm/CVBasic) with the full source available in [/configtool](configtool).
 
 ## Building
 
@@ -180,4 +196,5 @@ The hardware design files in this repository are licensed under the CERN-OHL-S. 
 
 ### Firmware
 The firmware code in this repository is licensed under the MIT License. See [LICENSE_FIRMWARE.md](LICENSE_FIRMWARE.md) for details.
+
 
