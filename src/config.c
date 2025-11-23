@@ -129,7 +129,7 @@ void readConfig(uint8_t config[CONFIG_BYTES])
 
     config[CONF_CRT_SCANLINES] = 0;
     config[CONF_SCANLINE_SPRITES] = 0;
-    config[CONF_CLOCK_PRESET_ID] = 0;
+    config[CONF_CLOCK_PRESET_ID] = 2;
 
     config[CONF_PALETTE_IDX_0] = 0;
     config[CONF_PALETTE_IDX_0 + 1] = 0;

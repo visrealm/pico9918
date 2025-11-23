@@ -21,6 +21,8 @@
 #include "hardware/dma.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
+#include "../../submodules/vrEmuTms9918/src/vrEmuTms9918.h"
+#include "../../submodules/vrEmuTms9918/src/impl/vrEmuTms9918Priv.h"
 
  #define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
 
@@ -287,6 +289,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
 {
   static int currentTimingLine = -1;
   static int currentDisplayLine = -1;
+  const bool bModeText80_8 = tmsMode(tms9918) == TMS_MODE_TEXT80_8;
 
   if (dma_hw->ints0 & syncDmaChanMask)
   {
@@ -332,12 +335,17 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
   {
     dma_hw->ints0 = rgbDmaChanMask;
 
-    currentDisplayLine++;
 
     uint32_t pxLine = currentDisplayLine / DISPLAY_YSCALE;
     uint32_t pxLineRpt = currentDisplayLine & (DISPLAY_YSCALE - 1);
+    if (bModeText80_8)
+    {
+      pxLine = currentDisplayLine;
+      pxLineRpt = 0;
+    }
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
+    currentDisplayLine++;
 
     // crt effect?
     if (vgaParams.scanlines && pxLineRpt != 0)
@@ -353,12 +361,13 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     if (pxLineRpt == 0)
     {
       uint32_t requestLine = pxLine + 1;
-      if (requestLine < VIRTUAL_PIXELS_Y)
-      {
-        multicore_fifo_push_timeout_us(requestLine, 0);
-      }
+      const uint32_t maxLines = (!bModeText80_8 ? 1 : 2) * VIRTUAL_PIXELS_Y;
+      if (requestLine >= maxLines)
+        requestLine -= maxLines;
 
-      if (requestLine == VIRTUAL_PIXELS_Y - 1)
+        multicore_fifo_push_timeout_us(requestLine, 0);
+
+      if (requestLine == maxLines - 1)
       {
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
       }

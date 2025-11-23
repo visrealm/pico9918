@@ -3,6 +3,28 @@
 # This can be dropped into an external project to help locate this SDK
 # It should be include()ed prior to project()
 
+# Copyright 2020 (c) 2020 Raspberry Pi (Trading) Ltd.
+#
+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+# following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+# disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+# disclaimer in the documentation and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
+# derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 if (DEFINED ENV{PICO_SDK_PATH} AND (NOT PICO_SDK_PATH))
     set(PICO_SDK_PATH $ENV{PICO_SDK_PATH})
     message("Using PICO_SDK_PATH from environment ('${PICO_SDK_PATH}')")
@@ -31,40 +53,49 @@ endif()
 set(PICO_SDK_PATH "${PICO_SDK_PATH}" CACHE PATH "Path to the Raspberry Pi Pico SDK")
 set(PICO_SDK_FETCH_FROM_GIT "${PICO_SDK_FETCH_FROM_GIT}" CACHE BOOL "Set to ON to fetch copy of SDK from git if not otherwise locatable")
 set(PICO_SDK_FETCH_FROM_GIT_PATH "${PICO_SDK_FETCH_FROM_GIT_PATH}" CACHE FILEPATH "location to download SDK")
-set(PICO_SDK_FETCH_FROM_GIT_TAG "${PICO_SDK_FETCH_FROM_GIT_TAG}" CACHE STRING "release tag for SDK")
+set(PICO_SDK_FETCH_FROM_GIT_TAG "${PICO_SDK_FETCH_FROM_GIT_TAG}" CACHE FILEPATH "release tag for SDK")
 
 if (NOT PICO_SDK_PATH)
     if (PICO_SDK_FETCH_FROM_GIT)
         include(FetchContent)
-        # Handle FetchContent deprecation warning gracefully
-        if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.30.0")
-            cmake_policy(SET CMP0169 NEW)
-        endif()
         set(FETCHCONTENT_BASE_DIR_SAVE ${FETCHCONTENT_BASE_DIR})
         if (PICO_SDK_FETCH_FROM_GIT_PATH)
             get_filename_component(FETCHCONTENT_BASE_DIR "${PICO_SDK_FETCH_FROM_GIT_PATH}" REALPATH BASE_DIR "${CMAKE_SOURCE_DIR}")
         endif ()
-        # GIT_SUBMODULES_RECURSE was added in 3.17
-        if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
-            FetchContent_Declare(
-                    pico_sdk
-                    GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
-                    GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
-                    GIT_SUBMODULES_RECURSE FALSE
-                    PATCH_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> git apply --ignore-whitespace --ignore-space-change --3way ${CMAKE_SOURCE_DIR}/picosdk-2.0.0-visrealm-fastboot.patch || ${CMAKE_COMMAND} -E echo "PICO9918: SDK patch failed or already applied (this is normal)"
-            )
-        else ()
-            FetchContent_Declare(
-                    pico_sdk
-                    GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
-                    GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
-                    PATCH_COMMAND ${CMAKE_COMMAND} -E chdir <SOURCE_DIR> git apply --ignore-whitespace --ignore-space-change --3way ${CMAKE_SOURCE_DIR}/picosdk-2.0.0-visrealm-fastboot.patch || ${CMAKE_COMMAND} -E echo "PICO9918: SDK patch failed or already applied (this is normal)"
-            )
-        endif ()
+        FetchContent_Declare(
+                pico_sdk
+                GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
+                GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
+        )
 
         if (NOT pico_sdk)
             message("Downloading Raspberry Pi Pico SDK")
-            FetchContent_MakeAvailable(pico_sdk)
+            # GIT_SUBMODULES_RECURSE was added in 3.17
+            if (${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.17.0")
+                FetchContent_Populate(
+                        pico_sdk
+                        QUIET
+                        GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
+                        GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
+                        GIT_SUBMODULES_RECURSE FALSE
+
+                        SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-src
+                        BINARY_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-build
+                        SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-subbuild
+                )
+            else ()
+                FetchContent_Populate(
+                        pico_sdk
+                        QUIET
+                        GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
+                        GIT_TAG ${PICO_SDK_FETCH_FROM_GIT_TAG}
+
+                        SOURCE_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-src
+                        BINARY_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-build
+                        SUBBUILD_DIR ${FETCHCONTENT_BASE_DIR}/pico_sdk-subbuild
+                )
+            endif ()
+
             set(PICO_SDK_PATH ${pico_sdk_SOURCE_DIR})
         endif ()
         set(FETCHCONTENT_BASE_DIR ${FETCHCONTENT_BASE_DIR_SAVE})

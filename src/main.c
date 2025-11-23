@@ -236,7 +236,7 @@ static const ClockSettings clockPresets[] = {
   CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
 };
 
-static int clockPresetIndex = 0;
+static int clockPresetIndex = 2;
 static bool testingClock = false;
 
 static void eofInterrupt()
@@ -403,12 +403,17 @@ static __attribute__((noinline))  void generateRgbCache()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  int vPixels = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 * 8 : 24 * 8;
+  vrEmuTms9918Mode mode =  vrEmuTms9918DisplayMode(tms9918);
+  const bool bModeText80_8 = mode == TMS_MODE_TEXT80_8;
+  const bool b30Columns = (TMS_REGISTER(tms9918, 0x31) & 0x40) != 0 || bModeText80_8;
+  int vPixels = b30Columns ? 30 * 8 : 24 * 8;
 
   const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
-  const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80;
+  if (bModeText80_8)
+    vPixels *= 2;
+  const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80 && !bModeText80_8;
 
-  const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
+  const uint32_t halfHBorder = bModeText80_8 ? 0 : (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
@@ -463,7 +468,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       
       if (frameCount > 600)
       {
-        tms9918->config[CONF_DIAG] = true;
+        tms9918->config[CONF_DIAG] = false;//true;
         tms9918->config[CONF_DIAG_REGISTERS] = true;
         tms9918->config[CONF_DIAG_PERFORMANCE] = true;
         tms9918->config[CONF_DIAG_PALETTE] = true;
@@ -497,7 +502,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     /* generate the scanline */
     uint32_t renderTime  = time_us_32();
+#ifndef BGR12PALETTE
     uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+#else
+    uint8_t tempStatus = vrEmuTms9918ScanLine(y, bModeText80_8 ? (uint8_t *)pixels : tmsScanlineBuffer);
+#endif
     renderTime = time_us_32() - renderTime;
 
     /*** interrupt signal? ***/
@@ -539,8 +548,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     dma_channel_wait_for_finish_blocking(dma32);
 
-    uint8_t* src = tmsScanlineBuffer;
-    uint8_t* end = tmsScanlineBuffer + TMS9918_PIXELS_X;
+#ifdef BGR12PALETTE
+    if (bModeText80_8)
+      return;
+#endif
+    uint8_t *src = tmsScanlineBuffer;
+    uint8_t *end = tmsScanlineBuffer + TMS9918_PIXELS_X;
     uint32_t* dP = (uint32_t*)(pixels) + halfHBorder;
 
     tms9918->vram.map.blanking = 1; // H

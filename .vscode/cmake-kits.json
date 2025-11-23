@@ -2,10 +2,9 @@
     {
         "name": "Pico",
         "compilers": {
-            "C": "${userHome}/.pico-sdk/toolchain/13_3_Rel1/bin/arm-none-eabi-gcc.exe",
-            "CXX": "${userHome}/.pico-sdk/toolchain/13_3_Rel1/bin/arm-none-eabi-gcc.exe"
+            "C": "${command:raspberry-pi-pico.getCompilerPath}",
+            "CXX": "${command:raspberry-pi-pico.getCxxCompilerPath}"
         },
-        "toolchainFile": "${env:USERPROFILE}/.pico-sdk/sdk/2.0.0/cmake/preload/toolchains/pico_arm_cortex_m33_gcc.cmake",
         "environmentVariables": {
             "PATH": "${command:raspberry-pi-pico.getEnvPath};${env:PATH}"
         },
