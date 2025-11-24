@@ -38,7 +38,7 @@
 #include "hardware/dma.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
-#include "hardware/structs/ssi.h"
+//#include "hardware/structs/ssi.h"
 
 
 
@@ -82,7 +82,7 @@ static const uint32_t dma32 = 2;  // memset 32bit
 /*
  * update the value send to the read PIO
  */
-static void updateTmsReadAhead()
+static inline void updateTmsReadAhead()
 {
   uint32_t readAhead = 0xff;              // pin direction
   readAhead |= nextValue << 8;

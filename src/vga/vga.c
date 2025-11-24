@@ -334,6 +334,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
   if (dma_hw->ints0 & rgbDmaChanMask)
   {
     dma_hw->ints0 = rgbDmaChanMask;
+    currentDisplayLine++;
 
 
     uint32_t pxLine = currentDisplayLine / DISPLAY_YSCALE;
@@ -345,7 +346,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
-    currentDisplayLine++;
 
     // crt effect?
     if (vgaParams.scanlines && pxLineRpt != 0)
