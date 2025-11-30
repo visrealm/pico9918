@@ -236,7 +236,7 @@ static const ClockSettings clockPresets[] = {
   CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
 };
 
-static int clockPresetIndex = 2;
+static int clockPresetIndex = 0;
 static bool testingClock = false;
 
 static void eofInterrupt()
@@ -701,7 +701,7 @@ int main(void)
 
   /* we could set clock freq here from options */
   readConfig(tms9918->config);
-  
+  tms9918->config[CONF_CLOCK_PRESET_ID] = 2;
   /*
    * if we're trying out a new clock rate, we need to have a failsafe 
    * we test it first 
