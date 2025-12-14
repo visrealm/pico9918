@@ -16,14 +16,20 @@
 ;           possible read values already. Each tx FIFO word contains
 ;           the current values for status, read data and pin direction
 ;
-; fifo osr  0b|xxxxxxxx|ssssssss|dddddddd|11111111|
-;             | ignore | status |  data  | pindir |
+; fifo osr   0b|0000|rrrr|ssssssss|dddddddd|11111111|
+;              |    |reg | status |  data  | pindir |
 ;
-; fifo isr  0b|m|w|r|
-;             |o|r|e|
-;             |d|i|a|
-;             |e|t|d|
-;             | |e| |
+;
+; fifo isr  
+; if mode==1 0b|000|rrrr|ssssssss|dddddddd|11111111|m|
+;              |   |reg | status |  data  | pindir |o|
+;              |   |    |        |        |        |d|
+;              |   |    |        |        |        |e|
+;
+; if mode==0 0b|m|
+;              |o|
+;              |d|
+;              |e|
 ;
 
 .program tmsRead
@@ -34,7 +40,7 @@
 
 .wrap_target
   wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
-  mov osr, null       ; change CD0-7 pindirs to inputs
+  mov osr, null   [4] ; change CD0-7 pindirs to inputs
   out pindirs, 8
   mov isr, null
 
