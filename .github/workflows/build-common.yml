@@ -56,11 +56,14 @@ jobs:
         Expand-Archive -Path $output -DestinationPath "C:\arm-toolchain"
         echo "C:\arm-toolchain\xpack-arm-none-eabi-gcc-13.2.1-1.1\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         
+    - name: Setup MSVC environment
+      uses: ilammy/msvc-dev-cmd@v1
+        
     - name: Configure CMake (with automatic SDK fetch and patch)
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja "-DCMAKE_TOOLCHAIN_FILE=../windows-msvc.cmake" -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
