@@ -56,47 +56,23 @@ jobs:
         Expand-Archive -Path $output -DestinationPath "C:\arm-toolchain"
         echo "C:\arm-toolchain\xpack-arm-none-eabi-gcc-13.2.1-1.1\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         
-    - name: Configure and build (MSVC environment)
-      # Run vcvars64 and then configure + build in the same step so the MSVC
-      # environment is available to subproject CMake invocations (fixes cases
-      # where CMake falls back to MinGW during external project configure).
-      shell: cmd
-      env:
-        BUILD_FIRMWARE: ${{ inputs.build-firmware }}
-        BUILD_CONFIGURATOR: ${{ inputs.build-configurator }}
+    - name: Configure CMake (with automatic SDK fetch and patch)
       run: |
         mkdir build
         cd build
-        rem try known vcvars locations (Community is the usual install on runners)
-        if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat" (
-          call "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
-        ) else if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" (
-          call "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        ) else (
-          echo "vcvars64.bat not found; continuing without explicit vcvars."
-        )
-  echo ==== Diagnostic: environment and toolchain check ====
-  echo PATH=%PATH%
-  where cl.exe >nul 2>&1 && (echo cl.exe found at & where cl.exe) || (echo cl.exe NOT found)
-  where c++.exe >nul 2>&1 && (echo c++.exe found at & where c++.exe) || (echo c++.exe NOT found)
-  where gcc.exe >nul 2>&1 && (echo gcc.exe found at & where gcc.exe) || (echo gcc.exe NOT found)
-  where g++.exe >nul 2>&1 && (echo g++.exe found at & where g++.exe) || (echo g++.exe NOT found)
-  echo ==== CMake version ====
-  cmake --version
-  echo ==== Begin CMake configure (using MSVC if available) ====
-  cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
-        if "%BUILD_FIRMWARE%"=="true" (
-          echo ==== Building firmware ====
-          cmake --build . --target firmware
-        ) else (
-          echo Skipping firmware build
-        )
-        if "%BUILD_CONFIGURATOR%"=="true" (
-          echo ==== Building configurator ====
-          cmake --build . --target configurator_all
-        ) else (
-          echo Skipping configurator build
-        )
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        
+    - name: Build Firmware
+      if: ${{ inputs.build-firmware }}
+      run: |
+        cd build
+        cmake --build . --target firmware
+        
+    - name: Build Configurator
+      if: ${{ inputs.build-configurator }}
+      run: |
+        cd build
+        cmake --build . --target configurator_all
         
     - name: Upload Firmware Artifacts
       if: ${{ inputs.build-firmware }}
