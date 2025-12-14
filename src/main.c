@@ -125,8 +125,8 @@ void  __not_in_flash_func(pio_irq_handler)()
       }
       else
       {
-        readVal >>= (1 + 16); // What status was read?
-        int readReg = (readVal >> 8) & 0x0f; // What status register was read?
+        readVal >>= (1 + 16);        // What status was read?
+        int readReg = (readVal >> 8); // What status register was read?
         readVal &= 0xff;
         tms9918->regWriteStage = 0;
         switch (readReg)
@@ -180,6 +180,7 @@ void  __not_in_flash_func(pio_irq_handler)()
  */
 static inline void enableTmsPioInterrupts()
 {
+  __dmb();
   irq_set_enabled(TMS_IRQ, true);
 }
 
@@ -189,6 +190,7 @@ static inline void enableTmsPioInterrupts()
 static inline void disableTmsPioInterrupts()
 {
   irq_set_enabled(TMS_IRQ, false);
+  __dmb();
 }
 
 /*
