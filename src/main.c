@@ -47,7 +47,8 @@
 #define TMS_PIO pio1
 #define CLOCK_PIO pio1
 
-#define TMS_IRQ PIO1_IRQ_0
+#define TMS_WRITE_IRQ PIO1_IRQ_0
+#define TMS_READ_IRQ PIO1_IRQ_1
 
 /* file globals */
 
@@ -102,75 +103,82 @@ static void updateTmsReadAhead()
 }
 
 /*
- * handle interrupts from the TMS9918<->CPU interface
+ * handle read interrupts from the TMS9918<->CPU interface
  */
-void  __not_in_flash_func(pio_irq_handler)()
+void __not_in_flash_func(tmsReadIrqHandler)()
 {
-  if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsReadSm))) == 0) // read?
-  {
-    uint32_t readVal = TMS_PIO->rxf[tmsReadSm];
+  uint32_t readVal = TMS_PIO->rxf[tmsReadSm];
 
-    if ((readVal & 0x01) == 0) // read data
-    {
-      nextValue = vrEmuTms9918ReadAheadDataImpl();
-    }
-    else // read status
-    {
-      if (!tms9918->isUnlocked)
-      {
-        currentStatus = 0x1f;
-        vrEmuTms9918SetStatusImpl(currentStatus);
-        currentInt = false;
-        gpio_put(GPIO_INT, !currentInt);
-      }
-      else
-      {
-        readVal >>= (1 + 16);        // What status was read?
-        int readReg = (readVal >> 8); // What status register was read?
-        readVal &= 0xff;
-        tms9918->regWriteStage = 0;
-        switch (readReg)
-        {
-          case 0:
-            readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
-            currentStatus &= ~readVal; // Switch off any 3 high bits which have just been read
-            if (readVal & STATUS_5S) // Was 5th Sprite read?
-              currentStatus |= 0x1f;
-            vrEmuTms9918SetStatusImpl(currentStatus);
-            if (readVal & STATUS_INT)  // Was Interrupt read?
-            {
-              currentInt = false;
-              gpio_put(GPIO_INT, !currentInt);
-            }
-            break;
-          case 1:
-            if (readVal << 31)
-              TMS_STATUS(tms9918, 0x01) &= ~0x01;
-            break;
-        }
-      }
-    }
+  if ((readVal & 0x01) == 0) // read data
+  {
+    nextValue = vrEmuTms9918ReadAheadDataImpl();
   }
-  else if ((TMS_PIO->fstat & (1u << (PIO_FSTAT_RXEMPTY_LSB + tmsWriteSm))) == 0) // write?
+  else // read status
   {
-    uint32_t writeVal = TMS_PIO->rxf[tmsWriteSm];
-    uint8_t dataVal = writeVal & 0xff;
-    writeVal >>= ((GPIO_MODE - GPIO_CD7) + 16);
-
-    if (writeVal & 0x01) // write reg/addr
+    if (!tms9918->isUnlocked)
     {
-      vrEmuTms9918WriteAddrImpl(dataVal);
-      currentInt = vrEmuTms9918InterruptStatusImpl();
+      currentStatus = 0x1f;
+      vrEmuTms9918SetStatusImpl(currentStatus);
+      currentInt = false;
       gpio_put(GPIO_INT, !currentInt);
     }
-    else // write data
+    else
     {
-      vrEmuTms9918WriteDataImpl(dataVal);
+      readVal >>= (1 + 16);        // What status was read?
+      int readReg = (readVal >> 8); // What status register was read?
+      readVal &= 0xff;
+      tms9918->regWriteStage = 0;
+      switch (readReg)
+      {
+        case 0:
+          readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
+          currentStatus &= ~readVal; // Switch off any 3 high bits which have just been read
+          if (readVal & STATUS_5S) // Was 5th Sprite read?
+            currentStatus |= 0x1f;
+          vrEmuTms9918SetStatusImpl(currentStatus);
+          if (readVal & STATUS_INT)  // Was Interrupt read?
+          {
+            currentInt = false;
+            gpio_put(GPIO_INT, !currentInt);
+          }
+          break;
+        case 1:
+          if (readVal << 31)
+            TMS_STATUS(tms9918, 0x01) &= ~0x01;
+          break;
+      }
     }
-
-    nextValue = vrEmuTms9918ReadDataNoIncImpl();
   }
 
+  updateTmsReadAhead();
+}
+
+/*
+ * handle write interrupts from the TMS9918<->CPU interface
+ */
+void __not_in_flash_func(tmsWriteIrqHandler)()
+{
+  uint32_t writeVal = TMS_PIO->rxf[tmsWriteSm];
+  uint8_t dataVal = writeVal & 0xff;
+  writeVal >>= ((GPIO_MODE - GPIO_CD7) + 16);
+
+  if (writeVal & 0x01) // write reg/addr
+  {
+    vrEmuTms9918WriteAddrImpl(dataVal);
+    
+    bool newInt = vrEmuTms9918InterruptStatusImpl();
+    if (newInt != currentInt)
+    {
+      currentInt = newInt;
+      gpio_put(GPIO_INT, !currentInt);
+    }
+  }
+  else // write data
+  {
+    vrEmuTms9918WriteDataImpl(dataVal);
+  }
+
+  nextValue = vrEmuTms9918ReadDataNoIncImpl();
   updateTmsReadAhead();
 }
 
@@ -181,7 +189,8 @@ void  __not_in_flash_func(pio_irq_handler)()
 static inline void enableTmsPioInterrupts()
 {
   __dmb();
-  irq_set_enabled(TMS_IRQ, true);
+  irq_set_enabled(TMS_WRITE_IRQ, true);
+  irq_set_enabled(TMS_READ_IRQ, true);
 }
 
 /*
@@ -189,7 +198,8 @@ static inline void enableTmsPioInterrupts()
  */
 static inline void disableTmsPioInterrupts()
 {
-  irq_set_enabled(TMS_IRQ, false);
+  irq_set_enabled(TMS_WRITE_IRQ, false);
+  irq_set_enabled(TMS_READ_IRQ, false);
   __dmb();
 }
 
@@ -206,7 +216,8 @@ void __not_in_flash_func(gpioIrqHandler)()
 
   readConfig(tms9918->config);  // re-load config palette
 
-  irq_clear(TMS_IRQ);
+  irq_clear(TMS_WRITE_IRQ);
+  irq_clear(TMS_READ_IRQ);
   pio_sm_clear_fifos(TMS_PIO, tmsReadSm);
   pio_sm_clear_fifos(TMS_PIO, tmsWriteSm);
 
@@ -279,10 +290,21 @@ static void updateInterrupts(uint8_t tempStatus)
     currentStatus = (currentStatus & 0xe0) | tempStatus;
 
     vrEmuTms9918SetStatusImpl(currentStatus);
-    updateTmsReadAhead();
+    updateTmsReadAhead();  // Update read-ahead before changing pin state
 
     currentInt = vrEmuTms9918InterruptStatusImpl();
     gpio_put(GPIO_INT, !currentInt);
+  }
+  else
+  {
+    // Status already has INT set, but ensure pin state is correct
+    // (in case R1 was modified to disable interrupts)
+    bool shouldInt = vrEmuTms9918InterruptStatusImpl();
+    if (shouldInt != currentInt)
+    {
+      currentInt = shouldInt;
+      gpio_put(GPIO_INT, !currentInt);
+    }
   }
   enableTmsPioInterrupts();
 }
@@ -606,8 +628,12 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
  */
 void tmsPioInit()
 {
-  irq_set_exclusive_handler(TMS_IRQ, pio_irq_handler);
-  irq_set_enabled(TMS_IRQ, true);
+  // Set up separate interrupt handlers for read and write
+  irq_set_exclusive_handler(TMS_WRITE_IRQ, tmsWriteIrqHandler);
+  irq_set_enabled(TMS_WRITE_IRQ, true);
+  
+  irq_set_exclusive_handler(TMS_READ_IRQ, tmsReadIrqHandler);
+  irq_set_enabled(TMS_READ_IRQ, true);
 
   uint tmsWriteProgram = pio_add_program(TMS_PIO, &tmsWrite_program);
 
@@ -638,7 +664,7 @@ void tmsPioInit()
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
-  pio_set_irq0_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
+  pio_set_irq1_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
 
   pio_sm_put(TMS_PIO, tmsReadSm, 0x000000ff);
 }
