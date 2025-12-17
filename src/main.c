@@ -117,7 +117,6 @@ void __not_in_flash_func(tmsReadIrqHandler)()
   {
     readVal >>= (1 + 16);        // Extract status that was actually read
     int readReg = (readVal >> 8); // What status register was read?
-    readVal &= 0xff;
     tms9918->regWriteStage = 0;
     
     // Standard mode or F18A status register 0
@@ -137,7 +136,7 @@ void __not_in_flash_func(tmsReadIrqHandler)()
     else if (readReg == 1)
     {
       // F18A status register 1
-      if (readVal << 31)
+      if (readVal & 0x01)
         TMS_STATUS(tms9918, 0x01) &= ~0x01;
     }
   }
