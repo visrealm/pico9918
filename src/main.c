@@ -115,38 +115,30 @@ void __not_in_flash_func(tmsReadIrqHandler)()
   }
   else // read status
   {
-    if (!tms9918->isUnlocked)
+    readVal >>= (1 + 16);        // Extract status that was actually read
+    int readReg = (readVal >> 8); // What status register was read?
+    readVal &= 0xff;
+    tms9918->regWriteStage = 0;
+    
+    // Standard mode or F18A status register 0
+    if (!tms9918->isUnlocked || readReg == 0)
     {
-      currentStatus = 0x1f;
+      readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
+      currentStatus &= ~readVal; // Clear only the flags that were set
+      if (readVal & STATUS_5S)   // Was 5th Sprite flag set?
+        currentStatus |= 0x1f;   // Set sprite number to 31
       vrEmuTms9918SetStatusImpl(currentStatus);
-      currentInt = false;
-      gpio_put(GPIO_INT, !currentInt);
-    }
-    else
-    {
-      readVal >>= (1 + 16);        // What status was read?
-      int readReg = (readVal >> 8); // What status register was read?
-      readVal &= 0xff;
-      tms9918->regWriteStage = 0;
-      switch (readReg)
+      if (readVal & STATUS_INT)  // Was Interrupt flag set?
       {
-        case 0:
-          readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
-          currentStatus &= ~readVal; // Switch off any 3 high bits which have just been read
-          if (readVal & STATUS_5S) // Was 5th Sprite read?
-            currentStatus |= 0x1f;
-          vrEmuTms9918SetStatusImpl(currentStatus);
-          if (readVal & STATUS_INT)  // Was Interrupt read?
-          {
-            currentInt = false;
-            gpio_put(GPIO_INT, !currentInt);
-          }
-          break;
-        case 1:
-          if (readVal << 31)
-            TMS_STATUS(tms9918, 0x01) &= ~0x01;
-          break;
+        currentInt = false;
+        gpio_put(GPIO_INT, !currentInt);
       }
+    }
+    else if (readReg == 1)
+    {
+      // F18A status register 1
+      if (readVal << 31)
+        TMS_STATUS(tms9918, 0x01) &= ~0x01;
     }
   }
 
