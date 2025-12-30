@@ -81,6 +81,8 @@ static bool doneInt = false;      // interrupt raised this frame?
 static bool droppedFrames[16] = {0};
 int droppedFramesCount = 0;
 
+#define R0_DOUBLE_ROWS 0x08
+
 static const uint32_t dma32 = 2;  // memset 32bit
 /*
  * update the value send to the read PIO
@@ -379,6 +381,11 @@ static void tmsEndOfFrame(uint32_t frameNumber)
     eofInterrupt();
     updateInterrupts(STATUS_INT);
   }
+
+#if DISPLAY_YSCALE > 1
+  vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
+  vgaCurrentParams()->params.vVirtualPixels = VIRTUAL_PIXELS_Y << (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
+#endif
 }
 
 
@@ -428,8 +435,10 @@ static __attribute__((noinline))  void generateRgbCache()
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
   int vPixels = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 * 8 : 24 * 8;
+  if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
+    vPixels <<= 1;
 
-  const uint32_t vBorder = (VIRTUAL_PIXELS_Y - vPixels) / 2;
+  const uint32_t vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
   const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80;
 
   const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
@@ -791,7 +800,7 @@ int main(void)
   /* then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(DISPLAY_MODE);
-  setVgaParamsScaleY(&params.params, DISPLAY_YSCALE);
+  setVgaParamsScaleY(&params.params, 1);
 
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;

@@ -333,8 +333,9 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
 
     currentDisplayLine++;
 
-    uint32_t pxLine = currentDisplayLine / DISPLAY_YSCALE;
-    uint32_t pxLineRpt = currentDisplayLine & (DISPLAY_YSCALE - 1);
+    uint32_t pxLine = currentDisplayLine;
+    if (vgaParams.params.vPixelScale == 2) pxLine >>= 1;
+    uint32_t pxLineRpt = currentDisplayLine & (vgaParams.params.vPixelScale - 1);
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
 
@@ -346,18 +347,16 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
-    pio_sm_set_pindirs_with_mask(VGA_PIO, RGB_SM, (vgaParams.scanlines && pxLineRpt != 0) - 1, (1 << 5) | (1 << 9) | (1 << 13));
-
     // need a new line every X display lines
     if (pxLineRpt == 0)
     {
       uint32_t requestLine = pxLine + 1;
-      if (requestLine < VIRTUAL_PIXELS_Y)
+      if (requestLine < vgaParams.params.vVirtualPixels)
       {
         multicore_fifo_push_timeout_us(requestLine, 0);
       }
 
-      if (requestLine == VIRTUAL_PIXELS_Y - 1)
+      if (requestLine == vgaParams.params.vVirtualPixels - 1)
       {
         multicore_fifo_push_timeout_us(END_OF_FRAME_MSG, 0);
       }
