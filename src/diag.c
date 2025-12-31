@@ -57,6 +57,7 @@ IntString gpuPctStr = {0};
 IntString clockMhzStr = {0};
 IntString modeStr = {0};
 IntString fpsStr = {0};
+IntString hwVerStr = {0};
 
 IntString nameTabStr = {0};
 IntString colorTabStr = {0};
@@ -157,12 +158,17 @@ void initDiagnostics()
   clear(&totalTimePerScanlineStr);
   clear(&temperatureStr);
   clear(&gpuPctStr);
-  
+  clear(&modeStr);
+  clear(&fpsStr);
+
   clear(&nameTabStr);
   clear(&colorTabStr);
   clear(&pattTabStr);
   clear(&sprAttTabStr);
   clear(&sprPattTabStr);
+
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
+  strcpy(hwVerStr.digits, hwVersion == HWVer_0_3 ? "V0.3" : "V1.0+");
 }
 
 const char *modeNames[] = {
@@ -330,6 +336,11 @@ static void renderLeft(const char *label, IntString *val, const char *units, uin
   xPos = backgroundPixels(xPos, 102 - xPos, pixels);
 }
 
+static void diagHwVer(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("HWVER : ", &hwVerStr, "", row, pixels);
+}
+
 static void diagRenderTime(uint16_t row, uint16_t* pixels)
 {
   renderLeft("FRAME : ", &frameTimeStr, "&S", row, pixels);
@@ -463,6 +474,7 @@ DiagPtr leftDiags[32] = {0};
 int leftDiagRows = 0;
 
 DiagPtr performanceDiags[] = {
+  &diagHwVer,
   &diagClock,
   &diagRenderTime,
   &diagFPS,

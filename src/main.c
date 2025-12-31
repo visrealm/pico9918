@@ -675,15 +675,10 @@ void tmsPioInit()
  */
 void proc1Entry()
 {
-  // set up gpio pins
-  gpio_init_mask(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_MODE1_MASK | GPIO_INT_MASK | GPIO_RESET_MASK);
-  gpio_put_all(0); // we want to kep /INT held low for now
-  gpio_set_dir_all_bits(GPIO_INT_MASK); // /INT is an output
-
   tmsPioInit();
 
   gpio_put_all(GPIO_INT_MASK);	// ok, we can release /INT now
-  
+
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
   if (hwVersion != HWVer_0_3)
@@ -710,6 +705,14 @@ int main(void)
    * that comes close to being divisible by 25.175MHz. 252.0 is close... enough :)
    * I do have code which sets the best clock baased on the chosen VGA mode,
    * but this'll do for now. */
+
+
+  // set up gpio pins
+  gpio_put_all(0); // we want to kep /INT held low for now
+  gpio_set_dir_all_bits(GPIO_INT_MASK); // /INT is an output
+  gpio_set_function_masked(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_MODE1_MASK | GPIO_INT_MASK | GPIO_RESET_MASK, GPIO_FUNC_SIO);
+
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
 
   /* the initial "safe" clock speed */
   ClockSettings clockSettings = clockPresets[clockPresetIndex];
@@ -751,7 +754,6 @@ int main(void)
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
   }
 
-  Pico9918HardwareVersion hwVersion = currentHwVersion();
   initClock((hwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL, tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
   initClock((hwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL, tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
 
