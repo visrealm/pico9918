@@ -41,7 +41,7 @@ function(convert_uf2_to_cvbasic BANK_SIZE OUTPUT_PREFIX)
                 -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}" 
                 "${FIRMWARE_PATH}"
         DEPENDS "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py" "${FIRMWARE_PATH}"
-        COMMENT "Converting UF2 to CVBasic data (${BANK_SIZE}KB banks)"
+        COMMENT "Converting UF2 (${FIRMWARE_PATH}) to CVBasic data (${BANK_SIZE}KB banks)"
         VERBATIM
     )
 endfunction()
