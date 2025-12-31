@@ -39,8 +39,8 @@
   mov x, osr        ; ensure we have a valid fifo value in x
 
 .wrap_target
+  mov osr, null       ; change CD0-7 pindirs to inputs
   wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
-  mov osr, null   [7] ; change CD0-7 pindirs to inputs
   out pindirs, 8
   mov isr, null
 
