@@ -347,6 +347,8 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
+    pio_sm_set_pindirs_with_mask(VGA_PIO, RGB_SM, (vgaParams.scanlines && (currentDisplayLine & 0x01)) - 1, (1 << 5) | (1 << 9) | (1 << 13));
+
     // need a new line every X display lines
     if (pxLineRpt == 0)
     {
