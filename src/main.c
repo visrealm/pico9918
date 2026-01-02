@@ -401,8 +401,7 @@ void renderDiag(int y, uint16_t *pixels)
 /*
  * cache color lookup from color index to BGR16
  */
-static __attribute__((section(".scratch_y.buffer"))) 
-uint32_t __aligned(4) pram [64];
+uint32_t __aligned(4) pram [256];
 
 
 static __attribute__((noinline))  void generateRgbCache()
@@ -415,16 +414,34 @@ static __attribute__((noinline))  void generateRgbCache()
   dma_channel_set_read_addr(dmapalOut, tms9918->vram.map.pram, true);
   dma_channel_set_write_addr(dmapalIn, pram, true);
 #else
-  for (int i = 0; i < 64; i += 8)
+  const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80;
+  if (pixelsDoubled)
   {
-    data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data | (data << 16);
-    data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data | (data << 16);
-    data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data | (data << 16);
-    data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data | (data << 16);
-    data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data | (data << 16);
-    data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data | (data << 16);
-    data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data | (data << 16);
-    data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data | (data << 16);
+    for (int i = 0; i < 64; i += 8)
+    {
+      data = tms9918->vram.map.pram [i + 0] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 0] = data * 0x10001;
+      data = tms9918->vram.map.pram [i + 1] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 1] = data * 0x10001;
+      data = tms9918->vram.map.pram [i + 2] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 2] = data * 0x10001;
+      data = tms9918->vram.map.pram [i + 3] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 3] = data * 0x10001;
+      data = tms9918->vram.map.pram [i + 4] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 4] = data * 0x10001;
+      data = tms9918->vram.map.pram [i + 5] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 5] = data * 0x10001;
+      data = tms9918->vram.map.pram [i + 6] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 6] = data * 0x10001;
+      data = tms9918->vram.map.pram [i + 7] & 0xFF0F; data = data | ((data >> 12) << 4); pram [i + 7] = data * 0x10001;
+    }
+  }
+  else // 80-col mode doesn't have doubled pixels
+  {
+    uint16_t tmpPal[16];
+    for (int i = 0; i < 16; ++i)
+    {
+      data = tms9918->vram.map.pram [i] & 0xFF0F;
+      tmpPal[i] = data | ((data >> 12) << 4);
+      pram[i] = tmpPal[i] << 16 | tmpPal[i];
+    }
+    for (int j = 16; j < 256; ++j)
+    {
+      pram[j] = (tmpPal[j & 0xf] << 16) | (tmpPal[j >> 4] & 0xffff);
+    }
   }
 #endif
 }
@@ -439,8 +456,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     vPixels <<= 1;
 
   const uint32_t vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
-  const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80;
-
   const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
 
   uint32_t* dPixels = (uint32_t*)pixels;
@@ -578,39 +593,19 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     tms9918->vram.map.blanking = 1; // H
 
-    if (pixelsDoubled)
+    // convert all pixel data from color index to BGR16
+    while (src < end)
     {
-      // convert all pixel data from color index to BGR16
-      while (src < end)
-      {
-        dP [0] = pram[src[0]];
-        dP [1] = pram[src[1]];
-        dP [2] = pram[src[2]];
-        dP [3] = pram[src[3]];
-        dP [4] = pram[src[4]];
-        dP [5] = pram[src[5]];
-        dP [6] = pram[src[6]];
-        dP [7] = pram[src[7]];
-        dP += 8;
-        src += 8;
-      }
-    }
-    else
-    {
-      while (src < end)
-      {
-        register char p80;
-        p80 = src[0]; dP [0] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        p80 = src[1]; dP [1] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        p80 = src[2]; dP [2] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        p80 = src[3]; dP [3] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        p80 = src[4]; dP [4] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        p80 = src[5]; dP [5] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        p80 = src[6]; dP [6] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        p80 = src[7]; dP [7] = (pram[p80 & 0xf] << 16) | (pram[p80 >> 4] & 0xffff);
-        dP += 8;
-        src += 8;
-      }
+      dP [0] = pram[src[0]];
+      dP [1] = pram[src[1]];
+      dP [2] = pram[src[2]];
+      dP [3] = pram[src[3]];
+      dP [4] = pram[src[4]];
+      dP [5] = pram[src[5]];
+      dP [6] = pram[src[6]];
+      dP [7] = pram[src[7]];
+      dP += 8;
+      src += 8;
     }
 
     // right border
