@@ -38,7 +38,6 @@
 #include "hardware/dma.h"
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
-#include "hardware/structs/ssi.h"
 
 
 
@@ -436,7 +435,7 @@ static __attribute__((noinline))  void generateRgbCache()
     {
       data = tms9918->vram.map.pram [i] & 0xFF0F;
       tmpPal[i] = data | ((data >> 12) << 4);
-      pram[i] = tmpPal[i] << 16 | tmpPal[i];
+      pram[i] = tmpPal[i] * 0x10001;
     }
     for (int j = 16; j < 256; ++j)
     {

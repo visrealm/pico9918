@@ -338,7 +338,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     uint32_t pxLineRpt = currentDisplayLine & (vgaParams.params.vPixelScale - 1);
 
     uint32_t* currentBuffer = (uint32_t*)rgbDataBuffer[pxLine & 0x01];
-
+    
     // crt effect?
     if (vgaParams.scanlines && pxLineRpt != 0)
     {
@@ -347,7 +347,9 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
+#if PICO_RP2040
     pio_sm_set_pindirs_with_mask(VGA_PIO, RGB_SM, (vgaParams.scanlines && (currentDisplayLine & 0x01)) - 1, (1 << 5) | (1 << 9) | (1 << 13));
+#endif
 
     // need a new line every X display lines
     if (pxLineRpt == 0)
