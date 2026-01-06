@@ -124,6 +124,13 @@ static void guard(void* a)
 static void __attribute__ ((noinline)) volatileHack ()
 {
   tms9918->restart = 0;
+#if 1
+  TMS_REGISTER(tms9918, 0x38) = 1;
+  TMS_STATUS(tms9918, 2) |= 0x80; // Running
+  memcpy(&tms9918->vram.bytes[0], &tms9918->vram.bytes[80], 80 * 29);
+  memcpy(&tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + 0], &tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + 80], 80 * 29);
+  memset(&tms9918->vram.bytes[80 * 29], 0, 80);
+#else
   if ((tms9918->gpuAddress & 1) == 0) // Odd addresses will cause the RP2040 to crash
   { 
     uint16_t lastAddress = tms9918->gpuAddress;
@@ -131,7 +138,7 @@ restart:
     TMS_REGISTER(tms9918, 0x38) = 1;
     TMS_STATUS(tms9918, 2) |= 0x80; // Running
 
-    #if PICO_RP2040 // Old memory protection unit
+#if PICO_RP2040 // Old memory protection unit
     mpu_hw->ctrl = M0PLUS_MPU_CTRL_PRIVDEFENA_BITS | M0PLUS_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
 #else
     mpu_hw->ctrl = M33_MPU_CTRL_PRIVDEFENA_BITS | M33_MPU_CTRL_ENABLE_BITS; // (=5) Turn on memory protection
@@ -155,6 +162,7 @@ restart:
       goto restart;
     }
   }
+#endif
   TMS_STATUS(tms9918, 2) &= ~0x80; // Stopped
   TMS_REGISTER(tms9918, 0x38) = 0;
 }
