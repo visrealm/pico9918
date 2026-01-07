@@ -91,8 +91,6 @@ INCLUDE "menu-main.bas"
 INCLUDE "menu-firmware.bas"
 INCLUDE "menu-info.bas"
 INCLUDE "menu-diag.bas"
-INCLUDE "menu-palette.bas"
-
     ' =========================================================================
     ' PROGRAM ENTRY
     ' -------------------------------------------------------------------------
@@ -194,6 +192,8 @@ main: PROCEDURE
         VDP_REG(5) = defaultReg(5)
         VDP_REG(6) = defaultReg(6)
 
+        BANKSEL(1)
+
           ' enable interrupts (so we can wait)
         VDP_ENABLE_INT_DISP_OFF
         WAIT    
@@ -219,7 +219,7 @@ main: PROCEDURE
 
         ' palette for sprites and tile 1 layer
         VDP_REG(24) = $11
-
+        
         WHILE 1
             ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu
             VDP_DISABLE_INT
@@ -242,3 +242,5 @@ delay: PROCEDURE
 
 hexChar:
     DATA BYTE "0123456789ABCDEF"
+
+INCLUDE "menu-palette.bas"
