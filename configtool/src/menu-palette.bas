@@ -10,7 +10,9 @@
 ' https://github.com/visrealm/pico9918
 '
 
+#if BANK_SIZE
 BANK 1
+#endif
 
 paletteMenu: PROCEDURE
 
