@@ -124,13 +124,6 @@ static void guard(void* a)
 static void __attribute__ ((noinline)) volatileHack ()
 {
   tms9918->restart = 0;
-#if 1
-  TMS_REGISTER(tms9918, 0x38) = 1;
-  TMS_STATUS(tms9918, 2) |= 0x80; // Running
-  memcpy(&tms9918->vram.bytes[0], &tms9918->vram.bytes[80], 80 * 29);
-  memcpy(&tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + 0], &tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + 80], 80 * 29);
-  memset(&tms9918->vram.bytes[80 * 29], 0, 80);
-#else
   if ((tms9918->gpuAddress & 1) == 0) // Odd addresses will cause the RP2040 to crash
   { 
     uint16_t lastAddress = tms9918->gpuAddress;
@@ -162,7 +155,6 @@ restart:
       goto restart;
     }
   }
-#endif
   TMS_STATUS(tms9918, 2) &= ~0x80; // Stopped
   TMS_REGISTER(tms9918, 0x38) = 0;
 }
@@ -198,6 +190,27 @@ void resetGpuTime()
   gpuTimeUs = 0;  
 }
 
+static void __attribute__ ((noinline)) v9938command ()
+{
+  tms9918->command = 0;
+  TMS_STATUS(tms9918, 2) |= 1; // Running
+  if ((TMS_REGISTER(tms9918, 46) & 0xF0) == 0xE0)
+  {
+    int16_t SY = TMS_REGISTER(tms9918, 34); // | (TMS_REGISTER(tms9918, 35) << 8)
+    int16_t DX = TMS_REGISTER(tms9918, 36); // | (TMS_REGISTER(tms9918, 37) << 8)
+    int16_t DY = TMS_REGISTER(tms9918, 38); // | (TMS_REGISTER(tms9918, 39) << 8)
+    int16_t NY = TMS_REGISTER(tms9918, 42); // | (TMS_REGISTER(tms9918, 43) << 8)
+    // R45 is ignored for now
+
+    memcpy(&tms9918->vram.bytes[DY * 80], &tms9918->vram.bytes[SY * 80], 80 * NY);
+    memcpy(&tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + DY * 80], &tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + SY * 80], 80 * NY);
+    if (SY > DY)
+      memset(tms9918->vram.bytes + 80 * (DY + NY), 0, 80);
+    else
+      memset(tms9918->vram.bytes + 80 * SY, 0, 80);
+  }
+  TMS_STATUS(tms9918, 2) &= ~1; // Stopped
+}
 /*
  * TMS9900 GPU main loop 
  */
@@ -211,6 +224,10 @@ void gpuLoop()
       uint32_t gpuStart = time_us_32();
       volatileHack();
       gpuTimeUs += time_us_32() - gpuStart;
+    }
+    if (tms9918->command)
+    {
+      v9938command();
     }
     reportedBack = 1;
       

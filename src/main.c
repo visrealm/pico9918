@@ -159,7 +159,7 @@ void  __not_in_flash_func(pio_irq_handler)()
     {
       vrEmuTms9918WriteAddrImpl(dataVal);
       currentInt = vrEmuTms9918InterruptStatusImpl();
-      gpio_put(GPIO_INT, !currentInt);
+      //gpio_put(GPIO_INT, !currentInt);
     }
     else // write data
     {
