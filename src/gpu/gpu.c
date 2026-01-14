@@ -202,8 +202,8 @@ static void __attribute__ ((noinline)) v9938command ()
     int16_t NY = TMS_REGISTER(tms9918, 42); // | (TMS_REGISTER(tms9918, 43) << 8)
     // R45 is ignored for now
 
-    memcpy(&tms9918->vram.bytes[DY * 80], &tms9918->vram.bytes[SY * 80], 80 * NY);
-    memcpy(&tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + DY * 80], &tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + SY * 80], 80 * NY);
+    memmove(&tms9918->vram.bytes[DY * 80], &tms9918->vram.bytes[SY * 80], 80 * NY);
+    memmove(&tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + DY * 80], &tms9918->vram.bytes[T80_VRAM_ATTR_ADDR + SY * 80], 80 * NY);
     if (SY > DY)
       memset(tms9918->vram.bytes + 80 * (DY + NY), 0, 80);
     else
