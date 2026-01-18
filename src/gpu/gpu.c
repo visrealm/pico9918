@@ -194,7 +194,8 @@ static void __attribute__ ((noinline)) v9938command ()
 {
   tms9918->command = 0;
   TMS_STATUS(tms9918, 2) |= 1; // Running
-  if ((TMS_REGISTER(tms9918, 46) & 0xF0) == 0xE0)
+  uint8_t cmd = TMS_REGISTER(tms9918, 46) & 0xF0;
+  if (cmd == 0xE0) // YMMM
   {
     int16_t SY = TMS_REGISTER(tms9918, 34); // | (TMS_REGISTER(tms9918, 35) << 8)
     int16_t DX = TMS_REGISTER(tms9918, 36); // | (TMS_REGISTER(tms9918, 37) << 8)
@@ -208,6 +209,24 @@ static void __attribute__ ((noinline)) v9938command ()
       memset(tms9918->vram.bytes + 80 * (DY + NY), 0, 80);
     else
       memset(tms9918->vram.bytes + 80 * SY, 0, 80);
+  }
+  else if (cmd == 0xC0) // XMMV
+  {
+    int16_t DX = (TMS_REGISTER(tms9918, 36) | (TMS_REGISTER(tms9918, 37) << 8)) >> 2;
+    int16_t DY = TMS_REGISTER(tms9918, 38) | (TMS_REGISTER(tms9918, 39) << 8);
+    int16_t NX = (TMS_REGISTER(tms9918, 40) | (TMS_REGISTER(tms9918, 41) << 8)) >> 2;
+    int16_t NY = TMS_REGISTER(tms9918, 42) | (TMS_REGISTER(tms9918, 43) << 8);
+    uint8_t CLR = TMS_REGISTER(tms9918, 44);
+    const uint16_t w = 128;
+    uint8_t* ptr = tms9918->vram.bytes + w * DY;
+    if (DX == 0 && NX==w)
+      memset(ptr, CLR, NX*NY);
+    else
+      for (int16_t i = 0; i < NY; ++i)
+      {
+        memset(ptr, CLR, NX);
+        ptr += w;
+      }
   }
   TMS_STATUS(tms9918, 2) &= ~1; // Stopped
 }
