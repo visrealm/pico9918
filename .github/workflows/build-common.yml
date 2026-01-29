@@ -47,7 +47,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pillow
-        
+    
+    - name: Install MSVC Build Tools
+      uses: microsoft/setup-msbuild@v2
+  
     - name: Install ARM GNU Toolchain
       run: |
         $url = "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip"
@@ -60,7 +63,14 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
+        cmake -S .. -B . -G Ninja ^
+          -DCMAKE_C_COMPILER=cl ^
+          -DCMAKE_CXX_COMPILER=cl ^
+          -DPICO_SDK_FETCH_FROM_GIT=ON ^
+          "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" ^
+          "-DPICO_BOARD_HEADER_DIRS=../src/boards" ^
+          -DPICO_BOARD=pico9918 ^
+          -DBUILD_TOOLS_FROM_SOURCE=ON
         
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
