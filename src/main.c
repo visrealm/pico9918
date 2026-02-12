@@ -257,7 +257,7 @@ static void eofInterrupt()
 
   static float tempC = 0.0f;
   tempC += coreTemperatureC();
-  if ((frameCount & 0x3f) == 0) // every 16th frame
+  if ((frameCount & 0x3f) == 0) // every 64th frame
   {
     tempC /= 64.0f;
     diagSetTemperature(tempC);
@@ -516,6 +516,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         tms9918->config[CONF_DIAG_PALETTE] = true;
         tms9918->config[CONF_DIAG_ADDRESS] = true;
       }
+    }
+
+    if (y == vBorder - 1)
+    {
+      generateRgbCache();
     }
 
     if (TMS_REGISTER(tms9918, 0x32) & 0x40)
