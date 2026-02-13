@@ -164,7 +164,6 @@ endfunction()
 
 # Define all platform targets
 add_cvbasic_target(ti99 "--ti994a" "" "pico9918conf-${VERSION_WITH_OUTPUT}_ti99.a99" "pico9918conf-${VERSION_WITH_OUTPUT}_ti99_8.bin" "TI-99/4A")
-add_cvbasic_target(ti99_f18a "--ti994a" "-dF18A_TESTING=1" "pico9918conf-${VERSION_WITH_OUTPUT}_ti99_f18a.a99" "pico9918conf-${VERSION_WITH_OUTPUT}_ti99_f18a_8.bin" "TI-99/4A F18A Testing")
 add_cvbasic_target(coleco "" "" "pico9918conf-${VERSION_WITH_OUTPUT}_cv.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_cv.rom" "ColecoVision")
 add_cvbasic_target(msx_asc16 "--msx" "" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_asc16.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_asc16.rom" "MSX ASCII16")
 add_cvbasic_target(msx_konami "--msx" "-konami" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_konami.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_konami.rom" "MSX Konami")
@@ -190,7 +189,7 @@ add_custom_command(
 add_custom_target(nabu_mame_package DEPENDS "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.npz")
 
 # Master target to build all platforms
-add_custom_target(configurator_all DEPENDS ti99 ti99_f18a coleco msx_asc16 msx_konami nabu sg1000 nabu_mame_package)
+add_custom_target(configurator_all DEPENDS ti99 coleco msx_asc16 msx_konami nabu sg1000 nabu_mame_package)
 
 # Print build information
 message(STATUS "PICO9918 Configurator CMake Configuration")
