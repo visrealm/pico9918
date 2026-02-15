@@ -967,6 +967,9 @@ int_handler
     jne .noquit
     li r0,>3280        ; reset PICO9918 vdp registers
     bl @WRTVDP
+    .ifne CVBASIC_BANK_SWITCHING
+    clr @>6000         ; reset to bank 0
+    .endif
     clr @intwsr2
     blwp @>0000
 .noquit    
