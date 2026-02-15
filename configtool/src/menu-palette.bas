@@ -10,8 +10,11 @@
 ' https://github.com/visrealm/pico9918
 '
 
-paletteMenu: PROCEDURE
+#if BANK_SIZE
+BANK 1
+#endif
 
+paletteMenu: PROCEDURE
 
     VDP_DISABLE_INT
 
@@ -89,11 +92,11 @@ paletteMenu: PROCEDURE
     oldIndex = g_currentMenuIndex
 
     g_menuTopRow = MENU_TITLE_ROW + 13
-    MENU_INDEX_OFFSET = 12
+    MENU_INDEX_OFFSET = 21
     MENU_INDEX_COUNT = 2
-    MENU_START_X = 6
     g_currentMenuIndex = 0
 
+    GOSUB detectPalettePreset
     GOSUB renderMenu
 
     currentIndex = 1
@@ -204,12 +207,26 @@ paletteMenu: PROCEDURE
                 IF (currentMenu > (3 + MENU_INDEX_COUNT)) THEN currentMenu = 0
             ELSEIF NAV(NAV_UP) THEN
                 currentMenu = currentMenu - 1
-            ELSEIF g_nav THEN
-                IF currentMenu = 4 THEN' reset
-                    GOSUB resetPalette
-                ELSEIF currentMenu = 5 THEN' back
-                    g_nav = NAV_CANCEL
+            ELSEIF currentMenu = 4 THEN
+                presetChanged = FALSE
+
+                IF NAV(NAV_LEFT) THEN
+                    IF g_palettePreset = 0 THEN g_palettePreset = 3
+                    g_palettePreset = g_palettePreset - 1
+                    presetChanged = TRUE
+                ELSEIF NAV(NAV_RIGHT) THEN
+                    g_palettePreset = g_palettePreset + 1
+                    IF g_palettePreset > 2 THEN g_palettePreset = 0
+                    presetChanged = TRUE
                 END IF
+
+                IF presetChanged THEN
+                    GOSUB resetPalette
+                    RENDER_MENU_ROW(g_currentMenuIndex)
+                END IF
+
+            ELSEIF g_nav THEN
+                g_nav = NAV_CANCEL
             END IF
         END IF
 
@@ -301,16 +318,7 @@ resetPalette: PROCEDURE
 
     GOSUB hideSprites
 
-    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
-    DEFINE VRAM 0, 32, defPal
-    DEFINE VRAM 0, 32, defPal
-    VDP_REG(47) = $40
-
-    ' update config palette
-    FOR I = 0 TO 31
-        VDP_CONFIG(128 + I) = defPal(I)
-        tempConfigValues(128 + I) = defPal(I)
-    NEXT I
+    ON g_palettePreset GOSUB applyPreset9918A, applyPresetV9938, applyPresetGrey
 
     I = currentIndex
     FOR currentIndex = 1 TO 15
@@ -321,6 +329,76 @@ resetPalette: PROCEDURE
     lastIndex = 0
     GOSUB updateRGB
 
+    END
+
+detectPalettePreset: PROCEDURE
+    g_palettePreset = 0
+
+    paletteMatch = TRUE
+    FOR I = 0 TO 31
+        IF tempConfigValues(128 + I) <> defPal(I) THEN
+            paletteMatch = FALSE
+            EXIT FOR
+        END IF
+    NEXT I
+    IF paletteMatch THEN RETURN
+
+    paletteMatch = TRUE
+    FOR I = 0 TO 31
+        IF tempConfigValues(128 + I) <> presetPalV9938(I) THEN
+            paletteMatch = FALSE
+            EXIT FOR
+        END IF
+    NEXT I
+    IF paletteMatch THEN
+        g_palettePreset = 1
+        RETURN
+    END IF
+
+    paletteMatch = TRUE
+    FOR I = 0 TO 31
+        IF tempConfigValues(128 + I) <> presetPalGrey(I) THEN
+            paletteMatch = FALSE
+            EXIT FOR
+        END IF
+    NEXT I
+    IF paletteMatch THEN g_palettePreset = 2
+    END
+
+applyPreset9918A: PROCEDURE
+    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
+    DEFINE VRAM 0, 32, defPal
+    DEFINE VRAM 0, 32, defPal
+    VDP_REG(47) = $40
+
+    FOR I = 0 TO 31
+        VDP_CONFIG(128 + I) = defPal(I)
+        tempConfigValues(128 + I) = defPal(I)
+    NEXT I
+    END
+
+applyPresetV9938: PROCEDURE
+    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
+    DEFINE VRAM 0, 32, presetPalV9938
+    DEFINE VRAM 0, 32, presetPalV9938
+    VDP_REG(47) = $40
+
+    FOR I = 0 TO 31
+        VDP_CONFIG(128 + I) = presetPalV9938(I)
+        tempConfigValues(128 + I) = presetPalV9938(I)
+    NEXT I
+    END
+
+applyPresetGrey: PROCEDURE
+    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
+    DEFINE VRAM 0, 32, presetPalGrey
+    DEFINE VRAM 0, 32, presetPalGrey
+    VDP_REG(47) = $40
+
+    FOR I = 0 TO 31
+        VDP_CONFIG(128 + I) = presetPalGrey(I)
+        tempConfigValues(128 + I) = presetPalGrey(I)
+    NEXT I
     END
 
 defPal:
@@ -340,4 +418,40 @@ defPal:
   DATA BYTE $FC, $5C
   DATA BYTE $FC, $CC
   DATA BYTE $FF, $FF
+
+presetPalV9938:
+    DATA BYTE $00, $00
+    DATA BYTE $F0, $00
+    DATA BYTE $F2, $C2
+    DATA BYTE $F6, $E6
+    DATA BYTE $F2, $2E
+    DATA BYTE $F4, $6E
+    DATA BYTE $FA, $22
+    DATA BYTE $F4, $CE
+    DATA BYTE $FE, $22
+    DATA BYTE $FE, $66
+    DATA BYTE $FC, $C2
+    DATA BYTE $FC, $C8
+    DATA BYTE $F2, $82
+    DATA BYTE $FC, $4A
+    DATA BYTE $FA, $AA
+    DATA BYTE $FE, $EE
+
+presetPalGrey:
+    DATA BYTE $00, $00
+    DATA BYTE $F0, $00
+    DATA BYTE $F6, $66
+    DATA BYTE $F8, $88
+    DATA BYTE $F8, $88
+    DATA BYTE $F9, $99
+    DATA BYTE $F7, $77
+    DATA BYTE $FB, $BB
+    DATA BYTE $F8, $88
+    DATA BYTE $F9, $99
+    DATA BYTE $F9, $99
+    DATA BYTE $FB, $BB
+    DATA BYTE $F5, $55
+    DATA BYTE $FA, $AA
+    DATA BYTE $FC, $CC
+    DATA BYTE $FF, $FF
 

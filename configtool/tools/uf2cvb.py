@@ -82,7 +82,7 @@ def main() -> int:
             try:
                 with open(filename, mode='rb') as uf2:
                     blocksRead = 0
-                    bank = 1
+                    bank = 2
 
                     inpbuf = uf2.read(512)
                     w = struct.unpack("<IIIIIIII", inpbuf[0:32])

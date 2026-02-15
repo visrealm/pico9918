@@ -57,6 +57,8 @@ IntString gpuPctStr = {0};
 IntString clockMhzStr = {0};
 IntString modeStr = {0};
 IntString fpsStr = {0};
+IntString hwVerStr = {0};
+IntString fwVerStr = {0};
 
 IntString nameTabStr = {0};
 IntString colorTabStr = {0};
@@ -157,19 +159,30 @@ void initDiagnostics()
   clear(&totalTimePerScanlineStr);
   clear(&temperatureStr);
   clear(&gpuPctStr);
-  
+  clear(&modeStr);
+  clear(&fpsStr);
+  clear(&hwVerStr);
+  clear(&fwVerStr);
+
   clear(&nameTabStr);
   clear(&colorTabStr);
   clear(&pattTabStr);
   clear(&sprAttTabStr);
   clear(&sprPattTabStr);
+
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
+  strcpy(hwVerStr.digits, hwVersion == HWVer_0_3 ? "V0.3" : "V1.0+");
+
+  strncpy(fwVerStr.digits, PICO9918_VERSION, sizeof(fwVerStr.digits) - 1);
+  fwVerStr.digits[sizeof(fwVerStr.digits) - 1] = '\0';
+  fwVerStr.start = 0;
 }
 
 const char *modeNames[] = {
   "GFX I",
   "GFX II",
   "TEXT",
-  "MULTI",
+  "MULTI", 
   "80 COL",
 };
 
@@ -330,6 +343,16 @@ static void renderLeft(const char *label, IntString *val, const char *units, uin
   xPos = backgroundPixels(xPos, 102 - xPos, pixels);
 }
 
+static void diagHwVer(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("HWVER : ", &hwVerStr, "", row, pixels);
+}
+
+static void diagFwVer(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("FWVER : ", &fwVerStr, "", row, pixels);
+}
+
 static void diagRenderTime(uint16_t row, uint16_t* pixels)
 {
   renderLeft("FRAME : ", &frameTimeStr, "&S", row, pixels);
@@ -463,6 +486,8 @@ DiagPtr leftDiags[32] = {0};
 int leftDiagRows = 0;
 
 DiagPtr performanceDiags[] = {
+  &diagHwVer,
+  &diagFwVer,
   &diagClock,
   &diagRenderTime,
   &diagFPS,

@@ -12,6 +12,7 @@
 #include "display.h"
 
 #include "splash.h"
+#include "vga.h"
 
 #if !PICO9918_NO_SPLASH
 #include "bmp_splash.h"
@@ -49,7 +50,7 @@ void outputSplash(uint16_t y, uint32_t frameCount, uint32_t vBorder, uint32_t vP
     }
   }
 
-  if (y < (VIRTUAL_PIXELS_Y - 1))
+  if (y < (vgaCurrentParams()->params.vVirtualPixels - 1))
   {
     y -= vBorder + vPixels + logoOffset;
     if (y < splashHeight)

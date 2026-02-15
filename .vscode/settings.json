@@ -16,6 +16,10 @@
     "cmake.configureOnOpen": false,
     "cmake.generator": "Ninja",
     "cmake.cmakePath": "${userHome}/.pico-sdk/cmake/v3.31.5/bin/cmake",
+    "cmake.additionalKits": [],
+    "cmake.environment": {
+        "PATH": "${userHome}/.pico-sdk/ninja/v1.12.1;${env:PATH}"
+    },
     "cmake.configureArgs": [
         "-DPICO9918_SCART_RGBS=OFF",
         "-DPICO9918_SCART_PAL=OFF", 

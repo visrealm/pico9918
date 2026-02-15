@@ -68,7 +68,7 @@ function(setup_cvbasic_tools)
     option(BUILD_TOOLS_FROM_SOURCE "Build CVBasic, gasm80 and XDT99 from source" ON)
 
     # Tool version/tag configuration
-    set(CVBASIC_GIT_TAG "master" CACHE STRING "CVBasic git tag/branch/commit")
+    set(CVBASIC_GIT_TAG "5947e26c86af34e3270f1ecaf85d8036f12c3658" CACHE STRING "CVBasic git tag/branch/commit")
     set(GASM80_GIT_TAG "master" CACHE STRING "GASM80 git tag/branch/commit")
     set(XDT99_GIT_TAG "master" CACHE STRING "XDT99 git tag/branch/commit")
     

@@ -16,14 +16,20 @@
 ;           possible read values already. Each tx FIFO word contains
 ;           the current values for status, read data and pin direction
 ;
-; fifo osr  0b|xxxxxxxx|ssssssss|dddddddd|11111111|
-;             | ignore | status |  data  | pindir |
+; fifo osr   0b|0000|rrrr|ssssssss|dddddddd|11111111|
+;              |    |reg | status |  data  | pindir |
 ;
-; fifo isr  0b|m|w|r|
-;             |o|r|e|
-;             |d|i|a|
-;             |e|t|d|
-;             | |e| |
+;
+; fifo isr  
+; if mode==1 0b|000|rrrr|ssssssss|dddddddd|11111111|m|
+;              |   |reg | status |  data  | pindir |o|
+;              |   |    |        |        |        |d|
+;              |   |    |        |        |        |e|
+;
+; if mode==0 0b|m|
+;              |o|
+;              |d|
+;              |e|
 ;
 
 .program tmsRead
@@ -33,8 +39,8 @@
   mov x, osr        ; ensure we have a valid fifo value in x
 
 .wrap_target
-  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
   mov osr, null       ; change CD0-7 pindirs to inputs
+  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
   out pindirs, 8
   mov isr, null
 
@@ -43,11 +49,14 @@ pullLoop:
   mov x, osr        ; since we want the latest value
   jmp pin pullLoop
 
-  in pins, 1          ; hacky way to jmp based on the CSR pin
-  mov y, isr          ; since we can only have one jmp pin
-
+  nop           [7] ; ~32 ns debounce delay for CSR settling (covers typical bounce)
+  jmp pin pullLoop  ; if CSR bounced back HIGH, go back to waiting (debounce recovery)
+  
+  in pins, 1        ; read MODE pin (debounce verified, CSR is stable LOW)
+  mov y, isr        ; y contains MODE state
+  
   out pindirs, 8    ; set up CD0-7 as outputs
-  out pins, 8       ; mode is low, send the data byte
+  out pins, 8       ; output data byte
 
   jmp !y, endPart ; still 1? loop, otherwise, let's read
 
@@ -75,12 +84,16 @@ endPart:
 .program tmsWrite
 .define public CSW_PIN 27
 
-  wait 0 gpio CSW_PIN [4]   ; wait for CSW to go active (low)
+  wait 0 gpio CSW_PIN [7]   ; wait for CSW to go active (low)
   in pins, 16               ; grab the initial (mode) state
 pollWriteLoop:
   mov x, pins               ; continuously grab pin state
   jmp pin captureWrite      ; and wait for csw high
   jmp pollWriteLoop
 captureWrite:
-  in x, 16           [4]    ; grab the final state prior to CSRW high
+  nop                 [7]   ; ~32 ns debounce delay for CSW settling
+  jmp pin confirmed         ; if CSW still HIGH, it's stable
+  jmp pollWriteLoop         ; if CSW bounced back LOW, retry
+confirmed:
+  in x, 16                  ; grab the final state (CSW confirmed stable HIGH)
 .wrap

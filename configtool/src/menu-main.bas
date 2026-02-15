@@ -57,7 +57,13 @@ renderMenuRow: PROCEDURE
     valuesCount = MENU_DATA(a_menuIndexToRender, CONF_NUM_VALUES)
     IF valuesCount > 0 THEN
         valuesBaseIndex = MENU_DATA(a_menuIndexToRender, CONF_VALUES_IND)
-        currentValueOffset = tempConfigValues(confIndex)
+        IF confIndex < CONF_COUNT THEN
+            currentValueOffset = tempConfigValues(confIndex)
+        ELSEIF confIndex = CONF_MENU_RESET THEN
+            currentValueOffset = g_palettePreset
+        ELSE
+            currentValueOffset = 0
+        END IF
 
         ' output option value
         DEFINE VRAM #addr + 22, 6, VARPTR configMenuOptionValueData((valuesBaseIndex + currentValueOffset) * CONF_VALUE_LABEL_LEN)
@@ -423,6 +429,9 @@ configMenuData:
     DATA BYTE CONF_DIAG_PALETTE,    "Palette         ", 0, 2, "        Show palettes           "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
+    DATA BYTE CONF_MENU_RESET,      "Preset          ", 9, 3, "    Select preset palette       "
+    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
+
 ' -----------------------------------------------------------------------------
 ' Pico9918Option values. Indexed from options()
 ' -----------------------------------------------------------------------------
@@ -436,3 +445,6 @@ configMenuOptionValueData:
     DATA BYTE "252MHz"
     DATA BYTE "302MHz"
     DATA BYTE "352MHz"
+    DATA BYTE "9918A "
+    DATA BYTE "V9938 "
+    DATA BYTE "GREY  "
