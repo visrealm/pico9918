@@ -38,10 +38,10 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
   * [Gradiente Expert XP-800](https://www.msx.org/wiki/Gradiente_Expert_XP-800)
   * [National CF-2700](https://www.msx.org/wiki/National_CF-2700)
   * [Sharp HB-8000](https://www.msx.org/wiki/Sharp_HB-8000)
-  * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)
-  * [Spectravideo SVI-728](https://www.msx.org/wiki/Spectravideo_SVI-728)
+  * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)  
   * [Toshiba HX-10](https://www.msx.org/wiki/Toshiba_HX-10)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
+  * [Yamaha CX5M](https://www.msx.org/wiki/Yamaha_CX5M)
   * [Yamaha YIS-503](https://www.msx.org/wiki/Yamaha_YIS-503)
 * [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
 * [Powertran Cortex](http://powertrancortex.com/)
@@ -197,6 +197,7 @@ The hardware design files in this repository are licensed under the CERN-OHL-S. 
 
 ### Firmware
 The firmware code in this repository is licensed under the MIT License. See [LICENSE_FIRMWARE.md](LICENSE_FIRMWARE.md) for details.
+
 
 
 
