@@ -194,6 +194,7 @@ static void __attribute__ ((noinline)) v9938command ()
 {
   tms9918->command = 0;
   TMS_STATUS(tms9918, 2) |= 1; // Running
+  gpio_put(25, 1);
   uint8_t cmd = TMS_REGISTER(tms9918, 46) & 0xF0;
   if (cmd == 0xE0) // YMMM
   {
@@ -229,6 +230,7 @@ static void __attribute__ ((noinline)) v9938command ()
       }
   }
   TMS_STATUS(tms9918, 2) &= ~1; // Stopped
+  gpio_put(25, 0);
 }
 /*
  * TMS9900 GPU main loop 
