@@ -656,6 +656,10 @@ void proc1Entry()
   gpio_put_all(0); // we want to kep /INT held low for now
   gpio_set_dir_all_bits(GPIO_INT_MASK); // /INT is an output
 
+  gpio_init(25);
+  gpio_set_dir(25, true);
+  gpio_put(25, 0);
+
   tmsPioInit();
 
   gpio_put_all(GPIO_INT_MASK);	// ok, we can release /INT now
