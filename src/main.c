@@ -370,7 +370,7 @@ void renderDiag(int y, uint16_t *pixels)
 /*
  * cache color lookup from color index to BGR16
  */
-static __attribute__((section(".scratch_y.buffer"))) 
+__attribute__((section(".scratch_y.buffer"))) 
 uint32_t __aligned(4) pram [64];
 
 
