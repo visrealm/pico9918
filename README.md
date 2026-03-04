@@ -70,6 +70,13 @@ If you have tested the PICO9918 on any other device, please let me know and I'll
 
 So far, there aren't any. 
 
+# Digital A/V (HDMI) Dongle [NEW]
+
+The new Digital A/V dongle provides video and audio direct to any HDMI compatible display. The new dongle is fully compatible with all previous FFC-equipped PICO9918 boards (v1.2 and v1.3) and are available to purchase either with a new PICO9918 or separately.
+
+![Digital A/V dongle](img/digital_av.jpg)
+
+
 # F18A compatibility
 
 The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
