@@ -74,7 +74,7 @@ So far, there aren't any.
 
 The new Digital A/V dongle provides video and audio direct to any HDMI compatible display. The new dongle is fully compatible with all previous FFC-equipped PICO9918 boards (v1.2 and v1.3) and are available to purchase either with a new PICO9918 or separately.
 
-![Digital A/V dongle](img/digital_av.jpg)
+![Digital A/V dongle](img/digital_av_m.jpg)
 
 See the [FFC Connector](docs/README.md#ffc-connector) documentation for cable connection instructions.
 
