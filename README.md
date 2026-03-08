@@ -6,6 +6,23 @@ A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pic
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
 
+## Contents
+
+* [Build status](#build-status)
+* [Supported devices](#supported-devices)
+* [Digital A/V (HDMI) Dongle](#digital-av-hdmi-dongle-new)
+* [F18A compatibility](#f18a-compatibility)
+* [Purchasing options](#purchasing-options)
+* [Hardware](#hardware)
+* [Firmware](#firmware)
+* [Configurator](#configurator)
+* [Documentation](#documentation)
+* [Building](#building)
+* [Thanks](#thanks)
+* [Discussion](#discussion)
+* [Videos](#videos)
+* [Licensing](#licensing)
+
 ## Build status
 
 ### Main Branch
