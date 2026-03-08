@@ -76,6 +76,7 @@ The new Digital A/V dongle provides video and audio direct to any HDMI compatibl
 
 ![Digital A/V dongle](img/digital_av.jpg)
 
+See the [FFC Connector](docs/README.md#ffc-connector) documentation for cable connection instructions.
 
 # F18A compatibility
 
@@ -150,7 +151,8 @@ If you don't have a device supported by the native configurator, the [Web-based 
 
 ## Building
 
-Quick start - build both firmware and configurator ROMs:
+### Quick start
+Build both firmware and configurator ROMs:
 
 ```bash
 # Automatic SDK download (recommended)
@@ -170,7 +172,9 @@ Each platform requires specific toolchain installation:
 
 All platforms use **Raspberry Pi Pico SDK 2.1.1** specifically (newer versions may cause issues).
 
-**[Complete Build Instructions](BUILDING.md)** - includes detailed platform setup, development environment configuration, build options, individual platform builds, VSCode integration, and troubleshooting.
+### Detailed instructions
+
+For detailed platform setup, development environment configuration, build options, individual platform builds, VSCode integration, and troubleshooting, see [BUILDING.md](BUILDING.md)
 
 ## Thanks
 
