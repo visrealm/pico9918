@@ -148,6 +148,7 @@ If you don't have a device supported by the native configurator, the [Web-based 
 
 * [CPU and GRM jumpers](docs/README.md#cpu-and-grm-jumper)
 * [FFC Connector](docs/README.md#ffc-connector)
+* [MDE1 Pin](docs/README.md#mde1-pin)
 
 ## Building
 
