@@ -71,7 +71,7 @@ static const uint32_t dmapalOut = 5; // palette dma
 static const uint32_t dmapalIn  = 6; // palette dma
 #endif
 
-#define SHOW_DIAGNOSTICS_FRAMES 600
+#define SHOW_DIAGNOSTICS_FRAMES 900
 
 static int frameCount = 0;
 static bool validWrites = false;  // has the VDP display been enabled at all?
@@ -450,7 +450,8 @@ static __attribute__((noinline))  void generateRgbCache()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  int vPixels = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 * 8 : 24 * 8;
+  int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
+  int vPixels = baseRows << 3;
   if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
     vPixels <<= 1;
 
