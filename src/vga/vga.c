@@ -26,8 +26,6 @@
 
 #define VGA_NO_MALLOC 1
 
-#define VGA_SCANLINE_CB_ENABLE 0
-
 // avoid bringing in math.h
 int roundflt(float x)
 {
@@ -322,9 +320,6 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
         multicore_fifo_push_timeout_us(FRONT_PORCH_MSG, 0);
       }
     }
-#if VGA_SCANLINE_CB_ENABLE    
-    multicore_fifo_push_timeout_us(END_OF_SCANLINE_MSG | currentTimingLine, 0);
-#endif
   }
 
   if (dma_hw->ints0 & rgbDmaChanMask)
@@ -370,6 +365,10 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
       int end = VIRTUAL_PIXELS_X / 2;
       for (int i = 5; i < end; ++i)
         currentBuffer[i] >>= 1;
+    }
+    if (pxLineRpt == vgaParams.params.vPixelScale - 1)
+    {
+      multicore_fifo_push_timeout_us(END_OF_SCANLINE_MSG | pxLine, 0);
     }
   }
 }
@@ -418,15 +417,13 @@ void __time_critical_func(vgaLoop)()
         ++frameNumber;
       }
     }
-#if VGA_SCANLINE_CB_ENABLE    
     else if ((message & END_OF_SCANLINE_MSG) != 0)
     {
       if (vgaParams.endOfScanlineFn)
       {
-        vgaParams.endOfScanlineFn();
+        vgaParams.endOfScanlineFn(message & 0x0fff);
       }
     }
-#endif
     else
     {
       bool doEof = false;

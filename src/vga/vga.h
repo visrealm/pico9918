@@ -45,7 +45,7 @@ typedef void (*vgaScanlineRgbFn)(uint16_t y, VgaParams* params, uint16_t* pixels
 typedef void (*vgaEndOfFrameFn)(uint32_t frameNumber);
 typedef void (*vgaPorchFn)();
 typedef void (*vgaInitFn)();
-typedef void (*vgaEndOfScanlineFn)();
+typedef void (*vgaEndOfScanlineFn)(uint32_t displayLine);
 
 extern uint32_t vgaMinimumPioClockKHz(VgaParams* params);
 

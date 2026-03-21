@@ -77,6 +77,9 @@ static int frameCount = 0;
 static bool validWrites = false;  // has the VDP display been enabled at all?
 static bool doneInt = false;      // interrupt raised this frame?
 
+static int vPixels = 192;         // active TMS display lines (updated each frame)
+static uint32_t vBorder = 0;      // top border offset in VGA lines (updated each frame)
+
 static bool droppedFrames[16] = {0};
 int droppedFramesCount = 0;
 
@@ -351,6 +354,19 @@ static void tmsPorch()
   TMS_STATUS(tms9918, 0x03) = 255;
 }
 
+static void tmsEndOfScanline(uint32_t displayLine)
+{
+  if (!doneInt && displayLine == vBorder + vPixels - 1)
+  {
+    bool droppedFrame = currentStatus & STATUS_INT;
+    droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
+    droppedFrames[frameCount & 0xf] = droppedFrame;
+
+    eofInterrupt();
+    updateInterrupts(STATUS_INT);
+  }
+}
+
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
@@ -385,6 +401,12 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
   vgaCurrentParams()->params.vVirtualPixels = VIRTUAL_PIXELS_Y << (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
 #endif
+
+  int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
+  vPixels = baseRows << 3;
+  if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
+    vPixels <<= 1;
+  vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
 }
 
 
@@ -450,12 +472,6 @@ static __attribute__((noinline))  void generateRgbCache()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
-  int vPixels = baseRows << 3;
-  if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
-    vPixels <<= 1;
-
-  const uint32_t vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
   const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
 
   uint32_t* dPixels = (uint32_t*)pixels;
@@ -469,7 +485,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   dma_channel_wait_for_finish_blocking(dma32);
 
   /*** top and bottom borders ***/
-  if (y < vBorder || y >= (vBorder + vPixels))  // TODO: Note of this runs in ROW30 mode
+  if (y < vBorder || y >= (vBorder + vPixels))  // TODO: None of this runs in ROW30 mode
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
     dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
@@ -553,16 +569,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
     renderTime = time_us_32() - renderTime;
 
-    /*** interrupt signal? ***/
-    const int interruptThreshold = 1;
-    if (y < vPixels - interruptThreshold)
-    {
-      TMS_STATUS(tms9918, 0x01) &= ~0x03;
-    }
-    else
-    {
-      TMS_STATUS(tms9918, 0x01) &= ~0x01;
-    }
+    /*** F18A status register updates ***/
+    TMS_STATUS(tms9918, 0x01) &= ~0x03;
 
     if (tms9918->vram.map.scanline && (TMS_REGISTER(tms9918, 0x13) == tms9918->vram.map.scanline))
     {
@@ -573,19 +581,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     if (TMS_REGISTER(tms9918, 0x32) & 0x40)
     {
       gpuTrigger();
-    }
-
-    if (!doneInt && y >= vPixels - interruptThreshold)
-    {
-      eofInterrupt();
-      tempStatus |= STATUS_INT;
-
-      // keep track of the number of dropped frames in the past 64 frames
-      // NOTE: this is unrelated to the PICO9918 - the same would occur on a 
-      // standard VDP when an interrupt is missed
-      bool droppedFrame = currentStatus & STATUS_INT;
-      droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
-      droppedFrames[frameCount & 0xf] = droppedFrame;
     }
 
     updateInterrupts(tempStatus);
@@ -807,6 +802,7 @@ int main(void)
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;
+  params.endOfScanlineFn = tmsEndOfScanline;
   params.porchFn = tmsPorch;
 
   const char *version = PICO9918_VERSION;
