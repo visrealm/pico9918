@@ -14,19 +14,22 @@
 ' Other implementations have 16kB banks.
 
 
-#if TI994A
+#if NO_UPGRADE
+    CONST BANK_SIZE = 0
+    #INFO "No firmware upgrade"
+#elif NABU
+    CONST BANK_SIZE = 0
+    #INFO "No banking / No firmware upgrade"
+#elif CREATIVISION
+    CONST BANK_SIZE = 0
+    #INFO "No banking / No firmware upgrade"
+#elif SG1000
+    CONST BANK_SIZE = 0
+    #INFO "No banking / No firmware upgrade"
+#elif TI994A
     BANK ROM 128
     CONST BANK_SIZE = 8
     #INFO "TI-99/4A - 8KB BANK SIZE"
-#elif NABU
-    CONST BANK_SIZE = 0
-    #INFO "NABU - No banking"
-#elif CREATIVISION
-    CONST BANK_SIZE = 0
-    #INFO "CreatiVision - No banking"
-#elif SG1000
-    CONST BANK_SIZE = 0
-    #INFO "SG-1000/SC-3000 - No banking"
 #else
     BANK ROM 128
     CONST BANK_SIZE = 16
@@ -56,7 +59,8 @@ GOTO main
 INCLUDE "banksel.bas"
 INCLUDE "core.bas"
 
-#if TI994A
+#if NO_UPGRADE
+#elif TI994A
     INCLUDE "firmware_8k.bas"
 #elif BANK_SIZE
     INCLUDE "firmware_16k.bas"
