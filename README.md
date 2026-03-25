@@ -121,9 +121,11 @@ This is the latest version, poewered by the more powerful RP2350. This hardware 
 
 <p align="left"><a href="img/pico9918pro_800_1.jpg"><img src="img/pico9918pro_800_1.jpg" alt="PICO9918 PRO v2.0" width="720px"></a></p>
 
+This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
+
 ### v1.x (v1.3, v1.2, v1.1, v1.0 and v0.4)
 
-PICO9918 v1.3 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
+PICO9918 v1.3 was the first single board version which doesn't require a piggy-backed Pi Pico.
 
 <p align="left"><a href="img/pico9918_v1_2_sm.jpg"><img src="img/pico9918_v1_2_sm.jpg" alt="PICO9918 v1.2" width="720px"></a></p>
 
