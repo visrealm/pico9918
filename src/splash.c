@@ -16,6 +16,13 @@
 
 #if !PICO9918_NO_SPLASH
 #include "bmp_splash.h"
+// img2carray.py derives symbol names from filenames; splash_pro.png -> splashpro*
+#ifdef PICO_RP2350
+#define splash      splashpro
+#define splashWidth splashproWidth
+#define splashHeight splashproHeight
+#define splash_pal  splashpro_pal
+#endif
 #endif
 
 static int logoOffset = 100;
