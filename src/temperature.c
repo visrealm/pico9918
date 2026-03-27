@@ -13,12 +13,26 @@
 #include "pico/divider.h"
 
 #if !PICO_RP2040
+#include "hardware/regs/sysinfo.h"
 #include "hardware/regs/addressmap.h"
 #endif
 
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#if PICO_RP2040
+#define TEMP_SENSOR_CHANNEL 4
+#else
+// RP2350A (QFN-60, PACKAGE_SEL=0) uses channel 4.
+// RP2350B (QFN-80, PACKAGE_SEL=1) uses channel 8.
+// Read PACKAGE_SEL at runtime so one binary works on both variants.
+static inline int tempSensorChannel()
+{
+  const volatile uint32_t *package_sel = (const volatile uint32_t *)(SYSINFO_BASE + SYSINFO_PACKAGE_SEL_OFFSET);
+  return (*package_sel & SYSINFO_PACKAGE_SEL_BITS) ? 4 : 8;
+}
+#define TEMP_SENSOR_CHANNEL tempSensorChannel()
+#endif
 
 /*
  * initialise temperature hardware
@@ -27,27 +41,7 @@ void initTemperature()
 {
   adc_init();
   adc_set_temp_sensor_enabled(true);
-  
-  /*
-   * RP2040 and RP2350A use the same internal temperature channel.
-   * RP2350B (QFN60, PACKAGE_SEL = 1) moved the sensor to a different channel.
-   */
-#if PICO_RP2040
-  adc_select_input(4); // RP2040 internal temperature sensor
-#else
-  // SYSINFO offset 0x04 bit 0: PACKAGE_SEL (0 = QFN80 / RP2350A, 1 = QFN60 / RP2350B)
-  const volatile uint32_t *package_sel = (uint32_t *)(SYSINFO_BASE + 0x04u);
-  const bool is_rp2350b = (*package_sel & 0x1u) != 0;
-
-  if (is_rp2350b)
-  {
-    adc_select_input(8); // RP2350B temperature sensor channel
-  }
-  else
-  {
-    adc_select_input(4); // RP2350A temperature sensor channel
-  }
-#endif
+  adc_select_input(TEMP_SENSOR_CHANNEL);
 }
 
 /*
