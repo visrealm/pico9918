@@ -25,7 +25,7 @@ endif()
 # ====================================================================================
 
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
-set(PICO_BOARD pico9918 CACHE STRING "Board type")
+set(PICO_BOARD pico9918pro CACHE STRING "Board type")
 #set(PICO_BOARD pimoroni_pga2350 CACHE STRING "Board type")
 
 # Check if building configurator only (skip Pico SDK setup)
@@ -42,8 +42,8 @@ project(pico9918 C CXX ASM)
 
 # PICO9918 Version Information
 set(PICO9918_MAJOR_VER 1)
-set(PICO9918_MINOR_VER 0)
-set(PICO9918_PATCH_VER 4)
+set(PICO9918_MINOR_VER 1)
+set(PICO9918_PATCH_VER 0)
 
 set(PICO9918_VERSION "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
@@ -92,7 +92,9 @@ endif()
 set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
-if (NOT ${PICO_BOARD} STREQUAL "pico9918")
+if (${PICO_BOARD} STREQUAL "pico9918pro")
+  set(PICO_BOARD_STR pro)
+elseif (NOT ${PICO_BOARD} STREQUAL "pico9918")
   set(PICO_BOARD_STR -${PICO_BOARD})
 endif()
 
