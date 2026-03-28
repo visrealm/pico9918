@@ -338,7 +338,13 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     if (vgaParams.scanlines && pxLineRpt != 0)
     {
       for (int i = 0; i < 5; ++i)
+      {
+#if PICO_RP2040
         currentBuffer[i] >>= 1;
+#else
+        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
+#endif
+      }
     }
     dma_channel_set_read_addr(rgbDmaChan, currentBuffer, true);
 
@@ -364,7 +370,13 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     {
       int end = VIRTUAL_PIXELS_X / 2;
       for (int i = 5; i < end; ++i)
+      {
+#if PICO_RP2040
         currentBuffer[i] >>= 1;
+#else
+        currentBuffer[i] = (currentBuffer[i] >> 1) & 0x07770777;
+#endif
+      }
     }
     if (pxLineRpt == vgaParams.params.vPixelScale - 1)
     {
