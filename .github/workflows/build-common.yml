@@ -59,17 +59,17 @@ jobs:
     - name: Setup MSVC environment
       uses: ilammy/msvc-dev-cmd@v1
         
-    - name: Configure CMake (with automatic SDK fetch and patch)
+    - name: Configure CMake
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1
-        
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON
+
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
       run: |
         cd build
-        cmake --build . --target firmware
+        cmake --build . --target combined
         
     - name: Build Configurator
       if: ${{ inputs.build-configurator }}
@@ -124,45 +124,43 @@ jobs:
         sudo apt-get install -y build-essential cmake python3 python3-pip git gcc-arm-none-eabi
         pip3 install pillow
         
-    - name: Configure CMake (with automatic SDK fetch and patch)
+    - name: Configure CMake
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
-        
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON
+
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
       run: |
         cd build
-        cmake --build . --target firmware
-        
+        cmake --build . --target combined
+
     - name: Build Configurator
       if: ${{ inputs.build-configurator }}
       run: |
         cd build
         cmake --build . --target configurator_all
-        
+
     - name: Extract version info for artifacts
       id: version
       run: |
-        # Extract version and branch from firmware filename if it exists
         fwFile=$(ls build/dist/*.uf2 2>/dev/null | head -1)
         if [ -n "$fwFile" ]; then
-          # Extract version string from filename (e.g., pico9918-vga-v1-0-3-dev.uf2 -> v1-0-3-dev)
           name=$(basename "$fwFile" .uf2)
           if [[ $name =~ v[0-9]+-[0-9]+-[0-9]+(-[a-zA-Z0-9]+)? ]]; then
             version="${BASH_REMATCH[0]}"
             echo "version=$version" >> $GITHUB_OUTPUT
           fi
         fi
-        
+
     - name: Upload Firmware Artifacts
       if: ${{ inputs.build-firmware }}
       uses: actions/upload-artifact@v4
       with:
         name: firmware-${{ inputs.artifact-name-suffix }}-${{ steps.version.outputs.version }}
         path: build/dist/*.uf2
-        
+
     - name: Upload Configurator Artifacts
       if: ${{ inputs.build-configurator }}
       uses: actions/upload-artifact@v4
@@ -195,17 +193,17 @@ jobs:
         sudo tar -xzf arm-toolchain.tar.gz -C /opt
         echo "/opt/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin" >> $GITHUB_PATH
         
-    - name: Configure CMake (with automatic SDK fetch and patch)
+    - name: Configure CMake
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" "-DPICO_BOARD_HEADER_DIRS=../src/boards" -DPICO_BOARD=pico9918 -DBUILD_TOOLS_FROM_SOURCE=ON
-        
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON
+
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
       run: |
         cd build
-        cmake --build . --target firmware
+        cmake --build . --target combined
         
     - name: Build Configurator
       if: ${{ inputs.build-configurator }}
