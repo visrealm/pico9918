@@ -171,7 +171,11 @@ void initDiagnostics()
   clear(&sprPattTabStr);
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
+#if PICO_RP2350
+  strcpy(hwVerStr.digits, "V2.0+");
+#else
   strcpy(hwVerStr.digits, hwVersion == HWVer_0_3 ? "V0.3" : "V1.0+");
+#endif
 
   strncpy(fwVerStr.digits, PICO9918_VERSION, sizeof(fwVerStr.digits) - 1);
   fwVerStr.digits[sizeof(fwVerStr.digits) - 1] = '\0';

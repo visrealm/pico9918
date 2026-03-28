@@ -41,7 +41,9 @@ static Pico9918HardwareVersion detectHardwareVersion()
 {
   Pico9918HardwareVersion version = HWVer_1_x;
 
-#if PICO_RP2040
+#if PICO_RP2350
+  version = HWVer_2_x;
+#elif PICO_RP2040
   // check if RESET pin is being driven externally (on v0.4+, it is, on v0.3 it isn't since it's CPUCL)
   gpio_pull_down(GPIO_RESET);
   sleep_ms(1);  
