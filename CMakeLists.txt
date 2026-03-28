@@ -28,8 +28,10 @@ set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
 set(PICO_BOARD pico9918pro CACHE STRING "Board type")
 #set(PICO_BOARD pimoroni_pga2350 CACHE STRING "Board type")
 
+option(PICO9918_BUILD_COMBINED "Build combined UF2 for both pico9918 (RP2040) and pico9918pro (RP2350)" OFF)
+
 # Check if building configurator only (skip Pico SDK setup)
-if(NOT CONFIGURATOR_ONLY)
+if(NOT CONFIGURATOR_ONLY AND NOT PICO9918_BUILD_COMBINED)
     # Pull in Raspberry Pi Pico SDK (must be before project)
     include(pico_sdk_import.cmake)
 endif()
@@ -38,7 +40,11 @@ endif()
 include(visrealm_tools.cmake)
 include(visrealm_cvbasic.cmake)
 
-project(pico9918 C CXX ASM)
+if(PICO9918_BUILD_COMBINED)
+    project(pico9918 NONE)
+else()
+    project(pico9918 C CXX ASM)
+endif()
 
 # PICO9918 Version Information
 set(PICO9918_MAJOR_VER 1)
@@ -114,7 +120,65 @@ set(FIRMWARE_FILE pico9918${PICO9918_BINARY_SUFFIX})
 
 
 
-if(CONFIGURATOR_ONLY)
+if(PICO9918_BUILD_COMBINED)
+    include(ExternalProject)
+    find_package(Python3 REQUIRED)
+
+    set(COMMON_CMAKE_ARGS
+        -DPICO_BOARD_HEADER_DIRS=${CMAKE_SOURCE_DIR}/src/boards
+        -DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS}
+        -DPICO9918_SCART_PAL=${PICO9918_SCART_PAL}
+        -DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH}
+        -DPICO9918_DIAG=${PICO9918_DIAG}
+        -DPICO_SDK_FETCH_FROM_GIT=${PICO_SDK_FETCH_FROM_GIT}
+        -DPICO_SDK_FETCH_FROM_GIT_TAG=${PICO_SDK_FETCH_FROM_GIT_TAG}
+    )
+    if(WIN32)
+        list(APPEND COMMON_CMAKE_ARGS
+            -DCMAKE_C_COMPILER_WORKS=1
+            -DCMAKE_CXX_COMPILER_WORKS=1
+        )
+    endif()
+
+    ExternalProject_Add(build_pico9918
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}
+        BINARY_DIR ${CMAKE_BINARY_DIR}/pico9918
+        CMAKE_ARGS ${COMMON_CMAKE_ARGS} -DPICO_BOARD=pico9918
+        BUILD_COMMAND ${CMAKE_COMMAND} --build . --target firmware
+        INSTALL_COMMAND ""
+        BUILD_ALWAYS TRUE
+    )
+
+    ExternalProject_Add(build_pico9918pro
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}
+        BINARY_DIR ${CMAKE_BINARY_DIR}/pico9918pro
+        CMAKE_ARGS ${COMMON_CMAKE_ARGS} -DPICO_BOARD=pico9918pro
+        BUILD_COMMAND ${CMAKE_COMMAND} --build . --target firmware
+        INSTALL_COMMAND ""
+        BUILD_ALWAYS TRUE
+    )
+
+    # Compute expected firmware filenames (mirrors logic in src/CMakeLists.txt)
+    set(RP2040_SUFFIX "-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
+    set(RP2350_SUFFIX "pro-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
+    if(PICO9918_DIAG)
+        set(RP2040_SUFFIX "${RP2040_SUFFIX}-diag")
+        set(RP2350_SUFFIX "${RP2350_SUFFIX}-diag")
+    endif()
+
+    set(UF2_RP2040  ${CMAKE_BINARY_DIR}/pico9918/dist/pico9918${RP2040_SUFFIX}.uf2)
+    set(UF2_RP2350  ${CMAKE_BINARY_DIR}/pico9918pro/dist/pico9918${RP2350_SUFFIX}.uf2)
+    set(UF2_COMBINED ${CMAKE_BINARY_DIR}/dist/pico9918-combined-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}.uf2)
+
+    add_custom_target(combined ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/dist
+        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/concat_uf2.py
+                ${UF2_RP2040} ${UF2_RP2350} ${UF2_COMBINED}
+        DEPENDS build_pico9918 build_pico9918pro
+        COMMENT "Creating combined UF2: pico9918-combined-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}.uf2"
+    )
+
+elseif(CONFIGURATOR_ONLY)
     add_subdirectory(configtool)
 else()
     # Initialise the Raspberry Pi Pico SDK
