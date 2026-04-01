@@ -9,6 +9,7 @@
  *
  */
 
+#include <stdio.h>
 #include "vga.h"
 #include "vga-modes.h"
 
@@ -54,6 +55,8 @@
 static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
 static uint8_t currentStatus = 0x1f; /* current status register value */
+
+static char collisionDebugStr[32] = "";  /* debug: last collision info */
 
 static __attribute__((section(".scratch_y.buffer"))) uint32_t bg; 
 
@@ -282,24 +285,33 @@ static void updateInterrupts(uint8_t tempStatus)
   disableTmsPioInterrupts();
   if ((currentStatus & STATUS_INT) == 0)
   {
-    currentStatus = (currentStatus & 0xe0) | tempStatus;
-
-    vrEmuTms9918SetStatusImpl(currentStatus);
-    updateTmsReadAhead();  // Update read-ahead before changing pin state
-
-    currentInt = vrEmuTms9918InterruptStatusImpl();
-    gpio_put(GPIO_INT, !currentInt);
+    if (currentStatus & STATUS_5S)
+    {
+      // 5S already latched - preserve existing ID, OR in any new flags (INT, 5S, COL)
+      currentStatus |= (tempStatus & 0xe0);
+    }
+    else
+    {
+      currentStatus = (currentStatus & 0xe0) | tempStatus;
+    }
   }
   else
   {
-    // Status already has INT set, but ensure pin state is correct
-    // (in case R1 was modified to disable interrupts)
-    bool shouldInt = vrEmuTms9918InterruptStatusImpl();
-    if (shouldInt != currentInt)
-    {
-      currentInt = shouldInt;
-      gpio_put(GPIO_INT, !currentInt);
-    }
+    // F is set - only allow COL through (per F18A/TMS9918A: COL is not gated by F)
+    // 5S is blocked while F is set (per datasheet)
+    currentStatus |= (tempStatus & STATUS_COL);
+  }
+
+  vrEmuTms9918SetStatusImpl(currentStatus);
+  updateTmsReadAhead();
+
+  // Ensure interrupt pin state is correct
+  // (in case R1 was modified to enable/disable interrupts)
+  bool shouldInt = vrEmuTms9918InterruptStatusImpl();
+  if (shouldInt != currentInt)
+  {
+    currentInt = shouldInt;
+    gpio_put(GPIO_INT, !currentInt);
   }
   enableTmsPioInterrupts();
 }
@@ -356,7 +368,7 @@ static void tmsPorch()
 
 static void tmsEndOfScanline(uint32_t displayLine)
 {
-  if (!doneInt && displayLine == vBorder + vPixels - 1)
+  if (!doneInt && (displayLine == (vBorder + vPixels)))
   {
     bool droppedFrame = currentStatus & STATUS_INT;
     droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
