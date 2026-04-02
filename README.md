@@ -89,7 +89,7 @@ So far, there aren't any.
 
 # Digital A/V (HDMI) Dongle [NEW]
 
-The new Digital A/V dongle provides video and audio direct to any HDMI compatible display. The new dongle is fully compatible with all previous FFC-equipped PICO9918 boards (v1.2 and v1.3) and are available to purchase either with a new PICO9918 or separately.
+The new Digital A/V dongle provides video and audio direct to any HDMI compatible display. The new dongle is fully compatible with all previous FFC-equipped PICO9918 boards (v1.2, v1.3 and PRO v2.0) and are available to purchase either with a new PICO9918 PRO or separately.
 
 ![Digital A/V dongle](img/digital_av_m.jpg)
 
@@ -103,7 +103,7 @@ The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video bel
 
 ## Purchasing options
 
-Fully assembled and tested PICO9918 v1.2s are available on my Tindie store:
+Fully assembled and tested PICO9918 PROs are available on my Tindie store:
 
 <a href="https://www.tindie.com/search/?q=PICO9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
 
@@ -113,11 +113,19 @@ Also (more convenient for North America)
 
 ## Hardware
 
-There are two main variants of the hardware. 
+There are three main variants of the hardware. 
+
+### PRO v2.x (v2.0)
+
+This is the latest version, poewered by the more powerful RP2350. This hardware upgrade will allow for additional VRAM and display modes in the future, including V9938 support.
+
+<p align="left"><a href="img/pico9918pro_800_1.jpg"><img src="img/pico9918pro_800_1.jpg" alt="PICO9918 PRO v2.0" width="720px"></a></p>
+
+This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
 
 ### v1.x (v1.3, v1.2, v1.1, v1.0 and v0.4)
 
-PICO9918 v1.3 is the single board version which doesn't require a piggy-backed Pi Pico. This is the version you can currently buy pre-assembled from Tindie and ArcadeShopper.
+PICO9918 v1.3 was the first single board version which doesn't require a piggy-backed Pi Pico.
 
 <p align="left"><a href="img/pico9918_v1_2_sm.jpg"><img src="img/pico9918_v1_2_sm.jpg" alt="PICO9918 v1.2" width="720px"></a></p>
 
