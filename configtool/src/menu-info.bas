@@ -12,9 +12,6 @@
 
 
 deviceInfoMenu: PROCEDURE
-    const PICO_MODEL_RP2040 = 1
-    const PICO_MODEL_RP2350 = 2
-
     g_menuTopRow = MENU_TITLE_ROW + 3
 
 

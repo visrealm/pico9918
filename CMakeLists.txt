@@ -40,7 +40,7 @@ endif()
 include(visrealm_tools.cmake)
 include(visrealm_cvbasic.cmake)
 
-if(PICO9918_BUILD_COMBINED)
+if(PICO9918_BUILD_COMBINED OR CONFIGURATOR_ONLY)
     project(pico9918 NONE)
 else()
     project(pico9918 C CXX ASM)
@@ -176,6 +176,26 @@ if(PICO9918_BUILD_COMBINED)
                 ${UF2_RP2040} ${UF2_RP2350} ${UF2_COMBINED}
         DEPENDS build_pico9918 build_pico9918pro
         COMMENT "Creating combined UF2: pico9918-combined-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}.uf2"
+    )
+
+    # Build configurator ROMs using the combined UF2
+    ExternalProject_Add(build_configurators
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}
+        BINARY_DIR ${CMAKE_BINARY_DIR}/configurators
+        CMAKE_ARGS
+            -DCONFIGURATOR_ONLY=ON
+            -DPICO9918_FIRMWARE_UF2_PATH=${UF2_COMBINED}
+            -DPICO9918_VERSION=${PICO9918_VERSION}
+            -DPICO9918_VERSION_STR=${PICO9918_VERSION_STR}
+            -DPICO9918_MAJOR_VER=${PICO9918_MAJOR_VER}
+            -DPICO9918_MINOR_VER=${PICO9918_MINOR_VER}
+            -DPICO9918_PATCH_VER=${PICO9918_PATCH_VER}
+            -DPICO9918_OUTPUT_STR=${PICO9918_OUTPUT_STR}
+            -DPICO9918_GIT_BRANCH=${PICO9918_GIT_BRANCH}
+        BUILD_COMMAND ${CMAKE_COMMAND} --build . --target configurator_all
+        INSTALL_COMMAND ""
+        BUILD_ALWAYS TRUE
+        DEPENDS combined
     )
 
 elseif(CONFIGURATOR_ONLY)

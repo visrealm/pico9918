@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 # PICO9918 Configurator CMake Build
 # Converts the batch-based build to cross-platform CMake
 
-project(pico9918-configurator)
+project(pico9918-configurator NONE)
 
 # Include CVBasic build functions
 include(${CMAKE_SOURCE_DIR}/visrealm_cvbasic.cmake)
@@ -24,11 +24,19 @@ set(FRIENDLYVER "${PICO9918_VERSION}")
 setup_cvbasic_tools()
 
 # Firmware dependency (checked at build time, not configure time)
-set(FIRMWARE_PATH "${CMAKE_BINARY_DIR}/dist/${FIRMWARE_FILE}.uf2")
-if(NOT CONFIGURATOR_ONLY)
-    set(FIRMWARE_TARGET "firmware")  # Target that builds the firmware
+# PICO9918_FIRMWARE_UF2_PATH can be set externally to use a specific UF2
+# (e.g. the combined RP2040+RP2350 UF2 when building release configurators)
+if(PICO9918_FIRMWARE_UF2_PATH)
+    set(FIRMWARE_PATH "${PICO9918_FIRMWARE_UF2_PATH}")
+    set(FIRMWARE_TARGET "")  # External path, no CMake build target
+    message(STATUS "Configurator firmware: ${FIRMWARE_PATH}")
 else()
-    set(FIRMWARE_TARGET "")  # No target dependency when building configurator only
+    set(FIRMWARE_PATH "${CMAKE_BINARY_DIR}/dist/${FIRMWARE_FILE}.uf2")
+    if(NOT CONFIGURATOR_ONLY)
+        set(FIRMWARE_TARGET "firmware")  # Target that builds the firmware
+    else()
+        set(FIRMWARE_TARGET "")  # No target dependency when building configurator only
+    endif()
 endif()
 
 # Custom function to convert UF2 to CVBasic data
