@@ -74,8 +74,7 @@ jobs:
     - name: Build Configurator
       if: ${{ inputs.build-configurator }}
       run: |
-        cd build
-        cmake --build . --target configurator_all
+        cmake --build build/configurators --target configurator_all
         
     - name: Extract version info for artifacts
       id: version
@@ -140,8 +139,7 @@ jobs:
     - name: Build Configurator
       if: ${{ inputs.build-configurator }}
       run: |
-        cd build
-        cmake --build . --target configurator_all
+        cmake --build build/configurators --target configurator_all
 
     - name: Extract version info for artifacts
       id: version
@@ -210,8 +208,7 @@ jobs:
     - name: Build Configurator
       if: ${{ inputs.build-configurator }}
       run: |
-        cd build
-        cmake --build . --target configurator_all
+        cmake --build build/configurators --target configurator_all
         
     - name: Extract version info for artifacts
       id: version
