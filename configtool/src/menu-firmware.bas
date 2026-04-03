@@ -83,6 +83,8 @@ firmwareMenu: PROCEDURE
 
             GOSUB firmwareWriteAndVerify
         END IF
+    ELSE
+        GOSUB waitForInput
     END IF
 #endif
 
