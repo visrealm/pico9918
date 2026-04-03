@@ -76,7 +76,7 @@ selectBank: PROCEDURE
     DEF FN BANKSEL(BANK) = B = BANK
 #endif
 
-#if TI994A
+#if TI994A_BANKED
 
 selectBank16: PROCEDURE
     BANK SELECT 16
