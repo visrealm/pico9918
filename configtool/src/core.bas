@@ -110,7 +110,7 @@ main: PROCEDURE
     ' what are we working with?
     GOSUB vdpDetect
 
-    PRINT AT XY(4, 21), "Detected: "
+    PRINT AT XY(3, 21), "Detected: "
 
     IF isF18ACompatible THEN
 
@@ -131,7 +131,16 @@ main: PROCEDURE
             verMinor = optValue AND $0f
             VDP_REG(58) = CONF_SW_PATCH_VERSION
             verPatch = VDP_STATUS
-            PRINT "PICO9918 v", verMajor, ".", verMinor, ".", verPatch
+            VDP_REG(58) = CONF_PICO_MODEL
+            picoModel = VDP_STATUS
+            VDP_REG(58) = CONF_HW_VERSION
+            optValue = VDP_STATUS
+            hwMajor = optValue / 16
+            hwMinor = optValue AND $0f
+            PRINT "PICO9918 "
+            IF picoModel = PICO_MODEL_RP2350 THEN PRINT "PRO "
+            PRINT "v", hwMajor, "."
+            IF hwMinor = 0 THEN PRINT "x" ELSE PRINT hwMinor
             isPico9918 = TRUE
         ELSEIF (statReg AND $E0) = $E0 THEN
             VDP_STATUS_REG = 14      ' SR14: Version
