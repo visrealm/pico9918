@@ -56,10 +56,96 @@ selectBank12: PROCEDURE
     BANK SELECT 12
     END
 
+selectBank13: PROCEDURE
+    BANK SELECT 13
+    END
+
+selectBank14: PROCEDURE
+    BANK SELECT 14
+    END
+
+selectBank15: PROCEDURE
+    BANK SELECT 15
+    END
+#endif
+
+#if TI994A_BANKED
+
+selectBank16: PROCEDURE
+    BANK SELECT 16
+    END
+
+selectBank17: PROCEDURE
+    BANK SELECT 17
+    END
+
+selectBank18: PROCEDURE
+    BANK SELECT 18
+    END
+
+selectBank19: PROCEDURE
+    BANK SELECT 19
+    END
+
+selectBank20: PROCEDURE
+    BANK SELECT 20
+    END
+
+selectBank21: PROCEDURE
+    BANK SELECT 21
+    END
+
+selectBank22: PROCEDURE
+    BANK SELECT 22
+    END
+
+selectBank23: PROCEDURE
+    BANK SELECT 23
+    END
+
+selectBank24: PROCEDURE
+    BANK SELECT 24
+    END
+
+selectBank25: PROCEDURE
+    BANK SELECT 25
+    END
+
+selectBank26: PROCEDURE
+    BANK SELECT 26
+    END
+
+selectBank27: PROCEDURE
+    BANK SELECT 27
+    END
+
+selectBank28: PROCEDURE
+    BANK SELECT 28
+    END
+
+selectBank29: PROCEDURE
+    BANK SELECT 29
+    END
+
+selectBank30: PROCEDURE
+    BANK SELECT 30
+    END
+
+selectBank31: PROCEDURE
+    BANK SELECT 31
+    END
+
 selectBank: PROCEDURE
-    ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12
+    ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12,selectBank13,selectBank14,selectBank15,selectBank16,selectBank17,selectBank18,selectBank19,selectBank20,selectBank21,selectBank22,selectBank23,selectBank24,selectBank25,selectBank26,selectBank27,selectBank28,selectBank29,selectBank30,selectBank31
+    END
+
+#elif BANK_SIZE
+
+selectBank: PROCEDURE
+    ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12,selectBank13,selectBank14,selectBank15
     END
 
 #else   ' No banking
     DEF FN BANKSEL(BANK) = B = BANK
+    
 #endif

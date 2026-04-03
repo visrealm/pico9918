@@ -27,12 +27,14 @@
     CONST BANK_SIZE = 0
     #INFO "No banking / No firmware upgrade"
 #elif TI994A
-    BANK ROM 128
+    BANK ROM 256
     CONST BANK_SIZE = 8
+    CONST TI994A_BANKED = 1
     #INFO "TI-99/4A - 8KB BANK SIZE"
 #else
-    BANK ROM 128
+    BANK ROM 256
     CONST BANK_SIZE = 16
+    CONST BANKED_16K = 1
     #INFO "Other - 16KB BANK SIZE"
 #endif
 
@@ -49,6 +51,11 @@
     INCLUDE "firmware_16k.h.bas"
 #endif
 
+#if BANK_SIZE
+    CONST BANKED_COMBINED = FIRMWARE_COMBINED
+#else
+    CONST BANKED_COMBINED = 0
+#endif
 
 #if F18A_TESTING
     #INFO "F18A testing mode"

@@ -95,7 +95,7 @@
         },
         {
             "label": "Build MSX Configurator",
-            "type": "shell", 
+            "type": "shell",
             "command": "cmake",
             "args": ["--build", "./build", "--target", "msx_asc16"],
             "group": "build",
@@ -105,6 +105,45 @@
             },
             "problemMatcher": "$gcc",
             "dependsOn": "Compile Project"
+        },
+        {
+            "label": "Configure Combined Firmware",
+            "type": "shell",
+            "command": "${userHome}/.pico-sdk/cmake/v3.31.5/bin/cmake",
+            "args": [
+                "-B", "./build-combined",
+                "-G", "Ninja",
+                "-DPICO9918_BUILD_COMBINED=ON",
+                "-DPICO9918_SCART_RGBS=OFF",
+                "-DPICO9918_SCART_PAL=OFF",
+                "-DPICO9918_NO_SPLASH=OFF",
+                "-DPICO9918_DIAG=OFF"
+            ],
+            "windows": {
+                "command": "${env:USERPROFILE}/.pico-sdk/cmake/v3.31.5/bin/cmake.exe"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "Build Combined Firmware",
+            "type": "shell",
+            "command": "${userHome}/.pico-sdk/cmake/v3.31.5/bin/cmake",
+            "args": ["--build", "./build-combined"],
+            "windows": {
+                "command": "${env:USERPROFILE}/.pico-sdk/cmake/v3.31.5/bin/cmake.exe"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "problemMatcher": "$gcc",
+            "dependsOn": "Configure Combined Firmware"
         }
     ]
 }

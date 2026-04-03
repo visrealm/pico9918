@@ -1,6 +1,6 @@
 # PICO9918 PCBs
 
-Here you will find schematics and gerbers for all working revisions of the PICO9918. There are two main variants of the hardware. Due to a minor difference in RP2040 GPIO pinouts, firmware binaries aren't compatible between the two, however both are fully supported with latest firmware updates and separate firmware packages are provided for each.
+Here you will find schematics and gerbers for all working revisions of the PICO9918. There are three main variants of the hardware. 
 
 ### DIY Piggybacked board (v0.3)
 
@@ -10,14 +10,30 @@ This version is relatively cheap and easy to build and is powered by a piggyback
 
 See [PICO9918 v0.3](v0.3)
 
-### Fully integrated single board (v0.4 - v1.3+)
+### Fully integrated RP2040 single board (v0.4 - v1.3)
 
 From v0.4 the RP2040 has been integrated onto the PICO9918 PCB, making a much smaller small form factor. This revision has many small (0402) components and can be challenging (and more expensive) to build. They can be purchased too.
 
 <p align="left"><a href="../img/pico9918_v1_0_sm.png"><img src="../img/pico9918_v1_0_sm.png" 
 alt="PICO9918 v1.0" width="240px"></a></p>
 
+### Fully integrated RP2350 single board (PRO v2.0+)
+
+With the introduction of the RP2350, the PICO9918 v2.0 "PRO" was produced to take advantage of the much improved instruction set.
+
 # Revision history
+
+## [PRO v2.0 (2026-03-09)](v2.0)
+
+<p align="left"><a href="../img/pico9918pro_800_1.jpg"><img src="../img/pico9918pro_800_1.jpg" alt="PICO9918 PRO v2.0" width="720px"></a></p>
+
+### Changelog
+- Switched from RP2040 to RP2354A (RP2350 with integrated flash).
+- Removed Winbond 16mbit flash.
+- Switched from dual transceiver data I/O to single transceiver.
+- Additional power filtering to FFC interface to improve HDMI dongle power delivery.
+- Added optional BOOTSEL pin on FFC interface.
+- Many routing improvements.
 
 ## [v1.3 (2025-07-02)](v1.2)
 

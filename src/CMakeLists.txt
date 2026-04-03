@@ -21,7 +21,11 @@ pico_set_program_url(${PROGRAM} "https://github.com/visrealm/pico9918")
 
 # generate image array source files from png images
 if (NOT PICO9918_NO_SPLASH)
+if (PICO_BOARD STREQUAL "pico9918pro")
+visrealm_generate_image_source_ram(${PROGRAM} bmp_splash res/splash_pro.png )
+else()
 visrealm_generate_image_source_ram(${PROGRAM} bmp_splash res/splash.png )
+endif()
 endif()
 
 visrealm_generate_image_source_ram(${PROGRAM} bmp_font res/font.png )

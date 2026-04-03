@@ -48,6 +48,7 @@ typedef enum
 {
   HWVer_0_3 = 0x03,
   HWVer_1_x = 0x10,
+  HWVer_2_x = 0x20,
 } Pico9918HardwareVersion;
 
 #define CONFIG_BYTES 256
