@@ -169,7 +169,7 @@ If you're not interested in building the configurator yourself, you'll find the 
 
 ### Web-based Configurator
 
-If you don't have a device supported by the native configurator, the [Web-based PICO9918 Configurator](https://visrealm.github.io/pico9918/config/index.html) can be used to generate a config .uf2 file. Just drag-and-drop the resulting file onto your PICO9918 using the same method as for firmware updates.
+If you don't have a device supported by the native configurator, the [Web-based PICO9918 Configurator](https://visrealm.github.io/pico9918/config/index.html) can be used to generate a config .uf2 file compatible with both the PICO9918 and PICO9918 PRO. Just drag-and-drop the resulting file onto your device using the same method as for firmware updates.
 
 ## Documentation
 
