@@ -83,18 +83,20 @@ The latest PICO9918 source can be configured and built using the official [Raspb
 
 The PICO9918 firmware is the primary component - a TMS9918A VDP emulator for Raspberry Pi Pico.
 
-### Quick Start - Firmware Only
+### Quick Start
 
-**Option 1: Automatic SDK Download (Recommended)**
+**Combined build — firmware for PICO9918 and PICO9918 PRO, plus all configurator ROMs (Recommended)**
 ```bash
 mkdir build && cd build
-cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
-cmake --build . --target firmware
+cmake .. -DPICO9918_BUILD_COMBINED=ON
+cmake --build . --target combined
+cmake --build . --target build_configurators
 ```
 
-**Option 2: Manual SDK Setup**
+Outputs in `build/dist/`: combined `.uf2` firmware and all configurator ROMs.
+
+**Firmware only (RP2040)**
 ```bash
-# First: Follow platform-specific setup above to install SDK
 mkdir build && cd build
 cmake ..
 cmake --build . --target firmware
@@ -192,13 +194,15 @@ The configurator creates ROM files for retro computers that can upload firmware 
 > Simply run the build commands below - all tools will be built from source automatically.
 
 ### Quick Start - Configurator
+
+The recommended approach is the **combined build** above, which builds firmware and all configurator ROMs together and embeds the combined RP2040+RP2350 firmware in each ROM.
+
+To build configurator ROMs against an existing firmware (standalone):
 ```bash
 mkdir build && cd build
-cmake ..
-# Build firmware first (required dependency)
-cmake --build . --target firmware
-# Build all configurator ROMs
-cmake --build . --target configurator_all
+cmake .. -DPICO9918_BUILD_COMBINED=ON
+cmake --build . --target combined
+cmake --build . --target build_configurators
 ```
 
 ### Configurator Targets
@@ -261,30 +265,48 @@ cmake .. -DBUILD_TOOLS_FROM_SOURCE=OFF
 | NABU MAME | None | `.npz` | GASM80 | MAME emulator |
 | CreatiVision | None | `.bin` | GASM80 | CreatiVision console |
 
-## Unified Build (Complete System)
+## Combined Build (Recommended)
 
-Build both firmware and all configurator ROMs together:
+The combined build produces a single UF2 file that contains firmware for **both** PICO9918 (RP2040) and PICO9918 PRO (RP2350). Configurator ROMs built against this combined UF2 can update either device using the same ROM file.
+
+Enable it with `-DPICO9918_BUILD_COMBINED=ON`:
+
+```bash
+mkdir build && cd build
+cmake .. -DPICO9918_BUILD_COMBINED=ON
+cmake --build . --target combined
+cmake --build . --target build_configurators
+```
+
+All outputs land in `build/dist/`:
+- **Combined firmware**: `pico9918-vga-<version>.uf2` — works on both RP2040 and RP2350
+- **Configurator ROMs**: All platform ROMs, each embedding the combined firmware
+
+### Ninja Generator (Faster)
+```bash
+cmake .. -DPICO9918_BUILD_COMBINED=ON -G Ninja
+ninja combined
+ninja build_configurators
+```
+
+### Parallel Builds
+```bash
+cmake --build . --target combined --parallel 8
+```
+
+## Firmware-Only Build
+
+To build individual firmware images without the combined file:
 
 ```bash
 mkdir build && cd build
 cmake ..
-cmake --build .
+cmake --build . --target firmware
 ```
 
-All outputs in `build/dist/`:
-- **Firmware**: `pico9918-vga-build-<version>.uf2`
-- **Configurator ROMs**: Platform-specific ROM files
+Output: `build/dist/pico9918-vga-build-<version>.uf2` (RP2040 only)
 
-### Parallel Builds
-```bash
-cmake --build . --parallel 8               # Use 8 CPU cores
-```
-
-### Ninja Generator (Faster)
-```bash
-cmake .. -G Ninja
-ninja
-```
+For RP2350 (PICO9918 PRO) firmware only, set the board in CMake or use the combined build above.
 
 ## Cross-Platform Support
 
@@ -320,18 +342,26 @@ The project includes GitHub Actions workflows that automatically build on every 
 
 ## Output Structure
 
+### Combined Build (`-DPICO9918_BUILD_COMBINED=ON`)
 ```
 build/
-├── dist/                              # Final artifacts
-│   ├── pico9918-vga-build-<version>.uf2  # Pico firmware
-│   ├── pico9918_<version>_ti99_8.bin      # TI-99/4A ROM
-│   ├── pico9918_<version>_cv.rom          # ColecoVision ROM
-│   ├── pico9918_<version>_msx_asc16.rom   # MSX ROM
-│   └── ...                               # Other platform ROMs
-├── src/                               # Firmware build
-│   └── pico9918-vga-build-<version>.uf2  # Original firmware output
-├── intermediate/                      # Configurator intermediates
-└── external/                          # Auto-built tools
+├── dist/                                      # Final artifacts
+│   ├── pico9918-vga-<version>.uf2             # Combined RP2040+RP2350 firmware
+│   ├── pico9918_<version>_ti99_8.bin          # TI-99/4A ROM (with combined firmware)
+│   ├── pico9918_<version>_cv.rom              # ColecoVision ROM
+│   ├── pico9918_<version>_msx_asc16.rom       # MSX ROM
+│   └── ...                                    # Other platform ROMs
+├── pico9918/dist/                             # RP2040-only firmware
+├── pico9918pro/dist/                          # RP2350-only firmware
+└── configurators/                             # Configurator build tree
+```
+
+### Firmware-Only Build (default)
+```
+build/
+├── dist/                                      # Final artifacts
+│   └── pico9918-vga-build-<version>.uf2       # RP2040 firmware
+└── src/                                       # Build intermediates
 ```
 
 ## Troubleshooting
