@@ -104,10 +104,11 @@ jobs:
       with:
         name: configurator-${{ inputs.artifact-name-suffix }}-${{ steps.version.outputs.version }}
         path: |
-          build/dist/*.rom
-          build/dist/*.bin
-          build/dist/*.nabu
-          build/dist/*.sg
+          build/configurators/dist/*.rom
+          build/configurators/dist/*.bin
+          build/configurators/dist/*.nabu
+          build/configurators/dist/*.sg
+          build/configurators/dist/*.npz
 
   linux:
     runs-on: ubuntu-latest
@@ -167,10 +168,11 @@ jobs:
       with:
         name: configurator-${{ inputs.artifact-name-suffix }}-${{ steps.version.outputs.version }}
         path: |
-          build/dist/*.rom
-          build/dist/*.bin
-          build/dist/*.nabu
-          build/dist/*.sg
+          build/configurators/dist/*.rom
+          build/configurators/dist/*.bin
+          build/configurators/dist/*.nabu
+          build/configurators/dist/*.sg
+          build/configurators/dist/*.npz
 
   macos:
     runs-on: macos-latest
@@ -238,8 +240,9 @@ jobs:
       with:
         name: configurator-${{ inputs.artifact-name-suffix }}-${{ steps.version.outputs.version }}
         path: |
-          build/dist/*.rom
-          build/dist/*.bin
-          build/dist/*.nabu
-          build/dist/*.sg
+          build/configurators/dist/*.rom
+          build/configurators/dist/*.bin
+          build/configurators/dist/*.nabu
+          build/configurators/dist/*.sg
+          build/configurators/dist/*.npz
 
