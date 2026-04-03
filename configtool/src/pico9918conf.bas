@@ -34,6 +34,7 @@
 #else
     BANK ROM 256
     CONST BANK_SIZE = 16
+    CONST BANKED_16K = 1
     #INFO "Other - 16KB BANK SIZE"
 #endif
 

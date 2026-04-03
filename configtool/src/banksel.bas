@@ -67,13 +67,6 @@ selectBank14: PROCEDURE
 selectBank15: PROCEDURE
     BANK SELECT 15
     END
-
-selectBank: PROCEDURE
-    ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12,selectBank13,selectBank14,selectBank15
-    END
-
-#else   ' No banking
-    DEF FN BANKSEL(BANK) = B = BANK
 #endif
 
 #if TI994A_BANKED
@@ -146,4 +139,13 @@ selectBank: PROCEDURE
     ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12,selectBank13,selectBank14,selectBank15,selectBank16,selectBank17,selectBank18,selectBank19,selectBank20,selectBank21,selectBank22,selectBank23,selectBank24,selectBank25,selectBank26,selectBank27,selectBank28,selectBank29,selectBank30,selectBank31
     END
 
+#elif BANK_SIZE
+
+selectBank: PROCEDURE
+    ON g_currentBank FAST GOSUB selectBank0,selectBank1,selectBank2,selectBank3,selectBank4,selectBank5,selectBank6,selectBank7,selectBank8,selectBank9,selectBank10,selectBank11,selectBank12,selectBank13,selectBank14,selectBank15
+    END
+
+#else   ' No banking
+    DEF FN BANKSEL(BANK) = B = BANK
+    
 #endif
