@@ -368,7 +368,7 @@ static void tmsPorch()
 
 static void tmsEndOfScanline(uint32_t displayLine)
 {
-  if (!doneInt && (displayLine == (vBorder + vPixels)))
+  if (!doneInt)
   {
     bool droppedFrame = currentStatus & STATUS_INT;
     droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
@@ -419,6 +419,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
     vPixels <<= 1;
   vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
+  vgaSetTriggerScanline(vBorder + vPixels);
 }
 
 
@@ -816,6 +817,7 @@ int main(void)
   params.endOfFrameFn = tmsEndOfFrame;
   params.endOfScanlineFn = tmsEndOfScanline;
   params.porchFn = tmsPorch;
+  params.triggerScanline = UINT32_MAX;  // will be set dynamically once vBorder/vPixels are known
 
   const char *version = PICO9918_VERSION;
 

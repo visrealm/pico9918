@@ -58,6 +58,7 @@ typedef struct
   vgaEndOfScanlineFn endOfScanlineFn;
   vgaPorchFn porchFn;
   bool scanlines;
+  uint32_t triggerScanline;  // scanline to fire endOfScanlineFn on; UINT32_MAX to disable
 } VgaInitParams;
 
 void vgaLoop();
@@ -65,3 +66,5 @@ void vgaLoop();
 void vgaInit(VgaInitParams params);
 
 VgaInitParams *vgaCurrentParams();
+
+void vgaSetTriggerScanline(uint32_t scanline);

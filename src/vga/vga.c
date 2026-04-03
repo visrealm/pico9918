@@ -378,7 +378,8 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
 #endif
       }
     }
-    if (pxLineRpt == vgaParams.params.vPixelScale - 1)
+    if (pxLine == vgaParams.triggerScanline &&
+        pxLineRpt == vgaParams.params.vPixelScale - 1)
     {
       multicore_fifo_push_timeout_us(END_OF_SCANLINE_MSG | pxLine, 0);
     }
@@ -486,4 +487,9 @@ void vgaInit(VgaInitParams params)
 VgaInitParams *vgaCurrentParams()
 {
   return &vgaParams;
+}
+
+void vgaSetTriggerScanline(uint32_t scanline)
+{
+  vgaParams.triggerScanline = scanline;
 }
