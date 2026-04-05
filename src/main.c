@@ -434,8 +434,10 @@ static void tmsEndOfFrame(uint32_t frameNumber)
 
   int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
   vPixels = baseRows << 3;
+#if DISPLAY_YSCALE > 1
   if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
     vPixels <<= 1;
+#endif
   vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
   vgaSetTriggerScanline(vBorder + vPixels);
 }
@@ -508,7 +510,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   // for interlaced modes, bit 12 of y carries the field number (0=Field1, 1=Field2)
   const uint8_t  field  = (y >> 12) & 1;
   y = y & 0x0fff;  // virtual line within the field (0..N-1)
-  (void)field;     // available for future odd/even line selection
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
@@ -601,8 +602,13 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       generateRgbCache();
 
     /* generate the scanline */
+    uint16_t tmsY = y;
+#if DISPLAY_YSCALE == 1
+    if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
+      tmsY = y * 2 + field;
+#endif
     uint32_t renderTime  = time_us_32();
-    uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+    uint8_t tempStatus = vrEmuTms9918ScanLine(tmsY, tmsScanlineBuffer);
     renderTime = time_us_32() - renderTime;
 
     /*** F18A status register updates ***/
