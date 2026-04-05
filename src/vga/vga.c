@@ -327,7 +327,7 @@ static void vgaInitRgb()
 
   // add rgb pio program
   pio_sm_set_consecutive_pindirs(VGA_PIO, RGB_SM, RGB_PINS_START, RGB_PINS_COUNT, true);
-  pio_set_y(VGA_PIO, RGB_SM, RGB_PIXELS_X - 1);
+  pio_set_y(VGA_PIO, RGB_SM, vgaParams.params.hSyncParams.displayPixels - 1);
 
   rgbProgOffset = pio_add_program(VGA_PIO, &rgbProgram);
   rgbConfig = vga_rgb_program_get_default_config(rgbProgOffset);
@@ -348,7 +348,7 @@ static void vgaInitRgb()
   channel_config_set_dreq(&rgbDmaChanConfig, pio_get_dreq(VGA_PIO, RGB_SM, true));
 
   // setup the dma channel and set it going
-  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], RGB_PIXELS_X / 2, false);
+  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], vgaParams.params.hSyncParams.displayPixels / 2, false);
   dma_channel_set_irq0_enabled(rgbDmaChan, true);
 }
 
@@ -531,7 +531,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
     else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
-      int end = RGB_PIXELS_X / 2;
+      int end = vgaParams.params.hSyncParams.displayPixels / 2;
       for (int i = 5; i < end; ++i)
       {
 #if PICO_RP2040
@@ -621,9 +621,9 @@ void __time_critical_func(vgaLoop)()
 
       // get the next scanline pixels
       // for interlaced modes, bit 12 of y carries the field number (0 or 1)
-      // offset pixel pointer to center the VIRTUAL_PIXELS_X render area within the RGB_PIXELS_X buffer
+      // offset pixel pointer to center the virtual render area within the display buffer
       vgaParams.scanlineFn(message & 0x1fff, &vgaParams.params,
-                           rgbDataBuffer[message & 0x01] + (RGB_PIXELS_X - VIRTUAL_PIXELS_X) / 2);
+                           rgbDataBuffer[message & 0x01] + (vgaParams.params.hSyncParams.displayPixels - vgaParams.params.hVirtualPixels) / 2);
       if (doEof && vgaParams.endOfFrameFn)
       {
         vgaParams.endOfFrameFn(frameNumber);

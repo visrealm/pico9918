@@ -228,6 +228,14 @@ VgaParams vgaGetParams(VgaMode mode)
 
   setVgaParamsScale(&params, 1);
 
+  if (params.interlaced)
+  {
+    // SCART: narrower virtual area within the 720px buffer for black side margins
+    params.hVirtualPixels = 624;
+    // SCART: reduce virtual height to create black top/bottom margins
+    params.vVirtualPixels = params.vSyncParams.displayPixels - 24;
+  }
+
   return params;
 }
 

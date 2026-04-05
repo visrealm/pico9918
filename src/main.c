@@ -428,8 +428,9 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   }
 
 #if DISPLAY_YSCALE > 1
-  vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
-  vgaCurrentParams()->params.vVirtualPixels = VIRTUAL_PIXELS_Y << (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
+  bool doubleRows = TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS;
+  vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)doubleRows;
+  vgaCurrentParams()->params.vVirtualPixels = vgaCurrentParams()->params.vSyncParams.displayPixels << (bool)doubleRows;
 #endif
 
   int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
@@ -505,7 +506,7 @@ static __attribute__((noinline))  void generateRgbCache()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
+  const uint32_t halfHBorder = (params->hVirtualPixels - TMS9918_PIXELS_X * 2) / 4;
 
   // for interlaced modes, bit 12 of y carries the field number (0=Field1, 1=Field2)
   const uint8_t  field  = (y >> 12) & 1;
@@ -525,7 +526,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (y < vBorder || y >= (vBorder + vPixels))  // TODO: None of this runs in ROW30 mode
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
-    dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
+    dma_channel_set_trans_count(dma32, params->hVirtualPixels / 2, true);
     tms9918->vram.map.blanking = 1; // V
     if ((y >= vBorder + vPixels))
     {
@@ -839,9 +840,6 @@ int main(void)
   /* then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(DISPLAY_MODE);
-  setVgaParamsScaleY(&params.params, 1);
-  params.params.vVirtualPixels = VIRTUAL_PIXELS_Y;
-
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;

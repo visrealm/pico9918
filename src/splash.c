@@ -9,8 +9,6 @@
  *
  */
 
-#include "display.h"
-
 #include "splash.h"
 #include "vga.h"
 
