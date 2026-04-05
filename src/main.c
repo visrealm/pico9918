@@ -243,11 +243,21 @@ typedef struct
 
 #define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
 
+#if PICO9918_SCART_RGBS
+// SCART builds: clocks chosen for exact integer pioClocksPerPixel at 13.5 MHz
+// 270 MHz -> pioClocksPerPixel=20, 297 MHz -> 22, 351 MHz -> 26 (all exact)
 static const ClockSettings clockPresets[] = {
-  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252
-  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4
-  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
+  CLOCK_PRESET(1080000000, 4, 1, VREG_VOLTAGE_1_15),    // 270 MHz
+  CLOCK_PRESET(1188000000, 4, 1, VREG_VOLTAGE_1_20),    // 297 MHz
+  CLOCK_PRESET(1404000000, 4, 1, VREG_VOLTAGE_1_30)     // 351 MHz
 };
+#else
+static const ClockSettings clockPresets[] = {
+  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252 MHz
+  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4 MHz
+  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352 MHz
+};
+#endif
 
 static int clockPresetIndex = 0;
 static bool testingClock = false;
@@ -381,6 +391,14 @@ static void tmsEndOfScanline(uint32_t displayLine)
 
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
+#if PICO9918_SCART_RGBS
+  // interlaced: END_OF_FRAME_MSG fires once per field (100 Hz for PAL 50Hz).
+  // only process every second field to maintain correct 50 Hz frame timing.
+  static uint8_t eofField = 0;
+  eofField ^= 1;
+  if (eofField) return;
+#endif
+
   ++frameCount;
   
   if (!validWrites)
@@ -486,6 +504,11 @@ static __attribute__((noinline))  void generateRgbCache()
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
   const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
+
+  // for interlaced modes, bit 12 of y carries the field number (0=Field1, 1=Field2)
+  const uint8_t  field  = (y >> 12) & 1;
+  y = y & 0x0fff;  // virtual line within the field (0..N-1)
+  (void)field;     // available for future odd/even line selection
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
@@ -820,6 +843,9 @@ int main(void)
   params.triggerScanline = UINT32_MAX;  // will be set dynamically once vBorder/vPixels are known
 
   const char *version = PICO9918_VERSION;
+
+  // detect SCART dongle before PIO claims the sync pins
+  detectScartDongle();
 
   vgaInit(params);
 

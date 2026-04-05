@@ -18,7 +18,7 @@ void vgaUpdateTotalPixels(VgaSyncParams* params);
  */
 VgaParams vgaGetParams(VgaMode mode)
 {
-  VgaParams params;
+  VgaParams params = { 0 };
 
   switch (mode)
   {
@@ -99,17 +99,63 @@ VgaParams vgaGetParams(VgaMode mode)
 
   case RGBS_PAL_720_576i_50HZ:
       params.pixelClockKHz = 13500;
+      // Standard PAL: 864 pixels/line = 64us at 13.5MHz
       params.hSyncParams.displayPixels = 720;
-      params.hSyncParams.frontPorchPixels = 22;
+      params.hSyncParams.frontPorchPixels = 12;
       params.hSyncParams.syncPixels = 64;
-      params.hSyncParams.backPorchPixels = 74;
+      params.hSyncParams.backPorchPixels = 68;    // total=864
       params.hSyncParams.syncHigh = false;
 
-      params.vSyncParams.displayPixels = 576 / 2; // halving since... interlaced
-      params.vSyncParams.frontPorchPixels = 8;
-      params.vSyncParams.syncPixels = 3;          // this should be 2.5
-      params.vSyncParams.backPorchPixels = 14;
+      // Interlaced: 312.5 lines/field, 625 lines/frame.
+      // All DMA transfers are 4 words (one full line = 64us = 2 half-lines).
+      //   F1 (313): LsLs LsLs LsEq EqEq EqEq [17 porch] [288 active] EqEq EqEq EqLs
+      //   F2 (312): LsLs LsLs EqEq EqEq       [17 porch] [288 active] EqEq EqEq EqEq
+      // F1 ends with EqLs — the interlace transition line (half-line offset).
+      params.vSyncParams.displayPixels = 576 / 2; // for vVirtualPixels derivation
       params.vSyncParams.syncHigh = false;
+      params.interlaced = true;
+      params.numFields = 2;
+
+      // Half-line sync pulse widths at 13.5MHz pixel clock:
+      // EQ (short sync): 2us = 27 pixels,  LS (long sync): 30us = 405 pixels
+      // Each half-line = shortPulsePixels + (halfLine - shortPulsePixels) = 432 pixels = 32us
+      params.halfLineSync.shortPulsePixels = 27;
+      params.halfLineSync.longPulsePixels = 405;
+
+      // Field 1 (313 lines): starts at whole-line boundary
+      //   Vsync:    LsLs LsLs LsEq EqEq EqEq  (5 lines)
+      //   Porch:    17 lines (back porch, normal hsync)
+      //   Active:   288 lines
+      //   Trailing: Porch Porch EqLs             (3 lines — last line is interlace transition)
+      // Hsyncs between LS: 17 porch + 288 active + 2 trailing porch = 307
+      params.fields[0].vsyncLines = 5;
+      params.fields[0].vsyncPattern[0] = VSYNC_LSLS;
+      params.fields[0].vsyncPattern[1] = VSYNC_LSLS;
+      params.fields[0].vsyncPattern[2] = VSYNC_LSEQ;
+      params.fields[0].vsyncPattern[3] = VSYNC_EQEQ;
+      params.fields[0].vsyncPattern[4] = VSYNC_EQEQ;
+      params.fields[0].porchLines = 17;
+      params.fields[0].activeLines = 288;
+      params.fields[0].trailingLines = 3;
+      params.fields[0].eqLsIndex = 2;   // trailing[2] = last line = EqLs
+      params.fields[0].totalLines = 313;
+
+      // Field 2 (312 lines): starts at half-line boundary (after F1's EqLs)
+      //   Vsync:    LsLs LsLs LsEq EqEq        (4 lines)
+      //   Porch:    17 lines (back porch, normal hsync)
+      //   Active:   288 lines
+      //   Trailing: Porch Porch Porch            (3 lines — all normal porch)
+      // Hsyncs between LS: 17 porch + 288 active + 3 trailing porch = 308
+      params.fields[1].vsyncLines = 4;
+      params.fields[1].vsyncPattern[0] = VSYNC_LSLS;
+      params.fields[1].vsyncPattern[1] = VSYNC_LSLS;
+      params.fields[1].vsyncPattern[2] = VSYNC_LSEQ;
+      params.fields[1].vsyncPattern[3] = VSYNC_EQEQ;
+      params.fields[1].porchLines = 17;
+      params.fields[1].activeLines = 288;
+      params.fields[1].trailingLines = 3;
+      params.fields[1].eqLsIndex = -1;  // no EqLs — all trailing lines are porch
+      params.fields[1].totalLines = 312;
       break;
 
   case RGBS_NTSC_720_480i_60HZ:
