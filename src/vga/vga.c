@@ -92,7 +92,7 @@ uint32_t __aligned(8) syncDataEqEq[4];    // EQ + EQ
 uint32_t __aligned(8) syncDataEqLs[4];    // EQ + LS  (F1 last line — interlace transition)
 
 #if VGA_NO_MALLOC
-__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2][VIRTUAL_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
+__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2][RGB_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
 #else
 #include <stdlib.h>
 uint16_t* __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG] = { 0 };                          // two scanline buffers (odd and even)
@@ -142,8 +142,8 @@ static bool buildSyncData()
   }
 
 #if !VGA_NO_MALLOC
-  rgbDataBuffer[0] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
-  rgbDataBuffer[1] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
+  rgbDataBuffer[0] = malloc(RGB_PIXELS_X * sizeof(uint16_t));
+  rgbDataBuffer[1] = malloc(RGB_PIXELS_X * sizeof(uint16_t));
 #endif
 
   vgaParams.params.pioDivider = roundflt(sysClockKHz / (float)minClockKHz);
@@ -327,7 +327,7 @@ static void vgaInitRgb()
 
   // add rgb pio program
   pio_sm_set_consecutive_pindirs(VGA_PIO, RGB_SM, RGB_PINS_START, RGB_PINS_COUNT, true);
-  pio_set_y(VGA_PIO, RGB_SM, VIRTUAL_PIXELS_X - 1);
+  pio_set_y(VGA_PIO, RGB_SM, RGB_PIXELS_X - 1);
 
   rgbProgOffset = pio_add_program(VGA_PIO, &rgbProgram);
   rgbConfig = vga_rgb_program_get_default_config(rgbProgOffset);
@@ -348,7 +348,7 @@ static void vgaInitRgb()
   channel_config_set_dreq(&rgbDmaChanConfig, pio_get_dreq(VGA_PIO, RGB_SM, true));
 
   // setup the dma channel and set it going
-  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], VIRTUAL_PIXELS_X / 2, false);
+  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], RGB_PIXELS_X / 2, false);
   dma_channel_set_irq0_enabled(rgbDmaChan, true);
 }
 
@@ -400,14 +400,11 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
         dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
         if (currentLine + 2 == porchEnd)
         {
-          // Pre-load: request Core 1 to render first two display lines
           multicore_fifo_push_timeout_us((uint32_t)(currentField << 12) | 0, 0);
           multicore_fifo_push_timeout_us((uint32_t)(currentField << 12) | 1, 0);
 
-          // Reset RGB state for the new field: abort any stale DMA, flush FIFO,
-          // restart PIO at mov pins,null, and prime the DMA with line 0's buffer.
           dma_channel_abort(rgbDmaChan);
-          dma_hw->ints0 = rgbDmaChanMask;  // clear any pending RGB DMA IRQ
+          dma_hw->ints0 = rgbDmaChanMask;
           pio_sm_set_enabled(VGA_PIO, RGB_SM, false);
           pio_sm_clear_fifos(VGA_PIO, RGB_SM);
           pio_sm_restart(VGA_PIO, RGB_SM);
@@ -419,8 +416,13 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
       }
       else if (currentLine < activeEnd)
       {
-        // Active display
-        dma_channel_set_read_addr(syncDmaChan, syncDataActive, true);
+        // Active display: center vVirtualPixels rendered lines, black margins around them
+        int activeLine = currentLine - porchEnd;
+        int vMargin = ((int)field->activeLines - (int)vgaParams.params.vVirtualPixels) / 2;
+        if (activeLine >= vMargin && activeLine < vMargin + (int)vgaParams.params.vVirtualPixels)
+          dma_channel_set_read_addr(syncDmaChan, syncDataActive, true);
+        else
+          dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
       }
       else
       {
@@ -529,7 +531,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
     else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
-      int end = VIRTUAL_PIXELS_X / 2;
+      int end = RGB_PIXELS_X / 2;
       for (int i = 5; i < end; ++i)
       {
 #if PICO_RP2040
@@ -619,7 +621,9 @@ void __time_critical_func(vgaLoop)()
 
       // get the next scanline pixels
       // for interlaced modes, bit 12 of y carries the field number (0 or 1)
-      vgaParams.scanlineFn(message & 0x1fff, &vgaParams.params, rgbDataBuffer[message & 0x01]);
+      // offset pixel pointer to center the VIRTUAL_PIXELS_X render area within the RGB_PIXELS_X buffer
+      vgaParams.scanlineFn(message & 0x1fff, &vgaParams.params,
+                           rgbDataBuffer[message & 0x01] + (RGB_PIXELS_X - VIRTUAL_PIXELS_X) / 2);
       if (doEof && vgaParams.endOfFrameFn)
       {
         vgaParams.endOfFrameFn(frameNumber);
