@@ -25,34 +25,38 @@ typedef struct
   bool syncHigh;
 } VgaSyncParams;
 
-// Interlaced vsync line types (each is a full 64us line = 2 half-line pulses)
+// Interlaced sync line types (each is a full line = 2 half-line pulses)
 typedef enum
 {
   VSYNC_LSLS = 0,  // long sync + long sync
   VSYNC_LSEQ,      // long sync + short sync
   VSYNC_EQEQ,      // short sync + short sync
   VSYNC_EQLS,      // short sync + long sync (interlace transition)
+  VSYNC_PORCH,      // normal hsync (porch line)
+  VSYNC_TYPE_COUNT
 } VgaVsyncLineType;
 
 #define VGA_MAX_VSYNC_LINES 8
+#define VGA_MAX_TRAILING_LINES 4
 #define VGA_MAX_FIELDS 2
 
-// Half-line sync pulse widths (for interlaced vsync region)
+// Half-line sync pulse definition (for interlaced vsync region).
+// Each half-line = shortPulsePixels + (hSyncParams.totalPixels/2 - shortPulsePixels).
+// The LS (long sync) pulse width = halfLine - shortPulsePixels (by definition).
 typedef struct
 {
-  uint32_t shortPulsePixels;   // EQ low duration in pixels (e.g. 27 at 13.5MHz = 2us)
-  uint32_t longPulsePixels;    // LS low duration in pixels  (e.g. 405 at 13.5MHz = 30us)
+  uint32_t shortPulsePixels;   // EQ pulse low duration in pixels (e.g. 27 at 13.5MHz = 2us)
 } VgaHalfLineSyncParams;
 
 typedef struct
 {
-  uint32_t vsyncLines;                              // number of vsync lines
-  VgaVsyncLineType vsyncPattern[VGA_MAX_VSYNC_LINES]; // vsync line sequence
-  uint32_t porchLines;                              // back porch lines
-  uint32_t activeLines;                             // active display lines
-  uint32_t trailingLines;                           // trailing lines (porch or EqLs)
-  int eqLsIndex;                                    // trailing line index for EqLs (-1 = none)
-  uint32_t totalLines;                              // total lines this field
+  uint32_t vsyncLines;                                    // number of vsync lines
+  VgaVsyncLineType vsyncPattern[VGA_MAX_VSYNC_LINES];    // vsync line sequence
+  uint32_t porchLines;                                    // back porch lines
+  uint32_t activeLines;                                   // active display lines
+  uint32_t trailingLines;                                 // trailing lines after active
+  VgaVsyncLineType trailingPattern[VGA_MAX_TRAILING_LINES]; // trailing line types
+  uint32_t totalLines;                                    // total lines this field
 } VgaFieldParams;
 
 typedef struct

@@ -511,7 +511,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   (void)field;     // available for future odd/even line selection
 
   uint32_t* dPixels = (uint32_t*)pixels;
-  bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
+  bg = 0;//pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
 
   if (y == 0)
   {

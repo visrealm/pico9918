@@ -21,6 +21,7 @@
   #endif
   #define DISPLAY_YSCALE 1
   #define VIRTUAL_PIXELS_X 720
+  #define SCART_BLACK_MARGIN 48  // black pixels at each edge for TV blanking reference
 #else // VGA
   #define DISPLAY_MODE VGA_640_480_60HZ
   #define DISPLAY_YSCALE 2
