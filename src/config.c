@@ -16,6 +16,9 @@
 #include "config.h"
 
 #include "hardware/flash.h"
+#include "hardware/gpio.h"
+
+#include "pico/time.h"
 
 #include <string.h>
 
@@ -72,6 +75,53 @@ Pico9918HardwareVersion currentHwVersion()
     hwVersionDetected = true;
   }
   return hwVersion;
+}
+
+static bool scartConnected = false;
+
+/*
+ * detect a SCART dongle by probing the VGA sync pins (GPIO 0 and 1) with
+ * internal pull-down then pull-up before PIO claims them.
+ * A SCART-to-VGA dongle drives the VGA hsync/vsync lines through resistors,
+ * so the external drive overcomes the internal pull-down (gpio_get returns 1).
+ * Without a dongle the pins float and follow the internal pull.
+ */
+bool detectScartDongle()
+{
+#if PICO9918_SCART_AUTODETECT
+  // GPIO 0 = hsync (or csync), GPIO 1 = vsync — both are SYNC_PINS
+  gpio_set_function(0, GPIO_FUNC_SIO);
+  gpio_set_function(1, GPIO_FUNC_SIO);
+  gpio_set_dir(0, false);
+  gpio_set_dir(1, false);
+
+  gpio_pull_down(0);
+  gpio_pull_down(1);
+  sleep_ms(1);
+  bool drivenHigh = gpio_get(0);  // dongle holds line above pull-down threshold
+
+  gpio_pull_up(0);
+  gpio_pull_up(1);
+  sleep_ms(1);
+  bool drivenLow = !gpio_get(0);  // dongle holds line below pull-up threshold
+
+  gpio_disable_pulls(0);
+  gpio_disable_pulls(1);
+  // PIO will re-claim these pins during vgaInit()
+
+  scartConnected = drivenHigh || drivenLow;
+#else
+  scartConnected = (bool)PICO9918_SCART_RGBS;
+#endif
+  return scartConnected;
+}
+
+/*
+ * true if a SCART dongle was detected (or SCART build is unconditional)
+ */
+bool isScartConnected()
+{
+  return scartConnected;
 }
 
 /*

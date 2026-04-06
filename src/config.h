@@ -56,6 +56,12 @@ typedef enum
 /* get hardware version (v0.3 or v0.4/v1.0+) */
 Pico9918HardwareVersion currentHwVersion();
 
+/* detect SCART dongle by testing GPIO pull response on sync pins (call before vgaInit) */
+bool detectScartDongle();
+
+/* true if a SCART dongle was detected at boot */
+bool isScartConnected();
+
 /* read configuration data from flash */
 void readConfig(uint8_t config[CONFIG_BYTES]);
 

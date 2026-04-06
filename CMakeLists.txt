@@ -57,6 +57,7 @@ string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 # PICO9918 Build Options
 option(PICO9918_SCART_RGBS "Enable SCART RGBs output (default: VGA)" OFF)
 option(PICO9918_SCART_PAL "Use PAL 576i timing (default: NTSC 480i)" OFF)
+option(PICO9918_SCART_AUTODETECT "Runtime SCART dongle detection via GPIO pull test" OFF)
 option(PICO9918_NO_SPLASH "Disable splash screen" OFF)
 option(PICO9918_DIAG "Enable diagnostic mode" OFF)
 
@@ -65,10 +66,18 @@ add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 add_definitions(-DVR_EMU_TMS9918_MODE=1)
 
 
-add_definitions(-DSYS_CLK_HZ=252000000)
-add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1512000000)
-add_definitions(-DPLL_SYS_POSTDIV1=6)
-add_definitions(-DPLL_SYS_POSTDIV2=1)
+if(PICO9918_SCART_RGBS)
+  # 270 MHz: exact integer pioClocksPerPixel=20 for 13.5 MHz PAL/NTSC pixel clock
+  add_definitions(-DSYS_CLK_HZ=270000000)
+  add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1080000000)
+  add_definitions(-DPLL_SYS_POSTDIV1=4)
+  add_definitions(-DPLL_SYS_POSTDIV2=1)
+else()
+  add_definitions(-DSYS_CLK_HZ=252000000)
+  add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1512000000)
+  add_definitions(-DPLL_SYS_POSTDIV1=6)
+  add_definitions(-DPLL_SYS_POSTDIV2=1)
+endif()
 
 # SDK Flash write routines exit XIP mode and use boot2 to reenter it, so
 # boot2 needs to be properly configured for whatever speed we end up at.
