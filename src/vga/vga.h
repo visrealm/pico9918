@@ -73,6 +73,7 @@ typedef struct
   float pioClocksPerPixel;
   float pioClocksPerScaledPixel;
   bool interlaced;
+  uint8_t interlacedFieldOrder;             // 0 or 1: XOR'd with field number for double-row mapping
   uint32_t numFields;                       // 1 = progressive, 2 = interlaced
   VgaHalfLineSyncParams halfLineSync;       // EQ/LS pulse widths (interlaced only)
   VgaFieldParams fields[VGA_MAX_FIELDS];

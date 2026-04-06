@@ -606,7 +606,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
     uint16_t tmsY = y;
 #if DISPLAY_YSCALE == 1
     if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
-      tmsY = y * 2 + field;
+      tmsY = y * 2 + (field ^ params->interlacedFieldOrder);
 #endif
     uint32_t renderTime  = time_us_32();
     uint8_t tempStatus = vrEmuTms9918ScanLine(tmsY, tmsScanlineBuffer);

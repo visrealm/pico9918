@@ -114,6 +114,7 @@ VgaParams vgaGetParams(VgaMode mode)
       params.vSyncParams.displayPixels = 576 / 2; // for vVirtualPixels derivation
       params.vSyncParams.syncHigh = false;
       params.interlaced = true;
+      params.interlacedFieldOrder = 1;  // PAL: field 0 is lower raster position
       params.numFields = 2;
 
       // EQ (short sync) pulse: 2us = 27 pixels at 13.5MHz
@@ -231,9 +232,9 @@ VgaParams vgaGetParams(VgaMode mode)
   if (params.interlaced)
   {
     // SCART: narrower virtual area within the 720px buffer for black side margins
-    params.hVirtualPixels = 624;
+    params.hVirtualPixels = 636;
     // SCART: reduce virtual height to create black top/bottom margins
-    params.vVirtualPixels = params.vSyncParams.displayPixels - 24;
+    params.vVirtualPixels = params.vSyncParams.displayPixels - 16;
   }
 
   return params;
