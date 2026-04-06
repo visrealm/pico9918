@@ -141,7 +141,6 @@ function(setup_cvbasic_tools)
         message(STATUS "CVBasic version/tag: ${CVBASIC_GIT_TAG}")
         message(STATUS "GASM80 version/tag: ${GASM80_GIT_TAG}")
         message(STATUS "XDT99 version/tag: ${XDT99_GIT_TAG}")
-
     else()
         # Find required tools (original behavior)
         find_program(CVBASIC_EXE cvbasic PATHS ${CMAKE_SOURCE_DIR}/configtool/tools/cvbasic ${CMAKE_SOURCE_DIR}/../CVBasic/build/Release REQUIRED)
@@ -172,7 +171,7 @@ function(setup_cvbasic_tools)
         endif()
         
         set(TOOL_DEPENDENCIES "" PARENT_SCOPE)
-
+        
         message(STATUS "Using existing CVBasic tools")
         message(STATUS "CVBasic: ${CVBASIC_EXE}")
         message(STATUS "GASM80: ${GASM80_EXE}")
@@ -250,54 +249,33 @@ function(visrealm_gasm80_assemble TARGET ASM_FILE ROM_OUTPUT)
 endfunction()
 
 # Assemble with XAS99 (for TI-99 platform)
-# XAS99 bank suffix width depends on the number of banks:
-#   <=10 banks: _b0, _b1, ... _b9
-#   >10 banks:  _b00, _b01, ... _b99
-# We use a glob to find whichever first bank file xas99 actually produced.
 function(visrealm_xas99_assemble TARGET ASM_FILE BIN_OUTPUT CART_OUTPUT TITLE)
     if(NOT XAS99_SCRIPT)
         message(WARNING "XAS99 not found - skipping TI-99 assembly")
         return()
     endif()
-
+    
     get_filename_component(ASM_DIR ${ASM_FILE} DIRECTORY)
     get_filename_component(ASM_NAME ${ASM_FILE} NAME_WE)
-
-    _ensure_xas99_bank_resolver()
-
+    set(BIN_FILE ${ASM_DIR}/${ASM_NAME}_b00.bin)
+    
     add_custom_command(
-        OUTPUT ${CART_OUTPUT}
+        OUTPUT ${BIN_FILE}
         COMMAND ${PYTHON} ${XAS99_SCRIPT} -b -R ${ASM_FILE}
-        COMMAND ${PYTHON} ${XAS99_RESOLVE_AND_LINK}
-                "${ASM_DIR}/${ASM_NAME}" "${LINKTICART_SCRIPT}"
-                "${CART_OUTPUT}" "${TITLE}"
-        DEPENDS ${ASM_FILE} ${LINKTICART_SCRIPT}
+        DEPENDS ${ASM_FILE}
         WORKING_DIRECTORY ${ASM_DIR}
         COMMENT "Assembling with XAS99: ${ASM_FILE}"
         VERBATIM
     )
-
+    
+    # Link to TI cartridge format using configured linkticart script
+    add_custom_command(
+        OUTPUT ${CART_OUTPUT}
+        COMMAND ${PYTHON} ${LINKTICART_SCRIPT} ${BIN_FILE} ${CART_OUTPUT} ${TITLE}
+        DEPENDS ${BIN_FILE} ${LINKTICART_SCRIPT}
+        COMMENT "Creating TI cartridge: ${CART_OUTPUT}"
+        VERBATIM
+    )
+    
     target_sources(${TARGET} PRIVATE ${CART_OUTPUT})
-endfunction()
-
-# Generate a small Python helper that resolves the XAS99 bank file and calls linkticart.
-# Written to the build directory at configure time.
-function(_ensure_xas99_bank_resolver)
-    if(XAS99_RESOLVE_AND_LINK)
-        return()
-    endif()
-    set(SCRIPT_PATH "${CMAKE_BINARY_DIR}/resolve_xas99_bank.py")
-    file(WRITE "${SCRIPT_PATH}" [=[
-"""Resolve XAS99 banked output filename and invoke linkticart.py"""
-import glob, subprocess, sys
-
-base, linkticart, output, title = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-matches = sorted(glob.glob(base + '_b0*.bin'))
-if not matches:
-    print(f'Error: no bank file found matching {base}_b0*.bin', file=sys.stderr)
-    sys.exit(1)
-print(f'Using bank file: {matches[0]}')
-sys.exit(subprocess.call([sys.executable, linkticart, matches[0], output, title]))
-]=])
-    set(XAS99_RESOLVE_AND_LINK "${SCRIPT_PATH}" PARENT_SCOPE)
 endfunction()

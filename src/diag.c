@@ -10,7 +10,7 @@
  */
 
 #include "diag.h"
-#include "vga.h"
+#include "display.h"
 #include "config.h"
 #include "bmp_font.h"  
 #include "gpu.h"
@@ -606,7 +606,7 @@ static void renderPalette(int y, uint16_t *pixels)
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int row = to_remainder_u32(dmResult);
 
-  uint8_t palette = (y - (vgaCurrentParams()->params.vVirtualPixels - 24)) / 6;
+  uint8_t palette = (y - 216) / 6;
   if (palette < 4)
   {
     char buf[] = "PALETTE 0:"; buf[8] = '0' + palette;
@@ -637,7 +637,7 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   y -= 1; // vertical border
 
   // palette
-  if (tms9918->config[CONF_DIAG_PALETTE] && (y > ((int)vgaCurrentParams()->params.vVirtualPixels - 27))) renderPalette(y + 2, pixels);
+  if (tms9918->config[CONF_DIAG_PALETTE] && (y > 213)) renderPalette(y + 2, pixels);
 
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int diagRow = to_quotient_u32(dmResult);

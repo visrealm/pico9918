@@ -243,21 +243,11 @@ typedef struct
 
 #define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
 
-#if PICO9918_SCART_RGBS
-// SCART builds: clocks chosen for exact integer pioClocksPerPixel at 13.5 MHz
-// 270 MHz -> pioClocksPerPixel=20, 297 MHz -> 22, 351 MHz -> 26 (all exact)
 static const ClockSettings clockPresets[] = {
-  CLOCK_PRESET(1080000000, 4, 1, VREG_VOLTAGE_1_15),    // 270 MHz
-  CLOCK_PRESET(1188000000, 4, 1, VREG_VOLTAGE_1_20),    // 297 MHz
-  CLOCK_PRESET(1404000000, 4, 1, VREG_VOLTAGE_1_30)     // 351 MHz
+  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252
+  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4
+  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
 };
-#else
-static const ClockSettings clockPresets[] = {
-  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252 MHz
-  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4 MHz
-  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352 MHz
-};
-#endif
 
 static int clockPresetIndex = 0;
 static bool testingClock = false;
@@ -391,14 +381,6 @@ static void tmsEndOfScanline(uint32_t displayLine)
 
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
-#if PICO9918_SCART_RGBS
-  // interlaced: END_OF_FRAME_MSG fires once per field (100 Hz for PAL 50Hz).
-  // only process every second field to maintain correct 50 Hz frame timing.
-  static uint8_t eofField = 0;
-  eofField ^= 1;
-  if (eofField) return;
-#endif
-
   ++frameCount;
   
   if (!validWrites)
@@ -428,17 +410,14 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   }
 
 #if DISPLAY_YSCALE > 1
-  bool doubleRows = TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS;
-  vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)doubleRows;
-  vgaCurrentParams()->params.vVirtualPixels = vgaCurrentParams()->params.vSyncParams.displayPixels << (bool)doubleRows;
+  vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
+  vgaCurrentParams()->params.vVirtualPixels = VIRTUAL_PIXELS_Y << (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
 #endif
 
   int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
   vPixels = baseRows << 3;
-#if DISPLAY_YSCALE > 1
   if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
     vPixels <<= 1;
-#endif
   vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
   vgaSetTriggerScanline(vBorder + vPixels);
 }
@@ -506,11 +485,7 @@ static __attribute__((noinline))  void generateRgbCache()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  const uint32_t halfHBorder = (params->hVirtualPixels - TMS9918_PIXELS_X * 2) / 4;
-
-  // for interlaced modes, bit 12 of y carries the field number (0=Field1, 1=Field2)
-  const uint8_t  field  = (y >> 12) & 1;
-  y = y & 0x0fff;  // virtual line within the field (0..N-1)
+  const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
@@ -526,7 +501,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (y < vBorder || y >= (vBorder + vPixels))  // TODO: None of this runs in ROW30 mode
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
-    dma_channel_set_trans_count(dma32, params->hVirtualPixels / 2, true);
+    dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
     tms9918->vram.map.blanking = 1; // V
     if ((y >= vBorder + vPixels))
     {
@@ -603,13 +578,8 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       generateRgbCache();
 
     /* generate the scanline */
-    uint16_t tmsY = y;
-#if DISPLAY_YSCALE == 1
-    if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
-      tmsY = y * 2 + (field ^ params->interlacedFieldOrder);
-#endif
     uint32_t renderTime  = time_us_32();
-    uint8_t tempStatus = vrEmuTms9918ScanLine(tmsY, tmsScanlineBuffer);
+    uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
     renderTime = time_us_32() - renderTime;
 
     /*** F18A status register updates ***/
@@ -840,6 +810,8 @@ int main(void)
   /* then set up VGA output */
   VgaInitParams params = { 0 };
   params.params = vgaGetParams(DISPLAY_MODE);
+  setVgaParamsScaleY(&params.params, 1);
+
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;
@@ -848,9 +820,6 @@ int main(void)
   params.triggerScanline = UINT32_MAX;  // will be set dynamically once vBorder/vPixels are known
 
   const char *version = PICO9918_VERSION;
-
-  // detect SCART dongle before PIO claims the sync pins
-  detectScartDongle();
 
   vgaInit(params);
 

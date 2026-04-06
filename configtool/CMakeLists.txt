@@ -129,25 +129,19 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
         if(XAS99_SCRIPT)
             # XAS99 generates files based on the assembly filename, not the target name
             get_filename_component(ASM_NAME "${ASM_OUTPUT}" NAME_WE)
-            # Banked builds: XAS99 suffix width depends on bank count (_b0 for <=10, _b00 for >10)
-            # Unbanked (lite/NO_UPGRADE) builds produce a flat .bin
-            _ensure_xas99_bank_resolver()
+            # Banked builds produce _b00.bin; unbanked (lite/NO_UPGRADE) produce a flat .bin
             if("${DEFINES}" MATCHES "NO_UPGRADE")
                 set(XAS99_BIN_SUFFIX ".bin")
-                set(XAS99_LINK_CMD ${PYTHON} "${LINKTICART_SCRIPT}"
-                        "${ASM_DIR}/${ASM_NAME}${XAS99_BIN_SUFFIX}"
-                        "${DIST_DIR}/${ROM_OUTPUT}"
-                        "PICO9918 V${FRIENDLYVER}")
             else()
-                set(XAS99_LINK_CMD ${PYTHON} "${XAS99_RESOLVE_AND_LINK}"
-                        "${ASM_DIR}/${ASM_NAME}" "${LINKTICART_SCRIPT}"
-                        "${DIST_DIR}/${ROM_OUTPUT}"
-                        "PICO9918 V${FRIENDLYVER}")
+                set(XAS99_BIN_SUFFIX "_b00.bin")
             endif()
             add_custom_command(
                 OUTPUT "${DIST_DIR}/${ROM_OUTPUT}"
                 COMMAND ${PYTHON} "${XAS99_SCRIPT}" -b -R "${ASM_DIR}/${ASM_OUTPUT}"
-                COMMAND ${XAS99_LINK_CMD}
+                COMMAND ${PYTHON} "${LINKTICART_SCRIPT}"
+                        "${ASM_DIR}/${ASM_NAME}${XAS99_BIN_SUFFIX}"
+                        "${DIST_DIR}/${ROM_OUTPUT}"
+                        "PICO9918 V${FRIENDLYVER}"
                 DEPENDS "${ASM_DIR}/${ASM_OUTPUT}" ${TOOL_DEPENDENCIES}
                 WORKING_DIRECTORY "${ASM_DIR}"
                 COMMENT "Assembling ${DESCRIPTION}"
