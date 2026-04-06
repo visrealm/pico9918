@@ -10,6 +10,7 @@
 # https://github.com/visrealm/pico9918
 #
 
+import math
 import os
 import re
 import sys
@@ -136,15 +137,15 @@ def main() -> int:
     if is_combined:
         blocks_2040 = len(rp2040_blocks)
         blocks_2350 = len(rp2350_blocks)
-        banks_2040 = int(blocks_2040 / BLOCKS_PER_BANK) + 1
-        banks_2350 = int(blocks_2350 / BLOCKS_PER_BANK) + 1
+        banks_2040 = math.ceil(blocks_2040 / BLOCKS_PER_BANK)
+        banks_2350 = math.ceil(blocks_2350 / BLOCKS_PER_BANK)
         rp2350_start_bank = banks_2040 + 2  # banks are 1-indexed starting at 2
         max_blocks = max(blocks_2040, blocks_2350)
         total_banks = banks_2040 + banks_2350
     else:
         single_blocks = list(families.values())[0] if families else all_blocks
         total_blocks = len(single_blocks)
-        total_banks = int(total_blocks / BLOCKS_PER_BANK) + 1
+        total_banks = math.ceil(total_blocks / BLOCKS_PER_BANK)
 
     use_banking = args['banksize'] != 0
 
