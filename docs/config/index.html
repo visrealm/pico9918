@@ -820,8 +820,8 @@
             const rp2040Config = createConfigArray(options, PICO_MODEL_RP2040, HW_VER_1_X);
             const rp2350Config = createConfigArray(options, PICO_MODEL_RP2350, HW_VER_2_X);
 
-            const block0 = createUF2Block(rp2040Config, FAMILY_ID_RP2040, 0, 2);
-            const block1 = createUF2Block(rp2350Config, FAMILY_ID_RP2350, 1, 2);
+            const block0 = createUF2Block(rp2040Config, FAMILY_ID_RP2040, 0, 1);
+            const block1 = createUF2Block(rp2350Config, FAMILY_ID_RP2350, 0, 1);
 
             const combined = new Uint8Array(1024);
             combined.set(block0, 0);
