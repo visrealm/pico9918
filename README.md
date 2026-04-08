@@ -173,9 +173,7 @@ If you don't have a device supported by the native configurator, the [Web-based 
 
 ## Documentation
 
-* [CPU and GRM jumpers](docs/README.md#cpu-and-grm-jumper)
-* [FFC Connector](docs/README.md#ffc-connector)
-* [MDE1 Pin](docs/README.md#mde1-pin)
+For detailed documentation covering hardware setup, firmware, the configurator, supported devices, F18A compatibility and more, visit the **[PICO9918 Wiki](https://github.com/visrealm/pico9918/wiki)**.
 
 ## Building
 
