@@ -41,14 +41,15 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 
 ## Supported devices
 
-This is a list of devices the PICO9918 has been tested and confirmed to work on. 
+This is a list of devices the PICO9918 has been tested and confirmed to work on.
+📖 For detailed compatibility notes, installation tips, and configurator support for each device, see the [Supported Devices](https://github.com/visrealm/pico9918/wiki/Supported-Devices) wiki page.
 
-* [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision)
+* [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/ColecoVision))
   * [Coleco ADAM](https://en.wikipedia.org/wiki/Coleco_Adam)
   * [AtariBits CV-NUC+](https://ataribits.weebly.com/cv-nuc.html)
   * [Bit Dina 2 in one](https://segaretro.org/Dina_2_in_one)
-* [Memotech MTX500](https://en.wikipedia.org/wiki/Memotech_MTX)
-* [MSX](https://en.wikipedia.org/wiki/MSX)
+* [Memotech MTX500](https://en.wikipedia.org/wiki/Memotech_MTX) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/Memotech-MTX))
+* [MSX](https://en.wikipedia.org/wiki/MSX) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/MSX))
   * [Casio MX-10](https://www.msx.org/wiki/Casio_MX-10)
   * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
   * [Casio PV-16](https://www.msx.org/wiki/Casio_PV-16)
@@ -60,21 +61,21 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
   * [Yamaha CX5M](https://www.msx.org/wiki/Yamaha_CX5M)
   * [Yamaha YIS-503](https://www.msx.org/wiki/Yamaha_YIS-503)
-* [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network)
-* [Powertran Cortex](http://powertrancortex.com/)
-* [Sega SG-1000 / SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000)
+* [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/NABU-Personal-Computer))
+* [Powertran Cortex](http://powertrancortex.com/) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/Powertran-Cortex))
+* [Sega SG-1000 / SC-3000](https://en.wikipedia.org/wiki/SG-1000#SC-3000) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/Sega-SG-1000))
 * [Sega SG-1000 II](https://segaretro.org/SG-1000_II)
-* [Sord M5](https://en.wikipedia.org/wiki/Sord_M5)
-* [Texas Instruments TI-99](https://en.wikipedia.org/wiki/TI-99/4A)
+* [Sord M5](https://en.wikipedia.org/wiki/Sord_M5) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/Sord-M5))
+* [Texas Instruments TI-99](https://en.wikipedia.org/wiki/TI-99/4A) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/Texas-Instruments-TI-99))
   * [Texas Instruments TI-99/4](https://en.wikipedia.org/wiki/TI-99/4)
   * [Texas Instruments TI-99/4A](https://en.wikipedia.org/wiki/TI-99/4A)
   * [Texas Instruments TI-99/4QI](http://www.mainbyte.com/ti99/computers/ti99qi.html)
   * [Dan Werner TI-99/22](https://github.com/danwerner21/TI99_22)
-* [Tomy Pyūta / Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor)
+* [Tomy Pyūta / Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/Tomy-Tutor))
 * [Tomy Pyūta Jr](http://videogamekraken.com/pyuta-jr-by-tomy)
-* [VTech CreatiVision / Dick Smith Wizzard](https://en.wikipedia.org/wiki/VTech_CreatiVision)
+* [VTech CreatiVision / Dick Smith Wizzard](https://en.wikipedia.org/wiki/VTech_CreatiVision) ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/CreatiVision))
 
-Homebrews:
+Homebrews ([📖 Wiki](https://github.com/visrealm/pico9918/wiki/Homebrew-Projects)):
 
 * Troy Schrapel's [HBC-56](https://github.com/visrealm/hbc-56)
 * Stuart Connor's [TM990](http://www.stuartconner.me.uk/tm990/tm990.htm)
@@ -93,13 +94,15 @@ The new Digital A/V dongle provides video and audio direct to any HDMI compatibl
 
 ![Digital A/V dongle](img/digital_av_m.jpg)
 
-See the [FFC Connector](docs/README.md#ffc-connector) documentation for cable connection instructions.
+📖 For full details, see the [Digital AV Dongle](https://github.com/visrealm/pico9918/wiki/Digital-AV-Dongle) wiki page. See [Hardware Setup](https://github.com/visrealm/pico9918/wiki/Hardware-Setup#ffc-connector) for FFC cable connection instructions.
 
 # F18A compatibility
 
 The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
 
 [![PICO9918 F18A mode preview 1 demo](https://img.visualrealmsoftware.com/youtube/thumb/TabTIPL1xQY)](https://youtu.be/TabTIPL1xQY)
+
+📖 For technical details on the enhanced registers, ECM, GPU, and palette RAM, see the [F18A Programmer's Reference](https://github.com/visrealm/pico9918/wiki/F18A-Programmers-Reference) wiki page.
 
 ## Purchasing options
 
@@ -113,7 +116,7 @@ Also (more convenient for North America)
 
 ## Hardware
 
-There are three main variants of the hardware. 
+There are three main variants of the hardware.
 
 ### PRO v2.x (v2.0)
 
@@ -137,6 +140,8 @@ v0.3 is relatively cheap and easy to build, schematic and gerbers are available.
 
 I also have the [v0.3 board as a PCBWay Project](https://www.pcbway.com/project/shareproject/PICO9918_Drop_in_replacement_for_the_classic_TMS9918A_family_of_VDPs_fc11359a.html) you can order there.
 
+📖 For detailed specifications and setup instructions, see the [Hardware](https://github.com/visrealm/pico9918/wiki/Hardware) and [Hardware Setup](https://github.com/visrealm/pico9918/wiki/Hardware-Setup) wiki pages.
+
 ### Schematics
 
 Schematics and Gerbers are available in [/pcb](pcb)
@@ -147,6 +152,8 @@ If you're not interested in building the firmware yourself, you'll find the late
 
 To install, just hold the 'BOOT' button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
 
+📖 For detailed information on firmware installation, output modes, and updates, see the [Firmware](https://github.com/visrealm/pico9918/wiki/Firmware) wiki page.
+
 ## Configurator
 
 The configurator is a software tool used to modify PICO9918 configuration options, including:
@@ -155,9 +162,11 @@ The configurator is a software tool used to modify PICO9918 configuration option
 * Scanline CRT effect
 * Scanline sprite limit
 * Default palette
-* Diagnostics overlays
+* [📖 Diagnostic overlays](https://github.com/visrealm/pico9918/wiki/Diagnostic-Overlays)
 
 Additionally, firmware updates can be provided via the Configurator. The full configurator is available for the **TI-99/4A**, **ColecoVision** and **MSX**. With cut-down builds (without firmware updates) available for several other machines.
+
+📖 For full details, see the [Configurator](https://github.com/visrealm/pico9918/wiki/Configurator) wiki page.
 
 See the configurator in action:
 
