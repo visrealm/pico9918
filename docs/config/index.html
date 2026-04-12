@@ -400,6 +400,19 @@
                     <option value="2">352.0 MHz</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="vdpDevice">VDP Device</label>
+                <select id="vdpDevice" name="vdpDevice">
+                    <option value="0" selected>TMS9918A - GROMCLK + CPUCLK (Default)</option>
+                    <option value="1">TMS992xA - GROMCLK only</option>
+                    <option value="2">TMS9118 - CPUCLK only</option>
+                    <option value="3">TMS912x - CPUCLK on pin 37</option>
+                </select>
+                <div class="info-box">
+                    <strong>Note:</strong> This setting controls which clock signals are output on pins 37 and 38.
+                    Select the VDP chip model that matches your original hardware for correct clock behavior.
+                </div>
+            </div>
         </div>
 
         <!-- Palette Editor -->
@@ -486,6 +499,7 @@
         const CONF_CRT_SCANLINES = 8;
         const CONF_SCANLINE_SPRITES = 9;
         const CONF_CLOCK_PRESET_ID = 10;
+        const CONF_VDP_DEVICE = 12;
         const CONF_DIAG = 16;
         const CONF_DIAG_REGISTERS = 17;
         const CONF_DIAG_PERFORMANCE = 18;
@@ -650,6 +664,7 @@
             document.getElementById('scanlines').checked = false;
             document.getElementById('scanlineSprites').value = '0';
             document.getElementById('clockPreset').value = '0';
+            document.getElementById('vdpDevice').value = '0';
             document.getElementById('diagRegisters').checked = false;
             document.getElementById('diagPerformance').checked = false;
             document.getElementById('diagPalette').checked = false;
@@ -688,6 +703,7 @@
                 scanlines: document.getElementById('scanlines').checked,
                 scanlineSprites: parseInt(document.getElementById('scanlineSprites').value),
                 clockPreset: parseInt(document.getElementById('clockPreset').value),
+                vdpDevice: parseInt(document.getElementById('vdpDevice').value),
                 diagRegisters: document.getElementById('diagRegisters').checked,
                 diagPerformance: document.getElementById('diagPerformance').checked,
                 diagPalette: document.getElementById('diagPalette').checked,
@@ -707,6 +723,9 @@
             const clockNames = ['252.0 MHz', '302.4 MHz', '352.0 MHz'];
             const clockName = clockNames[config.clockPreset];
 
+            const vdpNames = ['TMS9918A', 'TMS992xA', 'TMS9118', 'TMS912x'];
+            const vdpName = vdpNames[config.vdpDevice] || 'TMS9918A';
+
             const diagnostics = [
                 config.diagRegisters && 'Registers',
                 config.diagPerformance && 'Performance',
@@ -715,6 +734,10 @@
             ].filter(Boolean);
 
             const diagText = diagnostics.length > 0 ? diagnostics.join(', ') : 'None';
+
+            // Determine minimum firmware version
+            let minFirmware = 'v1.0.0';
+            if (config.vdpDevice > 0) minFirmware = 'v1.1.1';
 
             // Determine palette status
             const selectedPreset = document.getElementById('palettePreset').value;
@@ -728,6 +751,10 @@
                     <span class="summary-value">PICO9918 &amp; PICO9918 PRO</span>
                 </div>
                 <div class="summary-item">
+                    <span class="summary-label">Min. Firmware:</span>
+                    <span class="summary-value">${minFirmware}+</span>
+                </div>
+                <div class="summary-item">
                     <span class="summary-label">CRT Scanlines:</span>
                     <span class="summary-value">${config.scanlines ? 'ON' : 'OFF'}</span>
                 </div>
@@ -738,6 +765,10 @@
                 <div class="summary-item">
                     <span class="summary-label">Clock Frequency:</span>
                     <span class="summary-value">${clockName}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">VDP Device:</span>
+                    <span class="summary-value">${vdpName}</span>
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">Diagnostics:</span>
@@ -771,6 +802,7 @@
             config[CONF_CRT_SCANLINES] = options.scanlines ? 1 : 0;
             config[CONF_SCANLINE_SPRITES] = options.scanlineSprites & 0x03;
             config[CONF_CLOCK_PRESET_ID] = options.clockPreset & 0x03;
+            config[CONF_VDP_DEVICE] = options.vdpDevice & 0x03;
 
             // Set diagnostic options
             config[CONF_DIAG_REGISTERS] = options.diagRegisters ? 1 : 0;
