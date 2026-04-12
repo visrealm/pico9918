@@ -10,8 +10,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
-build/**
-build-combined/**
+build*/**
 testapps/**
 configtool/build/**
 configtool/CLAUDE.md
