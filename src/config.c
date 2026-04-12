@@ -115,6 +115,7 @@ void readConfig(uint8_t config[CONFIG_BYTES])
   if (config[CONF_PICO_MODEL] != PICO_MODEL ||
       config[CONF_DISP_DRIVER] != PICO9918_DISP_DRIVER ||
       config[CONF_CLOCK_PRESET_ID] > 2 ||
+      config[CONF_VDP_DEVICE] >= VDP_DEVICE_COUNT ||
       config[CONF_CRT_SCANLINES] > 1 ||
       config[CONF_SCANLINE_SPRITES] > 3 ||
       config[CONF_PALETTE_IDX_0] != 0x00 ||
@@ -131,6 +132,7 @@ void readConfig(uint8_t config[CONFIG_BYTES])
     config[CONF_CRT_SCANLINES] = 0;
     config[CONF_SCANLINE_SPRITES] = 0;
     config[CONF_CLOCK_PRESET_ID] = 0;
+    config[CONF_VDP_DEVICE] = VDP_TMS9918A;
 
     config[CONF_PALETTE_IDX_0] = 0;
     config[CONF_PALETTE_IDX_0 + 1] = 0;

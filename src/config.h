@@ -31,6 +31,7 @@ typedef enum
   CONF_CRT_SCANLINES    = 8,
   CONF_SCANLINE_SPRITES = 9,
   CONF_CLOCK_PRESET_ID  = 10,
+  CONF_VDP_DEVICE       = 12,
 
   CONF_DIAG             = 16,
   CONF_DIAG_REGISTERS   = 17,
@@ -50,6 +51,15 @@ typedef enum
   HWVer_1_x = 0x10,
   HWVer_2_x = 0x20,
 } Pico9918HardwareVersion;
+
+typedef enum
+{
+  VDP_TMS9918A = 0,  // GROMCLK + CPUCLK (default)
+  VDP_TMS992xA = 1,  // GROMCLK only
+  VDP_TMS9118  = 2,  // CPUCLK only (on pin 38)
+  VDP_TMS912x  = 3,  // CPUCLK on GROMCLK pin (pin 37)
+  VDP_DEVICE_COUNT
+} VdpDevice;
 
 #define CONFIG_BYTES 256
 
