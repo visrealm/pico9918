@@ -42,7 +42,10 @@
 
 
 
-#define TMS_CRYSTAL_FREQ_HZ 10738635.0f
+#define TMS_CRYSTAL_FREQ_HZ  10738635.0f
+#define TMS_GROMCLK_FREQ_HZ  (TMS_CRYSTAL_FREQ_HZ / 24.0f)  // ~447 kHz
+#define TMS_CPUCLK_FREQ_HZ   (TMS_CRYSTAL_FREQ_HZ / 3.0f)   // ~3.58 MHz
+#define TMS_CLK_OFF           0.0f                            // pull low
 
 #define TMS_PIO pio1
 #define CLOCK_PIO pio1
@@ -252,6 +255,19 @@ static const ClockSettings clockPresets[] = {
 static int clockPresetIndex = 0;
 static bool testingClock = false;
 
+typedef struct
+{
+  float pin37freq;  // GROMCLK pin frequency, 0 = pull low
+  float pin38freq;  // CPUCLK pin frequency, 0 = pull low
+} VdpClockConfig;
+
+static const VdpClockConfig vdpClockConfigs[] = {
+  { TMS_GROMCLK_FREQ_HZ, TMS_CPUCLK_FREQ_HZ },  // VDP_TMS9918A: GROMCLK + CPUCLK
+  { TMS_GROMCLK_FREQ_HZ, TMS_CLK_OFF         },  // VDP_TMS992xA: GROMCLK only
+  { TMS_CLK_OFF,          TMS_CPUCLK_FREQ_HZ },  // VDP_TMS9118:  CPUCLK only
+  { TMS_CPUCLK_FREQ_HZ,  TMS_CLK_OFF         },  // VDP_TMS912x:  CPUCLK freq on pin 37
+};
+
 static void eofInterrupt()
 {
   doneInt = true;
@@ -338,6 +354,11 @@ void updateClock(uint pioSm, float freqHz)
 }
 
 /*
+ * initialise a clock output using PIO, or pull pin low if freq is 0
+ */
+static void initClockOrPullLow(uint gpio, uint pioSm, float freqHz);
+
+/*
  * initialise a clock output using PIO
  */
 void initClock(uint gpio, uint pioSm, float freqHz)
@@ -357,6 +378,20 @@ void initClock(uint gpio, uint pioSm, float freqHz)
   pio_sm_init(CLOCK_PIO, pioSm, clocksPioOffset, &c);
 
   updateClock(pioSm, freqHz);
+}
+
+static void initClockOrPullLow(uint gpio, uint pioSm, float freqHz)
+{
+  if (freqHz > 0.0f)
+  {
+    initClock(gpio, pioSm, freqHz);
+  }
+  else
+  {
+    gpio_init(gpio);
+    gpio_set_dir(gpio, GPIO_OUT);
+    gpio_put(gpio, 0);
+  }
 }
 
 static void tmsPorch()
@@ -762,8 +797,14 @@ int main(void)
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
   }
 
-  initClock((hwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL, tmsGromClkSm, TMS_CRYSTAL_FREQ_HZ / 24.0f);
-  initClock((hwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL, tmsCpuClkSm, TMS_CRYSTAL_FREQ_HZ / 3.0f);
+  uint8_t vdpDevice = tms9918->config[CONF_VDP_DEVICE];
+  const VdpClockConfig *clkCfg = &vdpClockConfigs[vdpDevice];
+
+  uint gromClkGpio = (hwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL;
+  uint cpuClkGpio  = (hwVersion == HWVer_0_3) ? GPIO_CPUCL_V03  : GPIO_CPUCL;
+
+  initClockOrPullLow(gromClkGpio, tmsGromClkSm, clkCfg->pin37freq);
+  initClockOrPullLow(cpuClkGpio, tmsCpuClkSm, clkCfg->pin38freq);
 
   dma_channel_config cfg = dma_channel_get_default_config(dma32);
   channel_config_set_read_increment(&cfg, false);
