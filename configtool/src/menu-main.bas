@@ -429,7 +429,7 @@ configMenuData:
     DATA BYTE CONF_DIAG_PALETTE,    "Palette         ", 0, 2, "        Show palettes           "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
-    DATA BYTE CONF_MENU_RESET,      "Preset          ", 9, 3, "    Select preset palette       "
+    DATA BYTE CONF_MENU_RESET,      "Preset          ", 9, 5, "    Select preset palette       "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
 ' -----------------------------------------------------------------------------
@@ -448,3 +448,5 @@ configMenuOptionValueData:
     DATA BYTE "9918A "
     DATA BYTE "V9938 "
     DATA BYTE "GREY  "
+    DATA BYTE "SEPIA "
+    DATA BYTE "EGA   "

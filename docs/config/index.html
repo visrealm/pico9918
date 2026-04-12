@@ -415,6 +415,7 @@
                         <option value="v9938">V9938</option>
                         <option value="grey">Greyscale</option>
                         <option value="sepia">Sepia</option>
+                        <option value="ega">EGA</option>
                     </select>
                 </div>
 
@@ -537,12 +538,19 @@
             0xF865, 0xF976, 0xF976, 0xFBA9, 0xF532, 0xFA97, 0xFCB9, 0xFFED
         ];
 
+        // EGA palette (IBM Enhanced Graphics Adapter)
+        const PALETTE_EGA = [
+            0x0000, 0xF00A, 0xF0A0, 0xF0AA, 0xFA00, 0xFA0A, 0xFA50, 0xFAAA,
+            0xF555, 0xF55F, 0xF5F5, 0xF5FF, 0xFF55, 0xFF5F, 0xFFF5, 0xFFFF
+        ];
+
         // All available palettes
         const PALETTES = {
             'tms9918a': { name: 'TMS9918A (Default)', colors: PALETTE_TMS9918A },
             'v9938': { name: 'V9938', colors: PALETTE_V9938 },
             'grey': { name: 'Greyscale', colors: PALETTE_GREY },
-            'sepia': { name: 'Sepia', colors: PALETTE_SEPIA }
+            'sepia': { name: 'Sepia', colors: PALETTE_SEPIA },
+            'ega': { name: 'EGA', colors: PALETTE_EGA }
         };
 
         // Current palette (working copy)

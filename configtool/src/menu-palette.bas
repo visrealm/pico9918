@@ -14,6 +14,8 @@
 BANK 1
 #endif
 
+CONST PALETTE_PRESET_COUNT = 5
+
 paletteMenu: PROCEDURE
 
     VDP_DISABLE_INT
@@ -211,12 +213,12 @@ paletteMenu: PROCEDURE
                 presetChanged = FALSE
 
                 IF NAV(NAV_LEFT) THEN
-                    IF g_palettePreset = 0 THEN g_palettePreset = 3
+                    IF g_palettePreset = 0 THEN g_palettePreset = PALETTE_PRESET_COUNT
                     g_palettePreset = g_palettePreset - 1
                     presetChanged = TRUE
                 ELSEIF NAV(NAV_RIGHT) THEN
                     g_palettePreset = g_palettePreset + 1
-                    IF g_palettePreset > 2 THEN g_palettePreset = 0
+                    IF g_palettePreset >= PALETTE_PRESET_COUNT THEN g_palettePreset = 0
                     presetChanged = TRUE
                 END IF
 
@@ -313,12 +315,14 @@ renderSliders: PROCEDURE
     NEXT I
     END
 
+CONST PALETTE_BYTES = 32
+
 resetPalette: PROCEDURE
     WAIT
 
     GOSUB hideSprites
 
-    ON g_palettePreset GOSUB applyPreset9918A, applyPresetV9938, applyPresetGrey
+    GOSUB applyPreset
 
     I = currentIndex
     FOR currentIndex = 1 TO 15
@@ -334,92 +338,60 @@ resetPalette: PROCEDURE
 detectPalettePreset: PROCEDURE
     g_palettePreset = 0
 
-    paletteMatch = TRUE
-    FOR I = 0 TO 31
-        IF tempConfigValues(128 + I) <> defPal(I) THEN
-            paletteMatch = FALSE
-            EXIT FOR
+    FOR P = 0 TO PALETTE_PRESET_COUNT - 1
+        paletteMatch = TRUE
+        palOffset = P * PALETTE_BYTES
+        FOR I = 0 TO 31
+            IF tempConfigValues(128 + I) <> palettePresets(palOffset + I) THEN
+                paletteMatch = FALSE
+                EXIT FOR
+            END IF
+        NEXT I
+        IF paletteMatch THEN
+            g_palettePreset = P
+            RETURN
         END IF
-    NEXT I
-    IF paletteMatch THEN RETURN
-
-    paletteMatch = TRUE
-    FOR I = 0 TO 31
-        IF tempConfigValues(128 + I) <> presetPalV9938(I) THEN
-            paletteMatch = FALSE
-            EXIT FOR
-        END IF
-    NEXT I
-    IF paletteMatch THEN
-        g_palettePreset = 1
-        RETURN
-    END IF
-
-    paletteMatch = TRUE
-    FOR I = 0 TO 31
-        IF tempConfigValues(128 + I) <> presetPalGrey(I) THEN
-            paletteMatch = FALSE
-            EXIT FOR
-        END IF
-    NEXT I
-    IF paletteMatch THEN g_palettePreset = 2
+    NEXT P
     END
 
-applyPreset9918A: PROCEDURE
-    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
-    DEFINE VRAM 0, 32, defPal
-    DEFINE VRAM 0, 32, defPal
+applyPreset: PROCEDURE
+    palOffset = g_palettePreset * PALETTE_BYTES
+
+    VDP_REG(47) = $c0 ' palette data port
+    DEFINE VRAM 0, 32, VARPTR palettePresets(palOffset)
+    DEFINE VRAM 0, 32, VARPTR palettePresets(palOffset)
     VDP_REG(47) = $40
 
     FOR I = 0 TO 31
-        VDP_CONFIG(128 + I) = defPal(I)
-        tempConfigValues(128 + I) = defPal(I)
+        VDP_CONFIG(128 + I) = palettePresets(palOffset + I)
+        tempConfigValues(128 + I) = palettePresets(palOffset + I)
     NEXT I
     END
 
-applyPresetV9938: PROCEDURE
-    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
-    DEFINE VRAM 0, 32, presetPalV9938
-    DEFINE VRAM 0, 32, presetPalV9938
-    VDP_REG(47) = $40
+' Palette presets - contiguous block, PALETTE_BYTES each
+' Order must match menu value labels in menu-main.bas
 
-    FOR I = 0 TO 31
-        VDP_CONFIG(128 + I) = presetPalV9938(I)
-        tempConfigValues(128 + I) = presetPalV9938(I)
-    NEXT I
-    END
-
-applyPresetGrey: PROCEDURE
-    VDP_REG(47) = $c0 ' palette data port from pal 2 index #10
-    DEFINE VRAM 0, 32, presetPalGrey
-    DEFINE VRAM 0, 32, presetPalGrey
-    VDP_REG(47) = $40
-
-    FOR I = 0 TO 31
-        VDP_CONFIG(128 + I) = presetPalGrey(I)
-        tempConfigValues(128 + I) = presetPalGrey(I)
-    NEXT I
-    END
-
+palettePresets:
 defPal:
-  DATA BYTE $00, $00
-  DATA BYTE $F0, $00
-  DATA BYTE $F2, $C3
-  DATA BYTE $F5, $D6
-  DATA BYTE $F5, $4F
-  DATA BYTE $F7, $6F
-  DATA BYTE $FD, $54
-  DATA BYTE $F4, $EF
-  DATA BYTE $FF, $54
-  DATA BYTE $FF, $76
-  DATA BYTE $FD, $C3
-  DATA BYTE $FE, $D6
-  DATA BYTE $F2, $B2
-  DATA BYTE $FC, $5C
-  DATA BYTE $FC, $CC
-  DATA BYTE $FF, $FF
+' TMS9918A (default)
+    DATA BYTE $00, $00
+    DATA BYTE $F0, $00
+    DATA BYTE $F2, $C3
+    DATA BYTE $F5, $D6
+    DATA BYTE $F5, $4F
+    DATA BYTE $F7, $6F
+    DATA BYTE $FD, $54
+    DATA BYTE $F4, $EF
+    DATA BYTE $FF, $54
+    DATA BYTE $FF, $76
+    DATA BYTE $FD, $C3
+    DATA BYTE $FE, $D6
+    DATA BYTE $F2, $B2
+    DATA BYTE $FC, $5C
+    DATA BYTE $FC, $CC
+    DATA BYTE $FF, $FF
 
-presetPalV9938:
+' V9938
     DATA BYTE $00, $00
     DATA BYTE $F0, $00
     DATA BYTE $F2, $C2
@@ -437,7 +409,7 @@ presetPalV9938:
     DATA BYTE $FA, $AA
     DATA BYTE $FE, $EE
 
-presetPalGrey:
+' Greyscale
     DATA BYTE $00, $00
     DATA BYTE $F0, $00
     DATA BYTE $F6, $66
@@ -453,5 +425,41 @@ presetPalGrey:
     DATA BYTE $F5, $55
     DATA BYTE $FA, $AA
     DATA BYTE $FC, $CC
+    DATA BYTE $FF, $FF
+
+' Sepia
+    DATA BYTE $00, $00
+    DATA BYTE $F0, $00
+    DATA BYTE $F6, $43
+    DATA BYTE $F8, $65
+    DATA BYTE $F8, $65
+    DATA BYTE $F9, $76
+    DATA BYTE $F7, $54
+    DATA BYTE $FB, $A9
+    DATA BYTE $F8, $65
+    DATA BYTE $F9, $76
+    DATA BYTE $F9, $76
+    DATA BYTE $FB, $A9
+    DATA BYTE $F5, $32
+    DATA BYTE $FA, $97
+    DATA BYTE $FC, $B9
+    DATA BYTE $FF, $ED
+
+' EGA
+    DATA BYTE $00, $00
+    DATA BYTE $F0, $0A
+    DATA BYTE $F0, $A0
+    DATA BYTE $F0, $AA
+    DATA BYTE $FA, $00
+    DATA BYTE $FA, $0A
+    DATA BYTE $FA, $50
+    DATA BYTE $FA, $AA
+    DATA BYTE $F5, $55
+    DATA BYTE $F5, $5F
+    DATA BYTE $F5, $F5
+    DATA BYTE $F5, $FF
+    DATA BYTE $FF, $55
+    DATA BYTE $FF, $5F
+    DATA BYTE $FF, $F5
     DATA BYTE $FF, $FF
 
