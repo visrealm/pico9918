@@ -287,9 +287,7 @@ I_NEG:  LDRH R0,[R5,#0] // R5=SRCE/DEST
 
         ANDS R1,#0x06 // Get initialised ST
 
-        MOVS R4,#0x80
-        LSLS R4,#8 // -> #0x8000
-        CMP  R0,R4
+        CMP  R0,#0x8000
         BNE  I_NEG_no_ov
         ADDS R1,#0x08 // Overflow bit
         B    OP_COMP_W
@@ -341,11 +339,9 @@ I_ABS:  LDRH R0,[R5,#0] // R5=SRCE
 
         ANDS R1,#0x06 // Get initialised ST
 
-        MOVS R4,#0x80
-        LSLS R4,#8 // -> #0x8000
-        TST  R0,R4 // pos check...
+        TST  R0,#0x8000 // pos check...
         BEQ  OP_COMP_W
-        CMP  R0,R4
+        CMP  R0,#0x8000
         BNE  I_ABS_no_ov
         ADDS R1,#0x08 // Overflow bit
         B    OP_COMP_W
@@ -753,10 +749,8 @@ I_CI_e:
 // *********************************************************************************************
 .align 4
 I_MUL:  MULS R4,R5
-        REV16 R4,R4
-        STRH R4,[R6,#2]
-        LSRS R4,16
-        STRH R4,[R6,#0]
+        REV  R4,R4
+        STR  R4,[R6,#0]
         B    start
 // *********************************************************************************************
 .align 4
@@ -822,10 +816,8 @@ I_LIMI: ADDS R3,#2    // Skip LIMI's 2nd WORD
 I_BLWP: LDRH R0,[R5,#0] // R5=SRCE
         REV16 R0,R0
         BICS R0,#1 // R0 &= 0xFFFE
-        MOV  R7,R8
-        ADDS R0,R7
-        MOV  R2,R11 // WP
-        SUBS R2,R7
+        SUB  R2,R11,R8 // WP - base
+        ADD  R0,R0,R8
         MOV  R11,R0
 
         REV16 R2,R2
@@ -842,15 +834,13 @@ I_BLWP: LDRH R0,[R5,#0] // R5=SRCE
         B    start
 // *********************************************************************************************
 .align 4
-I_RTWP: MOV  R5,R11  // Get address of WP
+I_RTWP: LDRB R1,[R11,#30] // R15 high byte
 
-        LDRB R1,[R5,#30] // R15 high byte
-
-        LDRH R3,[R5,#28] // R14..
+        LDRH R3,[R11,#28] // R14..
         REV16 R3,R3
         BICS R3,#1 // R3 &= 0xFFFE
 
-        LDRH R0,[R5,#26] // R13..
+        LDRH R0,[R11,#26] // R13..
         REV16 R0,R0
         BICS R0,#1 // R0 &= 0xFFFE
         ADD  R11,R0,R8
@@ -877,8 +867,7 @@ I_SWPB: LDRH R0,[R5,#0] // R5=SRCE
         B    start
 // *********************************************************************************************
 .align 4
-I_SETO: MOVS R0,0xFF
-        SXTB R0,R0
+I_SETO: MVN  R0,#0
         STRH R0,[R5,#0]
         B    start
 // *********************************************************************************************
@@ -1130,9 +1119,8 @@ start:  UXTH R3,R3 // Discard any extra - but allow to flow into register space
 
 startX: REV16 R6,R0    // R6=INST|BYTE
         LSRS R2,R6,#5  // Get opcode
-        LSLS R2,#3     // x8
-        ADR  R4,JMPTBL // This is just in reach
-        ADDS R4,R2
+        ADR  R4,JMPTBL
+        ADD  R4,R4,R2,LSL #3
         LDM  R4,{R7,PC} // Get 1st and 2nd branch locations (if it's needed)
 
 // *********************************************************************************************
@@ -1440,8 +1428,7 @@ I_XOP_BL_M:
 
 .align 4
 I_XOP_BL_P:
-        LSLS R0,#30
-        LSRS R0,#30      // R0 = s = p & 0x03;
+        AND  R0,R0,#3     // R0 = s = p & 0x03;
         ADD  R2,R8       // Within the 64KB memory area
         LDRB R3,[R2,#0]  // R3 = b = mem [a];
         ADR  R7,MSKSH
@@ -1458,16 +1445,14 @@ I_XOP_BL_P:
         LSRS R5,R4,#9    // if (R4 & PIX_E)
         BCC  I_XOP_BL_ET // Equal or Not Equal Test?
 
-        LSLS R5,R4,#26
-        LSRS R5,#30      // ((R4 >> 4) & PIX_PP)
+        UBFX R5,R4,#4,#2 // ((R4 >> 4) & PIX_PP)
         CMP  R5,R0
         BNE  I_XOP_BL_NW // if (p != ((R4 >> 4) & PIX_PP)) goto nowrite;
         B    I_XOP_BL_W
 
 .align 4
 I_XOP_BL_ET: // Equal Test
-        LSLS R5,R4,#26
-        LSRS R5,#30      // ((R4 >> 4) & PIX_PP)
+        UBFX R5,R4,#4,#2 // ((R4 >> 4) & PIX_PP)
         CMP  R5,R0
         BEQ  I_XOP_BL_NW // if (p == ((R4 >> 4) & PIX_PP)) goto nowrite;
 
@@ -1485,8 +1470,7 @@ I_XOP_BL_W:
         LDRB R5,[R7,#0]  // Get MASK
         BICS R3,R5
         LDRB R7,[R7,#4]  // Get SHIFT
-        LSLS R5,R4,#30
-        LSRS R5,#30
+        AND  R5,R4,#3
         LSLS R5,R7
         ORRS R3,R5
         STRB R3,[R2,#0]  // mem [a] = (b & ~MSKSH [s]) | ((R4 & PIX_PP) << MSKSH [s + 4]);
@@ -1512,15 +1496,14 @@ MSKSH:  .BYTE 0xC0, 0x30, 0x0C, 0x03, 0x06, 0x04, 0x02, 0x00
 //89ABCDEF01234567 (Format 7)
 //oo00000000001100
 .align 4
-I_RET:  MOV  R0,R11 // WP
-        LDRH R4,[R0,#30] // R15
+I_RET:  LDRH R4,[R11,#30] // R15
         REV16 R4,R4
         BICS R4,#1 // R4 &= 0xFFFE
 
         ADDS R4,#2
         UXTH R4,R4
         REV16 R2,R4
-        STRH R2,[R0,#30] // R15
+        STRH R2,[R11,#30] // R15
 
         LDRH R3,[R8,R4] // Get the value off the stack
         REV16 R3,R3
@@ -1531,14 +1514,13 @@ I_RET:  MOV  R0,R11 // WP
 //89ABCDEF01234567 (Format 6)
 //10TsSSSS00001100
 .align 4
-I_CALL: MOV  R0,R11 // WP
-        LDRH R4,[R0,#30] // Get R15
+I_CALL: LDRH R4,[R11,#30] // Get R15
         REV16 R4,R4
         BICS R4,#1 // R4 &= 0xFFFE
 
         SUBS R2,R4,#2 // Stack word has been consumed
         REV16 R2,R2
-        STRH R2,[R0,#30] // Store new R15
+        STRH R2,[R11,#30] // Store new R15
 
         REV16 R3,R3
         STRH R3,[R8,R4] // Old *R15
@@ -1552,14 +1534,13 @@ I_CALL: MOV  R0,R11 // WP
 .align 4
 I_PUSH: LDRH R5,[R5,#0] // R5=SRCE
 
-        MOV  R0,R11 // WP
-        LDRH R4,[R0,#30] // Get R15
+        LDRH R4,[R11,#30] // Get R15
         REV16 R4,R4
         BICS R4,#1 // R4 &= 0xFFFE
 
         SUBS R2,R4,#2 // Stack word has been consumed
         REV16 R2,R2
-        STRH R2,[R0,#30] // Store new R15
+        STRH R2,[R11,#30] // Store new R15
 
         STRH R5,[R8,R4] // Old *R15
         B    start
@@ -1568,15 +1549,14 @@ I_PUSH: LDRH R5,[R5,#0] // R5=SRCE
 //89ABCDEF01234567 (Format 6)
 //00TsSSSS00001111
 .align 4
-I_POP:  MOV  R0,R11 // WP
-        LDRH R4,[R0,#30] // Get R15
+I_POP:  LDRH R4,[R11,#30] // Get R15
         REV16 R4,R4
         BICS R4,#1 // R4 &= 0xFFFE
 
         ADDS R4,#2 // Stack word has been consumed
         UXTH R4,R4
         REV16 R2,R4
-        STRH R2,[R0,#30] // Store new R15
+        STRH R2,[R11,#30] // Store new R15
 
         LDRH R0,[R8,R4] // *R15
         STRH R0,[R5,#0] // R5=DEST
