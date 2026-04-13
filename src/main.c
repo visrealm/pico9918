@@ -80,6 +80,9 @@ static const uint32_t dmapalIn  = 6; // palette dma
 #define SHOW_DIAGNOSTICS_FRAMES 900
 
 static int frameCount = 0;
+#if PICO9918_GPU_FRAME_COUNTER
+uint32_t gpuFrameCount = 0;
+#endif
 static bool validWrites = false;  // has the VDP display been enabled at all?
 static bool doneInt = false;      // interrupt raised this frame?
 
@@ -230,6 +233,9 @@ void __not_in_flash_func(gpioIrqHandler)()
   updateTmsReadAhead();  
   
   frameCount = 0;
+#if PICO9918_GPU_FRAME_COUNTER
+  gpuFrameCount = 0;
+#endif
   resetSplash();
   gpio_put(GPIO_INT, !currentInt);
   enableTmsPioInterrupts();
@@ -420,19 +426,9 @@ static void tmsEndOfScanline(uint32_t displayLine)
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
-
-  {
-    static float tempC = 0.0f;
-    tempC += coreTemperatureC();
-    if ((frameCount & 0x3f) == 0) // every 64th frame
-    {
-      tempC /= 64.0f;
-      diagSetTemperature(tempC);
-      uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
-      TMS_STATUS(tms9918, 13) = t4;
-      tempC = 0.0f;
-    }
-  }
+#if PICO9918_GPU_FRAME_COUNTER
+  gpuFrameCount += (TMS_STATUS(tms9918, 2) & 0x80) != 0;
+#endif
 
   if (!validWrites)
   {
@@ -787,7 +783,7 @@ int main(void)
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
-  // detect SCART dongle early â€” before clock setup and readConfig()
+  // detect SCART dongle early — before clock setup and readConfig()
   detectScartDongle();
 
 #if PICO9918_ENABLE_SCART

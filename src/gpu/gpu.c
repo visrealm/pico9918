@@ -188,8 +188,9 @@ uint32_t gpuTime(uint32_t totalTime)
 /* reset the internal gpu time to 0 */
 void resetGpuTime()
 {
-  gpuTimeUs = 0;  
+  gpuTimeUs = 0;
 }
+
 
 /*
  * TMS9900 GPU main loop 

@@ -57,6 +57,9 @@ IntString gpuPctStr = {0};
 IntString clockMhzStr = {0};
 IntString modeStr = {0};
 IntString fpsStr = {0};
+#if PICO9918_GPU_FRAME_COUNTER
+IntString gpuFrameStr = {0};
+#endif
 IntString hwVerStr = {0};
 IntString fwVerStr = {0};
 IntString outputStr = {0};
@@ -159,6 +162,9 @@ void initDiagnostics()
   clear(&renderTimeStr);
   clear(&frameTimeStr);
   clear(&gpuPctStr);
+#if PICO9918_GPU_FRAME_COUNTER
+  clear(&gpuFrameStr);
+#endif
   clear(&renderTimePerScanlineStr);
   clear(&totalTimePerScanlineStr);
   clear(&temperatureStr);
@@ -211,6 +217,9 @@ void diagSetClockHz(float clockHz)
 }
 
 extern int droppedFramesCount;
+#if PICO9918_GPU_FRAME_COUNTER
+extern uint32_t gpuFrameCount;
+#endif
 static uint32_t cachedFrameCount = 0;
 
 /* update diagnostics values */
@@ -235,6 +244,10 @@ void updateDiagnostics(uint32_t frameCount)
       float gpuPct = (gpuTime(totalTime) / (float)(lastUpdateTime - currentTime)) * 100.0f;
       flt2Str(gpuPct, 4, &gpuPctStr);
       resetGpuTime();
+
+#if PICO9918_GPU_FRAME_COUNTER
+      uint2Str(gpuFrameCount, 1, &gpuFrameStr);
+#endif
 
       lastUpdateTime = currentTime;
     }
@@ -376,6 +389,13 @@ static void diagGpuTime(uint16_t row, uint16_t* pixels)
   renderLeft("GPU   : ", &gpuPctStr, "%", row, pixels);
 }
 
+#if PICO9918_GPU_FRAME_COUNTER
+static void diagGpuFrames(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("GPU FR: ", &gpuFrameStr, "", row, pixels);
+}
+#endif
+
 static void diagFPS(uint16_t row, uint16_t* pixels)
 {
   renderLeft("FPS   : ", &fpsStr, "FPS", row, pixels);
@@ -513,6 +533,9 @@ DiagPtr performanceDiags[] = {
   &diagRenderTime,
   &diagFPS,
   &diagGpuTime,
+#if PICO9918_GPU_FRAME_COUNTER
+  &diagGpuFrames,
+#endif
   &diagTemp};
 
 DiagPtr addressDiags[] = {
