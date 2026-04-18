@@ -114,8 +114,7 @@
                 "-B", "./build-combined",
                 "-G", "Ninja",
                 "-DPICO9918_BUILD_COMBINED=ON",
-                "-DPICO9918_SCART_RGBS=OFF",
-                "-DPICO9918_SCART_PAL=OFF",
+                "-DPICO9918_ENABLE_SCART=ON",
                 "-DPICO9918_NO_SPLASH=OFF",
                 "-DPICO9918_DIAG=OFF"
             ],

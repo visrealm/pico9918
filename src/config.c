@@ -22,15 +22,6 @@
 
 #include <string.h>
 
-#if PICO9918_SCART_AUTODETECT
-  // For autodetect, DISP_DRIVER is set after readConfig + detectScartDongle
-  // using updateDispDriver(). Not used during config validation.
-#elif PICO9918_SCART_RGBS // 0 = VGA, 1 = NTSC, 2 = PAL
-  #define PICO9918_DISP_DRIVER (1 + PICO9918_SCART_PAL)
-#else
-  #define PICO9918_DISP_DRIVER 0
-#endif
-
 #if PICO_RP2040
   #define PICO_MODEL 1
 #elif PICO_RP2350
@@ -89,7 +80,7 @@ static bool scartConnected = false;
  */
 bool detectScartDongle()
 {
-#if PICO9918_SCART_AUTODETECT
+#if PICO9918_ENABLE_SCART
   const uint syncMask = 0x03 << VGA_SYNC_PINS_START;  // GPIO 0 and 1
   const uint driveMask = 0x01 << VGA_SYNC_PINS_START; // GPIO 0
 
@@ -107,21 +98,18 @@ bool detectScartDongle()
   gpio_disable_pulls(VGA_SYNC_PINS_START + 1);
   gpio_set_dir_masked(syncMask, 0);  // both inputs
   // PIO will re-claim these pins during vgaInit()
-#else
-  scartConnected = (bool)PICO9918_SCART_RGBS;
 #endif
   return scartConnected;
 }
 
 /*
- * true if a SCART dongle was detected (or SCART build is unconditional)
+ * true if a SCART dongle was detected at boot
  */
 bool isScartConnected()
 {
   return scartConnected;
 }
 
-#if PICO9918_SCART_AUTODETECT
 /*
  * update CONF_DISP_DRIVER based on detection result and SCART timing config.
  * call after both detectScartDongle() and readConfig() have run.
@@ -132,7 +120,6 @@ void updateDispDriver()
   tms9918->config[CONF_DISP_DRIVER] = isScartConnected()
     ? (2 - tms9918->config[CONF_SCART_TIMING]) : 0;
 }
-#endif
 
 /*
  * apply current configuration to the VDP
@@ -173,9 +160,6 @@ void readConfig(uint8_t config[CONFIG_BYTES])
   memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
 
   if (config[CONF_PICO_MODEL] != PICO_MODEL ||
-#if !PICO9918_SCART_AUTODETECT
-      config[CONF_DISP_DRIVER] != PICO9918_DISP_DRIVER ||
-#endif
       config[CONF_CLOCK_PRESET_ID] > 2 ||
       config[CONF_VDP_DEVICE] >= VDP_DEVICE_COUNT ||
       config[CONF_CRT_SCANLINES] > 1 ||
@@ -189,9 +173,6 @@ void readConfig(uint8_t config[CONFIG_BYTES])
     config[CONF_PICO_MODEL] = PICO_MODEL;
     config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
     config[CONF_HW_VERSION] = currentHwVersion();
-#if !PICO9918_SCART_AUTODETECT
-    config[CONF_DISP_DRIVER] = PICO9918_DISP_DRIVER;
-#endif
     config[CONF_CLOCK_TESTED] = 0;
 
     config[CONF_CRT_SCANLINES] = 0;

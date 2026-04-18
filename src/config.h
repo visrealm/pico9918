@@ -73,7 +73,7 @@ bool detectScartDongle();
 /* true if a SCART dongle was detected at boot */
 bool isScartConnected();
 
-/* update CONF_DISP_DRIVER at runtime (autodetect builds only) */
+/* update CONF_DISP_DRIVER at runtime based on SCART detection */
 void updateDispDriver();
 
 /* read configuration data from flash */

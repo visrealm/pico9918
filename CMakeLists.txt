@@ -28,7 +28,7 @@ set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
 set(PICO_BOARD pico9918pro CACHE STRING "Board type")
 #set(PICO_BOARD pimoroni_pga2350 CACHE STRING "Board type")
 
-option(PICO9918_BUILD_COMBINED "Build combined UF2 for both pico9918 (RP2040) and pico9918pro (RP2350)" OFF)
+option(PICO9918_BUILD_COMBINED "Build combined PICO9918 + PICO9918 PRO UF2" OFF)
 
 # Check if building configurator only (skip Pico SDK setup)
 if(NOT CONFIGURATOR_ONLY AND NOT PICO9918_BUILD_COMBINED)
@@ -55,9 +55,7 @@ set(PICO9918_VERSION "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PAT
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 
 # PICO9918 Build Options
-option(PICO9918_SCART_RGBS "Enable SCART RGBs output (default: VGA)" OFF)
-option(PICO9918_SCART_PAL "Use PAL 576i timing (default: NTSC 480i)" OFF)
-option(PICO9918_SCART_AUTODETECT "Runtime SCART dongle detection via GPIO pull test" OFF)
+option(PICO9918_ENABLE_SCART "Enable SCART support" ON)
 option(PICO9918_NO_SPLASH "Disable splash screen" OFF)
 option(PICO9918_DIAG "Enable diagnostic mode" OFF)
 
@@ -66,19 +64,12 @@ add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 add_definitions(-DVR_EMU_TMS9918_MODE=1)
 
 
-if(PICO9918_SCART_RGBS AND NOT PICO9918_SCART_AUTODETECT)
-  # 270 MHz: exact integer pioClocksPerPixel=20 for 13.5 MHz PAL/NTSC pixel clock
-  add_definitions(-DSYS_CLK_HZ=270000000)
-  add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1080000000)
-  add_definitions(-DPLL_SYS_POSTDIV1=4)
-  add_definitions(-DPLL_SYS_POSTDIV2=1)
-else()
-  # VGA 252 MHz (also the boot default for autodetect; re-clocked if SCART detected)
-  add_definitions(-DSYS_CLK_HZ=252000000)
-  add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1512000000)
-  add_definitions(-DPLL_SYS_POSTDIV1=6)
-  add_definitions(-DPLL_SYS_POSTDIV2=1)
-endif()
+# Boot clock is VGA 252 MHz. When SCART is detected at runtime, we re-clock to
+# 270 MHz (a multiple of 13.5 MHz) for exact integer pioClocksPerPixel.
+add_definitions(-DSYS_CLK_HZ=252000000)
+add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1512000000)
+add_definitions(-DPLL_SYS_POSTDIV1=6)
+add_definitions(-DPLL_SYS_POSTDIV2=1)
 
 # SDK Flash write routines exit XIP mode and use boot2 to reenter it, so
 # boot2 needs to be properly configured for whatever speed we end up at.
@@ -96,19 +87,10 @@ execute_process(
 )
 
 if(NOT CONFIGURATOR_ONLY)
-  if(PICO9918_SCART_AUTODETECT)
-    set(PICO9918_OUTPUT_STR "autodetect")
-    set(PICO9918_OUTPUT_PREFIX "-autodetect")
-  elseif(PICO9918_SCART_RGBS)
-    if (PICO9918_SCART_PAL)
-      set(PICO9918_OUTPUT_STR "rgbs-pal576i")
-    else()
-      set(PICO9918_OUTPUT_STR "rgbs-ntsc480i")
-    endif()
-    set(PICO9918_OUTPUT_PREFIX "-${PICO9918_OUTPUT_STR}")
+  if(PICO9918_ENABLE_SCART)
+    set(PICO9918_OUTPUT_STR "")
   else()
-    set(PICO9918_OUTPUT_STR "vga")
-    set(PICO9918_OUTPUT_PREFIX "")
+    set(PICO9918_OUTPUT_STR "-vgaonly")
   endif()
 endif()
 
@@ -128,7 +110,7 @@ if (NOT PICO9918_GIT_BRANCH STREQUAL "main" AND NOT PICO9918_GIT_BRANCH STREQUAL
   set(PICO9918_BRANCH_STR "-${PICO9918_GIT_BRANCH_SAFE}")
 endif()
 
-set(PICO9918_BINARY_SUFFIX ${PICO_BOARD_STR}-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR})
+set(PICO9918_BINARY_SUFFIX ${PICO_BOARD_STR}${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR})
 
 if (PICO9918_DIAG)
   set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-diag)
@@ -144,9 +126,7 @@ if(PICO9918_BUILD_COMBINED)
 
     set(COMMON_CMAKE_ARGS
         -DPICO_BOARD_HEADER_DIRS=${CMAKE_SOURCE_DIR}/src/boards
-        -DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS}
-        -DPICO9918_SCART_PAL=${PICO9918_SCART_PAL}
-        -DPICO9918_SCART_AUTODETECT=${PICO9918_SCART_AUTODETECT}
+        -DPICO9918_ENABLE_SCART=${PICO9918_ENABLE_SCART}
         -DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH}
         -DPICO9918_DIAG=${PICO9918_DIAG}
         -DPICO_SDK_FETCH_FROM_GIT=${PICO_SDK_FETCH_FROM_GIT}
@@ -178,8 +158,8 @@ if(PICO9918_BUILD_COMBINED)
     )
 
     # Compute expected firmware filenames (mirrors logic in src/CMakeLists.txt)
-    set(RP2040_SUFFIX "-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
-    set(RP2350_SUFFIX "pro-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
+    set(RP2040_SUFFIX "${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
+    set(RP2350_SUFFIX "pro${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
     if(PICO9918_DIAG)
         set(RP2040_SUFFIX "${RP2040_SUFFIX}-diag")
         set(RP2350_SUFFIX "${RP2350_SUFFIX}-diag")
@@ -187,14 +167,14 @@ if(PICO9918_BUILD_COMBINED)
 
     set(UF2_RP2040  ${CMAKE_BINARY_DIR}/pico9918/dist/pico9918${RP2040_SUFFIX}.uf2)
     set(UF2_RP2350  ${CMAKE_BINARY_DIR}/pico9918pro/dist/pico9918${RP2350_SUFFIX}.uf2)
-    set(UF2_COMBINED ${CMAKE_BINARY_DIR}/dist/pico9918${PICO9918_OUTPUT_PREFIX}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}.uf2)
+    set(UF2_COMBINED ${CMAKE_BINARY_DIR}/dist/pico9918${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}.uf2)
 
     add_custom_target(combined ALL
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/dist
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/concat_uf2.py
                 ${UF2_RP2040} ${UF2_RP2350} ${UF2_COMBINED}
         DEPENDS build_pico9918 build_pico9918pro
-        COMMENT "Creating combined UF2: pico9918${PICO9918_OUTPUT_PREFIX}-v${PICO9918_VERSION_STR}.uf2"
+        COMMENT "Creating combined UF2: pico9918${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}.uf2"
     )
 
     # Build configurator ROMs using the combined UF2
@@ -210,7 +190,6 @@ if(PICO9918_BUILD_COMBINED)
             -DPICO9918_MINOR_VER=${PICO9918_MINOR_VER}
             -DPICO9918_PATCH_VER=${PICO9918_PATCH_VER}
             -DPICO9918_OUTPUT_STR=${PICO9918_OUTPUT_STR}
-            -DPICO9918_OUTPUT_PREFIX=${PICO9918_OUTPUT_PREFIX}
             -DPICO9918_GIT_BRANCH=${PICO9918_GIT_BRANCH}
         BUILD_COMMAND ${CMAKE_COMMAND} --build . --target configurator_all
         INSTALL_COMMAND ""

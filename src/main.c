@@ -246,6 +246,7 @@ typedef struct
 
 #define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
 
+#if PICO9918_ENABLE_SCART
 // SCART: clocks must be multiples of 54 MHz for exact integer pioClocksPerPixel
 // (pioFreq must be a multiple of 13.5 MHz, minimum 54 MHz)
 // 270/5=54MHz(4), 324/6=54MHz(4) clocks per pixel
@@ -254,6 +255,7 @@ static const ClockSettings scartClockPresets[] = {
   CLOCK_PRESET(1296000000, 4, 1, VREG_VOLTAGE_1_20),    // 324 MHz
   CLOCK_PRESET(1296000000, 4, 1, VREG_VOLTAGE_1_20)     // 324 MHz (no safe higher option)
 };
+#endif
 
 // VGA: clocks for 25.175 MHz pixel clock
 static const ClockSettings vgaClockPresets[] = {
@@ -262,13 +264,7 @@ static const ClockSettings vgaClockPresets[] = {
   CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352 MHz
 };
 
-#if PICO9918_SCART_AUTODETECT
 static const ClockSettings *clockPresets = vgaClockPresets;
-#elif PICO9918_SCART_RGBS
-static const ClockSettings *clockPresets = scartClockPresets;
-#else
-static const ClockSettings *clockPresets = vgaClockPresets;
-#endif
 
 static int clockPresetIndex = 0;
 static bool testingClock = false;
@@ -464,12 +460,10 @@ static void tmsEndOfFrame(uint32_t frameNumber)
     updateInterrupts(STATUS_INT);
   }
 
-#if PICO9918_SCART_AUTODETECT
+#if PICO9918_ENABLE_SCART
   const int yScale = vgaCurrentParams()->params.interlaced ? 1 : 2;
-#elif defined(DISPLAY_YSCALE)
-  const int yScale = DISPLAY_YSCALE;
 #else
-  const int yScale = 1;
+  const int yScale = DISPLAY_YSCALE;
 #endif
 
   if (yScale > 1) {
@@ -796,7 +790,7 @@ int main(void)
   // detect SCART dongle early — before clock setup and readConfig()
   detectScartDongle();
 
-#if PICO9918_SCART_AUTODETECT
+#if PICO9918_ENABLE_SCART
   if (isScartConnected())
     clockPresets = scartClockPresets;
 #endif
@@ -816,9 +810,7 @@ int main(void)
   /* we could set clock freq here from options */
   readConfig(tms9918->config);
 
-#if PICO9918_SCART_AUTODETECT
   updateDispDriver();
-#endif
 
   /*
    * if we're trying out a new clock rate, we need to have a failsafe
@@ -898,7 +890,7 @@ int main(void)
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
-#if PICO9918_SCART_AUTODETECT
+#if PICO9918_ENABLE_SCART
   VgaMode scartMode = tms9918->config[CONF_SCART_TIMING]
     ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ;
   params.params = vgaGetParams(isScartConnected() ? scartMode : VGA_640_480_60HZ);

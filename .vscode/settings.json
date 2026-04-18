@@ -21,8 +21,7 @@
         "PATH": "${userHome}/.pico-sdk/ninja/v1.12.1;${env:PATH}"
     },
     "cmake.configureArgs": [
-        "-DPICO9918_SCART_RGBS=OFF",
-        "-DPICO9918_SCART_PAL=OFF", 
+        "-DPICO9918_ENABLE_SCART=ON",
         "-DPICO9918_NO_SPLASH=OFF",
         "-DPICO9918_DIAG=OFF"
     ],

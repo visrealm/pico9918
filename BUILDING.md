@@ -109,25 +109,21 @@ Output: `build/dist/pico9918-vga-build-<version>.uf2`
 Configure output mode and features with `-D` flags:
 
 ```bash
-cmake .. -DPICO9918_SCART_RGBS=ON -DPICO9918_DIAG=ON
+cmake .. -DPICO9918_DIAG=ON
 ```
 
 #### Available Options
-- **`PICO9918_SCART_RGBS`** (OFF/ON): Enable SCART RGBs output instead of VGA
-- **`PICO9918_SCART_PAL`** (OFF/ON): Use PAL 576i timing instead of NTSC 480i  
+- **`PICO9918_ENABLE_SCART`** (ON/OFF, default ON): Runtime SCART dongle autodetect. VGA is always supported; when a SCART dongle is detected at boot, output switches to RGBs and the PAL/NTSC timing comes from the user configuration. Set OFF to produce a pure VGA-only firmware with no SCART detection code.
 - **`PICO9918_NO_SPLASH`** (OFF/ON): Disable splash screen on startup
 - **`PICO9918_DIAG`** (OFF/ON): Enable diagnostic mode by default
 
 #### Configuration Examples
 ```bash
-# VGA output (default)
+# Default: VGA + SCART autodetect
 cmake ..
 
-# SCART RGBs NTSC output
-cmake .. -DPICO9918_SCART_RGBS=ON
-
-# SCART RGBs PAL output  
-cmake .. -DPICO9918_SCART_RGBS=ON -DPICO9918_SCART_PAL=ON
+# Pure VGA firmware (no SCART support)
+cmake .. -DPICO9918_ENABLE_SCART=OFF
 
 # Diagnostic build with no splash
 cmake .. -DPICO9918_DIAG=ON -DPICO9918_NO_SPLASH=ON
@@ -149,9 +145,8 @@ Set build options in `.vscode/settings.json`:
 ```json
 {
   "cmake.configureArgs": [
-    "-DPICO9918_SCART_RGBS=OFF",
-    "-DPICO9918_SCART_PAL=OFF",
-    "-DPICO9918_NO_SPLASH=OFF", 
+    "-DPICO9918_ENABLE_SCART=ON",
+    "-DPICO9918_NO_SPLASH=OFF",
     "-DPICO9918_DIAG=OFF"
   ]
 }

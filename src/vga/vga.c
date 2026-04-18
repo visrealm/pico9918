@@ -22,11 +22,6 @@
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
-#if PICO9918_SCART_AUTODETECT
-  #define VGA_COMBINE_SYNC_RUNTIME 1
-#else
-  #define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
-#endif
 
 #define VGA_NO_MALLOC 1
 
@@ -54,12 +49,9 @@ int roundflt(float x)
 #define END_OF_SCANLINE_MSG 0x40000000
 #define END_OF_FRAME_MSG    0x80000000
 
-#if VGA_COMBINE_SYNC_RUNTIME
+#if PICO9918_ENABLE_SCART
 bi_decl(bi_1pin_with_name(SYNC_PINS_START, "Sync"));
 bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "Sync"));
-#elif VGA_COMBINE_SYNC
-bi_decl(bi_1pin_with_name(SYNC_PINS_START, "C Sync"));
-bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "C Sync"));
 #else
 bi_decl(bi_1pin_with_name(SYNC_PINS_START, "H Sync"));
 bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "V Sync"));
@@ -173,10 +165,8 @@ static bool buildSyncData()
   const uint32_t vSyncOff = !vgaParams.params.vSyncParams.syncHigh << vga_sync_WORD_VSYNC_OFFSET;
   const uint32_t vSyncOn = vgaParams.params.vSyncParams.syncHigh << vga_sync_WORD_VSYNC_OFFSET;
 
-#if VGA_COMBINE_SYNC_RUNTIME
+#if PICO9918_ENABLE_SCART
   const bool combinedSync = vgaParams.params.interlaced;
-#elif VGA_COMBINE_SYNC
-  const bool combinedSync = true;
 #else
   const bool combinedSync = false;
 #endif
