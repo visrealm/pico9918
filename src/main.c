@@ -429,6 +429,19 @@ static void tmsEndOfFrame(uint32_t frameNumber)
 #if PICO9918_GPU_FRAME_COUNTER
   gpuFrameCount += (TMS_STATUS(tms9918, 2) & 0x80) != 0;
 #endif
+  
+{
+    static float tempC = 0.0f;
+    tempC += coreTemperatureC();
+    if ((frameCount & 0x3f) == 0) // every 64th frame
+    {
+      tempC /= 64.0f;
+      diagSetTemperature(tempC);
+      uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
+      TMS_STATUS(tms9918, 13) = t4;
+      tempC = 0.0f;
+    }
+  }
 
   if (!validWrites)
   {
@@ -783,7 +796,7 @@ int main(void)
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
-  // detect SCART dongle early — before clock setup and readConfig()
+  // detect SCART dongle early ï¿½ before clock setup and readConfig()
   detectScartDongle();
 
 #if PICO9918_ENABLE_SCART
