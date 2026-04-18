@@ -261,7 +261,7 @@ function(visrealm_xas99_assemble TARGET ASM_FILE BIN_OUTPUT CART_OUTPUT TITLE)
     endif()
 
     get_filename_component(ASM_DIR ${ASM_FILE} DIRECTORY)
-    get_filename_component(ASM_NAME ${ASM_FILE} NAME_WE)
+    get_filename_component(ASM_NAME ${ASM_FILE} NAME_WLE)
 
     _ensure_xas99_bank_resolver()
 
