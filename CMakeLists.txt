@@ -57,6 +57,7 @@ string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
 # PICO9918 Build Options
 option(PICO9918_SCART_RGBS "Enable SCART RGBs output (default: VGA)" OFF)
 option(PICO9918_SCART_PAL "Use PAL 576i timing (default: NTSC 480i)" OFF)
+option(PICO9918_SCART_AUTODETECT "Runtime SCART dongle detection via GPIO pull test" OFF)
 option(PICO9918_NO_SPLASH "Disable splash screen" OFF)
 option(PICO9918_DIAG "Enable diagnostic mode" OFF)
 
@@ -65,10 +66,19 @@ add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 add_definitions(-DVR_EMU_TMS9918_MODE=1)
 
 
-add_definitions(-DSYS_CLK_HZ=252000000)
-add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1512000000)
-add_definitions(-DPLL_SYS_POSTDIV1=6)
-add_definitions(-DPLL_SYS_POSTDIV2=1)
+if(PICO9918_SCART_RGBS AND NOT PICO9918_SCART_AUTODETECT)
+  # 270 MHz: exact integer pioClocksPerPixel=20 for 13.5 MHz PAL/NTSC pixel clock
+  add_definitions(-DSYS_CLK_HZ=270000000)
+  add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1080000000)
+  add_definitions(-DPLL_SYS_POSTDIV1=4)
+  add_definitions(-DPLL_SYS_POSTDIV2=1)
+else()
+  # VGA 252 MHz (also the boot default for autodetect; re-clocked if SCART detected)
+  add_definitions(-DSYS_CLK_HZ=252000000)
+  add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1512000000)
+  add_definitions(-DPLL_SYS_POSTDIV1=6)
+  add_definitions(-DPLL_SYS_POSTDIV2=1)
+endif()
 
 # SDK Flash write routines exit XIP mode and use boot2 to reenter it, so
 # boot2 needs to be properly configured for whatever speed we end up at.
@@ -85,16 +95,21 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-if (PICO9918_SCART_RGBS)
-  if (PICO9918_SCART_PAL)
-    set(PICO9918_OUTPUT_STR "rgbs-pal576i")
+if(NOT CONFIGURATOR_ONLY)
+  if(PICO9918_SCART_AUTODETECT)
+    set(PICO9918_OUTPUT_STR "autodetect")
+    set(PICO9918_OUTPUT_PREFIX "-autodetect")
+  elseif(PICO9918_SCART_RGBS)
+    if (PICO9918_SCART_PAL)
+      set(PICO9918_OUTPUT_STR "rgbs-pal576i")
+    else()
+      set(PICO9918_OUTPUT_STR "rgbs-ntsc480i")
+    endif()
+    set(PICO9918_OUTPUT_PREFIX "-${PICO9918_OUTPUT_STR}")
   else()
-    set(PICO9918_OUTPUT_STR "rgbs-ntsc480i")
+    set(PICO9918_OUTPUT_STR "vga")
+    set(PICO9918_OUTPUT_PREFIX "")
   endif()
-  set(PICO9918_OUTPUT_PREFIX "-${PICO9918_OUTPUT_STR}")
-else()
-  set(PICO9918_OUTPUT_STR "vga")
-  set(PICO9918_OUTPUT_PREFIX "")
 endif()
 
 set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
@@ -131,6 +146,7 @@ if(PICO9918_BUILD_COMBINED)
         -DPICO_BOARD_HEADER_DIRS=${CMAKE_SOURCE_DIR}/src/boards
         -DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS}
         -DPICO9918_SCART_PAL=${PICO9918_SCART_PAL}
+        -DPICO9918_SCART_AUTODETECT=${PICO9918_SCART_AUTODETECT}
         -DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH}
         -DPICO9918_DIAG=${PICO9918_DIAG}
         -DPICO_SDK_FETCH_FROM_GIT=${PICO_SDK_FETCH_FROM_GIT}

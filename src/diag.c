@@ -10,7 +10,7 @@
  */
 
 #include "diag.h"
-#include "display.h"
+#include "vga.h"
 #include "config.h"
 #include "bmp_font.h"  
 #include "gpu.h"
@@ -59,6 +59,10 @@ IntString modeStr = {0};
 IntString fpsStr = {0};
 IntString hwVerStr = {0};
 IntString fwVerStr = {0};
+IntString outputStr = {0};
+
+static const char *outputValues[] = {"480P ", "480I ", "576I "};
+static const char *outputUnits[]  = {"@60", "@60", "@50"};
 
 IntString nameTabStr = {0};
 IntString colorTabStr = {0};
@@ -169,6 +173,11 @@ void initDiagnostics()
   clear(&pattTabStr);
   clear(&sprAttTabStr);
   clear(&sprPattTabStr);
+  clear(&outputStr);
+
+  uint8_t driver = tms9918->config[CONF_DISP_DRIVER];
+  if (driver > 2) driver = 0;
+  strcpy(outputStr.digits, outputValues[driver]);
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 #if PICO_RP2350
@@ -232,7 +241,7 @@ void updateDiagnostics(uint32_t frameCount)
 
     if ((++frameCount & (framesPerUpdate - 1)) == 0)
     {
-      flt2Str((16.0f - droppedFramesCount) * 3.75f, 2, &fpsStr);
+      flt2Str((16.0f - droppedFramesCount) * (vgaCurrentParams()->params.frameRateHz / 16.0f), 2, &fpsStr);
     }
   }
 
@@ -377,6 +386,13 @@ static void diagTemp(uint16_t row, uint16_t* pixels)
   renderLeft("TEMP  : ", &temperatureStr, "^C", row, pixels);
 }
 
+static void diagOutput(uint16_t row, uint16_t* pixels)
+{
+  uint8_t driver = tms9918->config[CONF_DISP_DRIVER];
+  if (driver > 2) driver = 0;
+  renderLeft("OUTPUT: ", &outputStr, outputUnits[driver], row, pixels);
+}
+
 static void diagClock(uint16_t row, uint16_t* pixels)
 {
   renderLeft("CLOCK : ", &clockMhzStr, "MHZ", row, pixels);
@@ -493,6 +509,7 @@ DiagPtr performanceDiags[] = {
   &diagHwVer,
   &diagFwVer,
   &diagClock,
+  &diagOutput,
   &diagRenderTime,
   &diagFPS,
   &diagGpuTime,
@@ -606,7 +623,7 @@ static void renderPalette(int y, uint16_t *pixels)
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int row = to_remainder_u32(dmResult);
 
-  uint8_t palette = (y - 216) / 6;
+  uint8_t palette = (y - (vgaCurrentParams()->params.vVirtualPixels - 24)) / 6;
   if (palette < 4)
   {
     char buf[] = "PALETTE 0:"; buf[8] = '0' + palette;
@@ -637,7 +654,7 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   y -= 1; // vertical border
 
   // palette
-  if (tms9918->config[CONF_DIAG_PALETTE] && (y > 213)) renderPalette(y + 2, pixels);
+  if (tms9918->config[CONF_DIAG_PALETTE] && (y > ((int)vgaCurrentParams()->params.vVirtualPixels - 27))) renderPalette(y + 2, pixels);
 
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int diagRow = to_quotient_u32(dmResult);

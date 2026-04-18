@@ -246,11 +246,29 @@ typedef struct
 
 #define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
 
-static const ClockSettings clockPresets[] = {
-  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252
-  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4
-  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
+// SCART: clocks must be multiples of 54 MHz for exact integer pioClocksPerPixel
+// (pioFreq must be a multiple of 13.5 MHz, minimum 54 MHz)
+// 270/5=54MHz(4), 324/6=54MHz(4) clocks per pixel
+static const ClockSettings scartClockPresets[] = {
+  CLOCK_PRESET(1080000000, 4, 1, VREG_VOLTAGE_1_15),    // 270 MHz
+  CLOCK_PRESET(1296000000, 4, 1, VREG_VOLTAGE_1_20),    // 324 MHz
+  CLOCK_PRESET(1296000000, 4, 1, VREG_VOLTAGE_1_20)     // 324 MHz (no safe higher option)
 };
+
+// VGA: clocks for 25.175 MHz pixel clock
+static const ClockSettings vgaClockPresets[] = {
+  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252 MHz
+  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4 MHz
+  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352 MHz
+};
+
+#if PICO9918_SCART_AUTODETECT
+static const ClockSettings *clockPresets = vgaClockPresets;
+#elif PICO9918_SCART_RGBS
+static const ClockSettings *clockPresets = scartClockPresets;
+#else
+static const ClockSettings *clockPresets = vgaClockPresets;
+#endif
 
 static int clockPresetIndex = 0;
 static bool testingClock = false;
@@ -275,17 +293,6 @@ static void eofInterrupt()
   if (TMS_REGISTER(tms9918, 0x32) & 0x20)
   {
     gpuTrigger();
-  }
-
-  static float tempC = 0.0f;
-  tempC += coreTemperatureC();
-  if ((frameCount & 0x3f) == 0) // every 64th frame
-  {
-    tempC /= 64.0f;
-    diagSetTemperature(tempC);
-    uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
-    TMS_STATUS(tms9918, 13) = t4;
-    tempC = 0.0f;
   }
 
   if (tms9918->configDirty)
@@ -417,7 +424,20 @@ static void tmsEndOfScanline(uint32_t displayLine)
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
-  
+
+  {
+    static float tempC = 0.0f;
+    tempC += coreTemperatureC();
+    if ((frameCount & 0x3f) == 0) // every 64th frame
+    {
+      tempC /= 64.0f;
+      diagSetTemperature(tempC);
+      uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
+      TMS_STATUS(tms9918, 13) = t4;
+      tempC = 0.0f;
+    }
+  }
+
   if (!validWrites)
   {
     // has the display been enabled?
@@ -444,14 +464,23 @@ static void tmsEndOfFrame(uint32_t frameNumber)
     updateInterrupts(STATUS_INT);
   }
 
-#if DISPLAY_YSCALE > 1
-  vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
-  vgaCurrentParams()->params.vVirtualPixels = VIRTUAL_PIXELS_Y << (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
+#if PICO9918_SCART_AUTODETECT
+  const int yScale = vgaCurrentParams()->params.interlaced ? 1 : 2;
+#elif defined(DISPLAY_YSCALE)
+  const int yScale = DISPLAY_YSCALE;
+#else
+  const int yScale = 1;
 #endif
+
+  if (yScale > 1) {
+    bool doubleRows = TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS;
+    vgaCurrentParams()->params.vPixelScale = yScale - (bool)doubleRows;
+    vgaCurrentParams()->params.vVirtualPixels = (vgaCurrentParams()->params.vSyncParams.displayPixels / yScale) << (bool)doubleRows;
+  }
 
   int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
   vPixels = baseRows << 3;
-  if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
+  if (yScale > 1 && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS))
     vPixels <<= 1;
   vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
   vgaSetTriggerScanline(vBorder + vPixels);
@@ -520,7 +549,11 @@ static __attribute__((noinline))  void generateRgbCache()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
+  const uint32_t halfHBorder = (params->hVirtualPixels - TMS9918_PIXELS_X * 2) / 4;
+
+  // for interlaced modes, bit 12 of y carries the field number (0=Field1, 1=Field2)
+  const uint8_t  field  = (y >> 12) & 1;
+  y = y & 0x0fff;  // virtual line within the field (0..N-1)
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
@@ -536,7 +569,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (y < vBorder || y >= (vBorder + vPixels))  // TODO: None of this runs in ROW30 mode
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
-    dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
+    dma_channel_set_trans_count(dma32, params->hVirtualPixels / 2, true);
     tms9918->vram.map.blanking = 1; // V
     if ((y >= vBorder + vPixels))
     {
@@ -613,8 +646,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       generateRgbCache();
 
     /* generate the scanline */
+    uint16_t tmsY = y;
+    if (params->interlaced && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS))
+      tmsY = y * 2 + (field ^ params->interlacedFieldOrder);
     uint32_t renderTime  = time_us_32();
-    uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+    uint8_t tempStatus = vrEmuTms9918ScanLine(tmsY, tmsScanlineBuffer);
     renderTime = time_us_32() - renderTime;
 
     /*** F18A status register updates ***/
@@ -757,10 +793,18 @@ int main(void)
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
+  // detect SCART dongle early — before clock setup and readConfig()
+  detectScartDongle();
+
+#if PICO9918_SCART_AUTODETECT
+  if (isScartConnected())
+    clockPresets = scartClockPresets;
+#endif
+
   /* the initial "safe" clock speed */
   ClockSettings clockSettings = clockPresets[clockPresetIndex];
   vreg_set_voltage(clockSettings.voltage);
-  sleep_ms(2);
+  sleep_ms(1);
   set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
 
   /* we need one of these. it's the main guy */
@@ -771,10 +815,14 @@ int main(void)
 
   /* we could set clock freq here from options */
   readConfig(tms9918->config);
-  
+
+#if PICO9918_SCART_AUTODETECT
+  updateDispDriver();
+#endif
+
   /*
-   * if we're trying out a new clock rate, we need to have a failsafe 
-   * we test it first 
+   * if we're trying out a new clock rate, we need to have a failsafe
+   * we test it first
    */
   if (tms9918->config[CONF_CLOCK_PRESET_ID] != 0 && 
       tms9918->config[CONF_CLOCK_PRESET_ID] != tms9918->config[CONF_CLOCK_TESTED])
@@ -850,9 +898,13 @@ int main(void)
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
+#if PICO9918_SCART_AUTODETECT
+  VgaMode scartMode = tms9918->config[CONF_SCART_TIMING]
+    ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ;
+  params.params = vgaGetParams(isScartConnected() ? scartMode : VGA_640_480_60HZ);
+#else
   params.params = vgaGetParams(DISPLAY_MODE);
-  setVgaParamsScaleY(&params.params, 1);
-
+#endif
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;

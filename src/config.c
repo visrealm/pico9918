@@ -16,10 +16,16 @@
 #include "config.h"
 
 #include "hardware/flash.h"
+#include "hardware/gpio.h"
+
+#include "pico/time.h"
 
 #include <string.h>
 
-#if PICO9918_SCART_RGBS // 0 = VGA, 1 = NTSC, 2 = PAL
+#if PICO9918_SCART_AUTODETECT
+  // For autodetect, DISP_DRIVER is set after readConfig + detectScartDongle
+  // using updateDispDriver(). Not used during config validation.
+#elif PICO9918_SCART_RGBS // 0 = VGA, 1 = NTSC, 2 = PAL
   #define PICO9918_DISP_DRIVER (1 + PICO9918_SCART_PAL)
 #else
   #define PICO9918_DISP_DRIVER 0
@@ -74,6 +80,60 @@ Pico9918HardwareVersion currentHwVersion()
   return hwVersion;
 }
 
+static bool scartConnected = false;
+
+/*
+ * detect a SCART dongle by checking if the two sync pins are bridged.
+ * The SCART dongle connects hsync (GPIO 0) and vsync (GPIO 1) via 1k resistor.
+ * Drive one high, pull-down the other and read it. Must be called before vgaInit().
+ */
+bool detectScartDongle()
+{
+#if PICO9918_SCART_AUTODETECT
+  const uint syncMask = 0x03 << VGA_SYNC_PINS_START;  // GPIO 0 and 1
+  const uint driveMask = 0x01 << VGA_SYNC_PINS_START; // GPIO 0
+
+  gpio_init_mask(syncMask);
+  gpio_set_drive_strength(VGA_SYNC_PINS_START, GPIO_DRIVE_STRENGTH_12MA);
+  gpio_set_dir_masked(syncMask, driveMask);  // GPIO 0 output, GPIO 1 input
+  gpio_pull_down(VGA_SYNC_PINS_START + 1);
+
+  gpio_set_mask(driveMask);
+  sleep_ms(1);
+  scartConnected = gpio_get(VGA_SYNC_PINS_START + 1);
+
+  gpio_clr_mask(driveMask);
+  gpio_set_drive_strength(VGA_SYNC_PINS_START, GPIO_DRIVE_STRENGTH_4MA);
+  gpio_disable_pulls(VGA_SYNC_PINS_START + 1);
+  gpio_set_dir_masked(syncMask, 0);  // both inputs
+  // PIO will re-claim these pins during vgaInit()
+#else
+  scartConnected = (bool)PICO9918_SCART_RGBS;
+#endif
+  return scartConnected;
+}
+
+/*
+ * true if a SCART dongle was detected (or SCART build is unconditional)
+ */
+bool isScartConnected()
+{
+  return scartConnected;
+}
+
+#if PICO9918_SCART_AUTODETECT
+/*
+ * update CONF_DISP_DRIVER based on detection result and SCART timing config.
+ * call after both detectScartDongle() and readConfig() have run.
+ */
+void updateDispDriver()
+{
+  // DISP_DRIVER: 0=VGA, 1=NTSC, 2=PAL. SCART_TIMING: 0=PAL, 1=NTSC
+  tms9918->config[CONF_DISP_DRIVER] = isScartConnected()
+    ? (2 - tms9918->config[CONF_SCART_TIMING]) : 0;
+}
+#endif
+
 /*
  * apply current configuration to the VDP
  */
@@ -113,11 +173,14 @@ void readConfig(uint8_t config[CONFIG_BYTES])
   memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
 
   if (config[CONF_PICO_MODEL] != PICO_MODEL ||
+#if !PICO9918_SCART_AUTODETECT
       config[CONF_DISP_DRIVER] != PICO9918_DISP_DRIVER ||
+#endif
       config[CONF_CLOCK_PRESET_ID] > 2 ||
       config[CONF_VDP_DEVICE] >= VDP_DEVICE_COUNT ||
       config[CONF_CRT_SCANLINES] > 1 ||
       config[CONF_SCANLINE_SPRITES] > 3 ||
+      config[CONF_SCART_TIMING] > 1 ||
       config[CONF_PALETTE_IDX_0] != 0x00 ||
       (config[CONF_PALETTE_IDX_0 + 2] & 0xf0) != 0xf0) // not initialised
   {
@@ -126,13 +189,16 @@ void readConfig(uint8_t config[CONFIG_BYTES])
     config[CONF_PICO_MODEL] = PICO_MODEL;
     config[CONF_SW_VERSION] = PICO9918_SW_VERSION;
     config[CONF_HW_VERSION] = currentHwVersion();
+#if !PICO9918_SCART_AUTODETECT
     config[CONF_DISP_DRIVER] = PICO9918_DISP_DRIVER;
+#endif
     config[CONF_CLOCK_TESTED] = 0;
 
     config[CONF_CRT_SCANLINES] = 0;
     config[CONF_SCANLINE_SPRITES] = 0;
     config[CONF_CLOCK_PRESET_ID] = 0;
     config[CONF_VDP_DEVICE] = VDP_TMS9918A;
+    config[CONF_SCART_TIMING] = 0;  // default PAL
 
     config[CONF_PALETTE_IDX_0] = 0;
     config[CONF_PALETTE_IDX_0 + 1] = 0;

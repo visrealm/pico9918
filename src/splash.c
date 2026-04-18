@@ -9,8 +9,6 @@
  *
  */
 
-#include "display.h"
-
 #include "splash.h"
 #include "vga.h"
 
@@ -50,9 +48,10 @@ void outputSplash(uint16_t y, uint32_t frameCount, uint32_t vBorder, uint32_t vP
 
   if (y == 0)
   {
+    int minOffset = vgaCurrentParams()->params.vVirtualPixels - vBorder - vPixels - splashHeight - 2;
     if (frameCount & 0x01)
     {
-      if (frameCount < 200 && logoOffset > (22 - splashHeight)) --logoOffset;
+      if (frameCount < 200 && logoOffset > minOffset) --logoOffset;
       else if (canHideSplash && frameCount > 500) ++logoOffset;
     }
   }

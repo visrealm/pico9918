@@ -31,6 +31,7 @@ typedef enum
   CONF_CRT_SCANLINES    = 8,
   CONF_SCANLINE_SPRITES = 9,
   CONF_CLOCK_PRESET_ID  = 10,
+  CONF_SCART_TIMING     = 11,  // 0 = PAL 576i (default), 1 = NTSC 480i
   CONF_VDP_DEVICE       = 12,
 
   CONF_DIAG             = 16,
@@ -65,6 +66,15 @@ typedef enum
 
 /* get hardware version (v0.3 or v0.4/v1.0+) */
 Pico9918HardwareVersion currentHwVersion();
+
+/* detect SCART dongle by testing if sync pins are bridged (call before vgaInit) */
+bool detectScartDongle();
+
+/* true if a SCART dongle was detected at boot */
+bool isScartConnected();
+
+/* update CONF_DISP_DRIVER at runtime (autodetect builds only) */
+void updateDispDriver();
 
 /* read configuration data from flash */
 void readConfig(uint8_t config[CONFIG_BYTES]);

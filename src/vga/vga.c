@@ -22,7 +22,11 @@
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
 
- #define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
+#if PICO9918_SCART_AUTODETECT
+  #define VGA_COMBINE_SYNC_RUNTIME 1
+#else
+  #define VGA_COMBINE_SYNC PICO9918_SCART_RGBS
+#endif
 
 #define VGA_NO_MALLOC 1
 
@@ -36,11 +40,11 @@ int roundflt(float x)
 }
 
 
-#define SYNC_PINS_START 0        // first sync pin gpio number
-#define SYNC_PINS_COUNT 2        // number of sync pins (h and v)
+#define SYNC_PINS_START VGA_SYNC_PINS_START
+#define SYNC_PINS_COUNT VGA_SYNC_PINS_COUNT
 
-#define RGB_PINS_START  2        // first rgb pin gpio number
-#define RGB_PINS_COUNT 12        // number of rgb pins
+#define RGB_PINS_START  VGA_RGB_PINS_START
+#define RGB_PINS_COUNT  VGA_RGB_PINS_COUNT
 
 #define VGA_PIO         pio0_hw  // which pio are we using for vga?
 #define SYNC_SM         0        // vga sync state machine index
@@ -50,7 +54,10 @@ int roundflt(float x)
 #define END_OF_SCANLINE_MSG 0x40000000
 #define END_OF_FRAME_MSG    0x80000000
 
-#if VGA_COMBINE_SYNC
+#if VGA_COMBINE_SYNC_RUNTIME
+bi_decl(bi_1pin_with_name(SYNC_PINS_START, "Sync"));
+bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "Sync"));
+#elif VGA_COMBINE_SYNC
 bi_decl(bi_1pin_with_name(SYNC_PINS_START, "C Sync"));
 bi_decl(bi_1pin_with_name(SYNC_PINS_START + 1, "C Sync"));
 #else
@@ -65,12 +72,34 @@ bi_decl(bi_pin_mask_with_names(0xf << RGB_PINS_START + 8, "Blue (LSB - MSB)"));
 /*
  * sync pio dma data buffers
  */
-uint32_t __aligned(8) syncDataActive[4];  // active display area
-uint32_t __aligned(8) syncDataPorch[4];   // vertical porch
-uint32_t __aligned(8) syncDataSync[4];    // vertical sync
+uint32_t __aligned(8) syncDataActive[4];  // active display full line (4 words, 64us)
+uint32_t __aligned(8) syncDataPorch[4];   // porch/blanking full line (4 words, 64us)
+uint32_t __aligned(8) syncDataSync[4];    // VGA vsync full line     (4 words, non-interlaced only)
+
+// Interlaced PAL/NTSC: full-line vsync buffers (4 words each = 64us = 2 half-lines).
+// All DMA transfers are always 4 words — no transfer count switching, no FIFO starvation.
+//
+// Each buffer encodes two half-line sync pulses:
+//   EQ (short sync): 2us low + 30us high = 32us per half-line
+//   LS (long sync):  30us low + 2us high = 32us per half-line
+//
+// Per-field line sequences (ISR dispatches one buffer per line):
+//   F1 (313 lines): LsLs LsLs LsEq EqEq EqEq [17 porch] [288 active] EqEq EqEq EqLs
+//   F2 (312 lines): LsLs LsLs EqEq EqEq       [17 porch] [288 active] EqEq EqEq EqEq
+//
+// F1 line 312 = EqLs creates the half-line offset: left half is F1's last EQ,
+// right half is F2's first LS. This is the interlace transition line.
+// F2 has no EqLs — its LS starts cleanly at line 0, giving the 0.5-line offset.
+//
+//   F1→F2 LS interval: (313 - 0) - 0.5 + 0 = 312.5 lines ✓
+//   F2→F1 LS interval: (312 - 0) + 0.5 = 312.5 lines ✓
+uint32_t __aligned(4) syncDataLsLs[4];    // LS + LS
+uint32_t __aligned(4) syncDataLsEq[4];    // LS + EQ  (F1 LS→EQ transition at line 2)
+uint32_t __aligned(4) syncDataEqEq[4];    // EQ + EQ
+uint32_t __aligned(4) syncDataEqLs[4];    // EQ + LS  (F1 last line — interlace transition)
 
 #if VGA_NO_MALLOC
-__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2][VIRTUAL_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
+__attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2][RGB_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
 #else
 #include <stdlib.h>
 uint16_t* __aligned(8) rgbDataBuffer[2 + VGA_SCANLINE_TIME_DEBUG] = { 0 };                          // two scanline buffers (odd and even)
@@ -101,6 +130,10 @@ uint32_t vgaMinimumPioClockKHz(VgaParams* params)
 }
 
 
+// Map VgaVsyncLineType enum to sync data buffer pointers.
+// Populated by buildSyncData() when interlaced is true.
+static const uint32_t* vsyncTypeBuffers[VSYNC_TYPE_COUNT];
+
 /*
  * build the sync data buffers
  */
@@ -116,8 +149,8 @@ static bool buildSyncData()
   }
 
 #if !VGA_NO_MALLOC
-  rgbDataBuffer[0] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
-  rgbDataBuffer[1] = malloc(VIRTUAL_PIXELS_X * sizeof(uint16_t));
+  rgbDataBuffer[0] = malloc(RGB_PIXELS_X * sizeof(uint16_t));
+  rgbDataBuffer[1] = malloc(RGB_PIXELS_X * sizeof(uint16_t));
 #endif
 
   vgaParams.params.pioDivider = roundflt(sysClockKHz / (float)minClockKHz);
@@ -140,17 +173,26 @@ static bool buildSyncData()
   const uint32_t vSyncOff = !vgaParams.params.vSyncParams.syncHigh << vga_sync_WORD_VSYNC_OFFSET;
   const uint32_t vSyncOn = vgaParams.params.vSyncParams.syncHigh << vga_sync_WORD_VSYNC_OFFSET;
 
-#if VGA_COMBINE_SYNC
-  const uint32_t HoffVoff = hSyncOff | vSyncOff;
-  const uint32_t HonVoff = hSyncOn | vSyncOn;
-  const uint32_t HoffVon = hSyncOn | vSyncOn;
-  const uint32_t HonVon = hSyncOff | vSyncOff;
+#if VGA_COMBINE_SYNC_RUNTIME
+  const bool combinedSync = vgaParams.params.interlaced;
+#elif VGA_COMBINE_SYNC
+  const bool combinedSync = true;
 #else
-  const uint32_t HoffVoff = hSyncOff | vSyncOff;
-  const uint32_t HonVoff = hSyncOn | vSyncOff;
-  const uint32_t HoffVon = hSyncOff | vSyncOn;
-  const uint32_t HonVon = hSyncOn | vSyncOn;
+  const bool combinedSync = false;
 #endif
+
+  uint32_t HoffVoff, HonVoff, HoffVon, HonVon;
+  if (combinedSync) {
+    HoffVoff = hSyncOff | vSyncOff;
+    HonVoff  = hSyncOn  | vSyncOn;
+    HoffVon  = hSyncOn  | vSyncOn;
+    HonVon   = hSyncOff | vSyncOff;
+  } else {
+    HoffVoff = hSyncOff | vSyncOff;
+    HonVoff  = hSyncOn  | vSyncOff;
+    HoffVon  = hSyncOff | vSyncOn;
+    HonVon   = hSyncOn  | vSyncOn;
+  }
 
   // compute exec instructions
   const uint32_t instIrq = pio_encode_irq_set(false, vga_rgb_RGB_IRQ) << vga_sync_WORD_EXEC_OFFSET;
@@ -178,6 +220,53 @@ static bool buildSyncData()
   syncDataSync[SYNC_LINE_FPORCH] = instNop | HoffVon | fPorchTicks;
   syncDataSync[SYNC_LINE_HSYNC] = instNop | HonVon | syncTicks;
   syncDataSync[SYNC_LINE_BPORCH] = instNop | HoffVon | bPorchTicks;
+
+  // Interlaced: full-line vsync buffers (4 words = 2 half-lines = 64us).
+  // Pulse widths from halfLineSync config; guard period fills the remainder of each half-line.
+  if (vgaParams.params.interlaced)
+  {
+    const uint32_t cLow  = HonVoff;   // csync asserted (low)
+    const uint32_t cHigh = HoffVoff;  // csync idle (high)
+
+    const float ppc = vgaParams.params.pioClocksPerPixel;
+    const uint32_t shortPx = vgaParams.params.shortPulsePixels;  // EQ pulse (e.g. 27)
+    const uint32_t halfLinePx = vgaParams.params.hSyncParams.totalPixels / 2; // half-line (e.g. 432)
+    const uint32_t longPx  = halfLinePx - shortPx;                            // LS pulse / EQ guard
+    const uint32_t eqLow  = roundflt(ppc * (float)shortPx) - vga_sync_SETUP_OVERHEAD;  // EQ pulse ticks
+    const uint32_t eqHigh = roundflt(ppc * (float)longPx)  - vga_sync_SETUP_OVERHEAD;  // EQ guard / LS pulse ticks
+
+    // LS+LS: [405px LOW][27px HIGH][405px LOW][27px HIGH] = 864px
+    syncDataLsLs[0] = instNop | cLow  | eqHigh;
+    syncDataLsLs[1] = instNop | cHigh | eqLow;
+    syncDataLsLs[2] = instNop | cLow  | eqHigh;
+    syncDataLsLs[3] = instNop | cHigh | eqLow;
+
+    // LS+EQ: [405px LOW][27px HIGH][27px LOW][405px HIGH] = 864px
+    syncDataLsEq[0] = instNop | cLow  | eqHigh;
+    syncDataLsEq[1] = instNop | cHigh | eqLow;
+    syncDataLsEq[2] = instNop | cLow  | eqLow;
+    syncDataLsEq[3] = instNop | cHigh | eqHigh;
+
+    // EQ+EQ: [27px LOW][405px HIGH][27px LOW][405px HIGH] = 864px
+    syncDataEqEq[0] = instNop | cLow  | eqLow;
+    syncDataEqEq[1] = instNop | cHigh | eqHigh;
+    syncDataEqEq[2] = instNop | cLow  | eqLow;
+    syncDataEqEq[3] = instNop | cHigh | eqHigh;
+
+    // EQ+LS: [27px LOW][405px HIGH][405px LOW][27px HIGH] = 864px
+    // This is the interlace transition line (F1 line 312).
+    syncDataEqLs[0] = instNop | cLow  | eqLow;
+    syncDataEqLs[1] = instNop | cHigh | eqHigh;
+    syncDataEqLs[2] = instNop | cLow  | eqHigh;
+    syncDataEqLs[3] = instNop | cHigh | eqLow;
+
+    // Lookup table: VgaVsyncLineType enum → buffer pointer
+    vsyncTypeBuffers[VSYNC_LSLS]  = syncDataLsLs;
+    vsyncTypeBuffers[VSYNC_LSEQ]  = syncDataLsEq;
+    vsyncTypeBuffers[VSYNC_EQEQ]  = syncDataEqEq;
+    vsyncTypeBuffers[VSYNC_EQLS]  = syncDataEqLs;
+    vsyncTypeBuffers[VSYNC_PORCH] = syncDataPorch;
+  }
 
   return true;
 }
@@ -218,7 +307,9 @@ static void vgaInitSync()
   channel_config_set_dreq(&syncDmaChanConfig, pio_get_dreq(VGA_PIO, SYNC_SM, true)); // transfer when there's space in fifo
 
   // setup the dma channel and set it going
-  dma_channel_configure(syncDmaChan, &syncDmaChanConfig, &VGA_PIO->txf[SYNC_SM], syncDataSync, 4, false);
+  // setup the dma channel and set it going
+  uint32_t* syncInitBuf = vgaParams.params.interlaced ? syncDataLsLs : syncDataSync;
+  dma_channel_configure(syncDmaChan, &syncDmaChanConfig, &VGA_PIO->txf[SYNC_SM], syncInitBuf, 4, false);
   dma_channel_set_irq0_enabled(syncDmaChan, true);
 }
 
@@ -252,7 +343,11 @@ static void vgaInitRgb()
 
   // add rgb pio program
   pio_sm_set_consecutive_pindirs(VGA_PIO, RGB_SM, RGB_PINS_START, RGB_PINS_COUNT, true);
-  pio_set_y(VGA_PIO, RGB_SM, VIRTUAL_PIXELS_X - 1);
+  // Output displayPixels + 2 pixels per line. The extra word (2 pixels) of
+  // zeros absorbs the PIO's speculative autopull, preventing stale FIFO data
+  // from bleeding into the next scanline. The extra pixels fall within the
+  // front porch region and are blanked by the sync signal.
+  pio_set_y(VGA_PIO, RGB_SM, vgaParams.params.hSyncParams.displayPixels + 1);
 
   rgbProgOffset = pio_add_program(VGA_PIO, &rgbProgram);
   rgbConfig = vga_rgb_program_get_default_config(rgbProgOffset);
@@ -272,52 +367,121 @@ static void vgaInitRgb()
   channel_config_set_write_increment(&rgbDmaChanConfig, false);           // don't increment write
   channel_config_set_dreq(&rgbDmaChanConfig, pio_get_dreq(VGA_PIO, RGB_SM, true));
 
-  // setup the dma channel and set it going
-  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], VIRTUAL_PIXELS_X / 2, false);
+  // DMA transfers displayPixels/2 + 1 words (the extra word is a black guard)
+  dma_channel_configure(rgbDmaChan, &rgbDmaChanConfig, &VGA_PIO->txf[RGB_SM], rgbDataBuffer[0], vgaParams.params.hSyncParams.displayPixels / 2 + 1, false);
   dma_channel_set_irq0_enabled(rgbDmaChan, true);
 }
 
 /*
  * dma interrupt handler
+ *
+ * Interlaced: all DMA transfers are 4 words (one full line = 64us).
+ * Field structure is read from vgaParams.params.fields[currentField].
+ * The vsync pattern, porch, active, and trailing EQ line counts are
+ * all defined per-field in the VgaFieldParams.
  */
 static void __isr __time_critical_func(dmaIrqHandler)(void)
 {
-  static int currentTimingLine = -1;
+  static int currentLine = -1;
   static int currentDisplayLine = -1;
+  static int currentField = 0;
 
   if (dma_hw->ints0 & syncDmaChanMask)
   {
     dma_hw->ints0 = syncDmaChanMask;
 
-    if (++currentTimingLine >= vgaParams.params.vSyncParams.totalPixels)
+    if (vgaParams.params.interlaced)
     {
-      currentTimingLine = 0;
-      currentDisplayLine = 0;
-    }
+      const VgaFieldParams* field = &vgaParams.params.fields[currentField];
 
-    if (currentTimingLine < vgaParams.params.vSyncParams.syncPixels)
-    {
-      dma_channel_set_read_addr(syncDmaChan, syncDataSync, true);
-    }
-    else if (currentTimingLine < (vgaParams.params.vSyncParams.syncPixels + vgaParams.params.vSyncParams.backPorchPixels))
-    {
-      dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
-      if (currentTimingLine + 2 == (vgaParams.params.vSyncParams.syncPixels + vgaParams.params.vSyncParams.backPorchPixels))
+      if (++currentLine >= (int)field->totalLines)
       {
-        multicore_fifo_push_timeout_us(0, 0);
-        multicore_fifo_push_timeout_us(1, 0);
+        currentLine = 0;
+        currentDisplayLine = 0;
+        currentField ^= 1;
+        field = &vgaParams.params.fields[currentField];
       }
-    }
-    else if (currentTimingLine < (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels))
-    {
-      dma_channel_set_read_addr(syncDmaChan, syncDataActive, true);
+
+      const int vsyncEnd  = field->vsyncLines;
+      const int porchEnd  = vsyncEnd + field->porchLines;
+      const int activeEnd = porchEnd + field->activeLines;
+
+      if (currentLine < vsyncEnd)
+      {
+        // Vsync region: dispatch from per-field pattern
+        dma_channel_set_read_addr(syncDmaChan,
+          vsyncTypeBuffers[field->vsyncPattern[currentLine]], true);
+      }
+      else if (currentLine < porchEnd)
+      {
+        // Back porch
+        dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
+        if (currentLine + 2 == porchEnd)
+        {
+          multicore_fifo_push_timeout_us((uint32_t)(currentField << 12) | 0, 0);
+          multicore_fifo_push_timeout_us((uint32_t)(currentField << 12) | 1, 0);
+
+          dma_channel_abort(rgbDmaChan);
+          dma_hw->ints0 = rgbDmaChanMask;
+          pio_sm_set_enabled(VGA_PIO, RGB_SM, false);
+          pio_sm_clear_fifos(VGA_PIO, RGB_SM);
+          pio_sm_restart(VGA_PIO, RGB_SM);
+          pio_sm_exec(VGA_PIO, RGB_SM, pio_encode_jmp(rgbProgOffset));
+          pio_sm_set_enabled(VGA_PIO, RGB_SM, true);
+          currentDisplayLine = 0;
+          dma_channel_set_read_addr(rgbDmaChan, rgbDataBuffer[0], true);
+        }
+      }
+      else if (currentLine < activeEnd)
+      {
+        dma_channel_set_read_addr(syncDmaChan, syncDataActive, true);
+      }
+      else
+      {
+        // Trailing lines: dispatch from per-field trailing pattern
+        int trailingIdx = currentLine - activeEnd;
+        dma_channel_set_read_addr(syncDmaChan,
+          vsyncTypeBuffers[field->trailingPattern[trailingIdx]], true);
+
+        if (currentLine == activeEnd)
+        {
+          multicore_fifo_push_timeout_us(FRONT_PORCH_MSG, 0);
+        }
+      }
     }
     else
     {
-      dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
-      if (currentTimingLine == (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels) + 2)
+      // non-interlaced VGA: original dispatch logic unchanged
+      if (++currentLine >= vgaParams.params.vSyncParams.totalPixels)
       {
-        multicore_fifo_push_timeout_us(FRONT_PORCH_MSG, 0);
+        currentLine = 0;
+        currentDisplayLine = 0;
+      }
+
+      if (currentLine < vgaParams.params.vSyncParams.syncPixels)
+      {
+        dma_channel_set_read_addr(syncDmaChan, syncDataSync, true);
+      }
+      else if (currentLine < (vgaParams.params.vSyncParams.syncPixels + vgaParams.params.vSyncParams.backPorchPixels))
+      {
+        dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
+        if (currentLine + 2 == (vgaParams.params.vSyncParams.syncPixels + vgaParams.params.vSyncParams.backPorchPixels))
+        {
+          multicore_fifo_push_timeout_us(0, 0);
+          multicore_fifo_push_timeout_us(1, 0);
+        }
+      }
+      else if (currentLine < (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels))
+      {
+        dma_channel_set_read_addr(syncDmaChan, syncDataActive, true);
+      }
+      else
+      {
+        dma_channel_set_read_addr(syncDmaChan, syncDataPorch, true);
+        if (currentLine == (vgaParams.params.vSyncParams.totalPixels - vgaParams.params.vSyncParams.frontPorchPixels) + 2)
+        {
+          multicore_fifo_push_timeout_us(FRONT_PORCH_MSG, 0);
+        }
       }
     }
   }
@@ -358,7 +522,8 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
       uint32_t requestLine = pxLine + 1;
       if (requestLine < vgaParams.params.vVirtualPixels)
       {
-        multicore_fifo_push_timeout_us(requestLine, 0);
+        // bit 12 carries the current field for interlaced modes (0 or 1)
+        multicore_fifo_push_timeout_us((currentField << 12) | requestLine, 0);
       }
 
       if (requestLine == vgaParams.params.vVirtualPixels - 1)
@@ -368,7 +533,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
     }
     else if (vgaParams.scanlines) // apply a lame CRT effect, darkening every 2nd scanline
     {
-      int end = VIRTUAL_PIXELS_X / 2;
+      int end = vgaParams.params.hSyncParams.displayPixels / 2;
       for (int i = 5; i < end; ++i)
       {
 #if PICO_RP2040
@@ -457,7 +622,9 @@ void __time_critical_func(vgaLoop)()
       }
 
       // get the next scanline pixels
-      vgaParams.scanlineFn(message & 0xfff, &vgaParams.params, rgbDataBuffer[message & 0x01]);
+      // for interlaced modes, bit 12 of y carries the field number (0 or 1)
+      vgaParams.scanlineFn(message & 0x1fff, &vgaParams.params,
+                           rgbDataBuffer[message & 0x01]);
       if (doEof && vgaParams.endOfFrameFn)
       {
         vgaParams.endOfFrameFn(frameNumber);
