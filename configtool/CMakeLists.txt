@@ -128,7 +128,7 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
     if("${PLATFORM_FLAG}" STREQUAL "--ti994a")
         if(XAS99_SCRIPT)
             # XAS99 generates files based on the assembly filename, not the target name
-            get_filename_component(ASM_NAME "${ASM_OUTPUT}" NAME_WE)
+            get_filename_component(ASM_NAME "${ASM_OUTPUT}" NAME_WLE)
             # Banked builds: XAS99 suffix width depends on bank count (_b0 for <=10, _b00 for >10)
             # Unbanked (lite/NO_UPGRADE) builds produce a flat .bin
             _ensure_xas99_bank_resolver()
