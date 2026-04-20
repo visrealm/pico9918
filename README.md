@@ -106,14 +106,14 @@ The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video bel
 
 ## Purchasing options
 
-Fully assembled and tested PICO9918 PROs are available on my Tindie store:
+Fully assembled and tested PICO9918 PROs are available here:
 
-<a href="https://www.tindie.com/search/?q=PICO9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
-
-Also (more convenient for North America)
-
-<a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=*PICO9918*"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
-
+| Link | Store | Best For |
+  |------|-------|----------|
+  | <a href="https://www.tindie.com/search/?q=PICO9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a> | Tindie (visrealm) | All regions |
+  | <a href="https://lectronz.com/stores/visrealm" alt="I sell on Lectronz"><img src="https://lectronz-images.b-cdn.net/static/badges/i-sell-on-lectronz-large.png" width="200" /></a> | Lectronz (visrealm) | All regions. Best choice for EU |
+  | <a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=*PICO9918*"><img src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg" width="200"></a> | Arcade Shopper | US |
+  
 ## Hardware
 
 There are three main variants of the hardware.
