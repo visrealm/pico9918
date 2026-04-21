@@ -1,8 +1,12 @@
 # PICO9918
 
-A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
+A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 (and now RP2350) microcontroller.
 
 <p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="400px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="406px"></a></p>
+
+The PICO9918 PRO can replace all classic VDP models (TMS9918, TMS9918A, TMS9928A, TMS9929A, TMS9118, TMS9128, TMS9129), providing a crisp VGA, HDMI or SCART RGB signal from your retrocomputer.
+
+The PICO9918 has been tested on over 30 classic models of TI-99, Coleco, MSX, NABU, Memotech, Sega and many more. See the [full list below](#supported-devices).
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
 
