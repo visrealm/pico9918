@@ -16,7 +16,7 @@ else()
     set(USERHOME $ENV{HOME})
 endif()
 set(sdkVersion 2.1.1)
-set(toolchainVersion 14_2_Rel1)
+set(toolchainVersion 15_2_Rel1)
 set(picotoolVersion 2.1.1)
 set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
 if (EXISTS ${picoVscode})
@@ -134,6 +134,12 @@ if(PICO9918_BUILD_COMBINED)
         -DPICO_SDK_FETCH_FROM_GIT=${PICO_SDK_FETCH_FROM_GIT}
         -DPICO_SDK_FETCH_FROM_GIT_TAG=${PICO_SDK_FETCH_FROM_GIT_TAG}
     )
+    if(PICO_SDK_PATH)
+        list(APPEND COMMON_CMAKE_ARGS -DPICO_SDK_PATH=${PICO_SDK_PATH})
+    endif()
+    if(PICO_TOOLCHAIN_PATH)
+        list(APPEND COMMON_CMAKE_ARGS -DPICO_TOOLCHAIN_PATH=${PICO_TOOLCHAIN_PATH})
+    endif()
     if(WIN32)
         list(APPEND COMMON_CMAKE_ARGS
             -DCMAKE_C_COMPILER_WORKS=1
