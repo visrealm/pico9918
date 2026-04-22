@@ -76,22 +76,6 @@ jobs:
       run: |
         cmake --build build --target build_configurators
 
-    - name: List configurator outputs (diagnostic)
-      if: ${{ inputs.build-configurator }}
-      run: |
-        Write-Host "=== build/configurators/dist/ ==="
-        if (Test-Path "build/configurators/dist") {
-          Get-ChildItem -Path "build/configurators/dist" -Recurse | Select-Object FullName, Length | Format-Table -AutoSize
-        } else {
-          Write-Host "(directory does not exist)"
-        }
-        Write-Host "=== build/configurators/ (top level) ==="
-        if (Test-Path "build/configurators") {
-          Get-ChildItem -Path "build/configurators" | Select-Object Name, Mode | Format-Table -AutoSize
-        }
-        Write-Host "=== searching for *.rom *.nabu *.npz anywhere under build/ ==="
-        Get-ChildItem -Path "build" -Recurse -Include "*.rom","*.nabu","*.npz","*.sg","*.bin" -ErrorAction SilentlyContinue | Select-Object FullName, Length | Format-Table -AutoSize
-
     - name: Extract version info for artifacts
       id: version
       run: |
@@ -156,16 +140,6 @@ jobs:
       if: ${{ inputs.build-configurator }}
       run: |
         cmake --build build --target build_configurators
-
-    - name: List configurator outputs (diagnostic)
-      if: ${{ inputs.build-configurator }}
-      run: |
-        echo "=== build/configurators/dist/ ==="
-        ls -la build/configurators/dist/ 2>&1 || echo "(directory does not exist)"
-        echo "=== build/configurators/ (top level) ==="
-        ls -la build/configurators/ 2>&1 || true
-        echo "=== searching for *.rom *.nabu *.npz *.sg *.bin anywhere under build/ ==="
-        find build -type f \( -name "*.rom" -o -name "*.nabu" -o -name "*.npz" -o -name "*.sg" -o -name "*.bin" \) 2>&1 || true
 
     - name: Extract version info for artifacts
       id: version
@@ -235,16 +209,6 @@ jobs:
       if: ${{ inputs.build-configurator }}
       run: |
         cmake --build build --target build_configurators
-
-    - name: List configurator outputs (diagnostic)
-      if: ${{ inputs.build-configurator }}
-      run: |
-        echo "=== build/configurators/dist/ ==="
-        ls -la build/configurators/dist/ 2>&1 || echo "(directory does not exist)"
-        echo "=== build/configurators/ (top level) ==="
-        ls -la build/configurators/ 2>&1 || true
-        echo "=== searching for *.rom *.nabu *.npz *.sg *.bin anywhere under build/ ==="
-        find build -type f \( -name "*.rom" -o -name "*.nabu" -o -name "*.npz" -o -name "*.sg" -o -name "*.bin" \) 2>&1 || true
 
     - name: Extract version info for artifacts
       id: version
