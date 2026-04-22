@@ -72,7 +72,6 @@ make msx_konami        # MSX Konami mapper
 make sg1000            # SG1000/SC3000
 make nabu              # NABU
 make creativision      # CreatiVision
-make nabu_mame_package # NABU MAME (.npz)
 ```
 
 #### Build with Ninja (faster)

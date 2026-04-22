@@ -196,25 +196,8 @@ add_cvbasic_target(nabu "--nabu" "" "pico9918conf-${VERSION_WITH_OUTPUT}_nabu.as
 add_cvbasic_target(creativision "--creativision" "-rom16" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.bin" "CreatiVision")
 add_cvbasic_target(sg1000 "--sg1000" "" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.sg" "SG-1000/SC-3000")
 
-# Special NABU MAME target (different defines)
-add_cvbasic_target(nabu_mame "--nabu" "-DTMS9918_TESTING=1" "pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.asm" "000001.nabu" "NABU MAME")
-
-# NABU MAME packaging
-add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.npz"
-    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.zip" --format=zip "000001.nabu"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.zip" "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.npz"
-    COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.zip" "000001.nabu"
-    DEPENDS "${CMAKE_BINARY_DIR}/dist/000001.nabu"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/dist"
-    COMMENT "Packaging NABU MAME"
-    VERBATIM
-)
-
-add_custom_target(nabu_mame_package DEPENDS "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.npz")
-
 # Master target to build all platforms
-add_custom_target(configurator_all DEPENDS ti99 ti99_lite coleco coleco_lite msx_asc16 msx_asc16_lite msx_konami msx_konami_lite nabu sg1000 nabu_mame_package)
+add_custom_target(configurator_all DEPENDS ti99 ti99_lite coleco coleco_lite msx_asc16 msx_asc16_lite msx_konami msx_konami_lite nabu sg1000)
 
 # Print build information
 message(STATUS "PICO9918 Configurator CMake Configuration")

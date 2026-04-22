@@ -208,8 +208,6 @@ cmake --build . --target build_configurators
 - **`msx_konami`**: MSX Konami mapper ROM
 - **`nabu`**: NABU computer ROM
 - **`creativision`**: CreatiVision ROM
-- **`nabu_mame`**: NABU MAME ROM
-- **`nabu_mame_package`**: NABU MAME NPZ package
 
 ### Individual Platform Builds
 ```bash
@@ -257,7 +255,6 @@ cmake .. -DBUILD_TOOLS_FROM_SOURCE=OFF
 | MSX ASCII16 | 16KB | `.rom` | GASM80 | ASCII16 mapper |
 | MSX Konami | 16KB | `.rom` | GASM80 | Konami mapper |
 | NABU | None | `.nabu` | GASM80 | NABU computer |
-| NABU MAME | None | `.npz` | GASM80 | MAME emulator |
 | CreatiVision | None | `.bin` | GASM80 | CreatiVision console |
 
 ## Combined Build (Recommended)
