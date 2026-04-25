@@ -28,10 +28,8 @@ CONST FWROWS = ((#FIRMWARE_BLOCKS + 1) / 2 - 1) / 30 + 2
 firmwareMenu: PROCEDURE
 
     GOSUB pushMenuCtx
-    ' firmware menu doesn't render menu rows itself - it only uses g_menuTopRow
-    ' as the anchor for status text and calls confirmationMenuLoop which has
-    ' its own context. only g_menuTopRow needs to be set.
-    g_menuTopRow = MENU_TITLE_ROW + 3
+    ' g_menuTopRow inherited from caller (= MENU_TITLE_ROW + 3 from
+    ' renderMainMenu); used here only as the anchor for status text.
 
     DRAW_TITLE("FIRMWARE UPDATE")
 

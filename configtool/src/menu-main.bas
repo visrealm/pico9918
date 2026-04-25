@@ -388,27 +388,6 @@ saveOptionsMenu: PROCEDURE
     END
 
 
-' -----------------------------------------------------------------------------
-' go back to main menu
-' -----------------------------------------------------------------------------
-backOptionsMenu: PROCEDURE
-
-    GOSUB pushMenuCtx
-    SET_MENU_CTX(12, 1, 6, MENU_TITLE_ROW + 9)
-    g_currentMenuIndex = MENU_INDEX_OFFSET
-
-    GOSUB renderMenu
-    GOSUB delay
-
-    WHILE 1
-        WAIT
-        IF NAV(NAV_CANCEL OR NAV_OK) THEN EXIT WHILE
-    WEND
-
-    GOSUB popMenuCtx
-    END
-
-
 INCLUDE "conf-scanline-sprites.bas"
 
 ' -----------------------------------------------------------------------------
@@ -431,21 +410,21 @@ configMenuData:
     DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
 #endif
 
+    ' Confirmation popup (Save / Update firmware) - offset 10, count 2
     DATA BYTE CONF_MENU_OK,         "Confirm         ", 0, 0, " Save configuration to PICO9918 "
     DATA BYTE CONF_MENU_CANCEL,     "Cancel          ", 0, 0, "        Back to main menu       "
 
-    DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
+    ' Device Info "<<< Main menu" row - offset 12, count 1
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
-    DATA BYTE CONF_MENU_FIRMWARE,   "Update firmware ", 0, 0, "   Write firmware to PICO9918   "
-    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
-
+    ' Diagnostics submenu - offset 13, count 5
     DATA BYTE CONF_DIAG_REGISTERS,  "Registers       ", 0, 2, "      Show VDP registers        "
     DATA BYTE CONF_DIAG_PERFORMANCE,"Performance     ", 0, 2, "     Show performance data      "
     DATA BYTE CONF_DIAG_ADDRESS,    "Addresses       ", 0, 2, "      Show VRAM addresses       "
     DATA BYTE CONF_DIAG_PALETTE,    "Palette         ", 0, 2, "        Show palettes           "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 
+    ' Palette submenu - offset 18, count 2
     DATA BYTE CONF_MENU_RESET,      "Preset          ", 9, 5, "    Select preset palette       "
     DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
 

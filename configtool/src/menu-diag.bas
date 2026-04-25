@@ -21,7 +21,7 @@ diagMenu: PROCEDURE
     DRAW_TITLE("DIAGNOSTICS")
 
     GOSUB pushMenuCtx
-    SET_MENU_CTX(16, 5, 1, MENU_TITLE_ROW + 3)
+    SET_MENU_CTX(13, 5, 1, MENU_TITLE_ROW + 3)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu

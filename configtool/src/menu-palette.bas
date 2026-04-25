@@ -96,7 +96,7 @@ paletteMenu: PROCEDURE
     NEXT I
 
     GOSUB pushMenuCtx
-    SET_MENU_CTX(21, 2, 1, MENU_TITLE_ROW + 13)
+    SET_MENU_CTX(18, 2, 1, MENU_TITLE_ROW + 13)
     g_currentMenuIndex = 0
 
     GOSUB detectPalettePreset
