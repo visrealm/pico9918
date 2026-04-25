@@ -13,7 +13,8 @@
 DEF FN DRAW_TITLE_AT(T, R) = a_titleLen = LEN(T) : PRINT AT XY((32 - a_titleLen) / 2, R), T : GOSUB drawTitleBox
 DEF FN DRAW_TITLE(T) = DRAW_TITLE_AT(T, MENU_TITLE_ROW)
 
-DEF FN DRAW_POPUP_W(T, H, W) = a_titleLen = LEN(T) : a_popupHeight = H : a_popupWidth = W : a_popupTop = (23 - a_popupHeight) / 2 : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
+DEF FN DRAW_POPUP_WY(T, H, W, DY) = a_titleLen = LEN(T) : a_popupHeight = H : a_popupWidth = W : a_popupTop = (23 - a_popupHeight) / 2 + DY : GOSUB drawPopup : PRINT AT XY((32 - a_titleLen) / 2, a_popupTop), T
+DEF FN DRAW_POPUP_W(T, H, W) = DRAW_POPUP_WY(T, H, W, 0)
 DEF FN DRAW_POPUP(T, H) = DRAW_POPUP_W(T, H, LEN(T))
 
 ' -----------------------------------------------------------------------------

@@ -274,7 +274,7 @@ mainMenu: PROCEDURE
 
 confirmationMenuLoop: PROCEDURE
 
-    g_menuTopRow = MENU_TITLE_ROW + 9
+    g_menuTopRow = a_popupTop + 3
     MENU_INDEX_OFFSET = 10
     MENU_INDEX_COUNT = 2
     MENU_START_X = 6
