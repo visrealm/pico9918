@@ -27,7 +27,11 @@ CONST FWROWS = ((#FIRMWARE_BLOCKS + 1) / 2 - 1) / 30 + 2
 ' -----------------------------------------------------------------------------
 firmwareMenu: PROCEDURE
 
-    g_menuTopRow = MENU_TITLE_ROW + 3   ' WTF? For some reason I need this line twice???? At least on TI-99
+    GOSUB pushMenuCtx
+    ' firmware menu doesn't render menu rows itself - it only uses g_menuTopRow
+    ' as the anchor for status text and calls confirmationMenuLoop which has
+    ' its own context. only g_menuTopRow needs to be set.
+    g_menuTopRow = MENU_TITLE_ROW + 3
 
     DRAW_TITLE("FIRMWARE UPDATE")
 
@@ -91,6 +95,7 @@ firmwareMenu: PROCEDURE
     END IF
 #endif
 
+    GOSUB popMenuCtx
     SET_MENU(MENU_ID_MAIN)
     END
 

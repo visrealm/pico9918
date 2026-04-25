@@ -11,6 +11,11 @@
 '
 
 #if BANK_SIZE
+' This menu lives in its own bank to keep bank 0 free for shared code
+' (dispatch, menu engine, input, firmware writer) and the firmware payload
+' (banks 2+). Only bank 0 may issue BANK SELECT, so paletteMenu cannot
+' itself call into other banks - any cross-bank work it needs must go via
+' a bank-0 trampoline. Currently it has none.
 BANK 1
 #endif
 
@@ -90,12 +95,8 @@ paletteMenu: PROCEDURE
         PRINT AT XY(25, I) , "\3\148\148\148\148\148\4"
     NEXT I
 
-    oldMenuTopRow = g_menuTopRow
-    oldIndex = g_currentMenuIndex
-
-    g_menuTopRow = MENU_TITLE_ROW + 13
-    MENU_INDEX_OFFSET = 21
-    MENU_INDEX_COUNT = 2
+    GOSUB pushMenuCtx
+    SET_MENU_CTX(21, 2, 1, MENU_TITLE_ROW + 13)
     g_currentMenuIndex = 0
 
     GOSUB detectPalettePreset
@@ -138,11 +139,13 @@ paletteMenu: PROCEDURE
                     currentColor(0) = $f0 OR rgb(0)
                     currentColor(1) = cc1
 
-                    VDP_REG(47) = $c0 + currentIndex' palette data port from pal 2 index #10
+                    ' write the new color to the target palette (page 0)
+                    ' and to the UI's live-preview slot (page 1 entry 1)
+                    PAL_PORT(PAL_PAGE_TARGET, currentIndex)
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
-                    VDP_REG(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
+                    PAL_PORT(PAL_PAGE_UI, PAL_UI_PREVIEW)
                     DEFINE VRAM 0, 2, VARPTR currentColor(0)
-                    VDP_REG(47) = $40
+                    PAL_PORT_END
 
                     ' update config palette
                     IDX = 128 + currentIndex * 2
@@ -261,9 +264,7 @@ paletteMenu: PROCEDURE
         END IF
     NEXT I
 
-    g_menuTopRow = oldMenuTopRow
-    g_currentMenuIndex = oldIndex
-
+    GOSUB popMenuCtx
     SET_MENU(MENU_ID_MAIN)
     END
 
@@ -286,10 +287,10 @@ updateRGB: PROCEDURE
     rgb(1) = currentColor(1) / 16
     rgb(2) = currentColor(1) AND $0f
 
-    ' update live palette
-    VDP_REG(47) = $c0 + 16 + 1 ' palette data port from pal 2 index #10
+    ' refresh the UI's live-preview slot with the newly-selected swatch
+    PAL_PORT(PAL_PAGE_UI, PAL_UI_PREVIEW)
     DEFINE VRAM 0, 2, VARPTR currentColor(0)
-    VDP_REG(47) = $40
+    PAL_PORT_END
 
     GOSUB renderSliders                
 
@@ -365,9 +366,9 @@ detectPalettePreset: PROCEDURE
 applyPreset: PROCEDURE
     palOffset = g_palettePreset * PALETTE_BYTES
 
-    VDP_REG(47) = $c0 ' palette data port
+    PAL_PORT(PAL_PAGE_TARGET, 0)
     DEFINE VRAM 0, 32, VARPTR palettePresets(palOffset)
-    VDP_REG(47) = $40
+    PAL_PORT_END
 
     FOR I = 0 TO 31
         VDP_CONFIG(128 + I) = palettePresets(palOffset + I)

@@ -93,8 +93,9 @@ applyConfigValues: PROCEDURE
     VDP_REG(50) = tempConfigValues(CONF_CRT_SCANLINES) * 4         ' set crt scanlines
     VDP_REG(30) = pow2(tempConfigValues(CONF_SCANLINE_SPRITES) + 2)   ' set scanline sprites
 
-    VDP_REG(47) = $c0
+    ' write the user's configured palette to page 0 (the target VDP palette)
+    PAL_PORT(PAL_PAGE_TARGET, 0)
     DEFINE VRAM 0, 32, VARPTR tempConfigValues(128)
-    VDP_REG(47) = $40
+    PAL_PORT_END
 
     END

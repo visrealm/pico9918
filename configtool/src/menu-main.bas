@@ -13,14 +13,18 @@
 ' menu helpers
 DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow
 
+' Menu "context" globals: MENU_INDEX_OFFSET, MENU_INDEX_COUNT, MENU_START_X,
+' g_menuTopRow are all read by renderMenu / renderMenuRow / menuLoop. Every
+' submenu must set them on entry and restore them on exit, otherwise its
+' values leak into whatever menu runs next. SET_MENU_CTX sets all four;
+' pushMenuCtx / popMenuCtx provide a single-deep save/restore.
+DEF FN SET_MENU_CTX(OFFSET, COUNT, START_X, TOP_ROW) = MENU_INDEX_OFFSET = OFFSET : MENU_INDEX_COUNT = COUNT : MENU_START_X = START_X : g_menuTopRow = TOP_ROW
+
 ' -----------------------------------------------------------------------------
 ' render all menu rows
 ' -----------------------------------------------------------------------------
 renderMainMenu: PROCEDURE
-    MENU_INDEX_OFFSET = 0
-    MENU_INDEX_COUNT = 9
-    MENU_START_X = 1
-    g_menuTopRow = MENU_TITLE_ROW + 3
+    SET_MENU_CTX(0, 9, 1, MENU_TITLE_ROW + 3)
     GOSUB renderMenu
     R = g_menuTopRow + MENU_INDEX_COUNT : GOSUB emptyRowR
     END
@@ -29,6 +33,27 @@ renderMenu: PROCEDURE
     FOR a_menuIndexToRender = MENU_INDEX_OFFSET TO MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
         GOSUB renderMenuRow
     NEXT a_menuIndexToRender
+    END
+
+' -----------------------------------------------------------------------------
+' single-deep save/restore for the menu context globals. submenus that need
+' to nest (currently: paletteMenu and confirmationMenuLoop) must not call
+' push twice without an intervening pop.
+' -----------------------------------------------------------------------------
+pushMenuCtx: PROCEDURE
+    g_savedMenuOffset  = MENU_INDEX_OFFSET
+    g_savedMenuCount   = MENU_INDEX_COUNT
+    g_savedMenuStartX  = MENU_START_X
+    g_savedMenuTopRow  = g_menuTopRow
+    g_savedMenuIndex   = g_currentMenuIndex
+    END
+
+popMenuCtx: PROCEDURE
+    MENU_INDEX_OFFSET   = g_savedMenuOffset
+    MENU_INDEX_COUNT    = g_savedMenuCount
+    MENU_START_X        = g_savedMenuStartX
+    g_menuTopRow        = g_savedMenuTopRow
+    g_currentMenuIndex  = g_savedMenuIndex
     END
 
 ' -----------------------------------------------------------------------------
@@ -274,10 +299,8 @@ mainMenu: PROCEDURE
 
 confirmationMenuLoop: PROCEDURE
 
-    g_menuTopRow = a_popupTop + 3
-    MENU_INDEX_OFFSET = 10
-    MENU_INDEX_COUNT = 2
-    MENU_START_X = 6
+    GOSUB pushMenuCtx
+    SET_MENU_CTX(10, 2, 6, a_popupTop + 3)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
@@ -303,9 +326,10 @@ confirmationMenuLoop: PROCEDURE
 
             EXIT WHILE
         END IF
-        
+
     WEND
 
+    GOSUB popMenuCtx
     END
 
 successMessage: PROCEDURE
@@ -369,26 +393,19 @@ saveOptionsMenu: PROCEDURE
 ' -----------------------------------------------------------------------------
 backOptionsMenu: PROCEDURE
 
-    oldIndex = g_currentMenuIndex
-
-    g_menuTopRow = MENU_TITLE_ROW + 9
-    MENU_INDEX_OFFSET = 12
-    MENU_INDEX_COUNT = 1
-    MENU_START_X = 6
+    GOSUB pushMenuCtx
+    SET_MENU_CTX(12, 1, 6, MENU_TITLE_ROW + 9)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
-
     GOSUB delay
 
-    ' main menu loop
     WHILE 1
         WAIT
         IF NAV(NAV_CANCEL OR NAV_OK) THEN EXIT WHILE
     WEND
 
-    g_currentMenuIndex = oldIndex
-
+    GOSUB popMenuCtx
     END
 
 

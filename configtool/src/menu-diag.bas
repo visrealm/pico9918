@@ -20,8 +20,8 @@ diagMenu: PROCEDURE
 
     DRAW_TITLE("DIAGNOSTICS")
 
-    MENU_INDEX_OFFSET = 16
-    MENU_INDEX_COUNT = 5
+    GOSUB pushMenuCtx
+    SET_MENU_CTX(16, 5, 1, MENU_TITLE_ROW + 3)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
@@ -48,10 +48,10 @@ diagMenu: PROCEDURE
         END IF
 
         IF NAV(NAV_CANCEL) THEN EXIT WHILE
-        
+
     WEND
 
-    g_currentMenuIndex = oldIndex
+    GOSUB popMenuCtx
     SET_MENU(MENU_ID_MAIN)
 
     g_diagDirty = FALSE

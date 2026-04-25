@@ -79,6 +79,10 @@ DEF FN SET_MENU(I) = g_currentMenu = I
 DIM tempConfigValues(CONF_COUNT)
 DIM savedConfigValues(CONF_COUNT)
 
+' All INCLUDEs below land in bank 0 (the default bank). Bank 0 is the
+' dispatcher for cross-bank calls - only bank 0 may issue BANK SELECT.
+' menu-palette.bas (included at the bottom of this file) opts into BANK 1.
+' Firmware payload data lives in banks 2+.
 INCLUDE "vdp-utils.bas"
 INCLUDE "patterns.bas"
 
@@ -252,4 +256,5 @@ delay: PROCEDURE
 hexChar:
     DATA BYTE "0123456789ABCDEF"
 
+' menu-palette.bas opens with `BANK 1`, so everything inside it lands there.
 INCLUDE "menu-palette.bas"

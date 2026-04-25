@@ -129,8 +129,9 @@ setupHeader: PROCEDURE
 ' update the PICO9918 palette (shades of blue)
 ' -----------------------------------------------------------------------------
 updatePalette: PROCEDURE
+    ' load the UI chrome palette (page 1) from the TMS9918A defaults
     WAIT
-    VDP_REG(47) = $c0 + 16 ' palette data port from index #2
+    PAL_PORT(PAL_PAGE_UI, 0)
     DEFINE VRAM 0, 32, defPal
-    VDP_REG(47) = $40
+    PAL_PORT_END
     END

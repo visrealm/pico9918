@@ -12,23 +12,18 @@
 
 
 deviceInfoMenu: PROCEDURE
-    g_menuTopRow = MENU_TITLE_ROW + 3
-
 
     DRAW_TITLE("DEVICE INFO")
 
-    oldMenuTopRow = g_menuTopRow
-    oldIndex = g_currentMenuIndex
-
-    g_menuTopRow = MENU_TITLE_ROW + 14
-    MENU_INDEX_OFFSET = 13
-    MENU_INDEX_COUNT = 1
-    MENU_START_X = 6
+    GOSUB pushMenuCtx
+    SET_MENU_CTX(13, 1, 6, MENU_TITLE_ROW + 14)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
 
-    g_menuTopRow = oldMenuTopRow
+    ' the rest of this menu uses g_menuTopRow as the top row for device info
+    ' text (a different anchor than the "<<< Main menu" row drawn above).
+    g_menuTopRow = MENU_TITLE_ROW + 3
 
     #addr = XY(2, g_menuTopRow)
     PRINT AT #addr,       "Processor family : "
@@ -125,8 +120,7 @@ deviceInfoMenu: PROCEDURE
         VDP_ENABLE_INT
     WEND
 
-    g_currentMenuIndex = oldIndex
-
+    GOSUB popMenuCtx
     SET_MENU(MENU_ID_MAIN)
 
     END
