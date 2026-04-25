@@ -216,7 +216,7 @@ paletteMenu: PROCEDURE
                     IF g_palettePreset = 0 THEN g_palettePreset = PALETTE_PRESET_COUNT
                     g_palettePreset = g_palettePreset - 1
                     presetChanged = TRUE
-                ELSEIF NAV(NAV_RIGHT) THEN
+                ELSEIF NAV(NAV_OK OR NAV_RIGHT) THEN
                     g_palettePreset = g_palettePreset + 1
                     IF g_palettePreset >= PALETTE_PRESET_COUNT THEN g_palettePreset = 0
                     presetChanged = TRUE
