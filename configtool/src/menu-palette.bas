@@ -367,7 +367,6 @@ applyPreset: PROCEDURE
 
     VDP_REG(47) = $c0 ' palette data port
     DEFINE VRAM 0, 32, VARPTR palettePresets(palOffset)
-    DEFINE VRAM 0, 32, VARPTR palettePresets(palOffset)
     VDP_REG(47) = $40
 
     FOR I = 0 TO 31
