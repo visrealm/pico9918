@@ -23,7 +23,11 @@
 #endif
 #endif
 
-static int logoOffset = 100;
+#define SPLASH_ENTER_FRAMES 60
+#define SPLASH_HOLD_FRAMES  180
+#define SPLASH_START_POS    (SPLASH_ENTER_FRAMES + splashHeight + 2)
+
+static int logoOffset = SPLASH_START_POS;
 static bool canHideSplash = false;
 
 /*
@@ -31,7 +35,7 @@ static bool canHideSplash = false;
  */
 void resetSplash()
 {
-  logoOffset = 100;
+  logoOffset = SPLASH_START_POS;
 }
 
 void allowSplashHide()
@@ -48,15 +52,14 @@ void outputSplash(uint16_t y, uint32_t frameCount, uint32_t vBorder, uint32_t vP
 
   if (y == 0)
   {
-    int minOffset = vgaCurrentParams()->params.vVirtualPixels - vBorder - vPixels - splashHeight - 2;
-    if (frameCount & 0x01)
+    //if (frameCount & 0x01)
     {
-      if (frameCount < 200 && logoOffset > minOffset) --logoOffset;
-      else if (canHideSplash && frameCount > 500) ++logoOffset;
+      if (frameCount < SPLASH_ENTER_FRAMES) --logoOffset;
+      else if (canHideSplash && frameCount > (SPLASH_ENTER_FRAMES + SPLASH_HOLD_FRAMES)) ++logoOffset;
     }
   }
 
-  if (y < (vgaCurrentParams()->params.vVirtualPixels - 1))
+  if (y <= vgaCurrentParams()->params.vVirtualPixels)
   {
     y -= vBorder + vPixels + logoOffset;
     if (y < splashHeight)
