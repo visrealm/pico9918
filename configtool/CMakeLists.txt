@@ -11,9 +11,12 @@ include(${CMAKE_SOURCE_DIR}/visrealm_cvbasic.cmake)
 set(PYTHON python3)
 
 # Version information (from root CMakeLists.txt)
-# Include branch name and output type in version string (except for main branch)
+# Explicit PICO9918_VERSION_SUFFIX (e.g. "a1") overrides the branch name.
+# Branch name is used otherwise, skipped on main.
 set(VERSION_BRANCH_STR "")
-if (NOT PICO9918_GIT_BRANCH STREQUAL "main" AND NOT PICO9918_GIT_BRANCH STREQUAL "")
+if (NOT "${PICO9918_VERSION_SUFFIX}" STREQUAL "")
+  set(VERSION_BRANCH_STR "-${PICO9918_VERSION_SUFFIX}")
+elseif (NOT PICO9918_GIT_BRANCH STREQUAL "main" AND NOT PICO9918_GIT_BRANCH STREQUAL "")
   string(REPLACE "/" "-" PICO9918_GIT_BRANCH_SAFE "${PICO9918_GIT_BRANCH}")
   set(VERSION_BRANCH_STR "-${PICO9918_GIT_BRANCH_SAFE}")
 endif()
