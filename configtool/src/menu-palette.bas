@@ -169,8 +169,16 @@ paletteMenu: PROCEDURE
         GOSUB updateNavInput
 
         IF (CONT1.KEY > 0 AND CONT1.KEY < 3) THEN
+            GOSUB hideSprites
             currentMenu = CONT1.KEY + 3
-            g_nav = NAV_OK
+            ' sync and re-render so the highlight follows the digit-selected row
+            ' immediately, and any rendering this iteration uses the correct index
+            g_currentMenuIndex = currentMenu + MENU_INDEX_OFFSET - 4
+            GOSUB renderMenu
+            ' "<<< Main menu" row activates immediately like the main menu does
+            IF MENU_DATA(g_currentMenuIndex, CONF_INDEX) = CONF_MENU_CANCEL THEN
+                g_nav = NAV_CANCEL
+            END IF
         END IF
 
         IF currentMenu = 0 THEN
