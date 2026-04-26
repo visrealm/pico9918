@@ -21,7 +21,7 @@ diagMenu: PROCEDURE
     DRAW_TITLE("DIAGNOSTICS")
 
     GOSUB pushMenuCtx
-    SET_MENU_CTX(13, 5, 1, MENU_TITLE_ROW + 3)
+    SET_MENU_CTX(MENU_OFFSET_DIAG, MENU_COUNT_DIAG, 1, MENU_TITLE_ROW + 3)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
@@ -29,10 +29,12 @@ diagMenu: PROCEDURE
     GOSUB delay
 
     WHILE 1
-        
+
         WAIT
 
         GOSUB menuLoop
+
+        IF NAV(NAV_CANCEL) THEN EXIT WHILE
 
         IF valueChanged THEN
             RENDER_MENU_ROW(g_currentMenuIndex)
@@ -42,12 +44,9 @@ diagMenu: PROCEDURE
                 VDP_CONFIG(vdpOptId) = currentValueIndex
             END IF
 
-            optionIndex = MENU_DATA(g_currentMenuIndex, CONF_INDEX)
-            IF optionIndex = CONF_MENU_CANCEL THEN EXIT WHILE
+            IF vdpOptId = CONF_MENU_CANCEL THEN EXIT WHILE
             GOSUB delay
         END IF
-
-        IF NAV(NAV_CANCEL) THEN EXIT WHILE
 
     WEND
 

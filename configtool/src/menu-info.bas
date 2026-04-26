@@ -16,7 +16,7 @@ deviceInfoMenu: PROCEDURE
     DRAW_TITLE("DEVICE INFO")
 
     GOSUB pushMenuCtx
-    SET_MENU_CTX(12, 1, 6, MENU_TITLE_ROW + 14)
+    SET_MENU_CTX(MENU_OFFSET_INFO, MENU_COUNT_INFO, 6, MENU_TITLE_ROW + 14)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu

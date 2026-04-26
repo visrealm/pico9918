@@ -91,6 +91,7 @@ INCLUDE "input.bas"
 
 INCLUDE "config.bas"
 
+INCLUDE "menu-data.bas"
 INCLUDE "menu-main.bas"
 INCLUDE "menu-firmware.bas"
 INCLUDE "menu-info.bas"
@@ -151,9 +152,8 @@ main: PROCEDURE
             verReg = VDP_STATUS
             verMajor = verReg / 16
             verMinor = verReg AND $0f
-            PRINT "    F18A v ."
-            PUT_XY(5 + 19, 21), hexChar(verMajor)
-            PUT_XY(5 + 21, 21), hexChar(verMinor)
+            PRINT "    F18A v"
+            PRINT CHR$(hexChar(verMajor)), ".", CHR$(hexChar(verMinor))
         ELSE
             PRINT "  UNKNOWN SR1 = ", <>statReg
         END IF
