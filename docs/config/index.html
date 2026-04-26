@@ -12,19 +12,19 @@
         }
 
         :root {
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
+            --primary-color: #5544ff;       /* matches title image underline */
+            --primary-hover: #6e60ff;
             --secondary-color: #6b7280;
-            --background: #1a1a1a;
-            --card-background: #2a2a2a;
-            --border-color: #404040;
+            --background: #000000;          /* match title image background */
+            --card-background: #141414;
+            --border-color: #2a2a2a;
             --text-primary: #e5e5e5;
             --text-secondary: #a0a0a0;
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
 
         body {
@@ -32,34 +32,46 @@
             background: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
-            padding: 20px;
+            padding: 12px 0 0;
+            border-top: 4px solid var(--primary-color);
         }
 
         .container {
-            max-width: 900px;
+            width: 1024px;                  /* match title image width exactly */
             margin: 0 auto;
-            padding-bottom: 100px;
+            padding: 0 20px 180px;          /* leave room for taller sticky footer */
         }
 
+        /* Title image: render at native 1024px, no scaling/interpolation. */
         header {
+            margin: 0 -20px 30px;           /* span container padding so image bleeds edge-to-edge on wider viewports */
             text-align: center;
-            margin-bottom: 40px;
-            padding: 40px 20px;
-            background: var(--card-background);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            background: #000;
+            overflow-x: auto;               /* horizontal scroll on narrow viewports rather than scaling */
         }
 
-        h1 {
-            color: var(--primary-color);
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        .title-image {
+            display: block;
+            margin: 0 auto;
+            width: 1024px;
+            height: auto;
+            max-width: none;                /* prevent shrinking */
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        .footer-meta {
+            text-align: center;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
         }
 
         .subtitle {
             color: var(--text-secondary);
-            font-size: 1.1em;
-            margin-bottom: 20px;
+            font-size: 0.9em;
+            margin-bottom: 8px;
         }
 
         .links {
@@ -89,8 +101,12 @@
 
         .card h2 {
             color: var(--text-primary);
-            font-size: 1.5em;
+            font-size: 1.25em;
             margin-bottom: 20px;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 2px solid var(--primary-color);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -123,14 +139,38 @@
         }
 
         .form-group {
-            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        .form-group label {
-            display: block;
+        .form-group > label {
+            flex: 0 0 220px;            /* fixed-width left column */
             font-weight: 600;
-            margin-bottom: 8px;
             color: var(--text-primary);
+            margin-bottom: 0;
+        }
+
+        /* control column: select / checkbox-option / radio-group fills remaining width */
+        .form-group > select,
+        .form-group > .checkbox-option,
+        .form-group > .checkbox-group,
+        .form-group > .radio-group {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        /* bare checkbox sits left-aligned in the control column rather than stretching */
+        .form-group > input[type="checkbox"] {
+            flex: 0 0 auto;
+            margin-right: auto;
+        }
+
+        /* info-box wraps to its own line below the row */
+        .form-group > .info-box {
+            flex-basis: 100%;
         }
 
         .radio-group, .checkbox-group {
@@ -264,7 +304,7 @@
         }
 
         .info-box {
-            background: #1e3a5f;
+            background: #0a1530;
             border-left: 4px solid var(--primary-color);
             padding: 15px;
             margin-top: 15px;
@@ -282,7 +322,7 @@
         }
 
         .summary {
-            background: #1f1f1f;
+            background: #0a0a0a;
             padding: 20px;
             border-radius: 6px;
             margin-top: 20px;
@@ -315,6 +355,32 @@
             color: var(--text-primary);
         }
 
+        .palette-swatches {
+            display: inline-flex;
+            gap: 2px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .palette-swatch {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--border-color);
+            display: inline-block;
+        }
+
+        .card p a {
+            color: var(--primary-color);
+        }
+
+        .card code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background: rgba(85, 68, 255, 0.12);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.95em;
+        }
+
         .sticky-footer {
             position: fixed;
             bottom: 0;
@@ -337,8 +403,8 @@
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
+            .form-group > label {
+                flex-basis: 100%;       /* stack label above control on narrow screens */
             }
 
             .palette-grid {
@@ -365,26 +431,31 @@
 <body>
     <div class="container">
         <header>
-            <h1>PICO9918 Configuration Generator</h1>
-            <p class="subtitle">Generate custom configuration UF2 files for your PICO9918 or PICO9918 PRO</p>
-            <div class="links">
-                <a href="https://github.com/visrealm/pico9918" target="_blank">GitHub Repository</a>
-                <a href="https://github.com/visrealm/pico9918/releases" target="_blank">Firmware Releases</a>
-                <a href="https://atariage.com/forums/topic/323020-pico9918-drop-in-replacement-for-tms9918a" target="_blank">AtariAge Forum</a>
-            </div>
+            <img src="configurator_title.png" alt="PICO9918 v1.2.0 Configurator" class="title-image">
         </header>
 
-        <!-- Display Settings -->
+        <!-- Main -->
         <div class="card">
-            <h2>Display Settings</h2>
+            <h2>Main</h2>
             <div class="form-group">
-                <div class="checkbox-option">
-                    <input type="checkbox" id="scanlines" name="scanlines">
-                    <label for="scanlines">Enable CRT Scanlines</label>
+                <label for="vdpDevice">VDP Device</label>
+                <select id="vdpDevice" name="vdpDevice">
+                    <option value="0" selected>TMS9918A - GROMCLK + CPUCLK (Default)</option>
+                    <option value="1">TMS992xA - GROMCLK only</option>
+                    <option value="2">TMS9118 - CPUCLK only</option>
+                    <option value="3">TMS912x - CPUCLK on pin 37</option>
+                </select>
+                <div class="info-box">
+                    <strong>Note:</strong> Controls which clock signals are output on pins 37 and 38.
+                    Select the VDP chip model that matches your original hardware for correct clock behavior.
                 </div>
             </div>
             <div class="form-group">
-                <label for="scanlineSprites">Scanline Sprite Limit</label>
+                <label for="scanlines">CRT Scanlines</label>
+                <input type="checkbox" id="scanlines" name="scanlines">
+            </div>
+            <div class="form-group">
+                <label for="scanlineSprites">Scanline Sprites</label>
                 <select id="scanlineSprites" name="scanlineSprites">
                     <option value="0" selected>4 sprites per scanline</option>
                     <option value="1">8 sprites per scanline</option>
@@ -400,24 +471,65 @@
                     <option value="2">352.0 MHz</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="vdpDevice">VDP Device</label>
-                <select id="vdpDevice" name="vdpDevice">
-                    <option value="0" selected>TMS9918A - GROMCLK + CPUCLK (Default)</option>
-                    <option value="1">TMS992xA - GROMCLK only</option>
-                    <option value="2">TMS9118 - CPUCLK only</option>
-                    <option value="3">TMS912x - CPUCLK on pin 37</option>
-                </select>
-                <div class="info-box">
-                    <strong>Note:</strong> This setting controls which clock signals are output on pins 37 and 38.
-                    Select the VDP chip model that matches your original hardware for correct clock behavior.
+        </div>
+
+        <!-- Output -->
+        <div class="card">
+            <h2 class="collapsible" onclick="toggleSection('outputSection')">Output</h2>
+            <div id="outputSection" class="collapsible-content collapsed">
+                <div class="form-group">
+                    <label for="dispDriverPref">Driver</label>
+                    <select id="dispDriverPref" name="dispDriverPref">
+                        <option value="0" selected>Auto (detect dongle)</option>
+                        <option value="1">VGA / HDMI (force)</option>
+                        <option value="2">SCART RGBs (force)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="vgaMode">VGA-HDMI Mode</label>
+                    <select id="vgaMode" name="vgaMode">
+                        <option value="0" selected>480p @ 60Hz</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="scartMode">SCART Mode</label>
+                    <select id="scartMode" name="scartMode">
+                        <option value="0" selected>576i @ 50Hz (PAL)</option>
+                        <option value="1">480i @ 60Hz (NTSC)</option>
+                    </select>
                 </div>
             </div>
         </div>
 
-        <!-- Palette Editor -->
+        <!-- Diagnostics -->
         <div class="card">
-            <h2 class="collapsible" onclick="toggleSection('paletteSection')">Palette Editor (Optional)</h2>
+            <h2 class="collapsible" onclick="toggleSection('diagSection')">Diagnostics (Optional)</h2>
+            <div id="diagSection" class="collapsible-content collapsed">
+                <div class="warning-box">
+                    <strong>Warning:</strong> Diagnostic modes are for debugging purposes and may affect performance.
+                </div>
+                <div class="form-group">
+                    <label for="diagRegisters">Show Registers</label>
+                    <input type="checkbox" id="diagRegisters" name="diagRegisters">
+                </div>
+                <div class="form-group">
+                    <label for="diagPerformance">Show Performance</label>
+                    <input type="checkbox" id="diagPerformance" name="diagPerformance">
+                </div>
+                <div class="form-group">
+                    <label for="diagPalette">Show Palette Info</label>
+                    <input type="checkbox" id="diagPalette" name="diagPalette">
+                </div>
+                <div class="form-group">
+                    <label for="diagAddress">Show Address Info</label>
+                    <input type="checkbox" id="diagAddress" name="diagAddress">
+                </div>
+            </div>
+        </div>
+
+        <!-- Palette -->
+        <div class="card">
+            <h2 class="collapsible" onclick="toggleSection('paletteSection')">Palette (Optional)</h2>
             <div id="paletteSection" class="collapsible-content collapsed">
                 <p>Customize the TMS9918A color palette. Color 0 (transparent) is always black.</p>
 
@@ -429,6 +541,7 @@
                         <option value="grey">Greyscale</option>
                         <option value="sepia">Sepia</option>
                         <option value="ega">EGA</option>
+                        <option value="custom">Custom</option>
                     </select>
                 </div>
 
@@ -436,34 +549,16 @@
             </div>
         </div>
 
-        <!-- Diagnostic Modes -->
+        <!-- How it works -->
         <div class="card">
-            <h2 class="collapsible" onclick="toggleSection('diagSection')">Diagnostic Modes (Optional)</h2>
-            <div id="diagSection" class="collapsible-content collapsed">
-                <div class="warning-box">
-                    <strong>Warning:</strong> Diagnostic modes are for debugging purposes and may affect performance.
-                </div>
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="diagRegisters" name="diagRegisters">
-                            <label for="diagRegisters">Show Registers</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="diagPerformance" name="diagPerformance">
-                            <label for="diagPerformance">Show Performance</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="diagPalette" name="diagPalette">
-                            <label for="diagPalette">Show Palette Info</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="diagAddress" name="diagAddress">
-                            <label for="diagAddress">Show Address Info</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <h2>How to Apply</h2>
+            <p>The generated UF2 contains <strong>only your settings</strong> &mdash; not the firmware itself.
+            Drag and drop it onto your PICO9918 the same way you'd flash firmware (hold BOOTSEL while
+            connecting USB, then copy the file to the <code>RPI-RP2</code> / <code>RP2350</code> drive).
+            Your existing firmware stays in place; only the configuration block in flash is updated.</p>
+            <p style="margin-top: 12px;">If you've already flashed firmware on the device, applying a config UF2
+            won't downgrade or replace it. To update firmware itself, grab the latest release UF2 from
+            <a href="https://github.com/visrealm/pico9918/releases" target="_blank">GitHub</a>.</p>
         </div>
 
         <!-- Configuration Summary -->
@@ -479,6 +574,14 @@
             <button type="button" class="btn-primary" onclick="generateAndDownload()">Generate & Download UF2</button>
             <button type="button" class="btn-secondary" onclick="resetToDefaults()">Reset to Defaults</button>
         </div>
+        <div class="footer-meta">
+            <p class="subtitle">Generate custom configuration UF2 files for your PICO9918 or PICO9918 PRO</p>
+            <div class="links">
+                <a href="https://github.com/visrealm/pico9918" target="_blank">GitHub Repository</a>
+                <a href="https://github.com/visrealm/pico9918/releases" target="_blank">Firmware Releases</a>
+                <a href="https://atariage.com/forums/topic/323020-pico9918-drop-in-replacement-for-tms9918a" target="_blank">AtariAge Forum</a>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -488,7 +591,7 @@
         const XIP_BASE = 0x10000000;
         const CONFIG_FLASH_ADDR = XIP_BASE + CONFIG_FLASH_OFFSET;
 
-        // Configuration byte offsets
+        // Configuration byte offsets (must match src/config.h)
         const CONF_PICO_MODEL = 0;
         const CONF_HW_VERSION = 1;
         const CONF_SW_VERSION = 2;
@@ -499,7 +602,10 @@
         const CONF_CRT_SCANLINES = 8;
         const CONF_SCANLINE_SPRITES = 9;
         const CONF_CLOCK_PRESET_ID = 10;
+        const CONF_SCART_MODE = 11;        // 0 = PAL 576i, 1 = NTSC 480i
         const CONF_VDP_DEVICE = 12;
+        const CONF_DISP_DRIVER_PREF = 13;  // 0 = AUTO, 1 = force VGA, 2 = force SCART
+        const CONF_VGA_MODE = 14;          // 0 = 480p60 (only valid value currently)
         const CONF_DIAG = 16;
         const CONF_DIAG_REGISTERS = 17;
         const CONF_DIAG_PERFORMANCE = 18;
@@ -618,6 +724,9 @@
                         // Update the RGB value display
                         document.getElementById(`value${i}`).textContent = formatRgb12(rgb12);
 
+                        // Manual edit -> drop preset selection to "Custom"
+                        document.getElementById('palettePreset').value = 'custom';
+
                         updateSummary();
                     });
                 }
@@ -640,6 +749,7 @@
         // Apply selected palette preset
         function applyPalettePreset() {
             const presetId = document.getElementById('palettePreset').value;
+            if (presetId === 'custom') return;  // "Custom" reflects state, not a preset to apply
             const palette = PALETTES[presetId].colors;
             currentPalette = [...palette];
 
@@ -699,7 +809,9 @@
         // Get current configuration from form
         function getCurrentConfig() {
             return {
-                dispDriver: 0,  // Default to VGA
+                dispDriverPref: parseInt(document.getElementById('dispDriverPref').value),
+                vgaMode: parseInt(document.getElementById('vgaMode').value),
+                scartMode: parseInt(document.getElementById('scartMode').value),
                 scanlines: document.getElementById('scanlines').checked,
                 scanlineSprites: parseInt(document.getElementById('scanlineSprites').value),
                 clockPreset: parseInt(document.getElementById('clockPreset').value),
@@ -726,6 +838,15 @@
             const vdpNames = ['TMS9918A', 'TMS992xA', 'TMS9118', 'TMS912x'];
             const vdpName = vdpNames[config.vdpDevice] || 'TMS9918A';
 
+            const driverNames = ['Auto', 'VGA / HDMI (forced)', 'SCART RGBs (forced)'];
+            const driverName = driverNames[config.dispDriverPref] || 'Auto';
+
+            const vgaModeNames = ['480p @ 60Hz'];
+            const vgaModeName = vgaModeNames[config.vgaMode] || '480p @ 60Hz';
+
+            const scartModeNames = ['576i @ 50Hz (PAL)', '480i @ 60Hz (NTSC)'];
+            const scartModeName = scartModeNames[config.scartMode] || '576i @ 50Hz (PAL)';
+
             const diagnostics = [
                 config.diagRegisters && 'Registers',
                 config.diagPerformance && 'Performance',
@@ -738,12 +859,24 @@
             // Determine minimum firmware version
             let minFirmware = 'v1.0.0';
             if (config.vdpDevice > 0) minFirmware = 'v1.1.1';
+            if (config.dispDriverPref > 0 || config.vgaMode > 0) minFirmware = 'v1.2.0';
 
-            // Determine palette status
+            // Determine palette status. The dropdown value may be 'custom' (after
+            // a manual edit) which has no preset entry - report it as "Custom".
             const selectedPreset = document.getElementById('palettePreset').value;
-            const selectedPalette = PALETTES[selectedPreset].colors;
-            const paletteMatches = currentPalette.every((color, i) => color === selectedPalette[i]);
-            const paletteText = paletteMatches ? PALETTES[selectedPreset].name : 'Custom';
+            let paletteText;
+            if (selectedPreset === 'custom' || !PALETTES[selectedPreset]) {
+                paletteText = 'Custom';
+            } else {
+                const selectedPalette = PALETTES[selectedPreset].colors;
+                const paletteMatches = currentPalette.every((color, i) => color === selectedPalette[i]);
+                paletteText = paletteMatches ? PALETTES[selectedPreset].name : 'Custom';
+            }
+
+            // Render colours 1..15 as a row of small swatches (skip transparent index 0)
+            const paletteSwatches = currentPalette.slice(1)
+                .map(c => `<span class="palette-swatch" style="background:${rgb12ToHex(c)}"></span>`)
+                .join('');
 
             summary.innerHTML = `
                 <div class="summary-item">
@@ -753,6 +886,10 @@
                 <div class="summary-item">
                     <span class="summary-label">Min. Firmware:</span>
                     <span class="summary-value">${minFirmware}+</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">VDP Device:</span>
+                    <span class="summary-value">${vdpName}</span>
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">CRT Scanlines:</span>
@@ -767,8 +904,16 @@
                     <span class="summary-value">${clockName}</span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">VDP Device:</span>
-                    <span class="summary-value">${vdpName}</span>
+                    <span class="summary-label">Output Driver:</span>
+                    <span class="summary-value">${driverName}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">VGA-HDMI Mode:</span>
+                    <span class="summary-value">${vgaModeName}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">SCART Mode:</span>
+                    <span class="summary-value">${scartModeName}</span>
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">Diagnostics:</span>
@@ -776,7 +921,7 @@
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">Palette:</span>
-                    <span class="summary-value">${paletteText}</span>
+                    <span class="summary-value"><span class="palette-swatches">${paletteSwatches}</span>${paletteText}</span>
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">File Size:</span>
@@ -796,13 +941,17 @@
             // Set hardware fields for validation
             config[CONF_PICO_MODEL] = picoModel;
             config[CONF_HW_VERSION] = hwVersion;
-            config[CONF_DISP_DRIVER] = options.dispDriver;
+            // CONF_DISP_DRIVER is recomputed by the firmware on boot from
+            // CONF_DISP_DRIVER_PREF + dongle detection; we just leave it 0.
 
             // Set user-configurable options
             config[CONF_CRT_SCANLINES] = options.scanlines ? 1 : 0;
             config[CONF_SCANLINE_SPRITES] = options.scanlineSprites & 0x03;
             config[CONF_CLOCK_PRESET_ID] = options.clockPreset & 0x03;
+            config[CONF_SCART_MODE] = options.scartMode & 0x01;
             config[CONF_VDP_DEVICE] = options.vdpDevice & 0x03;
+            config[CONF_DISP_DRIVER_PREF] = options.dispDriverPref & 0x03;
+            config[CONF_VGA_MODE] = options.vgaMode & 0x01;
 
             // Set diagnostic options
             config[CONF_DIAG_REGISTERS] = options.diagRegisters ? 1 : 0;
