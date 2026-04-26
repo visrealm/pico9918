@@ -219,43 +219,28 @@ void gpuLoop()
       saveConfigSplitPending(tms9918->config);
     }
 
+    // factory reset: write everything to main, skip the pending split
     if (tms9918->config[CONF_SAVE_FORCED])
     {
       tms9918->config[CONF_SAVE_FORCED] = 0;
-      // Factory-reset path: bypass the pending split, write the whole config
-      // straight to main, and erase any pending block. User does not see a
-      // confirmation banner / prompt on next boot.
       writeConfig(tms9918->config);
       erasePendingDisplay();
-      tms9918->config[CONF_PENDING_STATE]        = PENDING_STATE_CONFIRMED;
-      tms9918->config[CONF_PENDING_DRIVER_PREF]  = tms9918->config[CONF_DISP_DRIVER_PREF];
-      tms9918->config[CONF_PENDING_VGA_MODE]     = tms9918->config[CONF_VGA_MODE];
-      tms9918->config[CONF_PENDING_SCART_MODE]   = tms9918->config[CONF_SCART_MODE];
-      tms9918->config[CONF_PENDING_CLOCK_PRESET] = tms9918->config[CONF_CLOCK_PRESET_ID];
+      refreshPendingMirror(tms9918->config, PENDING_STATE_CONFIRMED);
     }
 
+    // user accepted pending change: promote to main
     if (tms9918->config[CONF_PENDING_CONFIRM])
     {
       tms9918->config[CONF_PENDING_CONFIRM] = 0;
-      // Pending values were already in tms9918->config at boot via
-      // applyPendingDisplay(). Promote them to the main config block, then
-      // erase the pending block.
       writeConfig(tms9918->config);
       erasePendingDisplay();
-      // Refresh the in-RAM mirror so the configurator sees CONFIRMED.
-      tms9918->config[CONF_PENDING_STATE]        = PENDING_STATE_CONFIRMED;
-      tms9918->config[CONF_PENDING_DRIVER_PREF]  = tms9918->config[CONF_DISP_DRIVER_PREF];
-      tms9918->config[CONF_PENDING_VGA_MODE]     = tms9918->config[CONF_VGA_MODE];
-      tms9918->config[CONF_PENDING_SCART_MODE]   = tms9918->config[CONF_SCART_MODE];
-      tms9918->config[CONF_PENDING_CLOCK_PRESET] = tms9918->config[CONF_CLOCK_PRESET_ID];
+      refreshPendingMirror(tms9918->config, PENDING_STATE_CONFIRMED);
     }
 
+    // user cancelled: keep current run going, revert on next boot
     if (tms9918->config[CONF_PENDING_CANCEL])
     {
       tms9918->config[CONF_PENDING_CANCEL] = 0;
-      // Discard the pending block. The running firmware continues with the
-      // pending values until reboot, but next boot will use last-confirmed
-      // values from the main config.
       erasePendingDisplay();
       tms9918->config[CONF_PENDING_STATE] = PENDING_STATE_CONFIRMED;
     }

@@ -13,6 +13,9 @@
 
 #include <stdint.h>
 
+#define CHAR_WIDTH  6
+#define CHAR_HEIGHT 6
+
 void initDiagnostics();
 
 void diagSetTemperature(float tempC);

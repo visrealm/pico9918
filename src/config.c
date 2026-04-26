@@ -111,12 +111,8 @@ bool isScartConnected()
 }
 
 /*
- * update CONF_DISP_DRIVER based on user preference, dongle detection, and
- * SCART mode config. call after both detectScartDongle() and readConfig() have run.
- *
- *   CONF_DISP_DRIVER_PREF: 0 = AUTO (detect dongle), 1 = force VGA, 2 = force SCART
- *   CONF_DISP_DRIVER (read-only result): 0 = VGA, 1 = NTSC, 2 = PAL
- *   CONF_SCART_MODE: 0 = PAL, 1 = NTSC
+ * update CONF_DISP_DRIVER from CONF_DISP_DRIVER_PREF + dongle detection
+ *   pref: 0=AUTO, 1=VGA, 2=SCART  ->  driver: 0=VGA, 1=NTSC, 2=PAL
  */
 void updateDispDriver()
 {
@@ -157,32 +153,26 @@ void applyConfig()
 #define CONFIG_FLASH_OFFSET  (0x200000 - 0x1000) // in the top 4kB of a 2MB flash
 #define CONFIG_FLASH_ADDR    (uint8_t*)(XIP_BASE + CONFIG_FLASH_OFFSET)
 
-// Pending-display block: 4 KB sector immediately below the main config block.
+// 4 KB sector immediately below the main config block
 #define PENDING_FLASH_OFFSET (CONFIG_FLASH_OFFSET - 0x1000)
 #define PENDING_FLASH_ADDR   (uint8_t*)(XIP_BASE + PENDING_FLASH_OFFSET)
 
-static bool pendingActive = false;
+static uint8_t pendingBannerState = PENDING_BANNER_NONE;
 
 /*
- * Decide the boot-time system clock. Peeks the pending block first (so a
- * pending driver change influences the initial clock) and falls back to the
- * main config block.
- *
- * Called before readConfig() / applyPendingDisplay() because the initial
- * vreg/PLL setup happens earlier than those.
+ * Pending block takes precedence: a pending driver change must influence the
+ * initial clock too. Called before readConfig() / applyPendingDisplay().
  */
 bool shouldUseScartClock()
 {
-  // Pending block takes precedence: a pending driver=SCART user expects the
-  // SCART clock on the very first boot after their change.
   const uint8_t *pendingFlash = PENDING_FLASH_ADDR;
   uint8_t pendingState = pendingFlash[0];
   if (pendingState == PENDING_STATE_PENDING || pendingState == PENDING_STATE_ARMED)
   {
     uint8_t pref = pendingFlash[1];
-    if (pref == 1) return false;                  // forced VGA
-    if (pref == 2) return true;                   // forced SCART
-    // pref == 0 (AUTO) or invalid: fall through to main config / dongle
+    if (pref == 1) return false;
+    if (pref == 2) return true;
+    // AUTO or invalid: fall through
   }
 
   const uint8_t *mainFlash = CONFIG_FLASH_ADDR;
@@ -192,11 +182,7 @@ bool shouldUseScartClock()
   return isScartConnected();
 }
 
-/*
- * Read the pending-display block. Any value other than the three known state
- * markers (CONFIRMED/PENDING/ARMED) means the block is erased or corrupt;
- * treat as CONFIRMED so first boot on a fresh chip is a no-op.
- */
+// erased or unrecognised state byte -> treat as CONFIRMED
 void readPendingDisplay(PendingDisplay *p)
 {
   const uint8_t *src = PENDING_FLASH_ADDR;
@@ -212,10 +198,7 @@ void readPendingDisplay(PendingDisplay *p)
   }
 }
 
-/*
- * Write the pending-display block (erases the 4 KB sector first). Mirrors
- * writeConfig()'s retry + verify flush.
- */
+// mirrors writeConfig()'s retry + verify flush
 bool writePendingDisplay(const PendingDisplay *p)
 {
   flash_range_erase(PENDING_FLASH_OFFSET, 0x1000);
@@ -233,7 +216,6 @@ bool writePendingDisplay(const PendingDisplay *p)
   {
     flash_range_program(PENDING_FLASH_OFFSET, buf, sizeof(buf));
 
-    // flush XIP
     int i = 0;
     while (i < (int)sizeof(buf)) {
       *((volatile uint32_t *)(PENDING_FLASH_ADDR) + (i / sizeof(uint32_t))) = 0;
@@ -252,19 +234,31 @@ bool writePendingDisplay(const PendingDisplay *p)
 bool erasePendingDisplay()
 {
   flash_range_erase(PENDING_FLASH_OFFSET, 0x1000);
-  pendingActive = false;
+  pendingBannerState = PENDING_BANNER_NONE;
   return true;
 }
 
-bool displayChangePending()
+uint8_t pendingDisplayBanner()
 {
-  return pendingActive;
+  return pendingBannerState;
 }
 
-/*
- * Update the in-RAM mirror at config[200..204] so the configurator can read
- * pending block state via VDP_REG(58)=200..204.
- */
+// To track an extra field: append to both arrays in matching order, extend
+// PendingDisplay, and update read/writePendingDisplay.
+static const uint8_t trackedConfigOffsets[] = {
+  CONF_DISP_DRIVER_PREF,
+  CONF_VGA_MODE,
+  CONF_SCART_MODE,
+  CONF_CLOCK_PRESET_ID,
+};
+static const uint8_t trackedMirrorOffsets[] = {
+  CONF_PENDING_DRIVER_PREF,
+  CONF_PENDING_VGA_MODE,
+  CONF_PENDING_SCART_MODE,
+  CONF_PENDING_CLOCK_PRESET,
+};
+#define TRACKED_FIELD_COUNT (sizeof(trackedConfigOffsets) / sizeof(trackedConfigOffsets[0]))
+
 static void mirrorPendingToConfig(uint8_t config[CONFIG_BYTES], const PendingDisplay *p)
 {
   config[CONF_PENDING_STATE]        = p->state;
@@ -274,20 +268,16 @@ static void mirrorPendingToConfig(uint8_t config[CONFIG_BYTES], const PendingDis
   config[CONF_PENDING_CLOCK_PRESET] = p->clockPresetId;
 }
 
-/*
- * Boot-time pending-display arbitration. Called after readConfig().
- *
- *   PENDING -> overlay pending values onto config[], advance state to ARMED
- *              in flash. Any unconfirmed reboot from here will revert.
- *   ARMED   -> previous boot was already armed and we're rebooting without a
- *              confirmation. Erase the pending block and leave the
- *              last-confirmed config[] in place (the revert path).
- *   else    -> no pending change; leave config[] alone.
- *
- * Updates the in-RAM mirror at config[CONF_PENDING_*] in all cases so the
- * configurator's VDP_REG(58)=200..204 reads return the live state, and sets
- * `pendingActive` for the OSD banner.
- */
+void refreshPendingMirror(uint8_t config[CONFIG_BYTES], uint8_t state)
+{
+  config[CONF_PENDING_STATE] = state;
+  for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
+  {
+    config[trackedMirrorOffsets[i]] = config[trackedConfigOffsets[i]];
+  }
+}
+
+// call after readConfig(): PENDING -> apply + ARMED, ARMED -> revert + erase
 void applyPendingDisplay(uint8_t config[CONFIG_BYTES])
 {
   PendingDisplay p;
@@ -295,7 +285,6 @@ void applyPendingDisplay(uint8_t config[CONFIG_BYTES])
 
   if (p.state == PENDING_STATE_PENDING)
   {
-    // Apply pending values to in-RAM config and advance to ARMED.
     config[CONF_DISP_DRIVER_PREF] = p.dispDriverPref;
     config[CONF_VGA_MODE]         = p.vgaMode;
     config[CONF_SCART_MODE]       = p.scartMode;
@@ -304,40 +293,28 @@ void applyPendingDisplay(uint8_t config[CONFIG_BYTES])
     p.state = PENDING_STATE_ARMED;
     writePendingDisplay(&p);
 
-    pendingActive = true;
+    pendingBannerState = PENDING_BANNER_AWAIT_OK;
+    mirrorPendingToConfig(config, &p);
   }
   else if (p.state == PENDING_STATE_ARMED)
   {
-    // Booted again without confirmation -> revert. Erase the pending block;
-    // config[] already holds last-confirmed values from readConfig().
     erasePendingDisplay();
-    p.state = PENDING_STATE_CONFIRMED;
-    p.dispDriverPref = config[CONF_DISP_DRIVER_PREF];
-    p.vgaMode        = config[CONF_VGA_MODE];
-    p.scartMode      = config[CONF_SCART_MODE];
-    p.clockPresetId  = config[CONF_CLOCK_PRESET_ID];
-    pendingActive = false;
+    pendingBannerState = PENDING_BANNER_NONE;
+    refreshPendingMirror(config, PENDING_STATE_CONFIRMED);
   }
   else
   {
-    pendingActive = false;
+    pendingBannerState = PENDING_BANNER_NONE;
+    refreshPendingMirror(config, PENDING_STATE_CONFIRMED);
   }
-
-  mirrorPendingToConfig(config, &p);
 }
 
-/*
- * Settable config field descriptor. Drives readConfig() validation, defaults,
- * and per-version migration. Adding a new field is a one-row append:
- *   { offset, max-value, default, version-introduced }.
- * `introducedIn` is a packed major/minor/patch (see PICO9918_SW_VERSION_FULL);
- * on version upgrade, fields with introducedIn > stored version are reset to
- * their defaults so users get sane values for newly-added options.
- */
+// drives readConfig() validation/defaults and per-version migration.
+// Adding a field: append one row. introducedIn is packed major/minor/patch.
 typedef struct
 {
   uint8_t  offset;
-  uint8_t  max;          // inclusive upper bound; bounds-check is value > max
+  uint8_t  max;          // bounds-check is value > max
   uint8_t  defaultValue;
   uint16_t introducedIn;
 } ConfigField;
@@ -350,7 +327,7 @@ static const ConfigField configFields[] =
   { CONF_SCART_MODE,       1,                    0,            0x0000 },
   { CONF_VDP_DEVICE,       VDP_DEVICE_COUNT - 1, VDP_TMS9918A, 0x0000 },
   { CONF_DISP_DRIVER_PREF, 2,                    0,            0x1200 },  // 1.2.0
-  { CONF_VGA_MODE,         0,                    0,            0x1200 },  // bump max as VGA modes are added
+  { CONF_VGA_MODE,         0,                    0,            0x1200 },  // 0=480p60 (only)
   { CONF_DIAG_REGISTERS,   1,                    0,            0x0000 },
   { CONF_DIAG_PERFORMANCE, 1,                    0,            0x0000 },
   { CONF_DIAG_PALETTE,     1,                    0,            0x0000 },
@@ -429,7 +406,6 @@ void readConfig(uint8_t config[CONFIG_BYTES])
 
   config[CONF_SAVE_TO_FLASH] = 0;
 
-  // version upgrade: apply defaults for any newly-introduced fields and stamp.
   if (storedVer != PICO9918_SW_VERSION_FULL)
   {
     migrateNewFields(config, storedVer);
@@ -484,39 +460,18 @@ bool writeConfig(uint8_t config[CONFIG_BYTES])
   return success;
 }
 
-/*
- * Save dispatcher invoked on CONF_SAVE_TO_FLASH = 1. Splits the save:
- *   - Display-related fields (driver pref, VGA mode, SCART mode, clock preset)
- *     that differ from the last-confirmed flash values go into the pending
- *     block (state = PENDING). They will only become permanent after the user
- *     confirms in the configurator post-reboot.
- *   - All other fields go to the main config block as usual.
- *
- * If any tracked field is pending, the in-RAM config has those tracked fields
- * temporarily reverted to last-confirmed flash values for the main-config
- * write, so the main block continues to hold a last-known-good display
- * configuration. After the writes, the in-RAM tracked fields are restored to
- * the user's chosen values so the running firmware keeps using them and the
- * configurator's mirror at config[CONF_PENDING_*] reflects PENDING state.
- */
+// CONF_SAVE_TO_FLASH handler. Tracked fields with changed values go to the
+// pending block; main config keeps last-confirmed values.
 bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
 {
-  static const uint8_t trackedFields[] = {
-    CONF_DISP_DRIVER_PREF,
-    CONF_VGA_MODE,
-    CONF_SCART_MODE,
-    CONF_CLOCK_PRESET_ID,
-  };
-  const size_t TRACKED_COUNT = sizeof(trackedFields) / sizeof(trackedFields[0]);
-
   const uint8_t *flashConfig = CONFIG_FLASH_ADDR;
   bool anyTrackedChanged = false;
-  uint8_t pendingValues[sizeof(trackedFields) / sizeof(trackedFields[0])];
-  uint8_t lastConfirmed[sizeof(trackedFields) / sizeof(trackedFields[0])];
+  uint8_t pendingValues[TRACKED_FIELD_COUNT];
+  uint8_t lastConfirmed[TRACKED_FIELD_COUNT];
 
-  for (size_t i = 0; i < TRACKED_COUNT; ++i)
+  for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
   {
-    uint8_t off = trackedFields[i];
+    uint8_t off = trackedConfigOffsets[i];
     pendingValues[i] = config[off];
     lastConfirmed[i] = flashConfig[off];
     if (pendingValues[i] != lastConfirmed[i]) anyTrackedChanged = true;
@@ -526,8 +481,7 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
 
   if (anyTrackedChanged)
   {
-    // Write pending block first - if power dies between this and the main
-    // config write, we still revert cleanly on next boot.
+    // pending block first: power loss between writes still reverts cleanly
     PendingDisplay p = {
       .state          = PENDING_STATE_PENDING,
       .dispDriverPref = pendingValues[0],
@@ -537,11 +491,10 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
     };
     ok = writePendingDisplay(&p);
 
-    // Temporarily restore last-confirmed values in the main config buffer so
-    // the main block keeps the safe values.
-    for (size_t i = 0; i < TRACKED_COUNT; ++i)
+    // restore last-confirmed values for the main-config write
+    for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
     {
-      config[trackedFields[i]] = lastConfirmed[i];
+      config[trackedConfigOffsets[i]] = lastConfirmed[i];
     }
   }
 
@@ -549,21 +502,15 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
 
   if (anyTrackedChanged)
   {
-    // Restore the user-chosen values in RAM so the firmware keeps using them
-    // (until reboot or revert) and the configurator's pending mirror reflects
-    // PENDING state for next read.
-    for (size_t i = 0; i < TRACKED_COUNT; ++i)
+    // restore the user's chosen values for the running firmware + mirror
+    for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
     {
-      config[trackedFields[i]] = pendingValues[i];
+      config[trackedConfigOffsets[i]] = pendingValues[i];
     }
     PendingDisplay p;
     readPendingDisplay(&p);
-    config[CONF_PENDING_STATE]        = p.state;
-    config[CONF_PENDING_DRIVER_PREF]  = p.dispDriverPref;
-    config[CONF_PENDING_VGA_MODE]     = p.vgaMode;
-    config[CONF_PENDING_SCART_MODE]   = p.scartMode;
-    config[CONF_PENDING_CLOCK_PRESET] = p.clockPresetId;
-    pendingActive = true;
+    mirrorPendingToConfig(config, &p);
+    pendingBannerState = PENDING_BANNER_AWAIT_PC;   // power cycle to test
   }
 
   return ok;

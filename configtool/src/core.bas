@@ -63,9 +63,7 @@ CONST CONF_DIAG_PALETTE     = 19
 CONST CONF_DIAG_ADDRESS     = 20
 ' ^^^ read/write config IDs
 
-' Pending-display state mirror (firmware -> configurator) and command bytes
-' (configurator -> firmware). Mirror bytes are read-only via VDP_REG(58); the
-' command bytes trigger pending-block actions via VDP_CONFIG(I) = 1.
+' pending-block mirror (read) and command bytes (write 1 to trigger)
 CONST CONF_PENDING_STATE        = 200
 CONST CONF_PENDING_DRIVER_PREF  = 201
 CONST CONF_PENDING_VGA_MODE     = 202
@@ -75,7 +73,7 @@ CONST CONF_SAVE_FORCED          = 252
 CONST CONF_PENDING_CANCEL       = 253
 CONST CONF_PENDING_CONFIRM      = 254
 
-' Pending-state magic markers (must match firmware src/config.h).
+' must match firmware src/config.h
 CONST PENDING_STATE_CONFIRMED = $C0
 CONST PENDING_STATE_PENDING   = $9E
 CONST PENDING_STATE_ARMED     = $A0

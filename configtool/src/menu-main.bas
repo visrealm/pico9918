@@ -70,8 +70,8 @@ renderMenuRow: PROCEDURE
     ' pre-compute row offset. we'll need this a few times
     #ROWOFFSET = XY(0, g_menuTopRow + MENU_INDEX_POSITION)
 
-    ' output menu number (index + 1)
-    PRINT AT #ROWOFFSET + MENU_START_X, " ", MENU_INDEX_POSITION + 1, ". "
+    ' (position + 1) % 10 keeps the 10th item printable as "0." in 2 chars
+    PRINT AT #ROWOFFSET + MENU_START_X, " ", (MENU_INDEX_POSITION + 1) % 10, ". "
 
     ' output menu label
     #addr = #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X
@@ -179,11 +179,20 @@ menuLoop: PROCEDURE
             END IF
         WEND
 
-    ' number button pressed?
+    ' '1'..'9' select positions 0..8; '0' selects position 9
     ELSEIF g_key > 0 AND g_key <= MENU_INDEX_COUNT THEN
         I = MENU_DATA(MIN_MENU_INDEX + g_key - 1, CONF_INDEX)
         IF I <> 255 THEN
             g_currentMenuIndex = MIN_MENU_INDEX + g_key - 1
+
+            IF I > 200 THEN
+                valueChanged = TRUE
+            END IF
+        END IF
+    ELSEIF g_key = 0 AND MENU_INDEX_COUNT >= 10 THEN
+        I = MENU_DATA(MIN_MENU_INDEX + 9, CONF_INDEX)
+        IF I <> 255 THEN
+            g_currentMenuIndex = MIN_MENU_INDEX + 9
 
             IF I > 200 THEN
                 valueChanged = TRUE

@@ -585,11 +585,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
       outputSplash(y, frameCount, vBorder, vPixels, pixels);
 
-      if (displayChangePending())
-      {
-        renderText(y, "DISPLAY CHANGE PENDING - CONFIRM",  222, 8, 0x0fff, 0x0444, pixels);
-      }
-      
       if (frameCount > SHOW_DIAGNOSTICS_FRAMES)
       {
         tms9918->config[CONF_DIAG] = true;
@@ -598,6 +593,24 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         tms9918->config[CONF_DIAG_PALETTE] = true;
         tms9918->config[CONF_DIAG_ADDRESS] = true;
       }
+    }
+
+    // pending-display banner persists in the top border until the user power
+    // cycles (PENDING) or confirms in the configurator (ARMED)
+    #define RENDER_CENTERED(scanline, text, ypos, fg, bg, pixels) \
+      renderText((scanline), (text), \
+                 (RGB_PIXELS_X - (sizeof(text) - 1) * CHAR_WIDTH) / 2, \
+                 (ypos), (fg), (bg), (pixels))
+    uint8_t banner = pendingDisplayBanner();
+    if (banner == PENDING_BANNER_AWAIT_PC)
+    {
+      dma_channel_wait_for_finish_blocking(dma32);
+      RENDER_CENTERED(y, "POWER CYCLE TO TEST NEW CONFIGURATION", 8, 0x0fff, 0x044f, pixels);
+    }
+    else if (banner == PENDING_BANNER_AWAIT_OK)
+    {
+      dma_channel_wait_for_finish_blocking(dma32);
+      RENDER_CENTERED(y, "OPEN CONFIGURATOR TO CONFIRM NEW SETTINGS", 8, 0x0fff, 0x044f, pixels);
     }
 
     if (y == vBorder - 1)
@@ -777,9 +790,7 @@ int main(void)
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
-  // detect SCART dongle early - before clock setup and readConfig().
-  // shouldUseScartClock() also peeks CONF_DISP_DRIVER_PREF from flash so a
-  // user-forced SCART preference picks the SCART clock without a dongle.
+  // shouldUseScartClock() peeks flash for a user-forced SCART preference
   detectScartDongle();
 
 #if PICO9918_ENABLE_SCART
@@ -802,9 +813,6 @@ int main(void)
   /* we could set clock freq here from options */
   readConfig(tms9918->config);
 
-  // Layer pending-display values on top of the main config. This may transition
-  // the pending block (PENDING -> ARMED) or revert it (ARMED -> erased). After
-  // this call, tms9918->config holds the values we'll actually run with.
   applyPendingDisplay(tms9918->config);
 
   updateDispDriver();
@@ -873,10 +881,9 @@ int main(void)
   /* then set up VGA output */
   VgaInitParams params = { 0 };
 #if PICO9918_ENABLE_SCART
-  // CONF_DISP_DRIVER (resolved by updateDispDriver()): 0=VGA, 1=NTSC, 2=PAL
+  // CONF_DISP_DRIVER: 0=VGA, 1=NTSC, 2=PAL (resolved by updateDispDriver)
   if (tms9918->config[CONF_DISP_DRIVER] == 0)
   {
-    // future: index by CONF_VGA_MODE once additional VGA modes are added
     params.params = vgaGetParams(VGA_640_480_60HZ);
   }
   else

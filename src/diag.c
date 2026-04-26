@@ -22,8 +22,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define CHAR_WIDTH 6
-#define CHAR_HEIGHT 6
 
 
 #define TIMING_DIAG PICO9918_DIAG

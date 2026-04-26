@@ -209,7 +209,7 @@ paletteMenu: PROCEDURE
                 rgb(rgbIndex) = rgb(rgbIndex) - 1
             ELSEIF NAV(NAV_RIGHT) AND rgb(rgbIndex) < 15 THEN
                 rgb(rgbIndex) = rgb(rgbIndex) + 1
-            ELSEIF g_key > 0 AND g_key < 16 THEN
+            ELSEIF g_key < 16 THEN
                 rgb(rgbIndex) = g_key
             END IF
         ELSE

@@ -15,7 +15,7 @@
 ' -----------------------------------------------------------------------------
 resetOptions: PROCEDURE
     VDP_DISABLE_INT
-    g_resetPending = TRUE   ' make next save bypass the display-change confirmation flow
+    g_resetPending = TRUE   ' next save bypasses the display-change confirm flow
     FOR I = 0 TO CONF_COUNT - 1
         tempConfigValues(I) = 0
     NEXT I
@@ -31,6 +31,8 @@ resetOptions: PROCEDURE
         IF tempConfigValues(I) <> savedConfigValues(I) THEN g_diagDirty = TRUE
     NEXT I
 
+    GOSUB recomputeOutputDirty
+
     FOR I = 0 TO CONF_COUNT - 1
         VDP_CONFIG(I) = tempConfigValues(I)
     NEXT I
@@ -45,9 +47,8 @@ resetOptions: PROCEDURE
 ' -----------------------------------------------------------------------------
 saveOptions: PROCEDURE
 
-    ' instruct the pico9918 to commit config to flash. After a factory reset,
-    ' use the FORCED variant which bypasses the display-change confirmation
-    ' flow so the user is not prompted for a change they explicitly initiated.
+    ' factory reset takes the FORCED path so the user isn't asked to confirm
+    ' a change they just chose
     IF g_resetPending THEN
         VDP_CONFIG(CONF_SAVE_FORCED) = 1
         g_resetPending = FALSE
@@ -64,6 +65,7 @@ saveOptions: PROCEDURE
 
     g_paletteDirty = FALSE
     g_diagDirty = FALSE
+    g_outputDirty = FALSE
 
     GOSUB renderMainMenu
 

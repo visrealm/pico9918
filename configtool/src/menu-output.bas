@@ -8,15 +8,25 @@
 ' https://github.com/visrealm/pico9918
 '
 
-' Output submenu:
-'   Driver           AUTO / VGA-HDMI / SCART
-'   VGA-HDMI mode    480p60 (extensible)
-'   SCART mode       576i50 / 480i60
-'
-' All three settings require a firmware reboot to take effect (see help text
-' in menu-data.bas). The firmware reads CONF_DISP_DRIVER_PREF early at boot to
-' pick the system clock; CONF_VGA_MODE / CONF_SCART_MODE are read after
-' readConfig().
+' Output submenu: Driver / VGA mode / SCART mode. All require a reboot.
+
+' Tracked fields for the Output dirty flag. To add a field, append here and
+' bump OUTPUT_FIELD_COUNT.
+CONST OUTPUT_FIELD_COUNT = 3
+outputFields:
+    DATA BYTE CONF_DISP_DRIVER_PREF
+    DATA BYTE CONF_VGA_MODE
+    DATA BYTE CONF_SCART_MODE
+
+recomputeOutputDirty: PROCEDURE
+    g_outputDirty = FALSE
+    FOR I = 0 TO OUTPUT_FIELD_COUNT - 1
+        outputFieldIdx = outputFields(I)
+        IF tempConfigValues(outputFieldIdx) <> savedConfigValues(outputFieldIdx) THEN
+            g_outputDirty = TRUE
+        END IF
+    NEXT I
+    END
 
 outputMenu: PROCEDURE
 
@@ -55,9 +65,6 @@ outputMenu: PROCEDURE
     GOSUB popMenuCtx
     SET_MENU(MENU_ID_MAIN)
 
-    g_outputDirty = FALSE
-    IF savedConfigValues(CONF_SCART_MODE) <> tempConfigValues(CONF_SCART_MODE) THEN g_outputDirty = TRUE
-    IF savedConfigValues(CONF_DISP_DRIVER_PREF) <> tempConfigValues(CONF_DISP_DRIVER_PREF) THEN g_outputDirty = TRUE
-    IF savedConfigValues(CONF_VGA_MODE) <> tempConfigValues(CONF_VGA_MODE) THEN g_outputDirty = TRUE
+    GOSUB recomputeOutputDirty
 
     END

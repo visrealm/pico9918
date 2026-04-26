@@ -16,9 +16,7 @@
 
 #define PICO9918_SW_VERSION ((PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER)
 
-// 16-bit packed major/minor/patch, used for tracking which release introduced
-// each settable config field (see configFields[] in config.c).
-// Layout: 4 bits major (0-15), 4 bits minor (0-15), 8 bits patch (0-255).
+// packed major(4) | minor(4) | patch(8) for configFields[].introducedIn
 #define PICO9918_SW_VERSION_FULL                              \
   (((uint16_t)PICO9918_MAJOR_VER << 12) |                     \
    ((uint16_t)PICO9918_MINOR_VER <<  8) |                     \
@@ -53,18 +51,17 @@ typedef enum
   CONF_PALETTE_IDX_0    = 128,
   CONF_PALETTE_IDX_15   = CONF_PALETTE_IDX_0 + 32, // 16x 2 bytes
 
-  // Pending-display state (read-only mirror of pending flash block).
-  // Configurator reads these via VDP_REG(58) to detect ARMED state.
+  // pending-block mirror (read by configurator)
   CONF_PENDING_STATE        = 200,
   CONF_PENDING_DRIVER_PREF  = 201,
   CONF_PENDING_VGA_MODE     = 202,
   CONF_PENDING_SCART_MODE   = 203,
   CONF_PENDING_CLOCK_PRESET = 204,
 
-  // Configurator -> firmware command bytes (write 1 to trigger).
-  CONF_SAVE_FORCED      = 252,    // factory reset path: write whole config to main + erase pending
-  CONF_PENDING_CANCEL   = 253,    // erase pending block; banner clears
-  CONF_PENDING_CONFIRM  = 254,    // copy pending->main; erase pending; banner clears
+  // commands (configurator writes 1 to trigger)
+  CONF_SAVE_FORCED      = 252,
+  CONF_PENDING_CANCEL   = 253,
+  CONF_PENDING_CONFIRM  = 254,
   CONF_SAVE_TO_FLASH    = 255,
 } Pico9918Options;
 
@@ -98,10 +95,7 @@ bool isScartConnected();
 /* update CONF_DISP_DRIVER at runtime based on SCART detection */
 void updateDispDriver();
 
-/* true if the boot-time clock should configure for SCART (270 MHz). Peeks
- * both the pending-display block and the main config block in flash so a
- * forced-SCART preference (whether confirmed or pending) works without a
- * dongle. Must be called after detectScartDongle(). */
+/* true if boot-time clock should be SCART (270 MHz). Call after detectScartDongle(). */
 bool shouldUseScartClock();
 
 /* read configuration data from flash */
@@ -110,25 +104,17 @@ void readConfig(uint8_t config[CONFIG_BYTES]);
 /* write configuration data to flash */
 bool writeConfig(uint8_t config[CONFIG_BYTES]);
 
-/* save dispatcher: routes display-related field changes to the pending block
- * (state = PENDING) and untracked changes to the main config. Called by the
- * gpu.c handler when the configurator triggers CONF_SAVE_TO_FLASH = 1. */
+/* split save: tracked display fields -> pending block, others -> main config */
 bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES]);
 
 /* apply configuration data to vdp instance */
 void applyConfig();
 
 // -----------------------------------------------------------------------------
-// Pending-display confirmation (separate 4 KB flash block).
+// Display-change confirmation (separate 4 KB flash block).
 //
-// Tracked fields (driver, VGA mode, SCART mode, clock preset) only become
-// permanent once the user has visually confirmed the change in the configurator
-// after a reboot. If they reboot without confirming, last-confirmed values are
-// restored from the main config block.
-//
-// State machine: CONFIRMED -> PENDING (configurator save) -> ARMED (firmware
-// boot) -> CONFIRMED (user accepts in configurator) | CONFIRMED (next reboot
-// without acceptance reverts).
+// State: CONFIRMED -> PENDING (save) -> ARMED (boot) -> CONFIRMED (user accepts)
+//                                                     | CONFIRMED (reboot reverts)
 // -----------------------------------------------------------------------------
 
 #define PENDING_STATE_CONFIRMED 0xC0
@@ -144,22 +130,21 @@ typedef struct
   uint8_t clockPresetId;
 } PendingDisplay;
 
-/* read the pending block; treats erased/invalid contents as CONFIRMED. */
 void readPendingDisplay(PendingDisplay *p);
-
-/* write the pending block (erases the 4 KB sector). returns true on success. */
 bool writePendingDisplay(const PendingDisplay *p);
-
-/* erase the pending block (synonym for writing CONFIRMED state via erase). */
 bool erasePendingDisplay();
 
-/* called early at boot, after readConfig(). If the pending block is PENDING,
- * overlays pending values onto config[] and bumps state to ARMED in flash so
- * a subsequent reboot without confirmation reverts. If ARMED, erases the
- * pending block and leaves config[] untouched (revert path). Updates the
- * internal banner flag (see displayChangePending). */
+/* PENDING -> apply to config + advance to ARMED. ARMED -> revert + erase. */
 void applyPendingDisplay(uint8_t config[CONFIG_BYTES]);
 
-/* true while the firmware is running with pending (unconfirmed) display
- * settings; drives the OSD banner. */
-bool displayChangePending();
+/* OSD banner state:
+ *   0 = none
+ *   1 = saved-pending (awaiting power cycle to test)
+ *   2 = armed (booted with pending; awaiting confirmation in configurator) */
+#define PENDING_BANNER_NONE      0
+#define PENDING_BANNER_AWAIT_PC  1
+#define PENDING_BANNER_AWAIT_OK  2
+uint8_t pendingDisplayBanner();
+
+/* copy live tracked fields into the in-RAM mirror with the given state */
+void refreshPendingMirror(uint8_t config[CONFIG_BYTES], uint8_t state);
