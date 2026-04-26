@@ -78,7 +78,7 @@ firmwareMenu: PROCEDURE
 
         IF confirm THEN
 
-            DRAW_POPUP_WY("Upgrading firmware :        ", FWROWS, 30, 1)
+            DRAW_POPUP_WY("Upgrading firmware :        ", FWROWS, 30, 2)
 
             WAIT
 

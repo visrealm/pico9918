@@ -5,23 +5,10 @@ cmake_minimum_required(VERSION 3.13)
 
 project(pico9918-configurator NONE)
 
-# Include CVBasic build functions
+# Inherits PYTHON and version vars from pico9918_common.cmake via the root.
 include(${CMAKE_SOURCE_DIR}/visrealm_cvbasic.cmake)
 
-set(PYTHON python3)
-
-# Version information (from root CMakeLists.txt)
-# Explicit PICO9918_VERSION_SUFFIX (e.g. "a1") overrides the branch name.
-# Branch name is used otherwise, skipped on main.
-set(VERSION_BRANCH_STR "")
-if (NOT "${PICO9918_VERSION_SUFFIX}" STREQUAL "")
-  set(VERSION_BRANCH_STR "-${PICO9918_VERSION_SUFFIX}")
-elseif (NOT PICO9918_GIT_BRANCH STREQUAL "main" AND NOT PICO9918_GIT_BRANCH STREQUAL "")
-  string(REPLACE "/" "-" PICO9918_GIT_BRANCH_SAFE "${PICO9918_GIT_BRANCH}")
-  set(VERSION_BRANCH_STR "-${PICO9918_GIT_BRANCH_SAFE}")
-endif()
-set(VERSION "v${PICO9918_VERSION_STR}${VERSION_BRANCH_STR}")
-set(VERSION_WITH_OUTPUT "${VERSION}${PICO9918_OUTPUT_STR}")
+set(VERSION_WITH_OUTPUT "v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}${PICO9918_OUTPUT_STR}")
 set(FRIENDLYVER "${PICO9918_VERSION}")
 
 # Setup CVBasic toolchain (auto-build or find existing tools)

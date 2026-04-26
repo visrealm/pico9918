@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 # CVBasic build functions for PICO9918 Configurator
 
 include(ExternalProject)
-set(PYTHON python3)
+# ${PYTHON} comes from pico9918_common.cmake.
 
 # Find CVBasic tools with fallback paths
 function(find_cvbasic_tools)

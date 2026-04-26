@@ -36,16 +36,6 @@ if(NOT CONFIGURATOR_ONLY AND NOT PICO9918_BUILD_COMBINED)
     include(pico_sdk_import.cmake)
 endif()
 
-# pull in helpers for my custom tools
-include(visrealm_tools.cmake)
-include(visrealm_cvbasic.cmake)
-
-if(PICO9918_BUILD_COMBINED OR CONFIGURATOR_ONLY)
-    project(pico9918 NONE)
-else()
-    project(pico9918 C CXX ASM)
-endif()
-
 # PICO9918 Version Information
 set(PICO9918_MAJOR_VER 1)
 set(PICO9918_MINOR_VER 2)
@@ -54,8 +44,16 @@ set(PICO9918_PATCH_VER 0)
 # overrides the git branch name in generated artifact filenames.
 set(PICO9918_VERSION_SUFFIX "beta-1")
 
-set(PICO9918_VERSION "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
-string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
+# Common helpers must follow the version vars above and precede visrealm_*.
+include(pico9918_common.cmake)
+include(visrealm_tools.cmake)
+include(visrealm_cvbasic.cmake)
+
+if(PICO9918_BUILD_COMBINED OR CONFIGURATOR_ONLY)
+    project(pico9918 NONE)
+else()
+    project(pico9918 C CXX ASM)
+endif()
 
 # PICO9918 Build Options
 option(PICO9918_ENABLE_SCART "Enable SCART support" ON)
@@ -81,15 +79,7 @@ add_definitions(-DPICO_FLASH_SPI_CLKDIV=4)      # This could be 2, but then we c
 add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=8)
 
 
-# set up variables for the build process
-
-execute_process(
-    COMMAND git symbolic-ref --short HEAD
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE PICO9918_GIT_BRANCH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
+# Output-mode suffix: "" for VGA+SCART, "-vgaonly" otherwise.
 if(NOT CONFIGURATOR_ONLY)
   if(PICO9918_ENABLE_SCART)
     set(PICO9918_OUTPUT_STR "")
@@ -98,38 +88,13 @@ if(NOT CONFIGURATOR_ONLY)
   endif()
 endif()
 
-set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
-string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
-
-if (${PICO_BOARD} STREQUAL "pico9918pro")
-  set(PICO_BOARD_STR pro)
-elseif (NOT ${PICO_BOARD} STREQUAL "pico9918")
-  set(PICO_BOARD_STR -${PICO_BOARD})
-endif()
-
-# Artifact suffix: explicit PICO9918_VERSION_SUFFIX (e.g. "a1") overrides the
-# git branch name. Branch name is used otherwise, skipped on main.
-set(PICO9918_BRANCH_STR "")
-if (NOT PICO9918_VERSION_SUFFIX STREQUAL "")
-  set(PICO9918_BRANCH_STR "-${PICO9918_VERSION_SUFFIX}")
-elseif (NOT PICO9918_GIT_BRANCH STREQUAL "main" AND NOT PICO9918_GIT_BRANCH STREQUAL "")
-  string(REPLACE "/" "-" PICO9918_GIT_BRANCH_SAFE "${PICO9918_GIT_BRANCH}")
-  set(PICO9918_BRANCH_STR "-${PICO9918_GIT_BRANCH_SAFE}")
-endif()
-
-set(PICO9918_BINARY_SUFFIX ${PICO_BOARD_STR}${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR})
-
-if (PICO9918_DIAG)
-  set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-diag)
-endif()
-
+pico9918_compute_binary_suffix("${PICO_BOARD}" "${PICO9918_OUTPUT_STR}" ${PICO9918_DIAG} PICO9918_BINARY_SUFFIX)
 set(FIRMWARE_FILE pico9918${PICO9918_BINARY_SUFFIX})
 
 
 
 if(PICO9918_BUILD_COMBINED)
     include(ExternalProject)
-    find_package(Python3 REQUIRED)
 
     set(COMMON_CMAKE_ARGS
         -DPICO_BOARD_HEADER_DIRS=${CMAKE_SOURCE_DIR}/src/boards
@@ -172,21 +137,16 @@ if(PICO9918_BUILD_COMBINED)
         BUILD_ALWAYS TRUE
     )
 
-    # Compute expected firmware filenames (mirrors logic in src/CMakeLists.txt)
-    set(RP2040_SUFFIX "${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
-    set(RP2350_SUFFIX "pro${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
-    if(PICO9918_DIAG)
-        set(RP2040_SUFFIX "${RP2040_SUFFIX}-diag")
-        set(RP2350_SUFFIX "${RP2350_SUFFIX}-diag")
-    endif()
+    pico9918_compute_binary_suffix("pico9918"    "${PICO9918_OUTPUT_STR}" ${PICO9918_DIAG} RP2040_SUFFIX)
+    pico9918_compute_binary_suffix("pico9918pro" "${PICO9918_OUTPUT_STR}" ${PICO9918_DIAG} RP2350_SUFFIX)
 
-    set(UF2_RP2040  ${CMAKE_BINARY_DIR}/pico9918/dist/pico9918${RP2040_SUFFIX}.uf2)
-    set(UF2_RP2350  ${CMAKE_BINARY_DIR}/pico9918pro/dist/pico9918${RP2350_SUFFIX}.uf2)
+    set(UF2_RP2040   ${CMAKE_BINARY_DIR}/pico9918/dist/pico9918${RP2040_SUFFIX}.uf2)
+    set(UF2_RP2350   ${CMAKE_BINARY_DIR}/pico9918pro/dist/pico9918${RP2350_SUFFIX}.uf2)
     set(UF2_COMBINED ${CMAKE_BINARY_DIR}/dist/pico9918${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}.uf2)
 
     add_custom_target(combined ALL
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/dist
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/concat_uf2.py
+        COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/tools/concat_uf2.py
                 ${UF2_RP2040} ${UF2_RP2350} ${UF2_COMBINED}
         DEPENDS build_pico9918 build_pico9918pro
         COMMENT "Creating combined UF2: pico9918${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}.uf2"
