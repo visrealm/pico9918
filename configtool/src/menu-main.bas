@@ -100,6 +100,7 @@ renderMenuRow: PROCEDURE
     END IF
     configDirty = configDirty OR ((optId = CONF_MENU_PALETTE) AND g_paletteDirty)
     configDirty = configDirty OR ((optId = CONF_MENU_DIAG) AND g_diagDirty)
+    configDirty = configDirty OR ((optId = CONF_MENU_OUTPUT) AND g_outputDirty)
     
     ' if the config option is "dirty" output an asterix next to it
     IF configDirty THEN
@@ -277,6 +278,8 @@ mainMenu: PROCEDURE
                     menu = MENU_ID_DIAG
             	CASE CONF_MENU_PALETTE
                     menu = MENU_ID_PALETTE
+            	CASE CONF_MENU_OUTPUT
+                    menu = MENU_ID_OUTPUT
             	CASE CONF_MENU_RESET
                     GOSUB resetOptions
             	CASE CONF_MENU_SAVE

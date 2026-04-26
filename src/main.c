@@ -273,7 +273,6 @@ static const ClockSettings vgaClockPresets[] = {
 static const ClockSettings *clockPresets = vgaClockPresets;
 
 static int clockPresetIndex = 0;
-static bool testingClock = false;
 
 typedef struct
 {
@@ -586,27 +585,9 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
       outputSplash(y, frameCount, vBorder, vPixels, pixels);
 
-      if (testingClock)
+      if (displayChangePending())
       {
-        if (frameCount < 400)
-        {
-          renderText(y, "TESTING NEW CLOCK FREQUENCY...", 231, 8, 0x0fff, 0x0222, pixels);
-        }
-        else if (frameCount < 500)
-        {
-          renderText(y, "TEST COMPLETED SUCCESSFULLY!", 234, 8, 0x07f7, 0x0444, pixels);
-        }
-        else if (frameCount < 599)
-        {
-          renderText(y, "WRITING CONFIGURATION TO FLASH...", 222, 8, 0x0fff, 0x0444, pixels);
-        }
-        else
-        {
-          // new clock lasted 10 seconds... let's accept it
-          tms9918->config[CONF_CLOCK_TESTED] = tms9918->config[CONF_CLOCK_PRESET_ID];
-          tms9918->config[CONF_SAVE_TO_FLASH] = 1;
-          testingClock = false;
-        }
+        renderText(y, "DISPLAY CHANGE PENDING - CONFIRM",  222, 8, 0x0fff, 0x0444, pixels);
       }
       
       if (frameCount > SHOW_DIAGNOSTICS_FRAMES)
@@ -796,11 +777,13 @@ int main(void)
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
-  // detect SCART dongle early � before clock setup and readConfig()
+  // detect SCART dongle early - before clock setup and readConfig().
+  // shouldUseScartClock() also peeks CONF_DISP_DRIVER_PREF from flash so a
+  // user-forced SCART preference picks the SCART clock without a dongle.
   detectScartDongle();
 
 #if PICO9918_ENABLE_SCART
-  if (isScartConnected())
+  if (shouldUseScartClock())
     clockPresets = scartClockPresets;
 #endif
 
@@ -819,22 +802,12 @@ int main(void)
   /* we could set clock freq here from options */
   readConfig(tms9918->config);
 
-  updateDispDriver();
+  // Layer pending-display values on top of the main config. This may transition
+  // the pending block (PENDING -> ARMED) or revert it (ARMED -> erased). After
+  // this call, tms9918->config holds the values we'll actually run with.
+  applyPendingDisplay(tms9918->config);
 
-  /*
-   * if we're trying out a new clock rate, we need to have a failsafe
-   * we test it first
-   */
-  if (tms9918->config[CONF_CLOCK_PRESET_ID] != 0 && 
-      tms9918->config[CONF_CLOCK_PRESET_ID] != tms9918->config[CONF_CLOCK_TESTED])
-  {
-    testingClock = true;
-    int wantedClock = tms9918->config[CONF_CLOCK_PRESET_ID];
-    tms9918->config[CONF_CLOCK_PRESET_ID] = 0;
-    tms9918->config[CONF_CLOCK_TESTED] = 0;
-    writeConfig(tms9918->config);
-    tms9918->config[CONF_CLOCK_PRESET_ID] = wantedClock;
-  }
+  updateDispDriver();
 
   if (tms9918->config[CONF_CLOCK_PRESET_ID] != clockPresetIndex)
   {
@@ -900,9 +873,17 @@ int main(void)
   /* then set up VGA output */
   VgaInitParams params = { 0 };
 #if PICO9918_ENABLE_SCART
-  VgaMode scartMode = tms9918->config[CONF_SCART_TIMING]
-    ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ;
-  params.params = vgaGetParams(isScartConnected() ? scartMode : VGA_640_480_60HZ);
+  // CONF_DISP_DRIVER (resolved by updateDispDriver()): 0=VGA, 1=NTSC, 2=PAL
+  if (tms9918->config[CONF_DISP_DRIVER] == 0)
+  {
+    // future: index by CONF_VGA_MODE once additional VGA modes are added
+    params.params = vgaGetParams(VGA_640_480_60HZ);
+  }
+  else
+  {
+    params.params = vgaGetParams(tms9918->config[CONF_SCART_MODE]
+      ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ);
+  }
 #else
   params.params = vgaGetParams(DISPLAY_MODE);
 #endif

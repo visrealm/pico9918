@@ -15,6 +15,7 @@
 ' -----------------------------------------------------------------------------
 resetOptions: PROCEDURE
     VDP_DISABLE_INT
+    g_resetPending = TRUE   ' make next save bypass the display-change confirmation flow
     FOR I = 0 TO CONF_COUNT - 1
         tempConfigValues(I) = 0
     NEXT I
@@ -44,8 +45,15 @@ resetOptions: PROCEDURE
 ' -----------------------------------------------------------------------------
 saveOptions: PROCEDURE
 
-    ' instruct the pico9918 to commit config to flash
-    VDP_CONFIG(CONF_SAVE_TO_FLASH) = 1
+    ' instruct the pico9918 to commit config to flash. After a factory reset,
+    ' use the FORCED variant which bypasses the display-change confirmation
+    ' flow so the user is not prompted for a change they explicitly initiated.
+    IF g_resetPending THEN
+        VDP_CONFIG(CONF_SAVE_FORCED) = 1
+        g_resetPending = FALSE
+    ELSE
+        VDP_CONFIG(CONF_SAVE_TO_FLASH) = 1
+    END IF
 
     clockChanged = savedConfigValues(CONF_CLOCK_PRESET_ID) <> tempConfigValues(CONF_CLOCK_PRESET_ID)
 
