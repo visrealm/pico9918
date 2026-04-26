@@ -7,7 +7,14 @@
 
 # Resolve Python to a real interpreter. On Windows, bare "python3" on PATH is
 # usually the Store App Execution Alias, which fails from console-less child
-# processes (the .pyw GUI builder hits this).
+# processes (the .pyw GUI builder hits this). We also need to honor whichever
+# Python is first on PATH so we match the interpreter that `pip install` used
+# (CI installs Pillow into PATH-python; find_package's newest-wins search can
+# otherwise pick a different install that lacks PIL).
+find_program(_pico9918_python NAMES python3 python)
+if(_pico9918_python)
+  set(Python3_EXECUTABLE "${_pico9918_python}" CACHE FILEPATH "" FORCE)
+endif()
 find_package(Python3 COMPONENTS Interpreter QUIET)
 if(Python3_Interpreter_FOUND)
   set(PYTHON ${Python3_EXECUTABLE})
