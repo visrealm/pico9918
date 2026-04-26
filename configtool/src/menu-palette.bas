@@ -19,8 +19,6 @@
 BANK 1
 #endif
 
-CONST PALETTE_PRESET_COUNT = 5
-
 paletteMenu: PROCEDURE
 
     VDP_DISABLE_INT
@@ -224,12 +222,12 @@ paletteMenu: PROCEDURE
                 presetChanged = FALSE
 
                 IF NAV(NAV_LEFT) THEN
-                    IF g_palettePreset = 0 THEN g_palettePreset = PALETTE_PRESET_COUNT
+                    IF g_palettePreset = 0 THEN g_palettePreset = OPT_COUNT_PALETTE
                     g_palettePreset = g_palettePreset - 1
                     presetChanged = TRUE
                 ELSEIF NAV(NAV_OK OR NAV_RIGHT) THEN
                     g_palettePreset = g_palettePreset + 1
-                    IF g_palettePreset >= PALETTE_PRESET_COUNT THEN g_palettePreset = 0
+                    IF g_palettePreset >= OPT_COUNT_PALETTE THEN g_palettePreset = 0
                     presetChanged = TRUE
                 END IF
 
@@ -347,7 +345,7 @@ resetPalette: PROCEDURE
 detectPalettePreset: PROCEDURE
     g_palettePreset = 0
 
-    FOR P = 0 TO PALETTE_PRESET_COUNT - 1
+    FOR P = 0 TO OPT_COUNT_PALETTE - 1
         paletteMatch = TRUE
         palOffset = P * PALETTE_BYTES
         FOR I = 0 TO 31
