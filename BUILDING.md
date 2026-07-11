@@ -85,7 +85,7 @@ The PICO9918 firmware is the primary component - a TMS9918A VDP emulator for Ras
 
 ### Quick Start
 
-**Combined build — firmware for PICO9918 and PICO9918 PRO, plus all configurator ROMs (Recommended)**
+**Combined build - firmware for PICO9918 and PICO9918 PRO, plus all configurator ROMs (Recommended)**
 ```bash
 mkdir build && cd build
 cmake .. -DPICO9918_BUILD_COMBINED=ON
@@ -271,7 +271,7 @@ cmake --build . --target build_configurators
 ```
 
 All outputs land in `build/dist/`:
-- **Combined firmware**: `pico9918-vga-<version>.uf2` — works on both RP2040 and RP2350
+- **Combined firmware**: `pico9918-vga-<version>.uf2` - works on both RP2040 and RP2350
 - **Configurator ROMs**: All platform ROMs, each embedding the combined firmware
 
 ### Ninja Generator (Faster)

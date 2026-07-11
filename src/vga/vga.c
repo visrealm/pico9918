@@ -69,7 +69,7 @@ uint32_t __aligned(8) syncDataPorch[4];   // porch/blanking full line (4 words, 
 uint32_t __aligned(8) syncDataSync[4];    // VGA vsync full line     (4 words, non-interlaced only)
 
 // Interlaced PAL/NTSC: full-line vsync buffers (4 words each = 64us = 2 half-lines).
-// All DMA transfers are always 4 words — no transfer count switching, no FIFO starvation.
+// All DMA transfers are always 4 words - no transfer count switching, no FIFO starvation.
 //
 // Each buffer encodes two half-line sync pulses:
 //   EQ (short sync): 2us low + 30us high = 32us per half-line
@@ -81,14 +81,14 @@ uint32_t __aligned(8) syncDataSync[4];    // VGA vsync full line     (4 words, n
 //
 // F1 line 312 = EqLs creates the half-line offset: left half is F1's last EQ,
 // right half is F2's first LS. This is the interlace transition line.
-// F2 has no EqLs — its LS starts cleanly at line 0, giving the 0.5-line offset.
+// F2 has no EqLs - its LS starts cleanly at line 0, giving the 0.5-line offset.
 //
 //   F1→F2 LS interval: (313 - 0) - 0.5 + 0 = 312.5 lines ✓
 //   F2→F1 LS interval: (312 - 0) + 0.5 = 312.5 lines ✓
 uint32_t __aligned(4) syncDataLsLs[4];    // LS + LS
 uint32_t __aligned(4) syncDataLsEq[4];    // LS + EQ  (F1 LS→EQ transition at line 2)
 uint32_t __aligned(4) syncDataEqEq[4];    // EQ + EQ
-uint32_t __aligned(4) syncDataEqLs[4];    // EQ + LS  (F1 last line — interlace transition)
+uint32_t __aligned(4) syncDataEqLs[4];    // EQ + LS  (F1 last line - interlace transition)
 
 #if VGA_NO_MALLOC
 __attribute__((section(".scratch_y.lookup"))) uint16_t __aligned(4) rgbDataBuffer[2][RGB_PIXELS_X] = { 0 };   // two scanline buffers (odd and even)
