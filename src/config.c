@@ -185,12 +185,7 @@ bool shouldUseScartClock()
 // erased or unrecognised state byte -> treat as CONFIRMED
 void readPendingDisplay(PendingDisplay *p)
 {
-  const uint8_t *src = PENDING_FLASH_ADDR;
-  p->state          = src[0];
-  p->dispDriverPref = src[1];
-  p->vgaMode        = src[2];
-  p->scartMode      = src[3];
-  p->clockPresetId  = src[4];
+  memcpy(p, PENDING_FLASH_ADDR, sizeof(*p));
 
   if (p->state != PENDING_STATE_PENDING && p->state != PENDING_STATE_ARMED)
   {
@@ -203,32 +198,17 @@ bool writePendingDisplay(const PendingDisplay *p)
 {
   flash_range_erase(PENDING_FLASH_OFFSET, 0x1000);
 
-  uint8_t buf[16] = { 0 };
-  buf[0] = p->state;
-  buf[1] = p->dispDriverPref;
-  buf[2] = p->vgaMode;
-  buf[3] = p->scartMode;
-  buf[4] = p->clockPresetId;
-
-  bool success = false;
   int attempts = 5;
   while (attempts--)
   {
-    flash_range_program(PENDING_FLASH_OFFSET, buf, sizeof(buf));
+    flash_range_program(PENDING_FLASH_OFFSET, (const uint8_t*)p, sizeof(*p));
 
-    int i = 0;
-    while (i < (int)sizeof(buf)) {
+    for (size_t i = 0; i < sizeof(*p); i += sizeof(uint32_t))
       *((volatile uint32_t *)(PENDING_FLASH_ADDR) + (i / sizeof(uint32_t))) = 0;
-      i += sizeof(uint32_t);
-    }
 
-    if (memcmp(PENDING_FLASH_ADDR, buf, sizeof(buf)) == 0)
-    {
-      success = true;
-      break;
-    }
+    if (memcmp(PENDING_FLASH_ADDR, p, sizeof(*p)) == 0) return true;
   }
-  return success;
+  return false;
 }
 
 bool erasePendingDisplay()
@@ -243,37 +223,45 @@ uint8_t pendingDisplayBanner()
   return pendingBannerState;
 }
 
-// To track an extra field: append to both arrays in matching order, extend
-// PendingDisplay, and update read/writePendingDisplay.
-static const uint8_t trackedConfigOffsets[] = {
-  CONF_DISP_DRIVER_PREF,
-  CONF_VGA_MODE,
-  CONF_SCART_MODE,
-  CONF_CLOCK_PRESET_ID,
-};
-static const uint8_t trackedMirrorOffsets[] = {
-  CONF_PENDING_DRIVER_PREF,
-  CONF_PENDING_VGA_MODE,
-  CONF_PENDING_SCART_MODE,
-  CONF_PENDING_CLOCK_PRESET,
-};
-#define TRACKED_FIELD_COUNT (sizeof(trackedConfigOffsets) / sizeof(trackedConfigOffsets[0]))
+// drives readConfig() validation/defaults, per-version migration, and the
+// pending-block mirror. Adding a field: append one row. introducedIn is packed
+// major/minor/patch. Set pendingMirror to PENDING_MIRROR_NONE for fields that
+// don't participate in the display-change confirmation flow.
+#define PENDING_MIRROR_NONE 0xFF
 
-static void mirrorPendingToConfig(uint8_t config[CONFIG_BYTES], const PendingDisplay *p)
+typedef struct
 {
-  config[CONF_PENDING_STATE]        = p->state;
-  config[CONF_PENDING_DRIVER_PREF]  = p->dispDriverPref;
-  config[CONF_PENDING_VGA_MODE]     = p->vgaMode;
-  config[CONF_PENDING_SCART_MODE]   = p->scartMode;
-  config[CONF_PENDING_CLOCK_PRESET] = p->clockPresetId;
-}
+  uint8_t  offset;
+  uint8_t  max;          // bounds-check is value > max
+  uint8_t  defaultValue;
+  uint8_t  pendingMirror; // CONF_PENDING_* offset, or PENDING_MIRROR_NONE
+  uint16_t introducedIn;
+} ConfigField;
+
+static const ConfigField configFields[] =
+{
+  { CONF_CRT_SCANLINES,    1,                    0,            PENDING_MIRROR_NONE,       0x1000 },
+  { CONF_SCANLINE_SPRITES, 3,                    0,            PENDING_MIRROR_NONE,       0x1000 },
+  { CONF_CLOCK_PRESET_ID,  2,                    0,            CONF_PENDING_CLOCK_PRESET, 0x1000 },
+  { CONF_SCART_MODE,       1,                    0,            CONF_PENDING_SCART_MODE,   0x1200 },
+  { CONF_VDP_DEVICE,       VDP_DEVICE_COUNT - 1, VDP_TMS9918A, PENDING_MIRROR_NONE,       0x1101 },
+  { CONF_DISP_DRIVER_PREF, 2,                    0,            CONF_PENDING_DRIVER_PREF,  0x1200 },  // 1.2.0
+  { CONF_VGA_MODE,         0,                    0,            CONF_PENDING_VGA_MODE,     0x1200 },  // 0=480p60 (only)
+  { CONF_DIAG_REGISTERS,   1,                    0,            PENDING_MIRROR_NONE,       0x1000 },
+  { CONF_DIAG_PERFORMANCE, 1,                    0,            PENDING_MIRROR_NONE,       0x1000 },
+  { CONF_DIAG_PALETTE,     1,                    0,            PENDING_MIRROR_NONE,       0x1000 },
+  { CONF_DIAG_ADDRESS,     1,                    0,            PENDING_MIRROR_NONE,       0x1000 },
+};
+
+#define CONFIG_FIELD_COUNT (sizeof(configFields) / sizeof(configFields[0]))
 
 void refreshPendingMirror(uint8_t config[CONFIG_BYTES], uint8_t state)
 {
   config[CONF_PENDING_STATE] = state;
-  for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
+  for (size_t i = 0; i < CONFIG_FIELD_COUNT; ++i)
   {
-    config[trackedMirrorOffsets[i]] = config[trackedConfigOffsets[i]];
+    if (configFields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    config[configFields[i].pendingMirror] = config[configFields[i].offset];
   }
 }
 
@@ -294,7 +282,7 @@ void applyPendingDisplay(uint8_t config[CONFIG_BYTES])
     writePendingDisplay(&p);
 
     pendingBannerState = PENDING_BANNER_AWAIT_OK;
-    mirrorPendingToConfig(config, &p);
+    refreshPendingMirror(config, PENDING_STATE_ARMED);
   }
   else if (p.state == PENDING_STATE_ARMED)
   {
@@ -308,33 +296,6 @@ void applyPendingDisplay(uint8_t config[CONFIG_BYTES])
     refreshPendingMirror(config, PENDING_STATE_CONFIRMED);
   }
 }
-
-// drives readConfig() validation/defaults and per-version migration.
-// Adding a field: append one row. introducedIn is packed major/minor/patch.
-typedef struct
-{
-  uint8_t  offset;
-  uint8_t  max;          // bounds-check is value > max
-  uint8_t  defaultValue;
-  uint16_t introducedIn;
-} ConfigField;
-
-static const ConfigField configFields[] =
-{
-  { CONF_CRT_SCANLINES,    1,                    0,            0x0000 },
-  { CONF_SCANLINE_SPRITES, 3,                    0,            0x0000 },
-  { CONF_CLOCK_PRESET_ID,  2,                    0,            0x0000 },
-  { CONF_SCART_MODE,       1,                    0,            0x0000 },
-  { CONF_VDP_DEVICE,       VDP_DEVICE_COUNT - 1, VDP_TMS9918A, 0x0000 },
-  { CONF_DISP_DRIVER_PREF, 2,                    0,            0x1200 },  // 1.2.0
-  { CONF_VGA_MODE,         0,                    0,            0x1200 },  // 0=480p60 (only)
-  { CONF_DIAG_REGISTERS,   1,                    0,            0x0000 },
-  { CONF_DIAG_PERFORMANCE, 1,                    0,            0x0000 },
-  { CONF_DIAG_PALETTE,     1,                    0,            0x0000 },
-  { CONF_DIAG_ADDRESS,     1,                    0,            0x0000 },
-};
-
-#define CONFIG_FIELD_COUNT (sizeof(configFields) / sizeof(configFields[0]))
 
 static inline uint16_t configStoredVersion(const uint8_t *config)
 {
@@ -404,14 +365,21 @@ void readConfig(uint8_t config[CONFIG_BYTES])
     storedVer = 0;  // force version stamp + save below
   }
 
-  config[CONF_SAVE_TO_FLASH] = 0;
+  // writeConfig() persists all 256 bytes; clear command bytes read from flash
+  config[CONF_SAVE_FORCED]     = 0;
+  config[CONF_PENDING_CANCEL]  = 0;
+  config[CONF_PENDING_CONFIRM] = 0;
+  config[CONF_SAVE_TO_FLASH]   = 0;
 
   if (storedVer != PICO9918_SW_VERSION_FULL)
   {
     migrateNewFields(config, storedVer);
     config[CONF_SW_VERSION]       = PICO9918_SW_VERSION;
     config[CONF_SW_PATCH_VERSION] = PICO9918_PATCH_VER;
-    config[CONF_SAVE_TO_FLASH]    = 1;
+
+    // forced path, not pending-split: reset/migrated values are not a user
+    // display change
+    config[CONF_SAVE_FORCED]      = 1;
   }
 
   tms9918->configDirty = true;  // so we apply it
@@ -466,35 +434,37 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
 {
   const uint8_t *flashConfig = CONFIG_FLASH_ADDR;
   bool anyTrackedChanged = false;
-  uint8_t pendingValues[TRACKED_FIELD_COUNT];
-  uint8_t lastConfirmed[TRACKED_FIELD_COUNT];
 
-  for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
+  for (size_t i = 0; i < CONFIG_FIELD_COUNT; ++i)
   {
-    uint8_t off = trackedConfigOffsets[i];
-    pendingValues[i] = config[off];
-    lastConfirmed[i] = flashConfig[off];
-    if (pendingValues[i] != lastConfirmed[i]) anyTrackedChanged = true;
+    if (configFields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    uint8_t off = configFields[i].offset;
+    if (config[off] != flashConfig[off]) { anyTrackedChanged = true; break; }
   }
 
   bool ok = true;
+  // doubles as scratch for the user-chosen values across the writeConfig() call
+  PendingDisplay p = {
+    .state          = PENDING_STATE_PENDING,
+    .dispDriverPref = config[CONF_DISP_DRIVER_PREF],
+    .vgaMode        = config[CONF_VGA_MODE],
+    .scartMode      = config[CONF_SCART_MODE],
+    .clockPresetId  = config[CONF_CLOCK_PRESET_ID],
+  };
 
   if (anyTrackedChanged)
   {
     // pending block first: power loss between writes still reverts cleanly
-    PendingDisplay p = {
-      .state          = PENDING_STATE_PENDING,
-      .dispDriverPref = pendingValues[0],
-      .vgaMode        = pendingValues[1],
-      .scartMode      = pendingValues[2],
-      .clockPresetId  = pendingValues[3],
-    };
     ok = writePendingDisplay(&p);
 
-    // restore last-confirmed values for the main-config write
-    for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
+    // revert tracked fields to last-confirmed; clamp out-of-range flash bytes
+    // so an uninitialised block can't invalidate the main config
+    for (size_t i = 0; i < CONFIG_FIELD_COUNT; ++i)
     {
-      config[trackedConfigOffsets[i]] = lastConfirmed[i];
+      if (configFields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+      uint8_t off = configFields[i].offset;
+      uint8_t last = flashConfig[off];
+      config[off] = (last > configFields[i].max) ? configFields[i].defaultValue : last;
     }
   }
 
@@ -502,14 +472,12 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
 
   if (anyTrackedChanged)
   {
-    // restore the user's chosen values for the running firmware + mirror
-    for (size_t i = 0; i < TRACKED_FIELD_COUNT; ++i)
-    {
-      config[trackedConfigOffsets[i]] = pendingValues[i];
-    }
-    PendingDisplay p;
-    readPendingDisplay(&p);
-    mirrorPendingToConfig(config, &p);
+    // restore user values for the running firmware, then refresh the mirror
+    config[CONF_DISP_DRIVER_PREF] = p.dispDriverPref;
+    config[CONF_VGA_MODE]         = p.vgaMode;
+    config[CONF_SCART_MODE]       = p.scartMode;
+    config[CONF_CLOCK_PRESET_ID]  = p.clockPresetId;
+    refreshPendingMirror(config, PENDING_STATE_PENDING);
     pendingBannerState = PENDING_BANNER_AWAIT_PC;   // power cycle to test
   }
 

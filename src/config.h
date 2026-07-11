@@ -121,6 +121,8 @@ void applyConfig();
 #define PENDING_STATE_PENDING   0x9E
 #define PENDING_STATE_ARMED     0xA0
 
+// 16-byte flash slot: payload + reserved (must be zero, callers using
+// designated init get this for free)
 typedef struct
 {
   uint8_t state;            // PENDING_STATE_*
@@ -128,7 +130,11 @@ typedef struct
   uint8_t vgaMode;
   uint8_t scartMode;
   uint8_t clockPresetId;
+  uint8_t reserved[11];
 } PendingDisplay;
+
+_Static_assert(sizeof(PendingDisplay) == 16,
+               "PendingDisplay must match the 16-byte flash slot - adjust reserved[]");
 
 void readPendingDisplay(PendingDisplay *p);
 bool writePendingDisplay(const PendingDisplay *p);
