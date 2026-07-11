@@ -174,7 +174,7 @@ void doFlashFirmwareSector()
 }
 
 #define PROGDATA_BLOCK_SIZE   256
-#define PROGDATA_BLOCK_COUNT  256 //4080          // 1MB - 4KB
+#define PROGDATA_BLOCK_COUNT  1024          // 256KB
 #define PROGDATA_ID_SIZE      16            // 128-bit GUID
 #define PROGDATA_FLASH_OFFSET (0x100000)    // Top 1MB of flash
 #define PROGDATA_FLASH_ADDR   (uint32_t*)(XIP_BASE + PROGDATA_FLASH_OFFSET)
