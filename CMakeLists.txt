@@ -42,7 +42,7 @@ set(PICO9918_MINOR_VER 2)
 set(PICO9918_PATCH_VER 0)
 # Optional artifact suffix (e.g. "a1", "alpha1", "rc2"). When non-empty, this
 # overrides the git branch name in generated artifact filenames.
-set(PICO9918_VERSION_SUFFIX "beta-1")
+set(PICO9918_VERSION_SUFFIX "beta-2")
 
 # Common helpers must follow the version vars above and precede visrealm_*.
 include(pico9918_common.cmake)
