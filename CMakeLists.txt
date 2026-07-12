@@ -63,7 +63,7 @@ endif()
 # overrides the git branch name in generated artifact filenames. Setting it to an
 # empty string is a valid choice (use the branch name), so we guard on DEFINED.
 if(NOT DEFINED PICO9918_VERSION_SUFFIX)
-    set(PICO9918_VERSION_SUFFIX "beta-2")
+    set(PICO9918_VERSION_SUFFIX "")
 endif()
 
 # Common helpers must follow the version vars above and precede visrealm_*.
