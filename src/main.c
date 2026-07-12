@@ -13,7 +13,9 @@
 #include "vga.h"
 #include "vga-modes.h"
 
+#ifndef PICO9918_NO_CLOCKS
 #include "clocks.pio.h"
+#endif
 
 #define PALCONV 0
 
@@ -67,8 +69,10 @@ static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(4) tmsSca
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
+#ifndef PICO9918_NO_CLOCKS
 const uint tmsGromClkSm = 2;
 const uint tmsCpuClkSm = 3;
+#endif
 
 #if PALCONV
 #define PAL_PIO         pio0  // which pio are we using for vga?
@@ -95,6 +99,21 @@ int droppedFramesCount = 0;
 #define R0_DOUBLE_ROWS 0x08
 
 static const uint32_t dma32 = 2;  // memset 32bit
+
+/*
+ * drive the /INT pin to match currentInt. Default is active-low; define
+ * PICO9918_INT_ACTIVE_HIGH (via pico9918_config.cmake) to drive active-high.
+ * Compile-time only - no runtime branch in the hot path.
+ */
+static inline void setIntPin()
+{
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put(GPIO_INT, currentInt);
+#else
+  gpio_put(GPIO_INT, !currentInt);
+#endif
+}
+
 /*
  * update the value send to the read PIO
  */
@@ -143,7 +162,7 @@ void __not_in_flash_func(tmsReadIrqHandler)()
       if (readVal & STATUS_INT)  // Was Interrupt flag set?
       {
         currentInt = false;
-        gpio_put(GPIO_INT, !currentInt);
+        setIntPin();
       }
     }
     else if (readReg == 1)
@@ -174,7 +193,7 @@ void __not_in_flash_func(tmsWriteIrqHandler)()
     if (newInt != currentInt)
     {
       currentInt = newInt;
-      gpio_put(GPIO_INT, !currentInt);
+      setIntPin();
     }
   }
   else // write data
@@ -237,7 +256,7 @@ void __not_in_flash_func(gpioIrqHandler)()
   gpuFrameCount = 0;
 #endif
   resetSplash();
-  gpio_put(GPIO_INT, !currentInt);
+  setIntPin();
   enableTmsPioInterrupts();
 }
 
@@ -335,7 +354,7 @@ static void updateInterrupts(uint8_t tempStatus)
   if (shouldInt != currentInt)
   {
     currentInt = shouldInt;
-    gpio_put(GPIO_INT, !currentInt);
+    setIntPin();
   }
   enableTmsPioInterrupts();
 }
@@ -353,6 +372,7 @@ inline uint32_t bigRgb2LittleBgr(uint32_t val)
 }
 
 
+#ifndef PICO9918_NO_CLOCKS
 void updateClock(uint pioSm, float freqHz)
 {
   float clockDiv = ((float)clockPresets[clockPresetIndex].clockHz) / (freqHz * 2.0f);
@@ -401,6 +421,7 @@ static void initClockOrPullLow(uint gpio, uint pioSm, float freqHz)
     gpio_put(gpio, 0);
   }
 }
+#endif // PICO9918_NO_CLOCKS
 
 static void tmsPorch()
 {
@@ -753,7 +774,13 @@ void proc1Entry()
 {
   tmsPioInit();
 
-  gpio_put_all(GPIO_INT_MASK);	// ok, we can release /INT now
+  // ok, we can release (deassert) /INT now. active-low => drive high (mask set),
+  // active-high => drive low (mask clear).
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put_all(0);
+#else
+  gpio_put_all(GPIO_INT_MASK);
+#endif
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
@@ -783,12 +810,18 @@ int main(void)
    * but this'll do for now. */
 
 
-  // set up gpio pins
-  gpio_put_all(0); // we want to kep /INT held low for now
+  // set up gpio pins. keep /INT asserted for now: active-low => low (0),
+  // active-high => high (mask set).
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put_all(GPIO_INT_MASK);
+#else
+  gpio_put_all(0);
+#endif
   gpio_set_dir_all_bits(GPIO_INT_MASK); // /INT is an output
   gpio_set_function_masked(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_MODE1_MASK | GPIO_INT_MASK | GPIO_RESET_MASK, GPIO_FUNC_SIO);
 
-  Pico9918HardwareVersion hwVersion = currentHwVersion();
+  // detect on core 0 before core 1 is launched (proc1 also reads it)
+  (void)currentHwVersion();
 
   // shouldUseScartClock() peeks flash for a user-forced SCART preference
   detectScartDongle();
@@ -827,6 +860,9 @@ int main(void)
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
   }
 
+#ifndef PICO9918_NO_CLOCKS
+  // set up the GROMCLK and CPUCLK outputs (frequencies depend on the VDP device)
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
   uint8_t vdpDevice = tms9918->config[CONF_VDP_DEVICE];
   const VdpClockConfig *clkCfg = &vdpClockConfigs[vdpDevice];
 
@@ -835,6 +871,7 @@ int main(void)
 
   initClockOrPullLow(gromClkGpio, tmsGromClkSm, clkCfg->pin37freq);
   initClockOrPullLow(cpuClkGpio, tmsCpuClkSm, clkCfg->pin38freq);
+#endif
 
   dma_channel_config cfg = dma_channel_get_default_config(dma32);
   channel_config_set_read_increment(&cfg, false);

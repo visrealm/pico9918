@@ -43,11 +43,11 @@ static Pico9918HardwareVersion detectHardwareVersion()
 #elif PICO_RP2040
   // check if RESET pin is being driven externally (on v0.4+, it is, on v0.3 it isn't since it's CPUCL)
   gpio_pull_down(GPIO_RESET);
-  sleep_ms(1);  
+  sleep_ms(1);
   if (!gpio_get(GPIO_RESET)) // following pull... ok
-  { 
+  {
     gpio_pull_up(GPIO_RESET);
-    sleep_ms(1);  
+    sleep_ms(1);
     if (gpio_get(GPIO_RESET)) // still following pull... must be v0.3
     {
       version = HWVer_0_3;
@@ -59,7 +59,8 @@ static Pico9918HardwareVersion detectHardwareVersion()
 }
 
 /*
- * current (detected) hardware version
+ * current (detected) hardware version. detects (with a one-time GPIO_RESET
+ * side effect) on first call and caches the result.
  */
 Pico9918HardwareVersion currentHwVersion()
 {

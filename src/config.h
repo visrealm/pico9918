@@ -83,7 +83,7 @@ typedef enum
 
 #define CONFIG_BYTES 256
 
-/* get hardware version (v0.3 or v0.4/v1.0+) */
+/* get the (cached) hardware version; detects on first call. */
 Pico9918HardwareVersion currentHwVersion();
 
 /* detect SCART dongle by testing if sync pins are bridged (call before vgaInit) */

@@ -87,7 +87,7 @@ configMenuData:
 
     ' Output submenu - MENU_OFFSET_OUTPUT, MENU_COUNT_OUTPUT
     DATA BYTE CONF_DISP_DRIVER_PREF, "Driver          ", OPT_OFFSET_DRIVER,     OPT_COUNT_DRIVER,     "Output driver (requires reboot) "
-    DATA BYTE CONF_VGA_MODE,         "VGA-HDMI mode   ", OPT_OFFSET_VGA_MODE,   OPT_COUNT_VGA_MODE,   "  VGA mode  (requires reboot)   "
+    DATA BYTE CONF_VGA_MODE,         "VGA/HDMI mode   ", OPT_OFFSET_VGA_MODE,   OPT_COUNT_VGA_MODE,   "  VGA mode  (requires reboot)   "
     DATA BYTE CONF_SCART_MODE,       "SCART mode      ", OPT_OFFSET_SCART_MODE, OPT_COUNT_SCART_MODE, " SCART mode  (requires reboot)  "
     DATA BYTE CONF_MENU_CANCEL,      "<<< Main menu   ", 0,                     0,                    "        Back to main menu       "
 

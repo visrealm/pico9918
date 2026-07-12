@@ -53,21 +53,57 @@
 
  #include "tms9918.pio.h"
 
-#define GPIO_CD7 14
+// Base pin defaults below may be overridden at build time via the CMake config
+// file (pico9918_config.cmake) which passes -DPICO9918_GPIO_* defines.
+#ifndef PICO9918_GPIO_CD7
+#define PICO9918_GPIO_CD7 14
+#endif
+#define GPIO_CD7 PICO9918_GPIO_CD7
+
 #define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio.h
 #define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio.h
-#define GPIO_MODE 28
-#define GPIO_MODE1 29
-#define GPIO_INT 22
-#define GPIO_RESET 23
+
+#ifndef PICO9918_GPIO_MODE
+#define PICO9918_GPIO_MODE 28
+#endif
+#define GPIO_MODE PICO9918_GPIO_MODE
+
+#ifndef PICO9918_GPIO_MODE1
+#define PICO9918_GPIO_MODE1 29
+#endif
+#define GPIO_MODE1 PICO9918_GPIO_MODE1
+
+#ifndef PICO9918_GPIO_INT
+#define PICO9918_GPIO_INT 22
+#endif
+#define GPIO_INT PICO9918_GPIO_INT
+
+#ifndef PICO9918_GPIO_RESET
+#define PICO9918_GPIO_RESET 23
+#endif
+#define GPIO_RESET PICO9918_GPIO_RESET
 
 // default mappings (v0.4+)
-#define GPIO_GROMCL 25
-#define GPIO_CPUCL 24
+#ifndef PICO9918_GPIO_GROMCL
+#define PICO9918_GPIO_GROMCL 25
+#endif
+#define GPIO_GROMCL PICO9918_GPIO_GROMCL
+
+#ifndef PICO9918_GPIO_CPUCL
+#define PICO9918_GPIO_CPUCL 24
+#endif
+#define GPIO_CPUCL PICO9918_GPIO_CPUCL
 
 // v0.3-specific pins mappings
-#define GPIO_GROMCL_V03 29
-#define GPIO_CPUCL_V03 23
+#ifndef PICO9918_GPIO_GROMCL_V03
+#define PICO9918_GPIO_GROMCL_V03 29
+#endif
+#define GPIO_GROMCL_V03 PICO9918_GPIO_GROMCL_V03
+
+#ifndef PICO9918_GPIO_CPUCL_V03
+#define PICO9918_GPIO_CPUCL_V03 23
+#endif
+#define GPIO_CPUCL_V03 PICO9918_GPIO_CPUCL_V03
 
 // gpio masks
 #define GPIO_CD_MASK (0xff << GPIO_CD7)

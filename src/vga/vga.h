@@ -14,9 +14,18 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
-#define VGA_SYNC_PINS_START  0
+// Start pins may be overridden at build time via the CMake config file
+// (pico9918_config.cmake) which passes -DPICO9918_VGA_*_PINS_START defines.
+#ifndef PICO9918_VGA_SYNC_PINS_START
+#define PICO9918_VGA_SYNC_PINS_START 0
+#endif
+#define VGA_SYNC_PINS_START  PICO9918_VGA_SYNC_PINS_START
 #define VGA_SYNC_PINS_COUNT  2
-#define VGA_RGB_PINS_START   2
+
+#ifndef PICO9918_VGA_RGB_PINS_START
+#define PICO9918_VGA_RGB_PINS_START 2
+#endif
+#define VGA_RGB_PINS_START   PICO9918_VGA_RGB_PINS_START
 #define VGA_RGB_PINS_COUNT  12
 
 typedef struct
