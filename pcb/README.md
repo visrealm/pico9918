@@ -21,6 +21,30 @@ alt="PICO9918 v1.0" width="240px"></a></p>
 
 With the introduction of the RP2350, the PICO9918 v2.0 "PRO" was produced to take advantage of the much improved instruction set.
 
+For a detailed changelog covering all versions, see the [revision history](#revision-history) below.
+
+# Dongles
+
+From v1.2 onwards, the PICO9918 exposes its video output over a 12-pin FFC interface, allowing different output dongles to be connected.
+
+<p align="left"><a href="../img/pro-with-dongles-2.jpg"><img src="../img/pro-with-dongles-2.jpg" alt="PICO9918 PRO with dongles" width="720px"></a></p>
+
+## [VGA dongle v1.2](vga)
+
+The standard VGA output dongle. Provides a DE-15 VGA connector.
+
+## [HDMI dongle v1.1](hdmi)
+
+Digital AV dongle providing HDMI output with optional audio.
+
+<p align="left"><a href="../img/hdmi_with_audio.jpg"><img src="../img/hdmi_with_audio.jpg" alt="PICO9918 HDMI dongle" width="480px"></a></p>
+
+## [SCART dongle v1.3](scart)
+
+SCART RGBs output dongle supporting PAL and NTSC timing, with optional audio.
+
+<p align="left"><a href="../img/scart_with_audio.jpg"><img src="../img/scart_with_audio.jpg" alt="PICO9918 SCART dongle" width="480px"></a></p>
+
 # Revision history
 
 ## [PRO v2.0 (2026-03-09)](v2.0)

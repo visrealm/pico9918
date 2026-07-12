@@ -1,8 +1,12 @@
 # PICO9918
 
-A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 microcontroller.
+A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 (and now RP2350) microcontroller.
 
 <p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="400px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="406px"></a></p>
+
+The PICO9918 PRO can replace all classic VDP models (TMS9918, TMS9918A, TMS9928A, TMS9929A, TMS9118, TMS9128, TMS9129), providing a crisp VGA, HDMI or SCART RGB signal from your retrocomputer.
+
+The PICO9918 has been tested on over 30 classic models of TI-99, Coleco, MSX, NABU, Memotech, Sega and many more. See the [full list below](#supported-devices).
 
 The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
 
@@ -54,9 +58,12 @@ This is a list of devices the PICO9918 has been tested and confirmed to work on.
   * [Casio PV-7](https://www.msx.org/wiki/Casio_PV-7)
   * [Casio PV-16](https://www.msx.org/wiki/Casio_PV-16)
   * [Gradiente Expert XP-800](https://www.msx.org/wiki/Gradiente_Expert_XP-800)
+  * [JFF (by Skoti)](https://github.com/konkotgit/JFF)
   * [National CF-2700](https://www.msx.org/wiki/National_CF-2700)
+  * [Sanyo PHV-30N](https://www.msx.org/wiki/Sanyo_PHC-30N)
   * [Sharp HB-8000](https://www.msx.org/wiki/Sharp_HB-8000)
-  * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)  
+  * [Sony HB-75](https://www.msx.org/wiki/Sony_HB-75)
+  * [Spectravideo SVI-728](https://www.msx.org/wiki/Spectravideo_SVI-728)
   * [Toshiba HX-10](https://www.msx.org/wiki/Toshiba_HX-10)
   * [Toshiba HX-21](https://www.msx.org/wiki/Toshiba_HX-21)
   * [Yamaha CX5M](https://www.msx.org/wiki/Yamaha_CX5M)
@@ -106,14 +113,14 @@ The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video bel
 
 ## Purchasing options
 
-Fully assembled and tested PICO9918 PROs are available on my Tindie store:
+Fully assembled and tested PICO9918 PROs are available here:
 
-<a href="https://www.tindie.com/search/?q=PICO9918"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
-
-Also (more convenient for North America)
-
-<a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=*PICO9918*"><img width="640" src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg"></img></a>
-
+| Link | Store | Best For |
+  |------|-------|----------|
+  | <a href="https://lectronz.com/stores/visrealm" alt="I sell on Lectronz"><img src="https://lectronz-images.b-cdn.net/static/badges/i-sell-on-lectronz-large.png" width="200" /></a> | Lectronz (visrealm) | All regions. Best choice for EU |
+  | <a href="https://www.tindie.com/search/?q=PICO9918"><img src="https://static.tindie.com/badges/tindie-mediums.png" alt="I sell on Tindie" width="200" height="104"></a> | Tindie (visrealm) | All regions |
+  | <a href="https://www.arcadeshopper.com/wp/store/#!/~/search/keyword=*PICO9918*"><img src="https://www.arcadeshopper.com/wp/wp-content/uploads/2016/01/Arcadeshopper-horizontal-Web-logo-1024x147.jpg" width="200"></a> | Arcade Shopper | US |
+  
 ## Hardware
 
 There are three main variants of the hardware.
