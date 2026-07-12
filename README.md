@@ -198,6 +198,8 @@ cmake --build .
 
 Output in `build/dist/`: firmware `.uf2` file and configurator ROMs for all retro platforms.
 
+Build settings can be overridden with `-D` flags or an optional, git-ignored `pico9918_config.cmake` in the project root - copy [`pico9918_config.cmake.template`](pico9918_config.cmake.template) to `pico9918_config.cmake` and edit it to get started. See [BUILDING.md](BUILDING.md).
+
 ### Platform-Specific Setup Required
 
 Each platform requires specific toolchain installation:

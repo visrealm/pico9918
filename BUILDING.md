@@ -129,6 +129,49 @@ cmake .. -DPICO9918_ENABLE_SCART=OFF
 cmake .. -DPICO9918_DIAG=ON -DPICO9918_NO_SPLASH=ON
 ```
 
+### Local Build Config File
+
+Instead of passing `-D` flags every time, you can keep build settings in an
+optional local config file. If `pico9918_config.cmake` exists in the project
+root it is included automatically at configure time and can set or override any
+build setting; if it is absent the build behaves exactly as normal. The file is
+git-ignored, so your local tweaks never get committed.
+
+To get started, copy the committed template
+[`pico9918_config.cmake.template`](pico9918_config.cmake.template) to
+`pico9918_config.cmake`, then uncomment and edit the settings you want:
+
+```bash
+cp pico9918_config.cmake.template pico9918_config.cmake
+# edit pico9918_config.cmake (uncomment/change the settings you need)
+cmake ..
+```
+
+**The template [`pico9918_config.cmake.template`](pico9918_config.cmake.template)
+is the source of truth for the full list of overridable settings** - board,
+version/artifact naming, the build options above, clock/PLL/flash timing,
+GPIO/VGA pin assignments, and custom-hardware behaviour flags. A few examples of
+what a config file can contain:
+
+```cmake
+# a diagnostic, VGA-only build
+set(PICO9918_DIAG ON)
+set(PICO9918_ENABLE_SCART OFF)
+
+# target the RP2040 board and a custom artifact suffix
+set(PICO_BOARD pico9918)
+set(PICO9918_VERSION_SUFFIX "myfork")
+
+# custom hardware: no TMS clock outputs, active-high interrupt, moved pins
+set(PICO9918_NO_CLOCKS ON)
+set(PICO9918_INT_ACTIVE_HIGH ON)
+set(PICO9918_GPIO_INT 20)
+set(PICO9918_VGA_RGB_PINS_START 6)
+```
+
+Settings still work as normal `-D` flags too; explicit `-D` on the command line
+wins over the file.
+
 ### Firmware Targets
 - **`firmware`**: Build firmware and copy to `build/dist/` (unified CMake system only)
 - **`pico9918-vga-build-<version>`**: Direct firmware target name (available in all builds)
