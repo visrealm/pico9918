@@ -15,18 +15,21 @@ CONST PICO_MODEL_RP2350 = 2
 
 #if BANK_SIZE
 ' convert .UF2 block number to name table location for visualization
-DEF FN BLOCKPOS(#I) = XY((#I) % 30 + 1, (#I) / 30 + a_popupTop + 2)
+' two firmware blocks share one cell to keep the popup within screen limits
+DEF FN BLOCKPOS(#I) = XY(((#I) / 2) % 30 + 1, ((#I) / 2) / 30 + a_popupTop + 2)
 
 #endif
 
-CONST FWROWS = (#FIRMWARE_BLOCKS - 1) / 30 + 2
+CONST FWROWS = ((#FIRMWARE_BLOCKS + 1) / 2 - 1) / 30 + 2
 
 ' -----------------------------------------------------------------------------
 ' open the firmware menu
 ' -----------------------------------------------------------------------------
 firmwareMenu: PROCEDURE
 
-    g_menuTopRow = MENU_TITLE_ROW + 3   ' WTF? For some reason I need this line twice???? At least on TI-99
+    GOSUB pushMenuCtx
+    ' g_menuTopRow inherited from caller (= MENU_TITLE_ROW + 3 from
+    ' renderMainMenu); used here only as the anchor for status text.
 
     DRAW_TITLE("FIRMWARE UPDATE")
 
@@ -65,7 +68,9 @@ firmwareMenu: PROCEDURE
 
     IF STATUS THEN
 
-        DRAW_POPUP_W("Update firmware?", 5, 20)
+        R = g_menuTopRow + 11: GOSUB emptyRowR
+
+        DRAW_POPUP_WY("Update firmware?", 5, 20, 1)
 
         GOSUB confirmationMenuLoop
 
@@ -73,7 +78,7 @@ firmwareMenu: PROCEDURE
 
         IF confirm THEN
 
-            DRAW_POPUP_W("Upgrading firmware :        ", FWROWS, 30)
+            DRAW_POPUP_WY("Upgrading firmware :        ", FWROWS, 30, 2)
 
             WAIT
 
@@ -88,6 +93,7 @@ firmwareMenu: PROCEDURE
     END IF
 #endif
 
+    GOSUB popMenuCtx
     SET_MENU(MENU_ID_MAIN)
     END
 
@@ -202,8 +208,16 @@ firmwareWriteAndVerify: PROCEDURE
             IF FWST AND $1c THEN
                 PRINT AT BLOCKPOS(#FWBLOCK), CHR$(2)
                 STATUS = 0
+                cellOk = FALSE
             ELSE
-                PRINT AT BLOCKPOS(#FWBLOCK), CHR$(0)
+                ' two firmware blocks share one cell; only mark the cell done
+                ' once both halves wrote cleanly, so an error is never overwritten
+                IF (#FWBLOCK AND 1) = 0 THEN
+                    cellOk = TRUE
+                END IF
+                IF cellOk AND (((#FWBLOCK AND 1) = 1) OR (#FWBLOCK + 1 = #fwBlocks)) THEN
+                    PRINT AT BLOCKPOS(#FWBLOCK), CHR$(0)
+                END IF
             END IF
 
 

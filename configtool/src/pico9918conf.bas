@@ -63,6 +63,15 @@
 
 GOTO main
 
+' Bank layout:
+'   bank 0 - dispatcher, menu engine, input, firmware writer, all shared code
+'            (banksel.bas + core.bas plus everything they include except
+'            menu-palette.bas)
+'   bank 1 - menu-palette.bas
+'   bank 2+ firmware payload (UF2 blocks consumed by firmwareWriteAndVerify)
+'
+' Only bank 0 may issue BANK SELECT, so any cross-bank call must go through
+' a bank-0 trampoline (see banksel.bas).
 INCLUDE "banksel.bas"
 INCLUDE "core.bas"
 

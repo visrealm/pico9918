@@ -188,8 +188,9 @@ uint32_t gpuTime(uint32_t totalTime)
 /* reset the internal gpu time to 0 */
 void resetGpuTime()
 {
-  gpuTimeUs = 0;  
+  gpuTimeUs = 0;
 }
+
 
 /*
  * TMS9900 GPU main loop 
@@ -215,7 +216,33 @@ void gpuLoop()
     if (tms9918->config[CONF_SAVE_TO_FLASH])
     {
       tms9918->config[CONF_SAVE_TO_FLASH] = 0;
+      saveConfigSplitPending(tms9918->config);
+    }
+
+    // factory reset: write everything to main, skip the pending split
+    if (tms9918->config[CONF_SAVE_FORCED])
+    {
+      tms9918->config[CONF_SAVE_FORCED] = 0;
       writeConfig(tms9918->config);
+      erasePendingDisplay();
+      refreshPendingMirror(tms9918->config, PENDING_STATE_CONFIRMED);
+    }
+
+    // user accepted pending change: promote to main
+    if (tms9918->config[CONF_PENDING_CONFIRM])
+    {
+      tms9918->config[CONF_PENDING_CONFIRM] = 0;
+      writeConfig(tms9918->config);
+      erasePendingDisplay();
+      refreshPendingMirror(tms9918->config, PENDING_STATE_CONFIRMED);
+    }
+
+    // user cancelled: keep current run going, revert on next boot
+    if (tms9918->config[CONF_PENDING_CANCEL])
+    {
+      tms9918->config[CONF_PENDING_CANCEL] = 0;
+      erasePendingDisplay();
+      tms9918->config[CONF_PENDING_STATE] = PENDING_STATE_CONFIRMED;
     }
   }
 }

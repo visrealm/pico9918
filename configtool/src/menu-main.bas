@@ -13,14 +13,18 @@
 ' menu helpers
 DEF FN RENDER_MENU_ROW(R) = a_menuIndexToRender = R : WAIT : GOSUB renderMenuRow
 
+' Menu "context" globals: MENU_INDEX_OFFSET, MENU_INDEX_COUNT, MENU_START_X,
+' g_menuTopRow are all read by renderMenu / renderMenuRow / menuLoop. Every
+' submenu must set them on entry and restore them on exit, otherwise its
+' values leak into whatever menu runs next. SET_MENU_CTX sets all four;
+' pushMenuCtx / popMenuCtx provide a single-deep save/restore.
+DEF FN SET_MENU_CTX(OFFSET, COUNT, START_X, TOP_ROW) = MENU_INDEX_OFFSET = OFFSET : MENU_INDEX_COUNT = COUNT : MENU_START_X = START_X : g_menuTopRow = TOP_ROW
+
 ' -----------------------------------------------------------------------------
 ' render all menu rows
 ' -----------------------------------------------------------------------------
 renderMainMenu: PROCEDURE
-    MENU_INDEX_OFFSET = 0
-    MENU_INDEX_COUNT = 9
-    MENU_START_X = 1
-    g_menuTopRow = MENU_TITLE_ROW + 3
+    SET_MENU_CTX(MENU_OFFSET_MAIN, MENU_COUNT_MAIN, 1, MENU_TITLE_ROW + 3)
     GOSUB renderMenu
     R = g_menuTopRow + MENU_INDEX_COUNT : GOSUB emptyRowR
     END
@@ -29,6 +33,27 @@ renderMenu: PROCEDURE
     FOR a_menuIndexToRender = MENU_INDEX_OFFSET TO MENU_INDEX_OFFSET + MENU_INDEX_COUNT - 1
         GOSUB renderMenuRow
     NEXT a_menuIndexToRender
+    END
+
+' -----------------------------------------------------------------------------
+' single-deep save/restore for the menu context globals. submenus that need
+' to nest (currently: paletteMenu and confirmationMenuLoop) must not call
+' push twice without an intervening pop.
+' -----------------------------------------------------------------------------
+pushMenuCtx: PROCEDURE
+    g_savedMenuOffset  = MENU_INDEX_OFFSET
+    g_savedMenuCount   = MENU_INDEX_COUNT
+    g_savedMenuStartX  = MENU_START_X
+    g_savedMenuTopRow  = g_menuTopRow
+    g_savedMenuIndex   = g_currentMenuIndex
+    END
+
+popMenuCtx: PROCEDURE
+    MENU_INDEX_OFFSET   = g_savedMenuOffset
+    MENU_INDEX_COUNT    = g_savedMenuCount
+    MENU_START_X        = g_savedMenuStartX
+    g_menuTopRow        = g_savedMenuTopRow
+    g_currentMenuIndex  = g_savedMenuIndex
     END
 
 ' -----------------------------------------------------------------------------
@@ -45,8 +70,8 @@ renderMenuRow: PROCEDURE
     ' pre-compute row offset. we'll need this a few times
     #ROWOFFSET = XY(0, g_menuTopRow + MENU_INDEX_POSITION)
 
-    ' output menu number (index + 1)
-    PRINT AT #ROWOFFSET + MENU_START_X, " ", MENU_INDEX_POSITION + 1, ". "
+    ' (position + 1) % 10 keeps the 10th item printable as "0." in 2 chars
+    PRINT AT #ROWOFFSET + MENU_START_X, " ", (MENU_INDEX_POSITION + 1) % 10, ". "
 
     ' output menu label
     #addr = #VDP_NAME_TAB + #ROWOFFSET + MENU_START_X
@@ -75,6 +100,7 @@ renderMenuRow: PROCEDURE
     END IF
     configDirty = configDirty OR ((optId = CONF_MENU_PALETTE) AND g_paletteDirty)
     configDirty = configDirty OR ((optId = CONF_MENU_DIAG) AND g_diagDirty)
+    configDirty = configDirty OR ((optId = CONF_MENU_OUTPUT) AND g_outputDirty)
     
     ' if the config option is "dirty" output an asterix next to it
     IF configDirty THEN
@@ -153,11 +179,20 @@ menuLoop: PROCEDURE
             END IF
         WEND
 
-    ' number button pressed?
+    ' '1'..'9' select positions 0..8; '0' selects position 9
     ELSEIF g_key > 0 AND g_key <= MENU_INDEX_COUNT THEN
         I = MENU_DATA(MIN_MENU_INDEX + g_key - 1, CONF_INDEX)
         IF I <> 255 THEN
             g_currentMenuIndex = MIN_MENU_INDEX + g_key - 1
+
+            IF I > 200 THEN
+                valueChanged = TRUE
+            END IF
+        END IF
+    ELSEIF g_key = 0 AND MENU_INDEX_COUNT >= 10 THEN
+        I = MENU_DATA(MIN_MENU_INDEX + 9, CONF_INDEX)
+        IF I <> 255 THEN
+            g_currentMenuIndex = MIN_MENU_INDEX + 9
 
             IF I > 200 THEN
                 valueChanged = TRUE
@@ -252,6 +287,8 @@ mainMenu: PROCEDURE
                     menu = MENU_ID_DIAG
             	CASE CONF_MENU_PALETTE
                     menu = MENU_ID_PALETTE
+            	CASE CONF_MENU_OUTPUT
+                    menu = MENU_ID_OUTPUT
             	CASE CONF_MENU_RESET
                     GOSUB resetOptions
             	CASE CONF_MENU_SAVE
@@ -274,10 +311,8 @@ mainMenu: PROCEDURE
 
 confirmationMenuLoop: PROCEDURE
 
-    g_menuTopRow = MENU_TITLE_ROW + 9
-    MENU_INDEX_OFFSET = 10
-    MENU_INDEX_COUNT = 2
-    MENU_START_X = 6
+    GOSUB pushMenuCtx
+    SET_MENU_CTX(MENU_OFFSET_POPUP, MENU_COUNT_POPUP, 6, a_popupTop + 3)
     g_currentMenuIndex = MENU_INDEX_OFFSET
 
     GOSUB renderMenu
@@ -303,9 +338,10 @@ confirmationMenuLoop: PROCEDURE
 
             EXIT WHILE
         END IF
-        
+
     WEND
 
+    GOSUB popMenuCtx
     END
 
 successMessage: PROCEDURE
@@ -364,89 +400,4 @@ saveOptionsMenu: PROCEDURE
     END
 
 
-' -----------------------------------------------------------------------------
-' go back to main menu
-' -----------------------------------------------------------------------------
-backOptionsMenu: PROCEDURE
-
-    oldIndex = g_currentMenuIndex
-
-    g_menuTopRow = MENU_TITLE_ROW + 9
-    MENU_INDEX_OFFSET = 12
-    MENU_INDEX_COUNT = 1
-    MENU_START_X = 6
-    g_currentMenuIndex = MENU_INDEX_OFFSET
-
-    GOSUB renderMenu
-
-    GOSUB delay
-
-    ' main menu loop
-    WHILE 1
-        WAIT
-        IF NAV(NAV_CANCEL OR NAV_OK) THEN EXIT WHILE
-    WEND
-
-    g_currentMenuIndex = oldIndex
-
-    END
-
-
 INCLUDE "conf-scanline-sprites.bas"
-
-' -----------------------------------------------------------------------------
-' Pico9918Options index, name[16], values index, num values, help[32]
-' -----------------------------------------------------------------------------
-configMenuData:
-    DATA BYTE CONF_CRT_SCANLINES,   "CRT scanlines   ", 0, 2, "    Faux CRT scanline effect    "
-    DATA BYTE CONF_SCANLINE_SPRITES,"Scanline sprites", 2, 4, "                                "
-    DATA BYTE CONF_CLOCK_PRESET_ID, "Clock frequency ", 6, 3, "  MCU clock  (requires reboot)  "
-    DATA BYTE CONF_MENU_DIAG,       "Diagnostics  >>>", 0, 0, "   Manage diagnostics options   "
-    DATA BYTE CONF_MENU_PALETTE,    "Palette      >>>", 0, 0, "     Change default palette     "
-    DATA BYTE CONF_MENU_INFO,       "Device info. >>>", 0, 0, "    View device information     "
-#if BANK_SIZE
-    DATA BYTE CONF_MENU_FIRMWARE,   "Firmware     >>>", 0, 0, "        Update firmware         "
-#endif
-    DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
-    DATA BYTE CONF_MENU_SAVE,       "Save settings   ", 0, 0, " Save configuration to PICO9918 "
-    DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
-#if NOT BANK_SIZE
-    DATA BYTE CONF_MENU_EMPTY,      "                ", 0, 0, "                                "
-#endif
-
-    DATA BYTE CONF_MENU_OK,         "Confirm         ", 0, 0, " Save configuration to PICO9918 "
-    DATA BYTE CONF_MENU_CANCEL,     "Cancel          ", 0, 0, "        Back to main menu       "
-
-    DATA BYTE CONF_MENU_RESET,      "Reset defaults  ", 0, 0, " Reset to default configuration "
-    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
-
-    DATA BYTE CONF_MENU_FIRMWARE,   "Update firmware ", 0, 0, "   Write firmware to PICO9918   "
-    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
-
-    DATA BYTE CONF_DIAG_REGISTERS,  "Registers       ", 0, 2, "      Show VDP registers        "
-    DATA BYTE CONF_DIAG_PERFORMANCE,"Performance     ", 0, 2, "     Show performance data      "
-    DATA BYTE CONF_DIAG_ADDRESS,    "Addresses       ", 0, 2, "      Show VRAM addresses       "
-    DATA BYTE CONF_DIAG_PALETTE,    "Palette         ", 0, 2, "        Show palettes           "
-    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
-
-    DATA BYTE CONF_MENU_RESET,      "Preset          ", 9, 5, "    Select preset palette       "
-    DATA BYTE CONF_MENU_CANCEL,     "<<< Main menu   ", 0, 0, "                                "
-
-' -----------------------------------------------------------------------------
-' Pico9918Option values. Indexed from options()
-' -----------------------------------------------------------------------------
-configMenuOptionValueData: 
-    DATA BYTE "Off   "
-    DATA BYTE "On    "
-    DATA BYTE "4     "
-    DATA BYTE "8     "
-    DATA BYTE "16    "
-    DATA BYTE "32    "
-    DATA BYTE "252MHz"
-    DATA BYTE "302MHz"
-    DATA BYTE "352MHz"
-    DATA BYTE "9918A "
-    DATA BYTE "V9938 "
-    DATA BYTE "GREY  "
-    DATA BYTE "SEPIA "
-    DATA BYTE "EGA   "

@@ -10,7 +10,7 @@
  */
 
 #include "diag.h"
-#include "display.h"
+#include "vga.h"
 #include "config.h"
 #include "bmp_font.h"  
 #include "gpu.h"
@@ -22,8 +22,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define CHAR_WIDTH 6
-#define CHAR_HEIGHT 6
 
 
 #define TIMING_DIAG PICO9918_DIAG
@@ -57,8 +55,15 @@ IntString gpuPctStr = {0};
 IntString clockMhzStr = {0};
 IntString modeStr = {0};
 IntString fpsStr = {0};
+#if PICO9918_GPU_FRAME_COUNTER
+IntString gpuFrameStr = {0};
+#endif
 IntString hwVerStr = {0};
 IntString fwVerStr = {0};
+IntString outputStr = {0};
+
+static const char *outputValues[] = {"480P ", "480I ", "576I "};
+static const char *outputUnits[]  = {"@60", "@60", "@50"};
 
 IntString nameTabStr = {0};
 IntString colorTabStr = {0};
@@ -155,6 +160,9 @@ void initDiagnostics()
   clear(&renderTimeStr);
   clear(&frameTimeStr);
   clear(&gpuPctStr);
+#if PICO9918_GPU_FRAME_COUNTER
+  clear(&gpuFrameStr);
+#endif
   clear(&renderTimePerScanlineStr);
   clear(&totalTimePerScanlineStr);
   clear(&temperatureStr);
@@ -169,6 +177,11 @@ void initDiagnostics()
   clear(&pattTabStr);
   clear(&sprAttTabStr);
   clear(&sprPattTabStr);
+  clear(&outputStr);
+
+  uint8_t driver = tms9918->config[CONF_DISP_DRIVER];
+  if (driver > 2) driver = 0;
+  strcpy(outputStr.digits, outputValues[driver]);
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 #if PICO_RP2350
@@ -202,6 +215,9 @@ void diagSetClockHz(float clockHz)
 }
 
 extern int droppedFramesCount;
+#if PICO9918_GPU_FRAME_COUNTER
+extern uint32_t gpuFrameCount;
+#endif
 static uint32_t cachedFrameCount = 0;
 
 /* update diagnostics values */
@@ -227,12 +243,16 @@ void updateDiagnostics(uint32_t frameCount)
       flt2Str(gpuPct, 4, &gpuPctStr);
       resetGpuTime();
 
+#if PICO9918_GPU_FRAME_COUNTER
+      uint2Str(gpuFrameCount, 1, &gpuFrameStr);
+#endif
+
       lastUpdateTime = currentTime;
     }
 
     if ((++frameCount & (framesPerUpdate - 1)) == 0)
     {
-      flt2Str((16.0f - droppedFramesCount) * 3.75f, 2, &fpsStr);
+      flt2Str((16.0f - droppedFramesCount) * (vgaCurrentParams()->params.frameRateHz / 16.0f), 2, &fpsStr);
     }
   }
 
@@ -367,6 +387,13 @@ static void diagGpuTime(uint16_t row, uint16_t* pixels)
   renderLeft("GPU   : ", &gpuPctStr, "%", row, pixels);
 }
 
+#if PICO9918_GPU_FRAME_COUNTER
+static void diagGpuFrames(uint16_t row, uint16_t* pixels)
+{
+  renderLeft("GPU FR: ", &gpuFrameStr, "", row, pixels);
+}
+#endif
+
 static void diagFPS(uint16_t row, uint16_t* pixels)
 {
   renderLeft("FPS   : ", &fpsStr, "FPS", row, pixels);
@@ -375,6 +402,13 @@ static void diagFPS(uint16_t row, uint16_t* pixels)
 static void diagTemp(uint16_t row, uint16_t* pixels)
 {
   renderLeft("TEMP  : ", &temperatureStr, "^C", row, pixels);
+}
+
+static void diagOutput(uint16_t row, uint16_t* pixels)
+{
+  uint8_t driver = tms9918->config[CONF_DISP_DRIVER];
+  if (driver > 2) driver = 0;
+  renderLeft("OUTPUT: ", &outputStr, outputUnits[driver], row, pixels);
 }
 
 static void diagClock(uint16_t row, uint16_t* pixels)
@@ -493,9 +527,13 @@ DiagPtr performanceDiags[] = {
   &diagHwVer,
   &diagFwVer,
   &diagClock,
+  &diagOutput,
   &diagRenderTime,
   &diagFPS,
   &diagGpuTime,
+#if PICO9918_GPU_FRAME_COUNTER
+  &diagGpuFrames,
+#endif
   &diagTemp};
 
 DiagPtr addressDiags[] = {
@@ -606,7 +644,7 @@ static void renderPalette(int y, uint16_t *pixels)
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int row = to_remainder_u32(dmResult);
 
-  uint8_t palette = (y - 216) / 6;
+  uint8_t palette = (y - (vgaCurrentParams()->params.vVirtualPixels - 24)) / 6;
   if (palette < 4)
   {
     char buf[] = "PALETTE 0:"; buf[8] = '0' + palette;
@@ -637,7 +675,7 @@ void renderDiagnostics(uint16_t y, uint16_t* pixels)
   y -= 1; // vertical border
 
   // palette
-  if (tms9918->config[CONF_DIAG_PALETTE] && (y > 213)) renderPalette(y + 2, pixels);
+  if (tms9918->config[CONF_DIAG_PALETTE] && (y > ((int)vgaCurrentParams()->params.vVirtualPixels - 27))) renderPalette(y + 2, pixels);
 
   divmod_result_t dmResult = divmod_u32u32(y, 6);
   int diagRow = to_quotient_u32(dmResult);

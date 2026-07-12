@@ -16,7 +16,7 @@ else()
     set(USERHOME $ENV{HOME})
 endif()
 set(sdkVersion 2.1.1)
-set(toolchainVersion 14_2_Rel1)
+set(toolchainVersion 15_2_Rel1)
 set(picotoolVersion 2.1.1)
 set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
 if (EXISTS ${picoVscode})
@@ -24,11 +24,23 @@ if (EXISTS ${picoVscode})
 endif()
 # ====================================================================================
 
+# Optional, git-ignored local build config. If present, it can set or override
+# any CMake variable/option used below (e.g. PICO_BOARD, PICO9918_* options).
+# Absent by default - the build works unchanged without it. See
+# pico9918_config.cmake.template for the available overrides.
+if (EXISTS ${CMAKE_CURRENT_LIST_DIR}/pico9918_config.cmake)
+    message(STATUS "Using local build config: pico9918_config.cmake")
+    include(${CMAKE_CURRENT_LIST_DIR}/pico9918_config.cmake)
+endif()
+
 set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/src/boards )
-set(PICO_BOARD pico9918pro CACHE STRING "Board type")
+# Default board, applied only if not already set (e.g. by pico9918_config.cmake).
+if(NOT DEFINED PICO_BOARD)
+    set(PICO_BOARD pico9918pro CACHE STRING "Board type")
+endif()
 #set(PICO_BOARD pimoroni_pga2350 CACHE STRING "Board type")
 
-option(PICO9918_BUILD_COMBINED "Build combined UF2 for both pico9918 (RP2040) and pico9918pro (RP2350)" OFF)
+option(PICO9918_BUILD_COMBINED "Build combined PICO9918 + PICO9918 PRO UF2" OFF)
 
 # Check if building configurator only (skip Pico SDK setup)
 if(NOT CONFIGURATOR_ONLY AND NOT PICO9918_BUILD_COMBINED)
@@ -36,7 +48,26 @@ if(NOT CONFIGURATOR_ONLY AND NOT PICO9918_BUILD_COMBINED)
     include(pico_sdk_import.cmake)
 endif()
 
-# pull in helpers for my custom tools
+# PICO9918 Version Information
+# Each default is applied only if not already set (e.g. by pico9918_config.cmake).
+if(NOT DEFINED PICO9918_MAJOR_VER)
+    set(PICO9918_MAJOR_VER 1)
+endif()
+if(NOT DEFINED PICO9918_MINOR_VER)
+    set(PICO9918_MINOR_VER 2)
+endif()
+if(NOT DEFINED PICO9918_PATCH_VER)
+    set(PICO9918_PATCH_VER 0)
+endif()
+# Optional artifact suffix (e.g. "a1", "alpha1", "rc2"). When non-empty, this
+# overrides the git branch name in generated artifact filenames. Setting it to an
+# empty string is a valid choice (use the branch name), so we guard on DEFINED.
+if(NOT DEFINED PICO9918_VERSION_SUFFIX)
+    set(PICO9918_VERSION_SUFFIX "")
+endif()
+
+# Common helpers must follow the version vars above and precede visrealm_*.
+include(pico9918_common.cmake)
 include(visrealm_tools.cmake)
 include(visrealm_cvbasic.cmake)
 
@@ -46,96 +77,125 @@ else()
     project(pico9918 C CXX ASM)
 endif()
 
-# PICO9918 Version Information
-set(PICO9918_MAJOR_VER 1)
-set(PICO9918_MINOR_VER 1)
-set(PICO9918_PATCH_VER 1)
-
-set(PICO9918_VERSION "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
-string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
-
 # PICO9918 Build Options
-option(PICO9918_SCART_RGBS "Enable SCART RGBs output (default: VGA)" OFF)
-option(PICO9918_SCART_PAL "Use PAL 576i timing (default: NTSC 480i)" OFF)
+option(PICO9918_ENABLE_SCART "Enable SCART support" ON)
 option(PICO9918_NO_SPLASH "Disable splash screen" OFF)
 option(PICO9918_DIAG "Enable diagnostic mode" OFF)
+option(PICO9918_GPU_FRAME_COUNTER "Enable GPU frame counter" OFF)
+
+# Custom-hardware behavioural flags (see pico9918_config.cmake). Each emits a
+# define only when enabled, so the C code guards with #ifdef.
+option(PICO9918_NO_CLOCKS "Disable GROMCLK/CPUCLK clock outputs" OFF)
+option(PICO9918_INT_ACTIVE_HIGH "Drive /INT active-high instead of active-low" OFF)
+if(PICO9918_NO_CLOCKS)
+    add_definitions(-DPICO9918_NO_CLOCKS)
+endif()
+if(PICO9918_INT_ACTIVE_HIGH)
+    add_definitions(-DPICO9918_INT_ACTIVE_HIGH)
+endif()
 
 add_definitions(-DPICO_BUILD=1)
 add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
 add_definitions(-DVR_EMU_TMS9918_MODE=1)
 
 
-add_definitions(-DSYS_CLK_HZ=252000000)
-add_definitions(-DPLL_SYS_VCO_FREQ_HZ=1512000000)
-add_definitions(-DPLL_SYS_POSTDIV1=6)
-add_definitions(-DPLL_SYS_POSTDIV2=1)
+# Boot clock is VGA 252 MHz. When SCART is detected at runtime, we re-clock to
+# 270 MHz (a multiple of 13.5 MHz) for exact integer pioClocksPerPixel.
+# Each default is applied only if not already set (e.g. by pico9918_config.cmake).
+# These are timing-critical and interdependent - change them together.
+if(NOT DEFINED PICO9918_SYS_CLK_HZ)
+    set(PICO9918_SYS_CLK_HZ 252000000)
+endif()
+if(NOT DEFINED PICO9918_PLL_SYS_VCO_FREQ_HZ)
+    set(PICO9918_PLL_SYS_VCO_FREQ_HZ 1512000000)
+endif()
+if(NOT DEFINED PICO9918_PLL_SYS_POSTDIV1)
+    set(PICO9918_PLL_SYS_POSTDIV1 6)
+endif()
+if(NOT DEFINED PICO9918_PLL_SYS_POSTDIV2)
+    set(PICO9918_PLL_SYS_POSTDIV2 1)
+endif()
+add_definitions(-DSYS_CLK_HZ=${PICO9918_SYS_CLK_HZ})
+add_definitions(-DPLL_SYS_VCO_FREQ_HZ=${PICO9918_PLL_SYS_VCO_FREQ_HZ})
+add_definitions(-DPLL_SYS_POSTDIV1=${PICO9918_PLL_SYS_POSTDIV1})
+add_definitions(-DPLL_SYS_POSTDIV2=${PICO9918_PLL_SYS_POSTDIV2})
 
 # SDK Flash write routines exit XIP mode and use boot2 to reenter it, so
 # boot2 needs to be properly configured for whatever speed we end up at.
-add_definitions(-DPICO_FLASH_SPI_CLKDIV=4)      # This could be 2, but then we can't write to firmware at higher clocks
-add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=8)
+# PICO_FLASH_SPI_CLKDIV could be 2, but then we can't write to firmware at higher clocks.
+if(NOT DEFINED PICO9918_FLASH_SPI_CLKDIV)
+    set(PICO9918_FLASH_SPI_CLKDIV 4)
+endif()
+if(NOT DEFINED PICO9918_XOSC_STARTUP_DELAY_MULTIPLIER)
+    set(PICO9918_XOSC_STARTUP_DELAY_MULTIPLIER 8)
+endif()
+add_definitions(-DPICO_FLASH_SPI_CLKDIV=${PICO9918_FLASH_SPI_CLKDIV})
+add_definitions(-DPICO_XOSC_STARTUP_DELAY_MULTIPLIER=${PICO9918_XOSC_STARTUP_DELAY_MULTIPLIER})
 
 
-# set up variables for the build process
-
-execute_process(
-    COMMAND git symbolic-ref --short HEAD
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE PICO9918_GIT_BRANCH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
+# GPIO / VGA pin assignments. Each is a base pin used by the corresponding
+# header default (src/gpio.h, src/vga/vga.h) via #ifndef, so setting one here
+# (e.g. in pico9918_config.cmake) overrides the hardware default. Each entry is
+# "PICO9918_<NAME> <default>"; the resulting define is -DPICO9918_<NAME>=<value>.
+set(PICO9918_PIN_DEFAULTS
+    "GPIO_CD7 14"          # CPU data bus base (CD7..CD0 = base..base+7)
+    "GPIO_MODE 28"         # mode select
+    "GPIO_MODE1 29"        # mode select 1
+    "GPIO_INT 22"          # /INT output
+    "GPIO_RESET 23"        # soft reset input (v0.4+)
+    "GPIO_GROMCL 25"       # GROM clock (v0.4+)
+    "GPIO_CPUCL 24"        # CPU clock (v0.4+)
+    "GPIO_GROMCL_V03 29"   # GROM clock (v0.3 hardware)
+    "GPIO_CPUCL_V03 23"    # CPU clock (v0.3 hardware)
+    "VGA_SYNC_PINS_START 0" # first VGA sync pin (h, v = base, base+1)
+    "VGA_RGB_PINS_START 2"  # first VGA rgb pin (12 pins from base)
 )
+foreach(_entry ${PICO9918_PIN_DEFAULTS})
+    separate_arguments(_parts UNIX_COMMAND "${_entry}")
+    list(GET _parts 0 _name)
+    list(GET _parts 1 _default)
+    if(NOT DEFINED PICO9918_${_name})
+        set(PICO9918_${_name} ${_default})
+    endif()
+    add_definitions(-DPICO9918_${_name}=${PICO9918_${_name}})
+endforeach()
 
-if (PICO9918_SCART_RGBS)
-  if (PICO9918_SCART_PAL)
-    set(PICO9918_OUTPUT_STR "rgbs-pal576i")
+
+# Output-mode suffix: "" for VGA+SCART, "-vgaonly" otherwise.
+if(NOT CONFIGURATOR_ONLY)
+  if(PICO9918_ENABLE_SCART)
+    set(PICO9918_OUTPUT_STR "")
   else()
-    set(PICO9918_OUTPUT_STR "rgbs-ntsc480i")
+    set(PICO9918_OUTPUT_STR "-vgaonly")
   endif()
-  set(PICO9918_OUTPUT_PREFIX "-${PICO9918_OUTPUT_STR}")
-else()
-  set(PICO9918_OUTPUT_STR "vga")
-  set(PICO9918_OUTPUT_PREFIX "")
 endif()
 
-set(PICO9918_VERSION  "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
-string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
-
-if (${PICO_BOARD} STREQUAL "pico9918pro")
-  set(PICO_BOARD_STR pro)
-elseif (NOT ${PICO_BOARD} STREQUAL "pico9918")
-  set(PICO_BOARD_STR -${PICO_BOARD})
-endif()
-
-# Include branch name in binary suffix (except for main branch)
-set(PICO9918_BRANCH_STR "")
-if (NOT PICO9918_GIT_BRANCH STREQUAL "main" AND NOT PICO9918_GIT_BRANCH STREQUAL "")
-  string(REPLACE "/" "-" PICO9918_GIT_BRANCH_SAFE "${PICO9918_GIT_BRANCH}")
-  set(PICO9918_BRANCH_STR "-${PICO9918_GIT_BRANCH_SAFE}")
-endif()
-
-set(PICO9918_BINARY_SUFFIX ${PICO_BOARD_STR}-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR})
-
-if (PICO9918_DIAG)
-  set(PICO9918_BINARY_SUFFIX ${PICO9918_BINARY_SUFFIX}-diag)
-endif()
-
+pico9918_compute_binary_suffix("${PICO_BOARD}" "${PICO9918_OUTPUT_STR}" ${PICO9918_DIAG} PICO9918_BINARY_SUFFIX)
 set(FIRMWARE_FILE pico9918${PICO9918_BINARY_SUFFIX})
 
 
 
 if(PICO9918_BUILD_COMBINED)
     include(ExternalProject)
-    find_package(Python3 REQUIRED)
 
     set(COMMON_CMAKE_ARGS
         -DPICO_BOARD_HEADER_DIRS=${CMAKE_SOURCE_DIR}/src/boards
-        -DPICO9918_SCART_RGBS=${PICO9918_SCART_RGBS}
-        -DPICO9918_SCART_PAL=${PICO9918_SCART_PAL}
+        -DPICO9918_ENABLE_SCART=${PICO9918_ENABLE_SCART}
         -DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH}
         -DPICO9918_DIAG=${PICO9918_DIAG}
+        -DPICO9918_GPU_FRAME_COUNTER=${PICO9918_GPU_FRAME_COUNTER}
+        -DPICO9918_NO_CLOCKS=${PICO9918_NO_CLOCKS}
+        -DPICO9918_INT_ACTIVE_HIGH=${PICO9918_INT_ACTIVE_HIGH}
+        -DPICO9918_VERSION_SUFFIX=${PICO9918_VERSION_SUFFIX}
         -DPICO_SDK_FETCH_FROM_GIT=${PICO_SDK_FETCH_FROM_GIT}
         -DPICO_SDK_FETCH_FROM_GIT_TAG=${PICO_SDK_FETCH_FROM_GIT_TAG}
     )
+    if(PICO_SDK_PATH)
+        list(APPEND COMMON_CMAKE_ARGS -DPICO_SDK_PATH=${PICO_SDK_PATH})
+    endif()
+    if(PICO_TOOLCHAIN_PATH)
+        list(APPEND COMMON_CMAKE_ARGS -DPICO_TOOLCHAIN_PATH=${PICO_TOOLCHAIN_PATH})
+    endif()
     if(WIN32)
         list(APPEND COMMON_CMAKE_ARGS
             -DCMAKE_C_COMPILER_WORKS=1
@@ -161,24 +221,19 @@ if(PICO9918_BUILD_COMBINED)
         BUILD_ALWAYS TRUE
     )
 
-    # Compute expected firmware filenames (mirrors logic in src/CMakeLists.txt)
-    set(RP2040_SUFFIX "-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
-    set(RP2350_SUFFIX "pro-${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}")
-    if(PICO9918_DIAG)
-        set(RP2040_SUFFIX "${RP2040_SUFFIX}-diag")
-        set(RP2350_SUFFIX "${RP2350_SUFFIX}-diag")
-    endif()
+    pico9918_compute_binary_suffix("pico9918"    "${PICO9918_OUTPUT_STR}" ${PICO9918_DIAG} RP2040_SUFFIX)
+    pico9918_compute_binary_suffix("pico9918pro" "${PICO9918_OUTPUT_STR}" ${PICO9918_DIAG} RP2350_SUFFIX)
 
-    set(UF2_RP2040  ${CMAKE_BINARY_DIR}/pico9918/dist/pico9918${RP2040_SUFFIX}.uf2)
-    set(UF2_RP2350  ${CMAKE_BINARY_DIR}/pico9918pro/dist/pico9918${RP2350_SUFFIX}.uf2)
-    set(UF2_COMBINED ${CMAKE_BINARY_DIR}/dist/pico9918${PICO9918_OUTPUT_PREFIX}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}.uf2)
+    set(UF2_RP2040   ${CMAKE_BINARY_DIR}/pico9918/dist/pico9918${RP2040_SUFFIX}.uf2)
+    set(UF2_RP2350   ${CMAKE_BINARY_DIR}/pico9918pro/dist/pico9918${RP2350_SUFFIX}.uf2)
+    set(UF2_COMBINED ${CMAKE_BINARY_DIR}/dist/pico9918${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}.uf2)
 
     add_custom_target(combined ALL
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/dist
-        COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/concat_uf2.py
+        COMMAND ${PYTHON} ${CMAKE_SOURCE_DIR}/tools/concat_uf2.py
                 ${UF2_RP2040} ${UF2_RP2350} ${UF2_COMBINED}
         DEPENDS build_pico9918 build_pico9918pro
-        COMMENT "Creating combined UF2: pico9918${PICO9918_OUTPUT_PREFIX}-v${PICO9918_VERSION_STR}.uf2"
+        COMMENT "Creating combined UF2: pico9918${PICO9918_OUTPUT_STR}-v${PICO9918_VERSION_STR}.uf2"
     )
 
     # Build configurator ROMs using the combined UF2
@@ -194,8 +249,8 @@ if(PICO9918_BUILD_COMBINED)
             -DPICO9918_MINOR_VER=${PICO9918_MINOR_VER}
             -DPICO9918_PATCH_VER=${PICO9918_PATCH_VER}
             -DPICO9918_OUTPUT_STR=${PICO9918_OUTPUT_STR}
-            -DPICO9918_OUTPUT_PREFIX=${PICO9918_OUTPUT_PREFIX}
             -DPICO9918_GIT_BRANCH=${PICO9918_GIT_BRANCH}
+            -DPICO9918_VERSION_SUFFIX=${PICO9918_VERSION_SUFFIX}
         BUILD_COMMAND ${CMAKE_COMMAND} --build . --target configurator_all
         INSTALL_COMMAND ""
         BUILD_ALWAYS TRUE

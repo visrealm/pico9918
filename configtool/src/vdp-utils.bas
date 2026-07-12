@@ -38,6 +38,38 @@ DEF FN VDP_CONFIG(I) = VDP_REG(58) = I : VDP_REG(59) ' = xxx
 DEF FN VDP_STATUS_REG = VDP_REG(15)
 DEF FN VDP_STATUS_REG0 = VDP_STATUS_REG = 0
 
+' -----------------------------------------------------------------------------
+' Palette port (VDP register 47).
+'
+' The configurator runs with TWO palette pages active at once:
+'
+'   Page 0 (PAL_TARGET) - the user's saved configuration. This is what the
+'                         host machine sees through the VDP. Edits to the
+'                         configurable colors land here. Entry 0 is the
+'                         hardware background colour and must not be
+'                         clobbered by preset writes.
+'   Page 1 (PAL_UI)     - the configurator's chrome palette, populated from
+'                         defPal (TMS9918A defaults). The UI tile patterns
+'                         are drawn against this page, so entries 0..15 of
+'                         this page must not change once setupTiles has run,
+'                         except for entry 1 (PAL_UI_PREVIEW), which is
+'                         repurposed as the "currently edited color" preview
+'                         shown next to the RGB sliders.
+'
+' Register 47 layout:
+'   bit 7 = enable, bit 6 = autoincrement, bit 4 = page select,
+'   bits 3..0 = entry index. So $c0 + 16*page + entry opens the port,
+'   and $40 closes it (autoincrement only, write disabled).
+' -----------------------------------------------------------------------------
+CONST PAL_PORT_OPEN     = $c0
+CONST PAL_PORT_CLOSE    = $40
+CONST PAL_PAGE_TARGET   = 0
+CONST PAL_PAGE_UI       = 1
+CONST PAL_UI_PREVIEW    = 1     ' page-1 entry used as live edit preview
+
+DEF FN PAL_PORT(PAGE, ENTRY) = VDP_REG(47) = PAL_PORT_OPEN + (PAGE) * 16 + (ENTRY)
+DEF FN PAL_PORT_END         = VDP_REG(47) = PAL_PORT_CLOSE
+
 ' VDP helpers
 DEF FN VDP_DISABLE_INT = VDP_REG(1) = $C2
 DEF FN VDP_ENABLE_INT = VDP_REG(1) = $E2

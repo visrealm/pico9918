@@ -260,7 +260,6 @@ I_LI:   LSLS R6,R0,#20
         MOV  R2,R8
         LDRH R0,[R2,R3]
         ADDS R3,#2
-        UXTH R3,R3
         STRH R0,[R6,#0]
         REV16 R0,R0
         MOVS R4,#0x1E // Get initialised ST
@@ -277,7 +276,6 @@ I_ANDI: LSLS R6,R0,#20
         MOV  R2,R8
         LDRH R0,[R2,R3]
         ADDS R3,#2
-        UXTH R3,R3
         LDRH R5,[R6,#0] // R6=DEST
         ANDS R0,R5
         STRH R0,[R6,#0] // R6=DEST
@@ -296,7 +294,6 @@ I_ORI:  LSLS R6,R0,#20
         MOV  R2,R8
         LDRH R0,[R2,R3]
         ADDS R3,#2
-        UXTH R3,R3
         LDRH R5,[R6,#0] // R6=DEST
         ORRS R0,R5
         STRH R0,[R6,#0] // R6=DEST
@@ -517,7 +514,6 @@ I_AI:   LSLS R6,R0,#20
         MOV  R2,R8
         LDRH R5,[R2,R3]
         ADDS R3,#2
-        UXTH R3,R3
 // *********************************************************************************************
 I_A:    LDRH R2,[R6,#0] // R6=DEST
         REV16 R2,R2
@@ -781,7 +777,6 @@ I_CI:   LSLS R6,R0,#20
         MOV  R2,R8
         LDRH R5,[R2,R3]
         ADDS R3,#2
-        UXTH R3,R3
         REV16 R5,R5
 
         LDRH R2,[R6,#0] // R6=DEST
@@ -866,7 +861,6 @@ I_DIV_ov:
 I_LWPI: MOV  R2,R8
         LDRH R0,[R2,R3]
         ADDS R3,#2
-        UXTH R3,R3
         REV16 R0,R0
         LSRS R0,#1
         LSLS R0,#1 // R0 &= 0xFFFE
@@ -902,7 +896,6 @@ I_STST: LSLS R6,R0,#20
 //ooo.WWWW00000011
 .align 4
 I_LIMI: ADDS R3,#2    // Skip LIMI's 2nd WORD
-        UXTH R3,R3
         B    start
 // *********************************************************************************************
 .align 4
@@ -1023,7 +1016,6 @@ COM_S2a_L:
         MOV  R2,R8
         LDRH R2,[R2,R3] // SRCE = (memory [PC + 0] << 8) | memory [PC + 1];
         ADDS R3,#2
-        UXTH R3,R3
         REV16 R2,R2
         CMP  R5,#0  // if (S) // Not R0?
         BEQ  COM_S2a_F
@@ -1088,7 +1080,6 @@ COM_S2b_R:
 COM_S2b_L:
         MOVS  R2,R3
         ADDS R3,#2
-        UXTH R3,R3
         ADD  R2,R8
         LDRH R2,[R2,#0] // SRCE = (memory [PC + 0] << 8) | memory [PC + 1];
         REV16 R2,R2
@@ -1137,7 +1128,6 @@ COM_S2b_F2:
 OP_3LO: LSRS R2,R0,#13 // if ((BYTE & 0x30) == 0x20) Ts==2 (already checked Ts high bit is 1)
         BCS  start // Carry Set - then it's not == 0x20
         ADDS R3,#2 // PC += 2; // Skip CRU's 2nd word address
-        UXTH R3,R3
         B    start
 // *********************************************************************************************
 //R0 (LE)
@@ -1216,6 +1206,8 @@ I_JNE:  LSRS R4,R1,#6 // EQ -> Carry
 
 // *********************************************************************************************
 .align 4
+.thumb_func
+.type run9900, %function
 run9900:
         PUSH {LR}
 
@@ -1238,9 +1230,9 @@ run9900:
 dojump: SXTH R0,R0 // R0 now has a signed offset
         ASRS R0,#7 // Word offset
 dojmp2: ADDS R3,R0 // Special entry point just for JMP
-        UXTH R3,R3 // Discard any extra
 // *********************************************************************************************
-start:  MOV  R0,R9
+start:  UXTH R3,R3 // Normalize PC once at top of dispatch
+        MOV  R0,R9
         LDRB R0,[R0,#0]
         LSRS R0,#1
         BCC  I_IDLE
@@ -1248,7 +1240,6 @@ start:  MOV  R0,R9
         MOV  R0,R8
         LDRH R0,[R0,R3] // Get instruction BYTE|INST (LE format)
         ADDS R3,#2
-        UXTH R3,R3
 
 startX: REV16 R6,R0    // R6=INST|BYTE
         LSRS R2,R6,#5  // Get opcode
@@ -1321,7 +1312,6 @@ COM_S2d_L:
         MOV  R2,R8
         LDRH R2,[R2,R3] // SRCE = (memory [PC + 0] << 8) | memory [PC + 1];
         ADDS R3,#2
-        UXTH R3,R3
         REV16 R2,R2
         CMP  R5,#0  // if (S) // Not R0?
         BEQ  COM_S2d_F
@@ -1370,7 +1360,6 @@ COM_D2_L:
         MOV  R2,R8
         LDRH R2,[R2,R3] // DEST = (memory [PC + 0] << 8) | memory [PC + 1];
         ADDS R3,#2
-        UXTH R3,R3
         REV16 R2,R2
         CMP  R6,#0  // if (D) // Not R0?
         BEQ  COM_D2_F
@@ -1437,7 +1426,6 @@ COM_S1_L:
         MOV  R2,R8
         LDRH R2,[R2,R3] // SRCE = (memory [PC + 0] << 8) | memory [PC + 1];
         ADDS R3,#2
-        UXTH R3,R3
         REV16 R2,R2
         CMP  R5,#0  // if (S) // Not R0?
         BEQ  COM_S1_F
@@ -1484,7 +1472,7 @@ COM_D1_L:
         MOV  R2,R8
         LDRH R2,[R2,R3] // DEST = (memory [PC + 0] << 8) | memory [PC + 1];
         ADDS R3,#2
-        UXTH R3,R3
+
         REV16 R2,R2
         CMP  R6,#0  // if (D) // Not R0?
         BEQ  COM_D1_F

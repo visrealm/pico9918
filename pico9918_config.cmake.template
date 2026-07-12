@@ -1,0 +1,126 @@
+# =============================================================================
+# pico9918_config.cmake - OPTIONAL local build overrides
+# =============================================================================
+#
+# Copy this file to "pico9918_config.cmake" (which is git-ignored) and edit it.
+# When that file is present it is included early in the root CMakeLists.txt (right
+# after the Pico VS Code block, before board selection, version, build options and
+# the clock/flash defines) and can override any of the settings below. When it is
+# absent the build uses its normal defaults - nothing changes.
+#
+# Every setting below is applied by CMakeLists.txt only if you have not already
+# set it here, so a plain set() is all you need - no CACHE / FORCE required.
+# Uncomment and edit only the lines you want to change; each value shown is the
+# current default.
+#
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# Board
+# -----------------------------------------------------------------------------
+
+# Target board. Valid values: pico9918pro (RP2350, default), pico9918 (RP2040).
+# Board headers live in src/boards/.
+# NOTE: a combined build (PICO9918_BUILD_COMBINED) builds BOTH boards and sets
+#       the board per sub-target, so this value is ignored in that mode.
+#set(PICO_BOARD pico9918pro)
+
+
+# -----------------------------------------------------------------------------
+# Build options
+# -----------------------------------------------------------------------------
+
+# Enable SCART support (VGA + SCART). OFF builds VGA-only firmware and adds the
+# "-vgaonly" suffix to the artifact name.
+#set(PICO9918_ENABLE_SCART ON)
+
+# Disable the splash screen shown on startup.
+#set(PICO9918_NO_SPLASH OFF)
+
+# Enable diagnostic mode by default (adds a "-diag" suffix to the artifact name).
+#set(PICO9918_DIAG OFF)
+
+# Enable the GPU frame counter.
+#set(PICO9918_GPU_FRAME_COUNTER OFF)
+
+# Build a combined PICO9918 (RP2040) + PICO9918 PRO (RP2350) UF2. Normally driven
+# by the builder/configure script (-DPICO9918_BUILD_COMBINED=ON); you can force it
+# here too.
+#set(PICO9918_BUILD_COMBINED OFF)
+
+
+# -----------------------------------------------------------------------------
+# Custom-hardware behaviour  (ADVANCED - non-standard boards only)
+# -----------------------------------------------------------------------------
+
+# Disable the GROMCLK/CPUCLK clock outputs. Use when the target board does not
+# wire (or cannot spare the GPIOs for) the TMS clock outputs - e.g. a genuine
+# Raspberry Pi Pico. The clock PIO program and its two state machines are omitted.
+#set(PICO9918_NO_CLOCKS OFF)
+
+# Drive the interrupt pin active-high instead of the default active-low (/INT).
+# Use when the host expects a positive-going interrupt signal.
+#set(PICO9918_INT_ACTIVE_HIGH OFF)
+
+
+# -----------------------------------------------------------------------------
+# Version / artifact naming
+# -----------------------------------------------------------------------------
+
+# Version numbers (used in the artifact filename and reported by the firmware).
+#set(PICO9918_MAJOR_VER 1)
+#set(PICO9918_MINOR_VER 2)
+#set(PICO9918_PATCH_VER 0)
+
+# Artifact suffix (e.g. "a1", "alpha1", "rc2", "beta-2"). When non-empty this
+# overrides the git branch name in generated artifact filenames. Set it to an
+# empty string ("") to use the branch name instead ("main" produces no suffix).
+#set(PICO9918_VERSION_SUFFIX "beta-2")
+
+
+# -----------------------------------------------------------------------------
+# Clock / PLL / flash timing  (ADVANCED)
+# -----------------------------------------------------------------------------
+#
+# These are timing-critical and interdependent - the boot clock, PLL divisors and
+# flash clock-divider must stay mutually consistent. Only change them for custom
+# hardware and change them together. The defaults target VGA at a 252 MHz boot
+# clock (the firmware re-clocks to 270 MHz at runtime when SCART is detected).
+
+# Boot / system clock in Hz, and the PLL that produces it
+# (VCO / POSTDIV1 / POSTDIV2 => SYS_CLK).
+#set(PICO9918_SYS_CLK_HZ           252000000)
+#set(PICO9918_PLL_SYS_VCO_FREQ_HZ  1512000000)
+#set(PICO9918_PLL_SYS_POSTDIV1     6)
+#set(PICO9918_PLL_SYS_POSTDIV2     1)
+
+# Flash / boot2 timing. PICO9918_FLASH_SPI_CLKDIV could be 2, but then firmware
+# can't be written at higher clocks.
+#set(PICO9918_FLASH_SPI_CLKDIV                4)
+#set(PICO9918_XOSC_STARTUP_DELAY_MULTIPLIER   8)
+
+
+# -----------------------------------------------------------------------------
+# GPIO / VGA pin assignments  (ADVANCED - custom hardware only)
+# -----------------------------------------------------------------------------
+#
+# Base pin numbers used by src/gpio.h and src/vga/vga.h. Only change these to
+# match custom board wiring; the defaults are the standard PICO9918 v0.4+ layout.
+
+# CPU interface (src/gpio.h)
+#set(PICO9918_GPIO_CD7    14)   # CPU data bus base: CD7..CD0 = base..base+7
+#set(PICO9918_GPIO_MODE   28)   # mode select
+#set(PICO9918_GPIO_MODE1  29)   # mode select 1
+#set(PICO9918_GPIO_INT    22)   # /INT output
+#set(PICO9918_GPIO_RESET  23)   # soft reset input (v0.4+)
+
+# Clock outputs (src/gpio.h)
+#set(PICO9918_GPIO_GROMCL      25)   # GROM clock (v0.4+)
+#set(PICO9918_GPIO_CPUCL       24)   # CPU clock  (v0.4+)
+#set(PICO9918_GPIO_GROMCL_V03  29)   # GROM clock (v0.3 hardware)
+#set(PICO9918_GPIO_CPUCL_V03   23)   # CPU clock  (v0.3 hardware)
+
+# VGA output start pins (src/vga/vga.h)
+#set(PICO9918_VGA_SYNC_PINS_START  0)   # first sync pin: h, v = base, base+1
+#set(PICO9918_VGA_RGB_PINS_START   2)   # first rgb pin: 12 pins from base

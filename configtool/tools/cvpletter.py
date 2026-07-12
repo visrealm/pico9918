@@ -75,7 +75,13 @@ def compressDataViaPletter(data, tempDir, label):
         raise RuntimeError(f"[✗] Pletter compression failed for {label}:\n{result.stderr}")
 
     with open(pletterPath, 'rb') as f:
-        return list(f.read())
+        compressed_data = list(f.read())
+
+    # Pad to even length so labels following this block stay word-aligned (TI-99 requires this)
+    if len(compressed_data) % 2 == 1:
+        compressed_data.append(0x00)
+
+    return compressed_data
 
 def writeFinalBas(inputBas, basOutputPath, compressedBlocks, sourceSizes):
     """generates the output .pletter.bas with compressed data blocks."""

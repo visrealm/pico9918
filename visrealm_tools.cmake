@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 
 set(IMG_CONV ${CMAKE_SOURCE_DIR}/tools/img2carray.py)
 set(BIN_CONV ${CMAKE_SOURCE_DIR}/tools/bin2carray.py)
-set(PYTHON python3)
+# ${PYTHON} comes from pico9918_common.cmake.
 
 # custom function to generate source code from images using tools/img2carray.py
 function(visrealm_generate_image_source TARGET DST ROMSRC)

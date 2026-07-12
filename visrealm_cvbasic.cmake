@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 # CVBasic build functions for PICO9918 Configurator
 
 include(ExternalProject)
-set(PYTHON python3)
+# ${PYTHON} comes from pico9918_common.cmake.
 
 # Find CVBasic tools with fallback paths
 function(find_cvbasic_tools)
@@ -261,7 +261,7 @@ function(visrealm_xas99_assemble TARGET ASM_FILE BIN_OUTPUT CART_OUTPUT TITLE)
     endif()
 
     get_filename_component(ASM_DIR ${ASM_FILE} DIRECTORY)
-    get_filename_component(ASM_NAME ${ASM_FILE} NAME_WE)
+    get_filename_component(ASM_NAME ${ASM_FILE} NAME_WLE)
 
     _ensure_xas99_bank_resolver()
 

@@ -13,7 +13,9 @@
 #include "vga.h"
 #include "vga-modes.h"
 
+#ifndef PICO9918_NO_CLOCKS
 #include "clocks.pio.h"
+#endif
 
 #define PALCONV 0
 
@@ -67,8 +69,10 @@ static __attribute__((section(".scratch_x.buffer"))) uint8_t __aligned(4) tmsSca
 
 const uint tmsWriteSm = 0;
 const uint tmsReadSm = 1;
+#ifndef PICO9918_NO_CLOCKS
 const uint tmsGromClkSm = 2;
 const uint tmsCpuClkSm = 3;
+#endif
 
 #if PALCONV
 #define PAL_PIO         pio0  // which pio are we using for vga?
@@ -80,6 +84,9 @@ static const uint32_t dmapalIn  = 6; // palette dma
 #define SHOW_DIAGNOSTICS_FRAMES 900
 
 static int frameCount = 0;
+#if PICO9918_GPU_FRAME_COUNTER
+uint32_t gpuFrameCount = 0;
+#endif
 static bool validWrites = false;  // has the VDP display been enabled at all?
 static bool doneInt = false;      // interrupt raised this frame?
 
@@ -92,6 +99,21 @@ int droppedFramesCount = 0;
 #define R0_DOUBLE_ROWS 0x08
 
 static const uint32_t dma32 = 2;  // memset 32bit
+
+/*
+ * drive the /INT pin to match currentInt. Default is active-low; define
+ * PICO9918_INT_ACTIVE_HIGH (via pico9918_config.cmake) to drive active-high.
+ * Compile-time only - no runtime branch in the hot path.
+ */
+static inline void setIntPin()
+{
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put(GPIO_INT, currentInt);
+#else
+  gpio_put(GPIO_INT, !currentInt);
+#endif
+}
+
 /*
  * update the value send to the read PIO
  */
@@ -140,7 +162,7 @@ void __not_in_flash_func(tmsReadIrqHandler)()
       if (readVal & STATUS_INT)  // Was Interrupt flag set?
       {
         currentInt = false;
-        gpio_put(GPIO_INT, !currentInt);
+        setIntPin();
       }
     }
     else if (readReg == 1)
@@ -171,7 +193,7 @@ void __not_in_flash_func(tmsWriteIrqHandler)()
     if (newInt != currentInt)
     {
       currentInt = newInt;
-      gpio_put(GPIO_INT, !currentInt);
+      setIntPin();
     }
   }
   else // write data
@@ -230,8 +252,11 @@ void __not_in_flash_func(gpioIrqHandler)()
   updateTmsReadAhead();  
   
   frameCount = 0;
+#if PICO9918_GPU_FRAME_COUNTER
+  gpuFrameCount = 0;
+#endif
   resetSplash();
-  gpio_put(GPIO_INT, !currentInt);
+  setIntPin();
   enableTmsPioInterrupts();
 }
 
@@ -246,14 +271,27 @@ typedef struct
 
 #define CLOCK_PRESET(PLL,PD1,PD2,VOL) {PLL, PD1, PD2, VOL, PLL / PD1 / PD2}
 
-static const ClockSettings clockPresets[] = {
-  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252
-  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4
-  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352
+#if PICO9918_ENABLE_SCART
+// SCART: clocks must be multiples of 54 MHz for exact integer pioClocksPerPixel
+// (pioFreq must be a multiple of 13.5 MHz, minimum 54 MHz)
+// 270/5=54MHz(4), 324/6=54MHz(4) clocks per pixel
+static const ClockSettings scartClockPresets[] = {
+  CLOCK_PRESET(1080000000, 4, 1, VREG_VOLTAGE_1_15),    // 270 MHz
+  CLOCK_PRESET(1296000000, 4, 1, VREG_VOLTAGE_1_20),    // 324 MHz
+  CLOCK_PRESET(1296000000, 4, 1, VREG_VOLTAGE_1_20)     // 324 MHz (no safe higher option)
+};
+#endif
+
+// VGA: clocks for 25.175 MHz pixel clock
+static const ClockSettings vgaClockPresets[] = {
+  CLOCK_PRESET(1512000000, 6, 1, VREG_VOLTAGE_1_15),    // 252 MHz
+  CLOCK_PRESET(1512000000, 5, 1, VREG_VOLTAGE_1_20),    // 302.4 MHz
+  CLOCK_PRESET(1056000000, 3, 1, VREG_VOLTAGE_1_30)     // 352 MHz
 };
 
+static const ClockSettings *clockPresets = vgaClockPresets;
+
 static int clockPresetIndex = 0;
-static bool testingClock = false;
 
 typedef struct
 {
@@ -275,17 +313,6 @@ static void eofInterrupt()
   if (TMS_REGISTER(tms9918, 0x32) & 0x20)
   {
     gpuTrigger();
-  }
-
-  static float tempC = 0.0f;
-  tempC += coreTemperatureC();
-  if ((frameCount & 0x3f) == 0) // every 64th frame
-  {
-    tempC /= 64.0f;
-    diagSetTemperature(tempC);
-    uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
-    TMS_STATUS(tms9918, 13) = t4;
-    tempC = 0.0f;
   }
 
   if (tms9918->configDirty)
@@ -327,7 +354,7 @@ static void updateInterrupts(uint8_t tempStatus)
   if (shouldInt != currentInt)
   {
     currentInt = shouldInt;
-    gpio_put(GPIO_INT, !currentInt);
+    setIntPin();
   }
   enableTmsPioInterrupts();
 }
@@ -345,6 +372,7 @@ inline uint32_t bigRgb2LittleBgr(uint32_t val)
 }
 
 
+#ifndef PICO9918_NO_CLOCKS
 void updateClock(uint pioSm, float freqHz)
 {
   float clockDiv = ((float)clockPresets[clockPresetIndex].clockHz) / (freqHz * 2.0f);
@@ -393,6 +421,7 @@ static void initClockOrPullLow(uint gpio, uint pioSm, float freqHz)
     gpio_put(gpio, 0);
   }
 }
+#endif // PICO9918_NO_CLOCKS
 
 static void tmsPorch()
 {
@@ -417,7 +446,23 @@ static void tmsEndOfScanline(uint32_t displayLine)
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
   ++frameCount;
+#if PICO9918_GPU_FRAME_COUNTER
+  gpuFrameCount += (TMS_STATUS(tms9918, 2) & 0x80) != 0;
+#endif
   
+{
+    static float tempC = 0.0f;
+    tempC += coreTemperatureC();
+    if ((frameCount & 0x3f) == 0) // every 64th frame
+    {
+      tempC /= 64.0f;
+      diagSetTemperature(tempC);
+      uint8_t t4 = (uint8_t)(tempC * 4.0f + 0.5f);
+      TMS_STATUS(tms9918, 13) = t4;
+      tempC = 0.0f;
+    }
+  }
+
   if (!validWrites)
   {
     // has the display been enabled?
@@ -444,14 +489,21 @@ static void tmsEndOfFrame(uint32_t frameNumber)
     updateInterrupts(STATUS_INT);
   }
 
-#if DISPLAY_YSCALE > 1
-  vgaCurrentParams()->params.vPixelScale = DISPLAY_YSCALE - (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
-  vgaCurrentParams()->params.vVirtualPixels = VIRTUAL_PIXELS_Y << (bool)(TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS);
+#if PICO9918_ENABLE_SCART
+  const int yScale = vgaCurrentParams()->params.interlaced ? 1 : 2;
+#else
+  const int yScale = DISPLAY_YSCALE;
 #endif
+
+  if (yScale > 1) {
+    bool doubleRows = TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS;
+    vgaCurrentParams()->params.vPixelScale = yScale - (bool)doubleRows;
+    vgaCurrentParams()->params.vVirtualPixels = (vgaCurrentParams()->params.vSyncParams.displayPixels / yScale) << (bool)doubleRows;
+  }
 
   int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
   vPixels = baseRows << 3;
-  if (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)
+  if (yScale > 1 && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS))
     vPixels <<= 1;
   vBorder = (vgaCurrentParams()->params.vVirtualPixels - vPixels) / 2;
   vgaSetTriggerScanline(vBorder + vPixels);
@@ -520,7 +572,11 @@ static __attribute__((noinline))  void generateRgbCache()
  */
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
-  const uint32_t halfHBorder = (VIRTUAL_PIXELS_X - TMS9918_PIXELS_X * 2) / 4;
+  const uint32_t halfHBorder = (params->hVirtualPixels - TMS9918_PIXELS_X * 2) / 4;
+
+  // for interlaced modes, bit 12 of y carries the field number (0=Field1, 1=Field2)
+  const uint8_t  field  = (y >> 12) & 1;
+  y = y & 0x0fff;  // virtual line within the field (0..N-1)
 
   uint32_t* dPixels = (uint32_t*)pixels;
   bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
@@ -536,7 +592,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   if (y < vBorder || y >= (vBorder + vPixels))  // TODO: None of this runs in ROW30 mode
   {
     dma_channel_set_write_addr(dma32, dPixels, false);
-    dma_channel_set_trans_count(dma32, VIRTUAL_PIXELS_X / 2, true);
+    dma_channel_set_trans_count(dma32, params->hVirtualPixels / 2, true);
     tms9918->vram.map.blanking = 1; // V
     if ((y >= vBorder + vPixels))
     {
@@ -550,29 +606,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
       outputSplash(y, frameCount, vBorder, vPixels, pixels);
 
-      if (testingClock)
-      {
-        if (frameCount < 400)
-        {
-          renderText(y, "TESTING NEW CLOCK FREQUENCY...", 231, 8, 0x0fff, 0x0222, pixels);
-        }
-        else if (frameCount < 500)
-        {
-          renderText(y, "TEST COMPLETED SUCCESSFULLY!", 234, 8, 0x07f7, 0x0444, pixels);
-        }
-        else if (frameCount < 599)
-        {
-          renderText(y, "WRITING CONFIGURATION TO FLASH...", 222, 8, 0x0fff, 0x0444, pixels);
-        }
-        else
-        {
-          // new clock lasted 10 seconds... let's accept it
-          tms9918->config[CONF_CLOCK_TESTED] = tms9918->config[CONF_CLOCK_PRESET_ID];
-          tms9918->config[CONF_SAVE_TO_FLASH] = 1;
-          testingClock = false;
-        }
-      }
-      
       if (frameCount > SHOW_DIAGNOSTICS_FRAMES)
       {
         tms9918->config[CONF_DIAG] = true;
@@ -581,6 +614,24 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
         tms9918->config[CONF_DIAG_PALETTE] = true;
         tms9918->config[CONF_DIAG_ADDRESS] = true;
       }
+    }
+
+    // pending-display banner persists in the top border until the user power
+    // cycles (PENDING) or confirms in the configurator (ARMED)
+    #define RENDER_CENTERED(scanline, text, ypos, fg, bg, pixels) \
+      renderText((scanline), (text), \
+                 (RGB_PIXELS_X - (sizeof(text) - 1) * CHAR_WIDTH) / 2, \
+                 (ypos), (fg), (bg), (pixels))
+    uint8_t banner = pendingDisplayBanner();
+    if (banner == PENDING_BANNER_AWAIT_PC)
+    {
+      dma_channel_wait_for_finish_blocking(dma32);
+      RENDER_CENTERED(y, "POWER CYCLE TO TEST NEW CONFIGURATION", 8, 0x0fff, 0x044f, pixels);
+    }
+    else if (banner == PENDING_BANNER_AWAIT_OK)
+    {
+      dma_channel_wait_for_finish_blocking(dma32);
+      RENDER_CENTERED(y, "OPEN CONFIGURATOR TO CONFIRM NEW SETTINGS", 8, 0x0fff, 0x044f, pixels);
     }
 
     if (y == vBorder - 1)
@@ -613,8 +664,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
       generateRgbCache();
 
     /* generate the scanline */
+    uint16_t tmsY = y;
+    if (params->interlaced && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS))
+      tmsY = y * 2 + (field ^ params->interlacedFieldOrder);
     uint32_t renderTime  = time_us_32();
-    uint8_t tempStatus = vrEmuTms9918ScanLine(y, tmsScanlineBuffer);
+    uint8_t tempStatus = vrEmuTms9918ScanLine(tmsY, tmsScanlineBuffer);
     renderTime = time_us_32() - renderTime;
 
     /*** F18A status register updates ***/
@@ -720,7 +774,13 @@ void proc1Entry()
 {
   tmsPioInit();
 
-  gpio_put_all(GPIO_INT_MASK);	// ok, we can release /INT now
+  // ok, we can release (deassert) /INT now. active-low => drive high (mask set),
+  // active-high => drive low (mask clear).
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put_all(0);
+#else
+  gpio_put_all(GPIO_INT_MASK);
+#endif
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
 
@@ -750,17 +810,31 @@ int main(void)
    * but this'll do for now. */
 
 
-  // set up gpio pins
-  gpio_put_all(0); // we want to kep /INT held low for now
+  // set up gpio pins. keep /INT asserted for now: active-low => low (0),
+  // active-high => high (mask set).
+#ifdef PICO9918_INT_ACTIVE_HIGH
+  gpio_put_all(GPIO_INT_MASK);
+#else
+  gpio_put_all(0);
+#endif
   gpio_set_dir_all_bits(GPIO_INT_MASK); // /INT is an output
   gpio_set_function_masked(GPIO_CD_MASK | GPIO_CSR_MASK | GPIO_CSW_MASK | GPIO_MODE_MASK | GPIO_MODE1_MASK | GPIO_INT_MASK | GPIO_RESET_MASK, GPIO_FUNC_SIO);
 
-  Pico9918HardwareVersion hwVersion = currentHwVersion();
+  // detect on core 0 before core 1 is launched (proc1 also reads it)
+  (void)currentHwVersion();
+
+  // shouldUseScartClock() peeks flash for a user-forced SCART preference
+  detectScartDongle();
+
+#if PICO9918_ENABLE_SCART
+  if (shouldUseScartClock())
+    clockPresets = scartClockPresets;
+#endif
 
   /* the initial "safe" clock speed */
   ClockSettings clockSettings = clockPresets[clockPresetIndex];
   vreg_set_voltage(clockSettings.voltage);
-  sleep_ms(2);
+  sleep_ms(1);
   set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
 
   /* we need one of these. it's the main guy */
@@ -771,21 +845,10 @@ int main(void)
 
   /* we could set clock freq here from options */
   readConfig(tms9918->config);
-  
-  /*
-   * if we're trying out a new clock rate, we need to have a failsafe 
-   * we test it first 
-   */
-  if (tms9918->config[CONF_CLOCK_PRESET_ID] != 0 && 
-      tms9918->config[CONF_CLOCK_PRESET_ID] != tms9918->config[CONF_CLOCK_TESTED])
-  {
-    testingClock = true;
-    int wantedClock = tms9918->config[CONF_CLOCK_PRESET_ID];
-    tms9918->config[CONF_CLOCK_PRESET_ID] = 0;
-    tms9918->config[CONF_CLOCK_TESTED] = 0;
-    writeConfig(tms9918->config);
-    tms9918->config[CONF_CLOCK_PRESET_ID] = wantedClock;
-  }
+
+  applyPendingDisplay(tms9918->config);
+
+  updateDispDriver();
 
   if (tms9918->config[CONF_CLOCK_PRESET_ID] != clockPresetIndex)
   {
@@ -797,6 +860,9 @@ int main(void)
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
   }
 
+#ifndef PICO9918_NO_CLOCKS
+  // set up the GROMCLK and CPUCLK outputs (frequencies depend on the VDP device)
+  Pico9918HardwareVersion hwVersion = currentHwVersion();
   uint8_t vdpDevice = tms9918->config[CONF_VDP_DEVICE];
   const VdpClockConfig *clkCfg = &vdpClockConfigs[vdpDevice];
 
@@ -805,6 +871,7 @@ int main(void)
 
   initClockOrPullLow(gromClkGpio, tmsGromClkSm, clkCfg->pin37freq);
   initClockOrPullLow(cpuClkGpio, tmsCpuClkSm, clkCfg->pin38freq);
+#endif
 
   dma_channel_config cfg = dma_channel_get_default_config(dma32);
   channel_config_set_read_increment(&cfg, false);
@@ -850,9 +917,20 @@ int main(void)
 
   /* then set up VGA output */
   VgaInitParams params = { 0 };
+#if PICO9918_ENABLE_SCART
+  // CONF_DISP_DRIVER: 0=VGA, 1=NTSC, 2=PAL (resolved by updateDispDriver)
+  if (tms9918->config[CONF_DISP_DRIVER] == 0)
+  {
+    params.params = vgaGetParams(VGA_640_480_60HZ);
+  }
+  else
+  {
+    params.params = vgaGetParams(tms9918->config[CONF_SCART_MODE]
+      ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ);
+  }
+#else
   params.params = vgaGetParams(DISPLAY_MODE);
-  setVgaParamsScaleY(&params.params, 1);
-
+#endif
   /* set vga scanline callback to generate tms9918 scanlines */
   params.scanlineFn = tmsScanline;
   params.endOfFrameFn = tmsEndOfFrame;

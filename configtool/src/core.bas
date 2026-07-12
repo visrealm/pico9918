@@ -22,6 +22,7 @@ CONST MENU_ID_INFO     = 1
 CONST MENU_ID_DIAG     = 2
 CONST MENU_ID_PALETTE  = 3
 CONST MENU_ID_FIRMWARE = 4
+CONST MENU_ID_OUTPUT   = 5
 
 ' Pico9918Options index, name[16], values index, num values,help[32]
 CONST CONF_COUNT      = 160 ' number of primary config options
@@ -52,6 +53,9 @@ CONST CONF_DISP_DRIVER      = 5
 CONST CONF_CRT_SCANLINES    = 8         ' 0 (off) or 1 (on)
 CONST CONF_SCANLINE_SPRITES = 9         ' 0 - 3 where value = (1 << (x + 2))
 CONST CONF_CLOCK_PRESET_ID  = 10        ' 0 - 2 see ClockSettings in main.c
+CONST CONF_SCART_MODE       = 11        ' 0 = PAL 576i, 1 = NTSC 480i
+CONST CONF_DISP_DRIVER_PREF = 13        ' 0 = AUTO, 1 = force VGA, 2 = force SCART
+CONST CONF_VGA_MODE         = 14        ' 0 = 480p60 (extensible)
 CONST CONF_DIAG             = 16
 CONST CONF_DIAG_REGISTERS   = 17
 CONST CONF_DIAG_PERFORMANCE = 18
@@ -59,8 +63,23 @@ CONST CONF_DIAG_PALETTE     = 19
 CONST CONF_DIAG_ADDRESS     = 20
 ' ^^^ read/write config IDs
 
+' pending-block mirror (read) and command bytes (write 1 to trigger)
+CONST CONF_PENDING_STATE        = 200
+CONST CONF_PENDING_DRIVER_PREF  = 201
+CONST CONF_PENDING_VGA_MODE     = 202
+CONST CONF_PENDING_SCART_MODE   = 203
+CONST CONF_PENDING_CLOCK_PRESET = 204
+CONST CONF_SAVE_FORCED          = 252
+CONST CONF_PENDING_CANCEL       = 253
+CONST CONF_PENDING_CONFIRM      = 254
+
+' must match firmware src/config.h
+CONST PENDING_STATE_CONFIRMED = $C0
+CONST PENDING_STATE_PENDING   = $9E
+CONST PENDING_STATE_ARMED     = $A0
+
 ' now the "special" config IDs
-CONST CONF_SAVE_TO_FLASH    = 255   
+CONST CONF_SAVE_TO_FLASH    = 255
 ' -------------------------------
 
 CONST CONF_MENU_PALETTE     = 251
@@ -72,6 +91,7 @@ CONST CONF_MENU_SAVE        = 250
 CONST CONF_MENU_FIRMWARE    = 249
 CONST CONF_MENU_OK          = 248
 CONST CONF_MENU_CANCEL      = 247
+CONST CONF_MENU_OUTPUT      = 246
 
 DEF FN MENU_DATA(I, C) = configMenuData((I) * CONF_STRUCT_LEN + (C))
 DEF FN SET_MENU(I) = g_currentMenu = I
@@ -79,6 +99,10 @@ DEF FN SET_MENU(I) = g_currentMenu = I
 DIM tempConfigValues(CONF_COUNT)
 DIM savedConfigValues(CONF_COUNT)
 
+' All INCLUDEs below land in bank 0 (the default bank). Bank 0 is the
+' dispatcher for cross-bank calls - only bank 0 may issue BANK SELECT.
+' menu-palette.bas (included at the bottom of this file) opts into BANK 1.
+' Firmware payload data lives in banks 2+.
 INCLUDE "vdp-utils.bas"
 INCLUDE "patterns.bas"
 
@@ -87,10 +111,13 @@ INCLUDE "input.bas"
 
 INCLUDE "config.bas"
 
+INCLUDE "menu-data.bas"
 INCLUDE "menu-main.bas"
 INCLUDE "menu-firmware.bas"
 INCLUDE "menu-info.bas"
 INCLUDE "menu-diag.bas"
+INCLUDE "menu-output.bas"
+INCLUDE "menu-confirm.bas"
     ' =========================================================================
     ' PROGRAM ENTRY
     ' -------------------------------------------------------------------------
@@ -100,6 +127,8 @@ main: PROCEDURE
     g_currentMenuIndex = 0                  ' current menu index
     g_paletteDirty = FALSE
     g_diagDirty = FALSE
+    g_outputDirty = FALSE
+    g_resetPending = FALSE
 
     ' setup the screen
     VDP_DISABLE_INT_DISP_OFF
@@ -147,9 +176,8 @@ main: PROCEDURE
             verReg = VDP_STATUS
             verMajor = verReg / 16
             verMinor = verReg AND $0f
-            PRINT "    F18A v ."
-            PUT_XY(5 + 19, 21), hexChar(verMajor)
-            PUT_XY(5 + 21, 21), hexChar(verMinor)
+            PRINT "    F18A v"
+            PRINT CHR$(hexChar(verMajor)), ".", CHR$(hexChar(verMinor))
         ELSE
             PRINT "  UNKNOWN SR1 = ", <>statReg
         END IF
@@ -215,6 +243,10 @@ main: PROCEDURE
 
         GOSUB vdpLoadConfigValues  ' load config values from VDP
 
+        GOSUB checkFirmwareVersion  ' halt or force update if firmware is too old
+
+        GOSUB checkPendingDisplayChange  ' prompt if a display change is awaiting confirmation
+
         GOSUB applyConfigValues
 
         VDP_ENABLE_INT_DISP_OFF
@@ -230,7 +262,7 @@ main: PROCEDURE
         VDP_REG(24) = $11
         
         WHILE 1
-            ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu
+            ON g_currentMenu GOSUB mainMenu, deviceInfoMenu, diagMenu, paletteMenu, firmwareMenu, outputMenu
             VDP_DISABLE_INT
             GOSUB clearScreen
         WEND
@@ -252,4 +284,5 @@ delay: PROCEDURE
 hexChar:
     DATA BYTE "0123456789ABCDEF"
 
+' menu-palette.bas opens with `BANK 1`, so everything inside it lands there.
 INCLUDE "menu-palette.bas"

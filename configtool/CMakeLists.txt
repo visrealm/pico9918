@@ -5,19 +5,10 @@ cmake_minimum_required(VERSION 3.13)
 
 project(pico9918-configurator NONE)
 
-# Include CVBasic build functions
+# Inherits PYTHON and version vars from pico9918_common.cmake via the root.
 include(${CMAKE_SOURCE_DIR}/visrealm_cvbasic.cmake)
 
-set(PYTHON python3)
-
-# Version information (from root CMakeLists.txt)
-# Include branch name and output type in version string (except for main branch)
-set(VERSION_BRANCH_STR "")
-if (NOT PICO9918_GIT_BRANCH STREQUAL "main" AND NOT PICO9918_GIT_BRANCH STREQUAL "")
-  set(VERSION_BRANCH_STR "-${PICO9918_GIT_BRANCH}")
-endif()
-set(VERSION "v${PICO9918_VERSION_STR}${VERSION_BRANCH_STR}")
-set(VERSION_WITH_OUTPUT "${VERSION}${PICO9918_OUTPUT_PREFIX}")
+set(VERSION_WITH_OUTPUT "v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}${PICO9918_OUTPUT_STR}")
 set(FRIENDLYVER "${PICO9918_VERSION}")
 
 # Setup CVBasic toolchain (auto-build or find existing tools)
@@ -40,13 +31,17 @@ else()
 endif()
 
 # Custom function to convert UF2 to CVBasic data
+# Also emits a banksel_<prefix>.bas with thunks sized to the firmware.
 function(convert_uf2_to_cvbasic BANK_SIZE OUTPUT_PREFIX)
     set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/intermediate")
     add_custom_command(
-        OUTPUT "${OUTPUT_DIR}/${OUTPUT_PREFIX}.h.bas" "${OUTPUT_DIR}/${OUTPUT_PREFIX}.bas"
-        COMMAND ${PYTHON} "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py" 
-                -b ${BANK_SIZE} 
-                -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}" 
+        OUTPUT "${OUTPUT_DIR}/${OUTPUT_PREFIX}.h.bas"
+               "${OUTPUT_DIR}/${OUTPUT_PREFIX}.bas"
+               "${OUTPUT_DIR}/banksel_${OUTPUT_PREFIX}.bas"
+        COMMAND ${PYTHON} "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py"
+                -b ${BANK_SIZE}
+                -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}"
+                --banksel "${OUTPUT_DIR}/banksel_${OUTPUT_PREFIX}.bas"
                 "${FIRMWARE_PATH}"
         DEPENDS "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py" "${FIRMWARE_PATH}"
         COMMENT "Converting UF2 (${FIRMWARE_PATH}) to CVBasic data (${BANK_SIZE}KB banks)"
@@ -56,7 +51,7 @@ endfunction()
 
 # Generate firmware data files
 convert_uf2_to_cvbasic(8 "firmware_8k")
-convert_uf2_to_cvbasic(16 "firmware_16k") 
+convert_uf2_to_cvbasic(16 "firmware_16k")
 convert_uf2_to_cvbasic(0 "firmware")
 
 # Custom function to compile CVBasic for a platform
@@ -83,6 +78,17 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
         "${CMAKE_SOURCE_DIR}/configtool/tools/*.py"
     )
 
+    # Pick the banksel.bas that matches this target's bank size. The
+    # NO_UPGRADE / NABU / CreatiVision / SG1000 targets don't use banking,
+    # so they get the no-banking shim (banksel_firmware.bas).
+    if("${PLATFORM_FLAG}" STREQUAL "--ti994a" AND NOT "${DEFINES}" MATCHES "NO_UPGRADE")
+        set(BANKSEL_SRC "${CMAKE_BINARY_DIR}/intermediate/banksel_firmware_8k.bas")
+    elseif("${DEFINES}" MATCHES "NO_UPGRADE" OR "${PLATFORM_FLAG}" STREQUAL "--nabu" OR "${PLATFORM_FLAG}" STREQUAL "--creativision" OR "${PLATFORM_FLAG}" STREQUAL "--sg1000")
+        set(BANKSEL_SRC "${CMAKE_BINARY_DIR}/intermediate/banksel_firmware.bas")
+    else()
+        set(BANKSEL_SRC "${CMAKE_BINARY_DIR}/intermediate/banksel_firmware_16k.bas")
+    endif()
+
     # Copy source files and generated firmware data
     add_custom_command(
         OUTPUT "${SOURCE_DIR}/pico9918conf.bas"
@@ -93,10 +99,12 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.bas" "${SOURCE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware.h.bas" "${SOURCE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware.bas" "${SOURCE_DIR}/"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${BANKSEL_SRC}" "${SOURCE_DIR}/banksel.bas"
         DEPENDS ${CVBASIC_SOURCE_FILES} ${CVBASIC_TOOLS}
                 "${CMAKE_BINARY_DIR}/intermediate/firmware_8k.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware_8k.bas"
                 "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.bas"
                 "${CMAKE_BINARY_DIR}/intermediate/firmware.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware.bas"
+                "${BANKSEL_SRC}"
         COMMENT "Copying CVBasic source files and firmware data"
     )
     
@@ -128,7 +136,7 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
     if("${PLATFORM_FLAG}" STREQUAL "--ti994a")
         if(XAS99_SCRIPT)
             # XAS99 generates files based on the assembly filename, not the target name
-            get_filename_component(ASM_NAME "${ASM_OUTPUT}" NAME_WE)
+            get_filename_component(ASM_NAME "${ASM_OUTPUT}" NAME_WLE)
             # Banked builds: XAS99 suffix width depends on bank count (_b0 for <=10, _b00 for >10)
             # Unbanked (lite/NO_UPGRADE) builds produce a flat .bin
             _ensure_xas99_bank_resolver()
@@ -195,25 +203,8 @@ add_cvbasic_target(nabu "--nabu" "" "pico9918conf-${VERSION_WITH_OUTPUT}_nabu.as
 add_cvbasic_target(creativision "--creativision" "-rom16" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.bin" "CreatiVision")
 add_cvbasic_target(sg1000 "--sg1000" "" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.sg" "SG-1000/SC-3000")
 
-# Special NABU MAME target (different defines)
-add_cvbasic_target(nabu_mame "--nabu" "-DTMS9918_TESTING=1" "pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.asm" "000001.nabu" "NABU MAME")
-
-# NABU MAME packaging
-add_custom_command(
-    OUTPUT "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.npz"
-    COMMAND ${CMAKE_COMMAND} -E tar "cf" "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.zip" --format=zip "000001.nabu"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.zip" "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.npz"
-    COMMAND ${CMAKE_COMMAND} -E remove "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.zip" "000001.nabu"
-    DEPENDS "${CMAKE_BINARY_DIR}/dist/000001.nabu"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/dist"
-    COMMENT "Packaging NABU MAME"
-    VERBATIM
-)
-
-add_custom_target(nabu_mame_package DEPENDS "${CMAKE_BINARY_DIR}/dist/pico9918conf-${VERSION_WITH_OUTPUT}_nabu_mame.npz")
-
 # Master target to build all platforms
-add_custom_target(configurator_all DEPENDS ti99 ti99_lite coleco coleco_lite msx_asc16 msx_asc16_lite msx_konami msx_konami_lite nabu sg1000 nabu_mame_package)
+add_custom_target(configurator_all DEPENDS ti99 ti99_lite coleco coleco_lite msx_asc16 msx_asc16_lite msx_konami msx_konami_lite nabu sg1000)
 
 # Print build information
 message(STATUS "PICO9918 Configurator CMake Configuration")

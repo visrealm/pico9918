@@ -27,12 +27,14 @@ updateNavInput: PROCEDURE
     g_nav = NAV_NONE
     g_key = CONT1.key
 
-    IF g_key >= 48 AND g_key <= 57 THEN 
+    ' '0'..'9' -> 0..9, 'A'..'Z' -> 10..35, raw joypad 0..9 pass through,
+    ' anything else -> 255. 255 disambiguates "no key" from the digit '0'.
+    IF g_key >= 48 AND g_key <= 57 THEN
         g_key = g_key - 48
-    ELSEIF g_key >= 65 AND g_key <= 90 THEN 
+    ELSEIF g_key >= 65 AND g_key <= 90 THEN
         g_key = g_key - 55
     ELSEIF g_key > 9 THEN
-        g_key = 0
+        g_key = 255
     END IF
 
     ' <DOWN> or <X>

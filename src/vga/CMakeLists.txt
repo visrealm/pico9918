@@ -13,6 +13,9 @@ pico_generate_pio_header(${LIBRARY} ${CMAKE_CURRENT_LIST_DIR}/vga.pio)
 
 target_include_directories (${LIBRARY} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
+target_compile_definitions(${LIBRARY} PRIVATE
+        PICO9918_ENABLE_SCART=$<BOOL:${PICO9918_ENABLE_SCART}>)
+
 target_link_libraries(${LIBRARY} PRIVATE
         pico9918-pio-utils
         pico_stdlib

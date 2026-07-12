@@ -304,6 +304,6 @@ pow2: ' 1 << INDEX
     DATA BYTE $01, $02, $04, $08, $10, $20, $40, $80
 
 block:
-    DATA BYTE $FE, $FE, $FE, $FE, $FE, $FE, $FE, $00
+    DATA BYTE $EE, $EE, $EE, $EE, $EE, $EE, $EE, $00
 palBlock:
     DATA BYTE $00, $00, $00, $00, $00, $00, $00, $00    

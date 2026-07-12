@@ -20,23 +20,23 @@ If you're ordering replacement cables from a thirdparty, look for 12 pin 0.5mm p
 
 ![FFC connector - open latch](img/ffc_0.jpg)
 
-**Step 1** — Open the FFC connector latch by lifting the locking tab upward.
+**Step 1** - Open the FFC connector latch by lifting the locking tab upward.
 
 ![FFC connector - insert cable](img/ffc_1.jpg)
 
-**Step 2** — Insert the FFC cable into the connector with the contacts facing down.
+**Step 2** - Insert the FFC cable into the connector with the contacts facing down.
 
 ![FFC connector - cable seated](img/ffc_2.jpg)
 
-**Step 3** — Push the cable fully into the connector until it seats flush.
+**Step 3** - Push the cable fully into the connector until it seats flush.
 
 ![FFC connector - close latch](img/ffc_3.jpg)
 
-**Step 4** — Close the latch by pressing the locking tab back down until it clicks.
+**Step 4** - Close the latch by pressing the locking tab back down until it clicks.
 
 ![FFC connector - secured](img/ffc_4.jpg)
 
-**Step 5** — Confirm the cable is secure and the latch is fully closed.
+**Step 5** - Confirm the cable is secure and the latch is fully closed.
 
 ---
 
@@ -71,6 +71,6 @@ To re-connect a cut jumper, apply a small solder blob onto the pad.
 
 One side of the PICO9918 v1.x includes 10 holes, but shipped units come with a 9-pin header installed. The unpopulated hole is reserved for the **MDE1** (Mode 1) pin.
 
-MDE1 is not currently used by the firmware but is included on the board for future expansion — for example, to support V9938 and other enhanced VDP variants which make use of this pin.
+MDE1 is not currently used by the firmware but is included on the board for future expansion - for example, to support V9938 and other enhanced VDP variants which make use of this pin.
 
 ---
