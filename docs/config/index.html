@@ -434,6 +434,16 @@
             <img src="configurator_title.png" alt="PICO9918 v1.2.0 Configurator" class="title-image">
         </header>
 
+        <!-- Target firmware banner -->
+        <div class="warning-box" style="margin-bottom: 20px;">
+            <strong>Firmware v<span id="fwVersion"></span> required.</strong>
+            This configurator targets the latest PICO9918 firmware. Update your
+            device to v<span id="fwVersionInline"></span> before applying a
+            generated config &mdash; older firmware may ignore these settings or
+            reset the device to defaults.
+            <a href="https://github.com/visrealm/pico9918/releases" target="_blank">Get the latest firmware &rarr;</a>
+        </div>
+
         <!-- Main -->
         <div class="card">
             <h2>Main</h2>
@@ -591,6 +601,24 @@
         const XIP_BASE = 0x10000000;
         const CONFIG_FLASH_ADDR = XIP_BASE + CONFIG_FLASH_OFFSET;
 
+        // Pending display-change block: separate 4 KB sector immediately below
+        // the main config block (config.c PENDING_FLASH_OFFSET). The firmware
+        // reads a 16-byte PendingDisplay struct from its start on boot and, if
+        // the state is PENDING/ARMED, overrides the tracked display fields in
+        // the main config. A config UF2 that writes only the main block leaves
+        // a stale pending block in place, so the chosen display settings never
+        // take effect. We write a CONFIRMED block here to clear that.
+        //
+        // The RP2350 bootloader requires every flash-targeted UF2 block to carry
+        // a 256-byte payload at a 256-byte-aligned address; a short (16-byte)
+        // payload is rejected and fails the whole file. So the pending payload is
+        // a full 256-byte page (16 meaningful bytes + zero padding), matching the
+        // main config block's payload size.
+        const PENDING_FLASH_OFFSET = CONFIG_FLASH_OFFSET - 0x1000; // 0x1FE000
+        const PENDING_FLASH_ADDR = XIP_BASE + PENDING_FLASH_OFFSET;
+        const PENDING_PAYLOAD_BYTES = 256;        // full page (RP2350 requirement)
+        const PENDING_STATE_CONFIRMED = 0xC0;
+
         // Configuration byte offsets (must match src/config.h)
         const CONF_PICO_MODEL = 0;
         const CONF_HW_VERSION = 1;
@@ -612,6 +640,32 @@
         const CONF_DIAG_PALETTE = 19;
         const CONF_DIAG_ADDRESS = 20;
         const CONF_PALETTE_IDX_0 = 128;
+
+        // ---------------------------------------------------------------------
+        // TARGET FIRMWARE VERSION - the single value to bump each release.
+        // ---------------------------------------------------------------------
+        // This configurator targets the LATEST firmware only. This one constant
+        // drives (a) the on-screen version banner/summary and (b) the version
+        // bytes stamped into the config block.
+        //
+        // The firmware stamps SW_VERSION = (major << 4) | minor and
+        // SW_PATCH_VERSION = patch on save (config.c). readConfig() compares the
+        // stored version against the running firmware's; if they differ it runs
+        // migrateNewFields(), which resets every field introduced after the
+        // stored version to its default. A config block left at version 0 (as
+        // this tool once emitted) therefore has ALL fields reset to default on
+        // first boot - the user's chosen settings never apply. Stamping the
+        // target version keeps storedVer == firmware version and skips migration.
+        //
+        // On release, bump this to match PICO9918_*_VER in CMakeLists.txt AND
+        // regenerate configurator_title.png (the title image bakes in the
+        // version text).
+        const FW_MAJOR = 1;
+        const FW_MINOR = 2;
+        const FW_PATCH = 0;
+        const FW_VERSION_STR = `${FW_MAJOR}.${FW_MINOR}.${FW_PATCH}`;
+        const CONF_SW_VERSION_VALUE = ((FW_MAJOR << 4) | FW_MINOR) & 0xFF;
+        const CONF_SW_PATCH_VALUE = FW_PATCH & 0xFF;
 
         // UF2 constants
         const UF2_MAGIC_START0 = 0x0A324655;
@@ -678,6 +732,10 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Fill the target-firmware version everywhere it is shown
+            document.getElementById('fwVersion').textContent = FW_VERSION_STR;
+            document.getElementById('fwVersionInline').textContent = FW_VERSION_STR;
+
             initializePaletteEditor();
             updateSummary();
 
@@ -856,11 +914,6 @@
 
             const diagText = diagnostics.length > 0 ? diagnostics.join(', ') : 'None';
 
-            // Determine minimum firmware version
-            let minFirmware = 'v1.0.0';
-            if (config.vdpDevice > 0) minFirmware = 'v1.1.1';
-            if (config.dispDriverPref > 0 || config.vgaMode > 0) minFirmware = 'v1.2.0';
-
             // Determine palette status. The dropdown value may be 'custom' (after
             // a manual edit) which has no preset entry - report it as "Custom".
             const selectedPreset = document.getElementById('palettePreset').value;
@@ -884,8 +937,8 @@
                     <span class="summary-value">PICO9918 &amp; PICO9918 PRO</span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Min. Firmware:</span>
-                    <span class="summary-value">${minFirmware}+</span>
+                    <span class="summary-label">Target Firmware:</span>
+                    <span class="summary-value">v${FW_VERSION_STR}</span>
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">VDP Device:</span>
@@ -925,7 +978,7 @@
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">File Size:</span>
-                    <span class="summary-value">1024 bytes (2 blocks)</span>
+                    <span class="summary-value">2048 bytes (4 blocks)</span>
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">Target Address:</span>
@@ -943,6 +996,11 @@
             config[CONF_HW_VERSION] = hwVersion;
             // CONF_DISP_DRIVER is recomputed by the firmware on boot from
             // CONF_DISP_DRIVER_PREF + dongle detection; we just leave it 0.
+
+            // Stamp the firmware version so readConfig() does not treat this as
+            // an older config and reset every field to default via migration.
+            config[CONF_SW_VERSION] = CONF_SW_VERSION_VALUE;
+            config[CONF_SW_PATCH_VERSION] = CONF_SW_PATCH_VALUE;
 
             // Set user-configurable options
             config[CONF_CRT_SCANLINES] = options.scanlines ? 1 : 0;
@@ -980,8 +1038,9 @@
             return config;
         }
 
-        // Create UF2 block
-        function createUF2Block(configData, familyId, blockNo, numBlocks) {
+        // Create UF2 block. targetAddr/payloadSize let a block target either
+        // the main config block or the pending block sector.
+        function createUF2Block(payload, familyId, blockNo, numBlocks, targetAddr, payloadSize) {
             const block = new Uint8Array(512);
             const view = new DataView(block.buffer);
 
@@ -989,14 +1048,14 @@
             view.setUint32(0, UF2_MAGIC_START0, true);
             view.setUint32(4, UF2_MAGIC_START1, true);
             view.setUint32(8, UF2_FLAG_FAMILYID, true);
-            view.setUint32(12, CONFIG_FLASH_ADDR, true);
-            view.setUint32(16, CONFIG_BYTES, true);
+            view.setUint32(12, targetAddr, true);
+            view.setUint32(16, payloadSize, true);
             view.setUint32(20, blockNo, true);
             view.setUint32(24, numBlocks, true);
             view.setUint32(28, familyId, true);
 
-            // Copy config data payload
-            block.set(configData, 32);
+            // Copy payload
+            block.set(payload, 32);
 
             // Magic end
             view.setUint32(508, UF2_MAGIC_END, true);
@@ -1004,17 +1063,43 @@
             return block;
         }
 
-        // Generate combined UF2 file with one block per device family
+        // Build a CONFIRMED PendingDisplay payload (matches config.h struct
+        // layout: state, dispDriverPref, vgaMode, scartMode, clockPresetId,
+        // then reserved zero bytes). Writing this clears any stale pending
+        // block so the main config's display settings actually boot. The RP2
+        // bootloader erases the whole 4 KB sector before writing this block.
+        function createPendingArray(options) {
+            const pending = new Uint8Array(PENDING_PAYLOAD_BYTES);
+            pending[0] = PENDING_STATE_CONFIRMED;
+            pending[1] = options.dispDriverPref & 0x03;
+            pending[2] = options.vgaMode & 0x01;
+            pending[3] = options.scartMode & 0x01;
+            pending[4] = options.clockPreset & 0x03;
+            // pending[5..15] remain zero (reserved)
+            return pending;
+        }
+
+        // Generate combined UF2 file. Per device family we write two blocks:
+        // the 256-byte main config block, and a 16-byte CONFIRMED pending
+        // block that clears the display-change rollback sector.
         function generateUF2(options) {
             const rp2040Config = createConfigArray(options, PICO_MODEL_RP2040, HW_VER_1_X);
             const rp2350Config = createConfigArray(options, PICO_MODEL_RP2350, HW_VER_2_X);
+            const pending = createPendingArray(options);
 
-            const block0 = createUF2Block(rp2040Config, FAMILY_ID_RP2040, 0, 1);
-            const block1 = createUF2Block(rp2350Config, FAMILY_ID_RP2350, 0, 1);
+            // Every block is self-contained (blockNo 0 / numBlocks 1), matching
+            // the proven single-block-per-family scheme: independent 0/1 blocks
+            // route purely by family ID. Each carries a full 256-byte payload so
+            // the strict RP2350 bootloader accepts them.
+            const blocks = [
+                createUF2Block(rp2040Config, FAMILY_ID_RP2040, 0, 1, CONFIG_FLASH_ADDR, CONFIG_BYTES),
+                createUF2Block(pending,      FAMILY_ID_RP2040, 0, 1, PENDING_FLASH_ADDR, PENDING_PAYLOAD_BYTES),
+                createUF2Block(rp2350Config, FAMILY_ID_RP2350, 0, 1, CONFIG_FLASH_ADDR, CONFIG_BYTES),
+                createUF2Block(pending,      FAMILY_ID_RP2350, 0, 1, PENDING_FLASH_ADDR, PENDING_PAYLOAD_BYTES),
+            ];
 
-            const combined = new Uint8Array(1024);
-            combined.set(block0, 0);
-            combined.set(block1, 512);
+            const combined = new Uint8Array(blocks.length * 512);
+            blocks.forEach((b, i) => combined.set(b, i * 512));
             return combined;
         }
 
