@@ -59,7 +59,6 @@
 
 static uint8_t nextValue = 0;     /* TMS9918A read-ahead value */
 static bool currentInt = false;   /* current interrupt state */
-static uint8_t currentStatus = 0x1f; /* current status register value */
 
 static char collisionDebugStr[32] = "";  /* debug: last collision info */
 
@@ -148,28 +147,14 @@ void __not_in_flash_func(tmsReadIrqHandler)()
   else // read status
   {
     readVal >>= (1 + 16);        // Extract status that was actually read
-    int readReg = (readVal >> 8); // What status register was read?
-    tms9918->regWriteStage = 0;
-    
-    // Standard mode or F18A status register 0
-    if (!tms9918->isUnlocked || readReg == 0)
+    int readReg = (readVal >> 8); // What status register was read? (0 when locked)
+
+    vrEmuTms9918StatusWasReadImpl(readReg, readVal);
+
+    if (readReg == 0 && (readVal & STATUS_INT)) // Was Interrupt flag set?
     {
-      readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
-      currentStatus &= ~readVal; // Clear only the flags that were set
-      if (readVal & STATUS_5S)   // Was 5th Sprite flag set?
-        currentStatus |= 0x1f;   // Set sprite number to 31
-      vrEmuTms9918SetStatusImpl(currentStatus);
-      if (readVal & STATUS_INT)  // Was Interrupt flag set?
-      {
-        currentInt = false;
-        setIntPin();
-      }
-    }
-    else if (readReg == 1)
-    {
-      // F18A status register 1
-      if (readVal & 0x01)
-        TMS_STATUS(tms9918, 0x01) &= ~0x01;
+      currentInt = false;
+      setIntPin();
     }
   }
 
@@ -245,8 +230,7 @@ void __not_in_flash_func(gpioIrqHandler)()
   pio_sm_clear_fifos(TMS_PIO, tmsWriteSm);
 
   nextValue = 0;
-  currentStatus = 0x1f;
-  vrEmuTms9918SetStatusImpl(currentStatus);
+  vrEmuTms9918SetStatusImpl(0x1f);
   currentInt = false;
   doneInt = true;
   updateTmsReadAhead();  
@@ -326,6 +310,7 @@ static void eofInterrupt()
 static void updateInterrupts(uint8_t tempStatus)
 {
   disableTmsPioInterrupts();
+  uint8_t currentStatus = TMS_STATUS(tms9918, 0);
   if ((currentStatus & STATUS_INT) == 0)
   {
     if (currentStatus & STATUS_5S)
@@ -434,7 +419,7 @@ static void tmsEndOfScanline(uint32_t displayLine)
 {
   if (!doneInt)
   {
-    bool droppedFrame = currentStatus & STATUS_INT;
+    bool droppedFrame = TMS_STATUS(tms9918, 0) & STATUS_INT;
     droppedFramesCount += droppedFrame - droppedFrames[frameCount & 0xf];
     droppedFrames[frameCount & 0xf] = droppedFrame;
 
