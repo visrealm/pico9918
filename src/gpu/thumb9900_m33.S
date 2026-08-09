@@ -1299,16 +1299,20 @@ I_XOP_BL:
         ADD  R3,R8,#0x6000 // Video registers within the 64KB memory area
         LDRB R0,[R3,#0x23] // Get VR35
 
-        UXTB R7,R5         // Y
         CMP  R0,#0         // 0 is special, == 256
         IT   EQ
         MOVEQ R0,#256
+        ADDS R0,#3
+        LSRS R0,#2         // Row stride in bytes, rounded up
+        UXTB R7,R5         // Y
         MULS R0,R7         // R7 is now free
-        ADD  R0,R0,R5,LSR #8 // R0 = p = (y * vregs [35]) + x;
+        ADD  R0,R0,R5,LSR #10 // R0 = (y * stride) + (x >> 2)
 
         LDRB R2,[R3,#0x20] // Get VR32 - R3 is now free
-        LSRS R5,R0,#2
-        ADD  R2,R5,R2,LSL #6 // R2 = a = (vregs [32] << 6) + (p >> 2);
+        ADD  R2,R0,R2,LSL #6 // R2 = a = (vregs [32] << 6) + offset
+        BFC  R2,#14,#18    // Address wraps within the 16KB of VRAM
+
+        UBFX R0,R5,#8,#2 // R0 = s = x & 0x03;
 
         LSRS R5,R4,#15   // if (R4 & PIX_A) - PIX_A into Carry
         BCC  I_XOP_BL_P  // Clear = Process Bits, else just store address result..
@@ -1320,7 +1324,6 @@ I_XOP_BL:
 
 .align 4
 I_XOP_BL_P:
-        AND  R0,R0,#3     // R0 = s = p & 0x03;
         ADD  R2,R8       // Within the 64KB memory area
         LDRB R3,[R2,#0]  // R3 = b = mem [a];
         ADR  R7,MSKSH
