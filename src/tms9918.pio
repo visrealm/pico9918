@@ -20,16 +20,12 @@
 ;              |    |reg | status |  data  | pindir |
 ;
 ;
-; fifo isr  
-; if mode==1 0b|000|rrrr|ssssssss|dddddddd|11111111|m|
+; fifo isr   0b|000|rrrr|ssssssss|dddddddd|11111111|m|
 ;              |   |reg | status |  data  | pindir |o|
 ;              |   |    |        |        |        |d|
 ;              |   |    |        |        |        |e|
 ;
-; if mode==0 0b|m|
-;              |o|
-;              |d|
-;              |e|
+;            only the mode bit is meaningful when mode==0
 ;
 
 .program tmsRead
@@ -60,11 +56,11 @@ pullLoop:
 
   jmp !y, endPart ; still 1? loop, otherwise, let's read
 
-readStatus:  
+readStatus:
   out pins, 8       ; output the status byte
-  mov isr, x        ; make this status value available
 endPart:
-  in pins, 1        ; push CSR, CSW and MODE back through fifo
+  mov isr, x        ; make this status value available
+  in y, 1           ; the MODE we acted on, so the cpu can't decide differently
   push              ; push ^^^ back to cpu to process
 .wrap
 
