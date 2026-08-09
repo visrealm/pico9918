@@ -54,18 +54,16 @@ res9900: // Restore simulator state
 //89ABCDEF01234567 (Format 5)
 //CCCCWWWW00001000
 .align 4
-I_SRA:  LSLS R5,R0,#20
-        LSRS R5,#27 // Get Register x 2
-        MOV  R6,R11
+I_SRA:  UBFX R5,R0,#8,#4 // Get Register
 
         LSRS R2,R0,#12 // Get Shift Count
         BNE  I_SRA_nr0 // Result not 0 - got it, else
-        LDRB R2,[R6,#1] // Get R0 low byte
+        LDRB R2,[R11,#1] // Get R0 low byte
         ANDS R2,#0x0F  // Mask lower nibble
         BNE  I_SRA_nr0 // Result not 0 - got it, else
         MOVS R2,#16
 I_SRA_nr0:
-        LDRH R0,[R5,R6]
+        LDRH R0,[R11,R5,LSL #1]
         REVSH R0,R0 // Signed
 
         ANDS R1,#0x0E // Get initialised ST
@@ -75,25 +73,23 @@ I_SRA_nr0:
         ADDS R1,#0x10 // Carry Bit
 I_SRA_st:
         REV16 R2,R0
-        STRH R2,[R5,R6]
+        STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
 // *********************************************************************************************
 //R0 (LE)
 //89ABCDEF01234567 (Format 5)
 //CCCCWWWW00001001
 .align 4
-I_SRL:  LSLS R5,R0,#20
-        LSRS R5,#27 // Get Register x 2
-        MOV  R6,R11
+I_SRL:  UBFX R5,R0,#8,#4 // Get Register
 
         LSRS R2,R0,#12 // Get Shift Count
         BNE  I_SRL_nr0 // Result not 0 - got it, else
-        LDRB R2,[R6,#1] // Get R0 low byte
+        LDRB R2,[R11,#1] // Get R0 low byte
         ANDS R2,#0x0F  // Mask lower nibble
         BNE  I_SRL_nr0 // Result not 0 - got it, else
         MOVS R2,#16
 I_SRL_nr0:
-        LDRH R0,[R5,R6]
+        LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
 
         ANDS R1,#0x0E // Get initialised ST
@@ -103,27 +99,25 @@ I_SRL_nr0:
         ADDS R1,#0x10 // Carry Bit
 I_SRL_st:
         REV16 R2,R0
-        STRH R2,[R5,R6]
+        STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
 // *********************************************************************************************
 //R0 (LE)
 //89ABCDEF01234567 (Format 5)
 //CCCCWWWW00001010
 .align 4
-I_SLA:  LSLS R5,R0,#20
-        LSRS R5,#27 // Get Register x 2
-        MOV  R6,R11
+I_SLA:  UBFX R5,R0,#8,#4 // Get Register
 
         ANDS R1,#0x06 // Get initialised ST
 
         LSRS R2,R0,#12 // Get Shift Count
         BNE  I_SLA_nr0 // Result not 0 - got it, else
-        LDRB R2,[R6,#1] // Get R0 low byte
+        LDRB R2,[R11,#1] // Get R0 low byte
         ANDS R2,#0x0F  // Mask lower nibble
         BNE  I_SLA_nr0 // Result not 0 - got it, else
         MOVS R2,#16
 
-        LDRH R0,[R5,R6]
+        LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
         LSLS R4,R0,#16
         ORRS R0,R4 // Copy lower halfword to high halfword
@@ -132,7 +126,7 @@ I_SLA:  LSLS R5,R0,#20
         BNE  I_SLA_ov // Result was not zero
         B    I_SLA_nov
 I_SLA_nr0:
-        LDRH R0,[R5,R6]
+        LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
         LSLS R4,R0,#16
         ORRS R0,R4 // Copy lower halfword to high halfword
@@ -163,7 +157,7 @@ I_SLA_nov:
         ADDS R1,#0x10 // Carry Bit
 I_SLA_st:
         REV16 R2,R0
-        STRH R2,[R5,R6]
+        STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
 .align 4
 I_SLA_M: .WORD 0x0000, 0x4000, 0x6000, 0x7000, 0x7800, 0x7C00, 0x7E00, 0x7F00
@@ -173,18 +167,16 @@ I_SLA_M: .WORD 0x0000, 0x4000, 0x6000, 0x7000, 0x7800, 0x7C00, 0x7E00, 0x7F00
 //89ABCDEF01234567 (Format 5)
 //CCCCWWWW00001011
 .align 4
-I_SRC:  LSLS R5,R0,#20
-        LSRS R5,#27 // Get Register x 2
-        MOV  R6,R11
+I_SRC:  UBFX R5,R0,#8,#4 // Get Register
 
         LSRS R2,R0,#12 // Get Shift Count
         BNE  I_SRC_nr0 // Result not 0 - got it, else
-        LDRB R2,[R6,#1] // Get R0 low byte
+        LDRB R2,[R11,#1] // Get R0 low byte
         ANDS R2,#0x0F  // Mask lower nibble
         BNE  I_SRC_nr0 // Result not 0 - got it, else
         MOVS R2,#16
 I_SRC_nr0:
-        LDRH R0,[R5,R6]
+        LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
         LSLS R4,R0,#16
         ORRS R0,R4 // Copy lower halfword to high halfword
@@ -196,7 +188,7 @@ I_SRC_nr0:
         ADDS R1,#0x10 // Carry Bit
 I_SRC_st:
         REV16 R2,R0
-        STRH R2,[R5,R6]
+        STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
 // *********************************************************************************************
 
@@ -208,18 +200,16 @@ I_SLC:
 //R0 (LE)
 //89ABCDEF01234567 (Format 5)
 //CCCCWWWW00001110
-I_SLC:  LSLS R5,R0,#20
-        LSRS R5,#27 // Get Register x 2
-        MOV  R6,R11
+I_SLC:  UBFX R5,R0,#8,#4 // Get Register
 
         LSRS R2,R0,#12 // Get Shift Count
         BNE  I_SLC_nr0 // Result not 0 - got it, else
-        LDRB R2,[R6,#1] // Get R0 low byte
+        LDRB R2,[R11,#1] // Get R0 low byte
         ANDS R2,#0x0F  // Mask lower nibble
         BNE  I_SLC_nr0 // Result not 0 - got it, else
         MOVS R2,#16
 I_SLC_nr0:
-        LDRH R0,[R5,R6]
+        LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
         LSLS R4,R0,#16
         ORRS R0,R4 // Copy lower halfword to high halfword
@@ -234,7 +224,7 @@ I_SLC_nr0:
         ADDS R1,#0x10 // Carry Bit
 I_SLC_st:
         REV16 R2,R0
-        STRH R2,[R5,R6]
+        STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
 
 // *********************************************************************************************
@@ -242,11 +232,10 @@ I_SLC_st:
 //89ABCDEF01234567
 //ooo.WWWW00000010
 .align 4
-I_LI:   LSLS R6,R0,#20
-        LSRS R6,#27 // DEST = WP + ((BYTE & 0x0F) << 1);
+I_LI:   UBFX R6,R0,#8,#4 // Register number
         LDRH R0,[R8,R3]
         ADDS R3,#2
-        STRH R0,[R11,R6]
+        STRH R0,[R11,R6,LSL #1]
         REV16 R0,R0
         ANDS R1,#0x1E // Get initialised ST
         B    OP_COMP_W
@@ -255,13 +244,12 @@ I_LI:   LSLS R6,R0,#20
 //89ABCDEF01234567
 //ooo.WWWW00000010
 .align 4
-I_ANDI: LSLS R6,R0,#20
-        LSRS R6,#27 // DEST = WP + ((BYTE & 0x0F) << 1);
+I_ANDI: UBFX R6,R0,#8,#4 // Register number
         LDRH R0,[R8,R3]
         ADDS R3,#2
-        LDRH R5,[R11,R6] // R6=DEST
+        LDRH R5,[R11,R6,LSL #1]
         ANDS R0,R5
-        STRH R0,[R11,R6] // R6=DEST
+        STRH R0,[R11,R6,LSL #1]
         REV16 R0,R0
         ANDS R1,#0x1E // Get initialised ST
         B    OP_COMP_W
@@ -270,13 +258,12 @@ I_ANDI: LSLS R6,R0,#20
 //89ABCDEF01234567
 //ooo.WWWW00000010
 .align 4
-I_ORI:  LSLS R6,R0,#20
-        LSRS R6,#27 // DEST = WP + ((BYTE & 0x0F) << 1);
+I_ORI:  UBFX R6,R0,#8,#4 // Register number
         LDRH R0,[R8,R3]
         ADDS R3,#2
-        LDRH R5,[R11,R6] // R6=DEST
+        LDRH R5,[R11,R6,LSL #1]
         ORRS R0,R5
-        STRH R0,[R11,R6] // R6=DEST
+        STRH R0,[R11,R6,LSL #1]
         REV16 R0,R0
         ANDS R1,#0x1E // Get initialised ST
         B    OP_COMP_W
@@ -472,9 +459,8 @@ OP_COMP_W_a:
 //89ABCDEF01234567
 //ooo.WWWW00000010
 .align 4
-I_AI:   LSLS R6,R0,#20
-        LSRS R6,#27
-        ADD  R6,R11 // DEST = WP + ((BYTE & 0x0F) << 1);
+I_AI:   UBFX R6,R0,#8,#4
+        ADD  R6,R11,R6,LSL #1 // DEST = WP + (W << 1)
         LDRH R5,[R8,R3]
         ADDS R3,#2
 // *********************************************************************************************
@@ -719,13 +705,12 @@ I_CZC_ne:
 //89ABCDEF01234567
 //ooo.WWWW00000010
 .align 4
-I_CI:   LSLS R6,R0,#20
-        LSRS R6,#27 // DEST = WP + ((BYTE & 0x0F) << 1);
+I_CI:   UBFX R6,R0,#8,#4 // Register number
         LDRH R5,[R8,R3]
         ADDS R3,#2
         REV16 R5,R5
 
-        LDRH R2,[R11,R6] // R6=DEST
+        LDRH R2,[R11,R6,LSL #1]
         REV16 R2,R2
 
         ANDS R1,#0x1E // Get initialised ST
@@ -789,20 +774,18 @@ I_LWPI: LDRH R0,[R8,R3]
 //89ABCDEF01234567
 //ooo.WWWW00000010
 .align 4
-I_STWP: LSLS R6,R0,#20
-        LSRS R6,#27 // DEST = WP + ((BYTE & 0x0F) << 1);
+I_STWP: UBFX R6,R0,#8,#4 // Register number
         SUB  R4,R11,R8
         REV16 R4,R4
-        STRH R4,[R6,R11]
+        STRH R4,[R11,R6,LSL #1]
         B    start
 // *********************************************************************************************
 //R0 (LE)
 //89ABCDEF01234567
 //ooo.WWWW00000010
 .align 4
-I_STST: LSLS R6,R0,#20
-        LSRS R6,#27 // DEST = WP + ((BYTE & 0x0F) << 1);
-        STRH R1,[R11,R6] // Don't need to swap low bytes here
+I_STST: UBFX R6,R0,#8,#4 // Register number
+        STRH R1,[R11,R6,LSL #1] // Don't need to swap low bytes here
         B    start
 // *********************************************************************************************
 //R0 (LE)
