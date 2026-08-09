@@ -69,9 +69,8 @@ I_SRA_nr0:
         ANDS R1,#0x0E // Get initialised ST
         
         ASRS R0,R2
-        BCC  I_SRA_st // Carry Clear?
-        ADDS R1,#0x10 // Carry Bit
-I_SRA_st:
+        IT   CS
+        ADDCS R1,#0x10 // Carry Bit
         REV16 R2,R0
         STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
@@ -95,9 +94,8 @@ I_SRL_nr0:
         ANDS R1,#0x0E // Get initialised ST
         
         LSRS R0,R2
-        BCC  I_SRL_st // Carry Clear?
-        ADDS R1,#0x10 // Carry Bit
-I_SRL_st:
+        IT   CS
+        ADDCS R1,#0x10 // Carry Bit
         REV16 R2,R0
         STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
@@ -153,9 +151,8 @@ I_SLA_ov:
         ADDS R1,#0x08 // Overflow Bit
 I_SLA_nov:
         LSLS R0,R2
-        BCC  I_SLA_st // Carry Clear?
-        ADDS R1,#0x10 // Carry Bit
-I_SLA_st:
+        IT   CS
+        ADDCS R1,#0x10 // Carry Bit
         REV16 R2,R0
         STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
@@ -184,9 +181,8 @@ I_SRC_nr0:
         ANDS R1,#0x0E // Get initialised ST
         
         RORS R0,R2
-        BCC  I_SRC_st // Carry Clear?
-        ADDS R1,#0x10 // Carry Bit
-I_SRC_st:
+        IT   CS
+        ADDCS R1,#0x10 // Carry Bit
         REV16 R2,R0
         STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
@@ -220,9 +216,8 @@ I_SLC_nr0:
         SUBS R4,R2  // R2 = 1..16, R4 -> 15..0
         RORS R0,R4
         LSRS R2,R0,#1 // Calculate Carry
-        BCC  I_SLC_st // Carry Clear?
-        ADDS R1,#0x10 // Carry Bit
-I_SLC_st:
+        IT   CS
+        ADDCS R1,#0x10 // Carry Bit
         REV16 R2,R0
         STRH R2,[R11,R5,LSL #1]
         B    OP_COMP_W
@@ -281,9 +276,8 @@ I_NEG:  LDRH R0,[R5,#0] // R5=SRCE/DEST
 .align 4
 I_NEG_no_ov:
         RSBS R0,#0 // R0=0-R0
-        BNE  I_NEG_nc
-        ADDS R1,#0x10 // Carry bit
-I_NEG_nc:
+        IT   EQ
+        ADDEQ R1,#0x10 // Carry bit
         REV16 R2,R0
         STRH R2,[R5,#0]
         B    OP_COMP_W
@@ -352,15 +346,12 @@ I_INC:  LDRH R2,[R5,#0] // R5=SRCE/DEST
         ANDS R1,#0x06 // Get initialised ST
 
         CMP  R2,R0
-        BLO  I_INC_nc
-        ADDS R1,#0x10 // Carry bit
-I_INC_nc:
-        LSRS R2,#15
-        BNE  OP_COMP_W
-        LSRS R4,R0,#15
-        CMP  R2,R4
-        BEQ  OP_COMP_W
-        ADDS R1,#0x08 // Overflow bit
+        IT   HS
+        ADDHS R1,#0x10 // Carry bit
+
+        CMP  R0,#0x8000 // signed overflow iff >7FFF -> >8000
+        IT   EQ
+        ADDEQ R1,#0x08 // Overflow bit
         B    OP_COMP_W
 // *********************************************************************************************
 .align 4
@@ -376,15 +367,13 @@ I_INCT: LDRH R2,[R5,#0] // R5=SRCE/DEST
         ANDS R1,#0x06 // Get initialised ST
 
         CMP  R2,R0
-        BLO  I_INCT_nc
-        ADDS R1,#0x10 // Carry bit
-I_INCT_nc:
-        LSRS R2,#15
-        BNE  OP_COMP_W
-        LSRS R4,R0,#15
-        CMP  R2,R4
-        BEQ  OP_COMP_W
-        ADDS R1,#0x08 // Overflow bit
+        IT   HS
+        ADDHS R1,#0x10 // Carry bit
+
+        BIC  R4,R0,#1
+        CMP  R4,#0x8000 // overflow iff result is >8000 or >8001
+        IT   EQ
+        ADDEQ R1,#0x08 // Overflow bit
         B    OP_COMP_W
 // *********************************************************************************************
 .align 4
@@ -399,15 +388,12 @@ I_DEC:  LDRH R2,[R5,#0] // R5=SRCE/DEST
         ANDS R1,#0x06 // Get initialised ST
 
         CMP  R2,R0
-        BLO  I_DEC_nc
-        ADDS R1,#0x10 // Carry bit
-I_DEC_nc:
-        LSRS R2,#15
-        BEQ  OP_COMP_W
-        LSRS R4,R0,#15
-        CMP  R2,R4
-        BEQ  OP_COMP_W
-        ADDS R1,#0x08 // Overflow bit
+        IT   HS
+        ADDHS R1,#0x10 // Carry bit
+
+        CMP  R2,#0x8000 // signed overflow iff >8000 -> >7FFF
+        IT   EQ
+        ADDEQ R1,#0x08 // Overflow bit
         B    OP_COMP_W
 // *********************************************************************************************
 .align 4
@@ -423,15 +409,13 @@ I_DECT: LDRH R2,[R5,#0] // R5=SRCE/DEST
         ANDS R1,#0x06 // Get initialised ST
 
         CMP  R2,R0
-        BLO  I_DECT_nc
-        ADDS R1,#0x10 // Carry bit
-I_DECT_nc:
-        LSRS R2,#15
-        BEQ  OP_COMP_W
-        LSRS R4,R0,#15
-        CMP  R2,R4
-        BEQ  OP_COMP_W
-        ADDS R1,#0x08 // Overflow bit
+        IT   HS
+        ADDHS R1,#0x10 // Carry bit
+
+        BIC  R4,R2,#1
+        CMP  R4,#0x8000 // overflow iff operand is >8000 or >8001
+        IT   EQ
+        ADDEQ R1,#0x08 // Overflow bit
         B    OP_COMP_W
 // *********************************************************************************************
 .align 4
@@ -473,21 +457,18 @@ I_A:    LDRH R2,[R6,#0] // R6=DEST
         ANDS R1,#0x06 // Get initialised ST
 
         LSRS R4,R7,#16
-        BEQ  I_A_nc
-        ADDS R1,#0x10 // Carry bit
-I_A_nc:
+        IT   NE
+        ADDNE R1,#0x10 // Carry bit
         UXTH R0,R7 // Keep a copy
         REV16 R7,R7
         STRH R7,[R6,#0]
 
-        LSRS R5,#15
-        LSRS R2,#15
-        CMP  R2,R5
-        BNE  OP_COMP_W
-        LSRS R4,R0,#15
-        CMP  R2,R4
-        BEQ  OP_COMP_W
-        ADDS R1,#0x08 // Overflow bit
+        EOR  R4,R2,R0 // Overflow iff both operands differ from the result
+        EOR  R5,R5,R0
+        AND  R4,R4,R5
+        TST  R4,#0x8000
+        IT   NE
+        ADDNE R1,#0x08 // Overflow bit
         B    OP_COMP_W
 // *********************************************************************************************
 .align 4
@@ -503,20 +484,15 @@ I_S:    LDRH R2,[R6,#0] // R6=DEST
 
         ANDS R1,#0x06 // Get initialised ST
 
-        CBZ  R5,I_S_c // Zero sets Carry
         CMP  R2,R0
-        BLO  I_S_nc
-I_S_c:
-        ADDS R1,#0x10 // Carry bit
-I_S_nc:
-        LSRS R5,#15
-        LSRS R2,#15
-        CMP  R2,R5
-        BEQ  OP_COMP_W
-        LSRS R4,R0,#15
-        CMP  R2,R4
-        BEQ  OP_COMP_W
-        ADDS R1,#0x08 // Overflow bit
+        IT   HS
+        ADDHS R1,#0x10 // Carry bit
+        EOR  R4,R2,R5 // Overflow iff operands differ and the result differs from R2
+        EOR  R5,R2,R0
+        AND  R4,R4,R5
+        TST  R4,#0x8000
+        IT   NE
+        ADDNE R1,#0x08 // Overflow bit
         B    OP_COMP_W
 // *********************************************************************************************
 .align 4
@@ -541,20 +517,17 @@ I_AB:   LDRB R2,[R6,#0] // R6=DEST
         ANDS R1,#0x02 // Get initialised ST
 
         LSRS R4,R0,#8
-        BEQ  I_AB_nc
-        ADDS R1,#0x10 // Carry bit
+        IT   NE
+        ADDNE R1,#0x10 // Carry bit
         UXTB R0,R0
-I_AB_nc:
         STRB R0,[R6,#0]
 
-        LSRS R5,#7
-        LSRS R2,#7
-        CMP  R2,R5
-        BNE  OP_COMP_B
-        LSRS R4,R0,#7
-        CMP  R2,R4
-        BEQ  OP_COMP_B
-        ADDS R1,#0x08 // Overflow bit
+        EOR  R4,R2,R0 // Overflow iff both operands differ from the result
+        EOR  R5,R5,R0
+        AND  R4,R4,R5
+        TST  R4,#0x80
+        IT   NE
+        ADDNE R1,#0x08 // Overflow bit
         B    OP_COMP_B
 // *********************************************************************************************
 .align 4
@@ -567,20 +540,15 @@ I_SB:   LDRB R2,[R6,#0] // R6=DEST
 
         ANDS R1,#0x02 // Get initialised ST
 
-        CBZ  R5,I_SB_c // Zero sets Carry
         CMP  R2,R0
-        BLO  I_SB_nc
-I_SB_c:
-        ADDS R1,#0x10 // Carry bit
-I_SB_nc:
-        LSRS R5,#7
-        LSRS R2,#7
-        CMP  R2,R5
-        BEQ  OP_COMP_B
-        LSRS R4,R0,#7
-        CMP  R2,R4
-        BEQ  OP_COMP_B
-        ADDS R1,#0x08 // Overflow bit
+        IT   HS
+        ADDHS R1,#0x10 // Carry bit
+        EOR  R4,R2,R5 // Overflow iff operands differ and the result differs from R2
+        EOR  R5,R2,R0
+        AND  R4,R4,R5
+        TST  R4,#0x80
+        IT   NE
+        ADDNE R1,#0x08 // Overflow bit
         B    OP_COMP_B
 // *********************************************************************************************
 .align 4
