@@ -80,8 +80,11 @@ endPart:
 .program tmsWrite
 .define public CSW_PIN 27
 
+startWrite:
   wait 0 gpio CSW_PIN       ; wait for CSW to go active (low)
   in pins, 16               ; MODE is only valid +/-30ns around this edge (th(WL-A)). Do not delay.
+  nop                 [7]   ; ~32 ns entry window. tw(WL) is 200ns, so a real cycle outlasts it
+  jmp pin startWrite        ; CSW high again? it was a glitch. discard and re-arm
 pollWriteLoop:
   mov x, pins               ; continuously grab pin state
   jmp pin captureWrite      ; and wait for csw high
@@ -92,4 +95,5 @@ captureWrite:
   jmp pollWriteLoop         ; if CSW bounced back LOW, retry
 confirmed:
   in x, 16                  ; grab the final state (CSW confirmed stable HIGH)
+  push                      ; not autopush: a discarded cycle leaves the isr partly filled
 .wrap
