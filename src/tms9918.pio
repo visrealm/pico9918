@@ -35,8 +35,9 @@
   mov x, osr        ; ensure we have a valid fifo value in x
 
 .wrap_target
+releaseBus:
   mov osr, null       ; change CD0-7 pindirs to inputs
-  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
+  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive)
   out pindirs, 8
   mov isr, null
 
@@ -45,14 +46,12 @@ pullLoop:
   mov x, osr        ; since we want the latest value
   jmp pin pullLoop
 
-  nop           [7] ; ~32 ns debounce delay for CSR settling (covers typical bounce)
-  jmp pin pullLoop  ; if CSR bounced back HIGH, go back to waiting (debounce recovery)
-  
+  out pindirs, 8    ; drive at once. U5 turned toward the host on the CSR edge,
+  out pins, 8   [8] ; so anything later leaves it driving an undriven input
+  jmp pin releaseBus ; ~32 ns settled? if CSR bounced back HIGH, release and re-arm
+
   in pins, 1        ; read MODE pin (debounce verified, CSR is stable LOW)
   mov y, isr        ; y contains MODE state
-  
-  out pindirs, 8    ; set up CD0-7 as outputs
-  out pins, 8       ; output data byte
 
   jmp !y, endPart ; still 1? loop, otherwise, let's read
 
@@ -82,8 +81,8 @@ endPart:
 
 startWrite:
   wait 0 gpio CSW_PIN       ; wait for CSW to go active (low)
-  in pins, 16               ; MODE is only valid +/-30ns around this edge (th(WL-A)). Do not delay.
-  nop                 [7]   ; ~32 ns entry window. tw(WL) is 200ns, so a real cycle outlasts it
+  in pins, 16         [5]   ; sample at the edge (th(WL-A) is 30ns), then hold out the
+                            ; ~20 ns entry window. tw(WL) is 200ns, so a real cycle outlasts it
   jmp pin startWrite        ; CSW high again? it was a glitch. discard and re-arm
 pollWriteLoop:
   mov x, pins               ; continuously grab pin state
