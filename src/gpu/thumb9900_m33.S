@@ -126,8 +126,7 @@ I_SLA:  UBFX R5,R0,#8,#4 // Get Register
 I_SLA_nr0:
         LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
-        LSLS R4,R0,#16
-        ORRS R0,R4 // Copy lower halfword to high halfword
+        PKHBT R0,R0,R0,LSL #16 // Copy lower halfword to high halfword
 
         // Set Overflow if sign changes
         ADR  R4,I_SLA_M
@@ -175,8 +174,7 @@ I_SRC:  UBFX R5,R0,#8,#4 // Get Register
 I_SRC_nr0:
         LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
-        LSLS R4,R0,#16
-        ORRS R0,R4 // Copy lower halfword to high halfword
+        PKHBT R0,R0,R0,LSL #16 // Copy lower halfword to high halfword
 
         ANDS R1,#0x0E // Get initialised ST
         
@@ -207,8 +205,7 @@ I_SLC:  UBFX R5,R0,#8,#4 // Get Register
 I_SLC_nr0:
         LDRH R0,[R11,R5,LSL #1]
         REV16 R0,R0 // Unsigned
-        LSLS R4,R0,#16
-        ORRS R0,R4 // Copy lower halfword to high halfword
+        PKHBT R0,R0,R0,LSL #16 // Copy lower halfword to high halfword
 
         ANDS R1,#0x0E // Get initialised ST
 
@@ -707,13 +704,11 @@ I_MUL:  MULS R4,R5
         B    start
 // *********************************************************************************************
 .align 4
-I_DIV:  CMP   R5,R4
-        BLS   I_DIV_ov // Equal also overflows
+I_DIV:  LDR  R4,[R6,#0]
+        REV  R4,R4 // 32-bit big-endian dividend
 
-        LSLS R4,16
-        LDRH R2,[R6,#2]
-        REV16 R2,R2
-        ORRS R4,R2
+        CMP  R5,R4,LSR #16 // Test the same word the division uses
+        BLS  I_DIV_ov // Equal also overflows
 
         UDIV R2,R4,R5    // Quotient in R2
         MLS  R5,R2,R5,R4 // Remainder - R5=R4-(R2*R5)
@@ -956,9 +951,8 @@ OP_3LO: LSRS R2,R0,#13 // if ((BYTE & 0x30) == 0x20) Ts==2 (already checked Ts h
 //89ABCDEF01234567 (Format 2)
 //dddddddd0001oooo
 .align 4
-I_JMP:  SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-        ADDS R4,R0,#2 // Does this jump to itself?
+I_JMP:  SBFX R0,R0,#8,#8 // Signed word displacement
+        ADDS R4,R0,#1 // Does this jump to itself?
         BNE  dojmp2   // Else quit the emulation
 // *********************************************************************************************
 I_IDLE: MOV  R0,R3 // PC is the return value
@@ -970,11 +964,10 @@ I_JLT:  TST  R1,#0x60 // AG|EQ
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JLE:  LSRS R4,R1,#6 // EQ -> Carry
-        BCS  dojump
-        LSRS R4,R1,#8 // LG -> Carry
-        BCS  start
-        B    dojump
+I_JLE:  AND  R4,R1,#0xA0 // LG|EQ
+        CMP  R4,#0x80 // Only LG set with EQ clear means no jump
+        BNE  dojump
+        B    start
 // *********************************************************************************************
 .align 4
 I_JEQ:  LSRS R4,R1,#6 // EQ -> Carry
@@ -1031,9 +1024,8 @@ run9900:
 JMPTBL_PTR: .WORD JMPTBL
 // *********************************************************************************************
 .align 4
-dojump: SXTH R0,R0 // R0 now has a signed offset
-        ASRS R0,#7 // Word offset
-dojmp2: ADDS R3,R0 // Special entry point just for JMP
+dojump: SBFX R0,R0,#8,#8 // Signed word displacement
+dojmp2: ADD  R3,R3,R0,LSL #1 // Special entry point just for JMP
 // *********************************************************************************************
 start:  UXTH R3,R3 // Discard any extra - but allow to flow into register space
 
@@ -1071,11 +1063,10 @@ I_JL:   TST  R1,#0xA0 // LG|EQ
         B    dojump
 // *********************************************************************************************
 .align 4
-I_JH:   LSRS R4,R1,#6 // EQ -> Carry
-        BCS  start
-        LSRS R4,R1,#8 // LG -> Carry
-        BCC  start
-        B    dojump
+I_JH:   AND  R4,R1,#0xA0 // LG|EQ
+        CMP  R4,#0x80 // Only LG set with EQ clear means jump
+        BEQ  dojump
+        B    start
 // *********************************************************************************************
 .align 4
 I_JOP:  LSRS R4,R1,#3 // P -> Carry
@@ -1274,25 +1265,17 @@ I_XOP: // F18A PIX instruction
         LSLS R7,R4,#17  // Move leftmost bit (M) into the Carry flag
         BCC  I_XOP_BL   // Not a BM calculation, goto BL code instead
 
-        UXTB R4,R5      // R4=00000000 yyyyyyyy (E/A 336)
-        LSLS R2,R4,#5   // R2=000yyyyy yyy00000
-        ORRS R2,R4      // R2=000yyyyy zzzyyyyy
-        MOVS R7,#0xF8
-        BICS R2,R7      // R2=000yyyyy 00000yyy
+        UXTB R4,R5           // R4=00000000 yyyyyyyy (E/A 336)
+        ORR  R2,R4,R4,LSL #5 // R2=000yyyyy zzzyyyyy
+        BIC  R2,R2,#0xF8     // R2=000yyyyy 00000yyy
 
-        LSRS R4,R5,#8   // R4=00000000 xxxxxxxx
-        MOVS R7,#7
-        BICS R4,R7      // R4=00000000 xxxxx000
-        ORRS R2,R4      // R2=000yyyyy xxxxxyyy (byte offset)
+        UBFX R4,R5,#11,#5    // R4=00000000 000xxxxx
+        ORR  R2,R2,R4,LSL #3 // R2=000yyyyy xxxxxyyy (byte offset)
 
-        ADR  R7,VREGSL
-        LDR  R7,[R7,#0] // Get offset
-        ADD  R7,R8      // Within the 64KB memory area
-        LDRB R4,[R7,#4] // Get VR04
-        MOVS R7,#0x04   // BM Pattern Table Location
-        ANDS R4,R7      // Can only be >0000 or >2000 (E/A 335)
-        LSLS R4,#11     // Move bit into position
-        ORRS R2,R4
+        ADD  R7,R8,#0x6000   // Video registers within the 64KB memory area
+        LDRB R4,[R7,#4]      // Get VR04
+        AND  R4,R4,#4        // Can only be >0000 or >2000 (E/A 335)
+        ORR  R2,R2,R4,LSL #11 // BM Pattern Table Location
 
         REV16 R2,R2
         STRH R2,[R6,#0] // *DEST=R2
@@ -1313,26 +1296,19 @@ I_XOP_BL: // Return to C code function: F18A_PIX for BL mode
 .align 4
 I_XOP_BL:
         PUSH {R3}        // Save current PC
-        ADR  R3,VREGSH
-        LDR  R3,[R3,#0]  // Get offset
-        ADD  R3,R8       // Within the 64KB memory area
-        LDRB R0,[R3,#3]  // Get VR35
+        ADD  R3,R8,#0x6000 // Video registers within the 64KB memory area
+        LDRB R0,[R3,#0x23] // Get VR35
 
-        MOVS R7,R5
-        MOVS R2,#255     // Set up a mask, plus a base for > 255 numbers
-        ANDS R7,R2       // Y
-        CMP  R0,#0       // 0 is special, == 256
-        BNE  I_XOP_BL_M
-        ADDS R0,R2,#1    // 256 - R2 is now free
-I_XOP_BL_M:
-        MULS R0,R7       // R7 is now free
-        LSRS R5,R5,#8    // X
-        ADDS R0,R5       // R0 = p = (y * vregs [35]) + x; - R5 is now free
+        UXTB R7,R5         // Y
+        CMP  R0,#0         // 0 is special, == 256
+        IT   EQ
+        MOVEQ R0,#256
+        MULS R0,R7         // R7 is now free
+        ADD  R0,R0,R5,LSR #8 // R0 = p = (y * vregs [35]) + x;
 
-        LDRB R2,[R3,#0]  // Get VR32 - R3 is now free
-        LSLS R2,#6
+        LDRB R2,[R3,#0x20] // Get VR32 - R3 is now free
         LSRS R5,R0,#2
-        ADDS R2,R5       // R2 = a = (vregs [32] << 6) + (p >> 2);
+        ADD  R2,R5,R2,LSL #6 // R2 = a = (vregs [32] << 6) + (p >> 2);
 
         LSRS R5,R4,#15   // if (R4 & PIX_A) - PIX_A into Carry
         BCC  I_XOP_BL_P  // Clear = Process Bits, else just store address result..
@@ -1404,8 +1380,6 @@ I_XOP_BL_F:
         B    start
 
 .align 4
-VREGSL: .WORD 0x6000 // Video Registers map point (VR0)
-VREGSH: .WORD 0x6020 // Video Registers map point (VR32)
 MSKSH:  .BYTE 0xC0, 0x30, 0x0C, 0x03, 0x06, 0x04, 0x02, 0x00
 // *********************************************************************************************
 //R0 (LE)
