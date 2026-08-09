@@ -17,13 +17,6 @@
 #include "clocks.pio.h"
 #endif
 
-#define PALCONV 0
-
-#if PALCONV
-#include "palconv.pio.h"
-#endif
-
-
 #include "impl/vrEmuTms9918Priv.h"
 #include "vrEmuTms9918Util.h"
 
@@ -78,13 +71,6 @@ const uint tmsReadSm = 1;
 #ifndef PICO9918_NO_CLOCKS
 const uint tmsGromClkSm = 2;
 const uint tmsCpuClkSm = 3;
-#endif
-
-#if PALCONV
-#define PAL_PIO         pio0  // which pio are we using for vga?
-const uint palconvSm = 2;
-static const uint32_t dmapalOut = 5; // palette dma
-static const uint32_t dmapalIn  = 6; // palette dma
 #endif
 
 #define SHOW_DIAGNOSTICS_FRAMES 900
@@ -523,10 +509,6 @@ static __attribute__((noinline))  void generateRgbCache()
   uint32_t data;
   tms9918->palDirty = 0;
 
-#if PALCONV
-  dma_channel_set_read_addr(dmapalOut, tms9918->vram.map.pram, true);
-  dma_channel_set_write_addr(dmapalIn, pram, true);
-#else
   const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80;
   if (pixelsDoubled)
   {
@@ -556,7 +538,6 @@ static __attribute__((noinline))  void generateRgbCache()
       pram[j] = (tmpPal[j & 0xf] << 16) | (tmpPal[j >> 4] & 0xffff);
     }
   }
-#endif
 }
 
 /*
@@ -880,39 +861,6 @@ int main(void)
   channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
   dma_channel_set_config(dma32, &cfg, false);
   dma_channel_set_read_addr(dma32, &bg, false);
-
-#if PALCONV
-  uint palConvProgram = pio_add_program(PAL_PIO, &palconv_program);
-
-  pio_sm_config palconvPioConfig = palconv_program_get_default_config(palConvProgram);
-
-  sm_config_set_in_shift(&palconvPioConfig, false, true, 24);  // L shift
-  sm_config_set_out_shift(&palconvPioConfig, true, false, 12);  // R shift
-  pio_sm_init(PAL_PIO, palconvSm, palConvProgram, &palconvPioConfig);
-
-  cfg = dma_channel_get_default_config(dmapalOut);
-  channel_config_set_read_increment(&cfg, true);
-  channel_config_set_write_increment(&cfg, false);
-  channel_config_set_transfer_data_size(&cfg, DMA_SIZE_16);
-  channel_config_set_dreq(&cfg, pio_get_dreq(PAL_PIO, palconvSm, true)); 
-  dma_channel_set_read_addr(dmapalOut, tms9918->vram.map.pram, false);
-  dma_channel_set_write_addr(dmapalOut, &PAL_PIO->txf[palconvSm], false);
-  dma_channel_set_trans_count(dmapalOut, 64, false);
-  dma_channel_set_config(dmapalOut, &cfg, false);
-
-  cfg = dma_channel_get_default_config(dmapalIn);
-  channel_config_set_read_increment(&cfg, false);
-  channel_config_set_write_increment(&cfg, true);
-  channel_config_set_transfer_data_size(&cfg, DMA_SIZE_32);
-  channel_config_set_dreq(&cfg, pio_get_dreq(PAL_PIO, palconvSm, false)); 
-
-  dma_channel_set_read_addr(dmapalIn, &PAL_PIO->rxf[palconvSm], false);
-  dma_channel_set_write_addr(dmapalIn, pram, false);
-  dma_channel_set_trans_count(dmapalIn, 64, false);
-  dma_channel_set_config(dmapalIn, &cfg, false);
-
-  pio_sm_set_enabled(PAL_PIO, palconvSm, true); 
-#endif
 
   tms9918->palDirty = 1;
 
