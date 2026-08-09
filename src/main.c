@@ -714,7 +714,7 @@ void tmsPioInit()
 
   pio_sm_config writePioConfig = tmsWrite_program_get_default_config(tmsWriteProgram);
   sm_config_set_in_pins(&writePioConfig, GPIO_CD7);
-  sm_config_set_in_shift(&writePioConfig, false, true, 32); // L shift, autopush @ 32 bits
+  sm_config_set_in_shift(&writePioConfig, false, false, 32); // L shift, explicit push
   sm_config_set_jmp_pin(&writePioConfig, GPIO_CSW);
   sm_config_set_clkdiv(&writePioConfig, tmsPioClkDiv());
 
