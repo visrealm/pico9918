@@ -895,19 +895,15 @@ I_TB:  // TB  - Not Implemented
 // *********************************************************************************************
 .align 4
 sdecode2a: // calculate S & SRCE
-        LSLS R5,R6,#28
-        LSRS R5,#27 // Got S << 1
-        LSRS R2,R0,#12 // Got TS, but with 2 extra random hi bits
+        AND  R5,R6,#0x0F // Got S
+        UBFX R2,R0,#12,#2 // Got TS
         ADR  R4,COM_S2a
         LDR  PC,[R4,R2,LSL #2]
 .align 4
-COM_S2a: .WORD COM_S2a_R+1, COM_S2a_I+1, COM_S2a_L+1, COM_S2a_II+1 // random bits 00
-         .WORD COM_S2a_R+1, COM_S2a_I+1, COM_S2a_L+1, COM_S2a_II+1 // random bits 01
-         .WORD COM_S2a_R+1, COM_S2a_I+1, COM_S2a_L+1, COM_S2a_II+1 // random bits 10
-         .WORD COM_S2a_R+1, COM_S2a_I+1, COM_S2a_L+1, COM_S2a_II+1 // random bits 11
+COM_S2a: .WORD COM_S2a_R+1, COM_S2a_I+1, COM_S2a_L+1, COM_S2a_II+1
 .align 4
 COM_S2a_R:
-        ADD  R5,R11 // SRCE = WP + S;
+        ADD  R5,R11,R5,LSL #1 // SRCE = WP + S;
         MOV  PC,R7
 .align 4
 COM_S2a_L:
@@ -915,7 +911,7 @@ COM_S2a_L:
         ADDS R3,#2
         REV16 R2,R2
         CBZ  R5,COM_S2a_F  // if (S) // Not R0?
-        LDRH R4,[R11,R5] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R4,[R11,R5,LSL #1] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R4,R4
         ADD  R2,R4
         UXTH R2,R2
@@ -925,17 +921,17 @@ COM_S2a_F:
         MOV  PC,R7
 .align 4
 COM_S2a_II:
-        LDRH R2,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
         ADDS R4,R2,#2
         REV16 R4,R4
-        STRH R4,[R11,R5]
+        STRH R4,[R11,R5,LSL #1]
         BICS R5,R2,#1 // SRCE &= 0xFFFE
         ADD  R5,R8
         MOV  PC,R7
 .align 4
 COM_S2a_I:
-        LDRH R5,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R5,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R5,R5
         BICS R5,#1 // SRCE &= 0xFFFE
         ADD  R5,R8
@@ -950,19 +946,15 @@ COM_S2a_I:
 // *********************************************************************************************
 .align 4
 sdecode2b: // calculate S & SRCE
-        LSLS R5,R6,#28
-        LSRS R5,#27 // Got S << 1
-        LSRS R2,R0,#12 // Got TS, but with 2 extra random hi bits
+        AND  R5,R6,#0x0F // Got S
+        UBFX R2,R0,#12,#2 // Got TS
         ADR  R4,COM_S2b
         LDR  PC,[R4,R2,LSL #2]
 .align 4
-COM_S2b: .WORD COM_S2b_R+1, COM_S2b_I+1, COM_S2b_L+1, COM_S2b_II+1 // random bits 00
-         .WORD COM_S2b_R+1, COM_S2b_I+1, COM_S2b_L+1, COM_S2b_II+1 // random bits 01
-         .WORD COM_S2b_R+1, COM_S2b_I+1, COM_S2b_L+1, COM_S2b_II+1 // random bits 10
-         .WORD COM_S2b_R+1, COM_S2b_I+1, COM_S2b_L+1, COM_S2b_II+1 // random bits 11
+COM_S2b: .WORD COM_S2b_R+1, COM_S2b_I+1, COM_S2b_L+1, COM_S2b_II+1
 .align 4
 COM_S2b_R:
-        ADD  R5,R11 // SRCE = WP + S;
+        ADD  R5,R11,R5,LSL #1 // SRCE = WP + S;
         B    COM_S2b_F2
 .align 4
 COM_S2b_L:
@@ -970,32 +962,30 @@ COM_S2b_L:
         ADDS R3,#2
         REV16 R2,R2
         CBZ  R5,COM_S2b_F  // if (S) // Not R0?
-        LDRH R4,[R11,R5] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R4,[R11,R5,LSL #1] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R4,R4
         ADD  R2,R4
         UXTH R2,R2
         B    COM_S2b_F
 .align 4
 COM_S2b_II:
-        LDRH R2,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
         ADDS R4,R2,#2
         REV16 R4,R4
-        STRH R4,[R11,R5]
+        STRH R4,[R11,R5,LSL #1]
         B    COM_S2b_F
 .align 4
 COM_S2b_I:
-        LDRH R2,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
 COM_S2b_F:
         BICS R5,R2,#1 // SRCE &= 0xFFFE
         ADD  R5,R8
 COM_S2b_F2:
 // *********************************************************************************************
-        LSLS R6,#22
-        LSRS R6,#28
-        LSLS R6,#1  // Got D << 1
-        ADD  R6,R11 // DEST = WP + D;
+        UBFX R6,R6,#6,#4 // Got D
+        ADD  R6,R11,R6,LSL #1 // DEST = WP + D;
         LDRH R5,[R5,#0]
         REV16 R5,R5 // SRCE = (memory [SRCE + 0] << 8) | memory [SRCE + 1];
         LDRH R4,[R6,#0]
@@ -1150,19 +1140,16 @@ I_JOP:  LSRS R4,R1,#3 // P -> Carry
 // *********************************************************************************************
 .align 4
 sdecode2d: // calculate S & SRCE
-        LSLS R5,R6,#28
-        LSRS R5,#27 // Got S << 1
-        LSRS R2,R0,#10
-        MOVS R4,#0x0C
-        ANDS R2,R4 // Got TS * 4
-        ANDS R0,R4 // Got TD * 4
+        AND  R5,R6,#0x0F // Got S
+        UBFX R2,R0,#12,#2 // Got TS
+        AND  R0,R0,#0x0C // Got TD * 4
         ADR  R4,COM_S2d
-        LDR  PC,[R4,R2]
+        LDR  PC,[R4,R2,LSL #2]
 .align 4
 COM_S2d: .WORD COM_S2d_R+1, COM_S2d_I+1, COM_S2d_L+1, COM_S2d_II+1
 .align 4
 COM_S2d_R:
-        ADD  R5,R11 // SRCE = WP + S;
+        ADD  R5,R11,R5,LSL #1 // SRCE = WP + S;
         B    COM_S2d_F2
 .align 4
 COM_S2d_L:
@@ -1170,22 +1157,22 @@ COM_S2d_L:
         ADDS R3,#2
         REV16 R2,R2
         CBZ  R5,COM_S2d_F  // if (S) // Not R0?
-        LDRH R4,[R11,R5] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R4,[R11,R5,LSL #1] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R4,R4
         ADD  R2,R4
         UXTH R2,R2
         B    COM_S2d_F
 .align 4
 COM_S2d_II:
-        LDRH R2,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
         ADDS R4,R2,#2
         REV16 R4,R4
-        STRH R4,[R11,R5]
+        STRH R4,[R11,R5,LSL #1]
         B    COM_S2d_F
 .align 4
 COM_S2d_I:
-        LDRH R2,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
 COM_S2d_F:
         BICS R5,R2,#1 // SRCE &= 0xFFFE
@@ -1194,16 +1181,14 @@ COM_S2d_F2:
 // *********************************************************************************************
         LDRH R5,[R5,#0] // R5=SRCE - but note this is reversed byte order - instructions to fix.
 // *********************************************************************************************
-        LSLS R6,#22
-        LSRS R6,#28
-        LSLS R6,#1 // Got D << 1
+        UBFX R6,R6,#6,#4 // Got D
         ADR  R4,COM_D2
         LDR  PC,[R4,R0]
 .align 4
 COM_D2: .WORD COM_D2_R+1, COM_D2_I+1, COM_D2_L+1, COM_D2_II+1
 .align 4
 COM_D2_R:
-        ADD  R6,R11 // DEST = WP + D;
+        ADD  R6,R11,R6,LSL #1 // DEST = WP + D;
         MOV  PC,R7
 .align 4
 COM_D2_L:
@@ -1211,7 +1196,7 @@ COM_D2_L:
         ADDS R3,#2
         REV16 R2,R2
         CBZ  R6,COM_D2_F  // if (D) // Not R0?
-        LDRH R4,[R11,R6] // DEST += (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
+        LDRH R4,[R11,R6,LSL #1] // DEST += (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
         REV16 R4,R4
         ADD  R2,R4
         UXTH R2,R2
@@ -1221,17 +1206,17 @@ COM_D2_F:
         MOV  PC,R7
 .align 4
 COM_D2_II:
-        LDRH R2,[R11,R6] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
+        LDRH R2,[R11,R6,LSL #1] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
         REV16 R2,R2
         ADDS R4,R2,#2
         REV16 R4,R4
-        STRH R4,[R11,R6]
+        STRH R4,[R11,R6,LSL #1]
         BICS R6,R2,#1 // DEST &= 0xFFFE
         ADD  R6,R8
         MOV  PC,R7
 .align 4
 COM_D2_I:
-        LDRH R6,[R11,R6] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
+        LDRH R6,[R11,R6,LSL #1] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
         REV16 R6,R6
         BICS R6,#1 // DEST &= 0xFFFE
         ADD  R6,R8
@@ -1247,19 +1232,16 @@ COM_D2_I:
 // *********************************************************************************************
 .align 4
 sdecode1d: // calculate S & SRCE
-        LSLS R5,R6,#28
-        LSRS R5,#27 // Got S << 1
-        LSRS R2,R0,#10
-        MOVS R4,#0x0C
-        ANDS R2,R4 // Got TS * 4
-        ANDS R0,R4 // Got TD * 4
+        AND  R5,R6,#0x0F // Got S
+        UBFX R2,R0,#12,#2 // Got TS
+        AND  R0,R0,#0x0C // Got TD * 4
         ADR  R4,COM_S1
-        LDR  PC,[R4,R2]
+        LDR  PC,[R4,R2,LSL #2]
 .align 4
 COM_S1: .WORD COM_S1_R+1, COM_S1_I+1, COM_S1_L+1, COM_S1_II+1
 .align 4
 COM_S1_R:
-        LDRB R5,[R11,R5] // R5=SRCE (WP + S;)
+        LDRB R5,[R11,R5,LSL #1] // R5=SRCE (WP + S;)
         B    COM_S1_F2
 .align 4
 COM_S1_L:
@@ -1267,22 +1249,22 @@ COM_S1_L:
         ADDS R3,#2
         REV16 R2,R2
         CBZ  R5,COM_S1_F  // if (S) // Not R0?
-        LDRH R4,[R11,R5] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R4,[R11,R5,LSL #1] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R4,R4
         ADD  R2,R4
         UXTH R2,R2
         B    COM_S1_F
 .align 4
 COM_S1_II:
-        LDRH R2,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
         ADDS R4,R2,#1
         REV16 R4,R4
-        STRH R4,[R11,R5]
+        STRH R4,[R11,R5,LSL #1]
         B    COM_S1_F
 .align 4
 COM_S1_I:
-        LDRH R2,[R11,R5] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
+        LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
 COM_S1_F:
         ADD  R2,R8
@@ -1290,16 +1272,14 @@ COM_S1_F:
         LDRB R5,[R2,#0] // R5=SRCE
 // *********************************************************************************************
 COM_S1_F2:
-        LSLS R6,#22
-        LSRS R6,#28
-        LSLS R6,#1 // Got D << 1
+        UBFX R6,R6,#6,#4 // Got D
         ADR  R4,COM_D1
         LDR  PC,[R4,R0]
 .align 4
 COM_D1: .WORD COM_D1_R+1, COM_D1_I+1, COM_D1_L+1, COM_D1_II+1
 .align 4
 COM_D1_R:
-        ADD  R6,R11 // DEST = WP + D;
+        ADD  R6,R11,R6,LSL #1 // DEST = WP + D;
         MOV  PC,R7
 .align 4
 COM_D1_L:
@@ -1307,7 +1287,7 @@ COM_D1_L:
         ADDS R3,#2
         REV16 R2,R2
         CBZ  R6,COM_D1_F  // if (D) // Not R0?
-        LDRH R4,[R11,R6] // DEST += (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
+        LDRH R4,[R11,R6,LSL #1] // DEST += (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
         REV16 R4,R4
         ADD  R2,R4
         UXTH R6,R2
@@ -1319,16 +1299,16 @@ COM_D1_F:
         MOV  PC,R7
 .align 4
 COM_D1_II:
-        LDRH R2,[R11,R6] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
+        LDRH R2,[R11,R6,LSL #1] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
         REV16 R2,R2
         ADDS R4,R2,#1
         REV16 R4,R4
-        STRH R4,[R11,R6]
+        STRH R4,[R11,R6,LSL #1]
         ADD  R6,R2,R8
         MOV  PC,R7
 .align 4
 COM_D1_I:
-        LDRH R6,[R11,R6] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
+        LDRH R6,[R11,R6,LSL #1] // DEST = (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
         REV16 R6,R6
         ADD  R6,R8
         MOV  PC,R7
