@@ -1020,19 +1020,8 @@ I_JMP:  SXTH R0,R0 // R0 now has a signed offset
         ADDS R4,R0,#2 // Does this jump to itself?
         BNE  dojmp2   // Else quit the emulation
 // *********************************************************************************************
-I_IDLE: ADR  R0,RETCODE
-        STR  R3,[R0,#0] // PC
-
-        POP  {R0-R7}
-        MOV  R8,R0
-        MOV  R9,R1
-        MOV  R10,R2
-        MOV  R11,R3
-        ADR  R0,RETCODE
-        LDR  R0,[R0,#0]
-        POP  {PC}
-.align 4
-RETCODE: .WORD 0
+I_IDLE: MOV  R0,R3 // PC is the return value
+        POP  {R4-R11,PC}
 // *********************************************************************************************
 .align 4
 I_JLT:  TST  R1,#0x60 // AG|EQ
@@ -1080,7 +1069,7 @@ I_JNE:  LSRS R4,R1,#6 // EQ -> Carry
 // R7 =2nd JUMP location
 // R8 =memory
 // R9 =regx38
-// R10=SPARE
+// R10=JMPTBL
 // R11=WP
 
 // *********************************************************************************************
@@ -1088,22 +1077,17 @@ I_JNE:  LSRS R4,R1,#6 // EQ -> Carry
 .thumb_func
 .type run9900, %function
 run9900:
-        PUSH {LR}
-
-        PUSH {R4-R7} // R7..R4
-        MOV  R4,R8
-        MOV  R5,R9
-        MOV  R6,R10
-        MOV  R7,R11
-        PUSH {R4-R7} // R11..R8
+        PUSH {R4-R11,LR}
 
         MOV  R8,R0  // memory
         MOV  R9,R3  // regx38
-        MOVS R3,R1  // PC
-        ADDS R2,R0
-        MOV  R11,R2 // WP
+        MOV  R3,R1  // PC
+        ADD  R11,R2,R0 // WP
+        LDR  R10,JMPTBL_PTR
         MOVS R1,#0  // ST=0
         B    start
+.align 4
+JMPTBL_PTR: .WORD JMPTBL
 // *********************************************************************************************
 .align 4
 dojump: SXTH R0,R0 // R0 now has a signed offset
@@ -1121,8 +1105,7 @@ start:  UXTH R3,R3 // Discard any extra - but allow to flow into register space
 
 startX: REV16 R6,R0    // R6=INST|BYTE
         LSRS R2,R6,#5  // Get opcode
-        ADR  R4,JMPTBL
-        ADD  R4,R4,R2,LSL #3
+        ADD  R4,R10,R2,LSL #3
         LDM  R4,{R7,PC} // Get 1st and 2nd branch locations (if it's needed)
 
 // *********************************************************************************************
@@ -1398,7 +1381,7 @@ I_XOP_BL: // Return to C code function: F18A_PIX for BL mode
 */
 .align 4
 I_XOP_BL:
-        MOV  R10,R3      // Save current PC
+        PUSH {R3}        // Save current PC
         ADR  R3,VREGSH
         LDR  R3,[R3,#0]  // Get offset
         ADD  R3,R8       // Within the 64KB memory area
@@ -1425,7 +1408,7 @@ I_XOP_BL_M:
 
         REV16 R2,R2
         STRH R2,[R6,#0]
-        MOV  R3,R10      // Restore current PC
+        POP  {R3}        // Restore current PC
         B    start
 
 .align 4
@@ -1486,7 +1469,7 @@ I_XOP_BL_NW:
         REV16 R4,R4
         STRH R4,[R6,#0]
 I_XOP_BL_F:
-        MOV  R3,R10      // Restore current PC
+        POP  {R3}        // Restore current PC
         B    start
 
 .align 4
