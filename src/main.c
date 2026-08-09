@@ -50,7 +50,14 @@
 #define TMS_CLK_OFF           0.0f                            // pull low
 
 #define TMS_PIO pio1
-#define CLOCK_PIO pio1
+
+/* GROMCLK/CPUCLK live on the VGA block (SMs 2 and 3) to keep pio1's
+   instruction memory free for the host interface */
+#define CLOCK_PIO pio0
+
+/* the host interface state machines run at this rate on every system clock
+   preset, so all bus timing figures hold regardless of the configured clock */
+#define TMS_PIO_HZ 252000000.0f
 
 #define TMS_WRITE_IRQ PIO1_IRQ_0
 #define TMS_READ_IRQ PIO1_IRQ_1
@@ -705,6 +712,11 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   renderDiag(y + vBorder, pixels);
 }
 
+static float tmsPioClkDiv()
+{
+  return (float)clock_get_hz(clk_sys) / TMS_PIO_HZ;
+}
+
 /*
  * Set up PIOs for TMS9918 <-> CPU interface
  */
@@ -723,7 +735,7 @@ void tmsPioInit()
   sm_config_set_in_pins(&writePioConfig, GPIO_CD7);
   sm_config_set_in_shift(&writePioConfig, false, true, 32); // L shift, autopush @ 32 bits
   sm_config_set_jmp_pin(&writePioConfig, GPIO_CSW);
-  sm_config_set_clkdiv(&writePioConfig, 1.0f);
+  sm_config_set_clkdiv(&writePioConfig, tmsPioClkDiv());
 
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writePioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
@@ -742,7 +754,7 @@ void tmsPioInit()
   sm_config_set_out_pins(&readPioConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readPioConfig, false, false, 32); // L shift
   sm_config_set_out_shift(&readPioConfig, true, false, 32); // R shift
-  sm_config_set_clkdiv(&readPioConfig, 1.0f);
+  sm_config_set_clkdiv(&readPioConfig, tmsPioClkDiv());
 
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
@@ -843,6 +855,10 @@ int main(void)
     vreg_set_voltage(clockSettings.voltage);
     sleep_ms(1);
     set_sys_clock_pll(clockSettings.pll, clockSettings.pllDiv1, clockSettings.pllDiv2);
+
+    /* core 1 sized these against the boot clock */
+    pio_sm_set_clkdiv(TMS_PIO, tmsWriteSm, tmsPioClkDiv());
+    pio_sm_set_clkdiv(TMS_PIO, tmsReadSm, tmsPioClkDiv());
   }
 
 #ifndef PICO9918_NO_CLOCKS
