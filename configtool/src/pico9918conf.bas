@@ -27,12 +27,10 @@
     CONST BANK_SIZE = 0
     #INFO "No banking / No firmware upgrade"
 #elif TI994A
-    BANK ROM 256
     CONST BANK_SIZE = 8
     CONST TI994A_BANKED = 1
     #INFO "TI-99/4A - 8KB BANK SIZE"
 #else
-    BANK ROM 256
     CONST BANK_SIZE = 16
     CONST BANKED_16K = 1
     #INFO "Other - 16KB BANK SIZE"
@@ -71,7 +69,8 @@ GOTO main
 '   bank 2+ firmware payload (UF2 blocks consumed by firmwareWriteAndVerify)
 '
 ' Only bank 0 may issue BANK SELECT, so any cross-bank call must go through
-' a bank-0 trampoline (see banksel.bas).
+' a bank-0 trampoline (see banksel.bas), which also carries the BANK ROM size
+' uf2cvb.py picked to fit this firmware.
 INCLUDE "banksel.bas"
 INCLUDE "core.bas"
 
