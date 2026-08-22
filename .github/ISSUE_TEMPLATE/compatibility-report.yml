@@ -1,0 +1,138 @@
+name: Compatibility report (new machine)
+description: Tell me the PICO9918 works, or does not work, on a machine that is not in the supported list
+title: "[Compatibility] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing. The supported list in the README only grows from reports like this one,
+        so the more of the fields below you can fill in, the sooner your machine lands on it.
+
+        If your machine is already listed and something is broken, use the bug report instead.
+
+  - type: input
+    id: machine
+    attributes:
+      label: Machine
+      description: Make and model, as specifically as you can.
+      placeholder: Sanyo PHC-28S, Spectravideo SVI-738, Coleco ADAM
+    validations:
+      required: true
+
+  - type: input
+    id: reference
+    attributes:
+      label: Reference link
+      description: A page describing the machine, if there is one. Saves me hunting for the right URL.
+      placeholder: https://www.msx.org/wiki/...
+
+  - type: dropdown
+    id: vdp
+    attributes:
+      label: VDP the machine shipped with
+      description: Printed on the 40-pin chip you are replacing.
+      options:
+        - TMS9918A
+        - TMS9918
+        - TMS9928A
+        - TMS9929A
+        - TMS9118
+        - TMS9128
+        - TMS9129
+        - Something else, or not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: result
+    attributes:
+      label: Result
+      options:
+        - Works
+        - Works, but needed a non-default setting
+        - Partly works
+        - Does not work
+    validations:
+      required: true
+
+  - type: textarea
+    id: detail
+    attributes:
+      label: What works, and what does not
+      description: |
+        Anything you noticed. Picture quality, sprites, scrolling, 80-column mode, F18A software,
+        whether the machine boots reliably from cold.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: board
+    attributes:
+      label: PICO9918 board
+      options:
+        - PRO v2.0
+        - v1.3
+        - v1.2
+        - v1.1
+        - v1.0
+        - v0.4
+        - v0.3
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware version
+      description: |
+        Shown on the performance diagnostic overlay, and by the configurator. See
+        https://github.com/visrealm/pico9918/wiki/Firmware-Version-History
+      placeholder: v1.2.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device_mode
+    attributes:
+      label: Device mode
+      description: |
+        Set in the web configurator. It decides which pins carry GROMCLK and CPUCLK, and getting it
+        wrong can stop a machine booting. See
+        https://github.com/visrealm/pico9918/wiki/TMS9918-Family#device-mode-configuration
+      options:
+        - TMS9918A (default)
+        - TMS992xA
+        - TMS9118
+        - TMS912x
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: output
+    attributes:
+      label: Video output
+      options:
+        - VGA dongle
+        - Digital A/V (HDMI) dongle
+        - SCART A/V dongle
+        - On-board VGA header (v0.4 to v1.1)
+        - Custom wiring
+    validations:
+      required: true
+
+  - type: textarea
+    id: install
+    attributes:
+      label: Anything the install needed
+      description: |
+        A socket fitted where the VDP was soldered down, a cut CPU or GRM jumper, a case
+        modification, an unusual cable. Useful for the next person with the same machine.
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Photos or notes
+      description: Drag images straight in. A photo of the fitted board is always welcome.

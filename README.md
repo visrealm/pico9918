@@ -69,6 +69,10 @@ Nothing needs configuring for VGA or HDMI. A SCART dongle is detected automatica
 
 See the [Display Output](https://github.com/visrealm/pico9918/wiki/Display-Output) wiki page for how the driver is chosen, how to change it safely, and the SCART timing details. For fitting the cable, see [Hardware Setup](https://github.com/visrealm/pico9918/wiki/Hardware-Setup#ffc-connector).
 
+### No-cut installation
+
+Every dongle needs a route out of the case. No-cut mods provide one without permanently modifying the machine, using 3D-printed parts and, on the TI-99/4A, a small PCB that replaces the original A/V DIN socket. Kits exist for the [TI-99/4A](https://github.com/visrealm/pico9918/wiki/TI-99-4A-No-Cut-Mod), the CreatiVision and the NABU. STLs, gerbers and fitting photos are in [/nocut](nocut).
+
 ## F18A compatibility
 
 The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
@@ -125,7 +129,7 @@ If you're not interested in building the firmware yourself, you'll find the late
 
 To install, just hold the 'BOOT' button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
 
-For detailed information on firmware installation, output modes, and updates, see the [Firmware](https://github.com/visrealm/pico9918/wiki/Firmware) wiki page.
+For detailed information on firmware installation, output modes, and updates, see the [Firmware](https://github.com/visrealm/pico9918/wiki/Firmware) wiki page. For what changed in each release, see [CHANGELOG.md](CHANGELOG.md).
 
 ## Configurator
 
@@ -156,7 +160,7 @@ If you're not interested in building the configurator yourself, you'll find the 
 
 ## Documentation
 
-For detailed documentation covering hardware setup, firmware, the configurator, supported devices, F18A compatibility and more, visit the **[PICO9918 Wiki](https://github.com/visrealm/pico9918/wiki)**.
+Just fitted a board? Start with [Getting Started](https://github.com/visrealm/pico9918/wiki/Getting-Started). For everything else, covering hardware setup, firmware, the configurator, supported devices, F18A compatibility and more, visit the **[PICO9918 Wiki](https://github.com/visrealm/pico9918/wiki)**.
 
 ## Building
 
