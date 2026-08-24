@@ -19,6 +19,7 @@ The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.co
 * [Hardware](#hardware)
 * [Firmware](#firmware)
 * [Configurator](#configurator)
+* [Roadmap](#roadmap)
 * [Documentation](#documentation)
 * [Building](#building)
 * [Thanks](#thanks)
@@ -157,6 +158,12 @@ If you're not interested in building the configurator yourself, you'll find the 
 
 > [!TIP]
 > No native configurator for your machine? The [Web-based PICO9918 Configurator](https://visrealm.github.io/pico9918/config/index.html) generates a config .uf2 file for both the PICO9918 and PICO9918 PRO. Drag and drop it onto your device the same way you would a firmware update.
+
+## Roadmap
+
+[ROADMAP.md](ROADMAP.md) sets out what is planned for the firmware and roughly in what order: host bus timing and compatibility fixes in v1.2.1, a rewritten tile pipeline and the extraction of the rendering core into a reusable library in v1.3.0, the remaining F18A behaviour gaps in v1.4.0, and V9938 support in v2.0.0. It also spells out what the version numbers mean, in particular that the configuration layout never changes on a patch release.
+
+It is a direction rather than a commitment, and it deliberately carries no dates - items move between versions as work lands. Anything not listed is unscheduled rather than rejected, so if there is something you would like to see, open an issue and it can be considered. For what has already shipped, see [CHANGELOG.md](CHANGELOG.md).
 
 ## Documentation
 
