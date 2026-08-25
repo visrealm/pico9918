@@ -33,10 +33,10 @@ Every machine below has been tested and confirmed working. Each family has a wik
 
 | Family | Machines tested | Wiki page |
 |--------|-----------------|-----------|
-| [Texas Instruments TI-99](https://en.wikipedia.org/wiki/TI-99/4A) | TI-99/4, TI-99/4A, TI-99/4QI, TI-99/22 | [All models](https://github.com/visrealm/pico9918/wiki/Texas-Instruments-TI-99) |
+| [Texas Instruments TI-99](https://en.wikipedia.org/wiki/TI-99/4A) | TI-99/4, TI-99/4A, TI-99/4QI, TI-99/22 | [All models](https://github.com/visrealm/pico9918/wiki/Texas-Instruments-TI‐99) |
 | [MSX](https://en.wikipedia.org/wiki/MSX) | 14 models from Casio, Gradiente, National, Sanyo, Sharp, Sony, Spectravideo, Toshiba and Yamaha | [All models](https://github.com/visrealm/pico9918/wiki/MSX) |
 | [ColecoVision](https://en.wikipedia.org/wiki/ColecoVision) | ColecoVision, Coleco ADAM, AtariBits CV-NUC+, Bit Dina 2 in one | [All models](https://github.com/visrealm/pico9918/wiki/ColecoVision) |
-| [Sega SG-1000](https://en.wikipedia.org/wiki/SG-1000#SC-3000) | SG-1000, SG-1000 II, SC-3000 | [All models](https://github.com/visrealm/pico9918/wiki/Sega-SG-1000) |
+| [Sega SG-1000](https://en.wikipedia.org/wiki/SG-1000#SC-3000) | SG-1000, SG-1000 II, SC-3000 | [All models](https://github.com/visrealm/pico9918/wiki/Sega-SG‐1000) |
 | [Tomy Tutor](https://en.wikipedia.org/wiki/Tomy_Tutor) | Tomy Tutor, Pyūta, Pyūta Jr | [All models](https://github.com/visrealm/pico9918/wiki/Tomy-Tutor) |
 | [VTech CreatiVision](https://en.wikipedia.org/wiki/VTech_CreatiVision) | CreatiVision, Dick Smith Wizzard | [All models](https://github.com/visrealm/pico9918/wiki/CreatiVision) |
 | [NABU Personal Computer](https://en.wikipedia.org/wiki/NABU_Network) | NABU PC | [All models](https://github.com/visrealm/pico9918/wiki/NABU-Personal-Computer) |
@@ -58,8 +58,8 @@ One video pipeline, three ways out. Which one you get depends on the dongle you 
 | Output | Dongle | Signal | Audio |
 |--------|--------|--------|-------|
 | **VGA** | [VGA dongle](https://github.com/visrealm/pico9918/wiki/VGA-Dongle) (the default) | 640x480 @ 60 Hz progressive | No |
-| **HDMI** | [Digital A/V dongle](https://github.com/visrealm/pico9918/wiki/Digital-AV-Dongle) | 640x480 @ 60 Hz progressive | Yes, via two wires to the host mainboard |
-| **SCART RGB** | [SCART A/V dongle](https://github.com/visrealm/pico9918/wiki/SCART-AV-Dongle) | PAL 576i @ 50 Hz, or NTSC 480i @ 60 Hz | Yes, via two wires to the host mainboard |
+| **HDMI** | [Digital A/V dongle](https://github.com/visrealm/pico9918/wiki/Digital-AV-(HDMI)-Dongle) | 640x480 @ 60 Hz progressive | Yes, via two wires to the host mainboard |
+| **SCART RGB** | [SCART A/V dongle](https://github.com/visrealm/pico9918/wiki/SCART-RGB-AV-Dongle) | PAL 576i @ 50 Hz, or NTSC 480i @ 60 Hz | Yes, via two wires to the host mainboard |
 
 All three dongles fit any FFC-equipped board: **PRO v2.0**, **v1.3** and **v1.2**. On earlier integrated boards (v0.4 to v1.1) VGA comes off a 6-pin JST header on the board itself, and v0.3 has its own VGA breakout.
 
@@ -72,7 +72,7 @@ See the [Display Output](https://github.com/visrealm/pico9918/wiki/Display-Outpu
 
 ### No-cut installation
 
-Every dongle needs a route out of the case. No-cut mods provide one without permanently modifying the machine, using 3D-printed parts and, on the TI-99/4A, a small PCB that replaces the original A/V DIN socket. Kits exist for the [TI-99/4A](https://github.com/visrealm/pico9918/wiki/TI-99-4A-No-Cut-Mod), the CreatiVision and the NABU. STLs, gerbers and fitting photos are in [/nocut](nocut).
+Every dongle needs a route out of the case. No-cut mods provide one without permanently modifying the machine, using 3D-printed parts and, on the TI-99/4A, a small PCB that replaces the original A/V DIN socket. Kits exist for the [TI-99/4A](https://github.com/visrealm/pico9918/wiki/TI‐99∕4A-No‐Cut-Mod), the CreatiVision and the NABU. STLs, gerbers and fitting photos are in [/nocut](nocut).
 
 ## F18A compatibility
 
