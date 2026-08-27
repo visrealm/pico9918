@@ -1,0 +1,137 @@
+<ADDR> <vrEmuTmsDiagRenderText>:
+push	{r4, r5, r6, r7, lr}
+mov	r7, r9
+mov	lr, sl
+mov	r6, r8
+push	{r6, r7, lr}
+movs	r7, r1
+mov	r1, sp
+subs	r3, r0, r3
+ldrh	r5, [r1, #32]
+movs	r0, r2
+ldr	r4, [sp, #40]	@ 0x28
+cmp	r3, #5
+bhi.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+lsls	r0, r2, #1
+ldrh	r1, [r4, r0]
+ldr	r6, [pc, #236]	@ (<ADDR> <vrEmuTmsDiagRenderText+OFF>)
+lsrs	r1, r1, #2
+ands	r1, r6
+strh	r1, [r4, r0]
+adds	r2, #1
+uxth	r0, r2
+ldrb	r2, [r7, #0]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+lsls	r3, r3, #1
+mov	ip, r3
+ldr	r3, [pc, #216]	@ (<ADDR> <vrEmuTmsDiagRenderText+OFF>)
+mov	r9, r7
+mov	sl, r3
+b.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+ldrh	r2, [r3, #0]
+lsrs	r2, r2, #2
+ands	r2, r6
+strh	r2, [r3, #0]
+movs	r3, #1
+add	r9, r3
+mov	r3, r9
+ldrb	r2, [r3, #0]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+movs	r3, #48	@ 0x30
+movs	r1, #15
+subs	r2, #32
+ands	r3, r2
+add	r3, ip
+lsls	r3, r3, #3
+ands	r2, r1
+add	r3, sl
+ldrsb	r1, [r3, r2]
+lsls	r3, r0, #1
+mov	r8, r3
+adds	r3, r0, #1
+movs	r2, r5
+add	r8, r4
+uxth	r3, r3
+cmp	r1, #0
+blt.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+mov	r2, r8
+ldrh	r2, [r2, #0]
+lsrs	r2, r2, #2
+ands	r2, r6
+mov	r7, r8
+lsls	r3, r3, #1
+strh	r2, [r7, #0]
+adds	r2, r0, #2
+mov	r8, r5
+adds	r3, r4, r3
+uxth	r2, r2
+lsls	r7, r1, #25
+bmi.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+ldrh	r7, [r3, #0]
+lsrs	r7, r7, #2
+ands	r7, r6
+mov	r8, r7
+mov	r7, r8
+lsls	r2, r2, #1
+strh	r7, [r3, #0]
+adds	r3, r0, #3
+mov	r8, r5
+adds	r2, r4, r2
+uxth	r3, r3
+lsls	r7, r1, #26
+bmi.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+ldrh	r7, [r2, #0]
+lsrs	r7, r7, #2
+ands	r7, r6
+mov	r8, r7
+mov	r7, r8
+lsls	r3, r3, #1
+strh	r7, [r2, #0]
+adds	r2, r0, #4
+mov	r8, r5
+adds	r3, r4, r3
+uxth	r2, r2
+lsls	r7, r1, #27
+bmi.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+ldrh	r7, [r3, #0]
+lsrs	r7, r7, #2
+ands	r7, r6
+mov	r8, r7
+mov	r7, r8
+lsls	r2, r2, #1
+strh	r7, [r3, #0]
+adds	r3, r0, #5
+mov	r8, r5
+adds	r2, r4, r2
+uxth	r3, r3
+lsls	r7, r1, #28
+bmi.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+ldrh	r7, [r2, #0]
+lsrs	r7, r7, #2
+ands	r7, r6
+mov	r8, r7
+mov	r7, r8
+lsls	r3, r3, #1
+adds	r0, #6
+strh	r7, [r2, #0]
+adds	r3, r4, r3
+uxth	r0, r0
+lsls	r1, r1, #29
+bpl.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+strh	r5, [r3, #0]
+movs	r3, #1
+add	r9, r3
+mov	r3, r9
+ldrb	r2, [r3, #0]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTmsDiagRenderText+OFF>
+pop	{r5, r6, r7}
+mov	sl, r7
+mov	r9, r6
+mov	r8, r5
+pop	{r4, r5, r6, r7, pc}
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>

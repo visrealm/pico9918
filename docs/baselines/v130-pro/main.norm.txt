@@ -1,0 +1,93 @@
+<ADDR> <main>:
+push	{r4, r5, r6, lr}
+movs	r6, #0
+sub	sp, #440	@ 0x1b8
+@ <UNDEFINED> instruction: 0xADDR
+mov.w	r3, #4194304	@ 0xADDR
+@ <UNDEFINED> instruction: 0xADDR
+movs	r1, #5
+ldr	r0, [pc, #220]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <__gpio_set_function_masked_veneer>
+bl	<ADDR> <__currentHwVersion_veneer>
+bl	<ADDR> <detectScartDongle>
+bl	<ADDR> <__systemClockInit_veneer>
+bl	<ADDR> <__pico9918_init_veneer>
+ldr	r0, [pc, #204]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <__multicore_launch_core1_veneer>
+ldr	r3, [pc, #200]	@ (<ADDR> <main+OFF>)
+add	r4, sp, #284	@ 0x11c
+ldr	r5, [r3, #0]
+add.w	r5, r5, #65536	@ 0x10000
+add.w	r0, r5, #80	@ 0x50
+bl	<ADDR> <__readConfig_veneer>
+add.w	r0, r5, #80	@ 0x50
+bl	<ADDR> <applyPendingDisplay>
+bl	<ADDR> <__updateDispDriver_veneer>
+bl	<ADDR> <__systemClockApplyConfig_veneer>
+bl	<ADDR> <vdpClocksInit>
+bl	<ADDR> <__paletteInit_veneer>
+mov	r1, r6
+movs	r2, #156	@ 0x9c
+mov	r0, r4
+bl	<ADDR> <__memset_veneer>
+ldrb.w	r1, [r5, #85]	@ 0x55
+cbz	r1, <ADDR> <main+OFF>
+ldrb.w	r3, [r5, #91]	@ 0x5b
+cmp	r3, #0
+ite	eq
+moveq	r1, #1
+movne	r1, #2
+add	r0, sp, #144	@ 0x90
+bl	<ADDR> <__vgaGetParams_veneer>
+add	r1, sp, #144	@ 0x90
+movs	r2, #132	@ 0x84
+mov	r0, r4
+bl	<ADDR> <__memcpy_veneer>
+mov	r0, r4
+bl	<ADDR> <__rendererConfigureVga_veneer>
+add	r1, sp, #300	@ 0x12c
+movs	r2, #140	@ 0x8c
+mov	r0, sp
+bl	<ADDR> <__memcpy_veneer>
+ldmia.w	r4, {r0, r1, r2, r3}
+bl	<ADDR> <vgaInit>
+ldr	r0, [pc, #96]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <__pico9918_config_set_applied_callback_veneer>
+ldr	r0, [pc, #92]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <__pico9918_frame_set_config_reload_callback_veneer>
+bl	<ADDR> <initTemperature>
+bl	<ADDR> <pico9918_diag_init>
+ldr	r1, [pc, #84]	@ (<ADDR> <main+OFF>)
+ldr	r0, [pc, #84]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <__pico9918_diag_set_version_info_veneer>
+ldrb.w	r3, [r5, #85]	@ 0x55
+ldr	r2, [pc, #80]	@ (<ADDR> <main+OFF>)
+cmp	r3, #3
+it	cs
+movcs	r3, #0
+ldr	r1, [pc, #76]	@ (<ADDR> <main+OFF>)
+ldr.w	r0, [r2, r3, lsl #2]
+ldr.w	r1, [r1, r3, lsl #2]
+bl	<ADDR> <__pico9918_diag_set_output_name_veneer>
+movs	r0, #0
+bl	<ADDR> <__multicore_fifo_push_blocking_veneer>
+bl	<ADDR> <__pico9918_gpu_init_veneer>
+ldr	r0, [pc, #56]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <__pico9918_gpu_set_flash_callback_veneer>
+ldr	r0, [pc, #52]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <__pico9918_gpu_set_config_save_callback_veneer>
+bl	<ADDR> <__pico9918_gpu_loop_veneer>
+movs	r0, #0
+add	sp, #440	@ 0x1b8
+pop	{r4, r5, r6, pc}
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

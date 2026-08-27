@@ -1,0 +1,204 @@
+<ADDR> <volatileHack>:
+movs	r2, #0
+ldr	r3, [pc, #548]	@ (<ADDR> <volatileHack+OFF>)
+stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ldr.w	r9, [r3]
+sub	sp, #36	@ 0x24
+add.w	r3, r9, #65536	@ 0x10000
+ldrh	r1, [r3, #40]	@ 0x28
+strb.w	r2, [r3, #48]	@ 0x30
+lsls	r0, r1, #31
+add.w	r3, r9, #24576	@ 0x6000
+str	r3, [sp, #4]
+add.w	sl, r9, #45056	@ 0xb000
+bmi.w	<ADDR> <volatileHack+OFF>
+adds	r3, #56	@ 0x38
+ldr.w	fp, [pc, #520]	@ <ADDR> <volatileHack+OFF>
+str	r3, [sp, #8]
+str	r1, [sp, #0]
+movs	r5, #1
+ldr	r6, [sp, #4]
+ldrb.w	r4, [sl, #2]
+strb.w	r5, [r6, #56]	@ 0x38
+movs	r5, #5
+orn	r4, r4, #127	@ 0x7f
+strb.w	r4, [sl, #2]
+ldr	r4, [pc, #480]	@ (<ADDR> <volatileHack+OFF>)
+ldr	r3, [sp, #8]
+movw	r2, #65534	@ 0xfffe
+ldr	r1, [sp, #0]
+mov	r0, r9
+str.w	r5, [r4, #148]	@ 0x94
+bl	<ADDR> <run9900>
+movs	r3, #0
+ldrb.w	r2, [r6, #56]	@ 0x38
+str	r0, [sp, #0]
+lsls	r2, r2, #31
+str.w	r3, [r4, #148]	@ 0x94
+bpl.n	<ADDR> <volatileHack+OFF>
+add.w	r2, r9, #65536	@ 0x10000
+strb.w	r3, [r2, #48]	@ 0x30
+strh	r0, [r2, #40]	@ 0x28
+ldr.w	r3, [fp]
+cmp	r3, #0
+beq.w	<ADDR> <volatileHack+OFF>
+movs	r0, #0
+add.w	r2, r9, #32768	@ 0x8000
+ldrb	r3, [r2, #8]
+str.w	r0, [fp]
+cbnz	r3, <ADDR> <volatileHack+OFF>
+ldr	r1, [pc, #416]	@ (<ADDR> <volatileHack+OFF>)
+ldrb	r3, [r1, #0]
+cmp	r3, #0
+bne.n	<ADDR> <volatileHack+OFF>
+movs	r3, #1
+add.w	r9, r9, #65536	@ 0x10000
+strb.w	r3, [r9, #52]	@ 0x34
+mrs	r2, PRIMASK
+cpsid	i
+strb	r3, [r1, #0]
+ldr	r1, [pc, #384]	@ (<ADDR> <volatileHack+OFF>)
+str.w	r3, [r1, #152]	@ 0x98
+ldr.w	r3, [r1, #160]	@ 0xa0
+bic.w	r3, r3, #1
+str.w	r3, [r1, #160]	@ 0xa0
+msr	PRIMASK, r2
+ldr	r3, [pc, #360]	@ (<ADDR> <volatileHack+OFF>)
+ldr.w	r9, [r3]
+add.w	r3, r9, #24576	@ 0x6000
+str	r3, [sp, #4]
+adds	r3, #56	@ 0x38
+str	r3, [sp, #8]
+add.w	sl, r9, #45056	@ 0xb000
+b.n	<ADDR> <volatileHack+OFF>
+ldrb	r3, [r2, #7]
+ldrb	r7, [r2, #5]
+tst.w	r3, #2
+ite	eq
+moveq.w	lr, #1
+movne.w	lr, #4294967295
+tst.w	r3, #1
+ite	eq
+moveq	r8, lr
+movne	r8, r0
+cmp	r7, #0
+beq.n	<ADDR> <volatileHack+OFF>
+ldrb	r0, [r2, #4]
+cmp	r0, #0
+beq.n	<ADDR> <volatileHack+OFF>
+ldrh	r6, [r2, #0]
+ldrh	r5, [r2, #2]
+ldrb	r3, [r2, #6]
+rev16	r6, r6
+rev16	r5, r5
+subs	r3, r3, r0
+cmp.w	r8, #1
+mul.w	r4, lr, r3
+uxtah	r6, r9, r6
+uxtah	r5, r9, r5
+bne.n	<ADDR> <volatileHack+OFF>
+subs.w	r1, lr, #1
+it	ne
+movne	r1, #1
+cmp	r1, #0
+bne.n	<ADDR> <volatileHack+OFF>
+and.w	r8, r0, #252	@ 0xfc
+mov	ip, r1
+add.w	r1, r8, #2
+strd	r1, r9, [sp, #12]
+strd	r2, sl, [sp, #20]
+add.w	lr, r0, #4294967295
+add.w	sl, r8, #1
+cmp.w	lr, #5
+bls.n	<ADDR> <volatileHack+OFF>
+subs	r1, r5, #1
+subs	r1, r1, r6
+cmp	r1, #2
+mov	r2, r5
+mov	r3, r6
+bls.n	<ADDR> <volatileHack+OFF>
+add.w	r9, r6, r8
+ldr.w	r1, [r3], #4
+cmp	r3, r9
+str.w	r1, [r2], #4
+bne.n	<ADDR> <volatileHack+OFF>
+cmp	r0, r8
+beq.n	<ADDR> <volatileHack+OFF>
+ldrb	r2, [r3, #0]
+cmp	r0, sl
+strb.w	r2, [r5, r8]
+add.w	r2, r5, r8
+bls.n	<ADDR> <volatileHack+OFF>
+ldrb	r1, [r3, #1]
+strb	r1, [r2, #1]
+ldr	r1, [sp, #12]
+cmp	r0, r1
+bls.n	<ADDR> <volatileHack+OFF>
+ldrb	r3, [r3, #2]
+strb	r3, [r2, #2]
+adds	r5, #1
+adds	r6, #1
+add.w	ip, ip, #1
+add	r5, lr
+add	r6, lr
+cmp	r7, ip
+add	r6, r4
+add	r5, r4
+bne.n	<ADDR> <volatileHack+OFF>
+ldrd	r9, r2, [sp, #16]
+ldr.w	sl, [sp, #24]
+movs	r3, #0
+strh	r3, [r2, #8]
+b.n	<ADDR> <volatileHack+OFF>
+mov	r3, r5
+subs	r2, r6, #1
+add.w	r9, r5, r0
+ldrb.w	r1, [r2, #1]!
+strb.w	r1, [r3], #1
+cmp	r9, r3
+bne.n	<ADDR> <volatileHack+OFF>
+b.n	<ADDR> <volatileHack+OFF>
+movs	r2, #0
+ldrb.w	r3, [sl, #2]
+and.w	r3, r3, #127	@ 0x7f
+strb.w	r3, [sl, #2]
+ldr	r3, [sp, #4]
+strb.w	r2, [r3, #56]	@ 0x38
+add	sp, #36	@ 0x24
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+mov.w	ip, #0
+mul.w	r3, r8, r3
+str	r3, [sp, #12]
+subs	r3, r0, #1
+mul.w	r1, lr, r3
+strd	r2, sl, [sp, #24]
+mul.w	sl, r8, r3
+strd	r1, r9, [sp, #16]
+mov	r1, r5
+mov	r2, r6
+movs	r3, #0
+ldrb.w	r9, [r2]
+adds	r3, #1
+cmp	r0, r3
+strb.w	r9, [r1]
+add	r2, r8
+add	r1, lr
+bne.n	<ADDR> <volatileHack+OFF>
+ldr	r3, [sp, #16]
+add	r5, lr
+add	r5, r3
+add	r6, r8
+ldr	r3, [sp, #12]
+add.w	ip, ip, #1
+add	r6, sl
+cmp	r7, ip
+add	r6, r3
+add	r5, r4
+bne.n	<ADDR> <volatileHack+OFF>
+ldrd	r9, r2, [sp, #20]
+ldr.w	sl, [sp, #28]
+b.n	<ADDR> <volatileHack+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

@@ -1,0 +1,35 @@
+build/pico9918pro/src/pico9918pro-v1-3-0-core.elf  :
+section                  size        addr
+.flashtext                504   268435456
+.rodata                   424   268435960
+.flashcode_sdk           1776   268436384
+.flashcode               4088   268438160
+.ARM.exidx                  8   268442248
+.binary_info               96   268442256
+.ram_vector_table         272   536870912
+.uninitialized_data     87792   536871424
+.text                   16288   536959216
+.data                   72876   536975504
+.tdata                      0   537048380
+.tbss                       0   537048380
+.bss                     3020   537048384
+.heap                    2048   537051404
+.scratch_x               2132   537395200
+.scratch_y               2576   537399296
+.stack1_dummy            1024   537397332
+.stack_dummy             1024   537401888
+.flash_end                 20   268536224
+.ARM.attributes            52           0
+.comment                   69           0
+.debug_info            311578           0
+.debug_abbrev           45071           0
+.debug_loclists        304661           0
+.debug_aranges           5440           0
+.debug_rnglists         37077           0
+.debug_line            229445           0
+.debug_str              46548           0
+.debug_frame            15428           0
+.debug_line_str           348           0
+Total                 1191685
+
+

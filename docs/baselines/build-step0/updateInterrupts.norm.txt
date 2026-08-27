@@ -1,0 +1,107 @@
+20000134 <updateInterrupts>:
+push	{r4, r5, r6, lr}
+movs	r1, #0
+movs	r5, r0
+movs	r0, #9
+bl	200027d4 <irq_set_enabled>
+movs	r1, #0
+movs	r0, #10
+bl	200027d4 <irq_set_enabled>
+dmb	sy
+ldr	r1, [pc, #180]	@ (20000204 <updateInterrupts+0xd0>)
+ldr	r3, [pc, #184]	@ (20000208 <updateInterrupts+0xd4>)
+ldr	r4, [r1, #0]
+ldr	r1, [pc, #184]	@ (2000020c <updateInterrupts+0xd8>)
+ldrb	r2, [r3, #0]
+ldrb	r0, [r4, r1]
+movs	r1, #32
+ands	r1, r0
+movs	r0, #0
+ldrsb	r0, [r3, r0]
+cmp	r0, #0
+bge.n	200001b0 <updateInterrupts+0x7c>
+ldr	r3, [pc, #168]	@ (20000210 <updateInterrupts+0xdc>)
+ldrb	r2, [r3, #0]
+cmp	r1, #0
+bne.n	20000194 <updateInterrupts+0x60>
+cmp	r2, #0
+beq.n	2000017e <updateInterrupts+0x4a>
+movs	r2, #0
+strb	r2, [r3, #0]
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #20]
+dmb	sy
+movs	r1, #1
+movs	r0, #9
+bl	200027d4 <irq_set_enabled>
+movs	r1, #1
+movs	r0, #10
+bl	200027d4 <irq_set_enabled>
+pop	{r4, r5, r6, pc}
+ldr	r1, [pc, #124]	@ (20000214 <updateInterrupts+0xe0>)
+ldrb	r1, [r4, r1]
+cmp	r1, #127	@ 0x7f
+bls.n	2000016c <updateInterrupts+0x38>
+cmp	r2, #0
+bne.n	2000017e <updateInterrupts+0x4a>
+adds	r2, #1
+strb	r2, [r3, #0]
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #24]
+b.n	2000017e <updateInterrupts+0x4a>
+movs	r0, #31
+bics	r2, r0
+movs	r0, r5
+orrs	r0, r2
+movs	r2, #255	@ 0xff
+strb	r0, [r3, #0]
+ldr	r3, [pc, #84]	@ (20000214 <updateInterrupts+0xe0>)
+strb	r0, [r4, r3]
+ldr	r3, [pc, #84]	@ (20000218 <updateInterrupts+0xe4>)
+ldrb	r3, [r3, #0]
+lsls	r3, r3, #8
+orrs	r3, r2
+ldrb	r2, [r4, #11]
+cmp	r2, #0
+beq.n	200001fc <updateInterrupts+0xc8>
+ldr	r2, [pc, #76]	@ (2000021c <updateInterrupts+0xe8>)
+ldrb	r5, [r4, r2]
+movs	r2, #15
+ands	r2, r5
+lsls	r5, r2, #24
+orrs	r5, r3
+ldr	r3, [pc, #56]	@ (20000214 <updateInterrupts+0xe0>)
+adds	r2, r4, r2
+mov	ip, r3
+add	r2, ip
+ldrb	r3, [r2, #0]
+lsls	r3, r3, #16
+orrs	r3, r5
+ldr	r2, [pc, #52]	@ (20000220 <updateInterrupts+0xec>)
+str	r3, [r2, #20]
+ldr	r3, [pc, #32]	@ (20000210 <updateInterrupts+0xdc>)
+cmp	r1, #0
+beq.n	20000170 <updateInterrupts+0x3c>
+sxtb	r0, r0
+movs	r2, #1
+cmp	r0, #0
+bge.n	20000170 <updateInterrupts+0x3c>
+b.n	200001a2 <updateInterrupts+0x6e>
+lsls	r2, r0, #16
+orrs	r3, r2
+b.n	200001e8 <updateInterrupts+0xb4>
+nop			@ (mov r8, r8)
+20000204:	2000c7e4 	.word	0x2000c7e4
+20000208:	2000c374 	.word	0x2000c374
+2000020c:	0000602d 	.word	0x0000602d
+20000210:	200274d6 	.word	0x200274d6
+20000214:	0000b02c 	.word	0x0000b02c
+20000218:	200274da 	.word	0x200274da
+2000021c:	0000603b 	.word	0x0000603b
+20000220:	50300000 	.word	0x50300000

@@ -1,0 +1,16 @@
+20017a88 <pico9918_frame_porch>:
+20017a88:	22e0      	movs	r2, #224	@ 0xe0
+20017a8a:	4b05      	ldr	r3, [pc, #20]	@ (20017aa0 <pico9918_frame_porch+0x18>)
+20017a8c:	4905      	ldr	r1, [pc, #20]	@ (20017aa4 <pico9918_frame_porch+0x1c>)
+20017a8e:	681b      	ldr	r3, [r3, #0]
+20017a90:	01d2      	lsls	r2, r2, #7
+20017a92:	5299      	strh	r1, [r3, r2]
+20017a94:	4a04      	ldr	r2, [pc, #16]	@ (20017aa8 <pico9918_frame_porch+0x20>)
+20017a96:	3901      	subs	r1, #1
+20017a98:	39ff      	subs	r1, #255	@ 0xff
+20017a9a:	5499      	strb	r1, [r3, r2]
+20017a9c:	4770      	bx	lr
+20017a9e:	46c0      	nop			@ (mov r8, r8)
+20017aa0:	20022eb0 	.word	0x20022eb0
+20017aa4:	000001ff 	.word	0x000001ff
+20017aa8:	0000b003 	.word	0x0000b003

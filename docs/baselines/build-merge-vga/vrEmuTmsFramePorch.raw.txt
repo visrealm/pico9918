@@ -1,0 +1,15 @@
+20003b5c <vrEmuTmsFramePorch>:
+20003b5c:	4b04      	ldr	r3, [pc, #16]	@ (20003b70 <vrEmuTmsFramePorch+0x14>)
+20003b5e:	4a05      	ldr	r2, [pc, #20]	@ (20003b74 <vrEmuTmsFramePorch+0x18>)
+20003b60:	681b      	ldr	r3, [r3, #0]
+20003b62:	4905      	ldr	r1, [pc, #20]	@ (20003b78 <vrEmuTmsFramePorch+0x1c>)
+20003b64:	5299      	strh	r1, [r3, r2]
+20003b66:	4a05      	ldr	r2, [pc, #20]	@ (20003b7c <vrEmuTmsFramePorch+0x20>)
+20003b68:	3901      	subs	r1, #1
+20003b6a:	39ff      	subs	r1, #255	@ 0xff
+20003b6c:	5499      	strb	r1, [r3, r2]
+20003b6e:	4770      	bx	lr
+20003b70:	2000d534 	.word	0x2000d534
+20003b74:	0000702c 	.word	0x0000702c
+20003b78:	000001ff 	.word	0x000001ff
+20003b7c:	0000b02f 	.word	0x0000b02f

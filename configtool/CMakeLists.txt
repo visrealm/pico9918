@@ -54,6 +54,20 @@ convert_uf2_to_cvbasic(8 "firmware_8k")
 convert_uf2_to_cvbasic(16 "firmware_16k")
 convert_uf2_to_cvbasic(0 "firmware")
 
+# Generate the config-byte constants from the library's authoritative header.
+# core.bas INCLUDEs config-ids.bas; it is copied into each target's source dir
+# alongside the firmware data below.
+set(CONFIG_IDS_BAS "${CMAKE_BINARY_DIR}/intermediate/config-ids.bas")
+set(CONFIG_HEADER "${CMAKE_SOURCE_DIR}/core/src/pico9918_config.h")
+add_custom_command(
+    OUTPUT "${CONFIG_IDS_BAS}"
+    COMMAND ${PYTHON} "${CMAKE_SOURCE_DIR}/tools/config2bas.py"
+            -o "${CONFIG_IDS_BAS}" "${CONFIG_HEADER}"
+    DEPENDS "${CMAKE_SOURCE_DIR}/tools/config2bas.py" "${CONFIG_HEADER}"
+    COMMENT "Generating CVBasic config constants from pico9918_config.h"
+    VERBATIM
+)
+
 # Custom function to compile CVBasic for a platform
 function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUTPUT DESCRIPTION)
     set(SOURCE_DIR "${CMAKE_BINARY_DIR}/intermediate/${TARGET_NAME}/src")
@@ -100,11 +114,12 @@ function(add_cvbasic_target TARGET_NAME PLATFORM_FLAG DEFINES ASM_OUTPUT ROM_OUT
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware.h.bas" "${SOURCE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_BINARY_DIR}/intermediate/firmware.bas" "${SOURCE_DIR}/"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${BANKSEL_SRC}" "${SOURCE_DIR}/banksel.bas"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CONFIG_IDS_BAS}" "${SOURCE_DIR}/"
         DEPENDS ${CVBASIC_SOURCE_FILES} ${CVBASIC_TOOLS}
                 "${CMAKE_BINARY_DIR}/intermediate/firmware_8k.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware_8k.bas"
                 "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware_16k.bas"
                 "${CMAKE_BINARY_DIR}/intermediate/firmware.h.bas" "${CMAKE_BINARY_DIR}/intermediate/firmware.bas"
-                "${BANKSEL_SRC}"
+                "${BANKSEL_SRC}" "${CONFIG_IDS_BAS}"
         COMMENT "Copying CVBasic source files and firmware data"
     )
     
@@ -203,7 +218,8 @@ add_cvbasic_target(nabu "--nabu" "" "pico9918conf-${VERSION_WITH_OUTPUT}_nabu.as
 add_cvbasic_target(creativision "--creativision" "-rom16" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.bin" "CreatiVision")
 add_cvbasic_target(sg1000 "--sg1000" "" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.sg" "SG-1000/SC-3000")
 
-# Master target to build all platforms
+# Master target to build all platforms. creativision is left out: it overflows its
+# 16KB ROM and gasm80 rejects it, so including it here would fail every build.
 add_custom_target(configurator_all DEPENDS ti99 ti99_lite coleco coleco_lite msx_asc16 msx_asc16_lite msx_konami msx_konami_lite nabu sg1000)
 
 # Print build information

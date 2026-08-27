@@ -1,0 +1,845 @@
+10001bb0 00000010 t ____wrap___aeabi_f2iz_veneer
+10001bc0 00000010 t ____wrap___aeabi_f2uiz_veneer
+10001b60 00000010 t ____wrap___aeabi_fadd_veneer
+10001ad0 00000010 t ____wrap___aeabi_fcmpgt_veneer
+10001ab0 00000010 t ____wrap___aeabi_fcmplt_veneer
+10001a00 00000010 t ____wrap___aeabi_fdiv_veneer
+10001a50 00000010 t ____wrap___aeabi_fmul_veneer
+10001b10 00000010 t ____wrap___aeabi_fsub_veneer
+10001ba0 00000010 t ____wrap___aeabi_i2f_veneer
+10001b40 00000010 t ____wrap___aeabi_ui2f_veneer
+10000b80 00000010 t ____wrap___aeabi_uidiv_veneer
+10001cd0 00000010 t ____wrap___aeabi_uidiv_veneer
+10001aa0 00000010 t ____wrap_memcpy_veneer
+10001c30 00000010 t ____wrap_memset_veneer
+10001be0 00000010 t __adc_init_veneer
+200169c0 t __aeabi_bits_init
+20016bd2 t __aeabi_cfcmple_guts
+20016a78 000000a4 T __aeabi_double_init
+20016ce8 00000068 T __aeabi_float_init
+20016c40 t __aeabi_i2f_main
+20019628 00000002 W __aeabi_idiv0
+20019628 00000002 W __aeabi_ldiv0
+20016d94 T __aeabi_mem_init
+200228b0 0000000c t __bi_20
+200228a4 0000000c t __bi_21
+20022898 0000000c t __bi_22
+2002288c 0000000c t __bi_23
+20022880 0000000c t __bi_24
+20022874 0000000c t __bi_25
+20022928 0000000c t __bi_26
+20022868 0000000c t __bi_26
+2002285c 0000000c t __bi_29
+20022850 0000000c t __bi_30
+2002291c 0000000c t __bi_34
+20022910 0000000c t __bi_42
+20022904 0000000c t __bi_48
+200228f8 0000000c t __bi_54
+20022964 0000000c t __bi_55
+20022958 0000000c t __bi_56
+200228ec 0000000c t __bi_60
+2002294c 0000000c t __bi_62
+20022940 0000000c t __bi_63
+20022934 0000000c t __bi_64
+200228e0 0000000c t __bi_66
+200228d4 0000000c t __bi_72
+200228c8 0000000c t __bi_78
+200228bc 0000000c t __bi_84
+10001d40 00000004 r __bi_ptr20
+10001d3c 00000004 r __bi_ptr21
+10001d38 00000004 r __bi_ptr22
+10001d34 00000004 r __bi_ptr23
+10001d30 00000004 r __bi_ptr24
+10001d2c 00000004 r __bi_ptr25
+10001d28 00000004 r __bi_ptr26
+10001d68 00000004 r __bi_ptr26
+10001d24 00000004 r __bi_ptr29
+10001d20 00000004 r __bi_ptr30
+10001d64 00000004 r __bi_ptr34
+10001d60 00000004 r __bi_ptr42
+10001d5c 00000004 r __bi_ptr48
+10001d58 00000004 r __bi_ptr54
+10001d7c 00000004 r __bi_ptr55
+10001d78 00000004 r __bi_ptr56
+10001d54 00000004 r __bi_ptr60
+10001d74 00000004 r __bi_ptr62
+10001d70 00000004 r __bi_ptr63
+10001d6c 00000004 r __bi_ptr64
+10001d50 00000004 r __bi_ptr66
+10001d4c 00000004 r __bi_ptr72
+10001d48 00000004 r __bi_ptr78
+10001d44 00000004 r __bi_ptr84
+10001d80 R __binary_info_end
+100001e8 T __binary_info_header_end
+10001d20 R __binary_info_start
+10000100 T __boot2_end__
+10000000 T __boot2_start__
+200292e4 B __bss_end__
+2002853c B __bss_start__
+10000b60 00000010 t __clock_configure_int_divider_veneer
+10000b70 00000010 t __clock_get_hz_veneer
+10001ce0 00000010 t __clock_get_hz_veneer
+10001b00 00000010 t __currentHwVersion_veneer
+2002853c T __data_end__
+20019740 T __data_start__
+100001cc T __default_isrs_end
+100001c0 T __default_isrs_start
+10001b50 00000010 t __dma_claim_mask_veneer
+20019738 t __EH_FRAME_BEGIN__
+100001e8 T __embedded_block_end
+200292e4 N __end__
+10005f08 A __etext
+10001d20 T __exidx_end
+10001d20 T __exidx_start
+10015e68 N __flash_binary_end
+10000000 T __flash_binary_start
+10001bd0 00000010 t __flash_range_erase_veneer
+10001d00 00000010 t __flash_range_program_veneer
+10001d20 T __flashcode_end__
+10000bc0 T __flashcode_start__
+20028538 t __frame_dummy_init_array_entry
+10001a20 00000010 t __gpio_init_mask_veneer
+10001b30 00000010 t __gpio_init_veneer
+10001b90 00000010 t __gpio_set_drive_strength_veneer
+10001b70 00000010 t __gpio_set_function_masked_veneer
+10001d10 00000010 t __gpio_set_function_veneer
+10001cc0 00000010 t __gpio_set_pulls_veneer
+200196d8 00000010 t __guard_veneer
+20040000 B __HeapLimit
+10000bb0 00000010 t __hw_claim_lock_veneer
+10000ba0 00000010 t __hw_claim_unlock_veneer
+2002853c t __init_array_end
+20028538 t __init_array_start
+20022500 00000010 t __initLookups_veneer
+10000b40 00000010 t __irq_is_enabled_veneer
+10001a60 00000010 t __irq_set_enabled_veneer
+10000b50 00000010 t __irq_set_enabled_veneer
+10001af0 00000010 t __irq_set_exclusive_handler_veneer
+10000100 T __logical_binary_start
+10001ae0 00000010 t __multicore_fifo_pop_blocking_veneer
+10001ca0 00000010 t __multicore_fifo_push_blocking_veneer
+20019708 00000010 t __multicore_launch_core1_raw_veneer
+10001a90 00000010 t __multicore_launch_core1_veneer
+20028500 t __mutex_array_end
+200284f0 t __mutex_array_start
+10001a30 00000010 t __paletteInit_veneer
+10001c50 00000010 t __paletteInitCore1_veneer
+100019e0 00000010 t __pico9918_config_refresh_pending_mirror_veneer
+10001a70 00000010 t __pico9918_config_set_applied_callback_veneer
+10001cb0 00000010 t __pico9918_diag_set_clock_hz_veneer
+10001cf0 00000010 t __pico9918_diag_set_output_name_veneer
+100019f0 00000010 t __pico9918_diag_set_version_info_veneer
+10001c20 00000010 t __pico9918_frame_set_config_reload_callback_veneer
+10001bf0 00000010 t __pico9918_gpu_init_veneer
+10001a10 00000010 t __pico9918_gpu_loop_veneer
+10001c00 00000010 t __pico9918_gpu_set_config_save_callback_veneer
+10001c40 00000010 t __pico9918_gpu_set_flash_callback_veneer
+10001b20 00000010 t __pico9918_init_veneer
+20019728 00000010 t __pio_add_program_veneer
+200196e8 00000010 t __pio_sm_init_veneer
+20028530 00000004 T __pre_init_first_per_core_initializer
+20028518 00000004 T __pre_init_runtime_init_clocks
+20028500 00000004 T __pre_init_runtime_init_early_resets
+2002852c 00000004 T __pre_init_runtime_init_install_ram_vector_table
+20028528 00000004 T __pre_init_runtime_init_mutex
+20028534 00000004 T __pre_init_runtime_init_per_core_irq_priorities
+2002851c 00000004 T __pre_init_runtime_init_post_clock_resets
+20028520 00000004 T __pre_init_runtime_init_rp2040_gpio_ie_disable
+20028524 00000004 T __pre_init_runtime_init_spin_locks_reset
+20028504 00000004 T __pre_init_runtime_init_usb_power_down
+20028538 t __preinit_array_end
+20028500 t __preinit_array_start
+20019738 T __ram_text_end__
+10001d80 A __ram_text_source__
+200155b0 T __ram_text_start__
+10001a80 00000010 t __readConfig_veneer
+10001c90 00000010 t __rendererConfigureVga_veneer
+20040754 D __scratch_x_end__
+10014d04 A __scratch_x_source__
+20040000 D __scratch_x_start__
+20041a10 D __scratch_y_end__
+10015458 A __scratch_y_source__
+20041000 D __scratch_y_start__
+200196f8 00000010 t __set_sys_clock_pll_veneer
+20019718 00000010 t __shouldUseScartClock_veneer
+10001c70 00000010 t __sleep_ms_veneer
+20042000 A __stack
+20041c00 A __StackBottom
+20040000 B __StackLimit
+20040c00 A __StackOneBottom
+20041000 B __StackOneTop
+20042000 B __StackTop
+10001c60 00000010 t __systemClockApplyConfig_veneer
+10001ac0 00000010 t __systemClockInit_veneer
+20028540 B __tbss_end
+2002853c D __tdata_end
+10000b90 00000010 t __tick_start_veneer
+2002853c B __tls_base
+2002853c B __tls_end
+2002853c T __TMC_END__
+10001c80 00000010 t __tmsBusInit_veneer
+100001cc T __unhandled_user_irq
+10001a40 00000010 t __updateDispDriver_veneer
+10000100 T __VECTOR_TABLE
+10000100 T __vectors
+10001b80 00000010 t __vgaGetParams_veneer
+10001c10 00000010 t __vgaLoop_veneer
+20016bd0 T __wrap___aeabi_cfcmpeq
+20016bd0 T __wrap___aeabi_cfcmple
+20016bc4 T __wrap___aeabi_cfrcmple
+20016c78 T __wrap___aeabi_f2iz
+20016cdc T __wrap___aeabi_f2uiz
+20016b88 T __wrap___aeabi_fadd
+20016c20 T __wrap___aeabi_fcmpgt
+20016c14 T __wrap___aeabi_fcmplt
+20016b8e T __wrap___aeabi_fdiv
+20016bb6 T __wrap___aeabi_fmul
+20016b7c T __wrap___aeabi_frsub
+20016b82 T __wrap___aeabi_fsub
+20016c34 T __wrap___aeabi_i2f
+200169dc T __wrap___aeabi_idiv
+200169dc T __wrap___aeabi_idivmod
+20016b48 T __wrap___aeabi_lmul
+20016db0 T __wrap___aeabi_memcpy
+20016c2a T __wrap___aeabi_ui2f
+20016a2c T __wrap___aeabi_uidiv
+20016a2c T __wrap___aeabi_uidivmod
+200169d0 T __wrap___ctzsi2
+20016db0 T __wrap_memcpy
+20016da4 T __wrap_memset
+10000b30 00000010 t __xosc_init_veneer
+200292d4 00000002 b _claimed
+100001ea t _enter_vtable_in_r0
+100001e8 T _entry_point
+20016dbc 00000004 W _exit
+200196d0 T _fini
+200155b0 T _init
+100001f6 t _reset_handler
+200288bc 00000008 b _used_instruction_space
+200288c4 00000004 B accumulatedFrameTime
+200288c8 00000004 B accumulatedRenderTime
+200288cc 00000004 B accumulatedScanlines
+20016fd4 00000038 T adc_init
+20022f00 00000018 t addressDiags
+200231d0 T aeabi_bits_funcs
+200231e0 T aeabi_bits_funcs_end
+200231e0 T aeabi_mem_funcs
+200231f0 T aeabi_mem_funcs_end
+200159d8 00000020 T applyConfigHostEffects
+10000f78 000000b0 T applyPendingDisplay
+20041a08 00000004 d bg
+100001d4 t binary_info_header
+00000004 a BITS_FUNC_COUNT
+200288d0 00000100 b boot2_copyout
+200292d6 00000001 b boot2_copyout_valid
+10000218 t bss_fill_loop
+1000021a t bss_fill_test
+10001200 0000023c t buildSyncData.isra.0
+200166f0 00000020 T busy_wait_until
+20016684 0000006c T busy_wait_us
+200292d7 00000001 b canHideSplash
+20016710 000000ec T clock_configure_int_divider
+100005f0 000000e0 T clock_configure_undivided
+200167fc 0000000c T clock_get_hz
+200227f8 00000008 t clock_program
+20022800 00000004 t clock_program_instructions
+20028540 00000010 B clockMhzStr
+200289d0 00000004 b clockPresetIndex
+200231bc 00000004 t clockPresets
+200231b8 00000004 t clocksPioOffset.0
+00000004 a CLZ32
+20028550 00000010 B colorTabStr
+20023f20 t COM_D1
+20023f60 t COM_D1_F
+20023f90 t COM_D1_I
+20023f70 t COM_D1_II
+20023f40 t COM_D1_L
+20023f30 t COM_D1_R
+20023e20 t COM_D2
+20023e56 t COM_D2_F
+20023e80 t COM_D2_I
+20023e60 t COM_D2_II
+20023e40 t COM_D2_L
+20023e30 t COM_D2_R
+20023eb0 t COM_S1
+20023f06 t COM_S1_F
+20023f0a t COM_S1_F2
+20023f00 t COM_S1_I
+20023ef0 t COM_S1_II
+20023ed0 t COM_S1_L
+20023ec0 t COM_S1_R
+20023af0 t COM_S2a
+20023b56 t COM_S2a_F
+20023b80 t COM_S2a_I
+20023b60 t COM_S2a_II
+20023b40 t COM_S2a_L
+20023b30 t COM_S2a_R
+20023ba0 t COM_S2b
+20023c26 t COM_S2b_F
+20023c2c t COM_S2b_F2
+20023c20 t COM_S2b_I
+20023c10 t COM_S2b_II
+20023bf0 t COM_S2b_L
+20023be0 t COM_S2b_R
+20023db0 t COM_S2d
+20023e06 t COM_S2d_F
+20023e0c t COM_S2d_F2
+20023e00 t COM_S2d_I
+20023df0 t COM_S2d_II
+20023dd0 t COM_S2d_L
+20023dc0 t COM_S2d_R
+2001a900 00000144 t compositeTile2OnlyBuffer.constprop.0
+20015600 0000003a t configActionCallback
+200231b4 00000004 t configActionKeys
+200289d4 00000004 b configAppliedCallback
+200289d8 00000004 b configReloadCallback
+200289dc 00000028 b configured_freq
+20040754 00000400 b core1_stack
+20016df4 00000002 t core1_trampoline
+20016df8 0000000c T core1_wrapper
+20016218 0000005c T coreTemperatureC
+00000008 a CTZ32
+200231f0 00000004 t currentDisplayLine.0
+20028a04 00000004 b currentField.2
+20015934 00000064 T currentHwVersion
+200231f4 00000004 t currentLine.1
+10000232 t data_cpy
+1000022e t data_cpy_loop
+10000238 t data_cpy_table
+00000000 a debug
+20022e30 00000080 t defaultPalette
+10000ed0 00000060 T detectScartDongle
+200182e8 00000024 t diagClock
+200181a4 00000024 t diagColorTab
+20018258 00000024 t diagFPS
+2001830c 00000024 t diagFwVer
+20018234 00000024 t diagGpuTime
+20018330 00000024 t diagHwVer
+200181ec 00000024 t diagMode
+200181c8 00000024 t diagNameTab
+200182c4 00000024 t diagOutput
+20018180 00000024 t diagPattTab
+200182a0 00000024 t diagRenderTime
+2001827c 00000024 t diagScanlineRenderTime
+2001815c 00000024 t diagSprAttrTab
+20018138 00000024 t diagSprPattTab
+20018210 00000024 t diagTemp
+20028a08 00000004 b didFault
+00000078 a DIV_CSR
+00000070 a DIV_QUOTIENT
+200169dc T div_s32s32
+20016a2c T div_u32u32
+00000060 a DIV_UDIVIDEND
+00000064 a DIV_UDIVISOR
+200169dc T divmod_s32s32
+20016a10 T divmod_s32s32_savestate
+200169e4 T divmod_s32s32_unsafe
+20016a2c T divmod_u32u32
+20016a5c T divmod_u32u32_savestate
+20016a34 T divmod_u32u32_unsafe
+20016ee4 00000048 T dma_claim_mask
+20019d18 00000334 t dmaIrqHandler
+20023d04 t dojmp2
+20023d00 t dojump
+20016b1c T double_table_shim_on_use_helper
+200403e0 00000200 d doubledBits
+10001630 00000034 t doubledBitsInit
+20022e1c 00000010 t doubledBitsNibble
+20028a0c 00000010 b dropped_frames
+200400e0 00000100 d ecm0Palette
+100016b8 0000001c t ecm0PaletteInit
+100015a0 0000000c t ecmByte
+200011a0 00004000 b ecmLookup
+100015b0 0000007c t ecmLookupInit
+200292e4 N end
+20015ae0 0000001c T erasePendingDisplay
+20016dc0 00000006 T exit
+20022f3c 0000001e t extReg
+20016bb6 t fdiv_fsub_nan_helper
+20016b9c t fdiv_save_state
+20016b96 t fdiv_shim_call
+200168c0 00000002 t first_per_core_initializer
+20019c0c 0000000c t flash_enable_xip_via_boot2
+20019bdc 00000030 t flash_init_boot2_copyout
+20019c18 00000080 T flash_range_erase
+20019c98 00000080 T flash_range_program
+20028a1c 00000004 b flashing.0
+20015e50 000003c8 T flashSector
+20016d50 T float_table_shim_on_use_helper
+20016d7e T float2fix_shim
+20016cc8 T float2int
+20016d7c T float2int_shim
+20016c78 T float2int_z
+20016cdc T float2uint
+20016cdc T float2uint_z
+20017e18 00000150 t flt2Str.constprop.0
+200282b0 00000240 T font
+20028560 00000010 B fpsStr
+200155dc t frame_dummy
+20028570 00000010 B frameTimeStr
+20028580 00000010 B fwVerStr
+20028a20 00000400 b glyphMask
+10001770 000000bc t glyphMaskInit
+2001633c 00000018 T gpio_acknowledge_irq
+20016354 0000003c T gpio_init
+20016390 00000060 T gpio_init_mask
+200162c8 00000020 T gpio_set_drive_strength
+20016274 00000030 T gpio_set_function
+200163f0 00000048 T gpio_set_function_masked
+200162e8 00000054 T gpio_set_irq_enabled
+200162a4 00000024 T gpio_set_pulls
+200199b4 00000110 t gpioIrqHandler
+20028e24 00000004 b gpu_config_save_cb
+20028e28 00000004 b gpu_flash_cb
+20028590 00000010 B gpuPctStr
+20028e20 00000004 b gpuTimeUs
+20020158 00001ab0 t graphics_i_scan_line.constprop.0
+10001910 00000044 t guard
+200168c4 0000000c W hard_assertion_failure
+00000800 a HeapSize
+100001fe t hold_non_core0_in_bootrom
+20028e2c 00000004 b hostFrameRateHz
+20016440 00000018 T hw_claim_lock
+2001646c 00000050 T hw_claim_or_assert
+20016458 00000014 T hw_claim_unlock
+200231c0 00000001 t hwVersion
+200292d8 00000001 b hwVersionDetected
+200285a0 00000010 B hwVerStr
+2002359c t I_A
+200235ae t I_A_nc
+20023620 t I_AB
+20023630 t I_AB_nc
+20023460 t I_ABS
+20023480 t I_ABS_no_ov
+20023590 t I_AI
+200233b0 t I_ANDI
+20023a60 t I_B
+20023a70 t I_BL
+20023a10 t I_BLWP
+20023690 t I_C
+200236b4 t I_C_a
+200236be t I_C_e
+200236b0 t I_C_l
+20024090 t I_CALL
+200236c0 t I_CB
+200236e4 t I_CB_a
+200236ee t I_CB_e
+200236d4 t I_CB_l
+20023930 t I_CI
+20023954 t I_CI_a
+2002395e t I_CI_e
+20023950 t I_CI_l
+20023ab0 t I_CLR
+200238f0 t I_COC
+20023900 t I_COC_ne
+20023910 t I_CZC
+20023920 t I_CZC_ne
+200234f0 t I_DEC
+20023506 t I_DEC_nc
+20023520 t I_DECT
+20023536 t I_DECT_nc
+20023970 t I_DIV
+200239b0 t I_DIV_ov
+20023c58 t I_IDLE
+20023490 t I_INC
+200234a6 t I_INC_nc
+200234c0 t I_INCT
+200234d6 t I_INCT_nc
+20023420 t I_INV
+20023ca0 t I_JEQ
+20023cc0 t I_JGT
+20023d70 t I_JH
+20023cb0 t I_JHE
+20023d60 t I_JL
+20023c90 t I_JLE
+20023c80 t I_JLT
+20023c50 t I_JMP
+20023d30 t I_JNC
+20023cd0 t I_JNE
+20023d50 t I_JNO
+20023d40 t I_JOC
+20023d80 t I_JOP
+20023390 t I_LI
+20023a00 t I_LIMI
+200239c0 t I_LWPI
+20023550 t I_MOV
+20023680 t I_MOVB
+20023960 t I_MUL
+200233f0 t I_NEG
+20023416 t I_NEG_nc
+20023410 t I_NEG_no_ov
+200233d0 t I_ORI
+200240d0 t I_POP
+200240b0 t I_PUSH
+20024070 t I_RET
+20023a40 t I_RTWP
+200235d0 t I_S
+200235ea t I_S_c
+200235ec t I_S_nc
+20023650 t I_SB
+20023664 t I_SB_c
+20023666 t I_SB_nc
+20023ac0 t I_SBO
+20023ac0 t I_SBZ
+20023aa0 t I_SETO
+20023280 t I_SLA
+200232e0 t I_SLA_M
+200232bc t I_SLA_neg
+200232c6 t I_SLA_nov
+200232a4 t I_SLA_nr0
+200232c4 t I_SLA_ov
+200232cc t I_SLA_st
+20023350 t I_SLC
+20023364 t I_SLC_nr0
+2002337c t I_SLC_st
+20023450 t I_SOC
+20023610 t I_SOCB
+20023220 t I_SRA
+20023234 t I_SRA_nr0
+20023242 t I_SRA_st
+20023320 t I_SRC
+20023334 t I_SRC_nr0
+20023346 t I_SRC_st
+20023250 t I_SRL
+20023264 t I_SRL_nr0
+20023272 t I_SRL_st
+200239f0 t I_STST
+200239e0 t I_STWP
+20023a90 t I_SWPB
+20023440 t I_SZC
+20023600 t I_SZCB
+20023ad0 t I_TB
+20023a80 t I_X
+20023fa0 t I_XOP
+20023fd0 t I_XOP_BL
+20024030 t I_XOP_BL_ET
+20024056 t I_XOP_BL_F
+20023fe6 t I_XOP_BL_M
+20024048 t I_XOP_BL_NW
+20024000 t I_XOP_BL_P
+20024038 t I_XOP_BL_W
+20023430 t I_XOR
+10000db8 00000098 t initClock
+10000e50 00000034 t initClockOrPullLow
+10001058 00000028 t initDma
+100016d8 00000098 T initLookups
+10001028 00000030 T initTemperature
+20016c34 T int2float
+d0000000 a IOPORT
+2001655c 00000018 T irq_is_enabled
+20016538 00000024 T irq_set_enabled
+20016574 00000054 T irq_set_exclusive_handler
+200194d4 00000028 T isr_hardfault
+100001c0 W isr_invalid
+100001cc W isr_irq0
+100001cc W isr_irq1
+100001cc W isr_irq10
+100001cc W isr_irq11
+100001cc W isr_irq12
+100001cc W isr_irq13
+100001cc W isr_irq14
+100001cc W isr_irq15
+100001cc W isr_irq16
+100001cc W isr_irq17
+100001cc W isr_irq18
+100001cc W isr_irq19
+100001cc W isr_irq2
+100001cc W isr_irq20
+100001cc W isr_irq21
+100001cc W isr_irq22
+100001cc W isr_irq23
+100001cc W isr_irq24
+100001cc W isr_irq25
+100001cc W isr_irq26
+100001cc W isr_irq27
+100001cc W isr_irq28
+100001cc W isr_irq29
+100001cc W isr_irq3
+100001cc W isr_irq30
+100001cc W isr_irq31
+100001cc W isr_irq4
+100001cc W isr_irq5
+100001cc W isr_irq6
+100001cc W isr_irq7
+100001cc W isr_irq8
+100001cc W isr_irq9
+100001c2 W isr_nmi
+100001c8 W isr_pendsv
+100001c6 W isr_svcall
+100001ca W isr_systick
+200240f0 t JMPTBL
+20028e30 00000004 B lastUpdateTime
+20028e34 00000004 b lastWriteAddr
+20028e38 00000004 b leftDiagRows
+20028e3c 00000044 b leftDiags
+20028e80 00000004 b lineSource
+200165c8 00000010 T lock_init
+20023200 00000004 t logoOffset
+200292d9 00000001 B lookupsReady
+10000be0 00000140 T main
+200284f0 00000008 t malloc_mutex
+200400a0 00000040 d maskExpandNibbleToWordRev
+00000004 a MEM_FUNC_COUNT
+2001962c 00000042 T memcmp
+00000004 a MEMCPY
+0000000c a MEMCPY4
+00000000 a MEMSET
+00000008 a MEMSET4
+20023204 00000014 T modeNames
+200285b0 00000010 B modeStr
+20024068 t MSKSH
+20016e70 0000001c T multicore_fifo_pop_blocking
+20016e04 00000012 T multicore_fifo_push_blocking
+20016e18 00000058 T multicore_fifo_push_timeout_us
+20016e8c 00000058 T multicore_launch_core1
+10000aa8 00000088 T multicore_launch_core1_raw
+200285c0 00000010 B nameTabStr
+200164bc 00000018 T next_striped_spin_lock_num
+200292da 00000001 B nextValue
+20022f5c 00000080 t nibbleBinStr
+20028e84 b object.0
+20023c40 t OP_3LO
+20023688 t OP_COMP_B
+20023558 t OP_COMP_W
+20023580 t OP_COMP_W_a
+20023570 t OP_COMP_W_l
+200285d0 00000010 B outputStr
+200227e0 0000000c t outputUnits.0
+20023218 00000004 t outputUnitsStr
+200227ec 0000000c t outputValues.1
+20015678 00000014 T paletteInit
+2001563c 0000003c T paletteInitCore1
+20016438 00000006 T panic
+200236f0 t PARITY
+200237f0 t PARITY0
+200285e0 00000010 B pattTabStr
+200292db 00000001 b pendingBannerState
+20015afc 0000000c T pendingDisplayBanner
+20022f18 00000024 t performanceDiags
+20041a0c 00000004 D pico9918_border_bg
+20017518 000002a0 T pico9918_config_apply
+20022eb4 00000004 T pico9918_config_field_count
+20022eb8 00000048 T pico9918_config_fields
+200173a8 0000001e T pico9918_config_refresh_pending_mirror
+2001750c 0000000c T pico9918_config_set_applied_callback
+200173c8 00000144 T pico9918_config_validate
+20028e9c 00000004 B pico9918_copy_byte
+20028ea0 00000004 B pico9918_copy_word
+20017398 00000010 T pico9918_default_palette
+20018db8 00000078 T pico9918_diag_config_updated
+10001830 000000e0 T pico9918_diag_init
+20018e30 000003e0 T pico9918_diag_render
+20018ce4 000000ac T pico9918_diag_render_text
+2001851c 00000174 T pico9918_diag_set_clock_hz
+20018690 0000000c T pico9918_diag_set_frame_rate
+20018390 0000002c T pico9918_diag_set_output_name
+200183bc 00000160 T pico9918_diag_set_temperature
+20018354 0000003c T pico9918_diag_set_version_info
+2001869c 00000648 T pico9918_diag_update
+20018d90 00000028 T pico9918_diag_update_render_time
+20022120 0000000c T pico9918_display_mode
+20028ea4 00000004 B pico9918_dropped_frames_count
+20028ea8 00000004 B pico9918_frame_count
+20017b54 000001e4 T pico9918_frame_end
+20017aac 000000a8 T pico9918_frame_end_of_scanline
+20017a88 00000024 T pico9918_frame_porch
+20022140 0000038c T pico9918_frame_scanline
+2001797c 0000000c T pico9918_frame_set_config_reload_callback
+20017988 00000100 T pico9918_frame_update_interrupts
+200194fc 0000005c T pico9918_gpu_init
+20019620 00000008 T pico9918_gpu_loop
+200292dc 00000001 B pico9918_gpu_palette_guard_off
+200224cc 00000034 T pico9918_gpu_rearm_palette_guard
+20019570 0000000c T pico9918_gpu_reset_time
+200194c8 0000000c T pico9918_gpu_set_config_save_callback
+200194bc 0000000c T pico9918_gpu_set_flash_callback
+2001957c 000000a4 T pico9918_gpu_step
+20019558 00000018 T pico9918_gpu_time
+20021ca8 000000ac T pico9918_init
+2002212c 00000006 T pico9918_line_bytes
+20022134 0000000c T pico9918_line_source
+2001ba5c 00000190 t pico9918_output_sprites.constprop.0
+20028eac 00000400 B pico9918_palette_lut
+200177b8 000001c4 T pico9918_palette_regenerate
+20021f04 0000001c T pico9918_reg_value
+20021c08 000000a0 T pico9918_reset
+20021d54 000001b0 T pico9918_scan_line
+20017d44 0000000c T pico9918_splash_allow_hide
+20017d50 000000c8 T pico9918_splash_render
+20017d38 0000000c T pico9918_splash_reset
+200292ac 00000004 B pico9918_v_border
+200231fc 00000004 T pico9918_v_pixels
+200292dd 00000001 B pico9918_valid_writes
+20021f20 00000200 T pico9918_write_reg_value
+10000900 000000f8 T pio_add_program
+10001958 0000007c t pio_set_xy.constprop.0
+100019d8 00000008 T pio_set_y
+10000858 000000a8 T pio_sm_init
+100009f8 000000b0 T pio_sm_set_consecutive_pindirs
+20016f2c 000000a8 T pio_sm_set_pindirs_with_mask
+1000021e t platform_entry
+100006d0 000000b0 T pll_init
+00000000 a POPCOUNT32
+20022fdc 000001d8 t preload
+200284f8 00000008 t print_mutex
+10000bc0 0000001e t proc1Entry
+200231f8 00000004 T r1Modes
+20000000 000000c0 B ram_vector_table
+20015b08 000000cc T readConfig
+200155b4 t register_tm_clones
+200159f8 000000e8 T reloadStoredConfig
+20015788 00000030 T rendererConfigureVga
+2001577c 0000000c T rendererReset
+20017f68 000001d0 t renderLeft
+2001b144 00000918 t renderSprites.constprop.0
+200285f0 00000010 B renderTimePerScanlineStr
+2002321c 00000001 t reportedBack
+20023c70 t RETCODE
+0000000c a REVERSE32
+10001668 00000026 t reverseBits
+200402e0 00000100 d reversedBits
+200401e0 00000100 d reversedBits6
+10001690 00000028 t reversedBitsInit
+200292b0 00000010 b rgbConfig
+20041000 00000a08 D rgbDataBuffer
+200292c0 00000004 b rgbDmaChanMask
+200292c4 00000004 B rgbProgOffset
+20016844 0000000e T rom_data_lookup
+20016834 0000000e T rom_func_lookup
+20016854 00000042 T rom_funcs_lookup
+10001080 00000026 T roundflt
+200405e0 0000006c d rowMasks
+2001ac30 000001e4 t rowT1Ecm0
+2001f658 00000578 t rowT1Ecm1
+2001fbd0 00000588 t rowT1Ecm2
+2001c0c8 00000614 t rowT1Ecm3
+2001cb98 000001d8 t rowT1Gm2
+2001ca48 00000150 t rowT1Mcm
+2001aa44 000001ec t rowT2Ecm0
+2001cd70 000004b0 t rowT2Ecm1
+2001d220 00000508 t rowT2Ecm2
+2001d728 0000052c t rowT2Ecm3
+2001c864 000001e4 t rowT2Gm2
+2001c6dc 00000188 t rowT2Mcm
+20023ce0 T run9900
+20016dc8 0000002c T runtime_init
+10000780 000000d8 W runtime_init_clocks
+20016920 0000002c W runtime_init_early_resets
+200169a4 0000001c T runtime_init_install_ram_vector_table
+200165d8 00000050 W runtime_init_mutex
+200164f0 00000048 W runtime_init_per_core_irq_priorities
+20016968 00000020 W runtime_init_post_clock_resets
+20016988 00000014 W runtime_init_rp2040_gpio_ie_disable
+2001699c 00000008 W runtime_init_spin_locks_reset
+2001694c 0000001c W runtime_init_usb_power_down
+200168d0 00000028 T runtime_run_initializers
+200168f8 00000028 T runtime_run_per_core_initializers
+20015d14 0000013c T saveConfigSplitPending
+2004064c 00000108 d scanlineBuffer
+100002f0 0000003c r scartClockPresets
+200292de 00000001 b scartConnected
+20028600 00000100 B sd_table
+20023e90 t sdecode1d
+20023ae0 t sdecode2a
+20023b90 t sdecode2b
+20023d90 t sdecode2d
+20000100 00001000 b sectorBuffer
+10000438 000001b4 T set_sys_clock_pll
+200292c8 00000004 V sf_clz_func
+20028700 00000100 B sf_table
+10000f30 00000044 T shouldUseScartClock
+00000002 a SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
+00000002 a SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
+00000002 a SIO_DIV_CSR_DIRTY_SHIFT_FOR_CARRY
+00000001 a SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
+00000001 a SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
+00000001 a SIO_DIV_CSR_READY_SHIFT_FOR_CARRY
+20016628 00000048 T sleep_ms
+200164d4 0000001c T spin_locks_reset
+200280f0 000001b8 T splash
+200282a8 00000006 T splash_pal
+20028800 00000010 B sprAttTabStr
+20040020 00000080 d spriteAttrRows
+20040000 00000020 d spriteIndices
+20028810 00000010 B sprPattTabStr
+00000400 a StackSize
+20023d06 t start
+20023d16 t startX
+200231c1 00000001 t striped_spin_lock_num
+20019670 00000060 T strncpy
+20028820 00000010 B syncDataActive
+20028830 00000010 B syncDataEqEq
+20028840 00000010 B syncDataEqLs
+20028850 00000010 B syncDataLsEq
+20028860 00000010 B syncDataLsLs
+20028870 00000010 B syncDataPorch
+20028880 00000010 B syncDataSync
+200292cc 00000004 b syncDmaChanMask
+200156d8 00000050 T systemClockApplyConfig
+2001568c 0000004c T systemClockInit
+200292d0 00000004 b tempAccum.0
+20028890 00000010 B temperatureStr
+2001f198 000004c0 t text_scan_line.constprop.0
+2001a35c 00000158 t text40RowT1
+2001dc54 000003cc t text40RowT1Ecm1
+2001e478 0000042c t text40RowT1Ecm2
+2001ed28 00000470 t text40RowT1Ecm3
+2001a108 00000254 t text40RowT2
+2001e020 00000456 t text40RowT2Ecm1
+2001e8a4 00000482 t text40RowT2Ecm2
+2001bbec 000004dc t text40RowT2Ecm3
+20022ddc 00000040 t text80ColorWord
+200229dc 00000400 t text80MaskWord
+2001ae14 00000330 t text80Row.constprop.0
+2001a4b4 0000044c t text80RowScrolled
+200229bc 00000020 t textRowClones
+20016824 00000010 T tick_start
+2002298c 00000030 t tileRowClones
+20016670 00000014 T time_us_64
+20022eb0 00000004 T tms9918
+20005200 000103b0 b tms9918Inst
+200157b8 0000017c T tmsBusInit
+200292df 00000001 b tmsCachedMode
+200171ec 00000126 t tmsCopyAlignMask
+20015738 00000042 t tmsEndOfFrame
+20015730 00000008 t tmsEndOfScanline
+20015728 00000008 t tmsPorch
+20022820 00000008 t tmsRead_program
+20022828 00000028 t tmsRead_program_instructions
+20019ac4 00000118 t tmsReadIrqHandler
+20019740 000000b8 t tmsScanline
+20022804 00000008 t tmsWrite_program
+2002280c 00000012 t tmsWrite_program_instructions
+200197f8 000001bc t tmsWriteIrqHandler
+200288a0 00000008 b transparentPixels
+20016c2a T uint2float
+200292e0 00000001 b underLayer
+100001d2 T unhandled_user_irq_num_in_r0
+10000d20 00000098 t updateClock
+20015998 00000040 T updateDispDriver
+00000001 a use_hw_div
+10000290 00000020 r vdpClockConfigs
+10000e88 00000044 T vdpClocksInit
+20017314 00000084 t vdpRegisterReset.constprop.0
+20022970 0000000a t vga_rgb_program_instructions
+2002297c 00000008 t vga_sync_program
+20022984 00000008 t vga_sync_program_instructions
+100002b0 0000003c r vgaClockPresets
+2001700c 00000008 T vgaCurrentParams
+20017020 000001cc T vgaGetParams
+10001550 0000004c T vgaInit
+100010a8 00000158 t vgaInitRgb
+10001440 00000110 t vgaInitSync
+2001a04c 000000bc T vgaLoop
+100003a8 00000090 r vgaModeBase
+10000330 00000074 r vgaModeInterlaced
+20001100 0000009c b vgaParams
+20017014 0000000c T vgaSetTriggerScanline
+20019210 000002ac t volatileHack
+20016808 0000001c T vreg_set_voltage
+20024064 t VREGSH
+20024060 t VREGSL
+200288a8 00000014 b vsyncTypeBuffers
+20015bd4 00000140 T writeConfig
+20016898 00000028 T xosc_init
+20022e2c 00000004 t zeroWord

@@ -1,0 +1,32 @@
+tmsScanline                       78 instructions  (0x000000b8 bytes)
+pico9918_frame_scanline          391 instructions  (0x0000038c bytes)
+pico9918_frame_update_interrupts   107 instructions  (0x00000100 bytes)
+pico9918_palette_regenerate      202 instructions  (0x000001c4 bytes)
+tmsEndOfFrame                     30 instructions  (0x00000042 bytes)
+tmsEndOfScanline                   4 instructions  (0x00000008 bytes)
+tmsPorch                           4 instructions  (0x00000008 bytes)
+pico9918_frame_porch              13 instructions  (0x00000024 bytes)
+pico9918_frame_end_of_scanline    62 instructions  (0x000000a8 bytes)
+pico9918_frame_end               199 instructions  (0x000001e4 bytes)
+pico9918_config_apply            213 instructions  (0x000002a0 bytes)
+main                             101 instructions  (0x00000140 bytes)
+reloadStoredConfig                91 instructions  (0x000000e8 bytes)
+applyConfigHostEffects            12 instructions  (0x00000020 bytes)
+pico9918_scan_line               172 instructions  (0x000001b0 bytes)
+pico9918_diag_render             459 instructions  (0x000003e0 bytes)
+pico9918_diag_render_text         79 instructions  (0x000000ac bytes)
+pico9918_diag_update             668 instructions  (0x00000648 bytes)
+pico9918_splash_render            93 instructions  (0x000000c8 bytes)
+tmsReadIrqHandler                115 instructions  (0x00000118 bytes)
+tmsWriteIrqHandler               190 instructions  (0x000001bc bytes)
+gpioIrqHandler                   103 instructions  (0x00000110 bytes)
+dmaIrqHandler                    357 instructions  (0x00000334 bytes)
+initLookups                       42 instructions  (0x00000098 bytes)
+graphics_i_scan_line            3151 instructions  (0x00001ab0 bytes)  [graphics_i_scan_line.constprop.0]
+text_scan_line                   557 instructions  (0x000004c0 bytes)  [text_scan_line.constprop.0]
+WARN: symbol f18a_tile_layer_scan_line not found (inlined or renamed?)
+renderSprites                   1109 instructions  (0x00000918 bytes)  [renderSprites.constprop.0]
+pico9918_output_sprites          183 instructions  (0x00000190 bytes)  [pico9918_output_sprites.constprop.0]
+compositeTile2OnlyBuffer         157 instructions  (0x00000144 bytes)  [compositeTile2OnlyBuffer.constprop.0]
+volatileHack                     308 instructions  (0x000002ac bytes)
+pico9918_gpu_rearm_palette_guard    19 instructions  (0x00000034 bytes)

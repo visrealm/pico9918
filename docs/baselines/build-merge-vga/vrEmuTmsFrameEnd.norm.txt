@@ -1,0 +1,215 @@
+<ADDR> <vrEmuTmsFrameEnd>:
+push	{r4, r5, r6, r7, lr}
+mov	lr, sl
+mov	r7, r9
+mov	r6, r8
+mov	r9, r3
+ldr	r3, [pc, #408]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+push	{r6, r7, lr}
+mov	r8, r3
+ldr	r7, [pc, #404]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+movs	r4, r0
+ldr	r5, [r7, #0]
+adds	r0, r1, #0
+adds	r5, #1
+ldr	r1, [r3, #0]
+str	r5, [r7, #0]
+mov	sl, r2
+bl	<ADDR> <__wrap___aeabi_fadd>
+mov	r3, r8
+str	r0, [r3, #0]
+lsls	r5, r5, #26
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r6, [pc, #380]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldr	r5, [r6, #0]
+ldr	r2, [pc, #380]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldrb	r3, [r2, #0]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #376]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldrb	r1, [r5, r3]
+movs	r3, #64	@ 0x40
+ands	r3, r1
+lsls	r1, r3, #25
+lsrs	r1, r1, #31
+strb	r1, [r2, #0]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #360]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldrb	r3, [r5, r3]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #356]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldrb	r2, [r5, r3]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #352]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+mov	r1, r9
+ldrb	r2, [r5, r3]
+movs	r3, #64	@ 0x40
+ands	r3, r2
+ldrb	r2, [r1, #4]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r2, #192	@ 0xc0
+ldr	r3, [pc, #332]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+movs	r5, #192	@ 0xc0
+str	r2, [r3, #0]
+ldrh	r2, [r1, #6]
+movs	r1, #192	@ 0xc0
+subs	r2, r2, r1
+lsrs	r3, r2, #31
+adds	r3, r3, r2
+ldr	r2, [pc, #320]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+asrs	r3, r3, #1
+str	r3, [r2, #0]
+str	r3, [r4, #4]
+adds	r3, r3, r5
+movs	r0, r4
+str	r1, [r4, #0]
+str	r3, [r4, #8]
+pop	{r5, r6, r7}
+mov	sl, r7
+mov	r9, r6
+mov	r8, r5
+pop	{r4, r5, r6, r7, pc}
+movs	r0, #8
+ldr	r2, [pc, #296]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+mov	r6, r9
+ldrb	r2, [r5, r2]
+ldr	r5, [r6, #0]
+ands	r0, r2
+movs	r2, #2
+lsls	r1, r0, #28
+lsrs	r1, r1, #31
+subs	r2, r2, r1
+strb	r2, [r6, #5]
+lsrs	r2, r5, #31
+adds	r2, r2, r5
+asrs	r2, r2, #1
+lsls	r2, r1
+uxth	r2, r2
+strh	r2, [r6, #6]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r3, #192	@ 0xc0
+lsls	r3, r3, #1
+movs	r5, #192	@ 0xc0
+movs	r6, r3
+movs	r1, #192	@ 0xc0
+cmp	r0, #0
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r1, [pc, #240]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+movs	r5, r3
+str	r6, [r1, #0]
+movs	r1, r6
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r3, #240	@ 0xf0
+lsls	r3, r3, #1
+movs	r5, #240	@ 0xf0
+movs	r6, r3
+movs	r1, #240	@ 0xf0
+cmp	r0, #0
+bne.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #216]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+str	r1, [r3, #0]
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r2, #240	@ 0xf0
+ldr	r3, [pc, #208]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+movs	r5, #240	@ 0xf0
+str	r2, [r3, #0]
+ldrh	r2, [r1, #6]
+movs	r1, #240	@ 0xf0
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r1, #242	@ 0xf2
+lsls	r1, r1, #22
+bl	<ADDR> <__wrap___aeabi_fmul>
+mov	r3, r8
+str	r0, [r3, #0]
+bl	<ADDR> <vrEmuTmsDiagSetTemperature>
+mov	r3, r8
+movs	r1, #129	@ 0x81
+ldr	r0, [r3, #0]
+lsls	r1, r1, #23
+bl	<ADDR> <__wrap___aeabi_fmul>
+movs	r1, #252	@ 0xfc
+lsls	r1, r1, #22
+bl	<ADDR> <__wrap___aeabi_fadd>
+bl	<ADDR> <__wrap___aeabi_f2uiz>
+ldr	r6, [pc, #132]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldr	r3, [pc, #164]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldr	r5, [r6, #0]
+mov	r2, r8
+strb	r0, [r5, r3]
+movs	r3, #0
+str	r3, [r2, #0]
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r1, #1
+movs	r0, #2
+ldr	r2, [pc, #152]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+strb	r1, [r5, r3]
+ldrb	r3, [r5, r2]
+orrs	r3, r0
+strb	r3, [r5, r2]
+ldr	r3, [pc, #144]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldrb	r3, [r5, r3]
+lsls	r3, r3, #26
+bmi.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #140]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldrb	r2, [r5, r3]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r0, #128	@ 0x80
+bl	<ADDR> <vrEmuTmsFrameUpdateInterrupts>
+ldr	r5, [r6, #0]
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+mov	r0, sl
+bl	<ADDR> <vrEmuTmsDiagSetFrameRate>
+ldr	r0, [r7, #0]
+bl	<ADDR> <vrEmuTmsDiagUpdate>
+ldr	r5, [r6, #0]
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #108]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+strb	r1, [r5, #12]
+ldrb	r2, [r5, r3]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+movs	r2, #0
+strb	r2, [r5, r3]
+bl	<ADDR> <vrEmuTmsConfigApply>
+bl	<ADDR> <vrEmuTmsDiagConfigUpdated>
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+bl	<ADDR> <vrEmuTmsSplashAllowHide>
+movs	r3, #225	@ 0xe1
+ldr	r2, [r7, #0]
+lsls	r3, r3, #2
+cmp	r2, r3
+ble.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+ldr	r3, [pc, #72]	@ (<ADDR> <vrEmuTmsFrameEnd+OFF>)
+ldr	r3, [r3, #0]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+blx	r3
+ldr	r5, [r6, #0]
+b.n	<ADDR> <vrEmuTmsFrameEnd+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

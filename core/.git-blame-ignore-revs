@@ -1,0 +1,6 @@
+# Commits that only move whitespace.
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Adopt clang-format
+411176daf3b4fa4eff17b112751bc449deac9a1f

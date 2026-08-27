@@ -1,0 +1,111 @@
+<ADDR> <vrEmuTmsFrameUpdateInterrupts>:
+push	{r4, r5, lr}
+mov	lr, r8
+movs	r4, r0
+push	{lr}
+movs	r1, #0
+movs	r0, #9
+bl	<ADDR> <irq_set_enabled>
+movs	r1, #0
+movs	r0, #10
+bl	<ADDR> <irq_set_enabled>
+dmb	sy
+ldr	r3, [pc, #184]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+ldr	r2, [pc, #188]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+ldr	r3, [r3, #0]
+ldrb	r0, [r3, r2]
+ldrsb	r2, [r3, r2]
+cmp	r2, #0
+blt.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+lsls	r2, r0, #25
+bmi.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+movs	r2, #31
+bics	r0, r2
+orrs	r0, r4
+movs	r1, #255	@ 0xff
+ldr	r2, [pc, #164]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+strb	r0, [r3, r2]
+ldr	r2, [pc, #164]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+strb	r0, [r3, r2]
+ldr	r2, [pc, #164]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+ldrb	r2, [r2, #0]
+lsls	r2, r2, #8
+orrs	r2, r1
+ldrb	r1, [r3, #11]
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+ldr	r1, [pc, #152]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+ldrb	r1, [r3, r1]
+movs	r4, r1
+movs	r1, #15
+ands	r1, r4
+lsls	r4, r1, #24
+orrs	r4, r2
+ldr	r2, [pc, #132]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+adds	r1, r3, r1
+ldrb	r2, [r1, r2]
+lsls	r2, r2, #16
+orrs	r2, r4
+ldr	r1, [pc, #132]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+str	r2, [r1, #20]
+ldr	r1, [pc, #132]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+ldrb	r2, [r3, r1]
+mov	ip, r2
+ldr	r2, [pc, #132]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #26
+bpl.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+lsls	r0, r0, #24
+bmi.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+mov	r2, ip
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+movs	r1, #0
+ldr	r2, [pc, #108]	@ (<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>)
+strb	r1, [r3, r2]
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #20]
+dmb	sy
+movs	r1, #1
+movs	r0, #9
+bl	<ADDR> <irq_set_enabled>
+movs	r1, #1
+movs	r0, #10
+bl	<ADDR> <irq_set_enabled>
+pop	{r5}
+mov	r8, r5
+pop	{r4, r5, pc}
+movs	r2, #31
+movs	r1, r4
+bics	r1, r2
+orrs	r0, r1
+b.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+lsls	r1, r0, #16
+orrs	r2, r1
+b.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+movs	r2, #32
+ands	r2, r4
+orrs	r0, r2
+b.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+mov	r2, ip
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+adds	r2, #1
+strb	r2, [r3, r1]
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #24]
+b.n	<ADDR> <vrEmuTmsFrameUpdateInterrupts+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

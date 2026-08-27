@@ -1,0 +1,106 @@
+200060fc <gpioIrqHandler>:
+200060fc:	b510      	push	{r4, lr}
+200060fe:	2104      	movs	r1, #4
+20006100:	2017      	movs	r0, #23
+20006102:	f7fb f937 	bl	20001374 <gpio_acknowledge_irq>
+20006106:	2100      	movs	r1, #0
+20006108:	2009      	movs	r0, #9
+2000610a:	f7fb fa31 	bl	20001570 <irq_set_enabled>
+2000610e:	2100      	movs	r1, #0
+20006110:	200a      	movs	r0, #10
+20006112:	f7fb fa2d 	bl	20001570 <irq_set_enabled>
+20006116:	f3bf 8f5f 	dmb	sy
+2000611a:	f004 fe1f 	bl	2000ad5c <vrEmuTms9918Reset>
+2000611e:	4c2a      	ldr	r4, [pc, #168]	@ (200061c8 <gpioIrqHandler+0xcc>)
+20006120:	4b2a      	ldr	r3, [pc, #168]	@ (200061cc <gpioIrqHandler+0xd0>)
+20006122:	6820      	ldr	r0, [r4, #0]
+20006124:	18c0      	adds	r0, r0, r3
+20006126:	f7fa fc93 	bl	20000a50 <readConfig>
+2000612a:	2280      	movs	r2, #128	@ 0x80
+2000612c:	4b28      	ldr	r3, [pc, #160]	@ (200061d0 <gpioIrqHandler+0xd4>)
+2000612e:	0092      	lsls	r2, r2, #2
+20006130:	601a      	str	r2, [r3, #0]
+20006132:	2280      	movs	r2, #128	@ 0x80
+20006134:	00d2      	lsls	r2, r2, #3
+20006136:	601a      	str	r2, [r3, #0]
+20006138:	2380      	movs	r3, #128	@ 0x80
+2000613a:	4a26      	ldr	r2, [pc, #152]	@ (200061d4 <gpioIrqHandler+0xd8>)
+2000613c:	061b      	lsls	r3, r3, #24
+2000613e:	6013      	str	r3, [r2, #0]
+20006140:	6013      	str	r3, [r2, #0]
+20006142:	4a25      	ldr	r2, [pc, #148]	@ (200061d8 <gpioIrqHandler+0xdc>)
+20006144:	201f      	movs	r0, #31
+20006146:	6013      	str	r3, [r2, #0]
+20006148:	6013      	str	r3, [r2, #0]
+2000614a:	2200      	movs	r2, #0
+2000614c:	4b23      	ldr	r3, [pc, #140]	@ (200061dc <gpioIrqHandler+0xe0>)
+2000614e:	4924      	ldr	r1, [pc, #144]	@ (200061e0 <gpioIrqHandler+0xe4>)
+20006150:	701a      	strb	r2, [r3, #0]
+20006152:	6823      	ldr	r3, [r4, #0]
+20006154:	5458      	strb	r0, [r3, r1]
+20006156:	4923      	ldr	r1, [pc, #140]	@ (200061e4 <gpioIrqHandler+0xe8>)
+20006158:	545a      	strb	r2, [r3, r1]
+2000615a:	2120      	movs	r1, #32
+2000615c:	4a22      	ldr	r2, [pc, #136]	@ (200061e8 <gpioIrqHandler+0xec>)
+2000615e:	31ff      	adds	r1, #255	@ 0xff
+20006160:	5299      	strh	r1, [r3, r2]
+20006162:	7ada      	ldrb	r2, [r3, #11]
+20006164:	2a00      	cmp	r2, #0
+20006166:	d027      	beq.n	200061b8 <gpioIrqHandler+0xbc>
+20006168:	4a20      	ldr	r2, [pc, #128]	@ (200061ec <gpioIrqHandler+0xf0>)
+2000616a:	5c99      	ldrb	r1, [r3, r2]
+2000616c:	220f      	movs	r2, #15
+2000616e:	400a      	ands	r2, r1
+20006170:	491b      	ldr	r1, [pc, #108]	@ (200061e0 <gpioIrqHandler+0xe4>)
+20006172:	189b      	adds	r3, r3, r2
+20006174:	5c5b      	ldrb	r3, [r3, r1]
+20006176:	0612      	lsls	r2, r2, #24
+20006178:	041b      	lsls	r3, r3, #16
+2000617a:	4313      	orrs	r3, r2
+2000617c:	22ff      	movs	r2, #255	@ 0xff
+2000617e:	4313      	orrs	r3, r2
+20006180:	4a1b      	ldr	r2, [pc, #108]	@ (200061f0 <gpioIrqHandler+0xf4>)
+20006182:	6153      	str	r3, [r2, #20]
+20006184:	2200      	movs	r2, #0
+20006186:	4b1b      	ldr	r3, [pc, #108]	@ (200061f4 <gpioIrqHandler+0xf8>)
+20006188:	601a      	str	r2, [r3, #0]
+2000618a:	f7fd fe3d 	bl	20003e08 <vrEmuTmsSplashReset>
+2000618e:	6822      	ldr	r2, [r4, #0]
+20006190:	4b14      	ldr	r3, [pc, #80]	@ (200061e4 <gpioIrqHandler+0xe8>)
+20006192:	5cd3      	ldrb	r3, [r2, r3]
+20006194:	2b00      	cmp	r3, #0
+20006196:	d111      	bne.n	200061bc <gpioIrqHandler+0xc0>
+20006198:	23d0      	movs	r3, #208	@ 0xd0
+2000619a:	2280      	movs	r2, #128	@ 0x80
+2000619c:	061b      	lsls	r3, r3, #24
+2000619e:	03d2      	lsls	r2, r2, #15
+200061a0:	615a      	str	r2, [r3, #20]
+200061a2:	f3bf 8f5f 	dmb	sy
+200061a6:	2101      	movs	r1, #1
+200061a8:	2009      	movs	r0, #9
+200061aa:	f7fb f9e1 	bl	20001570 <irq_set_enabled>
+200061ae:	2101      	movs	r1, #1
+200061b0:	200a      	movs	r0, #10
+200061b2:	f7fb f9dd 	bl	20001570 <irq_set_enabled>
+200061b6:	bd10      	pop	{r4, pc}
+200061b8:	4b0f      	ldr	r3, [pc, #60]	@ (200061f8 <gpioIrqHandler+0xfc>)
+200061ba:	e7e1      	b.n	20006180 <gpioIrqHandler+0x84>
+200061bc:	23d0      	movs	r3, #208	@ 0xd0
+200061be:	2280      	movs	r2, #128	@ 0x80
+200061c0:	061b      	lsls	r3, r3, #24
+200061c2:	03d2      	lsls	r2, r2, #15
+200061c4:	619a      	str	r2, [r3, #24]
+200061c6:	e7ec      	b.n	200061a2 <gpioIrqHandler+0xa6>
+200061c8:	2000d534 	.word	0x2000d534
+200061cc:	00010050 	.word	0x00010050
+200061d0:	e000e280 	.word	0xe000e280
+200061d4:	503010e8 	.word	0x503010e8
+200061d8:	503010d0 	.word	0x503010d0
+200061dc:	20028676 	.word	0x20028676
+200061e0:	0000b02c 	.word	0x0000b02c
+200061e4:	00010151 	.word	0x00010151
+200061e8:	00010152 	.word	0x00010152
+200061ec:	0000603b 	.word	0x0000603b
+200061f0:	50300000 	.word	0x50300000
+200061f4:	2002864c 	.word	0x2002864c
+200061f8:	001f00ff 	.word	0x001f00ff

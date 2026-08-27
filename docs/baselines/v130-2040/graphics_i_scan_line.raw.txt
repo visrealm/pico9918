@@ -1,0 +1,3249 @@
+20020158 <graphics_i_scan_line.constprop.0>:
+20020158:	b5f0      	push	{r4, r5, r6, r7, lr}
+2002015a:	464e      	mov	r6, r9
+2002015c:	46de      	mov	lr, fp
+2002015e:	4657      	mov	r7, sl
+20020160:	4645      	mov	r5, r8
+20020162:	b5e0      	push	{r5, r6, r7, lr}
+20020164:	4abd      	ldr	r2, [pc, #756]	@ (2002045c <graphics_i_scan_line.constprop.0+0x304>)
+20020166:	b09b      	sub	sp, #108	@ 0x6c
+20020168:	4bbd      	ldr	r3, [pc, #756]	@ (20020460 <graphics_i_scan_line.constprop.0+0x308>)
+2002016a:	900b      	str	r0, [sp, #44]	@ 0x2c
+2002016c:	9209      	str	r2, [sp, #36]	@ 0x24
+2002016e:	5cd3      	ldrb	r3, [r2, r3]
+20020170:	4699      	mov	r9, r3
+20020172:	2b00      	cmp	r3, #0
+20020174:	d100      	bne.n	20020178 <graphics_i_scan_line.constprop.0+0x20>
+20020176:	e19b      	b.n	200204b0 <graphics_i_scan_line.constprop.0+0x358>
+20020178:	20a0      	movs	r0, #160	@ 0xa0
+2002017a:	21c8      	movs	r1, #200	@ 0xc8
+2002017c:	2280      	movs	r2, #128	@ 0x80
+2002017e:	05c0      	lsls	r0, r0, #23
+20020180:	0049      	lsls	r1, r1, #1
+20020182:	0452      	lsls	r2, r2, #17
+20020184:	5843      	ldr	r3, [r0, r1]
+20020186:	4213      	tst	r3, r2
+20020188:	d1fc      	bne.n	20020184 <graphics_i_scan_line.constprop.0+0x2c>
+2002018a:	4bb6      	ldr	r3, [pc, #728]	@ (20020464 <graphics_i_scan_line.constprop.0+0x30c>)
+2002018c:	9909      	ldr	r1, [sp, #36]	@ 0x24
+2002018e:	5ccd      	ldrb	r5, [r1, r3]
+20020190:	56cb      	ldrsb	r3, [r1, r3]
+20020192:	2b00      	cmp	r3, #0
+20020194:	db00      	blt.n	20020198 <graphics_i_scan_line.constprop.0+0x40>
+20020196:	e10f      	b.n	200203b8 <graphics_i_scan_line.constprop.0+0x260>
+20020198:	4bb3      	ldr	r3, [pc, #716]	@ (20020468 <graphics_i_scan_line.constprop.0+0x310>)
+2002019a:	9a0b      	ldr	r2, [sp, #44]	@ 0x2c
+2002019c:	5ccb      	ldrb	r3, [r1, r3]
+2002019e:	429a      	cmp	r2, r3
+200201a0:	d200      	bcs.n	200201a4 <graphics_i_scan_line.constprop.0+0x4c>
+200201a2:	e109      	b.n	200203b8 <graphics_i_scan_line.constprop.0+0x260>
+200201a4:	1ad3      	subs	r3, r2, r3
+200201a6:	4ab1      	ldr	r2, [pc, #708]	@ (2002046c <graphics_i_scan_line.constprop.0+0x314>)
+200201a8:	b29b      	uxth	r3, r3
+200201aa:	5c8a      	ldrb	r2, [r1, r2]
+200201ac:	429a      	cmp	r2, r3
+200201ae:	d800      	bhi.n	200201b2 <graphics_i_scan_line.constprop.0+0x5a>
+200201b0:	e102      	b.n	200203b8 <graphics_i_scan_line.constprop.0+0x260>
+200201b2:	4aaf      	ldr	r2, [pc, #700]	@ (20020470 <graphics_i_scan_line.constprop.0+0x318>)
+200201b4:	5c8a      	ldrb	r2, [r1, r2]
+200201b6:	2a00      	cmp	r2, #0
+200201b8:	d101      	bne.n	200201be <graphics_i_scan_line.constprop.0+0x66>
+200201ba:	f000 fbe5 	bl	20020988 <graphics_i_scan_line.constprop.0+0x830>
+200201be:	0892      	lsrs	r2, r2, #2
+200201c0:	0011      	movs	r1, r2
+200201c2:	4692      	mov	sl, r2
+200201c4:	48ab      	ldr	r0, [pc, #684]	@ (20020474 <graphics_i_scan_line.constprop.0+0x31c>)
+200201c6:	9c09      	ldr	r4, [sp, #36]	@ 0x24
+200201c8:	434b      	muls	r3, r1
+200201ca:	2640      	movs	r6, #64	@ 0x40
+200201cc:	5c24      	ldrb	r4, [r4, r0]
+200201ce:	2001      	movs	r0, #1
+200201d0:	01a4      	lsls	r4, r4, #6
+200201d2:	18e4      	adds	r4, r4, r3
+200201d4:	2320      	movs	r3, #32
+200201d6:	402e      	ands	r6, r5
+200201d8:	0671      	lsls	r1, r6, #25
+200201da:	4fa7      	ldr	r7, [pc, #668]	@ (20020478 <graphics_i_scan_line.constprop.0+0x320>)
+200201dc:	0fc9      	lsrs	r1, r1, #31
+200201de:	4041      	eors	r1, r0
+200201e0:	b2a4      	uxth	r4, r4
+200201e2:	402b      	ands	r3, r5
+200201e4:	960f      	str	r6, [sp, #60]	@ 0x3c
+200201e6:	970a      	str	r7, [sp, #40]	@ 0x28
+200201e8:	7039      	strb	r1, [r7, #0]
+200201ea:	2e00      	cmp	r6, #0
+200201ec:	d100      	bne.n	200201f0 <graphics_i_scan_line.constprop.0+0x98>
+200201ee:	e2c2      	b.n	20020776 <graphics_i_scan_line.constprop.0+0x61e>
+200201f0:	4649      	mov	r1, r9
+200201f2:	9107      	str	r1, [sp, #28]
+200201f4:	2b00      	cmp	r3, #0
+200201f6:	d000      	beq.n	200201fa <graphics_i_scan_line.constprop.0+0xa2>
+200201f8:	e2bf      	b.n	2002077a <graphics_i_scan_line.constprop.0+0x622>
+200201fa:	2a40      	cmp	r2, #64	@ 0x40
+200201fc:	d000      	beq.n	20020200 <graphics_i_scan_line.constprop.0+0xa8>
+200201fe:	e2bc      	b.n	2002077a <graphics_i_scan_line.constprop.0+0x622>
+20020200:	21ff      	movs	r1, #255	@ 0xff
+20020202:	3a20      	subs	r2, #32
+20020204:	489d      	ldr	r0, [pc, #628]	@ (2002047c <graphics_i_scan_line.constprop.0+0x324>)
+20020206:	f7f6 fdcd 	bl	20016da4 <__wrap_memset>
+2002020a:	4b9d      	ldr	r3, [pc, #628]	@ (20020480 <graphics_i_scan_line.constprop.0+0x328>)
+2002020c:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2002020e:	00a9      	lsls	r1, r5, #2
+20020210:	5cd3      	ldrb	r3, [r2, r3]
+20020212:	469b      	mov	fp, r3
+20020214:	930d      	str	r3, [sp, #52]	@ 0x34
+20020216:	06ed      	lsls	r5, r5, #27
+20020218:	d501      	bpl.n	2002021e <graphics_i_scan_line.constprop.0+0xc6>
+2002021a:	f001 fc98 	bl	20021b4e <graphics_i_scan_line.constprop.0+0x19f6>
+2002021e:	2300      	movs	r3, #0
+20020220:	2600      	movs	r6, #0
+20020222:	9307      	str	r3, [sp, #28]
+20020224:	2280      	movs	r2, #128	@ 0x80
+20020226:	0612      	lsls	r2, r2, #24
+20020228:	4694      	mov	ip, r2
+2002022a:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+2002022c:	465b      	mov	r3, fp
+2002022e:	193c      	adds	r4, r7, r4
+20020230:	4f92      	ldr	r7, [pc, #584]	@ (2002047c <graphics_i_scan_line.constprop.0+0x324>)
+20020232:	2000      	movs	r0, #0
+20020234:	940e      	str	r4, [sp, #56]	@ 0x38
+20020236:	9710      	str	r7, [sp, #64]	@ 0x40
+20020238:	2500      	movs	r5, #0
+2002023a:	4667      	mov	r7, ip
+2002023c:	243f      	movs	r4, #63	@ 0x3f
+2002023e:	46d4      	mov	ip, sl
+20020240:	46b3      	mov	fp, r6
+20020242:	46ca      	mov	sl, r9
+20020244:	4a8f      	ldr	r2, [pc, #572]	@ (20020484 <graphics_i_scan_line.constprop.0+0x32c>)
+20020246:	9311      	str	r3, [sp, #68]	@ 0x44
+20020248:	9008      	str	r0, [sp, #32]
+2002024a:	980e      	ldr	r0, [sp, #56]	@ 0x38
+2002024c:	5d40      	ldrb	r0, [r0, r5]
+2002024e:	0006      	movs	r6, r0
+20020250:	4680      	mov	r8, r0
+20020252:	43a6      	bics	r6, r4
+20020254:	11b6      	asrs	r6, r6, #6
+20020256:	430e      	orrs	r6, r1
+20020258:	54d6      	strb	r6, [r2, r3]
+2002025a:	1c5e      	adds	r6, r3, #1
+2002025c:	b2f0      	uxtb	r0, r6
+2002025e:	4681      	mov	r9, r0
+20020260:	4640      	mov	r0, r8
+20020262:	0086      	lsls	r6, r0, #2
+20020264:	4648      	mov	r0, r9
+20020266:	43a6      	bics	r6, r4
+20020268:	b2f6      	uxtb	r6, r6
+2002026a:	11b6      	asrs	r6, r6, #6
+2002026c:	430e      	orrs	r6, r1
+2002026e:	5416      	strb	r6, [r2, r0]
+20020270:	1c9e      	adds	r6, r3, #2
+20020272:	b2f0      	uxtb	r0, r6
+20020274:	4681      	mov	r9, r0
+20020276:	4640      	mov	r0, r8
+20020278:	0106      	lsls	r6, r0, #4
+2002027a:	4648      	mov	r0, r9
+2002027c:	43a6      	bics	r6, r4
+2002027e:	b2f6      	uxtb	r6, r6
+20020280:	11b6      	asrs	r6, r6, #6
+20020282:	430e      	orrs	r6, r1
+20020284:	5416      	strb	r6, [r2, r0]
+20020286:	2003      	movs	r0, #3
+20020288:	1cde      	adds	r6, r3, #3
+2002028a:	b2f6      	uxtb	r6, r6
+2002028c:	960c      	str	r6, [sp, #48]	@ 0x30
+2002028e:	0006      	movs	r6, r0
+20020290:	4640      	mov	r0, r8
+20020292:	4030      	ands	r0, r6
+20020294:	9e0c      	ldr	r6, [sp, #48]	@ 0x30
+20020296:	4308      	orrs	r0, r1
+20020298:	5590      	strb	r0, [r2, r6]
+2002029a:	08b8      	lsrs	r0, r7, #2
+2002029c:	087e      	lsrs	r6, r7, #1
+2002029e:	4306      	orrs	r6, r0
+200202a0:	433e      	orrs	r6, r7
+200202a2:	08f8      	lsrs	r0, r7, #3
+200202a4:	4306      	orrs	r6, r0
+200202a6:	9808      	ldr	r0, [sp, #32]
+200202a8:	3304      	adds	r3, #4
+200202aa:	4330      	orrs	r0, r6
+200202ac:	0006      	movs	r6, r0
+200202ae:	9008      	str	r0, [sp, #32]
+200202b0:	9807      	ldr	r0, [sp, #28]
+200202b2:	b2db      	uxtb	r3, r3
+200202b4:	093f      	lsrs	r7, r7, #4
+200202b6:	2800      	cmp	r0, #0
+200202b8:	d02f      	beq.n	2002031a <graphics_i_scan_line.constprop.0+0x1c2>
+200202ba:	2f00      	cmp	r7, #0
+200202bc:	d12d      	bne.n	2002031a <graphics_i_scan_line.constprop.0+0x1c2>
+200202be:	2e00      	cmp	r6, #0
+200202c0:	d02b      	beq.n	2002031a <graphics_i_scan_line.constprop.0+0x1c2>
+200202c2:	261f      	movs	r6, #31
+200202c4:	980d      	ldr	r0, [sp, #52]	@ 0x34
+200202c6:	0947      	lsrs	r7, r0, #5
+200202c8:	4030      	ands	r0, r6
+200202ca:	970d      	str	r7, [sp, #52]	@ 0x34
+200202cc:	0007      	movs	r7, r0
+200202ce:	980d      	ldr	r0, [sp, #52]	@ 0x34
+200202d0:	970c      	str	r7, [sp, #48]	@ 0x30
+200202d2:	0080      	lsls	r0, r0, #2
+200202d4:	4681      	mov	r9, r0
+200202d6:	9808      	ldr	r0, [sp, #32]
+200202d8:	9e10      	ldr	r6, [sp, #64]	@ 0x40
+200202da:	40f8      	lsrs	r0, r7
+200202dc:	464f      	mov	r7, r9
+200202de:	4680      	mov	r8, r0
+200202e0:	59f7      	ldr	r7, [r6, r7]
+200202e2:	0038      	movs	r0, r7
+200202e4:	4647      	mov	r7, r8
+200202e6:	4307      	orrs	r7, r0
+200202e8:	0030      	movs	r0, r6
+200202ea:	003e      	movs	r6, r7
+200202ec:	464f      	mov	r7, r9
+200202ee:	503e      	str	r6, [r7, r0]
+200202f0:	980c      	ldr	r0, [sp, #48]	@ 0x30
+200202f2:	1e47      	subs	r7, r0, #1
+200202f4:	2f1f      	cmp	r7, #31
+200202f6:	d80b      	bhi.n	20020310 <graphics_i_scan_line.constprop.0+0x1b8>
+200202f8:	9e0d      	ldr	r6, [sp, #52]	@ 0x34
+200202fa:	1c77      	adds	r7, r6, #1
+200202fc:	2620      	movs	r6, #32
+200202fe:	1a36      	subs	r6, r6, r0
+20020300:	9808      	ldr	r0, [sp, #32]
+20020302:	00bf      	lsls	r7, r7, #2
+20020304:	40b0      	lsls	r0, r6
+20020306:	9e10      	ldr	r6, [sp, #64]	@ 0x40
+20020308:	59f6      	ldr	r6, [r6, r7]
+2002030a:	4330      	orrs	r0, r6
+2002030c:	9e10      	ldr	r6, [sp, #64]	@ 0x40
+2002030e:	51f0      	str	r0, [r6, r7]
+20020310:	2000      	movs	r0, #0
+20020312:	2780      	movs	r7, #128	@ 0x80
+20020314:	930d      	str	r3, [sp, #52]	@ 0x34
+20020316:	9008      	str	r0, [sp, #32]
+20020318:	063f      	lsls	r7, r7, #24
+2002031a:	3501      	adds	r5, #1
+2002031c:	4565      	cmp	r5, ip
+2002031e:	db94      	blt.n	2002024a <graphics_i_scan_line.constprop.0+0xf2>
+20020320:	9b11      	ldr	r3, [sp, #68]	@ 0x44
+20020322:	465e      	mov	r6, fp
+20020324:	469b      	mov	fp, r3
+20020326:	9b07      	ldr	r3, [sp, #28]
+20020328:	46d1      	mov	r9, sl
+2002032a:	9808      	ldr	r0, [sp, #32]
+2002032c:	2b00      	cmp	r3, #0
+2002032e:	d025      	beq.n	2002037c <graphics_i_scan_line.constprop.0+0x224>
+20020330:	4663      	mov	r3, ip
+20020332:	2200      	movs	r2, #0
+20020334:	2b00      	cmp	r3, #0
+20020336:	d002      	beq.n	2002033e <graphics_i_scan_line.constprop.0+0x1e6>
+20020338:	4662      	mov	r2, ip
+2002033a:	3a01      	subs	r2, #1
+2002033c:	0092      	lsls	r2, r2, #2
+2002033e:	465b      	mov	r3, fp
+20020340:	3304      	adds	r3, #4
+20020342:	189b      	adds	r3, r3, r2
+20020344:	b2db      	uxtb	r3, r3
+20020346:	4698      	mov	r8, r3
+20020348:	2800      	cmp	r0, #0
+2002034a:	d017      	beq.n	2002037c <graphics_i_scan_line.constprop.0+0x224>
+2002034c:	241f      	movs	r4, #31
+2002034e:	0005      	movs	r5, r0
+20020350:	990d      	ldr	r1, [sp, #52]	@ 0x34
+20020352:	400c      	ands	r4, r1
+20020354:	40e5      	lsrs	r5, r4
+20020356:	094a      	lsrs	r2, r1, #5
+20020358:	4948      	ldr	r1, [pc, #288]	@ (2002047c <graphics_i_scan_line.constprop.0+0x324>)
+2002035a:	0097      	lsls	r7, r2, #2
+2002035c:	587b      	ldr	r3, [r7, r1]
+2002035e:	431d      	orrs	r5, r3
+20020360:	507d      	str	r5, [r7, r1]
+20020362:	2520      	movs	r5, #32
+20020364:	4643      	mov	r3, r8
+20020366:	1b2c      	subs	r4, r5, r4
+20020368:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+2002036a:	1b5b      	subs	r3, r3, r5
+2002036c:	42a3      	cmp	r3, r4
+2002036e:	d905      	bls.n	2002037c <graphics_i_scan_line.constprop.0+0x224>
+20020370:	40a0      	lsls	r0, r4
+20020372:	3201      	adds	r2, #1
+20020374:	0092      	lsls	r2, r2, #2
+20020376:	5853      	ldr	r3, [r2, r1]
+20020378:	4318      	orrs	r0, r3
+2002037a:	5050      	str	r0, [r2, r1]
+2002037c:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+2002037e:	2300      	movs	r3, #0
+20020380:	2a00      	cmp	r2, #0
+20020382:	d001      	beq.n	20020388 <graphics_i_scan_line.constprop.0+0x230>
+20020384:	4b40      	ldr	r3, [pc, #256]	@ (20020488 <graphics_i_scan_line.constprop.0+0x330>)
+20020386:	681b      	ldr	r3, [r3, #0]
+20020388:	21c0      	movs	r1, #192	@ 0xc0
+2002038a:	4a40      	ldr	r2, [pc, #256]	@ (2002048c <graphics_i_scan_line.constprop.0+0x334>)
+2002038c:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+2002038e:	6013      	str	r3, [r2, #0]
+20020390:	6053      	str	r3, [r2, #4]
+20020392:	4a3f      	ldr	r2, [pc, #252]	@ (20020490 <graphics_i_scan_line.constprop.0+0x338>)
+20020394:	5053      	str	r3, [r2, r1]
+20020396:	3940      	subs	r1, #64	@ 0x40
+20020398:	5053      	str	r3, [r2, r1]
+2002039a:	6413      	str	r3, [r2, #64]	@ 0x40
+2002039c:	6013      	str	r3, [r2, #0]
+2002039e:	f7fb fb5d 	bl	2001ba5c <pico9918_output_sprites.constprop.0>
+200203a2:	0007      	movs	r7, r0
+200203a4:	2e00      	cmp	r6, #0
+200203a6:	d11d      	bne.n	200203e4 <graphics_i_scan_line.constprop.0+0x28c>
+200203a8:	0038      	movs	r0, r7
+200203aa:	b01b      	add	sp, #108	@ 0x6c
+200203ac:	bcf0      	pop	{r4, r5, r6, r7}
+200203ae:	46bb      	mov	fp, r7
+200203b0:	46b2      	mov	sl, r6
+200203b2:	46a9      	mov	r9, r5
+200203b4:	46a0      	mov	r8, r4
+200203b6:	bdf0      	pop	{r4, r5, r6, r7, pc}
+200203b8:	4b2f      	ldr	r3, [pc, #188]	@ (20020478 <graphics_i_scan_line.constprop.0+0x320>)
+200203ba:	464e      	mov	r6, r9
+200203bc:	930a      	str	r3, [sp, #40]	@ 0x28
+200203be:	781b      	ldrb	r3, [r3, #0]
+200203c0:	2b00      	cmp	r3, #0
+200203c2:	d0df      	beq.n	20020384 <graphics_i_scan_line.constprop.0+0x22c>
+200203c4:	2000      	movs	r0, #0
+200203c6:	2100      	movs	r1, #0
+200203c8:	4b30      	ldr	r3, [pc, #192]	@ (2002048c <graphics_i_scan_line.constprop.0+0x334>)
+200203ca:	2200      	movs	r2, #0
+200203cc:	c303      	stmia	r3!, {r0, r1}
+200203ce:	21c0      	movs	r1, #192	@ 0xc0
+200203d0:	4b2f      	ldr	r3, [pc, #188]	@ (20020490 <graphics_i_scan_line.constprop.0+0x338>)
+200203d2:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+200203d4:	505a      	str	r2, [r3, r1]
+200203d6:	3940      	subs	r1, #64	@ 0x40
+200203d8:	505a      	str	r2, [r3, r1]
+200203da:	641a      	str	r2, [r3, #64]	@ 0x40
+200203dc:	601a      	str	r2, [r3, #0]
+200203de:	f7fb fb3d 	bl	2001ba5c <pico9918_output_sprites.constprop.0>
+200203e2:	0007      	movs	r7, r0
+200203e4:	2010      	movs	r0, #16
+200203e6:	4b2b      	ldr	r3, [pc, #172]	@ (20020494 <graphics_i_scan_line.constprop.0+0x33c>)
+200203e8:	9e09      	ldr	r6, [sp, #36]	@ 0x24
+200203ea:	4a2b      	ldr	r2, [pc, #172]	@ (20020498 <graphics_i_scan_line.constprop.0+0x340>)
+200203ec:	930d      	str	r3, [sp, #52]	@ 0x34
+200203ee:	781c      	ldrb	r4, [r3, #0]
+200203f0:	4b2a      	ldr	r3, [pc, #168]	@ (2002049c <graphics_i_scan_line.constprop.0+0x344>)
+200203f2:	5cb2      	ldrb	r2, [r6, r2]
+200203f4:	5cf1      	ldrb	r1, [r6, r3]
+200203f6:	4b2a      	ldr	r3, [pc, #168]	@ (200204a0 <graphics_i_scan_line.constprop.0+0x348>)
+200203f8:	4d2a      	ldr	r5, [pc, #168]	@ (200204a4 <graphics_i_scan_line.constprop.0+0x34c>)
+200203fa:	4010      	ands	r0, r2
+200203fc:	5cf3      	ldrb	r3, [r6, r3]
+200203fe:	9008      	str	r0, [sp, #32]
+20020400:	5d70      	ldrb	r0, [r6, r5]
+20020402:	5775      	ldrsb	r5, [r6, r5]
+20020404:	46ab      	mov	fp, r5
+20020406:	2c02      	cmp	r4, #2
+20020408:	d000      	beq.n	2002040c <graphics_i_scan_line.constprop.0+0x2b4>
+2002040a:	e103      	b.n	20020614 <graphics_i_scan_line.constprop.0+0x4bc>
+2002040c:	25ab      	movs	r5, #171	@ 0xab
+2002040e:	006d      	lsls	r5, r5, #1
+20020410:	002e      	movs	r6, r5
+20020412:	434e      	muls	r6, r1
+20020414:	0af6      	lsrs	r6, r6, #11
+20020416:	46b4      	mov	ip, r6
+20020418:	435d      	muls	r5, r3
+2002041a:	0076      	lsls	r6, r6, #1
+2002041c:	4466      	add	r6, ip
+2002041e:	0076      	lsls	r6, r6, #1
+20020420:	0aed      	lsrs	r5, r5, #11
+20020422:	1b8e      	subs	r6, r1, r6
+20020424:	9607      	str	r6, [sp, #28]
+20020426:	006e      	lsls	r6, r5, #1
+20020428:	1976      	adds	r6, r6, r5
+2002042a:	0076      	lsls	r6, r6, #1
+2002042c:	1b9d      	subs	r5, r3, r6
+2002042e:	46aa      	mov	sl, r5
+20020430:	465d      	mov	r5, fp
+20020432:	2d00      	cmp	r5, #0
+20020434:	da01      	bge.n	2002043a <graphics_i_scan_line.constprop.0+0x2e2>
+20020436:	f000 ffa2 	bl	2002137e <graphics_i_scan_line.constprop.0+0x1226>
+2002043a:	9b08      	ldr	r3, [sp, #32]
+2002043c:	2b00      	cmp	r3, #0
+2002043e:	d101      	bne.n	20020444 <graphics_i_scan_line.constprop.0+0x2ec>
+20020440:	f001 f841 	bl	200214c6 <graphics_i_scan_line.constprop.0+0x136e>
+20020444:	21ff      	movs	r1, #255	@ 0xff
+20020446:	9809      	ldr	r0, [sp, #36]	@ 0x24
+20020448:	4a17      	ldr	r2, [pc, #92]	@ (200204a8 <graphics_i_scan_line.constprop.0+0x350>)
+2002044a:	5883      	ldr	r3, [r0, r2]
+2002044c:	021b      	lsls	r3, r3, #8
+2002044e:	0a1b      	lsrs	r3, r3, #8
+20020450:	5083      	str	r3, [r0, r2]
+20020452:	4a16      	ldr	r2, [pc, #88]	@ (200204ac <graphics_i_scan_line.constprop.0+0x354>)
+20020454:	5883      	ldr	r3, [r0, r2]
+20020456:	438b      	bics	r3, r1
+20020458:	5083      	str	r3, [r0, r2]
+2002045a:	e7a5      	b.n	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+2002045c:	20005200 	.word	0x20005200
+20020460:	0001002f 	.word	0x0001002f
+20020464:	0000601f 	.word	0x0000601f
+20020468:	00006022 	.word	0x00006022
+2002046c:	00006024 	.word	0x00006024
+20020470:	00006023 	.word	0x00006023
+20020474:	00006020 	.word	0x00006020
+20020478:	200292e0 	.word	0x200292e0
+2002047c:	200405e0 	.word	0x200405e0
+20020480:	00006021 	.word	0x00006021
+20020484:	2004064c 	.word	0x2004064c
+20020488:	20041a08 	.word	0x20041a08
+2002048c:	200288a0 	.word	0x200288a0
+20020490:	200400e0 	.word	0x200400e0
+20020494:	200292df 	.word	0x200292df
+20020498:	00006032 	.word	0x00006032
+2002049c:	0000601b 	.word	0x0000601b
+200204a0:	00006019 	.word	0x00006019
+200204a4:	00006031 	.word	0x00006031
+200204a8:	00010364 	.word	0x00010364
+200204ac:	00010380 	.word	0x00010380
+200204b0:	22f0      	movs	r2, #240	@ 0xf0
+200204b2:	08c4      	lsrs	r4, r0, #3
+200204b4:	4bd0      	ldr	r3, [pc, #832]	@ (200207f8 <graphics_i_scan_line.constprop.0+0x6a0>)
+200204b6:	9809      	ldr	r0, [sp, #36]	@ 0x24
+200204b8:	0192      	lsls	r2, r2, #6
+200204ba:	5cc3      	ldrb	r3, [r0, r3]
+200204bc:	029b      	lsls	r3, r3, #10
+200204be:	4013      	ands	r3, r2
+200204c0:	22ff      	movs	r2, #255	@ 0xff
+200204c2:	4022      	ands	r2, r4
+200204c4:	0152      	lsls	r2, r2, #5
+200204c6:	189b      	adds	r3, r3, r2
+200204c8:	4acc      	ldr	r2, [pc, #816]	@ (200207fc <graphics_i_scan_line.constprop.0+0x6a4>)
+200204ca:	7816      	ldrb	r6, [r2, #0]
+200204cc:	4acc      	ldr	r2, [pc, #816]	@ (20020800 <graphics_i_scan_line.constprop.0+0x6a8>)
+200204ce:	5c81      	ldrb	r1, [r0, r2]
+200204d0:	4acc      	ldr	r2, [pc, #816]	@ (20020804 <graphics_i_scan_line.constprop.0+0x6ac>)
+200204d2:	5c80      	ldrb	r0, [r0, r2]
+200204d4:	0182      	lsls	r2, r0, #6
+200204d6:	920a      	str	r2, [sp, #40]	@ 0x28
+200204d8:	2e01      	cmp	r6, #1
+200204da:	d100      	bne.n	200204de <graphics_i_scan_line.constprop.0+0x386>
+200204dc:	e080      	b.n	200205e0 <graphics_i_scan_line.constprop.0+0x488>
+200204de:	2e03      	cmp	r6, #3
+200204e0:	d000      	beq.n	200204e4 <graphics_i_scan_line.constprop.0+0x38c>
+200204e2:	e249      	b.n	20020978 <graphics_i_scan_line.constprop.0+0x820>
+200204e4:	9a0b      	ldr	r2, [sp, #44]	@ 0x2c
+200204e6:	4034      	ands	r4, r6
+200204e8:	0752      	lsls	r2, r2, #29
+200204ea:	0060      	lsls	r0, r4, #1
+200204ec:	0fd2      	lsrs	r2, r2, #31
+200204ee:	24ff      	movs	r4, #255	@ 0xff
+200204f0:	1812      	adds	r2, r2, r0
+200204f2:	2000      	movs	r0, #0
+200204f4:	46a1      	mov	r9, r4
+200204f6:	b2d2      	uxtb	r2, r2
+200204f8:	3cf8      	subs	r4, #248	@ 0xf8
+200204fa:	4021      	ands	r1, r4
+200204fc:	02c9      	lsls	r1, r1, #11
+200204fe:	1812      	adds	r2, r2, r0
+20020500:	188a      	adds	r2, r1, r2
+20020502:	9909      	ldr	r1, [sp, #36]	@ 0x24
+20020504:	20a0      	movs	r0, #160	@ 0xa0
+20020506:	468b      	mov	fp, r1
+20020508:	24c8      	movs	r4, #200	@ 0xc8
+2002050a:	2180      	movs	r1, #128	@ 0x80
+2002050c:	4493      	add	fp, r2
+2002050e:	05c0      	lsls	r0, r0, #23
+20020510:	0064      	lsls	r4, r4, #1
+20020512:	0449      	lsls	r1, r1, #17
+20020514:	5902      	ldr	r2, [r0, r4]
+20020516:	420a      	tst	r2, r1
+20020518:	d1fc      	bne.n	20020514 <graphics_i_scan_line.constprop.0+0x3bc>
+2002051a:	465a      	mov	r2, fp
+2002051c:	9909      	ldr	r1, [sp, #36]	@ 0x24
+2002051e:	7815      	ldrb	r5, [r2, #0]
+20020520:	4ab9      	ldr	r2, [pc, #740]	@ (20020808 <graphics_i_scan_line.constprop.0+0x6b0>)
+20020522:	468c      	mov	ip, r1
+20020524:	5c8a      	ldrb	r2, [r1, r2]
+20020526:	210f      	movs	r1, #15
+20020528:	400a      	ands	r2, r1
+2002052a:	4463      	add	r3, ip
+2002052c:	9208      	str	r2, [sp, #32]
+2002052e:	2e01      	cmp	r6, #1
+20020530:	d100      	bne.n	20020534 <graphics_i_scan_line.constprop.0+0x3dc>
+20020532:	e1c9      	b.n	200208c8 <graphics_i_scan_line.constprop.0+0x770>
+20020534:	2e03      	cmp	r6, #3
+20020536:	d100      	bne.n	2002053a <graphics_i_scan_line.constprop.0+0x3e2>
+20020538:	e184      	b.n	20020844 <graphics_i_scan_line.constprop.0+0x6ec>
+2002053a:	000c      	movs	r4, r1
+2002053c:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2002053e:	980a      	ldr	r0, [sp, #40]	@ 0x28
+20020540:	5c12      	ldrb	r2, [r2, r0]
+20020542:	4691      	mov	r9, r2
+20020544:	4014      	ands	r4, r2
+20020546:	4211      	tst	r1, r2
+20020548:	d100      	bne.n	2002054c <graphics_i_scan_line.constprop.0+0x3f4>
+2002054a:	9c08      	ldr	r4, [sp, #32]
+2002054c:	49af      	ldr	r1, [pc, #700]	@ (2002080c <graphics_i_scan_line.constprop.0+0x6b4>)
+2002054e:	0912      	lsrs	r2, r2, #4
+20020550:	434c      	muls	r4, r1
+20020552:	2a00      	cmp	r2, #0
+20020554:	d05c      	beq.n	20020610 <graphics_i_scan_line.constprop.0+0x4b8>
+20020556:	49ad      	ldr	r1, [pc, #692]	@ (2002080c <graphics_i_scan_line.constprop.0+0x6b4>)
+20020558:	48ad      	ldr	r0, [pc, #692]	@ (20020810 <graphics_i_scan_line.constprop.0+0x6b8>)
+2002055a:	434a      	muls	r2, r1
+2002055c:	468a      	mov	sl, r1
+2002055e:	1c41      	adds	r1, r0, #1
+20020560:	31ff      	adds	r1, #255	@ 0xff
+20020562:	468c      	mov	ip, r1
+20020564:	9307      	str	r3, [sp, #28]
+20020566:	9909      	ldr	r1, [sp, #36]	@ 0x24
+20020568:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+2002056a:	2600      	movs	r6, #0
+2002056c:	18c9      	adds	r1, r1, r3
+2002056e:	230f      	movs	r3, #15
+20020570:	4698      	mov	r8, r3
+20020572:	4fa8      	ldr	r7, [pc, #672]	@ (20020814 <graphics_i_scan_line.constprop.0+0x6bc>)
+20020574:	4062      	eors	r2, r4
+20020576:	9109      	str	r1, [sp, #36]	@ 0x24
+20020578:	9b07      	ldr	r3, [sp, #28]
+2002057a:	0031      	movs	r1, r6
+2002057c:	781e      	ldrb	r6, [r3, #0]
+2002057e:	42b1      	cmp	r1, r6
+20020580:	d016      	beq.n	200205b0 <graphics_i_scan_line.constprop.0+0x458>
+20020582:	465b      	mov	r3, fp
+20020584:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20020586:	08f1      	lsrs	r1, r6, #3
+20020588:	5c69      	ldrb	r1, [r5, r1]
+2002058a:	00f5      	lsls	r5, r6, #3
+2002058c:	5ced      	ldrb	r5, [r5, r3]
+2002058e:	4589      	cmp	r9, r1
+20020590:	d00e      	beq.n	200205b0 <graphics_i_scan_line.constprop.0+0x458>
+20020592:	4644      	mov	r4, r8
+20020594:	4643      	mov	r3, r8
+20020596:	400c      	ands	r4, r1
+20020598:	420b      	tst	r3, r1
+2002059a:	d100      	bne.n	2002059e <graphics_i_scan_line.constprop.0+0x446>
+2002059c:	9c08      	ldr	r4, [sp, #32]
+2002059e:	4653      	mov	r3, sl
+200205a0:	435c      	muls	r4, r3
+200205a2:	090a      	lsrs	r2, r1, #4
+200205a4:	d100      	bne.n	200205a8 <graphics_i_scan_line.constprop.0+0x450>
+200205a6:	9a08      	ldr	r2, [sp, #32]
+200205a8:	4689      	mov	r9, r1
+200205aa:	4653      	mov	r3, sl
+200205ac:	435a      	muls	r2, r3
+200205ae:	4062      	eors	r2, r4
+200205b0:	0929      	lsrs	r1, r5, #4
+200205b2:	0089      	lsls	r1, r1, #2
+200205b4:	5879      	ldr	r1, [r7, r1]
+200205b6:	9b07      	ldr	r3, [sp, #28]
+200205b8:	4011      	ands	r1, r2
+200205ba:	4061      	eors	r1, r4
+200205bc:	6001      	str	r1, [r0, #0]
+200205be:	4641      	mov	r1, r8
+200205c0:	4029      	ands	r1, r5
+200205c2:	0089      	lsls	r1, r1, #2
+200205c4:	5879      	ldr	r1, [r7, r1]
+200205c6:	3301      	adds	r3, #1
+200205c8:	4011      	ands	r1, r2
+200205ca:	4061      	eors	r1, r4
+200205cc:	6041      	str	r1, [r0, #4]
+200205ce:	3008      	adds	r0, #8
+200205d0:	9307      	str	r3, [sp, #28]
+200205d2:	4560      	cmp	r0, ip
+200205d4:	d1d0      	bne.n	20020578 <graphics_i_scan_line.constprop.0+0x420>
+200205d6:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+200205d8:	f7fb fa40 	bl	2001ba5c <pico9918_output_sprites.constprop.0>
+200205dc:	0007      	movs	r7, r0
+200205de:	e6e3      	b.n	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+200205e0:	2207      	movs	r2, #7
+200205e2:	25c0      	movs	r5, #192	@ 0xc0
+200205e4:	9c0b      	ldr	r4, [sp, #44]	@ 0x2c
+200205e6:	016d      	lsls	r5, r5, #5
+200205e8:	4022      	ands	r2, r4
+200205ea:	09a4      	lsrs	r4, r4, #6
+200205ec:	400c      	ands	r4, r1
+200205ee:	02e4      	lsls	r4, r4, #11
+200205f0:	402c      	ands	r4, r5
+200205f2:	2507      	movs	r5, #7
+200205f4:	00c7      	lsls	r7, r0, #3
+200205f6:	432f      	orrs	r7, r5
+200205f8:	257f      	movs	r5, #127	@ 0x7f
+200205fa:	43a8      	bics	r0, r5
+200205fc:	9d0a      	ldr	r5, [sp, #40]	@ 0x28
+200205fe:	0180      	lsls	r0, r0, #6
+20020600:	4025      	ands	r5, r4
+20020602:	1810      	adds	r0, r2, r0
+20020604:	1940      	adds	r0, r0, r5
+20020606:	900a      	str	r0, [sp, #40]	@ 0x28
+20020608:	46b9      	mov	r9, r7
+2002060a:	0020      	movs	r0, r4
+2002060c:	2404      	movs	r4, #4
+2002060e:	e774      	b.n	200204fa <graphics_i_scan_line.constprop.0+0x3a2>
+20020610:	9a08      	ldr	r2, [sp, #32]
+20020612:	e7a0      	b.n	20020556 <graphics_i_scan_line.constprop.0+0x3fe>
+20020614:	2507      	movs	r5, #7
+20020616:	002e      	movs	r6, r5
+20020618:	401d      	ands	r5, r3
+2002061a:	46aa      	mov	sl, r5
+2002061c:	465d      	mov	r5, fp
+2002061e:	400e      	ands	r6, r1
+20020620:	9607      	str	r6, [sp, #28]
+20020622:	2d00      	cmp	r5, #0
+20020624:	da01      	bge.n	2002062a <graphics_i_scan_line.constprop.0+0x4d2>
+20020626:	f000 fdef 	bl	20021208 <graphics_i_scan_line.constprop.0+0x10b0>
+2002062a:	9b08      	ldr	r3, [sp, #32]
+2002062c:	2b00      	cmp	r3, #0
+2002062e:	d000      	beq.n	20020632 <graphics_i_scan_line.constprop.0+0x4da>
+20020630:	e6ba      	b.n	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+20020632:	0683      	lsls	r3, r0, #26
+20020634:	0f9b      	lsrs	r3, r3, #30
+20020636:	930e      	str	r3, [sp, #56]	@ 0x38
+20020638:	ab18      	add	r3, sp, #96	@ 0x60
+2002063a:	9408      	str	r4, [sp, #32]
+2002063c:	930c      	str	r3, [sp, #48]	@ 0x30
+2002063e:	9b0e      	ldr	r3, [sp, #56]	@ 0x38
+20020640:	2b00      	cmp	r3, #0
+20020642:	d101      	bne.n	20020648 <graphics_i_scan_line.constprop.0+0x4f0>
+20020644:	f000 ffdb 	bl	200215fe <graphics_i_scan_line.constprop.0+0x14a6>
+20020648:	4b73      	ldr	r3, [pc, #460]	@ (20020818 <graphics_i_scan_line.constprop.0+0x6c0>)
+2002064a:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2002064c:	5cd3      	ldrb	r3, [r2, r3]
+2002064e:	079b      	lsls	r3, r3, #30
+20020650:	d501      	bpl.n	20020656 <graphics_i_scan_line.constprop.0+0x4fe>
+20020652:	f001 f9ee 	bl	20021a32 <graphics_i_scan_line.constprop.0+0x18da>
+20020656:	2300      	movs	r3, #0
+20020658:	2520      	movs	r5, #32
+2002065a:	4699      	mov	r9, r3
+2002065c:	9311      	str	r3, [sp, #68]	@ 0x44
+2002065e:	9310      	str	r3, [sp, #64]	@ 0x40
+20020660:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20020662:	4b6e      	ldr	r3, [pc, #440]	@ (2002081c <graphics_i_scan_line.constprop.0+0x6c4>)
+20020664:	5cd6      	ldrb	r6, [r2, r3]
+20020666:	4b64      	ldr	r3, [pc, #400]	@ (200207f8 <graphics_i_scan_line.constprop.0+0x6a0>)
+20020668:	5cd3      	ldrb	r3, [r2, r3]
+2002066a:	22f0      	movs	r2, #240	@ 0xf0
+2002066c:	029b      	lsls	r3, r3, #10
+2002066e:	0192      	lsls	r2, r2, #6
+20020670:	401a      	ands	r2, r3
+20020672:	2e00      	cmp	r6, #0
+20020674:	d001      	beq.n	2002067a <graphics_i_scan_line.constprop.0+0x522>
+20020676:	f000 fe58 	bl	2002132a <graphics_i_scan_line.constprop.0+0x11d2>
+2002067a:	9e0b      	ldr	r6, [sp, #44]	@ 0x2c
+2002067c:	08f0      	lsrs	r0, r6, #3
+2002067e:	4368      	muls	r0, r5
+20020680:	1882      	adds	r2, r0, r2
+20020682:	b293      	uxth	r3, r2
+20020684:	930d      	str	r3, [sp, #52]	@ 0x34
+20020686:	960f      	str	r6, [sp, #60]	@ 0x3c
+20020688:	4b5e      	ldr	r3, [pc, #376]	@ (20020804 <graphics_i_scan_line.constprop.0+0x6ac>)
+2002068a:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2002068c:	5cd5      	ldrb	r5, [r2, r3]
+2002068e:	9b08      	ldr	r3, [sp, #32]
+20020690:	2b01      	cmp	r3, #1
+20020692:	d101      	bne.n	20020698 <graphics_i_scan_line.constprop.0+0x540>
+20020694:	f000 fed4 	bl	20021440 <graphics_i_scan_line.constprop.0+0x12e8>
+20020698:	01ab      	lsls	r3, r5, #6
+2002069a:	469c      	mov	ip, r3
+2002069c:	464b      	mov	r3, r9
+2002069e:	2b00      	cmp	r3, #0
+200206a0:	d101      	bne.n	200206a6 <graphics_i_scan_line.constprop.0+0x54e>
+200206a2:	f000 feac 	bl	200213fe <graphics_i_scan_line.constprop.0+0x12a6>
+200206a6:	9b08      	ldr	r3, [sp, #32]
+200206a8:	2b02      	cmp	r3, #2
+200206aa:	d001      	beq.n	200206b0 <graphics_i_scan_line.constprop.0+0x558>
+200206ac:	f000 fe9e 	bl	200213ec <graphics_i_scan_line.constprop.0+0x1294>
+200206b0:	4460      	add	r0, ip
+200206b2:	0480      	lsls	r0, r0, #18
+200206b4:	0c83      	lsrs	r3, r0, #18
+200206b6:	2007      	movs	r0, #7
+200206b8:	469c      	mov	ip, r3
+200206ba:	9b0f      	ldr	r3, [sp, #60]	@ 0x3c
+200206bc:	9d0c      	ldr	r5, [sp, #48]	@ 0x30
+200206be:	4018      	ands	r0, r3
+200206c0:	23ff      	movs	r3, #255	@ 0xff
+200206c2:	716b      	strb	r3, [r5, #5]
+200206c4:	2307      	movs	r3, #7
+200206c6:	0042      	lsls	r2, r0, #1
+200206c8:	1a9b      	subs	r3, r3, r2
+200206ca:	712b      	strb	r3, [r5, #4]
+200206cc:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+200206ce:	4b4c      	ldr	r3, [pc, #304]	@ (20020800 <graphics_i_scan_line.constprop.0+0x6a8>)
+200206d0:	2507      	movs	r5, #7
+200206d2:	5cd3      	ldrb	r3, [r2, r3]
+200206d4:	2200      	movs	r2, #0
+200206d6:	402b      	ands	r3, r5
+200206d8:	1882      	adds	r2, r0, r2
+200206da:	02db      	lsls	r3, r3, #11
+200206dc:	189b      	adds	r3, r3, r2
+200206de:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+200206e0:	18d3      	adds	r3, r2, r3
+200206e2:	9318      	str	r3, [sp, #96]	@ 0x60
+200206e4:	4b4e      	ldr	r3, [pc, #312]	@ (20020820 <graphics_i_scan_line.constprop.0+0x6c8>)
+200206e6:	0010      	movs	r0, r2
+200206e8:	5cd2      	ldrb	r2, [r2, r3]
+200206ea:	2303      	movs	r3, #3
+200206ec:	4013      	ands	r3, r2
+200206ee:	9a08      	ldr	r2, [sp, #32]
+200206f0:	2a02      	cmp	r2, #2
+200206f2:	d101      	bne.n	200206f8 <graphics_i_scan_line.constprop.0+0x5a0>
+200206f4:	f001 f854 	bl	200217a0 <graphics_i_scan_line.constprop.0+0x1648>
+200206f8:	2607      	movs	r6, #7
+200206fa:	9809      	ldr	r0, [sp, #36]	@ 0x24
+200206fc:	011a      	lsls	r2, r3, #4
+200206fe:	400e      	ands	r6, r1
+20020700:	08cb      	lsrs	r3, r1, #3
+20020702:	4948      	ldr	r1, [pc, #288]	@ (20020824 <graphics_i_scan_line.constprop.0+0x6cc>)
+20020704:	5c40      	ldrb	r0, [r0, r1]
+20020706:	990e      	ldr	r1, [sp, #56]	@ 0x38
+20020708:	0780      	lsls	r0, r0, #30
+2002070a:	0fc0      	lsrs	r0, r0, #31
+2002070c:	2900      	cmp	r1, #0
+2002070e:	d101      	bne.n	20020714 <graphics_i_scan_line.constprop.0+0x5bc>
+20020710:	f000 fe2b 	bl	2002136a <graphics_i_scan_line.constprop.0+0x1212>
+20020714:	4d44      	ldr	r5, [pc, #272]	@ (20020828 <graphics_i_scan_line.constprop.0+0x6d0>)
+20020716:	0089      	lsls	r1, r1, #2
+20020718:	594d      	ldr	r5, [r1, r5]
+2002071a:	990c      	ldr	r1, [sp, #48]	@ 0x30
+2002071c:	9202      	str	r2, [sp, #8]
+2002071e:	9104      	str	r1, [sp, #16]
+20020720:	464a      	mov	r2, r9
+20020722:	2100      	movs	r1, #0
+20020724:	9201      	str	r2, [sp, #4]
+20020726:	9103      	str	r1, [sp, #12]
+20020728:	4662      	mov	r2, ip
+2002072a:	990d      	ldr	r1, [sp, #52]	@ 0x34
+2002072c:	9600      	str	r6, [sp, #0]
+2002072e:	47a8      	blx	r5
+20020730:	4d3e      	ldr	r5, [pc, #248]	@ (2002082c <graphics_i_scan_line.constprop.0+0x6d4>)
+20020732:	9b07      	ldr	r3, [sp, #28]
+20020734:	18ee      	adds	r6, r5, r3
+20020736:	2c02      	cmp	r4, #2
+20020738:	d101      	bne.n	2002073e <graphics_i_scan_line.constprop.0+0x5e6>
+2002073a:	f000 ff2d 	bl	20021598 <graphics_i_scan_line.constprop.0+0x1440>
+2002073e:	465b      	mov	r3, fp
+20020740:	2b00      	cmp	r3, #0
+20020742:	da00      	bge.n	20020746 <graphics_i_scan_line.constprop.0+0x5ee>
+20020744:	e24f      	b.n	20020be6 <graphics_i_scan_line.constprop.0+0xa8e>
+20020746:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+20020748:	781b      	ldrb	r3, [r3, #0]
+2002074a:	2b00      	cmp	r3, #0
+2002074c:	d000      	beq.n	20020750 <graphics_i_scan_line.constprop.0+0x5f8>
+2002074e:	e254      	b.n	20020bfa <graphics_i_scan_line.constprop.0+0xaa2>
+20020750:	9b07      	ldr	r3, [sp, #28]
+20020752:	079b      	lsls	r3, r3, #30
+20020754:	d000      	beq.n	20020758 <graphics_i_scan_line.constprop.0+0x600>
+20020756:	e250      	b.n	20020bfa <graphics_i_scan_line.constprop.0+0xaa2>
+20020758:	4b35      	ldr	r3, [pc, #212]	@ (20020830 <graphics_i_scan_line.constprop.0+0x6d8>)
+2002075a:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2002075c:	5cd3      	ldrb	r3, [r2, r3]
+2002075e:	2b7f      	cmp	r3, #127	@ 0x7f
+20020760:	d900      	bls.n	20020764 <graphics_i_scan_line.constprop.0+0x60c>
+20020762:	e24a      	b.n	20020bfa <graphics_i_scan_line.constprop.0+0xaa2>
+20020764:	4b33      	ldr	r3, [pc, #204]	@ (20020834 <graphics_i_scan_line.constprop.0+0x6dc>)
+20020766:	5cd3      	ldrb	r3, [r2, r3]
+20020768:	2b00      	cmp	r3, #0
+2002076a:	d001      	beq.n	20020770 <graphics_i_scan_line.constprop.0+0x618>
+2002076c:	f001 f9f6 	bl	20021b5c <graphics_i_scan_line.constprop.0+0x1a04>
+20020770:	4b31      	ldr	r3, [pc, #196]	@ (20020838 <graphics_i_scan_line.constprop.0+0x6e0>)
+20020772:	601e      	str	r6, [r3, #0]
+20020774:	e618      	b.n	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+20020776:	2100      	movs	r1, #0
+20020778:	9107      	str	r1, [sp, #28]
+2002077a:	9809      	ldr	r0, [sp, #36]	@ 0x24
+2002077c:	492f      	ldr	r1, [pc, #188]	@ (2002083c <graphics_i_scan_line.constprop.0+0x6e4>)
+2002077e:	5c41      	ldrb	r1, [r0, r1]
+20020780:	00a8      	lsls	r0, r5, #2
+20020782:	468b      	mov	fp, r1
+20020784:	910d      	str	r1, [sp, #52]	@ 0x34
+20020786:	06ed      	lsls	r5, r5, #27
+20020788:	d400      	bmi.n	2002078c <graphics_i_scan_line.constprop.0+0x634>
+2002078a:	e102      	b.n	20020992 <graphics_i_scan_line.constprop.0+0x83a>
+2002078c:	2a00      	cmp	r2, #0
+2002078e:	d031      	beq.n	200207f4 <graphics_i_scan_line.constprop.0+0x69c>
+20020790:	2530      	movs	r5, #48	@ 0x30
+20020792:	4005      	ands	r5, r0
+20020794:	2b00      	cmp	r3, #0
+20020796:	d100      	bne.n	2002079a <graphics_i_scan_line.constprop.0+0x642>
+20020798:	e19c      	b.n	20020ad4 <graphics_i_scan_line.constprop.0+0x97c>
+2002079a:	9b07      	ldr	r3, [sp, #28]
+2002079c:	2b00      	cmp	r3, #0
+2002079e:	d001      	beq.n	200207a4 <graphics_i_scan_line.constprop.0+0x64c>
+200207a0:	f001 f88e 	bl	200218c0 <graphics_i_scan_line.constprop.0+0x1768>
+200207a4:	491a      	ldr	r1, [pc, #104]	@ (20020810 <graphics_i_scan_line.constprop.0+0x6b8>)
+200207a6:	2200      	movs	r2, #0
+200207a8:	468c      	mov	ip, r1
+200207aa:	465f      	mov	r7, fp
+200207ac:	4651      	mov	r1, sl
+200207ae:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+200207b0:	191c      	adds	r4, r3, r4
+200207b2:	5ca3      	ldrb	r3, [r4, r2]
+200207b4:	200f      	movs	r0, #15
+200207b6:	001e      	movs	r6, r3
+200207b8:	011b      	lsls	r3, r3, #4
+200207ba:	4386      	bics	r6, r0
+200207bc:	b2db      	uxtb	r3, r3
+200207be:	2e00      	cmp	r6, #0
+200207c0:	d008      	beq.n	200207d4 <graphics_i_scan_line.constprop.0+0x67c>
+200207c2:	1130      	asrs	r0, r6, #4
+200207c4:	4328      	orrs	r0, r5
+200207c6:	4680      	mov	r8, r0
+200207c8:	4660      	mov	r0, ip
+200207ca:	4646      	mov	r6, r8
+200207cc:	55c6      	strb	r6, [r0, r7]
+200207ce:	4640      	mov	r0, r8
+200207d0:	4e1b      	ldr	r6, [pc, #108]	@ (20020840 <graphics_i_scan_line.constprop.0+0x6e8>)
+200207d2:	55f0      	strb	r0, [r6, r7]
+200207d4:	2b00      	cmp	r3, #0
+200207d6:	d008      	beq.n	200207ea <graphics_i_scan_line.constprop.0+0x692>
+200207d8:	1cbe      	adds	r6, r7, #2
+200207da:	b2f6      	uxtb	r6, r6
+200207dc:	0030      	movs	r0, r6
+200207de:	4666      	mov	r6, ip
+200207e0:	111b      	asrs	r3, r3, #4
+200207e2:	432b      	orrs	r3, r5
+200207e4:	5433      	strb	r3, [r6, r0]
+200207e6:	4e16      	ldr	r6, [pc, #88]	@ (20020840 <graphics_i_scan_line.constprop.0+0x6e8>)
+200207e8:	5433      	strb	r3, [r6, r0]
+200207ea:	3704      	adds	r7, #4
+200207ec:	3201      	adds	r2, #1
+200207ee:	b2ff      	uxtb	r7, r7
+200207f0:	4291      	cmp	r1, r2
+200207f2:	dcde      	bgt.n	200207b2 <graphics_i_scan_line.constprop.0+0x65a>
+200207f4:	464e      	mov	r6, r9
+200207f6:	e5c1      	b.n	2002037c <graphics_i_scan_line.constprop.0+0x224>
+200207f8:	00006002 	.word	0x00006002
+200207fc:	200292df 	.word	0x200292df
+20020800:	00006004 	.word	0x00006004
+20020804:	00006003 	.word	0x00006003
+20020808:	00006007 	.word	0x00006007
+2002080c:	01010101 	.word	0x01010101
+20020810:	2004064c 	.word	0x2004064c
+20020814:	200400a0 	.word	0x200400a0
+20020818:	00006032 	.word	0x00006032
+2002081c:	0000601c 	.word	0x0000601c
+20020820:	00006018 	.word	0x00006018
+20020824:	0000601d 	.word	0x0000601d
+20020828:	2002298c 	.word	0x2002298c
+2002082c:	2001545c 	.word	0x2001545c
+20020830:	0000601f 	.word	0x0000601f
+20020834:	00010036 	.word	0x00010036
+20020838:	20028e80 	.word	0x20028e80
+2002083c:	00006021 	.word	0x00006021
+20020840:	2004064d 	.word	0x2004064d
+20020844:	0008      	movs	r0, r1
+20020846:	4028      	ands	r0, r5
+20020848:	4229      	tst	r1, r5
+2002084a:	d100      	bne.n	2002084e <graphics_i_scan_line.constprop.0+0x6f6>
+2002084c:	0010      	movs	r0, r2
+2002084e:	4a9d      	ldr	r2, [pc, #628]	@ (20020ac4 <graphics_i_scan_line.constprop.0+0x96c>)
+20020850:	4350      	muls	r0, r2
+20020852:	092a      	lsrs	r2, r5, #4
+20020854:	d100      	bne.n	20020858 <graphics_i_scan_line.constprop.0+0x700>
+20020856:	9a08      	ldr	r2, [sp, #32]
+20020858:	499a      	ldr	r1, [pc, #616]	@ (20020ac4 <graphics_i_scan_line.constprop.0+0x96c>)
+2002085a:	434a      	muls	r2, r1
+2002085c:	468a      	mov	sl, r1
+2002085e:	499a      	ldr	r1, [pc, #616]	@ (20020ac8 <graphics_i_scan_line.constprop.0+0x970>)
+20020860:	2700      	movs	r7, #0
+20020862:	6bcc      	ldr	r4, [r1, #60]	@ 0x3c
+20020864:	6809      	ldr	r1, [r1, #0]
+20020866:	46a1      	mov	r9, r4
+20020868:	4688      	mov	r8, r1
+2002086a:	4998      	ldr	r1, [pc, #608]	@ (20020acc <graphics_i_scan_line.constprop.0+0x974>)
+2002086c:	4042      	eors	r2, r0
+2002086e:	1c4c      	adds	r4, r1, #1
+20020870:	34ff      	adds	r4, #255	@ 0xff
+20020872:	46a4      	mov	ip, r4
+20020874:	781c      	ldrb	r4, [r3, #0]
+20020876:	42bc      	cmp	r4, r7
+20020878:	d015      	beq.n	200208a6 <graphics_i_scan_line.constprop.0+0x74e>
+2002087a:	465f      	mov	r7, fp
+2002087c:	00e6      	lsls	r6, r4, #3
+2002087e:	5df6      	ldrb	r6, [r6, r7]
+20020880:	0027      	movs	r7, r4
+20020882:	42ae      	cmp	r6, r5
+20020884:	d00f      	beq.n	200208a6 <graphics_i_scan_line.constprop.0+0x74e>
+20020886:	200f      	movs	r0, #15
+20020888:	220f      	movs	r2, #15
+2002088a:	4030      	ands	r0, r6
+2002088c:	4232      	tst	r2, r6
+2002088e:	d100      	bne.n	20020892 <graphics_i_scan_line.constprop.0+0x73a>
+20020890:	9808      	ldr	r0, [sp, #32]
+20020892:	4652      	mov	r2, sl
+20020894:	4350      	muls	r0, r2
+20020896:	0932      	lsrs	r2, r6, #4
+20020898:	d100      	bne.n	2002089c <graphics_i_scan_line.constprop.0+0x744>
+2002089a:	9a08      	ldr	r2, [sp, #32]
+2002089c:	4655      	mov	r5, sl
+2002089e:	436a      	muls	r2, r5
+200208a0:	0027      	movs	r7, r4
+200208a2:	0035      	movs	r5, r6
+200208a4:	4042      	eors	r2, r0
+200208a6:	464c      	mov	r4, r9
+200208a8:	4014      	ands	r4, r2
+200208aa:	4044      	eors	r4, r0
+200208ac:	600c      	str	r4, [r1, #0]
+200208ae:	4644      	mov	r4, r8
+200208b0:	4014      	ands	r4, r2
+200208b2:	4044      	eors	r4, r0
+200208b4:	604c      	str	r4, [r1, #4]
+200208b6:	3108      	adds	r1, #8
+200208b8:	3301      	adds	r3, #1
+200208ba:	4561      	cmp	r1, ip
+200208bc:	d1da      	bne.n	20020874 <graphics_i_scan_line.constprop.0+0x71c>
+200208be:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+200208c0:	f7fb f8cc 	bl	2001ba5c <pico9918_output_sprites.constprop.0>
+200208c4:	0007      	movs	r7, r0
+200208c6:	e56f      	b.n	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+200208c8:	4662      	mov	r2, ip
+200208ca:	980a      	ldr	r0, [sp, #40]	@ 0x28
+200208cc:	5c12      	ldrb	r2, [r2, r0]
+200208ce:	0008      	movs	r0, r1
+200208d0:	4690      	mov	r8, r2
+200208d2:	4010      	ands	r0, r2
+200208d4:	4211      	tst	r1, r2
+200208d6:	d100      	bne.n	200208da <graphics_i_scan_line.constprop.0+0x782>
+200208d8:	9808      	ldr	r0, [sp, #32]
+200208da:	497a      	ldr	r1, [pc, #488]	@ (20020ac4 <graphics_i_scan_line.constprop.0+0x96c>)
+200208dc:	0912      	lsrs	r2, r2, #4
+200208de:	4348      	muls	r0, r1
+200208e0:	2a00      	cmp	r2, #0
+200208e2:	d100      	bne.n	200208e6 <graphics_i_scan_line.constprop.0+0x78e>
+200208e4:	9a08      	ldr	r2, [sp, #32]
+200208e6:	4977      	ldr	r1, [pc, #476]	@ (20020ac4 <graphics_i_scan_line.constprop.0+0x96c>)
+200208e8:	434a      	muls	r2, r1
+200208ea:	4978      	ldr	r1, [pc, #480]	@ (20020acc <graphics_i_scan_line.constprop.0+0x974>)
+200208ec:	2400      	movs	r4, #0
+200208ee:	1c4e      	adds	r6, r1, #1
+200208f0:	36ff      	adds	r6, #255	@ 0xff
+200208f2:	46b4      	mov	ip, r6
+200208f4:	260f      	movs	r6, #15
+200208f6:	46b2      	mov	sl, r6
+200208f8:	465e      	mov	r6, fp
+200208fa:	46cb      	mov	fp, r9
+200208fc:	4f72      	ldr	r7, [pc, #456]	@ (20020ac8 <graphics_i_scan_line.constprop.0+0x970>)
+200208fe:	4042      	eors	r2, r0
+20020900:	960c      	str	r6, [sp, #48]	@ 0x30
+20020902:	9307      	str	r3, [sp, #28]
+20020904:	9b07      	ldr	r3, [sp, #28]
+20020906:	781e      	ldrb	r6, [r3, #0]
+20020908:	465b      	mov	r3, fp
+2002090a:	46b1      	mov	r9, r6
+2002090c:	0026      	movs	r6, r4
+2002090e:	464c      	mov	r4, r9
+20020910:	401c      	ands	r4, r3
+20020912:	42a6      	cmp	r6, r4
+20020914:	d018      	beq.n	20020948 <graphics_i_scan_line.constprop.0+0x7f0>
+20020916:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+20020918:	00e5      	lsls	r5, r4, #3
+2002091a:	195e      	adds	r6, r3, r5
+2002091c:	9b0a      	ldr	r3, [sp, #40]	@ 0x28
+2002091e:	5cf6      	ldrb	r6, [r6, r3]
+20020920:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+20020922:	5d5d      	ldrb	r5, [r3, r5]
+20020924:	45b0      	cmp	r8, r6
+20020926:	d00f      	beq.n	20020948 <graphics_i_scan_line.constprop.0+0x7f0>
+20020928:	4650      	mov	r0, sl
+2002092a:	4653      	mov	r3, sl
+2002092c:	4030      	ands	r0, r6
+2002092e:	4233      	tst	r3, r6
+20020930:	d100      	bne.n	20020934 <graphics_i_scan_line.constprop.0+0x7dc>
+20020932:	9808      	ldr	r0, [sp, #32]
+20020934:	4b63      	ldr	r3, [pc, #396]	@ (20020ac4 <graphics_i_scan_line.constprop.0+0x96c>)
+20020936:	0932      	lsrs	r2, r6, #4
+20020938:	4358      	muls	r0, r3
+2002093a:	2a00      	cmp	r2, #0
+2002093c:	d100      	bne.n	20020940 <graphics_i_scan_line.constprop.0+0x7e8>
+2002093e:	9a08      	ldr	r2, [sp, #32]
+20020940:	46b0      	mov	r8, r6
+20020942:	4b60      	ldr	r3, [pc, #384]	@ (20020ac4 <graphics_i_scan_line.constprop.0+0x96c>)
+20020944:	435a      	muls	r2, r3
+20020946:	4042      	eors	r2, r0
+20020948:	092e      	lsrs	r6, r5, #4
+2002094a:	00b6      	lsls	r6, r6, #2
+2002094c:	59be      	ldr	r6, [r7, r6]
+2002094e:	9b07      	ldr	r3, [sp, #28]
+20020950:	4016      	ands	r6, r2
+20020952:	4046      	eors	r6, r0
+20020954:	600e      	str	r6, [r1, #0]
+20020956:	4656      	mov	r6, sl
+20020958:	402e      	ands	r6, r5
+2002095a:	00b6      	lsls	r6, r6, #2
+2002095c:	59be      	ldr	r6, [r7, r6]
+2002095e:	3301      	adds	r3, #1
+20020960:	4016      	ands	r6, r2
+20020962:	4046      	eors	r6, r0
+20020964:	604e      	str	r6, [r1, #4]
+20020966:	3108      	adds	r1, #8
+20020968:	9307      	str	r3, [sp, #28]
+2002096a:	4561      	cmp	r1, ip
+2002096c:	d1ca      	bne.n	20020904 <graphics_i_scan_line.constprop.0+0x7ac>
+2002096e:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+20020970:	f7fb f874 	bl	2001ba5c <pico9918_output_sprites.constprop.0>
+20020974:	0007      	movs	r7, r0
+20020976:	e517      	b.n	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+20020978:	24ff      	movs	r4, #255	@ 0xff
+2002097a:	2207      	movs	r2, #7
+2002097c:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+2002097e:	46a1      	mov	r9, r4
+20020980:	4002      	ands	r2, r0
+20020982:	3cf8      	subs	r4, #248	@ 0xf8
+20020984:	2000      	movs	r0, #0
+20020986:	e5b8      	b.n	200204fa <graphics_i_scan_line.constprop.0+0x3a2>
+20020988:	2240      	movs	r2, #64	@ 0x40
+2002098a:	2140      	movs	r1, #64	@ 0x40
+2002098c:	4692      	mov	sl, r2
+2002098e:	f7ff fc19 	bl	200201c4 <graphics_i_scan_line.constprop.0+0x6c>
+20020992:	2a00      	cmp	r2, #0
+20020994:	d100      	bne.n	20020998 <graphics_i_scan_line.constprop.0+0x840>
+20020996:	e72d      	b.n	200207f4 <graphics_i_scan_line.constprop.0+0x69c>
+20020998:	213c      	movs	r1, #60	@ 0x3c
+2002099a:	4001      	ands	r1, r0
+2002099c:	2b00      	cmp	r3, #0
+2002099e:	d100      	bne.n	200209a2 <graphics_i_scan_line.constprop.0+0x84a>
+200209a0:	e08d      	b.n	20020abe <graphics_i_scan_line.constprop.0+0x966>
+200209a2:	9b07      	ldr	r3, [sp, #28]
+200209a4:	2b00      	cmp	r3, #0
+200209a6:	d101      	bne.n	200209ac <graphics_i_scan_line.constprop.0+0x854>
+200209a8:	f001 f85b 	bl	20021a62 <graphics_i_scan_line.constprop.0+0x190a>
+200209ac:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+200209ae:	2000      	movs	r0, #0
+200209b0:	1913      	adds	r3, r2, r4
+200209b2:	930c      	str	r3, [sp, #48]	@ 0x30
+200209b4:	233f      	movs	r3, #63	@ 0x3f
+200209b6:	4a46      	ldr	r2, [pc, #280]	@ (20020ad0 <graphics_i_scan_line.constprop.0+0x978>)
+200209b8:	469c      	mov	ip, r3
+200209ba:	4b44      	ldr	r3, [pc, #272]	@ (20020acc <graphics_i_scan_line.constprop.0+0x974>)
+200209bc:	2680      	movs	r6, #128	@ 0x80
+200209be:	920e      	str	r2, [sp, #56]	@ 0x38
+200209c0:	464a      	mov	r2, r9
+200209c2:	465d      	mov	r5, fp
+200209c4:	2700      	movs	r7, #0
+200209c6:	4688      	mov	r8, r1
+200209c8:	4699      	mov	r9, r3
+200209ca:	0636      	lsls	r6, r6, #24
+200209cc:	9210      	str	r2, [sp, #64]	@ 0x40
+200209ce:	9008      	str	r0, [sp, #32]
+200209d0:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+200209d2:	4662      	mov	r2, ip
+200209d4:	5ddb      	ldrb	r3, [r3, r7]
+200209d6:	4660      	mov	r0, ip
+200209d8:	0019      	movs	r1, r3
+200209da:	009c      	lsls	r4, r3, #2
+200209dc:	4391      	bics	r1, r2
+200209de:	019a      	lsls	r2, r3, #6
+200209e0:	011b      	lsls	r3, r3, #4
+200209e2:	4384      	bics	r4, r0
+200209e4:	4383      	bics	r3, r0
+200209e6:	b2d2      	uxtb	r2, r2
+200209e8:	b2e4      	uxtb	r4, r4
+200209ea:	b2db      	uxtb	r3, r3
+200209ec:	2900      	cmp	r1, #0
+200209ee:	d007      	beq.n	20020a00 <graphics_i_scan_line.constprop.0+0x8a8>
+200209f0:	4640      	mov	r0, r8
+200209f2:	1189      	asrs	r1, r1, #6
+200209f4:	4301      	orrs	r1, r0
+200209f6:	4648      	mov	r0, r9
+200209f8:	5541      	strb	r1, [r0, r5]
+200209fa:	9908      	ldr	r1, [sp, #32]
+200209fc:	4331      	orrs	r1, r6
+200209fe:	9108      	str	r1, [sp, #32]
+20020a00:	2c00      	cmp	r4, #0
+20020a02:	d00a      	beq.n	20020a1a <graphics_i_scan_line.constprop.0+0x8c2>
+20020a04:	4640      	mov	r0, r8
+20020a06:	11a4      	asrs	r4, r4, #6
+20020a08:	4304      	orrs	r4, r0
+20020a0a:	4648      	mov	r0, r9
+20020a0c:	1c69      	adds	r1, r5, #1
+20020a0e:	b2c9      	uxtb	r1, r1
+20020a10:	5444      	strb	r4, [r0, r1]
+20020a12:	9808      	ldr	r0, [sp, #32]
+20020a14:	0871      	lsrs	r1, r6, #1
+20020a16:	4308      	orrs	r0, r1
+20020a18:	9008      	str	r0, [sp, #32]
+20020a1a:	2b00      	cmp	r3, #0
+20020a1c:	d00a      	beq.n	20020a34 <graphics_i_scan_line.constprop.0+0x8dc>
+20020a1e:	4640      	mov	r0, r8
+20020a20:	119b      	asrs	r3, r3, #6
+20020a22:	4303      	orrs	r3, r0
+20020a24:	4648      	mov	r0, r9
+20020a26:	1ca9      	adds	r1, r5, #2
+20020a28:	b2c9      	uxtb	r1, r1
+20020a2a:	5443      	strb	r3, [r0, r1]
+20020a2c:	9908      	ldr	r1, [sp, #32]
+20020a2e:	08b3      	lsrs	r3, r6, #2
+20020a30:	4319      	orrs	r1, r3
+20020a32:	9108      	str	r1, [sp, #32]
+20020a34:	2a00      	cmp	r2, #0
+20020a36:	d00a      	beq.n	20020a4e <graphics_i_scan_line.constprop.0+0x8f6>
+20020a38:	4641      	mov	r1, r8
+20020a3a:	1192      	asrs	r2, r2, #6
+20020a3c:	430a      	orrs	r2, r1
+20020a3e:	4649      	mov	r1, r9
+20020a40:	1ceb      	adds	r3, r5, #3
+20020a42:	b2db      	uxtb	r3, r3
+20020a44:	54ca      	strb	r2, [r1, r3]
+20020a46:	9a08      	ldr	r2, [sp, #32]
+20020a48:	08f3      	lsrs	r3, r6, #3
+20020a4a:	431a      	orrs	r2, r3
+20020a4c:	9208      	str	r2, [sp, #32]
+20020a4e:	3504      	adds	r5, #4
+20020a50:	b2ed      	uxtb	r5, r5
+20020a52:	0936      	lsrs	r6, r6, #4
+20020a54:	d11f      	bne.n	20020a96 <graphics_i_scan_line.constprop.0+0x93e>
+20020a56:	9808      	ldr	r0, [sp, #32]
+20020a58:	2800      	cmp	r0, #0
+20020a5a:	d01c      	beq.n	20020a96 <graphics_i_scan_line.constprop.0+0x93e>
+20020a5c:	211f      	movs	r1, #31
+20020a5e:	9a0d      	ldr	r2, [sp, #52]	@ 0x34
+20020a60:	0953      	lsrs	r3, r2, #5
+20020a62:	400a      	ands	r2, r1
+20020a64:	40d0      	lsrs	r0, r2
+20020a66:	0006      	movs	r6, r0
+20020a68:	980e      	ldr	r0, [sp, #56]	@ 0x38
+20020a6a:	009c      	lsls	r4, r3, #2
+20020a6c:	5821      	ldr	r1, [r4, r0]
+20020a6e:	4331      	orrs	r1, r6
+20020a70:	5021      	str	r1, [r4, r0]
+20020a72:	1e51      	subs	r1, r2, #1
+20020a74:	291f      	cmp	r1, #31
+20020a76:	d809      	bhi.n	20020a8c <graphics_i_scan_line.constprop.0+0x934>
+20020a78:	2120      	movs	r1, #32
+20020a7a:	9808      	ldr	r0, [sp, #32]
+20020a7c:	1a89      	subs	r1, r1, r2
+20020a7e:	4088      	lsls	r0, r1
+20020a80:	3301      	adds	r3, #1
+20020a82:	990e      	ldr	r1, [sp, #56]	@ 0x38
+20020a84:	009b      	lsls	r3, r3, #2
+20020a86:	58ca      	ldr	r2, [r1, r3]
+20020a88:	4310      	orrs	r0, r2
+20020a8a:	50c8      	str	r0, [r1, r3]
+20020a8c:	2300      	movs	r3, #0
+20020a8e:	2680      	movs	r6, #128	@ 0x80
+20020a90:	950d      	str	r5, [sp, #52]	@ 0x34
+20020a92:	9308      	str	r3, [sp, #32]
+20020a94:	0636      	lsls	r6, r6, #24
+20020a96:	3701      	adds	r7, #1
+20020a98:	45ba      	cmp	sl, r7
+20020a9a:	dc99      	bgt.n	200209d0 <graphics_i_scan_line.constprop.0+0x878>
+20020a9c:	9b10      	ldr	r3, [sp, #64]	@ 0x40
+20020a9e:	2200      	movs	r2, #0
+20020aa0:	4699      	mov	r9, r3
+20020aa2:	4653      	mov	r3, sl
+20020aa4:	9808      	ldr	r0, [sp, #32]
+20020aa6:	2b00      	cmp	r3, #0
+20020aa8:	d002      	beq.n	20020ab0 <graphics_i_scan_line.constprop.0+0x958>
+20020aaa:	4652      	mov	r2, sl
+20020aac:	3a01      	subs	r2, #1
+20020aae:	0092      	lsls	r2, r2, #2
+20020ab0:	465b      	mov	r3, fp
+20020ab2:	3304      	adds	r3, #4
+20020ab4:	189b      	adds	r3, r3, r2
+20020ab6:	b2db      	uxtb	r3, r3
+20020ab8:	4698      	mov	r8, r3
+20020aba:	9e07      	ldr	r6, [sp, #28]
+20020abc:	e444      	b.n	20020348 <graphics_i_scan_line.constprop.0+0x1f0>
+20020abe:	464e      	mov	r6, r9
+20020ac0:	f7ff fbb0 	bl	20020224 <graphics_i_scan_line.constprop.0+0xcc>
+20020ac4:	01010101 	.word	0x01010101
+20020ac8:	200400a0 	.word	0x200400a0
+20020acc:	2004064c 	.word	0x2004064c
+20020ad0:	200405e0 	.word	0x200405e0
+20020ad4:	464e      	mov	r6, r9
+20020ad6:	22c0      	movs	r2, #192	@ 0xc0
+20020ad8:	0612      	lsls	r2, r2, #24
+20020ada:	4694      	mov	ip, r2
+20020adc:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+20020ade:	2100      	movs	r1, #0
+20020ae0:	193c      	adds	r4, r7, r4
+20020ae2:	465b      	mov	r3, fp
+20020ae4:	4667      	mov	r7, ip
+20020ae6:	2000      	movs	r0, #0
+20020ae8:	46d4      	mov	ip, sl
+20020aea:	46b2      	mov	sl, r6
+20020aec:	940c      	str	r4, [sp, #48]	@ 0x30
+20020aee:	4cc4      	ldr	r4, [pc, #784]	@ (20020e00 <graphics_i_scan_line.constprop.0+0xca8>)
+20020af0:	4ac4      	ldr	r2, [pc, #784]	@ (20020e04 <graphics_i_scan_line.constprop.0+0xcac>)
+20020af2:	940e      	str	r4, [sp, #56]	@ 0x38
+20020af4:	9108      	str	r1, [sp, #32]
+20020af6:	990c      	ldr	r1, [sp, #48]	@ 0x30
+20020af8:	240f      	movs	r4, #15
+20020afa:	5c0e      	ldrb	r6, [r1, r0]
+20020afc:	0031      	movs	r1, r6
+20020afe:	43a1      	bics	r1, r4
+20020b00:	1109      	asrs	r1, r1, #4
+20020b02:	4cc1      	ldr	r4, [pc, #772]	@ (20020e08 <graphics_i_scan_line.constprop.0+0xcb0>)
+20020b04:	4329      	orrs	r1, r5
+20020b06:	54d1      	strb	r1, [r2, r3]
+20020b08:	54e1      	strb	r1, [r4, r3]
+20020b0a:	210f      	movs	r1, #15
+20020b0c:	400e      	ands	r6, r1
+20020b0e:	1c99      	adds	r1, r3, #2
+20020b10:	432e      	orrs	r6, r5
+20020b12:	b2c9      	uxtb	r1, r1
+20020b14:	5456      	strb	r6, [r2, r1]
+20020b16:	5466      	strb	r6, [r4, r1]
+20020b18:	9c08      	ldr	r4, [sp, #32]
+20020b1a:	08be      	lsrs	r6, r7, #2
+20020b1c:	433e      	orrs	r6, r7
+20020b1e:	9907      	ldr	r1, [sp, #28]
+20020b20:	4334      	orrs	r4, r6
+20020b22:	3304      	adds	r3, #4
+20020b24:	9408      	str	r4, [sp, #32]
+20020b26:	b2db      	uxtb	r3, r3
+20020b28:	093f      	lsrs	r7, r7, #4
+20020b2a:	2900      	cmp	r1, #0
+20020b2c:	d025      	beq.n	20020b7a <graphics_i_scan_line.constprop.0+0xa22>
+20020b2e:	2f00      	cmp	r7, #0
+20020b30:	d123      	bne.n	20020b7a <graphics_i_scan_line.constprop.0+0xa22>
+20020b32:	2c00      	cmp	r4, #0
+20020b34:	d021      	beq.n	20020b7a <graphics_i_scan_line.constprop.0+0xa22>
+20020b36:	241f      	movs	r4, #31
+20020b38:	990d      	ldr	r1, [sp, #52]	@ 0x34
+20020b3a:	094f      	lsrs	r7, r1, #5
+20020b3c:	4021      	ands	r1, r4
+20020b3e:	000e      	movs	r6, r1
+20020b40:	00b9      	lsls	r1, r7, #2
+20020b42:	4688      	mov	r8, r1
+20020b44:	970d      	str	r7, [sp, #52]	@ 0x34
+20020b46:	9908      	ldr	r1, [sp, #32]
+20020b48:	4647      	mov	r7, r8
+20020b4a:	40f1      	lsrs	r1, r6
+20020b4c:	9c0e      	ldr	r4, [sp, #56]	@ 0x38
+20020b4e:	593f      	ldr	r7, [r7, r4]
+20020b50:	4339      	orrs	r1, r7
+20020b52:	4647      	mov	r7, r8
+20020b54:	5139      	str	r1, [r7, r4]
+20020b56:	1e71      	subs	r1, r6, #1
+20020b58:	291f      	cmp	r1, #31
+20020b5a:	d809      	bhi.n	20020b70 <graphics_i_scan_line.constprop.0+0xa18>
+20020b5c:	2120      	movs	r1, #32
+20020b5e:	1b8e      	subs	r6, r1, r6
+20020b60:	9908      	ldr	r1, [sp, #32]
+20020b62:	9f0d      	ldr	r7, [sp, #52]	@ 0x34
+20020b64:	40b1      	lsls	r1, r6
+20020b66:	3701      	adds	r7, #1
+20020b68:	00bf      	lsls	r7, r7, #2
+20020b6a:	59e6      	ldr	r6, [r4, r7]
+20020b6c:	4331      	orrs	r1, r6
+20020b6e:	51e1      	str	r1, [r4, r7]
+20020b70:	2100      	movs	r1, #0
+20020b72:	27c0      	movs	r7, #192	@ 0xc0
+20020b74:	930d      	str	r3, [sp, #52]	@ 0x34
+20020b76:	9108      	str	r1, [sp, #32]
+20020b78:	063f      	lsls	r7, r7, #24
+20020b7a:	3001      	adds	r0, #1
+20020b7c:	4560      	cmp	r0, ip
+20020b7e:	dbba      	blt.n	20020af6 <graphics_i_scan_line.constprop.0+0x99e>
+20020b80:	9b07      	ldr	r3, [sp, #28]
+20020b82:	4656      	mov	r6, sl
+20020b84:	9908      	ldr	r1, [sp, #32]
+20020b86:	2b00      	cmp	r3, #0
+20020b88:	d101      	bne.n	20020b8e <graphics_i_scan_line.constprop.0+0xa36>
+20020b8a:	f7ff fbf7 	bl	2002037c <graphics_i_scan_line.constprop.0+0x224>
+20020b8e:	4663      	mov	r3, ip
+20020b90:	2200      	movs	r2, #0
+20020b92:	2b00      	cmp	r3, #0
+20020b94:	d002      	beq.n	20020b9c <graphics_i_scan_line.constprop.0+0xa44>
+20020b96:	4662      	mov	r2, ip
+20020b98:	3a01      	subs	r2, #1
+20020b9a:	0092      	lsls	r2, r2, #2
+20020b9c:	465b      	mov	r3, fp
+20020b9e:	3304      	adds	r3, #4
+20020ba0:	189b      	adds	r3, r3, r2
+20020ba2:	b2db      	uxtb	r3, r3
+20020ba4:	4698      	mov	r8, r3
+20020ba6:	2900      	cmp	r1, #0
+20020ba8:	d101      	bne.n	20020bae <graphics_i_scan_line.constprop.0+0xa56>
+20020baa:	f7ff fbe7 	bl	2002037c <graphics_i_scan_line.constprop.0+0x224>
+20020bae:	241f      	movs	r4, #31
+20020bb0:	000d      	movs	r5, r1
+20020bb2:	980d      	ldr	r0, [sp, #52]	@ 0x34
+20020bb4:	4004      	ands	r4, r0
+20020bb6:	40e5      	lsrs	r5, r4
+20020bb8:	0942      	lsrs	r2, r0, #5
+20020bba:	4891      	ldr	r0, [pc, #580]	@ (20020e00 <graphics_i_scan_line.constprop.0+0xca8>)
+20020bbc:	0097      	lsls	r7, r2, #2
+20020bbe:	583b      	ldr	r3, [r7, r0]
+20020bc0:	431d      	orrs	r5, r3
+20020bc2:	503d      	str	r5, [r7, r0]
+20020bc4:	2520      	movs	r5, #32
+20020bc6:	4643      	mov	r3, r8
+20020bc8:	1b2c      	subs	r4, r5, r4
+20020bca:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+20020bcc:	1b5b      	subs	r3, r3, r5
+20020bce:	42a3      	cmp	r3, r4
+20020bd0:	d801      	bhi.n	20020bd6 <graphics_i_scan_line.constprop.0+0xa7e>
+20020bd2:	f7ff fbd3 	bl	2002037c <graphics_i_scan_line.constprop.0+0x224>
+20020bd6:	40a1      	lsls	r1, r4
+20020bd8:	3201      	adds	r2, #1
+20020bda:	0092      	lsls	r2, r2, #2
+20020bdc:	5813      	ldr	r3, [r2, r0]
+20020bde:	4319      	orrs	r1, r3
+20020be0:	5011      	str	r1, [r2, r0]
+20020be2:	f7ff fbcb 	bl	2002037c <graphics_i_scan_line.constprop.0+0x224>
+20020be6:	0029      	movs	r1, r5
+20020be8:	0028      	movs	r0, r5
+20020bea:	9b07      	ldr	r3, [sp, #28]
+20020bec:	312d      	adds	r1, #45	@ 0x2d
+20020bee:	3009      	adds	r0, #9
+20020bf0:	425a      	negs	r2, r3
+20020bf2:	31ff      	adds	r1, #255	@ 0xff
+20020bf4:	30ff      	adds	r0, #255	@ 0xff
+20020bf6:	f7f6 faf9 	bl	200171ec <tmsCopyAlignMask>
+20020bfa:	4652      	mov	r2, sl
+20020bfc:	9b07      	ldr	r3, [sp, #28]
+20020bfe:	4d83      	ldr	r5, [pc, #524]	@ (20020e0c <graphics_i_scan_line.constprop.0+0xcb4>)
+20020c00:	4313      	orrs	r3, r2
+20020c02:	2203      	movs	r2, #3
+20020c04:	0011      	movs	r1, r2
+20020c06:	4019      	ands	r1, r3
+20020c08:	4455      	add	r5, sl
+20020c0a:	910b      	str	r1, [sp, #44]	@ 0x2c
+20020c0c:	421a      	tst	r2, r3
+20020c0e:	d000      	beq.n	20020c12 <graphics_i_scan_line.constprop.0+0xaba>
+20020c10:	e2f2      	b.n	200211f8 <graphics_i_scan_line.constprop.0+0x10a0>
+20020c12:	2308      	movs	r3, #8
+20020c14:	930d      	str	r3, [sp, #52]	@ 0x34
+20020c16:	4b7e      	ldr	r3, [pc, #504]	@ (20020e10 <graphics_i_scan_line.constprop.0+0xcb8>)
+20020c18:	681a      	ldr	r2, [r3, #0]
+20020c1a:	4b7e      	ldr	r3, [pc, #504]	@ (20020e14 <graphics_i_scan_line.constprop.0+0xcbc>)
+20020c1c:	4c79      	ldr	r4, [pc, #484]	@ (20020e04 <graphics_i_scan_line.constprop.0+0xcac>)
+20020c1e:	611a      	str	r2, [r3, #16]
+20020c20:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+20020c22:	4a7d      	ldr	r2, [pc, #500]	@ (20020e18 <graphics_i_scan_line.constprop.0+0xcc0>)
+20020c24:	0030      	movs	r0, r6
+20020c26:	189b      	adds	r3, r3, r2
+20020c28:	469c      	mov	ip, r3
+20020c2a:	4b75      	ldr	r3, [pc, #468]	@ (20020e00 <graphics_i_scan_line.constprop.0+0xca8>)
+20020c2c:	9407      	str	r4, [sp, #28]
+20020c2e:	9308      	str	r3, [sp, #32]
+20020c30:	1c6b      	adds	r3, r5, #1
+20020c32:	33ff      	adds	r3, #255	@ 0xff
+20020c34:	9309      	str	r3, [sp, #36]	@ 0x24
+20020c36:	970c      	str	r7, [sp, #48]	@ 0x30
+20020c38:	e06a      	b.n	20020d10 <graphics_i_scan_line.constprop.0+0xbb8>
+20020c3a:	2a00      	cmp	r2, #0
+20020c3c:	d000      	beq.n	20020c40 <graphics_i_scan_line.constprop.0+0xae8>
+20020c3e:	e116      	b.n	20020e6e <graphics_i_scan_line.constprop.0+0xd16>
+20020c40:	2b00      	cmp	r3, #0
+20020c42:	d101      	bne.n	20020c48 <graphics_i_scan_line.constprop.0+0xaf0>
+20020c44:	f000 fcc9 	bl	200215da <graphics_i_scan_line.constprop.0+0x1482>
+20020c48:	1c5a      	adds	r2, r3, #1
+20020c4a:	d101      	bne.n	20020c50 <graphics_i_scan_line.constprop.0+0xaf8>
+20020c4c:	f000 fef7 	bl	20021a3e <graphics_i_scan_line.constprop.0+0x18e6>
+20020c50:	9a0b      	ldr	r2, [sp, #44]	@ 0x2c
+20020c52:	2a00      	cmp	r2, #0
+20020c54:	d000      	beq.n	20020c58 <graphics_i_scan_line.constprop.0+0xb00>
+20020c56:	e22e      	b.n	200210b6 <graphics_i_scan_line.constprop.0+0xf5e>
+20020c58:	4a70      	ldr	r2, [pc, #448]	@ (20020e1c <graphics_i_scan_line.constprop.0+0xcc4>)
+20020c5a:	0f1f      	lsrs	r7, r3, #28
+20020c5c:	6806      	ldr	r6, [r0, #0]
+20020c5e:	00b9      	lsls	r1, r7, #2
+20020c60:	682f      	ldr	r7, [r5, #0]
+20020c62:	5889      	ldr	r1, [r1, r2]
+20020c64:	4077      	eors	r7, r6
+20020c66:	400f      	ands	r7, r1
+20020c68:	4077      	eors	r7, r6
+20020c6a:	6027      	str	r7, [r4, #0]
+20020c6c:	011f      	lsls	r7, r3, #4
+20020c6e:	0f3f      	lsrs	r7, r7, #28
+20020c70:	6846      	ldr	r6, [r0, #4]
+20020c72:	6869      	ldr	r1, [r5, #4]
+20020c74:	00bf      	lsls	r7, r7, #2
+20020c76:	58bf      	ldr	r7, [r7, r2]
+20020c78:	4071      	eors	r1, r6
+20020c7a:	400f      	ands	r7, r1
+20020c7c:	4077      	eors	r7, r6
+20020c7e:	6067      	str	r7, [r4, #4]
+20020c80:	021f      	lsls	r7, r3, #8
+20020c82:	0f3f      	lsrs	r7, r7, #28
+20020c84:	6886      	ldr	r6, [r0, #8]
+20020c86:	68a9      	ldr	r1, [r5, #8]
+20020c88:	00bf      	lsls	r7, r7, #2
+20020c8a:	58bf      	ldr	r7, [r7, r2]
+20020c8c:	4071      	eors	r1, r6
+20020c8e:	400f      	ands	r7, r1
+20020c90:	4077      	eors	r7, r6
+20020c92:	60a7      	str	r7, [r4, #8]
+20020c94:	031f      	lsls	r7, r3, #12
+20020c96:	0f3f      	lsrs	r7, r7, #28
+20020c98:	68c6      	ldr	r6, [r0, #12]
+20020c9a:	68e9      	ldr	r1, [r5, #12]
+20020c9c:	00bf      	lsls	r7, r7, #2
+20020c9e:	58bf      	ldr	r7, [r7, r2]
+20020ca0:	4071      	eors	r1, r6
+20020ca2:	400f      	ands	r7, r1
+20020ca4:	4077      	eors	r7, r6
+20020ca6:	60e7      	str	r7, [r4, #12]
+20020ca8:	041f      	lsls	r7, r3, #16
+20020caa:	0f3f      	lsrs	r7, r7, #28
+20020cac:	6906      	ldr	r6, [r0, #16]
+20020cae:	6929      	ldr	r1, [r5, #16]
+20020cb0:	00bf      	lsls	r7, r7, #2
+20020cb2:	58bf      	ldr	r7, [r7, r2]
+20020cb4:	4071      	eors	r1, r6
+20020cb6:	400f      	ands	r7, r1
+20020cb8:	4077      	eors	r7, r6
+20020cba:	6127      	str	r7, [r4, #16]
+20020cbc:	051f      	lsls	r7, r3, #20
+20020cbe:	0f3f      	lsrs	r7, r7, #28
+20020cc0:	6946      	ldr	r6, [r0, #20]
+20020cc2:	6969      	ldr	r1, [r5, #20]
+20020cc4:	00bf      	lsls	r7, r7, #2
+20020cc6:	58bf      	ldr	r7, [r7, r2]
+20020cc8:	4071      	eors	r1, r6
+20020cca:	400f      	ands	r7, r1
+20020ccc:	4077      	eors	r7, r6
+20020cce:	6167      	str	r7, [r4, #20]
+20020cd0:	061f      	lsls	r7, r3, #24
+20020cd2:	0f3f      	lsrs	r7, r7, #28
+20020cd4:	6986      	ldr	r6, [r0, #24]
+20020cd6:	69a9      	ldr	r1, [r5, #24]
+20020cd8:	00bf      	lsls	r7, r7, #2
+20020cda:	58bf      	ldr	r7, [r7, r2]
+20020cdc:	4071      	eors	r1, r6
+20020cde:	400f      	ands	r7, r1
+20020ce0:	4077      	eors	r7, r6
+20020ce2:	260f      	movs	r6, #15
+20020ce4:	4033      	ands	r3, r6
+20020ce6:	61a7      	str	r7, [r4, #24]
+20020ce8:	69ee      	ldr	r6, [r5, #28]
+20020cea:	69c7      	ldr	r7, [r0, #28]
+20020cec:	009b      	lsls	r3, r3, #2
+20020cee:	589b      	ldr	r3, [r3, r2]
+20020cf0:	407e      	eors	r6, r7
+20020cf2:	4033      	ands	r3, r6
+20020cf4:	407b      	eors	r3, r7
+20020cf6:	61e3      	str	r3, [r4, #28]
+20020cf8:	2304      	movs	r3, #4
+20020cfa:	449c      	add	ip, r3
+20020cfc:	9b08      	ldr	r3, [sp, #32]
+20020cfe:	3520      	adds	r5, #32
+20020d00:	3304      	adds	r3, #4
+20020d02:	9308      	str	r3, [sp, #32]
+20020d04:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+20020d06:	3420      	adds	r4, #32
+20020d08:	3020      	adds	r0, #32
+20020d0a:	429d      	cmp	r5, r3
+20020d0c:	d100      	bne.n	20020d10 <graphics_i_scan_line.constprop.0+0xbb8>
+20020d0e:	e1c7      	b.n	200210a0 <graphics_i_scan_line.constprop.0+0xf48>
+20020d10:	4663      	mov	r3, ip
+20020d12:	9e08      	ldr	r6, [sp, #32]
+20020d14:	681b      	ldr	r3, [r3, #0]
+20020d16:	6832      	ldr	r2, [r6, #0]
+20020d18:	9907      	ldr	r1, [sp, #28]
+20020d1a:	6cb7      	ldr	r7, [r6, #72]	@ 0x48
+20020d1c:	439a      	bics	r2, r3
+20020d1e:	433a      	orrs	r2, r7
+20020d20:	000f      	movs	r7, r1
+20020d22:	3120      	adds	r1, #32
+20020d24:	9107      	str	r1, [sp, #28]
+20020d26:	1c56      	adds	r6, r2, #1
+20020d28:	d0e6      	beq.n	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+20020d2a:	990a      	ldr	r1, [sp, #40]	@ 0x28
+20020d2c:	0006      	movs	r6, r0
+20020d2e:	7809      	ldrb	r1, [r1, #0]
+20020d30:	2900      	cmp	r1, #0
+20020d32:	d082      	beq.n	20020c3a <graphics_i_scan_line.constprop.0+0xae2>
+20020d34:	2a00      	cmp	r2, #0
+20020d36:	d05e      	beq.n	20020df6 <graphics_i_scan_line.constprop.0+0xc9e>
+20020d38:	46a0      	mov	r8, r4
+20020d3a:	0029      	movs	r1, r5
+20020d3c:	4681      	mov	r9, r0
+20020d3e:	9c07      	ldr	r4, [sp, #28]
+20020d40:	e022      	b.n	20020d88 <graphics_i_scan_line.constprop.0+0xc30>
+20020d42:	7830      	ldrb	r0, [r6, #0]
+20020d44:	2800      	cmp	r0, #0
+20020d46:	d000      	beq.n	20020d4a <graphics_i_scan_line.constprop.0+0xbf2>
+20020d48:	7038      	strb	r0, [r7, #0]
+20020d4a:	0050      	lsls	r0, r2, #1
+20020d4c:	d405      	bmi.n	20020d5a <graphics_i_scan_line.constprop.0+0xc02>
+20020d4e:	0058      	lsls	r0, r3, #1
+20020d50:	d420      	bmi.n	20020d94 <graphics_i_scan_line.constprop.0+0xc3c>
+20020d52:	7870      	ldrb	r0, [r6, #1]
+20020d54:	2800      	cmp	r0, #0
+20020d56:	d000      	beq.n	20020d5a <graphics_i_scan_line.constprop.0+0xc02>
+20020d58:	7078      	strb	r0, [r7, #1]
+20020d5a:	0090      	lsls	r0, r2, #2
+20020d5c:	d405      	bmi.n	20020d6a <graphics_i_scan_line.constprop.0+0xc12>
+20020d5e:	0098      	lsls	r0, r3, #2
+20020d60:	d41a      	bmi.n	20020d98 <graphics_i_scan_line.constprop.0+0xc40>
+20020d62:	78b0      	ldrb	r0, [r6, #2]
+20020d64:	2800      	cmp	r0, #0
+20020d66:	d000      	beq.n	20020d6a <graphics_i_scan_line.constprop.0+0xc12>
+20020d68:	70b8      	strb	r0, [r7, #2]
+20020d6a:	00d0      	lsls	r0, r2, #3
+20020d6c:	d405      	bmi.n	20020d7a <graphics_i_scan_line.constprop.0+0xc22>
+20020d6e:	00d8      	lsls	r0, r3, #3
+20020d70:	d414      	bmi.n	20020d9c <graphics_i_scan_line.constprop.0+0xc44>
+20020d72:	78f0      	ldrb	r0, [r6, #3]
+20020d74:	2800      	cmp	r0, #0
+20020d76:	d000      	beq.n	20020d7a <graphics_i_scan_line.constprop.0+0xc22>
+20020d78:	70f8      	strb	r0, [r7, #3]
+20020d7a:	3704      	adds	r7, #4
+20020d7c:	011b      	lsls	r3, r3, #4
+20020d7e:	0112      	lsls	r2, r2, #4
+20020d80:	3604      	adds	r6, #4
+20020d82:	3104      	adds	r1, #4
+20020d84:	42a7      	cmp	r7, r4
+20020d86:	d032      	beq.n	20020dee <graphics_i_scan_line.constprop.0+0xc96>
+20020d88:	2a00      	cmp	r2, #0
+20020d8a:	dbde      	blt.n	20020d4a <graphics_i_scan_line.constprop.0+0xbf2>
+20020d8c:	2b00      	cmp	r3, #0
+20020d8e:	dad8      	bge.n	20020d42 <graphics_i_scan_line.constprop.0+0xbea>
+20020d90:	7808      	ldrb	r0, [r1, #0]
+20020d92:	e7d7      	b.n	20020d44 <graphics_i_scan_line.constprop.0+0xbec>
+20020d94:	7848      	ldrb	r0, [r1, #1]
+20020d96:	e7dd      	b.n	20020d54 <graphics_i_scan_line.constprop.0+0xbfc>
+20020d98:	7888      	ldrb	r0, [r1, #2]
+20020d9a:	e7e3      	b.n	20020d64 <graphics_i_scan_line.constprop.0+0xc0c>
+20020d9c:	78c8      	ldrb	r0, [r1, #3]
+20020d9e:	e7e9      	b.n	20020d74 <graphics_i_scan_line.constprop.0+0xc1c>
+20020da0:	0029      	movs	r1, r5
+20020da2:	4681      	mov	r9, r0
+20020da4:	46a0      	mov	r8, r4
+20020da6:	9c07      	ldr	r4, [sp, #28]
+20020da8:	2a00      	cmp	r2, #0
+20020daa:	db04      	blt.n	20020db6 <graphics_i_scan_line.constprop.0+0xc5e>
+20020dac:	2b00      	cmp	r3, #0
+20020dae:	da00      	bge.n	20020db2 <graphics_i_scan_line.constprop.0+0xc5a>
+20020db0:	e17f      	b.n	200210b2 <graphics_i_scan_line.constprop.0+0xf5a>
+20020db2:	7830      	ldrb	r0, [r6, #0]
+20020db4:	7038      	strb	r0, [r7, #0]
+20020db6:	0050      	lsls	r0, r2, #1
+20020db8:	d404      	bmi.n	20020dc4 <graphics_i_scan_line.constprop.0+0xc6c>
+20020dba:	0058      	lsls	r0, r3, #1
+20020dbc:	d500      	bpl.n	20020dc0 <graphics_i_scan_line.constprop.0+0xc68>
+20020dbe:	e176      	b.n	200210ae <graphics_i_scan_line.constprop.0+0xf56>
+20020dc0:	7870      	ldrb	r0, [r6, #1]
+20020dc2:	7078      	strb	r0, [r7, #1]
+20020dc4:	0090      	lsls	r0, r2, #2
+20020dc6:	d404      	bmi.n	20020dd2 <graphics_i_scan_line.constprop.0+0xc7a>
+20020dc8:	0098      	lsls	r0, r3, #2
+20020dca:	d500      	bpl.n	20020dce <graphics_i_scan_line.constprop.0+0xc76>
+20020dcc:	e16d      	b.n	200210aa <graphics_i_scan_line.constprop.0+0xf52>
+20020dce:	78b0      	ldrb	r0, [r6, #2]
+20020dd0:	70b8      	strb	r0, [r7, #2]
+20020dd2:	00d0      	lsls	r0, r2, #3
+20020dd4:	d404      	bmi.n	20020de0 <graphics_i_scan_line.constprop.0+0xc88>
+20020dd6:	00d8      	lsls	r0, r3, #3
+20020dd8:	d500      	bpl.n	20020ddc <graphics_i_scan_line.constprop.0+0xc84>
+20020dda:	e164      	b.n	200210a6 <graphics_i_scan_line.constprop.0+0xf4e>
+20020ddc:	78f0      	ldrb	r0, [r6, #3]
+20020dde:	70f8      	strb	r0, [r7, #3]
+20020de0:	3704      	adds	r7, #4
+20020de2:	011b      	lsls	r3, r3, #4
+20020de4:	0112      	lsls	r2, r2, #4
+20020de6:	3604      	adds	r6, #4
+20020de8:	3104      	adds	r1, #4
+20020dea:	42a7      	cmp	r7, r4
+20020dec:	d1dc      	bne.n	20020da8 <graphics_i_scan_line.constprop.0+0xc50>
+20020dee:	9407      	str	r4, [sp, #28]
+20020df0:	4648      	mov	r0, r9
+20020df2:	4644      	mov	r4, r8
+20020df4:	e780      	b.n	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+20020df6:	4680      	mov	r8, r0
+20020df8:	002a      	movs	r2, r5
+20020dfa:	9807      	ldr	r0, [sp, #28]
+20020dfc:	e02d      	b.n	20020e5a <graphics_i_scan_line.constprop.0+0xd02>
+20020dfe:	46c0      	nop			@ (mov r8, r8)
+20020e00:	200405e0 	.word	0x200405e0
+20020e04:	2004064c 	.word	0x2004064c
+20020e08:	2004064d 	.word	0x2004064d
+20020e0c:	20015354 	.word	0x20015354
+20020e10:	20028ea0 	.word	0x20028ea0
+20020e14:	500001c0 	.word	0x500001c0
+20020e18:	00010364 	.word	0x00010364
+20020e1c:	200400a0 	.word	0x200400a0
+20020e20:	7831      	ldrb	r1, [r6, #0]
+20020e22:	2900      	cmp	r1, #0
+20020e24:	d000      	beq.n	20020e28 <graphics_i_scan_line.constprop.0+0xcd0>
+20020e26:	7039      	strb	r1, [r7, #0]
+20020e28:	0059      	lsls	r1, r3, #1
+20020e2a:	d41e      	bmi.n	20020e6a <graphics_i_scan_line.constprop.0+0xd12>
+20020e2c:	7871      	ldrb	r1, [r6, #1]
+20020e2e:	2900      	cmp	r1, #0
+20020e30:	d000      	beq.n	20020e34 <graphics_i_scan_line.constprop.0+0xcdc>
+20020e32:	7079      	strb	r1, [r7, #1]
+20020e34:	0099      	lsls	r1, r3, #2
+20020e36:	d416      	bmi.n	20020e66 <graphics_i_scan_line.constprop.0+0xd0e>
+20020e38:	78b1      	ldrb	r1, [r6, #2]
+20020e3a:	2900      	cmp	r1, #0
+20020e3c:	d000      	beq.n	20020e40 <graphics_i_scan_line.constprop.0+0xce8>
+20020e3e:	70b9      	strb	r1, [r7, #2]
+20020e40:	00d9      	lsls	r1, r3, #3
+20020e42:	d40e      	bmi.n	20020e62 <graphics_i_scan_line.constprop.0+0xd0a>
+20020e44:	78f1      	ldrb	r1, [r6, #3]
+20020e46:	2900      	cmp	r1, #0
+20020e48:	d000      	beq.n	20020e4c <graphics_i_scan_line.constprop.0+0xcf4>
+20020e4a:	70f9      	strb	r1, [r7, #3]
+20020e4c:	3704      	adds	r7, #4
+20020e4e:	011b      	lsls	r3, r3, #4
+20020e50:	3604      	adds	r6, #4
+20020e52:	3204      	adds	r2, #4
+20020e54:	4287      	cmp	r7, r0
+20020e56:	d100      	bne.n	20020e5a <graphics_i_scan_line.constprop.0+0xd02>
+20020e58:	e11f      	b.n	2002109a <graphics_i_scan_line.constprop.0+0xf42>
+20020e5a:	2b00      	cmp	r3, #0
+20020e5c:	dae0      	bge.n	20020e20 <graphics_i_scan_line.constprop.0+0xcc8>
+20020e5e:	7811      	ldrb	r1, [r2, #0]
+20020e60:	e7df      	b.n	20020e22 <graphics_i_scan_line.constprop.0+0xcca>
+20020e62:	78d1      	ldrb	r1, [r2, #3]
+20020e64:	e7ef      	b.n	20020e46 <graphics_i_scan_line.constprop.0+0xcee>
+20020e66:	7891      	ldrb	r1, [r2, #2]
+20020e68:	e7e7      	b.n	20020e3a <graphics_i_scan_line.constprop.0+0xce2>
+20020e6a:	7851      	ldrb	r1, [r2, #1]
+20020e6c:	e7df      	b.n	20020e2e <graphics_i_scan_line.constprop.0+0xcd6>
+20020e6e:	990b      	ldr	r1, [sp, #44]	@ 0x2c
+20020e70:	2900      	cmp	r1, #0
+20020e72:	d195      	bne.n	20020da0 <graphics_i_scan_line.constprop.0+0xc48>
+20020e74:	6801      	ldr	r1, [r0, #0]
+20020e76:	682f      	ldr	r7, [r5, #0]
+20020e78:	4688      	mov	r8, r1
+20020e7a:	6821      	ldr	r1, [r4, #0]
+20020e7c:	43d2      	mvns	r2, r2
+20020e7e:	468b      	mov	fp, r1
+20020e80:	4641      	mov	r1, r8
+20020e82:	4079      	eors	r1, r7
+20020e84:	4689      	mov	r9, r1
+20020e86:	4fde      	ldr	r7, [pc, #888]	@ (20021200 <graphics_i_scan_line.constprop.0+0x10a8>)
+20020e88:	0f19      	lsrs	r1, r3, #28
+20020e8a:	0089      	lsls	r1, r1, #2
+20020e8c:	59c9      	ldr	r1, [r1, r7]
+20020e8e:	000e      	movs	r6, r1
+20020e90:	4649      	mov	r1, r9
+20020e92:	4031      	ands	r1, r6
+20020e94:	468a      	mov	sl, r1
+20020e96:	465e      	mov	r6, fp
+20020e98:	4641      	mov	r1, r8
+20020e9a:	4071      	eors	r1, r6
+20020e9c:	000e      	movs	r6, r1
+20020e9e:	4651      	mov	r1, sl
+20020ea0:	4071      	eors	r1, r6
+20020ea2:	4688      	mov	r8, r1
+20020ea4:	0f11      	lsrs	r1, r2, #28
+20020ea6:	0089      	lsls	r1, r1, #2
+20020ea8:	59c9      	ldr	r1, [r1, r7]
+20020eaa:	000e      	movs	r6, r1
+20020eac:	4641      	mov	r1, r8
+20020eae:	4031      	ands	r1, r6
+20020eb0:	000e      	movs	r6, r1
+20020eb2:	4659      	mov	r1, fp
+20020eb4:	4071      	eors	r1, r6
+20020eb6:	6021      	str	r1, [r4, #0]
+20020eb8:	6841      	ldr	r1, [r0, #4]
+20020eba:	4689      	mov	r9, r1
+20020ebc:	6861      	ldr	r1, [r4, #4]
+20020ebe:	464e      	mov	r6, r9
+20020ec0:	468b      	mov	fp, r1
+20020ec2:	0119      	lsls	r1, r3, #4
+20020ec4:	0f09      	lsrs	r1, r1, #28
+20020ec6:	0089      	lsls	r1, r1, #2
+20020ec8:	4688      	mov	r8, r1
+20020eca:	6869      	ldr	r1, [r5, #4]
+20020ecc:	4071      	eors	r1, r6
+20020ece:	468a      	mov	sl, r1
+20020ed0:	4641      	mov	r1, r8
+20020ed2:	59c9      	ldr	r1, [r1, r7]
+20020ed4:	000e      	movs	r6, r1
+20020ed6:	4651      	mov	r1, sl
+20020ed8:	4031      	ands	r1, r6
+20020eda:	4688      	mov	r8, r1
+20020edc:	465e      	mov	r6, fp
+20020ede:	4649      	mov	r1, r9
+20020ee0:	4071      	eors	r1, r6
+20020ee2:	000e      	movs	r6, r1
+20020ee4:	4641      	mov	r1, r8
+20020ee6:	4071      	eors	r1, r6
+20020ee8:	4688      	mov	r8, r1
+20020eea:	0111      	lsls	r1, r2, #4
+20020eec:	0f09      	lsrs	r1, r1, #28
+20020eee:	0089      	lsls	r1, r1, #2
+20020ef0:	59c9      	ldr	r1, [r1, r7]
+20020ef2:	000e      	movs	r6, r1
+20020ef4:	4641      	mov	r1, r8
+20020ef6:	4031      	ands	r1, r6
+20020ef8:	000e      	movs	r6, r1
+20020efa:	4659      	mov	r1, fp
+20020efc:	4071      	eors	r1, r6
+20020efe:	6061      	str	r1, [r4, #4]
+20020f00:	6881      	ldr	r1, [r0, #8]
+20020f02:	4689      	mov	r9, r1
+20020f04:	68a1      	ldr	r1, [r4, #8]
+20020f06:	464e      	mov	r6, r9
+20020f08:	468b      	mov	fp, r1
+20020f0a:	0219      	lsls	r1, r3, #8
+20020f0c:	0f09      	lsrs	r1, r1, #28
+20020f0e:	0089      	lsls	r1, r1, #2
+20020f10:	4688      	mov	r8, r1
+20020f12:	68a9      	ldr	r1, [r5, #8]
+20020f14:	4071      	eors	r1, r6
+20020f16:	468a      	mov	sl, r1
+20020f18:	4641      	mov	r1, r8
+20020f1a:	59c9      	ldr	r1, [r1, r7]
+20020f1c:	000e      	movs	r6, r1
+20020f1e:	4651      	mov	r1, sl
+20020f20:	4031      	ands	r1, r6
+20020f22:	4688      	mov	r8, r1
+20020f24:	465e      	mov	r6, fp
+20020f26:	4649      	mov	r1, r9
+20020f28:	4071      	eors	r1, r6
+20020f2a:	000e      	movs	r6, r1
+20020f2c:	4641      	mov	r1, r8
+20020f2e:	4071      	eors	r1, r6
+20020f30:	4688      	mov	r8, r1
+20020f32:	0211      	lsls	r1, r2, #8
+20020f34:	0f09      	lsrs	r1, r1, #28
+20020f36:	0089      	lsls	r1, r1, #2
+20020f38:	59c9      	ldr	r1, [r1, r7]
+20020f3a:	000e      	movs	r6, r1
+20020f3c:	4641      	mov	r1, r8
+20020f3e:	4031      	ands	r1, r6
+20020f40:	000e      	movs	r6, r1
+20020f42:	4659      	mov	r1, fp
+20020f44:	4071      	eors	r1, r6
+20020f46:	60a1      	str	r1, [r4, #8]
+20020f48:	68c1      	ldr	r1, [r0, #12]
+20020f4a:	4689      	mov	r9, r1
+20020f4c:	68e1      	ldr	r1, [r4, #12]
+20020f4e:	464e      	mov	r6, r9
+20020f50:	468b      	mov	fp, r1
+20020f52:	0319      	lsls	r1, r3, #12
+20020f54:	0f09      	lsrs	r1, r1, #28
+20020f56:	0089      	lsls	r1, r1, #2
+20020f58:	4688      	mov	r8, r1
+20020f5a:	68e9      	ldr	r1, [r5, #12]
+20020f5c:	4071      	eors	r1, r6
+20020f5e:	468a      	mov	sl, r1
+20020f60:	4641      	mov	r1, r8
+20020f62:	59c9      	ldr	r1, [r1, r7]
+20020f64:	000e      	movs	r6, r1
+20020f66:	4651      	mov	r1, sl
+20020f68:	4031      	ands	r1, r6
+20020f6a:	4688      	mov	r8, r1
+20020f6c:	465e      	mov	r6, fp
+20020f6e:	4649      	mov	r1, r9
+20020f70:	4071      	eors	r1, r6
+20020f72:	000e      	movs	r6, r1
+20020f74:	4641      	mov	r1, r8
+20020f76:	4071      	eors	r1, r6
+20020f78:	4688      	mov	r8, r1
+20020f7a:	0311      	lsls	r1, r2, #12
+20020f7c:	0f09      	lsrs	r1, r1, #28
+20020f7e:	0089      	lsls	r1, r1, #2
+20020f80:	59c9      	ldr	r1, [r1, r7]
+20020f82:	000e      	movs	r6, r1
+20020f84:	4641      	mov	r1, r8
+20020f86:	4031      	ands	r1, r6
+20020f88:	000e      	movs	r6, r1
+20020f8a:	4659      	mov	r1, fp
+20020f8c:	4071      	eors	r1, r6
+20020f8e:	60e1      	str	r1, [r4, #12]
+20020f90:	6901      	ldr	r1, [r0, #16]
+20020f92:	4689      	mov	r9, r1
+20020f94:	6921      	ldr	r1, [r4, #16]
+20020f96:	464e      	mov	r6, r9
+20020f98:	468b      	mov	fp, r1
+20020f9a:	0419      	lsls	r1, r3, #16
+20020f9c:	0f09      	lsrs	r1, r1, #28
+20020f9e:	0089      	lsls	r1, r1, #2
+20020fa0:	4688      	mov	r8, r1
+20020fa2:	6929      	ldr	r1, [r5, #16]
+20020fa4:	4071      	eors	r1, r6
+20020fa6:	468a      	mov	sl, r1
+20020fa8:	4641      	mov	r1, r8
+20020faa:	59c9      	ldr	r1, [r1, r7]
+20020fac:	000e      	movs	r6, r1
+20020fae:	4651      	mov	r1, sl
+20020fb0:	4031      	ands	r1, r6
+20020fb2:	4688      	mov	r8, r1
+20020fb4:	465e      	mov	r6, fp
+20020fb6:	4649      	mov	r1, r9
+20020fb8:	4071      	eors	r1, r6
+20020fba:	000e      	movs	r6, r1
+20020fbc:	4641      	mov	r1, r8
+20020fbe:	4071      	eors	r1, r6
+20020fc0:	4688      	mov	r8, r1
+20020fc2:	0411      	lsls	r1, r2, #16
+20020fc4:	0f09      	lsrs	r1, r1, #28
+20020fc6:	0089      	lsls	r1, r1, #2
+20020fc8:	59c9      	ldr	r1, [r1, r7]
+20020fca:	000e      	movs	r6, r1
+20020fcc:	4641      	mov	r1, r8
+20020fce:	4031      	ands	r1, r6
+20020fd0:	000e      	movs	r6, r1
+20020fd2:	4659      	mov	r1, fp
+20020fd4:	4071      	eors	r1, r6
+20020fd6:	6121      	str	r1, [r4, #16]
+20020fd8:	6941      	ldr	r1, [r0, #20]
+20020fda:	4689      	mov	r9, r1
+20020fdc:	6961      	ldr	r1, [r4, #20]
+20020fde:	464e      	mov	r6, r9
+20020fe0:	468b      	mov	fp, r1
+20020fe2:	0519      	lsls	r1, r3, #20
+20020fe4:	0f09      	lsrs	r1, r1, #28
+20020fe6:	0089      	lsls	r1, r1, #2
+20020fe8:	4688      	mov	r8, r1
+20020fea:	6969      	ldr	r1, [r5, #20]
+20020fec:	4071      	eors	r1, r6
+20020fee:	468a      	mov	sl, r1
+20020ff0:	4641      	mov	r1, r8
+20020ff2:	59c9      	ldr	r1, [r1, r7]
+20020ff4:	000e      	movs	r6, r1
+20020ff6:	4651      	mov	r1, sl
+20020ff8:	4031      	ands	r1, r6
+20020ffa:	4688      	mov	r8, r1
+20020ffc:	465e      	mov	r6, fp
+20020ffe:	4649      	mov	r1, r9
+20021000:	4071      	eors	r1, r6
+20021002:	000e      	movs	r6, r1
+20021004:	4641      	mov	r1, r8
+20021006:	4071      	eors	r1, r6
+20021008:	4688      	mov	r8, r1
+2002100a:	0511      	lsls	r1, r2, #20
+2002100c:	0f09      	lsrs	r1, r1, #28
+2002100e:	0089      	lsls	r1, r1, #2
+20021010:	59c9      	ldr	r1, [r1, r7]
+20021012:	000e      	movs	r6, r1
+20021014:	4641      	mov	r1, r8
+20021016:	4031      	ands	r1, r6
+20021018:	000e      	movs	r6, r1
+2002101a:	4659      	mov	r1, fp
+2002101c:	4071      	eors	r1, r6
+2002101e:	6161      	str	r1, [r4, #20]
+20021020:	6981      	ldr	r1, [r0, #24]
+20021022:	4689      	mov	r9, r1
+20021024:	69a1      	ldr	r1, [r4, #24]
+20021026:	464e      	mov	r6, r9
+20021028:	468b      	mov	fp, r1
+2002102a:	0619      	lsls	r1, r3, #24
+2002102c:	0f09      	lsrs	r1, r1, #28
+2002102e:	0089      	lsls	r1, r1, #2
+20021030:	4688      	mov	r8, r1
+20021032:	69a9      	ldr	r1, [r5, #24]
+20021034:	4071      	eors	r1, r6
+20021036:	468a      	mov	sl, r1
+20021038:	4641      	mov	r1, r8
+2002103a:	59c9      	ldr	r1, [r1, r7]
+2002103c:	000e      	movs	r6, r1
+2002103e:	4651      	mov	r1, sl
+20021040:	4031      	ands	r1, r6
+20021042:	4688      	mov	r8, r1
+20021044:	465e      	mov	r6, fp
+20021046:	4649      	mov	r1, r9
+20021048:	4071      	eors	r1, r6
+2002104a:	000e      	movs	r6, r1
+2002104c:	4641      	mov	r1, r8
+2002104e:	4071      	eors	r1, r6
+20021050:	4688      	mov	r8, r1
+20021052:	0611      	lsls	r1, r2, #24
+20021054:	0f09      	lsrs	r1, r1, #28
+20021056:	0089      	lsls	r1, r1, #2
+20021058:	59c9      	ldr	r1, [r1, r7]
+2002105a:	000e      	movs	r6, r1
+2002105c:	4641      	mov	r1, r8
+2002105e:	4031      	ands	r1, r6
+20021060:	000e      	movs	r6, r1
+20021062:	4659      	mov	r1, fp
+20021064:	4071      	eors	r1, r6
+20021066:	61a1      	str	r1, [r4, #24]
+20021068:	69c1      	ldr	r1, [r0, #28]
+2002106a:	4689      	mov	r9, r1
+2002106c:	69e1      	ldr	r1, [r4, #28]
+2002106e:	464e      	mov	r6, r9
+20021070:	468a      	mov	sl, r1
+20021072:	210f      	movs	r1, #15
+20021074:	400b      	ands	r3, r1
+20021076:	4688      	mov	r8, r1
+20021078:	009b      	lsls	r3, r3, #2
+2002107a:	69e9      	ldr	r1, [r5, #28]
+2002107c:	59db      	ldr	r3, [r3, r7]
+2002107e:	4071      	eors	r1, r6
+20021080:	400b      	ands	r3, r1
+20021082:	4656      	mov	r6, sl
+20021084:	4649      	mov	r1, r9
+20021086:	4071      	eors	r1, r6
+20021088:	404b      	eors	r3, r1
+2002108a:	4641      	mov	r1, r8
+2002108c:	400a      	ands	r2, r1
+2002108e:	0092      	lsls	r2, r2, #2
+20021090:	59d2      	ldr	r2, [r2, r7]
+20021092:	4013      	ands	r3, r2
+20021094:	4073      	eors	r3, r6
+20021096:	61e3      	str	r3, [r4, #28]
+20021098:	e62e      	b.n	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+2002109a:	9007      	str	r0, [sp, #28]
+2002109c:	4640      	mov	r0, r8
+2002109e:	e62b      	b.n	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+200210a0:	9f0c      	ldr	r7, [sp, #48]	@ 0x30
+200210a2:	f7ff f981 	bl	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+200210a6:	78c8      	ldrb	r0, [r1, #3]
+200210a8:	e699      	b.n	20020dde <graphics_i_scan_line.constprop.0+0xc86>
+200210aa:	7888      	ldrb	r0, [r1, #2]
+200210ac:	e690      	b.n	20020dd0 <graphics_i_scan_line.constprop.0+0xc78>
+200210ae:	7848      	ldrb	r0, [r1, #1]
+200210b0:	e687      	b.n	20020dc2 <graphics_i_scan_line.constprop.0+0xc6a>
+200210b2:	7808      	ldrb	r0, [r1, #0]
+200210b4:	e67e      	b.n	20020db4 <graphics_i_scan_line.constprop.0+0xc5c>
+200210b6:	2b00      	cmp	r3, #0
+200210b8:	da00      	bge.n	200210bc <graphics_i_scan_line.constprop.0+0xf64>
+200210ba:	e245      	b.n	20021548 <graphics_i_scan_line.constprop.0+0x13f0>
+200210bc:	7802      	ldrb	r2, [r0, #0]
+200210be:	7022      	strb	r2, [r4, #0]
+200210c0:	005a      	lsls	r2, r3, #1
+200210c2:	d500      	bpl.n	200210c6 <graphics_i_scan_line.constprop.0+0xf6e>
+200210c4:	e23e      	b.n	20021544 <graphics_i_scan_line.constprop.0+0x13ec>
+200210c6:	7842      	ldrb	r2, [r0, #1]
+200210c8:	7062      	strb	r2, [r4, #1]
+200210ca:	009a      	lsls	r2, r3, #2
+200210cc:	d500      	bpl.n	200210d0 <graphics_i_scan_line.constprop.0+0xf78>
+200210ce:	e237      	b.n	20021540 <graphics_i_scan_line.constprop.0+0x13e8>
+200210d0:	7882      	ldrb	r2, [r0, #2]
+200210d2:	70a2      	strb	r2, [r4, #2]
+200210d4:	00da      	lsls	r2, r3, #3
+200210d6:	d500      	bpl.n	200210da <graphics_i_scan_line.constprop.0+0xf82>
+200210d8:	e230      	b.n	2002153c <graphics_i_scan_line.constprop.0+0x13e4>
+200210da:	78c2      	ldrb	r2, [r0, #3]
+200210dc:	70e2      	strb	r2, [r4, #3]
+200210de:	011a      	lsls	r2, r3, #4
+200210e0:	d500      	bpl.n	200210e4 <graphics_i_scan_line.constprop.0+0xf8c>
+200210e2:	e241      	b.n	20021568 <graphics_i_scan_line.constprop.0+0x1410>
+200210e4:	7902      	ldrb	r2, [r0, #4]
+200210e6:	7122      	strb	r2, [r4, #4]
+200210e8:	015a      	lsls	r2, r3, #5
+200210ea:	d500      	bpl.n	200210ee <graphics_i_scan_line.constprop.0+0xf96>
+200210ec:	e23a      	b.n	20021564 <graphics_i_scan_line.constprop.0+0x140c>
+200210ee:	7942      	ldrb	r2, [r0, #5]
+200210f0:	7162      	strb	r2, [r4, #5]
+200210f2:	019a      	lsls	r2, r3, #6
+200210f4:	d500      	bpl.n	200210f8 <graphics_i_scan_line.constprop.0+0xfa0>
+200210f6:	e233      	b.n	20021560 <graphics_i_scan_line.constprop.0+0x1408>
+200210f8:	7982      	ldrb	r2, [r0, #6]
+200210fa:	71a2      	strb	r2, [r4, #6]
+200210fc:	01da      	lsls	r2, r3, #7
+200210fe:	d500      	bpl.n	20021102 <graphics_i_scan_line.constprop.0+0xfaa>
+20021100:	e22c      	b.n	2002155c <graphics_i_scan_line.constprop.0+0x1404>
+20021102:	79c2      	ldrb	r2, [r0, #7]
+20021104:	71e2      	strb	r2, [r4, #7]
+20021106:	021a      	lsls	r2, r3, #8
+20021108:	d500      	bpl.n	2002110c <graphics_i_scan_line.constprop.0+0xfb4>
+2002110a:	e225      	b.n	20021558 <graphics_i_scan_line.constprop.0+0x1400>
+2002110c:	7a02      	ldrb	r2, [r0, #8]
+2002110e:	7222      	strb	r2, [r4, #8]
+20021110:	025a      	lsls	r2, r3, #9
+20021112:	d500      	bpl.n	20021116 <graphics_i_scan_line.constprop.0+0xfbe>
+20021114:	e21e      	b.n	20021554 <graphics_i_scan_line.constprop.0+0x13fc>
+20021116:	7a42      	ldrb	r2, [r0, #9]
+20021118:	7262      	strb	r2, [r4, #9]
+2002111a:	029a      	lsls	r2, r3, #10
+2002111c:	d500      	bpl.n	20021120 <graphics_i_scan_line.constprop.0+0xfc8>
+2002111e:	e217      	b.n	20021550 <graphics_i_scan_line.constprop.0+0x13f8>
+20021120:	7a82      	ldrb	r2, [r0, #10]
+20021122:	72a2      	strb	r2, [r4, #10]
+20021124:	02da      	lsls	r2, r3, #11
+20021126:	d500      	bpl.n	2002112a <graphics_i_scan_line.constprop.0+0xfd2>
+20021128:	e210      	b.n	2002154c <graphics_i_scan_line.constprop.0+0x13f4>
+2002112a:	7ac2      	ldrb	r2, [r0, #11]
+2002112c:	72e2      	strb	r2, [r4, #11]
+2002112e:	031a      	lsls	r2, r3, #12
+20021130:	d500      	bpl.n	20021134 <graphics_i_scan_line.constprop.0+0xfdc>
+20021132:	e1e9      	b.n	20021508 <graphics_i_scan_line.constprop.0+0x13b0>
+20021134:	7b02      	ldrb	r2, [r0, #12]
+20021136:	7322      	strb	r2, [r4, #12]
+20021138:	035a      	lsls	r2, r3, #13
+2002113a:	d500      	bpl.n	2002113e <graphics_i_scan_line.constprop.0+0xfe6>
+2002113c:	e1e2      	b.n	20021504 <graphics_i_scan_line.constprop.0+0x13ac>
+2002113e:	7b42      	ldrb	r2, [r0, #13]
+20021140:	7362      	strb	r2, [r4, #13]
+20021142:	039a      	lsls	r2, r3, #14
+20021144:	d500      	bpl.n	20021148 <graphics_i_scan_line.constprop.0+0xff0>
+20021146:	e1db      	b.n	20021500 <graphics_i_scan_line.constprop.0+0x13a8>
+20021148:	7b82      	ldrb	r2, [r0, #14]
+2002114a:	73a2      	strb	r2, [r4, #14]
+2002114c:	03da      	lsls	r2, r3, #15
+2002114e:	d500      	bpl.n	20021152 <graphics_i_scan_line.constprop.0+0xffa>
+20021150:	e1d4      	b.n	200214fc <graphics_i_scan_line.constprop.0+0x13a4>
+20021152:	7bc2      	ldrb	r2, [r0, #15]
+20021154:	73e2      	strb	r2, [r4, #15]
+20021156:	041a      	lsls	r2, r3, #16
+20021158:	d500      	bpl.n	2002115c <graphics_i_scan_line.constprop.0+0x1004>
+2002115a:	e1cd      	b.n	200214f8 <graphics_i_scan_line.constprop.0+0x13a0>
+2002115c:	7c02      	ldrb	r2, [r0, #16]
+2002115e:	7422      	strb	r2, [r4, #16]
+20021160:	045a      	lsls	r2, r3, #17
+20021162:	d500      	bpl.n	20021166 <graphics_i_scan_line.constprop.0+0x100e>
+20021164:	e1c6      	b.n	200214f4 <graphics_i_scan_line.constprop.0+0x139c>
+20021166:	7c42      	ldrb	r2, [r0, #17]
+20021168:	7462      	strb	r2, [r4, #17]
+2002116a:	049a      	lsls	r2, r3, #18
+2002116c:	d500      	bpl.n	20021170 <graphics_i_scan_line.constprop.0+0x1018>
+2002116e:	e1bf      	b.n	200214f0 <graphics_i_scan_line.constprop.0+0x1398>
+20021170:	7c82      	ldrb	r2, [r0, #18]
+20021172:	74a2      	strb	r2, [r4, #18]
+20021174:	04da      	lsls	r2, r3, #19
+20021176:	d500      	bpl.n	2002117a <graphics_i_scan_line.constprop.0+0x1022>
+20021178:	e1b8      	b.n	200214ec <graphics_i_scan_line.constprop.0+0x1394>
+2002117a:	7cc2      	ldrb	r2, [r0, #19]
+2002117c:	74e2      	strb	r2, [r4, #19]
+2002117e:	051a      	lsls	r2, r3, #20
+20021180:	d500      	bpl.n	20021184 <graphics_i_scan_line.constprop.0+0x102c>
+20021182:	e1c9      	b.n	20021518 <graphics_i_scan_line.constprop.0+0x13c0>
+20021184:	7d02      	ldrb	r2, [r0, #20]
+20021186:	7522      	strb	r2, [r4, #20]
+20021188:	055a      	lsls	r2, r3, #21
+2002118a:	d500      	bpl.n	2002118e <graphics_i_scan_line.constprop.0+0x1036>
+2002118c:	e1c2      	b.n	20021514 <graphics_i_scan_line.constprop.0+0x13bc>
+2002118e:	7d42      	ldrb	r2, [r0, #21]
+20021190:	7562      	strb	r2, [r4, #21]
+20021192:	059a      	lsls	r2, r3, #22
+20021194:	d500      	bpl.n	20021198 <graphics_i_scan_line.constprop.0+0x1040>
+20021196:	e1bb      	b.n	20021510 <graphics_i_scan_line.constprop.0+0x13b8>
+20021198:	7d82      	ldrb	r2, [r0, #22]
+2002119a:	75a2      	strb	r2, [r4, #22]
+2002119c:	05da      	lsls	r2, r3, #23
+2002119e:	d500      	bpl.n	200211a2 <graphics_i_scan_line.constprop.0+0x104a>
+200211a0:	e1b4      	b.n	2002150c <graphics_i_scan_line.constprop.0+0x13b4>
+200211a2:	7dc2      	ldrb	r2, [r0, #23]
+200211a4:	75e2      	strb	r2, [r4, #23]
+200211a6:	061a      	lsls	r2, r3, #24
+200211a8:	d500      	bpl.n	200211ac <graphics_i_scan_line.constprop.0+0x1054>
+200211aa:	e1b9      	b.n	20021520 <graphics_i_scan_line.constprop.0+0x13c8>
+200211ac:	7e02      	ldrb	r2, [r0, #24]
+200211ae:	7622      	strb	r2, [r4, #24]
+200211b0:	065a      	lsls	r2, r3, #25
+200211b2:	d500      	bpl.n	200211b6 <graphics_i_scan_line.constprop.0+0x105e>
+200211b4:	e1b2      	b.n	2002151c <graphics_i_scan_line.constprop.0+0x13c4>
+200211b6:	7e42      	ldrb	r2, [r0, #25]
+200211b8:	7662      	strb	r2, [r4, #25]
+200211ba:	069a      	lsls	r2, r3, #26
+200211bc:	d500      	bpl.n	200211c0 <graphics_i_scan_line.constprop.0+0x1068>
+200211be:	e1b1      	b.n	20021524 <graphics_i_scan_line.constprop.0+0x13cc>
+200211c0:	7e82      	ldrb	r2, [r0, #26]
+200211c2:	76a2      	strb	r2, [r4, #26]
+200211c4:	06da      	lsls	r2, r3, #27
+200211c6:	d500      	bpl.n	200211ca <graphics_i_scan_line.constprop.0+0x1072>
+200211c8:	e18e      	b.n	200214e8 <graphics_i_scan_line.constprop.0+0x1390>
+200211ca:	7ec2      	ldrb	r2, [r0, #27]
+200211cc:	76e2      	strb	r2, [r4, #27]
+200211ce:	071a      	lsls	r2, r3, #28
+200211d0:	d500      	bpl.n	200211d4 <graphics_i_scan_line.constprop.0+0x107c>
+200211d2:	e1b1      	b.n	20021538 <graphics_i_scan_line.constprop.0+0x13e0>
+200211d4:	7f02      	ldrb	r2, [r0, #28]
+200211d6:	7722      	strb	r2, [r4, #28]
+200211d8:	075a      	lsls	r2, r3, #29
+200211da:	d500      	bpl.n	200211de <graphics_i_scan_line.constprop.0+0x1086>
+200211dc:	e1aa      	b.n	20021534 <graphics_i_scan_line.constprop.0+0x13dc>
+200211de:	7f42      	ldrb	r2, [r0, #29]
+200211e0:	7762      	strb	r2, [r4, #29]
+200211e2:	079a      	lsls	r2, r3, #30
+200211e4:	d500      	bpl.n	200211e8 <graphics_i_scan_line.constprop.0+0x1090>
+200211e6:	e1a3      	b.n	20021530 <graphics_i_scan_line.constprop.0+0x13d8>
+200211e8:	7f82      	ldrb	r2, [r0, #30]
+200211ea:	77a2      	strb	r2, [r4, #30]
+200211ec:	07db      	lsls	r3, r3, #31
+200211ee:	d500      	bpl.n	200211f2 <graphics_i_scan_line.constprop.0+0x109a>
+200211f0:	e19a      	b.n	20021528 <graphics_i_scan_line.constprop.0+0x13d0>
+200211f2:	7fc3      	ldrb	r3, [r0, #31]
+200211f4:	77e3      	strb	r3, [r4, #31]
+200211f6:	e57f      	b.n	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+200211f8:	2320      	movs	r3, #32
+200211fa:	930d      	str	r3, [sp, #52]	@ 0x34
+200211fc:	4b01      	ldr	r3, [pc, #4]	@ (20021204 <graphics_i_scan_line.constprop.0+0x10ac>)
+200211fe:	e50b      	b.n	20020c18 <graphics_i_scan_line.constprop.0+0xac0>
+20021200:	200400a0 	.word	0x200400a0
+20021204:	20028e9c 	.word	0x20028e9c
+20021208:	0681      	lsls	r1, r0, #26
+2002120a:	0f89      	lsrs	r1, r1, #30
+2002120c:	468c      	mov	ip, r1
+2002120e:	9113      	str	r1, [sp, #76]	@ 0x4c
+20021210:	d000      	beq.n	20021214 <graphics_i_scan_line.constprop.0+0x10bc>
+20021212:	e292      	b.n	2002173a <graphics_i_scan_line.constprop.0+0x15e2>
+20021214:	9115      	str	r1, [sp, #84]	@ 0x54
+20021216:	9114      	str	r1, [sp, #80]	@ 0x50
+20021218:	3120      	adds	r1, #32
+2002121a:	910c      	str	r1, [sp, #48]	@ 0x30
+2002121c:	2100      	movs	r1, #0
+2002121e:	9110      	str	r1, [sp, #64]	@ 0x40
+20021220:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20021222:	49d2      	ldr	r1, [pc, #840]	@ (2002156c <graphics_i_scan_line.constprop.0+0x1414>)
+20021224:	5c6e      	ldrb	r6, [r5, r1]
+20021226:	49d2      	ldr	r1, [pc, #840]	@ (20021570 <graphics_i_scan_line.constprop.0+0x1418>)
+20021228:	5c69      	ldrb	r1, [r5, r1]
+2002122a:	25f0      	movs	r5, #240	@ 0xf0
+2002122c:	0289      	lsls	r1, r1, #10
+2002122e:	01ad      	lsls	r5, r5, #6
+20021230:	400d      	ands	r5, r1
+20021232:	2e00      	cmp	r6, #0
+20021234:	d000      	beq.n	20021238 <graphics_i_scan_line.constprop.0+0x10e0>
+20021236:	e0b2      	b.n	2002139e <graphics_i_scan_line.constprop.0+0x1246>
+20021238:	9e0b      	ldr	r6, [sp, #44]	@ 0x2c
+2002123a:	990c      	ldr	r1, [sp, #48]	@ 0x30
+2002123c:	08f0      	lsrs	r0, r6, #3
+2002123e:	4348      	muls	r0, r1
+20021240:	1945      	adds	r5, r0, r5
+20021242:	b2a9      	uxth	r1, r5
+20021244:	910f      	str	r1, [sp, #60]	@ 0x3c
+20021246:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20021248:	49ca      	ldr	r1, [pc, #808]	@ (20021574 <graphics_i_scan_line.constprop.0+0x141c>)
+2002124a:	5c69      	ldrb	r1, [r5, r1]
+2002124c:	9112      	str	r1, [sp, #72]	@ 0x48
+2002124e:	2c01      	cmp	r4, #1
+20021250:	d100      	bne.n	20021254 <graphics_i_scan_line.constprop.0+0x10fc>
+20021252:	e21b      	b.n	2002168c <graphics_i_scan_line.constprop.0+0x1534>
+20021254:	0189      	lsls	r1, r1, #6
+20021256:	910e      	str	r1, [sp, #56]	@ 0x38
+20021258:	9910      	ldr	r1, [sp, #64]	@ 0x40
+2002125a:	2900      	cmp	r1, #0
+2002125c:	d100      	bne.n	20021260 <graphics_i_scan_line.constprop.0+0x1108>
+2002125e:	e1f5      	b.n	2002164c <graphics_i_scan_line.constprop.0+0x14f4>
+20021260:	2c02      	cmp	r4, #2
+20021262:	d000      	beq.n	20021266 <graphics_i_scan_line.constprop.0+0x110e>
+20021264:	e1e8      	b.n	20021638 <graphics_i_scan_line.constprop.0+0x14e0>
+20021266:	990e      	ldr	r1, [sp, #56]	@ 0x38
+20021268:	2507      	movs	r5, #7
+2002126a:	1841      	adds	r1, r0, r1
+2002126c:	0489      	lsls	r1, r1, #18
+2002126e:	0c89      	lsrs	r1, r1, #18
+20021270:	910e      	str	r1, [sp, #56]	@ 0x38
+20021272:	21ff      	movs	r1, #255	@ 0xff
+20021274:	4035      	ands	r5, r6
+20021276:	ae18      	add	r6, sp, #96	@ 0x60
+20021278:	7171      	strb	r1, [r6, #5]
+2002127a:	2107      	movs	r1, #7
+2002127c:	0068      	lsls	r0, r5, #1
+2002127e:	1a09      	subs	r1, r1, r0
+20021280:	7131      	strb	r1, [r6, #4]
+20021282:	9809      	ldr	r0, [sp, #36]	@ 0x24
+20021284:	49bc      	ldr	r1, [pc, #752]	@ (20021578 <graphics_i_scan_line.constprop.0+0x1420>)
+20021286:	960c      	str	r6, [sp, #48]	@ 0x30
+20021288:	5c41      	ldrb	r1, [r0, r1]
+2002128a:	2607      	movs	r6, #7
+2002128c:	2000      	movs	r0, #0
+2002128e:	9111      	str	r1, [sp, #68]	@ 0x44
+20021290:	9911      	ldr	r1, [sp, #68]	@ 0x44
+20021292:	1828      	adds	r0, r5, r0
+20021294:	4031      	ands	r1, r6
+20021296:	02c9      	lsls	r1, r1, #11
+20021298:	1809      	adds	r1, r1, r0
+2002129a:	9809      	ldr	r0, [sp, #36]	@ 0x24
+2002129c:	1841      	adds	r1, r0, r1
+2002129e:	9118      	str	r1, [sp, #96]	@ 0x60
+200212a0:	49b6      	ldr	r1, [pc, #728]	@ (2002157c <graphics_i_scan_line.constprop.0+0x1424>)
+200212a2:	0005      	movs	r5, r0
+200212a4:	5c40      	ldrb	r0, [r0, r1]
+200212a6:	210c      	movs	r1, #12
+200212a8:	4001      	ands	r1, r0
+200212aa:	2001      	movs	r0, #1
+200212ac:	4390      	bics	r0, r2
+200212ae:	0002      	movs	r2, r0
+200212b0:	2c02      	cmp	r4, #2
+200212b2:	d100      	bne.n	200212b6 <graphics_i_scan_line.constprop.0+0x115e>
+200212b4:	e36c      	b.n	20021990 <graphics_i_scan_line.constprop.0+0x1838>
+200212b6:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+200212b8:	48b1      	ldr	r0, [pc, #708]	@ (20021580 <graphics_i_scan_line.constprop.0+0x1428>)
+200212ba:	2607      	movs	r6, #7
+200212bc:	5c28      	ldrb	r0, [r5, r0]
+200212be:	4665      	mov	r5, ip
+200212c0:	401e      	ands	r6, r3
+200212c2:	0680      	lsls	r0, r0, #26
+200212c4:	08db      	lsrs	r3, r3, #3
+200212c6:	4698      	mov	r8, r3
+200212c8:	0089      	lsls	r1, r1, #2
+200212ca:	0fc0      	lsrs	r0, r0, #31
+200212cc:	2d00      	cmp	r5, #0
+200212ce:	d100      	bne.n	200212d2 <graphics_i_scan_line.constprop.0+0x117a>
+200212d0:	e19b      	b.n	2002160a <graphics_i_scan_line.constprop.0+0x14b2>
+200212d2:	2506      	movs	r5, #6
+200212d4:	4bab      	ldr	r3, [pc, #684]	@ (20021584 <graphics_i_scan_line.constprop.0+0x142c>)
+200212d6:	9311      	str	r3, [sp, #68]	@ 0x44
+200212d8:	9b13      	ldr	r3, [sp, #76]	@ 0x4c
+200212da:	195b      	adds	r3, r3, r5
+200212dc:	9d11      	ldr	r5, [sp, #68]	@ 0x44
+200212de:	009b      	lsls	r3, r3, #2
+200212e0:	595d      	ldr	r5, [r3, r5]
+200212e2:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+200212e4:	9203      	str	r2, [sp, #12]
+200212e6:	9304      	str	r3, [sp, #16]
+200212e8:	9b10      	ldr	r3, [sp, #64]	@ 0x40
+200212ea:	9a0e      	ldr	r2, [sp, #56]	@ 0x38
+200212ec:	9102      	str	r1, [sp, #8]
+200212ee:	9301      	str	r3, [sp, #4]
+200212f0:	990f      	ldr	r1, [sp, #60]	@ 0x3c
+200212f2:	4643      	mov	r3, r8
+200212f4:	9600      	str	r6, [sp, #0]
+200212f6:	47a8      	blx	r5
+200212f8:	4da3      	ldr	r5, [pc, #652]	@ (20021588 <graphics_i_scan_line.constprop.0+0x1430>)
+200212fa:	4652      	mov	r2, sl
+200212fc:	002e      	movs	r6, r5
+200212fe:	9b07      	ldr	r3, [sp, #28]
+20021300:	3624      	adds	r6, #36	@ 0x24
+20021302:	1a9a      	subs	r2, r3, r2
+20021304:	0029      	movs	r1, r5
+20021306:	0030      	movs	r0, r6
+20021308:	f7f5 ff70 	bl	200171ec <tmsCopyAlignMask>
+2002130c:	9b08      	ldr	r3, [sp, #32]
+2002130e:	2b00      	cmp	r3, #0
+20021310:	d100      	bne.n	20021314 <graphics_i_scan_line.constprop.0+0x11bc>
+20021312:	e1fe      	b.n	20021712 <graphics_i_scan_line.constprop.0+0x15ba>
+20021314:	9b07      	ldr	r3, [sp, #28]
+20021316:	0031      	movs	r1, r6
+20021318:	0028      	movs	r0, r5
+2002131a:	425a      	negs	r2, r3
+2002131c:	f7f5 ff66 	bl	200171ec <tmsCopyAlignMask>
+20021320:	4650      	mov	r0, sl
+20021322:	f7f9 faed 	bl	2001a900 <compositeTile2OnlyBuffer.constprop.0>
+20021326:	f7ff f83f 	bl	200203a8 <graphics_i_scan_line.constprop.0+0x250>
+2002132a:	9b0b      	ldr	r3, [sp, #44]	@ 0x2c
+2002132c:	18f6      	adds	r6, r6, r3
+2002132e:	2340      	movs	r3, #64	@ 0x40
+20021330:	4003      	ands	r3, r0
+20021332:	4258      	negs	r0, r3
+20021334:	4143      	adcs	r3, r0
+20021336:	202f      	movs	r0, #47	@ 0x2f
+20021338:	425b      	negs	r3, r3
+2002133a:	4383      	bics	r3, r0
+2002133c:	4698      	mov	r8, r3
+2002133e:	23f0      	movs	r3, #240	@ 0xf0
+20021340:	20c0      	movs	r0, #192	@ 0xc0
+20021342:	4498      	add	r8, r3
+20021344:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+20021346:	01c0      	lsls	r0, r0, #7
+20021348:	5c18      	ldrb	r0, [r3, r0]
+2002134a:	4643      	mov	r3, r8
+2002134c:	0700      	lsls	r0, r0, #28
+2002134e:	0fc0      	lsrs	r0, r0, #31
+20021350:	4083      	lsls	r3, r0
+20021352:	429e      	cmp	r6, r3
+20021354:	db00      	blt.n	20021358 <graphics_i_scan_line.constprop.0+0x1200>
+20021356:	e1fc      	b.n	20021752 <graphics_i_scan_line.constprop.0+0x15fa>
+20021358:	b2b3      	uxth	r3, r6
+2002135a:	08d8      	lsrs	r0, r3, #3
+2002135c:	4368      	muls	r0, r5
+2002135e:	1882      	adds	r2, r0, r2
+20021360:	930f      	str	r3, [sp, #60]	@ 0x3c
+20021362:	b293      	uxth	r3, r2
+20021364:	930d      	str	r3, [sp, #52]	@ 0x34
+20021366:	f7ff f98f 	bl	20020688 <graphics_i_scan_line.constprop.0+0x530>
+2002136a:	9908      	ldr	r1, [sp, #32]
+2002136c:	2901      	cmp	r1, #1
+2002136e:	d100      	bne.n	20021372 <graphics_i_scan_line.constprop.0+0x121a>
+20021370:	e3b6      	b.n	20021ae0 <graphics_i_scan_line.constprop.0+0x1988>
+20021372:	2903      	cmp	r1, #3
+20021374:	d100      	bne.n	20021378 <graphics_i_scan_line.constprop.0+0x1220>
+20021376:	e3cc      	b.n	20021b12 <graphics_i_scan_line.constprop.0+0x19ba>
+20021378:	4d84      	ldr	r5, [pc, #528]	@ (2002158c <graphics_i_scan_line.constprop.0+0x1434>)
+2002137a:	f7ff f9ce 	bl	2002071a <graphics_i_scan_line.constprop.0+0x5c2>
+2002137e:	0681      	lsls	r1, r0, #26
+20021380:	0f89      	lsrs	r1, r1, #30
+20021382:	468c      	mov	ip, r1
+20021384:	9113      	str	r1, [sp, #76]	@ 0x4c
+20021386:	4214      	tst	r4, r2
+20021388:	d100      	bne.n	2002138c <graphics_i_scan_line.constprop.0+0x1234>
+2002138a:	e25b      	b.n	20021844 <graphics_i_scan_line.constprop.0+0x16ec>
+2002138c:	4649      	mov	r1, r9
+2002138e:	9110      	str	r1, [sp, #64]	@ 0x40
+20021390:	2101      	movs	r1, #1
+20021392:	9115      	str	r1, [sp, #84]	@ 0x54
+20021394:	3127      	adds	r1, #39	@ 0x27
+20021396:	910c      	str	r1, [sp, #48]	@ 0x30
+20021398:	3927      	subs	r1, #39	@ 0x27
+2002139a:	9114      	str	r1, [sp, #80]	@ 0x50
+2002139c:	e740      	b.n	20021220 <graphics_i_scan_line.constprop.0+0x10c8>
+2002139e:	990b      	ldr	r1, [sp, #44]	@ 0x2c
+200213a0:	4688      	mov	r8, r1
+200213a2:	2140      	movs	r1, #64	@ 0x40
+200213a4:	4001      	ands	r1, r0
+200213a6:	4248      	negs	r0, r1
+200213a8:	4141      	adcs	r1, r0
+200213aa:	202f      	movs	r0, #47	@ 0x2f
+200213ac:	4249      	negs	r1, r1
+200213ae:	4381      	bics	r1, r0
+200213b0:	20c0      	movs	r0, #192	@ 0xc0
+200213b2:	44b0      	add	r8, r6
+200213b4:	9e09      	ldr	r6, [sp, #36]	@ 0x24
+200213b6:	01c0      	lsls	r0, r0, #7
+200213b8:	5c30      	ldrb	r0, [r6, r0]
+200213ba:	31f0      	adds	r1, #240	@ 0xf0
+200213bc:	0700      	lsls	r0, r0, #28
+200213be:	0fc0      	lsrs	r0, r0, #31
+200213c0:	4081      	lsls	r1, r0
+200213c2:	4588      	cmp	r8, r1
+200213c4:	db00      	blt.n	200213c8 <graphics_i_scan_line.constprop.0+0x1270>
+200213c6:	e216      	b.n	200217f6 <graphics_i_scan_line.constprop.0+0x169e>
+200213c8:	4641      	mov	r1, r8
+200213ca:	b28e      	uxth	r6, r1
+200213cc:	e735      	b.n	2002123a <graphics_i_scan_line.constprop.0+0x10e2>
+200213ce:	4b6c      	ldr	r3, [pc, #432]	@ (20021580 <graphics_i_scan_line.constprop.0+0x1428>)
+200213d0:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+200213d2:	5cd3      	ldrb	r3, [r2, r3]
+200213d4:	07db      	lsls	r3, r3, #31
+200213d6:	d428      	bmi.n	2002142a <graphics_i_scan_line.constprop.0+0x12d2>
+200213d8:	4b6d      	ldr	r3, [pc, #436]	@ (20021590 <graphics_i_scan_line.constprop.0+0x1438>)
+200213da:	5cd5      	ldrb	r5, [r2, r3]
+200213dc:	9b08      	ldr	r3, [sp, #32]
+200213de:	2b01      	cmp	r3, #1
+200213e0:	d02e      	beq.n	20021440 <graphics_i_scan_line.constprop.0+0x12e8>
+200213e2:	01ab      	lsls	r3, r5, #6
+200213e4:	469c      	mov	ip, r3
+200213e6:	464b      	mov	r3, r9
+200213e8:	2b00      	cmp	r3, #0
+200213ea:	d008      	beq.n	200213fe <graphics_i_scan_line.constprop.0+0x12a6>
+200213ec:	23c0      	movs	r3, #192	@ 0xc0
+200213ee:	9a0d      	ldr	r2, [sp, #52]	@ 0x34
+200213f0:	011b      	lsls	r3, r3, #4
+200213f2:	4013      	ands	r3, r2
+200213f4:	18c0      	adds	r0, r0, r3
+200213f6:	4460      	add	r0, ip
+200213f8:	0480      	lsls	r0, r0, #18
+200213fa:	0c83      	lsrs	r3, r0, #18
+200213fc:	469c      	mov	ip, r3
+200213fe:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20021400:	4b5d      	ldr	r3, [pc, #372]	@ (20021578 <graphics_i_scan_line.constprop.0+0x1420>)
+20021402:	5cd3      	ldrb	r3, [r2, r3]
+20021404:	9a08      	ldr	r2, [sp, #32]
+20021406:	2a03      	cmp	r2, #3
+20021408:	d12f      	bne.n	2002146a <graphics_i_scan_line.constprop.0+0x1312>
+2002140a:	0015      	movs	r5, r2
+2002140c:	9a0b      	ldr	r2, [sp, #44]	@ 0x2c
+2002140e:	08d0      	lsrs	r0, r2, #3
+20021410:	4028      	ands	r0, r5
+20021412:	0752      	lsls	r2, r2, #29
+20021414:	0fd2      	lsrs	r2, r2, #31
+20021416:	0040      	lsls	r0, r0, #1
+20021418:	9d0c      	ldr	r5, [sp, #48]	@ 0x30
+2002141a:	1880      	adds	r0, r0, r2
+2002141c:	4a5d      	ldr	r2, [pc, #372]	@ (20021594 <graphics_i_scan_line.constprop.0+0x143c>)
+2002141e:	b2c0      	uxtb	r0, r0
+20021420:	80aa      	strh	r2, [r5, #4]
+20021422:	2200      	movs	r2, #0
+20021424:	2507      	movs	r5, #7
+20021426:	f7ff f956 	bl	200206d6 <graphics_i_scan_line.constprop.0+0x57e>
+2002142a:	2380      	movs	r3, #128	@ 0x80
+2002142c:	9a0d      	ldr	r2, [sp, #52]	@ 0x34
+2002142e:	011b      	lsls	r3, r3, #4
+20021430:	405a      	eors	r2, r3
+20021432:	920d      	str	r2, [sp, #52]	@ 0x34
+20021434:	4b56      	ldr	r3, [pc, #344]	@ (20021590 <graphics_i_scan_line.constprop.0+0x1438>)
+20021436:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20021438:	5cd5      	ldrb	r5, [r2, r3]
+2002143a:	9b08      	ldr	r3, [sp, #32]
+2002143c:	2b01      	cmp	r3, #1
+2002143e:	d1d0      	bne.n	200213e2 <graphics_i_scan_line.constprop.0+0x128a>
+20021440:	237f      	movs	r3, #127	@ 0x7f
+20021442:	002a      	movs	r2, r5
+20021444:	439a      	bics	r2, r3
+20021446:	0193      	lsls	r3, r2, #6
+20021448:	469c      	mov	ip, r3
+2002144a:	464b      	mov	r3, r9
+2002144c:	2b00      	cmp	r3, #0
+2002144e:	d100      	bne.n	20021452 <graphics_i_scan_line.constprop.0+0x12fa>
+20021450:	e200      	b.n	20021854 <graphics_i_scan_line.constprop.0+0x16fc>
+20021452:	23c0      	movs	r3, #192	@ 0xc0
+20021454:	9a0d      	ldr	r2, [sp, #52]	@ 0x34
+20021456:	011b      	lsls	r3, r3, #4
+20021458:	4013      	ands	r3, r2
+2002145a:	18c3      	adds	r3, r0, r3
+2002145c:	4463      	add	r3, ip
+2002145e:	049b      	lsls	r3, r3, #18
+20021460:	0c9b      	lsrs	r3, r3, #18
+20021462:	469c      	mov	ip, r3
+20021464:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20021466:	4b44      	ldr	r3, [pc, #272]	@ (20021578 <graphics_i_scan_line.constprop.0+0x1420>)
+20021468:	5cd3      	ldrb	r3, [r2, r3]
+2002146a:	2007      	movs	r0, #7
+2002146c:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+2002146e:	9e0c      	ldr	r6, [sp, #48]	@ 0x30
+20021470:	4010      	ands	r0, r2
+20021472:	22ff      	movs	r2, #255	@ 0xff
+20021474:	7172      	strb	r2, [r6, #5]
+20021476:	0042      	lsls	r2, r0, #1
+20021478:	0016      	movs	r6, r2
+2002147a:	2207      	movs	r2, #7
+2002147c:	1b92      	subs	r2, r2, r6
+2002147e:	9e0c      	ldr	r6, [sp, #48]	@ 0x30
+20021480:	7132      	strb	r2, [r6, #4]
+20021482:	9a08      	ldr	r2, [sp, #32]
+20021484:	2a01      	cmp	r2, #1
+20021486:	d000      	beq.n	2002148a <graphics_i_scan_line.constprop.0+0x1332>
+20021488:	e396      	b.n	20021bb8 <graphics_i_scan_line.constprop.0+0x1a60>
+2002148a:	26c0      	movs	r6, #192	@ 0xc0
+2002148c:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2002148e:	4b3a      	ldr	r3, [pc, #232]	@ (20021578 <graphics_i_scan_line.constprop.0+0x1420>)
+20021490:	0176      	lsls	r6, r6, #5
+20021492:	5cd3      	ldrb	r3, [r2, r3]
+20021494:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+20021496:	0992      	lsrs	r2, r2, #6
+20021498:	401a      	ands	r2, r3
+2002149a:	02d2      	lsls	r2, r2, #11
+2002149c:	4032      	ands	r2, r6
+2002149e:	920b      	str	r2, [sp, #44]	@ 0x2c
+200214a0:	2207      	movs	r2, #7
+200214a2:	4690      	mov	r8, r2
+200214a4:	4642      	mov	r2, r8
+200214a6:	00ee      	lsls	r6, r5, #3
+200214a8:	4316      	orrs	r6, r2
+200214aa:	9a0c      	ldr	r2, [sp, #48]	@ 0x30
+200214ac:	01ad      	lsls	r5, r5, #6
+200214ae:	7156      	strb	r6, [r2, #5]
+200214b0:	9a0b      	ldr	r2, [sp, #44]	@ 0x2c
+200214b2:	4015      	ands	r5, r2
+200214b4:	4662      	mov	r2, ip
+200214b6:	1886      	adds	r6, r0, r2
+200214b8:	19ad      	adds	r5, r5, r6
+200214ba:	b2aa      	uxth	r2, r5
+200214bc:	4694      	mov	ip, r2
+200214be:	2504      	movs	r5, #4
+200214c0:	9a0b      	ldr	r2, [sp, #44]	@ 0x2c
+200214c2:	f7ff f908 	bl	200206d6 <graphics_i_scan_line.constprop.0+0x57e>
+200214c6:	0683      	lsls	r3, r0, #26
+200214c8:	0f9b      	lsrs	r3, r3, #30
+200214ca:	930e      	str	r3, [sp, #56]	@ 0x38
+200214cc:	ab18      	add	r3, sp, #96	@ 0x60
+200214ce:	930c      	str	r3, [sp, #48]	@ 0x30
+200214d0:	0792      	lsls	r2, r2, #30
+200214d2:	d400      	bmi.n	200214d6 <graphics_i_scan_line.constprop.0+0x137e>
+200214d4:	e1c7      	b.n	20021866 <graphics_i_scan_line.constprop.0+0x170e>
+200214d6:	2301      	movs	r3, #1
+200214d8:	9311      	str	r3, [sp, #68]	@ 0x44
+200214da:	3301      	adds	r3, #1
+200214dc:	9308      	str	r3, [sp, #32]
+200214de:	3b01      	subs	r3, #1
+200214e0:	2528      	movs	r5, #40	@ 0x28
+200214e2:	9310      	str	r3, [sp, #64]	@ 0x40
+200214e4:	f7ff f8bc 	bl	20020660 <graphics_i_scan_line.constprop.0+0x508>
+200214e8:	7eea      	ldrb	r2, [r5, #27]
+200214ea:	e66f      	b.n	200211cc <graphics_i_scan_line.constprop.0+0x1074>
+200214ec:	7cea      	ldrb	r2, [r5, #19]
+200214ee:	e645      	b.n	2002117c <graphics_i_scan_line.constprop.0+0x1024>
+200214f0:	7caa      	ldrb	r2, [r5, #18]
+200214f2:	e63e      	b.n	20021172 <graphics_i_scan_line.constprop.0+0x101a>
+200214f4:	7c6a      	ldrb	r2, [r5, #17]
+200214f6:	e637      	b.n	20021168 <graphics_i_scan_line.constprop.0+0x1010>
+200214f8:	7c2a      	ldrb	r2, [r5, #16]
+200214fa:	e630      	b.n	2002115e <graphics_i_scan_line.constprop.0+0x1006>
+200214fc:	7bea      	ldrb	r2, [r5, #15]
+200214fe:	e629      	b.n	20021154 <graphics_i_scan_line.constprop.0+0xffc>
+20021500:	7baa      	ldrb	r2, [r5, #14]
+20021502:	e622      	b.n	2002114a <graphics_i_scan_line.constprop.0+0xff2>
+20021504:	7b6a      	ldrb	r2, [r5, #13]
+20021506:	e61b      	b.n	20021140 <graphics_i_scan_line.constprop.0+0xfe8>
+20021508:	7b2a      	ldrb	r2, [r5, #12]
+2002150a:	e614      	b.n	20021136 <graphics_i_scan_line.constprop.0+0xfde>
+2002150c:	7dea      	ldrb	r2, [r5, #23]
+2002150e:	e649      	b.n	200211a4 <graphics_i_scan_line.constprop.0+0x104c>
+20021510:	7daa      	ldrb	r2, [r5, #22]
+20021512:	e642      	b.n	2002119a <graphics_i_scan_line.constprop.0+0x1042>
+20021514:	7d6a      	ldrb	r2, [r5, #21]
+20021516:	e63b      	b.n	20021190 <graphics_i_scan_line.constprop.0+0x1038>
+20021518:	7d2a      	ldrb	r2, [r5, #20]
+2002151a:	e634      	b.n	20021186 <graphics_i_scan_line.constprop.0+0x102e>
+2002151c:	7e6a      	ldrb	r2, [r5, #25]
+2002151e:	e64b      	b.n	200211b8 <graphics_i_scan_line.constprop.0+0x1060>
+20021520:	7e2a      	ldrb	r2, [r5, #24]
+20021522:	e644      	b.n	200211ae <graphics_i_scan_line.constprop.0+0x1056>
+20021524:	7eaa      	ldrb	r2, [r5, #26]
+20021526:	e64c      	b.n	200211c2 <graphics_i_scan_line.constprop.0+0x106a>
+20021528:	7feb      	ldrb	r3, [r5, #31]
+2002152a:	77e3      	strb	r3, [r4, #31]
+2002152c:	f7ff fbe4 	bl	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+20021530:	7faa      	ldrb	r2, [r5, #30]
+20021532:	e65a      	b.n	200211ea <graphics_i_scan_line.constprop.0+0x1092>
+20021534:	7f6a      	ldrb	r2, [r5, #29]
+20021536:	e653      	b.n	200211e0 <graphics_i_scan_line.constprop.0+0x1088>
+20021538:	7f2a      	ldrb	r2, [r5, #28]
+2002153a:	e64c      	b.n	200211d6 <graphics_i_scan_line.constprop.0+0x107e>
+2002153c:	78ea      	ldrb	r2, [r5, #3]
+2002153e:	e5cd      	b.n	200210dc <graphics_i_scan_line.constprop.0+0xf84>
+20021540:	78aa      	ldrb	r2, [r5, #2]
+20021542:	e5c6      	b.n	200210d2 <graphics_i_scan_line.constprop.0+0xf7a>
+20021544:	786a      	ldrb	r2, [r5, #1]
+20021546:	e5bf      	b.n	200210c8 <graphics_i_scan_line.constprop.0+0xf70>
+20021548:	782a      	ldrb	r2, [r5, #0]
+2002154a:	e5b8      	b.n	200210be <graphics_i_scan_line.constprop.0+0xf66>
+2002154c:	7aea      	ldrb	r2, [r5, #11]
+2002154e:	e5ed      	b.n	2002112c <graphics_i_scan_line.constprop.0+0xfd4>
+20021550:	7aaa      	ldrb	r2, [r5, #10]
+20021552:	e5e6      	b.n	20021122 <graphics_i_scan_line.constprop.0+0xfca>
+20021554:	7a6a      	ldrb	r2, [r5, #9]
+20021556:	e5df      	b.n	20021118 <graphics_i_scan_line.constprop.0+0xfc0>
+20021558:	7a2a      	ldrb	r2, [r5, #8]
+2002155a:	e5d8      	b.n	2002110e <graphics_i_scan_line.constprop.0+0xfb6>
+2002155c:	79ea      	ldrb	r2, [r5, #7]
+2002155e:	e5d1      	b.n	20021104 <graphics_i_scan_line.constprop.0+0xfac>
+20021560:	79aa      	ldrb	r2, [r5, #6]
+20021562:	e5ca      	b.n	200210fa <graphics_i_scan_line.constprop.0+0xfa2>
+20021564:	796a      	ldrb	r2, [r5, #5]
+20021566:	e5c3      	b.n	200210f0 <graphics_i_scan_line.constprop.0+0xf98>
+20021568:	792a      	ldrb	r2, [r5, #4]
+2002156a:	e5bc      	b.n	200210e6 <graphics_i_scan_line.constprop.0+0xf8e>
+2002156c:	0000601a 	.word	0x0000601a
+20021570:	0000600a 	.word	0x0000600a
+20021574:	0000600b 	.word	0x0000600b
+20021578:	00006004 	.word	0x00006004
+2002157c:	00006018 	.word	0x00006018
+20021580:	0000601d 	.word	0x0000601d
+20021584:	2002298c 	.word	0x2002298c
+20021588:	20015564 	.word	0x20015564
+2002158c:	2001ac31 	.word	0x2001ac31
+20021590:	00006003 	.word	0x00006003
+20021594:	ffffff00 	.word	0xffffff00
+20021598:	22ff      	movs	r2, #255	@ 0xff
+2002159a:	4bb8      	ldr	r3, [pc, #736]	@ (2002187c <graphics_i_scan_line.constprop.0+0x1724>)
+2002159c:	4691      	mov	r9, r2
+2002159e:	781c      	ldrb	r4, [r3, #0]
+200215a0:	3af7      	subs	r2, #247	@ 0xf7
+200215a2:	0021      	movs	r1, r4
+200215a4:	0030      	movs	r0, r6
+200215a6:	f7f5 fbfd 	bl	20016da4 <__wrap_memset>
+200215aa:	0030      	movs	r0, r6
+200215ac:	2208      	movs	r2, #8
+200215ae:	0021      	movs	r1, r4
+200215b0:	30f8      	adds	r0, #248	@ 0xf8
+200215b2:	f7f5 fbf7 	bl	20016da4 <__wrap_memset>
+200215b6:	465b      	mov	r3, fp
+200215b8:	2b00      	cmp	r3, #0
+200215ba:	da00      	bge.n	200215be <graphics_i_scan_line.constprop.0+0x1466>
+200215bc:	e2ac      	b.n	20021b18 <graphics_i_scan_line.constprop.0+0x19c0>
+200215be:	4649      	mov	r1, r9
+200215c0:	4baf      	ldr	r3, [pc, #700]	@ (20021880 <graphics_i_scan_line.constprop.0+0x1728>)
+200215c2:	4ab0      	ldr	r2, [pc, #704]	@ (20021884 <graphics_i_scan_line.constprop.0+0x172c>)
+200215c4:	18ed      	adds	r5, r5, r3
+200215c6:	58ab      	ldr	r3, [r5, r2]
+200215c8:	021b      	lsls	r3, r3, #8
+200215ca:	0a1b      	lsrs	r3, r3, #8
+200215cc:	50ab      	str	r3, [r5, r2]
+200215ce:	4aae      	ldr	r2, [pc, #696]	@ (20021888 <graphics_i_scan_line.constprop.0+0x1730>)
+200215d0:	58ab      	ldr	r3, [r5, r2]
+200215d2:	438b      	bics	r3, r1
+200215d4:	50ab      	str	r3, [r5, r2]
+200215d6:	f7ff f8b6 	bl	20020746 <graphics_i_scan_line.constprop.0+0x5ee>
+200215da:	23a0      	movs	r3, #160	@ 0xa0
+200215dc:	26e8      	movs	r6, #232	@ 0xe8
+200215de:	2780      	movs	r7, #128	@ 0x80
+200215e0:	9907      	ldr	r1, [sp, #28]
+200215e2:	05db      	lsls	r3, r3, #23
+200215e4:	0076      	lsls	r6, r6, #1
+200215e6:	047f      	lsls	r7, r7, #17
+200215e8:	599a      	ldr	r2, [r3, r6]
+200215ea:	423a      	tst	r2, r7
+200215ec:	d1fc      	bne.n	200215e8 <graphics_i_scan_line.constprop.0+0x1490>
+200215ee:	9107      	str	r1, [sp, #28]
+200215f0:	4ba6      	ldr	r3, [pc, #664]	@ (2002188c <graphics_i_scan_line.constprop.0+0x1734>)
+200215f2:	9a0d      	ldr	r2, [sp, #52]	@ 0x34
+200215f4:	6018      	str	r0, [r3, #0]
+200215f6:	605c      	str	r4, [r3, #4]
+200215f8:	61da      	str	r2, [r3, #28]
+200215fa:	f7ff fb7d 	bl	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+200215fe:	2520      	movs	r5, #32
+20021600:	4699      	mov	r9, r3
+20021602:	9311      	str	r3, [sp, #68]	@ 0x44
+20021604:	9310      	str	r3, [sp, #64]	@ 0x40
+20021606:	f7ff f82b 	bl	20020660 <graphics_i_scan_line.constprop.0+0x508>
+2002160a:	2c01      	cmp	r4, #1
+2002160c:	d100      	bne.n	20021610 <graphics_i_scan_line.constprop.0+0x14b8>
+2002160e:	e27d      	b.n	20021b0c <graphics_i_scan_line.constprop.0+0x19b4>
+20021610:	2c03      	cmp	r4, #3
+20021612:	d100      	bne.n	20021616 <graphics_i_scan_line.constprop.0+0x14be>
+20021614:	e298      	b.n	20021b48 <graphics_i_scan_line.constprop.0+0x19f0>
+20021616:	4d9e      	ldr	r5, [pc, #632]	@ (20021890 <graphics_i_scan_line.constprop.0+0x1738>)
+20021618:	e663      	b.n	200212e2 <graphics_i_scan_line.constprop.0+0x118a>
+2002161a:	499e      	ldr	r1, [pc, #632]	@ (20021894 <graphics_i_scan_line.constprop.0+0x173c>)
+2002161c:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+2002161e:	5c69      	ldrb	r1, [r5, r1]
+20021620:	06c9      	lsls	r1, r1, #27
+20021622:	d428      	bmi.n	20021676 <graphics_i_scan_line.constprop.0+0x151e>
+20021624:	499c      	ldr	r1, [pc, #624]	@ (20021898 <graphics_i_scan_line.constprop.0+0x1740>)
+20021626:	5c69      	ldrb	r1, [r5, r1]
+20021628:	9112      	str	r1, [sp, #72]	@ 0x48
+2002162a:	2c01      	cmp	r4, #1
+2002162c:	d02e      	beq.n	2002168c <graphics_i_scan_line.constprop.0+0x1534>
+2002162e:	0189      	lsls	r1, r1, #6
+20021630:	910e      	str	r1, [sp, #56]	@ 0x38
+20021632:	9910      	ldr	r1, [sp, #64]	@ 0x40
+20021634:	2900      	cmp	r1, #0
+20021636:	d009      	beq.n	2002164c <graphics_i_scan_line.constprop.0+0x14f4>
+20021638:	21c0      	movs	r1, #192	@ 0xc0
+2002163a:	9d0f      	ldr	r5, [sp, #60]	@ 0x3c
+2002163c:	0109      	lsls	r1, r1, #4
+2002163e:	4029      	ands	r1, r5
+20021640:	1841      	adds	r1, r0, r1
+20021642:	980e      	ldr	r0, [sp, #56]	@ 0x38
+20021644:	1809      	adds	r1, r1, r0
+20021646:	0489      	lsls	r1, r1, #18
+20021648:	0c89      	lsrs	r1, r1, #18
+2002164a:	910e      	str	r1, [sp, #56]	@ 0x38
+2002164c:	4993      	ldr	r1, [pc, #588]	@ (2002189c <graphics_i_scan_line.constprop.0+0x1744>)
+2002164e:	9809      	ldr	r0, [sp, #36]	@ 0x24
+20021650:	5c41      	ldrb	r1, [r0, r1]
+20021652:	9111      	str	r1, [sp, #68]	@ 0x44
+20021654:	2c03      	cmp	r4, #3
+20021656:	d130      	bne.n	200216ba <graphics_i_scan_line.constprop.0+0x1562>
+20021658:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+2002165a:	ae18      	add	r6, sp, #96	@ 0x60
+2002165c:	08c5      	lsrs	r5, r0, #3
+2002165e:	4025      	ands	r5, r4
+20021660:	0740      	lsls	r0, r0, #29
+20021662:	0fc0      	lsrs	r0, r0, #31
+20021664:	006d      	lsls	r5, r5, #1
+20021666:	182d      	adds	r5, r5, r0
+20021668:	488d      	ldr	r0, [pc, #564]	@ (200218a0 <graphics_i_scan_line.constprop.0+0x1748>)
+2002166a:	960c      	str	r6, [sp, #48]	@ 0x30
+2002166c:	80b0      	strh	r0, [r6, #4]
+2002166e:	b2ed      	uxtb	r5, r5
+20021670:	2000      	movs	r0, #0
+20021672:	2607      	movs	r6, #7
+20021674:	e60c      	b.n	20021290 <graphics_i_scan_line.constprop.0+0x1138>
+20021676:	2180      	movs	r1, #128	@ 0x80
+20021678:	9d0f      	ldr	r5, [sp, #60]	@ 0x3c
+2002167a:	0109      	lsls	r1, r1, #4
+2002167c:	404d      	eors	r5, r1
+2002167e:	950f      	str	r5, [sp, #60]	@ 0x3c
+20021680:	4985      	ldr	r1, [pc, #532]	@ (20021898 <graphics_i_scan_line.constprop.0+0x1740>)
+20021682:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20021684:	5c69      	ldrb	r1, [r5, r1]
+20021686:	9112      	str	r1, [sp, #72]	@ 0x48
+20021688:	2c01      	cmp	r4, #1
+2002168a:	d1d0      	bne.n	2002162e <graphics_i_scan_line.constprop.0+0x14d6>
+2002168c:	217f      	movs	r1, #127	@ 0x7f
+2002168e:	9d12      	ldr	r5, [sp, #72]	@ 0x48
+20021690:	438d      	bics	r5, r1
+20021692:	01a9      	lsls	r1, r5, #6
+20021694:	910e      	str	r1, [sp, #56]	@ 0x38
+20021696:	9910      	ldr	r1, [sp, #64]	@ 0x40
+20021698:	2900      	cmp	r1, #0
+2002169a:	d100      	bne.n	2002169e <graphics_i_scan_line.constprop.0+0x1546>
+2002169c:	e223      	b.n	20021ae6 <graphics_i_scan_line.constprop.0+0x198e>
+2002169e:	21c0      	movs	r1, #192	@ 0xc0
+200216a0:	9d0f      	ldr	r5, [sp, #60]	@ 0x3c
+200216a2:	0109      	lsls	r1, r1, #4
+200216a4:	4029      	ands	r1, r5
+200216a6:	1841      	adds	r1, r0, r1
+200216a8:	980e      	ldr	r0, [sp, #56]	@ 0x38
+200216aa:	1809      	adds	r1, r1, r0
+200216ac:	0489      	lsls	r1, r1, #18
+200216ae:	0c89      	lsrs	r1, r1, #18
+200216b0:	910e      	str	r1, [sp, #56]	@ 0x38
+200216b2:	9809      	ldr	r0, [sp, #36]	@ 0x24
+200216b4:	4979      	ldr	r1, [pc, #484]	@ (2002189c <graphics_i_scan_line.constprop.0+0x1744>)
+200216b6:	5c41      	ldrb	r1, [r0, r1]
+200216b8:	9111      	str	r1, [sp, #68]	@ 0x44
+200216ba:	2507      	movs	r5, #7
+200216bc:	20ff      	movs	r0, #255	@ 0xff
+200216be:	a918      	add	r1, sp, #96	@ 0x60
+200216c0:	4035      	ands	r5, r6
+200216c2:	7148      	strb	r0, [r1, #5]
+200216c4:	0068      	lsls	r0, r5, #1
+200216c6:	910c      	str	r1, [sp, #48]	@ 0x30
+200216c8:	0001      	movs	r1, r0
+200216ca:	2007      	movs	r0, #7
+200216cc:	1a40      	subs	r0, r0, r1
+200216ce:	990c      	ldr	r1, [sp, #48]	@ 0x30
+200216d0:	7108      	strb	r0, [r1, #4]
+200216d2:	2c01      	cmp	r4, #1
+200216d4:	d000      	beq.n	200216d8 <graphics_i_scan_line.constprop.0+0x1580>
+200216d6:	e273      	b.n	20021bc0 <graphics_i_scan_line.constprop.0+0x1a68>
+200216d8:	9809      	ldr	r0, [sp, #36]	@ 0x24
+200216da:	4970      	ldr	r1, [pc, #448]	@ (2002189c <graphics_i_scan_line.constprop.0+0x1744>)
+200216dc:	5c41      	ldrb	r1, [r0, r1]
+200216de:	09b0      	lsrs	r0, r6, #6
+200216e0:	4008      	ands	r0, r1
+200216e2:	9111      	str	r1, [sp, #68]	@ 0x44
+200216e4:	2107      	movs	r1, #7
+200216e6:	4688      	mov	r8, r1
+200216e8:	26c0      	movs	r6, #192	@ 0xc0
+200216ea:	4641      	mov	r1, r8
+200216ec:	0176      	lsls	r6, r6, #5
+200216ee:	02c0      	lsls	r0, r0, #11
+200216f0:	4030      	ands	r0, r6
+200216f2:	9e12      	ldr	r6, [sp, #72]	@ 0x48
+200216f4:	00f6      	lsls	r6, r6, #3
+200216f6:	430e      	orrs	r6, r1
+200216f8:	990c      	ldr	r1, [sp, #48]	@ 0x30
+200216fa:	714e      	strb	r6, [r1, #5]
+200216fc:	990e      	ldr	r1, [sp, #56]	@ 0x38
+200216fe:	9e12      	ldr	r6, [sp, #72]	@ 0x48
+20021700:	4688      	mov	r8, r1
+20021702:	01b6      	lsls	r6, r6, #6
+20021704:	4006      	ands	r6, r0
+20021706:	44a8      	add	r8, r5
+20021708:	4446      	add	r6, r8
+2002170a:	b2b1      	uxth	r1, r6
+2002170c:	910e      	str	r1, [sp, #56]	@ 0x38
+2002170e:	2604      	movs	r6, #4
+20021710:	e5be      	b.n	20021290 <graphics_i_scan_line.constprop.0+0x1138>
+20021712:	4b64      	ldr	r3, [pc, #400]	@ (200218a4 <graphics_i_scan_line.constprop.0+0x174c>)
+20021714:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20021716:	5cd0      	ldrb	r0, [r2, r3]
+20021718:	0683      	lsls	r3, r0, #26
+2002171a:	0f9b      	lsrs	r3, r3, #30
+2002171c:	930e      	str	r3, [sp, #56]	@ 0x38
+2002171e:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+20021720:	781b      	ldrb	r3, [r3, #0]
+20021722:	9308      	str	r3, [sp, #32]
+20021724:	4b60      	ldr	r3, [pc, #384]	@ (200218a8 <graphics_i_scan_line.constprop.0+0x1750>)
+20021726:	5cd1      	ldrb	r1, [r2, r3]
+20021728:	9b08      	ldr	r3, [sp, #32]
+2002172a:	2b02      	cmp	r3, #2
+2002172c:	d001      	beq.n	20021732 <graphics_i_scan_line.constprop.0+0x15da>
+2002172e:	f7fe ff86 	bl	2002063e <graphics_i_scan_line.constprop.0+0x4e6>
+20021732:	4b5e      	ldr	r3, [pc, #376]	@ (200218ac <graphics_i_scan_line.constprop.0+0x1754>)
+20021734:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20021736:	5cd2      	ldrb	r2, [r2, r3]
+20021738:	e6ca      	b.n	200214d0 <graphics_i_scan_line.constprop.0+0x1378>
+2002173a:	0791      	lsls	r1, r2, #30
+2002173c:	d400      	bmi.n	20021740 <graphics_i_scan_line.constprop.0+0x15e8>
+2002173e:	e1dc      	b.n	20021afa <graphics_i_scan_line.constprop.0+0x19a2>
+20021740:	4649      	mov	r1, r9
+20021742:	9110      	str	r1, [sp, #64]	@ 0x40
+20021744:	2101      	movs	r1, #1
+20021746:	9115      	str	r1, [sp, #84]	@ 0x54
+20021748:	311f      	adds	r1, #31
+2002174a:	910c      	str	r1, [sp, #48]	@ 0x30
+2002174c:	391f      	subs	r1, #31
+2002174e:	9114      	str	r1, [sp, #80]	@ 0x50
+20021750:	e566      	b.n	20021220 <graphics_i_scan_line.constprop.0+0x10c8>
+20021752:	1af3      	subs	r3, r6, r3
+20021754:	4698      	mov	r8, r3
+20021756:	b29b      	uxth	r3, r3
+20021758:	08d8      	lsrs	r0, r3, #3
+2002175a:	4368      	muls	r0, r5
+2002175c:	1882      	adds	r2, r0, r2
+2002175e:	930f      	str	r3, [sp, #60]	@ 0x3c
+20021760:	b293      	uxth	r3, r2
+20021762:	930d      	str	r3, [sp, #52]	@ 0x34
+20021764:	9b08      	ldr	r3, [sp, #32]
+20021766:	2b02      	cmp	r3, #2
+20021768:	d000      	beq.n	2002176c <graphics_i_scan_line.constprop.0+0x1614>
+2002176a:	e630      	b.n	200213ce <graphics_i_scan_line.constprop.0+0x1276>
+2002176c:	4b50      	ldr	r3, [pc, #320]	@ (200218b0 <graphics_i_scan_line.constprop.0+0x1758>)
+2002176e:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20021770:	5cd3      	ldrb	r3, [r2, r3]
+20021772:	019b      	lsls	r3, r3, #6
+20021774:	469c      	mov	ip, r3
+20021776:	464b      	mov	r3, r9
+20021778:	2b00      	cmp	r3, #0
+2002177a:	d001      	beq.n	20021780 <graphics_i_scan_line.constprop.0+0x1628>
+2002177c:	f7fe ff98 	bl	200206b0 <graphics_i_scan_line.constprop.0+0x558>
+20021780:	4b46      	ldr	r3, [pc, #280]	@ (2002189c <graphics_i_scan_line.constprop.0+0x1744>)
+20021782:	2007      	movs	r0, #7
+20021784:	5cd3      	ldrb	r3, [r2, r3]
+20021786:	4642      	mov	r2, r8
+20021788:	4010      	ands	r0, r2
+2002178a:	22ff      	movs	r2, #255	@ 0xff
+2002178c:	9e0c      	ldr	r6, [sp, #48]	@ 0x30
+2002178e:	0045      	lsls	r5, r0, #1
+20021790:	7172      	strb	r2, [r6, #5]
+20021792:	2207      	movs	r2, #7
+20021794:	1b52      	subs	r2, r2, r5
+20021796:	7132      	strb	r2, [r6, #4]
+20021798:	2507      	movs	r5, #7
+2002179a:	2200      	movs	r2, #0
+2002179c:	f7fe ff9b 	bl	200206d6 <graphics_i_scan_line.constprop.0+0x57e>
+200217a0:	4a44      	ldr	r2, [pc, #272]	@ (200218b4 <graphics_i_scan_line.constprop.0+0x175c>)
+200217a2:	5c86      	ldrb	r6, [r0, r2]
+200217a4:	0935      	lsrs	r5, r6, #4
+200217a6:	d100      	bne.n	200217aa <graphics_i_scan_line.constprop.0+0x1652>
+200217a8:	0035      	movs	r5, r6
+200217aa:	221f      	movs	r2, #31
+200217ac:	a810      	add	r0, sp, #64	@ 0x40
+200217ae:	1812      	adds	r2, r2, r0
+200217b0:	200f      	movs	r0, #15
+200217b2:	012d      	lsls	r5, r5, #4
+200217b4:	4030      	ands	r0, r6
+200217b6:	4328      	orrs	r0, r5
+200217b8:	7010      	strb	r0, [r2, #0]
+200217ba:	9d0e      	ldr	r5, [sp, #56]	@ 0x38
+200217bc:	9810      	ldr	r0, [sp, #64]	@ 0x40
+200217be:	4328      	orrs	r0, r5
+200217c0:	d002      	beq.n	200217c8 <graphics_i_scan_line.constprop.0+0x1670>
+200217c2:	4662      	mov	r2, ip
+200217c4:	9809      	ldr	r0, [sp, #36]	@ 0x24
+200217c6:	1882      	adds	r2, r0, r2
+200217c8:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+200217ca:	980d      	ldr	r0, [sp, #52]	@ 0x34
+200217cc:	9102      	str	r1, [sp, #8]
+200217ce:	1828      	adds	r0, r5, r0
+200217d0:	4680      	mov	r8, r0
+200217d2:	980e      	ldr	r0, [sp, #56]	@ 0x38
+200217d4:	9909      	ldr	r1, [sp, #36]	@ 0x24
+200217d6:	0086      	lsls	r6, r0, #2
+200217d8:	2000      	movs	r0, #0
+200217da:	9003      	str	r0, [sp, #12]
+200217dc:	4836      	ldr	r0, [pc, #216]	@ (200218b8 <graphics_i_scan_line.constprop.0+0x1760>)
+200217de:	4d37      	ldr	r5, [pc, #220]	@ (200218bc <graphics_i_scan_line.constprop.0+0x1764>)
+200217e0:	1841      	adds	r1, r0, r1
+200217e2:	011b      	lsls	r3, r3, #4
+200217e4:	9101      	str	r1, [sp, #4]
+200217e6:	9300      	str	r3, [sp, #0]
+200217e8:	4640      	mov	r0, r8
+200217ea:	5975      	ldr	r5, [r6, r5]
+200217ec:	9b11      	ldr	r3, [sp, #68]	@ 0x44
+200217ee:	990c      	ldr	r1, [sp, #48]	@ 0x30
+200217f0:	47a8      	blx	r5
+200217f2:	f7fe ff9d 	bl	20020730 <graphics_i_scan_line.constprop.0+0x5d8>
+200217f6:	4640      	mov	r0, r8
+200217f8:	1a41      	subs	r1, r0, r1
+200217fa:	b28e      	uxth	r6, r1
+200217fc:	4688      	mov	r8, r1
+200217fe:	990c      	ldr	r1, [sp, #48]	@ 0x30
+20021800:	08f0      	lsrs	r0, r6, #3
+20021802:	4348      	muls	r0, r1
+20021804:	1945      	adds	r5, r0, r5
+20021806:	b2a9      	uxth	r1, r5
+20021808:	910f      	str	r1, [sp, #60]	@ 0x3c
+2002180a:	2c02      	cmp	r4, #2
+2002180c:	d000      	beq.n	20021810 <graphics_i_scan_line.constprop.0+0x16b8>
+2002180e:	e704      	b.n	2002161a <graphics_i_scan_line.constprop.0+0x14c2>
+20021810:	4921      	ldr	r1, [pc, #132]	@ (20021898 <graphics_i_scan_line.constprop.0+0x1740>)
+20021812:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20021814:	5c69      	ldrb	r1, [r5, r1]
+20021816:	0189      	lsls	r1, r1, #6
+20021818:	910e      	str	r1, [sp, #56]	@ 0x38
+2002181a:	9910      	ldr	r1, [sp, #64]	@ 0x40
+2002181c:	2900      	cmp	r1, #0
+2002181e:	d000      	beq.n	20021822 <graphics_i_scan_line.constprop.0+0x16ca>
+20021820:	e521      	b.n	20021266 <graphics_i_scan_line.constprop.0+0x110e>
+20021822:	491e      	ldr	r1, [pc, #120]	@ (2002189c <graphics_i_scan_line.constprop.0+0x1744>)
+20021824:	20ff      	movs	r0, #255	@ 0xff
+20021826:	5c69      	ldrb	r1, [r5, r1]
+20021828:	2507      	movs	r5, #7
+2002182a:	9111      	str	r1, [sp, #68]	@ 0x44
+2002182c:	4641      	mov	r1, r8
+2002182e:	400d      	ands	r5, r1
+20021830:	a918      	add	r1, sp, #96	@ 0x60
+20021832:	7148      	strb	r0, [r1, #5]
+20021834:	2007      	movs	r0, #7
+20021836:	006e      	lsls	r6, r5, #1
+20021838:	1b80      	subs	r0, r0, r6
+2002183a:	7108      	strb	r0, [r1, #4]
+2002183c:	2607      	movs	r6, #7
+2002183e:	2000      	movs	r0, #0
+20021840:	910c      	str	r1, [sp, #48]	@ 0x30
+20021842:	e525      	b.n	20021290 <graphics_i_scan_line.constprop.0+0x1138>
+20021844:	2100      	movs	r1, #0
+20021846:	9115      	str	r1, [sp, #84]	@ 0x54
+20021848:	3128      	adds	r1, #40	@ 0x28
+2002184a:	910c      	str	r1, [sp, #48]	@ 0x30
+2002184c:	2100      	movs	r1, #0
+2002184e:	9110      	str	r1, [sp, #64]	@ 0x40
+20021850:	9114      	str	r1, [sp, #80]	@ 0x50
+20021852:	e4e5      	b.n	20021220 <graphics_i_scan_line.constprop.0+0x10c8>
+20021854:	2007      	movs	r0, #7
+20021856:	9b0f      	ldr	r3, [sp, #60]	@ 0x3c
+20021858:	4018      	ands	r0, r3
+2002185a:	2307      	movs	r3, #7
+2002185c:	0042      	lsls	r2, r0, #1
+2002185e:	1a9b      	subs	r3, r3, r2
+20021860:	9a0c      	ldr	r2, [sp, #48]	@ 0x30
+20021862:	7113      	strb	r3, [r2, #4]
+20021864:	e611      	b.n	2002148a <graphics_i_scan_line.constprop.0+0x1332>
+20021866:	2300      	movs	r3, #0
+20021868:	9311      	str	r3, [sp, #68]	@ 0x44
+2002186a:	3302      	adds	r3, #2
+2002186c:	9308      	str	r3, [sp, #32]
+2002186e:	2300      	movs	r3, #0
+20021870:	2528      	movs	r5, #40	@ 0x28
+20021872:	4699      	mov	r9, r3
+20021874:	9310      	str	r3, [sp, #64]	@ 0x40
+20021876:	f7fe fef3 	bl	20020660 <graphics_i_scan_line.constprop.0+0x508>
+2002187a:	46c0      	nop			@ (mov r8, r8)
+2002187c:	20041a08 	.word	0x20041a08
+20021880:	fffefda4 	.word	0xfffefda4
+20021884:	00010364 	.word	0x00010364
+20021888:	00010380 	.word	0x00010380
+2002188c:	500001c0 	.word	0x500001c0
+20021890:	2001aa45 	.word	0x2001aa45
+20021894:	0000601d 	.word	0x0000601d
+20021898:	0000600b 	.word	0x0000600b
+2002189c:	00006004 	.word	0x00006004
+200218a0:	ffffff00 	.word	0xffffff00
+200218a4:	00006031 	.word	0x00006031
+200218a8:	0000601b 	.word	0x0000601b
+200218ac:	00006032 	.word	0x00006032
+200218b0:	00006003 	.word	0x00006003
+200218b4:	00006007 	.word	0x00006007
+200218b8:	00010264 	.word	0x00010264
+200218bc:	200229bc 	.word	0x200229bc
+200218c0:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+200218c2:	950c      	str	r5, [sp, #48]	@ 0x30
+200218c4:	1938      	adds	r0, r7, r4
+200218c6:	4cc0      	ldr	r4, [pc, #768]	@ (20021bc8 <graphics_i_scan_line.constprop.0+0x1a70>)
+200218c8:	4655      	mov	r5, sl
+200218ca:	46a4      	mov	ip, r4
+200218cc:	4cbf      	ldr	r4, [pc, #764]	@ (20021bcc <graphics_i_scan_line.constprop.0+0x1a74>)
+200218ce:	000b      	movs	r3, r1
+200218d0:	940e      	str	r4, [sp, #56]	@ 0x38
+200218d2:	24c0      	movs	r4, #192	@ 0xc0
+200218d4:	46ca      	mov	sl, r9
+200218d6:	2100      	movs	r1, #0
+200218d8:	2200      	movs	r2, #0
+200218da:	270f      	movs	r7, #15
+200218dc:	4681      	mov	r9, r0
+200218de:	0624      	lsls	r4, r4, #24
+200218e0:	9508      	str	r5, [sp, #32]
+200218e2:	4648      	mov	r0, r9
+200218e4:	5c86      	ldrb	r6, [r0, r2]
+200218e6:	0030      	movs	r0, r6
+200218e8:	0136      	lsls	r6, r6, #4
+200218ea:	43b8      	bics	r0, r7
+200218ec:	b2f6      	uxtb	r6, r6
+200218ee:	2800      	cmp	r0, #0
+200218f0:	d008      	beq.n	20021904 <graphics_i_scan_line.constprop.0+0x17ac>
+200218f2:	9d0c      	ldr	r5, [sp, #48]	@ 0x30
+200218f4:	1100      	asrs	r0, r0, #4
+200218f6:	4328      	orrs	r0, r5
+200218f8:	0005      	movs	r5, r0
+200218fa:	4660      	mov	r0, ip
+200218fc:	54c5      	strb	r5, [r0, r3]
+200218fe:	48b4      	ldr	r0, [pc, #720]	@ (20021bd0 <graphics_i_scan_line.constprop.0+0x1a78>)
+20021900:	4321      	orrs	r1, r4
+20021902:	54c5      	strb	r5, [r0, r3]
+20021904:	2e00      	cmp	r6, #0
+20021906:	d00b      	beq.n	20021920 <graphics_i_scan_line.constprop.0+0x17c8>
+20021908:	980c      	ldr	r0, [sp, #48]	@ 0x30
+2002190a:	1136      	asrs	r6, r6, #4
+2002190c:	4306      	orrs	r6, r0
+2002190e:	1c98      	adds	r0, r3, #2
+20021910:	b2c0      	uxtb	r0, r0
+20021912:	0005      	movs	r5, r0
+20021914:	4660      	mov	r0, ip
+20021916:	5546      	strb	r6, [r0, r5]
+20021918:	48ad      	ldr	r0, [pc, #692]	@ (20021bd0 <graphics_i_scan_line.constprop.0+0x1a78>)
+2002191a:	5546      	strb	r6, [r0, r5]
+2002191c:	08a6      	lsrs	r6, r4, #2
+2002191e:	4331      	orrs	r1, r6
+20021920:	3304      	adds	r3, #4
+20021922:	b2db      	uxtb	r3, r3
+20021924:	0924      	lsrs	r4, r4, #4
+20021926:	d121      	bne.n	2002196c <graphics_i_scan_line.constprop.0+0x1814>
+20021928:	2900      	cmp	r1, #0
+2002192a:	d01f      	beq.n	2002196c <graphics_i_scan_line.constprop.0+0x1814>
+2002192c:	980d      	ldr	r0, [sp, #52]	@ 0x34
+2002192e:	341f      	adds	r4, #31
+20021930:	0945      	lsrs	r5, r0, #5
+20021932:	4020      	ands	r0, r4
+20021934:	0004      	movs	r4, r0
+20021936:	0008      	movs	r0, r1
+20021938:	40e0      	lsrs	r0, r4
+2002193a:	9e0e      	ldr	r6, [sp, #56]	@ 0x38
+2002193c:	950d      	str	r5, [sp, #52]	@ 0x34
+2002193e:	00ad      	lsls	r5, r5, #2
+20021940:	59ae      	ldr	r6, [r5, r6]
+20021942:	4330      	orrs	r0, r6
+20021944:	0006      	movs	r6, r0
+20021946:	980e      	ldr	r0, [sp, #56]	@ 0x38
+20021948:	502e      	str	r6, [r5, r0]
+2002194a:	1e60      	subs	r0, r4, #1
+2002194c:	281f      	cmp	r0, #31
+2002194e:	d809      	bhi.n	20021964 <graphics_i_scan_line.constprop.0+0x180c>
+20021950:	2020      	movs	r0, #32
+20021952:	1b04      	subs	r4, r0, r4
+20021954:	40a1      	lsls	r1, r4
+20021956:	9e0d      	ldr	r6, [sp, #52]	@ 0x34
+20021958:	980e      	ldr	r0, [sp, #56]	@ 0x38
+2002195a:	3601      	adds	r6, #1
+2002195c:	00b6      	lsls	r6, r6, #2
+2002195e:	5984      	ldr	r4, [r0, r6]
+20021960:	4321      	orrs	r1, r4
+20021962:	5181      	str	r1, [r0, r6]
+20021964:	24c0      	movs	r4, #192	@ 0xc0
+20021966:	2100      	movs	r1, #0
+20021968:	930d      	str	r3, [sp, #52]	@ 0x34
+2002196a:	0624      	lsls	r4, r4, #24
+2002196c:	9808      	ldr	r0, [sp, #32]
+2002196e:	3201      	adds	r2, #1
+20021970:	4290      	cmp	r0, r2
+20021972:	dcb6      	bgt.n	200218e2 <graphics_i_scan_line.constprop.0+0x178a>
+20021974:	46d1      	mov	r9, sl
+20021976:	2200      	movs	r2, #0
+20021978:	2800      	cmp	r0, #0
+2002197a:	d001      	beq.n	20021980 <graphics_i_scan_line.constprop.0+0x1828>
+2002197c:	1e42      	subs	r2, r0, #1
+2002197e:	0092      	lsls	r2, r2, #2
+20021980:	465b      	mov	r3, fp
+20021982:	3304      	adds	r3, #4
+20021984:	189b      	adds	r3, r3, r2
+20021986:	b2db      	uxtb	r3, r3
+20021988:	4698      	mov	r8, r3
+2002198a:	9e07      	ldr	r6, [sp, #28]
+2002198c:	f7ff f90b 	bl	20020ba6 <graphics_i_scan_line.constprop.0+0xa4e>
+20021990:	4890      	ldr	r0, [pc, #576]	@ (20021bd4 <graphics_i_scan_line.constprop.0+0x1a7c>)
+20021992:	5c2e      	ldrb	r6, [r5, r0]
+20021994:	0935      	lsrs	r5, r6, #4
+20021996:	d100      	bne.n	2002199a <graphics_i_scan_line.constprop.0+0x1842>
+20021998:	0035      	movs	r5, r6
+2002199a:	a810      	add	r0, sp, #64	@ 0x40
+2002199c:	4680      	mov	r8, r0
+2002199e:	201f      	movs	r0, #31
+200219a0:	4440      	add	r0, r8
+200219a2:	4680      	mov	r8, r0
+200219a4:	9006      	str	r0, [sp, #24]
+200219a6:	200f      	movs	r0, #15
+200219a8:	012d      	lsls	r5, r5, #4
+200219aa:	4030      	ands	r0, r6
+200219ac:	4328      	orrs	r0, r5
+200219ae:	4645      	mov	r5, r8
+200219b0:	7028      	strb	r0, [r5, #0]
+200219b2:	4660      	mov	r0, ip
+200219b4:	9d14      	ldr	r5, [sp, #80]	@ 0x50
+200219b6:	4646      	mov	r6, r8
+200219b8:	4328      	orrs	r0, r5
+200219ba:	d002      	beq.n	200219c2 <graphics_i_scan_line.constprop.0+0x186a>
+200219bc:	9e0e      	ldr	r6, [sp, #56]	@ 0x38
+200219be:	9809      	ldr	r0, [sp, #36]	@ 0x24
+200219c0:	1986      	adds	r6, r0, r6
+200219c2:	9809      	ldr	r0, [sp, #36]	@ 0x24
+200219c4:	9d0f      	ldr	r5, [sp, #60]	@ 0x3c
+200219c6:	9203      	str	r2, [sp, #12]
+200219c8:	1945      	adds	r5, r0, r5
+200219ca:	46ac      	mov	ip, r5
+200219cc:	9813      	ldr	r0, [sp, #76]	@ 0x4c
+200219ce:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+200219d0:	9302      	str	r3, [sp, #8]
+200219d2:	4b81      	ldr	r3, [pc, #516]	@ (20021bd8 <graphics_i_scan_line.constprop.0+0x1a80>)
+200219d4:	4d81      	ldr	r5, [pc, #516]	@ (20021bdc <graphics_i_scan_line.constprop.0+0x1a84>)
+200219d6:	3004      	adds	r0, #4
+200219d8:	189b      	adds	r3, r3, r2
+200219da:	0080      	lsls	r0, r0, #2
+200219dc:	0089      	lsls	r1, r1, #2
+200219de:	0032      	movs	r2, r6
+200219e0:	5945      	ldr	r5, [r0, r5]
+200219e2:	9301      	str	r3, [sp, #4]
+200219e4:	4660      	mov	r0, ip
+200219e6:	9b15      	ldr	r3, [sp, #84]	@ 0x54
+200219e8:	9100      	str	r1, [sp, #0]
+200219ea:	990c      	ldr	r1, [sp, #48]	@ 0x30
+200219ec:	47a8      	blx	r5
+200219ee:	4652      	mov	r2, sl
+200219f0:	9909      	ldr	r1, [sp, #36]	@ 0x24
+200219f2:	4d7b      	ldr	r5, [pc, #492]	@ (20021be0 <graphics_i_scan_line.constprop.0+0x1a88>)
+200219f4:	4e7b      	ldr	r6, [pc, #492]	@ (20021be4 <graphics_i_scan_line.constprop.0+0x1a8c>)
+200219f6:	9b07      	ldr	r3, [sp, #28]
+200219f8:	1876      	adds	r6, r6, r1
+200219fa:	186d      	adds	r5, r5, r1
+200219fc:	1a9a      	subs	r2, r3, r2
+200219fe:	0029      	movs	r1, r5
+20021a00:	0030      	movs	r0, r6
+20021a02:	f7f5 fbf3 	bl	200171ec <tmsCopyAlignMask>
+20021a06:	9b08      	ldr	r3, [sp, #32]
+20021a08:	2b00      	cmp	r3, #0
+20021a0a:	d100      	bne.n	20021a0e <graphics_i_scan_line.constprop.0+0x18b6>
+20021a0c:	e681      	b.n	20021712 <graphics_i_scan_line.constprop.0+0x15ba>
+20021a0e:	9b07      	ldr	r3, [sp, #28]
+20021a10:	0031      	movs	r1, r6
+20021a12:	425a      	negs	r2, r3
+20021a14:	0028      	movs	r0, r5
+20021a16:	f7f5 fbe9 	bl	200171ec <tmsCopyAlignMask>
+20021a1a:	21ff      	movs	r1, #255	@ 0xff
+20021a1c:	9809      	ldr	r0, [sp, #36]	@ 0x24
+20021a1e:	4a70      	ldr	r2, [pc, #448]	@ (20021be0 <graphics_i_scan_line.constprop.0+0x1a88>)
+20021a20:	5883      	ldr	r3, [r0, r2]
+20021a22:	021b      	lsls	r3, r3, #8
+20021a24:	0a1b      	lsrs	r3, r3, #8
+20021a26:	5083      	str	r3, [r0, r2]
+20021a28:	4a6f      	ldr	r2, [pc, #444]	@ (20021be8 <graphics_i_scan_line.constprop.0+0x1a90>)
+20021a2a:	5883      	ldr	r3, [r0, r2]
+20021a2c:	438b      	bics	r3, r1
+20021a2e:	5083      	str	r3, [r0, r2]
+20021a30:	e476      	b.n	20021320 <graphics_i_scan_line.constprop.0+0x11c8>
+20021a32:	2301      	movs	r3, #1
+20021a34:	2520      	movs	r5, #32
+20021a36:	9311      	str	r3, [sp, #68]	@ 0x44
+20021a38:	9310      	str	r3, [sp, #64]	@ 0x40
+20021a3a:	f7fe fe11 	bl	20020660 <graphics_i_scan_line.constprop.0+0x508>
+20021a3e:	23a0      	movs	r3, #160	@ 0xa0
+20021a40:	26e8      	movs	r6, #232	@ 0xe8
+20021a42:	2780      	movs	r7, #128	@ 0x80
+20021a44:	9907      	ldr	r1, [sp, #28]
+20021a46:	05db      	lsls	r3, r3, #23
+20021a48:	0076      	lsls	r6, r6, #1
+20021a4a:	047f      	lsls	r7, r7, #17
+20021a4c:	599a      	ldr	r2, [r3, r6]
+20021a4e:	423a      	tst	r2, r7
+20021a50:	d1fc      	bne.n	20021a4c <graphics_i_scan_line.constprop.0+0x18f4>
+20021a52:	9107      	str	r1, [sp, #28]
+20021a54:	4b65      	ldr	r3, [pc, #404]	@ (20021bec <graphics_i_scan_line.constprop.0+0x1a94>)
+20021a56:	9a0d      	ldr	r2, [sp, #52]	@ 0x34
+20021a58:	601d      	str	r5, [r3, #0]
+20021a5a:	605c      	str	r4, [r3, #4]
+20021a5c:	61da      	str	r2, [r3, #28]
+20021a5e:	f7ff f94b 	bl	20020cf8 <graphics_i_scan_line.constprop.0+0xba0>
+20021a62:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+20021a64:	4f58      	ldr	r7, [pc, #352]	@ (20021bc8 <graphics_i_scan_line.constprop.0+0x1a70>)
+20021a66:	469c      	mov	ip, r3
+20021a68:	465e      	mov	r6, fp
+20021a6a:	44a4      	add	ip, r4
+20021a6c:	2500      	movs	r5, #0
+20021a6e:	243f      	movs	r4, #63	@ 0x3f
+20021a70:	46b8      	mov	r8, r7
+20021a72:	468b      	mov	fp, r1
+20021a74:	4663      	mov	r3, ip
+20021a76:	5d5b      	ldrb	r3, [r3, r5]
+20021a78:	0019      	movs	r1, r3
+20021a7a:	019a      	lsls	r2, r3, #6
+20021a7c:	0098      	lsls	r0, r3, #2
+20021a7e:	011b      	lsls	r3, r3, #4
+20021a80:	43a0      	bics	r0, r4
+20021a82:	43a3      	bics	r3, r4
+20021a84:	43a1      	bics	r1, r4
+20021a86:	b2d2      	uxtb	r2, r2
+20021a88:	b2c0      	uxtb	r0, r0
+20021a8a:	b2db      	uxtb	r3, r3
+20021a8c:	2900      	cmp	r1, #0
+20021a8e:	d004      	beq.n	20021a9a <graphics_i_scan_line.constprop.0+0x1942>
+20021a90:	465f      	mov	r7, fp
+20021a92:	1189      	asrs	r1, r1, #6
+20021a94:	4339      	orrs	r1, r7
+20021a96:	4647      	mov	r7, r8
+20021a98:	55b9      	strb	r1, [r7, r6]
+20021a9a:	2800      	cmp	r0, #0
+20021a9c:	d006      	beq.n	20021aac <graphics_i_scan_line.constprop.0+0x1954>
+20021a9e:	465f      	mov	r7, fp
+20021aa0:	1180      	asrs	r0, r0, #6
+20021aa2:	4338      	orrs	r0, r7
+20021aa4:	4647      	mov	r7, r8
+20021aa6:	1c71      	adds	r1, r6, #1
+20021aa8:	b2c9      	uxtb	r1, r1
+20021aaa:	5478      	strb	r0, [r7, r1]
+20021aac:	2b00      	cmp	r3, #0
+20021aae:	d006      	beq.n	20021abe <graphics_i_scan_line.constprop.0+0x1966>
+20021ab0:	4658      	mov	r0, fp
+20021ab2:	119b      	asrs	r3, r3, #6
+20021ab4:	4303      	orrs	r3, r0
+20021ab6:	4640      	mov	r0, r8
+20021ab8:	1cb1      	adds	r1, r6, #2
+20021aba:	b2c9      	uxtb	r1, r1
+20021abc:	5443      	strb	r3, [r0, r1]
+20021abe:	2a00      	cmp	r2, #0
+20021ac0:	d006      	beq.n	20021ad0 <graphics_i_scan_line.constprop.0+0x1978>
+20021ac2:	4659      	mov	r1, fp
+20021ac4:	1192      	asrs	r2, r2, #6
+20021ac6:	430a      	orrs	r2, r1
+20021ac8:	4641      	mov	r1, r8
+20021aca:	1cf3      	adds	r3, r6, #3
+20021acc:	b2db      	uxtb	r3, r3
+20021ace:	54ca      	strb	r2, [r1, r3]
+20021ad0:	3604      	adds	r6, #4
+20021ad2:	3501      	adds	r5, #1
+20021ad4:	b2f6      	uxtb	r6, r6
+20021ad6:	45aa      	cmp	sl, r5
+20021ad8:	dccc      	bgt.n	20021a74 <graphics_i_scan_line.constprop.0+0x191c>
+20021ada:	464e      	mov	r6, r9
+20021adc:	f7fe fc4e 	bl	2002037c <graphics_i_scan_line.constprop.0+0x224>
+20021ae0:	4d43      	ldr	r5, [pc, #268]	@ (20021bf0 <graphics_i_scan_line.constprop.0+0x1a98>)
+20021ae2:	f7fe fe1a 	bl	2002071a <graphics_i_scan_line.constprop.0+0x5c2>
+20021ae6:	2507      	movs	r5, #7
+20021ae8:	a918      	add	r1, sp, #96	@ 0x60
+20021aea:	910c      	str	r1, [sp, #48]	@ 0x30
+20021aec:	2107      	movs	r1, #7
+20021aee:	4035      	ands	r5, r6
+20021af0:	0068      	lsls	r0, r5, #1
+20021af2:	1a09      	subs	r1, r1, r0
+20021af4:	980c      	ldr	r0, [sp, #48]	@ 0x30
+20021af6:	7101      	strb	r1, [r0, #4]
+20021af8:	e5ee      	b.n	200216d8 <graphics_i_scan_line.constprop.0+0x1580>
+20021afa:	2100      	movs	r1, #0
+20021afc:	9115      	str	r1, [sp, #84]	@ 0x54
+20021afe:	3120      	adds	r1, #32
+20021b00:	910c      	str	r1, [sp, #48]	@ 0x30
+20021b02:	2100      	movs	r1, #0
+20021b04:	9110      	str	r1, [sp, #64]	@ 0x40
+20021b06:	9114      	str	r1, [sp, #80]	@ 0x50
+20021b08:	f7ff fb8a 	bl	20021220 <graphics_i_scan_line.constprop.0+0x10c8>
+20021b0c:	4d39      	ldr	r5, [pc, #228]	@ (20021bf4 <graphics_i_scan_line.constprop.0+0x1a9c>)
+20021b0e:	f7ff fbe8 	bl	200212e2 <graphics_i_scan_line.constprop.0+0x118a>
+20021b12:	4d39      	ldr	r5, [pc, #228]	@ (20021bf8 <graphics_i_scan_line.constprop.0+0x1aa0>)
+20021b14:	f7fe fe01 	bl	2002071a <graphics_i_scan_line.constprop.0+0x5c2>
+20021b18:	0029      	movs	r1, r5
+20021b1a:	0028      	movs	r0, r5
+20021b1c:	9b07      	ldr	r3, [sp, #28]
+20021b1e:	312d      	adds	r1, #45	@ 0x2d
+20021b20:	3009      	adds	r0, #9
+20021b22:	425a      	negs	r2, r3
+20021b24:	31ff      	adds	r1, #255	@ 0xff
+20021b26:	30ff      	adds	r0, #255	@ 0xff
+20021b28:	f7f5 fb60 	bl	200171ec <tmsCopyAlignMask>
+20021b2c:	4649      	mov	r1, r9
+20021b2e:	4b33      	ldr	r3, [pc, #204]	@ (20021bfc <graphics_i_scan_line.constprop.0+0x1aa4>)
+20021b30:	4a2b      	ldr	r2, [pc, #172]	@ (20021be0 <graphics_i_scan_line.constprop.0+0x1a88>)
+20021b32:	18ed      	adds	r5, r5, r3
+20021b34:	58ab      	ldr	r3, [r5, r2]
+20021b36:	021b      	lsls	r3, r3, #8
+20021b38:	0a1b      	lsrs	r3, r3, #8
+20021b3a:	50ab      	str	r3, [r5, r2]
+20021b3c:	4a2a      	ldr	r2, [pc, #168]	@ (20021be8 <graphics_i_scan_line.constprop.0+0x1a90>)
+20021b3e:	58ab      	ldr	r3, [r5, r2]
+20021b40:	438b      	bics	r3, r1
+20021b42:	50ab      	str	r3, [r5, r2]
+20021b44:	f7ff f859 	bl	20020bfa <graphics_i_scan_line.constprop.0+0xaa2>
+20021b48:	4d2d      	ldr	r5, [pc, #180]	@ (20021c00 <graphics_i_scan_line.constprop.0+0x1aa8>)
+20021b4a:	f7ff fbca 	bl	200212e2 <graphics_i_scan_line.constprop.0+0x118a>
+20021b4e:	2530      	movs	r5, #48	@ 0x30
+20021b50:	2300      	movs	r3, #0
+20021b52:	2600      	movs	r6, #0
+20021b54:	400d      	ands	r5, r1
+20021b56:	9307      	str	r3, [sp, #28]
+20021b58:	f7fe ffbd 	bl	20020ad6 <graphics_i_scan_line.constprop.0+0x97e>
+20021b5c:	4b1b      	ldr	r3, [pc, #108]	@ (20021bcc <graphics_i_scan_line.constprop.0+0x1a74>)
+20021b5e:	0030      	movs	r0, r6
+20021b60:	469b      	mov	fp, r3
+20021b62:	1c73      	adds	r3, r6, #1
+20021b64:	33ff      	adds	r3, #255	@ 0xff
+20021b66:	4699      	mov	r9, r3
+20021b68:	46b8      	mov	r8, r7
+20021b6a:	46b4      	mov	ip, r6
+20021b6c:	4c16      	ldr	r4, [pc, #88]	@ (20021bc8 <graphics_i_scan_line.constprop.0+0x1a70>)
+20021b6e:	4d25      	ldr	r5, [pc, #148]	@ (20021c04 <graphics_i_scan_line.constprop.0+0x1aac>)
+20021b70:	465b      	mov	r3, fp
+20021b72:	6c9b      	ldr	r3, [r3, #72]	@ 0x48
+20021b74:	2100      	movs	r1, #0
+20021b76:	2b00      	cmp	r3, #0
+20021b78:	d102      	bne.n	20021b80 <graphics_i_scan_line.constprop.0+0x1a28>
+20021b7a:	e013      	b.n	20021ba4 <graphics_i_scan_line.constprop.0+0x1a4c>
+20021b7c:	011b      	lsls	r3, r3, #4
+20021b7e:	3104      	adds	r1, #4
+20021b80:	0f1a      	lsrs	r2, r3, #28
+20021b82:	d103      	bne.n	20021b8c <graphics_i_scan_line.constprop.0+0x1a34>
+20021b84:	011b      	lsls	r3, r3, #4
+20021b86:	3104      	adds	r1, #4
+20021b88:	0f1a      	lsrs	r2, r3, #28
+20021b8a:	d0f7      	beq.n	20021b7c <graphics_i_scan_line.constprop.0+0x1a24>
+20021b8c:	5847      	ldr	r7, [r0, r1]
+20021b8e:	5866      	ldr	r6, [r4, r1]
+20021b90:	0092      	lsls	r2, r2, #2
+20021b92:	58aa      	ldr	r2, [r5, r2]
+20021b94:	407e      	eors	r6, r7
+20021b96:	4032      	ands	r2, r6
+20021b98:	407a      	eors	r2, r7
+20021b9a:	5042      	str	r2, [r0, r1]
+20021b9c:	011b      	lsls	r3, r3, #4
+20021b9e:	d001      	beq.n	20021ba4 <graphics_i_scan_line.constprop.0+0x1a4c>
+20021ba0:	3104      	adds	r1, #4
+20021ba2:	e7f1      	b.n	20021b88 <graphics_i_scan_line.constprop.0+0x1a30>
+20021ba4:	2304      	movs	r3, #4
+20021ba6:	3020      	adds	r0, #32
+20021ba8:	3420      	adds	r4, #32
+20021baa:	449b      	add	fp, r3
+20021bac:	4548      	cmp	r0, r9
+20021bae:	d1df      	bne.n	20021b70 <graphics_i_scan_line.constprop.0+0x1a18>
+20021bb0:	4666      	mov	r6, ip
+20021bb2:	4647      	mov	r7, r8
+20021bb4:	f7fe fddc 	bl	20020770 <graphics_i_scan_line.constprop.0+0x618>
+20021bb8:	2200      	movs	r2, #0
+20021bba:	2507      	movs	r5, #7
+20021bbc:	f7fe fd8b 	bl	200206d6 <graphics_i_scan_line.constprop.0+0x57e>
+20021bc0:	2000      	movs	r0, #0
+20021bc2:	2607      	movs	r6, #7
+20021bc4:	f7ff fb64 	bl	20021290 <graphics_i_scan_line.constprop.0+0x1138>
+20021bc8:	2004064c 	.word	0x2004064c
+20021bcc:	200405e0 	.word	0x200405e0
+20021bd0:	2004064d 	.word	0x2004064d
+20021bd4:	00006007 	.word	0x00006007
+20021bd8:	0001015c 	.word	0x0001015c
+20021bdc:	200229bc 	.word	0x200229bc
+20021be0:	00010364 	.word	0x00010364
+20021be4:	00010388 	.word	0x00010388
+20021be8:	00010380 	.word	0x00010380
+20021bec:	500001c0 	.word	0x500001c0
+20021bf0:	2001cb99 	.word	0x2001cb99
+20021bf4:	2001c865 	.word	0x2001c865
+20021bf8:	2001ca49 	.word	0x2001ca49
+20021bfc:	fffefda4 	.word	0xfffefda4
+20021c00:	2001c6dd 	.word	0x2001c6dd
+20021c04:	200400a0 	.word	0x200400a0

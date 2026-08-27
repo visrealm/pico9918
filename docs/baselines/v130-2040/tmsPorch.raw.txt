@@ -1,0 +1,4 @@
+20015728 <tmsPorch>:
+20015728:	b510      	push	{r4, lr}
+2001572a:	f002 f9ad 	bl	20017a88 <pico9918_frame_porch>
+2001572e:	bd10      	pop	{r4, pc}

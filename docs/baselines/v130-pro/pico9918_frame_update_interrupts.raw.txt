@@ -1,0 +1,71 @@
+20017750 <pico9918_frame_update_interrupts>:
+20017750:	b510      	push	{r4, lr}
+20017752:	2100      	movs	r1, #0
+20017754:	4604      	mov	r4, r0
+20017756:	2011      	movs	r0, #17
+20017758:	f7ff f838 	bl	200167cc <irq_set_enabled>
+2001775c:	2100      	movs	r1, #0
+2001775e:	2012      	movs	r0, #18
+20017760:	f7ff f834 	bl	200167cc <irq_set_enabled>
+20017764:	f3bf 8f5f 	dmb	sy
+20017768:	4b2c      	ldr	r3, [pc, #176]	@ (2001781c <pico9918_frame_update_interrupts+0xcc>)
+2001776a:	6818      	ldr	r0, [r3, #0]
+2001776c:	f500 3180 	add.w	r1, r0, #65536	@ 0x10000
+20017770:	f991 35ed 	ldrsb.w	r3, [r1, #1517]	@ 0x5ed
+20017774:	f891 25ed 	ldrb.w	r2, [r1, #1517]	@ 0x5ed
+20017778:	2b00      	cmp	r3, #0
+2001777a:	db4b      	blt.n	20017814 <pico9918_frame_update_interrupts+0xc4>
+2001777c:	0653      	lsls	r3, r2, #25
+2001777e:	bf4b      	itete	mi
+20017780:	f024 031f 	bicmi.w	r3, r4, #31
+20017784:	f002 02e0 	andpl.w	r2, r2, #224	@ 0xe0
+20017788:	431a      	orrmi	r2, r3
+2001778a:	4322      	orrpl	r2, r4
+2001778c:	4b24      	ldr	r3, [pc, #144]	@ (20017820 <pico9918_frame_update_interrupts+0xd0>)
+2001778e:	f891 c02f 	ldrb.w	ip, [r1, #47]	@ 0x2f
+20017792:	781b      	ldrb	r3, [r3, #0]
+20017794:	f500 4e30 	add.w	lr, r0, #45056	@ 0xb000
+20017798:	021b      	lsls	r3, r3, #8
+2001779a:	f88e 2000 	strb.w	r2, [lr]
+2001779e:	f043 03ff 	orr.w	r3, r3, #255	@ 0xff
+200177a2:	f881 25ed 	strb.w	r2, [r1, #1517]	@ 0x5ed
+200177a6:	f1bc 0f00 	cmp.w	ip, #0
+200177aa:	d02e      	beq.n	2001780a <pico9918_frame_update_interrupts+0xba>
+200177ac:	f500 4cc0 	add.w	ip, r0, #24576	@ 0x6000
+200177b0:	f89c e00f 	ldrb.w	lr, [ip, #15]
+200177b4:	f00e 0e0f 	and.w	lr, lr, #15
+200177b8:	4470      	add	r0, lr
+200177ba:	f500 4030 	add.w	r0, r0, #45056	@ 0xb000
+200177be:	7800      	ldrb	r0, [r0, #0]
+200177c0:	ea43 630e 	orr.w	r3, r3, lr, lsl #24
+200177c4:	ea43 4300 	orr.w	r3, r3, r0, lsl #16
+200177c8:	f89c 0001 	ldrb.w	r0, [ip, #1]
+200177cc:	f8df e054 	ldr.w	lr, [pc, #84]	@ 20017824 <pico9918_frame_update_interrupts+0xd4>
+200177d0:	f010 0020 	ands.w	r0, r0, #32
+200177d4:	f8ce 3014 	str.w	r3, [lr, #20]
+200177d8:	f891 35ec 	ldrb.w	r3, [r1, #1516]	@ 0x5ec
+200177dc:	bf18      	it	ne
+200177de:	09d0      	lsrne	r0, r2, #7
+200177e0:	4283      	cmp	r3, r0
+200177e2:	d006      	beq.n	200177f2 <pico9918_frame_update_interrupts+0xa2>
+200177e4:	f881 05ec 	strb.w	r0, [r1, #1516]	@ 0x5ec
+200177e8:	2316      	movs	r3, #22
+200177ea:	f080 0001 	eor.w	r0, r0, #1
+200177ee:	ec40 3040 	mcrr	0, 4, r3, r0, cr0
+200177f2:	f3bf 8f5f 	dmb	sy
+200177f6:	2101      	movs	r1, #1
+200177f8:	2011      	movs	r0, #17
+200177fa:	f7fe ffe7 	bl	200167cc <irq_set_enabled>
+200177fe:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+20017802:	2101      	movs	r1, #1
+20017804:	2012      	movs	r0, #18
+20017806:	f7fe bfe1 	b.w	200167cc <irq_set_enabled>
+2001780a:	ea43 4302 	orr.w	r3, r3, r2, lsl #16
+2001780e:	f500 4cc0 	add.w	ip, r0, #24576	@ 0x6000
+20017812:	e7d9      	b.n	200177c8 <pico9918_frame_update_interrupts+0x78>
+20017814:	f004 0320 	and.w	r3, r4, #32
+20017818:	431a      	orrs	r2, r3
+2001781a:	e7b7      	b.n	2001778c <pico9918_frame_update_interrupts+0x3c>
+2001781c:	20025f10 	.word	0x20025f10
+20017820:	2002c102 	.word	0x2002c102
+20017824:	50300000 	.word	0x50300000

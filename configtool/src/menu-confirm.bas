@@ -50,7 +50,7 @@ checkFirmwareVersion: PROCEDURE
 
 checkPendingDisplayChange: PROCEDURE
     VDP_STATUS_REG = 12
-    VDP_REG(58) = CONF_PENDING_STATE
+    VDP_REG(58) = PICO9918_CONF_PENDING_STATE
     pendingState = VDP_STATUS
     VDP_STATUS_REG0
 
@@ -61,9 +61,9 @@ checkPendingDisplayChange: PROCEDURE
     GOSUB confirmationMenuLoop
 
     IF confirm THEN
-        VDP_CONFIG(CONF_PENDING_CONFIRM) = 1
+        VDP_CONFIG(PICO9918_CONF_PENDING_CONFIRM) = 1
     ELSE
-        VDP_CONFIG(CONF_PENDING_CANCEL) = 1
+        VDP_CONFIG(PICO9918_CONF_PENDING_CANCEL) = 1
     END IF
 
     END

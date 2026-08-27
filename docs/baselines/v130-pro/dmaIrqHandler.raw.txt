@@ -1,0 +1,319 @@
+20019ef0 <dmaIrqHandler>:
+20019ef0:	f04f 43a0 	mov.w	r3, #1342177280	@ 0x50000000
+20019ef4:	b5f0      	push	{r4, r5, r6, r7, lr}
+20019ef6:	4aa3      	ldr	r2, [pc, #652]	@ (2001a184 <dmaIrqHandler+0x294>)
+20019ef8:	f8d3 140c 	ldr.w	r1, [r3, #1036]	@ 0x40c
+20019efc:	6812      	ldr	r2, [r2, #0]
+20019efe:	b083      	sub	sp, #12
+20019f00:	4211      	tst	r1, r2
+20019f02:	d041      	beq.n	20019f88 <dmaIrqHandler+0x98>
+20019f04:	48a0      	ldr	r0, [pc, #640]	@ (2001a188 <dmaIrqHandler+0x298>)
+20019f06:	49a1      	ldr	r1, [pc, #644]	@ (2001a18c <dmaIrqHandler+0x29c>)
+20019f08:	f8c3 240c 	str.w	r2, [r3, #1036]	@ 0x40c
+20019f0c:	6803      	ldr	r3, [r0, #0]
+20019f0e:	f891 2044 	ldrb.w	r2, [r1, #68]	@ 0x44
+20019f12:	3301      	adds	r3, #1
+20019f14:	2a00      	cmp	r2, #0
+20019f16:	f000 80b1 	beq.w	2001a07c <dmaIrqHandler+0x18c>
+20019f1a:	4c9d      	ldr	r4, [pc, #628]	@ (2001a190 <dmaIrqHandler+0x2a0>)
+20019f1c:	6003      	str	r3, [r0, #0]
+20019f1e:	f8d4 c000 	ldr.w	ip, [r4]
+20019f22:	ebcc 02cc 	rsb	r2, ip, ip, lsl #3
+20019f26:	eb01 0e82 	add.w	lr, r1, r2, lsl #2
+20019f2a:	f8be e064 	ldrh.w	lr, [lr, #100]	@ 0x64
+20019f2e:	0092      	lsls	r2, r2, #2
+20019f30:	459e      	cmp	lr, r3
+20019f32:	f340 80ce 	ble.w	2001a0d2 <dmaIrqHandler+0x1e2>
+20019f36:	324a      	adds	r2, #74	@ 0x4a
+20019f38:	440a      	add	r2, r1
+20019f3a:	7810      	ldrb	r0, [r2, #0]
+20019f3c:	4298      	cmp	r0, r3
+20019f3e:	dd16      	ble.n	20019f6e <dmaIrqHandler+0x7e>
+20019f40:	f04f 41a0 	mov.w	r1, #1342177280	@ 0x50000000
+20019f44:	441a      	add	r2, r3
+20019f46:	7850      	ldrb	r0, [r2, #1]
+20019f48:	4a92      	ldr	r2, [pc, #584]	@ (2001a194 <dmaIrqHandler+0x2a4>)
+20019f4a:	4b93      	ldr	r3, [pc, #588]	@ (2001a198 <dmaIrqHandler+0x2a8>)
+20019f4c:	f852 2020 	ldr.w	r2, [r2, r0, lsl #2]
+20019f50:	681b      	ldr	r3, [r3, #0]
+20019f52:	63ca      	str	r2, [r1, #60]	@ 0x3c
+20019f54:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+20019f58:	f8d2 140c 	ldr.w	r1, [r2, #1036]	@ 0x40c
+20019f5c:	4219      	tst	r1, r3
+20019f5e:	d11b      	bne.n	20019f98 <dmaIrqHandler+0xa8>
+20019f60:	4b8e      	ldr	r3, [pc, #568]	@ (2001a19c <dmaIrqHandler+0x2ac>)
+20019f62:	781b      	ldrb	r3, [r3, #0]
+20019f64:	2b00      	cmp	r3, #0
+20019f66:	f040 80af 	bne.w	2001a0c8 <dmaIrqHandler+0x1d8>
+20019f6a:	b003      	add	sp, #12
+20019f6c:	bdf0      	pop	{r4, r5, r6, r7, pc}
+20019f6e:	7a51      	ldrb	r1, [r2, #9]
+20019f70:	4401      	add	r1, r0
+20019f72:	4299      	cmp	r1, r3
+20019f74:	f340 80e1 	ble.w	2001a13a <dmaIrqHandler+0x24a>
+20019f78:	f04f 40a0 	mov.w	r0, #1342177280	@ 0x50000000
+20019f7c:	4a88      	ldr	r2, [pc, #544]	@ (2001a1a0 <dmaIrqHandler+0x2b0>)
+20019f7e:	3302      	adds	r3, #2
+20019f80:	428b      	cmp	r3, r1
+20019f82:	63c2      	str	r2, [r0, #60]	@ 0x3c
+20019f84:	f000 8118 	beq.w	2001a1b8 <dmaIrqHandler+0x2c8>
+20019f88:	4b83      	ldr	r3, [pc, #524]	@ (2001a198 <dmaIrqHandler+0x2a8>)
+20019f8a:	681b      	ldr	r3, [r3, #0]
+20019f8c:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+20019f90:	f8d2 140c 	ldr.w	r1, [r2, #1036]	@ 0x40c
+20019f94:	4219      	tst	r1, r3
+20019f96:	d0e3      	beq.n	20019f60 <dmaIrqHandler+0x70>
+20019f98:	4882      	ldr	r0, [pc, #520]	@ (2001a1a4 <dmaIrqHandler+0x2b4>)
+20019f9a:	f8c2 340c 	str.w	r3, [r2, #1036]	@ 0x40c
+20019f9e:	6803      	ldr	r3, [r0, #0]
+20019fa0:	f240 5e04 	movw	lr, #1284	@ 0x504
+20019fa4:	3301      	adds	r3, #1
+20019fa6:	461c      	mov	r4, r3
+20019fa8:	4978      	ldr	r1, [pc, #480]	@ (2001a18c <dmaIrqHandler+0x29c>)
+20019faa:	6003      	str	r3, [r0, #0]
+20019fac:	f891 2048 	ldrb.w	r2, [r1, #72]	@ 0x48
+20019fb0:	f8df c200 	ldr.w	ip, [pc, #512]	@ 2001a1b4 <dmaIrqHandler+0x2c4>
+20019fb4:	2a02      	cmp	r2, #2
+20019fb6:	bf08      	it	eq
+20019fb8:	085c      	lsreq	r4, r3, #1
+20019fba:	3a01      	subs	r2, #1
+20019fbc:	f344 0000 	sbfx	r0, r4, #0, #1
+20019fc0:	f891 6094 	ldrb.w	r6, [r1, #148]	@ 0x94
+20019fc4:	ea02 0503 	and.w	r5, r2, r3
+20019fc8:	ea00 020e 	and.w	r2, r0, lr
+20019fcc:	462f      	mov	r7, r5
+20019fce:	eb02 030c 	add.w	r3, r2, ip
+20019fd2:	2e00      	cmp	r6, #0
+20019fd4:	d03c      	beq.n	2001a050 <dmaIrqHandler+0x160>
+20019fd6:	2d00      	cmp	r5, #0
+20019fd8:	f000 8090 	beq.w	2001a0fc <dmaIrqHandler+0x20c>
+20019fdc:	f04f 4ea0 	mov.w	lr, #1342177280	@ 0x50000000
+20019fe0:	f85c 5002 	ldr.w	r5, [ip, r2]
+20019fe4:	4870      	ldr	r0, [pc, #448]	@ (2001a1a8 <dmaIrqHandler+0x2b8>)
+20019fe6:	ea00 0555 	and.w	r5, r0, r5, lsr #1
+20019fea:	f84c 5002 	str.w	r5, [ip, r2]
+20019fee:	685a      	ldr	r2, [r3, #4]
+20019ff0:	ea00 0252 	and.w	r2, r0, r2, lsr #1
+20019ff4:	605a      	str	r2, [r3, #4]
+20019ff6:	689a      	ldr	r2, [r3, #8]
+20019ff8:	ea00 0252 	and.w	r2, r0, r2, lsr #1
+20019ffc:	609a      	str	r2, [r3, #8]
+20019ffe:	68da      	ldr	r2, [r3, #12]
+2001a000:	ea00 0252 	and.w	r2, r0, r2, lsr #1
+2001a004:	60da      	str	r2, [r3, #12]
+2001a006:	691a      	ldr	r2, [r3, #16]
+2001a008:	ea00 0252 	and.w	r2, r0, r2, lsr #1
+2001a00c:	611a      	str	r2, [r3, #16]
+2001a00e:	888a      	ldrh	r2, [r1, #4]
+2001a010:	f8ce 307c 	str.w	r3, [lr, #124]	@ 0x7c
+2001a014:	2a0b      	cmp	r2, #11
+2001a016:	ea4f 0c52 	mov.w	ip, r2, lsr #1
+2001a01a:	d909      	bls.n	2001a030 <dmaIrqHandler+0x140>
+2001a01c:	eb03 0c8c 	add.w	ip, r3, ip, lsl #2
+2001a020:	3314      	adds	r3, #20
+2001a022:	681a      	ldr	r2, [r3, #0]
+2001a024:	ea00 0252 	and.w	r2, r0, r2, lsr #1
+2001a028:	f843 2b04 	str.w	r2, [r3], #4
+2001a02c:	459c      	cmp	ip, r3
+2001a02e:	d1f8      	bne.n	2001a022 <dmaIrqHandler+0x132>
+2001a030:	f8d1 3098 	ldr.w	r3, [r1, #152]	@ 0x98
+2001a034:	42a3      	cmp	r3, r4
+2001a036:	d193      	bne.n	20019f60 <dmaIrqHandler+0x70>
+2001a038:	f891 3048 	ldrb.w	r3, [r1, #72]	@ 0x48
+2001a03c:	3b01      	subs	r3, #1
+2001a03e:	429f      	cmp	r7, r3
+2001a040:	d18e      	bne.n	20019f60 <dmaIrqHandler+0x70>
+2001a042:	2200      	movs	r2, #0
+2001a044:	2300      	movs	r3, #0
+2001a046:	f044 4080 	orr.w	r0, r4, #1073741824	@ 0x40000000
+2001a04a:	f7fc fdf5 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a04e:	e787      	b.n	20019f60 <dmaIrqHandler+0x70>
+2001a050:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2001a054:	67d3      	str	r3, [r2, #124]	@ 0x7c
+2001a056:	2d00      	cmp	r5, #0
+2001a058:	d1ea      	bne.n	2001a030 <dmaIrqHandler+0x140>
+2001a05a:	8dcb      	ldrh	r3, [r1, #46]	@ 0x2e
+2001a05c:	1c62      	adds	r2, r4, #1
+2001a05e:	4293      	cmp	r3, r2
+2001a060:	4615      	mov	r5, r2
+2001a062:	d853      	bhi.n	2001a10c <dmaIrqHandler+0x21c>
+2001a064:	3b01      	subs	r3, #1
+2001a066:	42ab      	cmp	r3, r5
+2001a068:	d1e2      	bne.n	2001a030 <dmaIrqHandler+0x140>
+2001a06a:	2200      	movs	r2, #0
+2001a06c:	2300      	movs	r3, #0
+2001a06e:	f04f 4000 	mov.w	r0, #2147483648	@ 0x80000000
+2001a072:	9101      	str	r1, [sp, #4]
+2001a074:	f7fc fde0 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a078:	9901      	ldr	r1, [sp, #4]
+2001a07a:	e7d9      	b.n	2001a030 <dmaIrqHandler+0x140>
+2001a07c:	8c0c      	ldrh	r4, [r1, #32]
+2001a07e:	6003      	str	r3, [r0, #0]
+2001a080:	429c      	cmp	r4, r3
+2001a082:	dc05      	bgt.n	2001a090 <dmaIrqHandler+0x1a0>
+2001a084:	4613      	mov	r3, r2
+2001a086:	f8df c11c 	ldr.w	ip, [pc, #284]	@ 2001a1a4 <dmaIrqHandler+0x2b4>
+2001a08a:	6002      	str	r2, [r0, #0]
+2001a08c:	f8cc 2000 	str.w	r2, [ip]
+2001a090:	8b8a      	ldrh	r2, [r1, #28]
+2001a092:	429a      	cmp	r2, r3
+2001a094:	dc2b      	bgt.n	2001a0ee <dmaIrqHandler+0x1fe>
+2001a096:	8bc8      	ldrh	r0, [r1, #30]
+2001a098:	4402      	add	r2, r0
+2001a09a:	429a      	cmp	r2, r3
+2001a09c:	dd42      	ble.n	2001a124 <dmaIrqHandler+0x234>
+2001a09e:	f04f 41a0 	mov.w	r1, #1342177280	@ 0x50000000
+2001a0a2:	483f      	ldr	r0, [pc, #252]	@ (2001a1a0 <dmaIrqHandler+0x2b0>)
+2001a0a4:	3302      	adds	r3, #2
+2001a0a6:	429a      	cmp	r2, r3
+2001a0a8:	63c8      	str	r0, [r1, #60]	@ 0x3c
+2001a0aa:	f47f af6d 	bne.w	20019f88 <dmaIrqHandler+0x98>
+2001a0ae:	2200      	movs	r2, #0
+2001a0b0:	2300      	movs	r3, #0
+2001a0b2:	2000      	movs	r0, #0
+2001a0b4:	f7fc fdc0 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a0b8:	2300      	movs	r3, #0
+2001a0ba:	2200      	movs	r2, #0
+2001a0bc:	2001      	movs	r0, #1
+2001a0be:	f7fc fdbb 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a0c2:	4b35      	ldr	r3, [pc, #212]	@ (2001a198 <dmaIrqHandler+0x2a8>)
+2001a0c4:	681b      	ldr	r3, [r3, #0]
+2001a0c6:	e761      	b.n	20019f8c <dmaIrqHandler+0x9c>
+2001a0c8:	b003      	add	sp, #12
+2001a0ca:	e8bd 40f0 	ldmia.w	sp!, {r4, r5, r6, r7, lr}
+2001a0ce:	f00b b9e7 	b.w	200254a0 <pico9918_gpu_rearm_palette_guard>
+2001a0d2:	2300      	movs	r3, #0
+2001a0d4:	4a33      	ldr	r2, [pc, #204]	@ (2001a1a4 <dmaIrqHandler+0x2b4>)
+2001a0d6:	f08c 0c01 	eor.w	ip, ip, #1
+2001a0da:	6013      	str	r3, [r2, #0]
+2001a0dc:	ebcc 02cc 	rsb	r2, ip, ip, lsl #3
+2001a0e0:	eb01 0282 	add.w	r2, r1, r2, lsl #2
+2001a0e4:	f8c4 c000 	str.w	ip, [r4]
+2001a0e8:	6003      	str	r3, [r0, #0]
+2001a0ea:	324a      	adds	r2, #74	@ 0x4a
+2001a0ec:	e725      	b.n	20019f3a <dmaIrqHandler+0x4a>
+2001a0ee:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2001a0f2:	492e      	ldr	r1, [pc, #184]	@ (2001a1ac <dmaIrqHandler+0x2bc>)
+2001a0f4:	4b28      	ldr	r3, [pc, #160]	@ (2001a198 <dmaIrqHandler+0x2a8>)
+2001a0f6:	63d1      	str	r1, [r2, #60]	@ 0x3c
+2001a0f8:	681b      	ldr	r3, [r3, #0]
+2001a0fa:	e747      	b.n	20019f8c <dmaIrqHandler+0x9c>
+2001a0fc:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2001a100:	67d3      	str	r3, [r2, #124]	@ 0x7c
+2001a102:	8dcb      	ldrh	r3, [r1, #46]	@ 0x2e
+2001a104:	1c62      	adds	r2, r4, #1
+2001a106:	4293      	cmp	r3, r2
+2001a108:	4615      	mov	r5, r2
+2001a10a:	d9ab      	bls.n	2001a064 <dmaIrqHandler+0x174>
+2001a10c:	4b20      	ldr	r3, [pc, #128]	@ (2001a190 <dmaIrqHandler+0x2a0>)
+2001a10e:	9101      	str	r1, [sp, #4]
+2001a110:	6818      	ldr	r0, [r3, #0]
+2001a112:	2300      	movs	r3, #0
+2001a114:	ea42 3000 	orr.w	r0, r2, r0, lsl #12
+2001a118:	2200      	movs	r2, #0
+2001a11a:	f7fc fd8d 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a11e:	9901      	ldr	r1, [sp, #4]
+2001a120:	8dcb      	ldrh	r3, [r1, #46]	@ 0x2e
+2001a122:	e79f      	b.n	2001a064 <dmaIrqHandler+0x174>
+2001a124:	8b4a      	ldrh	r2, [r1, #26]
+2001a126:	1aa4      	subs	r4, r4, r2
+2001a128:	429c      	cmp	r4, r3
+2001a12a:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2001a12e:	dd22      	ble.n	2001a176 <dmaIrqHandler+0x286>
+2001a130:	491f      	ldr	r1, [pc, #124]	@ (2001a1b0 <dmaIrqHandler+0x2c0>)
+2001a132:	4b19      	ldr	r3, [pc, #100]	@ (2001a198 <dmaIrqHandler+0x2a8>)
+2001a134:	63d1      	str	r1, [r2, #60]	@ 0x3c
+2001a136:	681b      	ldr	r3, [r3, #0]
+2001a138:	e728      	b.n	20019f8c <dmaIrqHandler+0x9c>
+2001a13a:	8950      	ldrh	r0, [r2, #10]
+2001a13c:	4401      	add	r1, r0
+2001a13e:	4299      	cmp	r1, r3
+2001a140:	dc12      	bgt.n	2001a168 <dmaIrqHandler+0x278>
+2001a142:	f04f 40a0 	mov.w	r0, #1342177280	@ 0x50000000
+2001a146:	eba3 0101 	sub.w	r1, r3, r1
+2001a14a:	440a      	add	r2, r1
+2001a14c:	7b52      	ldrb	r2, [r2, #13]
+2001a14e:	4b11      	ldr	r3, [pc, #68]	@ (2001a194 <dmaIrqHandler+0x2a4>)
+2001a150:	f853 3022 	ldr.w	r3, [r3, r2, lsl #2]
+2001a154:	63c3      	str	r3, [r0, #60]	@ 0x3c
+2001a156:	f47f af17 	bne.w	20019f88 <dmaIrqHandler+0x98>
+2001a15a:	2200      	movs	r2, #0
+2001a15c:	2300      	movs	r3, #0
+2001a15e:	f04f 5000 	mov.w	r0, #536870912	@ 0x20000000
+2001a162:	f7fc fd69 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a166:	e70f      	b.n	20019f88 <dmaIrqHandler+0x98>
+2001a168:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2001a16c:	4910      	ldr	r1, [pc, #64]	@ (2001a1b0 <dmaIrqHandler+0x2c0>)
+2001a16e:	4b0a      	ldr	r3, [pc, #40]	@ (2001a198 <dmaIrqHandler+0x2a8>)
+2001a170:	63d1      	str	r1, [r2, #60]	@ 0x3c
+2001a172:	681b      	ldr	r3, [r3, #0]
+2001a174:	e70a      	b.n	20019f8c <dmaIrqHandler+0x9c>
+2001a176:	490a      	ldr	r1, [pc, #40]	@ (2001a1a0 <dmaIrqHandler+0x2b0>)
+2001a178:	3402      	adds	r4, #2
+2001a17a:	429c      	cmp	r4, r3
+2001a17c:	63d1      	str	r1, [r2, #60]	@ 0x3c
+2001a17e:	f47f af03 	bne.w	20019f88 <dmaIrqHandler+0x98>
+2001a182:	e7ea      	b.n	2001a15a <dmaIrqHandler+0x26a>
+2001a184:	2002c0f4 	.word	0x2002c0f4
+2001a188:	20026228 	.word	0x20026228
+2001a18c:	20001200 	.word	0x20001200
+2001a190:	2002b840 	.word	0x2002b840
+2001a194:	2002b6c0 	.word	0x2002b6c0
+2001a198:	2002c0ec 	.word	0x2002c0ec
+2001a19c:	2002c104 	.word	0x2002c104
+2001a1a0:	2002b688 	.word	0x2002b688
+2001a1a4:	20026224 	.word	0x20026224
+2001a1a8:	07770777 	.word	0x07770777
+2001a1ac:	2002b698 	.word	0x2002b698
+2001a1b0:	2002b638 	.word	0x2002b638
+2001a1b4:	20081000 	.word	0x20081000
+2001a1b8:	2200      	movs	r2, #0
+2001a1ba:	2300      	movs	r3, #0
+2001a1bc:	ea4f 300c 	mov.w	r0, ip, lsl #12
+2001a1c0:	f7fc fd3a 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a1c4:	6820      	ldr	r0, [r4, #0]
+2001a1c6:	2200      	movs	r2, #0
+2001a1c8:	0300      	lsls	r0, r0, #12
+2001a1ca:	2300      	movs	r3, #0
+2001a1cc:	f040 0001 	orr.w	r0, r0, #1
+2001a1d0:	f7fc fd32 	bl	20016c38 <multicore_fifo_push_timeout_us>
+2001a1d4:	2302      	movs	r3, #2
+2001a1d6:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2001a1da:	f8c2 3464 	str.w	r3, [r2, #1124]	@ 0x464
+2001a1de:	f04f 43a0 	mov.w	r3, #1342177280	@ 0x50000000
+2001a1e2:	6cda      	ldr	r2, [r3, #76]	@ 0x4c
+2001a1e4:	f012 6280 	ands.w	r2, r2, #67108864	@ 0x4000000
+2001a1e8:	d1f9      	bne.n	2001a1de <dmaIrqHandler+0x2ee>
+2001a1ea:	f04f 45a0 	mov.w	r5, #1342177280	@ 0x50000000
+2001a1ee:	f04f 4400 	mov.w	r4, #2147483648	@ 0x80000000
+2001a1f2:	4b12      	ldr	r3, [pc, #72]	@ (2001a23c <dmaIrqHandler+0x34c>)
+2001a1f4:	4912      	ldr	r1, [pc, #72]	@ (2001a240 <dmaIrqHandler+0x350>)
+2001a1f6:	681b      	ldr	r3, [r3, #0]
+2001a1f8:	f8df c050 	ldr.w	ip, [pc, #80]	@ 2001a24c <dmaIrqHandler+0x35c>
+2001a1fc:	f8c5 340c 	str.w	r3, [r5, #1036]	@ 0x40c
+2001a200:	6808      	ldr	r0, [r1, #0]
+2001a202:	f8df e04c 	ldr.w	lr, [pc, #76]	@ 2001a250 <dmaIrqHandler+0x360>
+2001a206:	f020 0002 	bic.w	r0, r0, #2
+2001a20a:	6008      	str	r0, [r1, #0]
+2001a20c:	480d      	ldr	r0, [pc, #52]	@ (2001a244 <dmaIrqHandler+0x354>)
+2001a20e:	f8c0 40e8 	str.w	r4, [r0, #232]	@ 0xe8
+2001a212:	f8c0 40e8 	str.w	r4, [r0, #232]	@ 0xe8
+2001a216:	2420      	movs	r4, #32
+2001a218:	f500 5080 	add.w	r0, r0, #4096	@ 0x1000
+2001a21c:	6004      	str	r4, [r0, #0]
+2001a21e:	f8dc 0000 	ldr.w	r0, [ip]
+2001a222:	f000 001f 	and.w	r0, r0, #31
+2001a226:	f8c1 00f0 	str.w	r0, [r1, #240]	@ 0xf0
+2001a22a:	6808      	ldr	r0, [r1, #0]
+2001a22c:	f040 0002 	orr.w	r0, r0, #2
+2001a230:	6008      	str	r0, [r1, #0]
+2001a232:	f8ce 2000 	str.w	r2, [lr]
+2001a236:	4a04      	ldr	r2, [pc, #16]	@ (2001a248 <dmaIrqHandler+0x358>)
+2001a238:	67ea      	str	r2, [r5, #124]	@ 0x7c
+2001a23a:	e6a7      	b.n	20019f8c <dmaIrqHandler+0x9c>
+2001a23c:	2002c0ec 	.word	0x2002c0ec
+2001a240:	50200000 	.word	0x50200000
+2001a244:	50201000 	.word	0x50201000
+2001a248:	20081000 	.word	0x20081000
+2001a24c:	2002c0f0 	.word	0x2002c0f0
+2001a250:	20026224 	.word	0x20026224

@@ -1,0 +1,703 @@
+<ADDR> <pico9918_diag_update>:
+push	{r4, r5, r6, r7, lr}
+mov	lr, r8
+movs	r4, #3
+push	{lr}
+ldr	r3, [pc, #772]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ands	r4, r0
+ldr	r5, [r3, #0]
+ldr	r3, [pc, #772]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldrb	r3, [r5, r3]
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+cmp	r4, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+cmp	r4, #3
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+ldr	r3, [pc, #756]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldrb	r3, [r5, r3]
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+cmp	r4, #2
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+pop	{r7}
+mov	r8, r7
+pop	{r4, r5, r6, r7, pc}
+ldr	r3, [pc, #740]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldr	r0, [r3, #0]
+movs	r7, r3
+lsrs	r0, r0, #2
+bl	<ADDR> <__wrap___aeabi_ui2f>
+ldr	r1, [pc, #732]	@ (<ADDR> <pico9918_diag_update+OFF>)
+bl	<ADDR> <__wrap___aeabi_fdiv>
+ldr	r1, [pc, #728]	@ (<ADDR> <pico9918_diag_update+OFF>)
+bl	<ADDR> <__wrap___aeabi_fmul>
+movs	r1, #252	@ 0xfc
+lsls	r1, r1, #22
+bl	<ADDR> <__wrap___aeabi_fadd>
+bl	<ADDR> <__wrap___aeabi_f2uiz>
+ldr	r5, [pc, #712]	@ (<ADDR> <pico9918_diag_update+OFF>)
+movs	r1, #10
+strb	r4, [r5, #11]
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #10]
+movs	r0, r6
+movs	r1, #10
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+adds	r1, #48	@ 0x30
+movs	r0, r4
+strb	r1, [r5, #9]
+movs	r1, #10
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r3, #46	@ 0x2e
+strb	r3, [r5, #7]
+movs	r3, #250	@ 0xfa
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #8]
+lsls	r3, r3, #2
+cmp	r6, r3
+bcc.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #6
+str	r3, [r5, #12]
+adds	r3, #42	@ 0x2a
+strb	r3, [r5, #6]
+ldr	r4, [pc, #640]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldr	r5, [pc, #640]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldr	r3, [r4, #0]
+mov	r8, r3
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r6, #0
+ldr	r2, [pc, #632]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldr	r3, [pc, #632]	@ (<ADDR> <pico9918_diag_update+OFF>)
+str	r6, [r4, #0]
+str	r6, [r7, #0]
+str	r6, [r5, #0]
+ldr	r3, [r3, #40]	@ 0x28
+ldr	r4, [r2, #0]
+movs	r7, r3
+subs	r4, r3, r4
+movs	r0, r4
+mov	r8, r2
+bl	<ADDR> <pico9918_gpu_time>
+bl	<ADDR> <__wrap___aeabi_ui2f>
+adds	r5, r0, #0
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_ui2f>
+adds	r1, r0, #0
+adds	r0, r5, #0
+bl	<ADDR> <__wrap___aeabi_fdiv>
+ldr	r1, [pc, #592]	@ (<ADDR> <pico9918_diag_update+OFF>)
+bl	<ADDR> <__wrap___aeabi_fmul>
+ldr	r1, [pc, #564]	@ (<ADDR> <pico9918_diag_update+OFF>)
+bl	<ADDR> <__wrap___aeabi_fmul>
+movs	r1, #252	@ 0xfc
+lsls	r1, r1, #22
+bl	<ADDR> <__wrap___aeabi_fadd>
+bl	<ADDR> <__wrap___aeabi_f2uiz>
+ldr	r4, [pc, #572]	@ (<ADDR> <pico9918_diag_update+OFF>)
+movs	r1, #10
+strb	r6, [r4, #11]
+movs	r5, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #10]
+movs	r0, r5
+movs	r1, #10
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+adds	r1, #48	@ 0x30
+movs	r0, r6
+strb	r1, [r4, #9]
+movs	r1, #10
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r3, #46	@ 0x2e
+strb	r3, [r4, #7]
+movs	r3, #250	@ 0xfa
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #8]
+lsls	r3, r3, #2
+cmp	r5, r3
+bcc.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #6
+str	r3, [r4, #12]
+adds	r3, #42	@ 0x2a
+strb	r3, [r4, #6]
+bl	<ADDR> <pico9918_gpu_reset_time>
+mov	r3, r8
+str	r7, [r3, #0]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+ldr	r3, [pc, #488]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldr	r0, [r3, #0]
+bl	<ADDR> <__wrap___aeabi_i2f>
+adds	r1, r0, #0
+movs	r0, #131	@ 0x83
+lsls	r0, r0, #23
+bl	<ADDR> <__wrap___aeabi_fsub>
+movs	r1, #246	@ 0xf6
+ldr	r3, [pc, #472]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r5, r0, #0
+lsls	r1, r1, #22
+ldr	r0, [r3, #0]
+bl	<ADDR> <__wrap___aeabi_fmul>
+adds	r1, r0, #0
+adds	r0, r5, #0
+bl	<ADDR> <__wrap___aeabi_fmul>
+ldr	r1, [pc, #456]	@ (<ADDR> <pico9918_diag_update+OFF>)
+bl	<ADDR> <flt2Str.constprop.0>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+ldr	r3, [pc, #452]	@ (<ADDR> <pico9918_diag_update+OFF>)
+movs	r1, #240	@ 0xf0
+ldrb	r2, [r5, r3]
+movs	r0, #0
+lsls	r2, r2, #10
+movs	r3, r2
+ldr	r4, [pc, #444]	@ (<ADDR> <pico9918_diag_update+OFF>)
+lsls	r1, r1, #6
+movs	r6, r4
+ands	r3, r1
+strb	r0, [r4, #11]
+tst	r2, r1
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #48	@ 0x30
+lsrs	r1, r3, #8
+strb	r2, [r4, #10]
+strb	r2, [r4, #9]
+subs	r2, #33	@ 0x21
+ands	r2, r1
+lsrs	r3, r3, #12
+cmp	r2, #9
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #55	@ 0x37
+strb	r2, [r4, #8]
+cmp	r3, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #7
+adds	r3, #48	@ 0x30
+strb	r3, [r6, #7]
+str	r4, [r6, #12]
+bl	<ADDR> <pico9918_display_mode>
+ldr	r3, [pc, #392]	@ (<ADDR> <pico9918_diag_update+OFF>)
+cmp	r0, #1
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #0
+ldrb	r2, [r5, r3]
+ldr	r0, [pc, #384]	@ (<ADDR> <pico9918_diag_update+OFF>)
+lsls	r3, r2, #6
+movs	r6, r0
+strb	r1, [r0, #11]
+cmp	r2, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #48	@ 0x30
+lsrs	r1, r3, #4
+strb	r2, [r0, #10]
+subs	r2, #33	@ 0x21
+ands	r2, r1
+lsrs	r1, r3, #8
+cmp	r2, #9
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #55	@ 0x37
+strb	r2, [r6, #9]
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #15
+lsrs	r3, r3, #12
+ands	r2, r1
+cmp	r2, #9
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #55	@ 0x37
+strb	r2, [r6, #8]
+cmp	r3, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #7
+adds	r3, #48	@ 0x30
+strb	r3, [r6, #7]
+str	r4, [r6, #12]
+bl	<ADDR> <pico9918_display_mode>
+subs	r0, #1
+subs	r3, r0, #1
+sbcs	r0, r3
+movs	r2, #3
+movs	r1, #0
+negs	r3, r0
+ands	r3, r2
+ldr	r2, [pc, #296]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldr	r0, [pc, #300]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldrb	r2, [r5, r2]
+adds	r3, #4
+ands	r3, r2
+movs	r6, r0
+lsls	r2, r3, #11
+strb	r1, [r0, #11]
+cmp	r3, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #48	@ 0x30
+lsrs	r1, r2, #12
+strb	r3, [r0, #10]
+strb	r3, [r0, #9]
+lsrs	r2, r2, #8
+subs	r3, #33	@ 0x21
+ands	r3, r2
+adds	r3, #48	@ 0x30
+strb	r3, [r0, #8]
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #7
+adds	r1, #48	@ 0x30
+strb	r1, [r0, #7]
+ldr	r3, [pc, #252]	@ (<ADDR> <pico9918_diag_update+OFF>)
+str	r4, [r6, #12]
+ldrb	r2, [r5, r3]
+movs	r1, #254	@ 0xfe
+lsls	r2, r2, #7
+movs	r3, r2
+movs	r0, #0
+ldr	r4, [pc, #244]	@ (<ADDR> <pico9918_diag_update+OFF>)
+lsls	r1, r1, #6
+movs	r6, r4
+ands	r3, r1
+strb	r0, [r4, #11]
+tst	r2, r1
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #48	@ 0x30
+lsrs	r1, r3, #4
+strb	r2, [r4, #10]
+subs	r2, #33	@ 0x21
+ands	r1, r2
+adds	r1, #48	@ 0x30
+lsrs	r0, r3, #8
+strb	r1, [r4, #9]
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+ands	r2, r0
+lsrs	r3, r3, #12
+cmp	r2, #9
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #55	@ 0x37
+strb	r2, [r4, #8]
+cmp	r3, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #7
+adds	r3, #48	@ 0x30
+strb	r3, [r6, #7]
+ldr	r3, [pc, #184]	@ (<ADDR> <pico9918_diag_update+OFF>)
+str	r4, [r6, #12]
+ldrb	r3, [r5, r3]
+movs	r1, #224	@ 0xe0
+lsls	r3, r3, #11
+movs	r2, r3
+movs	r0, #0
+ldr	r5, [pc, #176]	@ (<ADDR> <pico9918_diag_update+OFF>)
+lsls	r1, r1, #6
+ands	r2, r1
+strb	r0, [r5, #11]
+tst	r3, r1
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #48	@ 0x30
+lsrs	r1, r2, #12
+strb	r3, [r5, #10]
+strb	r3, [r5, #9]
+lsrs	r2, r2, #8
+subs	r3, #33	@ 0x21
+ands	r3, r2
+adds	r3, #48	@ 0x30
+strb	r3, [r5, #8]
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #7
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #7]
+str	r4, [r5, #12]
+bl	<ADDR> <pico9918_display_mode>
+ldr	r3, [pc, #128]	@ (<ADDR> <pico9918_diag_update+OFF>)
+lsls	r0, r0, #2
+ldr	r0, [r0, r3]
+ldr	r2, [pc, #128]	@ (<ADDR> <pico9918_diag_update+OFF>)
+ldrb	r1, [r0, #0]
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+strb	r1, [r2, #0]
+ldrb	r1, [r0, #1]
+adds	r0, #1
+adds	r2, #1
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #0
+strb	r3, [r2, #0]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r1, #10
+movs	r0, r6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #664]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #6]
+cmp	r5, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #640]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #5]
+cmp	r5, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #616]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #4]
+cmp	r5, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #592]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #3]
+cmp	r5, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #568]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #2]
+cmp	r5, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r6, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #544]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r4, #1]
+cmp	r5, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r3, #0
+adds	r0, #48	@ 0x30
+strb	r0, [r4, #0]
+str	r3, [r4, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #480]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #6]
+cmp	r6, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #456]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #5]
+cmp	r6, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #432]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #4]
+cmp	r6, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #408]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #3]
+cmp	r6, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #384]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #2]
+cmp	r6, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r1, #10
+movs	r4, r0
+bl	<ADDR> <__wrap___aeabi_uidiv>
+ldr	r3, [pc, #360]	@ (<ADDR> <pico9918_diag_update+OFF>)
+adds	r1, #48	@ 0x30
+strb	r1, [r5, #1]
+cmp	r6, r3
+bhi.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r1, #10
+movs	r0, r4
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r3, #0
+adds	r0, #48	@ 0x30
+strb	r0, [r5, #0]
+str	r3, [r5, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+ldr	r0, [r5, #0]
+bl	<ADDR> <__wrap___aeabi_ui2f>
+adds	r6, r0, #0
+mov	r0, r8
+bl	<ADDR> <__wrap___aeabi_ui2f>
+adds	r1, r0, #0
+adds	r0, r6, #0
+bl	<ADDR> <__wrap___aeabi_fdiv>
+ldr	r1, [pc, #312]	@ (<ADDR> <pico9918_diag_update+OFF>)
+bl	<ADDR> <flt2Str.constprop.0>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #48	@ 0x30
+strb	r2, [r4, #8]
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #8
+movs	r2, #0
+subs	r4, #1
+subs	r4, r4, r2
+movs	r1, #48	@ 0x30
+adds	r2, #1
+adds	r0, r6, r4
+bl	<ADDR> <__wrap_memset>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #48	@ 0x30
+strb	r2, [r6, #8]
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #1
+movs	r4, #8
+subs	r2, #1
+subs	r4, #1
+subs	r4, r4, r2
+movs	r1, #48	@ 0x30
+adds	r2, #1
+adds	r0, r6, r4
+bl	<ADDR> <__wrap_memset>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #48	@ 0x30
+strb	r2, [r4, #8]
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #1
+movs	r4, #8
+subs	r2, #1
+subs	r4, #1
+subs	r4, r4, r2
+movs	r1, #48	@ 0x30
+adds	r2, #1
+adds	r0, r6, r4
+bl	<ADDR> <__wrap_memset>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #0
+ldrb	r3, [r5, r3]
+ldr	r1, [pc, #208]	@ (<ADDR> <pico9918_diag_update+OFF>)
+lsrs	r3, r3, #7
+movs	r6, r1
+strb	r2, [r1, #11]
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #48	@ 0x30
+strb	r3, [r6, #10]
+strb	r3, [r6, #9]
+movs	r3, #128	@ 0x80
+movs	r1, #32
+lsls	r3, r3, #6
+b.n	<ADDR> <pico9918_diag_update+OFF>
+adds	r2, #48	@ 0x30
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #11
+movs	r2, #3
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #11
+movs	r2, #3
+subs	r4, #1
+subs	r4, r4, r2
+movs	r1, #48	@ 0x30
+adds	r2, #1
+adds	r0, r6, r4
+bl	<ADDR> <__wrap_memset>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #11
+movs	r2, #3
+subs	r4, #1
+subs	r4, r4, r2
+movs	r1, #48	@ 0x30
+adds	r2, #1
+adds	r0, r5, r4
+bl	<ADDR> <__wrap_memset>
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #11
+movs	r2, #3
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #8
+movs	r2, #0
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #8
+movs	r2, #0
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #2
+movs	r4, #9
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #6
+str	r3, [r5, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #6
+str	r3, [r4, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r2, #2
+movs	r4, #9
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #5
+str	r3, [r5, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #5
+str	r3, [r4, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #4
+str	r3, [r5, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #4
+str	r3, [r4, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #3
+str	r3, [r4, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #3
+str	r3, [r5, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #2
+str	r3, [r4, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #2
+str	r3, [r5, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #1
+str	r3, [r5, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r3, #1
+str	r3, [r4, #12]
+b.n	<ADDR> <pico9918_diag_update+OFF>
+movs	r4, #11
+movs	r2, #3
+b.n	<ADDR> <pico9918_diag_update+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

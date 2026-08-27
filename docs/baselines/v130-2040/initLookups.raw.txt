@@ -1,0 +1,57 @@
+100016d8 <initLookups>:
+100016d8:	b510      	push	{r4, lr}
+100016da:	4c16      	ldr	r4, [pc, #88]	@ (10001734 <initLookups+0x5c>)
+100016dc:	7823      	ldrb	r3, [r4, #0]
+100016de:	2b00      	cmp	r3, #0
+100016e0:	d127      	bne.n	10001732 <initLookups+0x5a>
+100016e2:	20e4      	movs	r0, #228	@ 0xe4
+100016e4:	f000 fa34 	bl	10001b50 <__dma_claim_mask_veneer>
+100016e8:	f7ff ff62 	bl	100015b0 <ecmLookupInit>
+100016ec:	f7ff ffa0 	bl	10001630 <doubledBitsInit>
+100016f0:	f7ff ffce 	bl	10001690 <reversedBitsInit>
+100016f4:	f7ff ffe0 	bl	100016b8 <ecm0PaletteInit>
+100016f8:	4b0f      	ldr	r3, [pc, #60]	@ (10001738 <initLookups+0x60>)
+100016fa:	4a10      	ldr	r2, [pc, #64]	@ (1000173c <initLookups+0x64>)
+100016fc:	4910      	ldr	r1, [pc, #64]	@ (10001740 <initLookups+0x68>)
+100016fe:	611a      	str	r2, [r3, #16]
+10001700:	4a10      	ldr	r2, [pc, #64]	@ (10001744 <initLookups+0x6c>)
+10001702:	601a      	str	r2, [r3, #0]
+10001704:	2240      	movs	r2, #64	@ 0x40
+10001706:	609a      	str	r2, [r3, #8]
+10001708:	4b0f      	ldr	r3, [pc, #60]	@ (10001748 <initLookups+0x70>)
+1000170a:	4a10      	ldr	r2, [pc, #64]	@ (1000174c <initLookups+0x74>)
+1000170c:	611a      	str	r2, [r3, #16]
+1000170e:	4a10      	ldr	r2, [pc, #64]	@ (10001750 <initLookups+0x78>)
+10001710:	601a      	str	r2, [r3, #0]
+10001712:	221b      	movs	r2, #27
+10001714:	609a      	str	r2, [r3, #8]
+10001716:	4b0f      	ldr	r3, [pc, #60]	@ (10001754 <initLookups+0x7c>)
+10001718:	4a0f      	ldr	r2, [pc, #60]	@ (10001758 <initLookups+0x80>)
+1000171a:	611a      	str	r2, [r3, #16]
+1000171c:	4a0f      	ldr	r2, [pc, #60]	@ (1000175c <initLookups+0x84>)
+1000171e:	601a      	str	r2, [r3, #0]
+10001720:	4b0f      	ldr	r3, [pc, #60]	@ (10001760 <initLookups+0x88>)
+10001722:	4a10      	ldr	r2, [pc, #64]	@ (10001764 <initLookups+0x8c>)
+10001724:	601a      	str	r2, [r3, #0]
+10001726:	4b10      	ldr	r3, [pc, #64]	@ (10001768 <initLookups+0x90>)
+10001728:	6019      	str	r1, [r3, #0]
+1000172a:	4b10      	ldr	r3, [pc, #64]	@ (1000176c <initLookups+0x94>)
+1000172c:	611a      	str	r2, [r3, #16]
+1000172e:	2301      	movs	r3, #1
+10001730:	7023      	strb	r3, [r4, #0]
+10001732:	bd10      	pop	{r4, pc}
+10001734:	200292d9 	.word	0x200292d9
+10001738:	50000180 	.word	0x50000180
+1000173c:	001fb029 	.word	0x001fb029
+10001740:	001fb83b 	.word	0x001fb83b
+10001744:	20041a08 	.word	0x20041a08
+10001748:	50000140 	.word	0x50000140
+1000174c:	001fa829 	.word	0x001fa829
+10001750:	20022e2c 	.word	0x20022e2c
+10001754:	50000080 	.word	0x50000080
+10001758:	001f9029 	.word	0x001f9029
+1000175c:	20041a0c 	.word	0x20041a0c
+10001760:	20028e9c 	.word	0x20028e9c
+10001764:	001fb833 	.word	0x001fb833
+10001768:	20028ea0 	.word	0x20028ea0
+1000176c:	500001c0 	.word	0x500001c0

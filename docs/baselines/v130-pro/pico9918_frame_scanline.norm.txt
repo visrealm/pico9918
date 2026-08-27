@@ -1,0 +1,338 @@
+<ADDR> <pico9918_frame_scanline>:
+stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ldrh	r3, [r1, #0]
+sub	sp, #44	@ 0x2c
+mov	r9, r1
+mov	r7, r2
+str	r3, [sp, #8]
+mov	sl, r0
+ubfx	r5, r0, #0, #12
+bl	<ADDR> <pico9918_line_bytes>
+mov	r6, r0
+bl	<ADDR> <pico9918_display_mode>
+cmp	r0, #4
+mov.w	r0, #7
+beq.w	<ADDR> <pico9918_frame_scanline+OFF>
+bl	<ADDR> <pico9918_reg_value>
+ldr.w	r8, [pc, #784]	@ <ADDR> <pico9918_frame_scanline+OFF>
+and.w	r0, r0, #15
+ldr.w	r3, [r8]
+add.w	r3, r3, #24576	@ 0x6000
+ldrb	r3, [r3, #24]
+lsls	r3, r3, #4
+and.w	r3, r3, #48	@ 0x30
+orrs	r3, r0
+ldr	r4, [pc, #740]	@ (<ADDR> <pico9918_frame_scanline+OFF>)
+ldr.w	r2, [r4, r3, lsl #2]
+ldr	r3, [pc, #736]	@ (<ADDR> <pico9918_frame_scanline+OFF>)
+str	r2, [r3, #0]
+cbnz	r5, <ADDR> <pico9918_frame_scanline+OFF>
+ldr.w	r3, [r8]
+add.w	r3, r3, #65536	@ 0x10000
+strb.w	r5, [r3, #1518]	@ 0x5ee
+mov.w	r3, #1342177280	@ 0xADDR
+ldr.w	r2, [r3, #144]	@ 0x90
+lsls	r0, r2, #5
+bmi.n	<ADDR> <pico9918_frame_scanline+OFF>
+ldr.w	fp, [pc, #728]	@ <ADDR> <pico9918_frame_scanline+OFF>
+ldr.w	ip, [pc, #728]	@ <ADDR> <pico9918_frame_scanline+OFF>
+ldr.w	r0, [fp]
+ldr.w	r2, [ip]
+cmp	r5, r0
+add.w	lr, r0, r2
+ldr.w	r2, [r8]
+bcc.w	<ADDR> <pico9918_frame_scanline+OFF>
+cmp	r5, lr
+bcs.w	<ADDR> <pico9918_frame_scanline+OFF>
+ldr	r1, [sp, #8]
+subs	r0, r5, r0
+subs.w	r3, r1, #512	@ 0x200
+it	mi
+mvnmi.w	ip, #508	@ 0x1fc
+uxth	r5, r0
+mov.w	r0, #0
+it	mi
+addmi.w	r3, r1, ip
+asrs	r3, r3, #2
+str	r3, [sp, #12]
+mov.w	r3, #1342177280	@ 0xADDR
+ldr	r1, [pc, #640]	@ (<ADDR> <pico9918_frame_scanline+OFF>)
+ldr	r1, [r1, #40]	@ 0x28
+str	r5, [sp, #8]
+str	r1, [sp, #28]
+add.w	r1, r2, #28672	@ 0x7000
+strb	r0, [r1, #1]
+ldr	r0, [sp, #8]
+strb	r5, [r1, #0]
+add.w	r5, r2, #45056	@ 0xb000
+strb	r0, [r5, #3]
+ldr	r0, [sp, #12]
+str.w	r0, [r3, #136]	@ 0x88
+str.w	r7, [r3, #172]	@ 0xac
+add.w	r3, r2, #65536	@ 0x10000
+str	r3, [sp, #24]
+ldrb.w	r3, [r3, #52]	@ 0x34
+cmp	r3, #0
+bne.w	<ADDR> <pico9918_frame_scanline+OFF>
+ldrsb.w	r3, [r5, #2]
+cmp	r3, #0
+blt.w	<ADDR> <pico9918_frame_scanline+OFF>
+ldrb.w	r3, [r9, #4]
+add.w	r2, r2, #24576	@ 0x6000
+cbz	r3, <ADDR> <pico9918_frame_scanline+OFF>
+ldrb	r3, [r2, #0]
+lsls	r0, r3, #28
+bmi.w	<ADDR> <pico9918_frame_scanline+OFF>
+ldr	r0, [sp, #8]
+ldr.w	sl, [pc, #560]	@ <ADDR> <pico9918_frame_scanline+OFF>
+strd	r2, r1, [sp, #16]
+ldr.w	r3, [sl, #40]	@ 0x28
+str	r3, [sp, #36]	@ 0x24
+bl	<ADDR> <pico9918_scan_line>
+ldr.w	r3, [sl, #40]	@ 0x28
+mov	sl, r0
+str	r3, [sp, #32]
+bl	<ADDR> <pico9918_line_source>
+ldr	r1, [sp, #20]
+mov	r3, r0
+ldrb	r0, [r1, #0]
+ldrb	r1, [r5, #1]
+ldr	r2, [sp, #16]
+and.w	r1, r1, #252	@ 0xfc
+strb	r1, [r5, #1]
+cbz	r0, <ADDR> <pico9918_frame_scanline+OFF>
+ldrb.w	ip, [r2, #19]
+cmp	ip, r0
+beq.w	<ADDR> <pico9918_frame_scanline+OFF>
+ldrb.w	r2, [r2, #50]	@ 0x32
+lsls	r1, r2, #25
+bpl.n	<ADDR> <pico9918_frame_scanline+OFF>
+movs	r2, #1
+ldr	r1, [sp, #24]
+strb.w	r2, [r1, #48]	@ 0x30
+mov	r0, sl
+str	r3, [sp, #16]
+bl	<ADDR> <pico9918_frame_update_interrupts>
+mov.w	r1, #1342177280	@ 0xADDR
+ldr	r3, [sp, #16]
+ldr.w	r2, [r1, #144]	@ 0x90
+lsls	r2, r2, #5
+bmi.n	<ADDR> <pico9918_frame_scanline+OFF>
+movs	r5, #1
+ldr.w	r1, [r8]
+ldr	r2, [sp, #12]
+add.w	ip, r1, #28672	@ 0x7000
+cmp.w	r6, #256	@ 0x100
+mov.w	r0, r2, lsl #2
+strb.w	r5, [ip, #1]
+add.w	r2, r7, r2, lsl #2
+beq.w	<ADDR> <pico9918_frame_scanline+OFF>
+adds	r5, r3, r6
+cmp	r3, r5
+bcs.n	<ADDR> <pico9918_frame_scanline+OFF>
+subs	r6, #1
+add.w	r5, r3, #16
+bic.w	r6, r6, #7
+adds	r2, #16
+add	r6, r5
+adds	r3, #8
+ldrb.w	r5, [r3, #-8]
+ldrb.w	ip, [r3, #-7]
+ldrh.w	r5, [r4, r5, lsl #2]
+ldr.w	ip, [r4, ip, lsl #2]
+adds	r3, #8
+orr.w	r5, r5, ip, lsl #16
+str.w	r5, [r2, #-16]
+ldrb.w	r5, [r3, #-14]
+ldrb.w	ip, [r3, #-13]
+ldrh.w	r5, [r4, r5, lsl #2]
+ldr.w	ip, [r4, ip, lsl #2]
+adds	r2, #16
+orr.w	r5, r5, ip, lsl #16
+str.w	r5, [r2, #-28]
+ldrb.w	r5, [r3, #-12]
+ldrb.w	ip, [r3, #-11]
+ldrh.w	r5, [r4, r5, lsl #2]
+ldr.w	ip, [r4, ip, lsl #2]
+orr.w	r5, r5, ip, lsl #16
+str.w	r5, [r2, #-24]
+ldrb.w	r5, [r3, #-10]
+ldrb.w	ip, [r3, #-9]
+ldrh.w	r5, [r4, r5, lsl #2]
+ldr.w	ip, [r4, ip, lsl #2]
+cmp	r3, r6
+orr.w	r5, r5, ip, lsl #16
+str.w	r5, [r2, #-20]
+bne.n	<ADDR> <pico9918_frame_scanline+OFF>
+mov.w	r2, #1342177280	@ 0xADDR
+add.w	r0, r0, #1024	@ 0x400
+add	r0, r7
+add.w	r1, r1, #65536	@ 0x10000
+str.w	r0, [r2, #172]	@ 0xac
+ldrb.w	r3, [r1, #96]	@ 0x60
+cmp	r3, #0
+bne.n	<ADDR> <pico9918_frame_scanline+OFF>
+ldrb.w	r3, [r1, #98]	@ 0x62
+cmp	r3, #0
+bne.n	<ADDR> <pico9918_frame_scanline+OFF>
+movs	r0, #0
+add	sp, #44	@ 0x2c
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+movs	r4, #1
+ldrh.w	r1, [r9]
+lsrs	r1, r4
+str.w	r1, [r3, #136]	@ 0x88
+add.w	r1, r2, #28672	@ 0x7000
+str.w	r7, [r3, #172]	@ 0xac
+strb	r4, [r1, #1]
+subs	r3, r5, r0
+strb	r3, [r1, #0]
+add.w	r1, r2, #45056	@ 0xb000
+strb	r3, [r1, #3]
+ldr	r3, [pc, #236]	@ (<ADDR> <pico9918_frame_scanline+OFF>)
+ldr	r4, [pc, #240]	@ (<ADDR> <pico9918_frame_scanline+OFF>)
+ldrb	r3, [r3, #0]
+cbz	r3, <ADDR> <pico9918_frame_scanline+OFF>
+ldr	r3, [r4, #0]
+cmp.w	r3, #600	@ 0x258
+blt.n	<ADDR> <pico9918_frame_scanline+OFF>
+subs	r0, #1
+cmp	r5, r0
+beq.n	<ADDR> <pico9918_frame_scanline+OFF>
+add.w	r3, r2, #24576	@ 0x6000
+ldrb.w	r3, [r3, #50]	@ 0x32
+lsls	r3, r3, #25
+bpl.n	<ADDR> <pico9918_frame_scanline+OFF>
+movs	r3, #1
+add.w	r2, r2, #65536	@ 0x10000
+strb.w	r3, [r2, #48]	@ 0x30
+movs	r0, #1
+add	sp, #44	@ 0x2c
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+mov.w	r2, #1342177280	@ 0xADDR
+ldr.w	r3, [r2, #144]	@ 0x90
+lsls	r1, r3, #5
+bmi.n	<ADDR> <pico9918_frame_scanline+OFF>
+str	r7, [sp, #4]
+ldrh.w	r3, [r9, #2]
+mov	r0, r5
+str	r3, [sp, #0]
+ldr.w	r3, [ip]
+ldr.w	r2, [fp]
+ldr	r1, [r4, #0]
+bl	<ADDR> <pico9918_splash_render>
+ldr	r3, [r4, #0]
+ldr.w	r2, [r8]
+cmp.w	r3, #900	@ 0x384
+bgt.n	<ADDR> <pico9918_frame_scanline+OFF>
+ldr.w	r0, [fp]
+subs	r0, #1
+cmp	r5, r0
+bne.n	<ADDR> <pico9918_frame_scanline+OFF>
+str	r2, [sp, #8]
+bl	<ADDR> <pico9918_palette_regenerate>
+ldr	r2, [sp, #8]
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+ldr.w	r3, [r2, #144]	@ 0x90
+lsls	r3, r3, #5
+bmi.n	<ADDR> <pico9918_frame_scanline+OFF>
+ldr	r3, [sp, #8]
+ldr.w	r0, [fp]
+ldrh.w	r1, [r9, #2]
+adds	r0, r3, r0
+mov	r2, r7
+uxth	r0, r0
+bl	<ADDR> <pico9918_diag_render>
+ldr.w	r1, [r8]
+add.w	r1, r1, #65536	@ 0x10000
+ldrb.w	r3, [r1, #98]	@ 0x62
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_frame_scanline+OFF>
+ldrd	r2, r1, [sp, #32]
+ldr	r3, [pc, #64]	@ (<ADDR> <pico9918_frame_scanline+OFF>)
+subs	r0, r2, r1
+ldr	r1, [r3, #40]	@ 0x28
+ldr	r3, [sp, #28]
+subs	r1, r1, r3
+bl	<ADDR> <pico9918_diag_update_render_time>
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+strd	r2, r1, [sp, #16]
+bl	<ADDR> <pico9918_palette_regenerate>
+ldrd	r2, r1, [sp, #16]
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+movs	r4, #1
+ldrh.w	r1, [r9]
+cmp	r5, lr
+lsr.w	r1, r1, r4
+str.w	r1, [r3, #136]	@ 0x88
+add.w	r1, r2, #28672	@ 0x7000
+str.w	r7, [r3, #172]	@ 0xac
+strb	r4, [r1, #1]
+bcc.n	<ADDR> <pico9918_frame_scanline+OFF>
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+cmp.w	r6, #256	@ 0x100
+bne.w	<ADDR> <pico9918_frame_scanline+OFF>
+bl	<ADDR> <pico9918_reg_value>
+ldr.w	r8, [pc, #180]	@ <ADDR> <pico9918_frame_scanline+OFF>
+and.w	r3, r0, #15
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+mov.w	r4, #<ADDR>	@ 0xADDR
+movs	r1, #1
+add.w	r3, r2, #65536	@ 0x10000
+ldr.w	r0, [fp]
+str	r4, [r3, #96]	@ 0x60
+strb.w	r1, [r3, #100]	@ 0x64
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+ldrb.w	r3, [r9, #5]
+ubfx	r0, sl, #12, #1
+eors	r0, r3
+ldr	r3, [sp, #8]
+add.w	r0, r0, r3, lsl #1
+uxth	r0, r0
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+orr.w	r1, r1, #1
+orn	sl, sl, #127	@ 0x7f
+strb	r1, [r5, #1]
+uxtb.w	sl, sl
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+add.w	r5, r2, #32
+adds	r3, #8
+add.w	r2, r2, #1056	@ 0x420
+ldrb.w	r6, [r3, #-8]
+adds	r5, #32
+ldr.w	r6, [r4, r6, lsl #2]
+adds	r3, #8
+str.w	r6, [r5, #-64]
+ldrb.w	r6, [r3, #-15]
+ldr.w	r6, [r4, r6, lsl #2]
+str.w	r6, [r5, #-60]
+ldrb.w	r6, [r3, #-14]
+ldr.w	r6, [r4, r6, lsl #2]
+str.w	r6, [r5, #-56]
+ldrb.w	r6, [r3, #-13]
+ldr.w	r6, [r4, r6, lsl #2]
+str.w	r6, [r5, #-52]
+ldrb.w	r6, [r3, #-12]
+ldr.w	r6, [r4, r6, lsl #2]
+str.w	r6, [r5, #-48]
+ldrb.w	r6, [r3, #-11]
+ldr.w	r6, [r4, r6, lsl #2]
+str.w	r6, [r5, #-44]
+ldrb.w	r6, [r3, #-10]
+ldr.w	r6, [r4, r6, lsl #2]
+str.w	r6, [r5, #-40]
+ldrb.w	r6, [r3, #-9]
+ldr.w	r6, [r4, r6, lsl #2]
+str.w	r6, [r5, #-36]
+cmp	r5, r2
+bne.n	<ADDR> <pico9918_frame_scanline+OFF>
+b.n	<ADDR> <pico9918_frame_scanline+OFF>
+	.word	<ADDR>

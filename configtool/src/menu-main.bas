@@ -275,9 +275,9 @@ mainMenu: PROCEDURE
             menu = 0
 
             SELECT CASE vdpOptId
-                CASE CONF_CRT_SCANLINES
+                CASE PICO9918_CONF_CRT_SCANLINES
                     VDP_REG(50) = currentValueIndex * $04
-                CASE CONF_SCANLINE_SPRITES
+                CASE PICO9918_CONF_SCANLINE_SPRITES
                     VDP_REG(30) = pow2(currentValueIndex + 2)
             	CASE CONF_MENU_FIRMWARE
                     menu = MENU_ID_FIRMWARE

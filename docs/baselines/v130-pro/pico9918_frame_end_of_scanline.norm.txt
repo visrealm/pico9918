@@ -1,0 +1,49 @@
+<ADDR> <pico9918_frame_end_of_scanline>:
+ldr	r3, [pc, #136]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldr	r3, [r3, #0]
+add.w	r2, r3, #65536	@ 0x10000
+ldrb.w	r1, [r2, #1518]	@ 0x5ee
+cbz	r1, <ADDR> <pico9918_frame_end_of_scanline+OFF>
+bx	lr
+push	{r4, lr}
+mov	r4, r3
+ldr	r1, [pc, #120]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldr	r3, [pc, #124]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldr	r0, [r1, #0]
+ldrb.w	ip, [r2, #1517]	@ 0x5ed
+and.w	r0, r0, #15
+ldrb	r1, [r3, r0]
+ldr.w	lr, [pc, #112]	@ <ADDR> <pico9918_frame_end_of_scanline+OFF>
+rsb	r1, r1, ip, lsr #7
+mov.w	ip, ip, lsr #7
+strb.w	ip, [r3, r0]
+add.w	r3, r4, #24576	@ 0x6000
+ldrb.w	ip, [r3, #50]	@ 0x32
+ldr.w	r3, [lr]
+add.w	r0, r4, #45056	@ 0xb000
+add	r3, r1
+str.w	r3, [lr]
+ldrb	r3, [r0, #1]
+tst.w	ip, #32
+orr.w	r3, r3, #2
+strb	r3, [r0, #1]
+mov.w	r3, #1
+strb.w	r3, [r2, #1518]	@ 0x5ee
+it	ne
+strbne.w	r3, [r2, #48]	@ 0x30
+ldrb.w	r3, [r2, #336]	@ 0x150
+cbnz	r3, <ADDR> <pico9918_frame_end_of_scanline+OFF>
+ldmia.w	sp!, {r4, lr}
+movs	r0, #128	@ 0x80
+b.w	<ADDR> <pico9918_frame_update_interrupts>
+movs	r3, #0
+strb.w	r3, [r2, #336]	@ 0x150
+bl	<ADDR> <pico9918_config_apply>
+bl	<ADDR> <pico9918_diag_config_updated>
+ldmia.w	sp!, {r4, lr}
+movs	r0, #128	@ 0x80
+b.w	<ADDR> <pico9918_frame_update_interrupts>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

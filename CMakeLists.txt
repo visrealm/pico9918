@@ -54,7 +54,7 @@ if(NOT DEFINED PICO9918_MAJOR_VER)
     set(PICO9918_MAJOR_VER 1)
 endif()
 if(NOT DEFINED PICO9918_MINOR_VER)
-    set(PICO9918_MINOR_VER 2)
+    set(PICO9918_MINOR_VER 3)
 endif()
 if(NOT DEFINED PICO9918_PATCH_VER)
     set(PICO9918_PATCH_VER 0)
@@ -82,6 +82,15 @@ option(PICO9918_ENABLE_SCART "Enable SCART support" ON)
 option(PICO9918_NO_SPLASH "Disable splash screen" OFF)
 option(PICO9918_DIAG "Enable diagnostic mode" OFF)
 option(PICO9918_GPU_FRAME_COUNTER "Enable GPU frame counter" OFF)
+option(PICO9918_COLD_IN_FLASH "Keep boot-only cold code/data resident in flash (XIP) instead of copying to RAM" ON)
+
+# Live test capture: one copy per scanline into a whole-frame buffer a debug
+# probe can read over SWD. Test builds only - it costs about a microsecond a
+# line, so never take timing readings from a build with it on.
+option(PICO9918_LIVE_TEST "Enable the SWD live test capture buffer" OFF)
+if(PICO9918_LIVE_TEST)
+    add_definitions(-DPICO9918_LIVE_TEST=1)
+endif()
 
 # Custom-hardware behavioural flags (see pico9918_config.cmake). Each emits a
 # define only when enabled, so the C code guards with #ifdef.
@@ -95,8 +104,44 @@ if(PICO9918_INT_ACTIVE_HIGH)
 endif()
 
 add_definitions(-DPICO_BUILD=1)
-add_definitions(-DVR_EMU_TMS9918_SINGLE_INSTANCE=1)
-add_definitions(-DVR_EMU_TMS9918_MODE=1)
+add_definitions(-DPICO9918_SINGLE_INSTANCE=1)
+add_definitions(-DPICO9918_MODE=1)
+
+# Also expose mode as a CMake variable for the library's CMakeLists.txt
+set(PICO9918_MODE 1 CACHE STRING "TMS9918 emulation mode (0=TMS9918, 1=F18A; V9938 is additive via PICO9918_V9938_BASE)")
+
+# 80-column text at eight bits a pixel. A board capability rather than a chip, so it stays
+# orthogonal to PICO9918_MODE: it buys the tile palette select, ECM, the bitmap
+# layer and the shared composite there, none of which four bits a pixel can represent. It costs a
+# 512-byte line and twice the palette expansion, which only the RP2350 has the budget for.
+if(PICO_PLATFORM STREQUAL "rp2350" OR PICO_BOARD STREQUAL "pico9918pro")
+    set(PICO9918_TEXT80_8BPP_DEFAULT ON)
+else()
+    set(PICO9918_TEXT80_8BPP_DEFAULT OFF)
+endif()
+# The option itself is core's, so that a standalone consumer of the published library can
+# set it too. Seeding the cache before add_subdirectory is what makes the board the
+# default here without a second option() shadowing it.
+set(PICO9918_TEXT80_8BPP ${PICO9918_TEXT80_8BPP_DEFAULT} CACHE BOOL
+    "80-column text at 8bpp: ECM, palette select and bitmap layer in T80")
+
+# Generated, so PROJECT_NUMBER comes from the version above rather than being a
+# second place to bump. The library's Doxyfile is templated the same way.
+configure_file(${CMAKE_SOURCE_DIR}/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+
+# API docs: `cmake --build <dir> --target docs`. Optional - the target only
+# exists when doxygen is installed, and is never part of `all`.
+find_package(Doxygen QUIET)
+if(DOXYGEN_FOUND)
+    # Doxygen resolves its paths against the working directory, which is why this runs
+    # from the source root rather than from the build tree the Doxyfile sits in.
+    add_custom_target(docs
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_SOURCE_DIR}/build/doxygen
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Generating API documentation into build/doxygen/html"
+        VERBATIM)
+endif()
 
 
 # Boot clock is VGA 252 MHz. When SCART is detected at runtime, we re-clock to
@@ -160,6 +205,22 @@ foreach(_entry ${PICO9918_PIN_DEFAULTS})
     add_definitions(-DPICO9918_${_name}=${PICO9918_${_name}})
 endforeach()
 
+# Library-facing alias for the /INT pin. The tier-1 PICO9918_HOST_SET_INT op lives in
+# the library's pico platform header, which carries no PICO9918_* names and has no
+# fallback pin - it #errors if this is missing rather than guessing one.
+add_definitions(-DPICO9918_INT_GPIO=${PICO9918_GPIO_INT})
+
+# The firmware's tier-1 host ops header. The library's platform dispatch header
+# includes this by name, so the ENTER/EXIT_CRITICAL and STATUS_VISIBLE macros expand
+# inside the library TUs that use them - no call and no function pointer on the
+# per-active-scanline path.
+add_definitions(-DPICO9918_HOST_OPS_HEADER="pico9918HostOps.h")
+
+# Include paths the ops header needs, applied globally because library TUs resolve
+# it too: src/ for the header itself and gpio.h, and the binary src/ for the
+# pico_generate_pio_header output (tms9918.pio.h) that gpio.h includes.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR}/src)
+
 
 # Output-mode suffix: "" for VGA+SCART, "-vgaonly" otherwise.
 if(NOT CONFIGURATOR_ONLY)
@@ -184,6 +245,8 @@ if(PICO9918_BUILD_COMBINED)
         -DPICO9918_NO_SPLASH=${PICO9918_NO_SPLASH}
         -DPICO9918_DIAG=${PICO9918_DIAG}
         -DPICO9918_GPU_FRAME_COUNTER=${PICO9918_GPU_FRAME_COUNTER}
+        -DPICO9918_LIVE_TEST=${PICO9918_LIVE_TEST}
+        -DPICO9918_COLD_IN_FLASH=${PICO9918_COLD_IN_FLASH}
         -DPICO9918_NO_CLOCKS=${PICO9918_NO_CLOCKS}
         -DPICO9918_INT_ACTIVE_HIGH=${PICO9918_INT_ACTIVE_HIGH}
         -DPICO9918_VERSION_SUFFIX=${PICO9918_VERSION_SUFFIX}
@@ -263,7 +326,30 @@ else()
     # Initialise the Raspberry Pi Pico SDK
     pico_sdk_init()
 
-    add_subdirectory(submodules/vrEmuTms9918)
+    # Library inputs the firmware owns, set before the library is added. The
+    # diag overlay's GPU-frames row is one: the count is host-pushed, so the row
+    # and its setter must be gated by the same option that produces it.
+    set(PICO9918_DIAG_GPU_FRAME_COUNTER ${PICO9918_GPU_FRAME_COUNTER} CACHE BOOL
+        "Diag GPU-frames row (forwarded from PICO9918_GPU_FRAME_COUNTER)" FORCE)
+    # The splash image is board-conditional and the assets live in the library.
+    if(PICO_BOARD STREQUAL "pico9918pro")
+        set(PICO9918_SPLASH_IMAGE res/splash_pro.png)
+    else()
+        set(PICO9918_SPLASH_IMAGE res/splash.png)
+    endif()
+
+    add_subdirectory(core)
+
+    # The library carries its own version, because a published library must. It is
+    # generated from this repository, so the two are one release - and a silent
+    # divergence would ship a package whose version means nothing.
+    set(PICO9918_CORE_EXPECTED_VER
+        "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
+    if(NOT pico9918_core_VERSION VERSION_EQUAL PICO9918_CORE_EXPECTED_VER)
+        message(WARNING "core/CMakeLists.txt says ${pico9918_core_VERSION}, this firmware is "
+                        "${PICO9918_CORE_EXPECTED_VER} - bump the library's project() version too")
+    endif()
+
     add_subdirectory(src)
     add_subdirectory(test)
     add_subdirectory(configtool)

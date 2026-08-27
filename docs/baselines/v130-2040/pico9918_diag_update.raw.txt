@@ -1,0 +1,703 @@
+2001869c <pico9918_diag_update>:
+2001869c:	b5f0      	push	{r4, r5, r6, r7, lr}
+2001869e:	46c6      	mov	lr, r8
+200186a0:	2403      	movs	r4, #3
+200186a2:	b500      	push	{lr}
+200186a4:	4bc1      	ldr	r3, [pc, #772]	@ (200189ac <pico9918_diag_update+0x310>)
+200186a6:	4004      	ands	r4, r0
+200186a8:	681d      	ldr	r5, [r3, #0]
+200186aa:	4bc1      	ldr	r3, [pc, #772]	@ (200189b0 <pico9918_diag_update+0x314>)
+200186ac:	5ceb      	ldrb	r3, [r5, r3]
+200186ae:	2b00      	cmp	r3, #0
+200186b0:	d004      	beq.n	200186bc <pico9918_diag_update+0x20>
+200186b2:	2c00      	cmp	r4, #0
+200186b4:	d00c      	beq.n	200186d0 <pico9918_diag_update+0x34>
+200186b6:	2c03      	cmp	r4, #3
+200186b8:	d100      	bne.n	200186bc <pico9918_diag_update+0x20>
+200186ba:	e099      	b.n	200187f0 <pico9918_diag_update+0x154>
+200186bc:	4bbd      	ldr	r3, [pc, #756]	@ (200189b4 <pico9918_diag_update+0x318>)
+200186be:	5ceb      	ldrb	r3, [r5, r3]
+200186c0:	2b00      	cmp	r3, #0
+200186c2:	d002      	beq.n	200186ca <pico9918_diag_update+0x2e>
+200186c4:	2c02      	cmp	r4, #2
+200186c6:	d100      	bne.n	200186ca <pico9918_diag_update+0x2e>
+200186c8:	e0aa      	b.n	20018820 <pico9918_diag_update+0x184>
+200186ca:	bc80      	pop	{r7}
+200186cc:	46b8      	mov	r8, r7
+200186ce:	bdf0      	pop	{r4, r5, r6, r7, pc}
+200186d0:	4bb9      	ldr	r3, [pc, #740]	@ (200189b8 <pico9918_diag_update+0x31c>)
+200186d2:	6818      	ldr	r0, [r3, #0]
+200186d4:	001f      	movs	r7, r3
+200186d6:	0880      	lsrs	r0, r0, #2
+200186d8:	f7fe faa7 	bl	20016c2a <__wrap___aeabi_ui2f>
+200186dc:	49b7      	ldr	r1, [pc, #732]	@ (200189bc <pico9918_diag_update+0x320>)
+200186de:	f7fe fa56 	bl	20016b8e <__wrap___aeabi_fdiv>
+200186e2:	49b6      	ldr	r1, [pc, #728]	@ (200189bc <pico9918_diag_update+0x320>)
+200186e4:	f7fe fa67 	bl	20016bb6 <__wrap___aeabi_fmul>
+200186e8:	21fc      	movs	r1, #252	@ 0xfc
+200186ea:	0589      	lsls	r1, r1, #22
+200186ec:	f7fe fa4c 	bl	20016b88 <__wrap___aeabi_fadd>
+200186f0:	f7fe faf4 	bl	20016cdc <__wrap___aeabi_f2uiz>
+200186f4:	4db2      	ldr	r5, [pc, #712]	@ (200189c0 <pico9918_diag_update+0x324>)
+200186f6:	210a      	movs	r1, #10
+200186f8:	72ec      	strb	r4, [r5, #11]
+200186fa:	0006      	movs	r6, r0
+200186fc:	f7fe f996 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018700:	3130      	adds	r1, #48	@ 0x30
+20018702:	72a9      	strb	r1, [r5, #10]
+20018704:	0030      	movs	r0, r6
+20018706:	210a      	movs	r1, #10
+20018708:	f7fe f990 	bl	20016a2c <__wrap___aeabi_uidiv>
+2001870c:	210a      	movs	r1, #10
+2001870e:	0004      	movs	r4, r0
+20018710:	f7fe f98c 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018714:	3130      	adds	r1, #48	@ 0x30
+20018716:	0020      	movs	r0, r4
+20018718:	7269      	strb	r1, [r5, #9]
+2001871a:	210a      	movs	r1, #10
+2001871c:	f7fe f986 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018720:	210a      	movs	r1, #10
+20018722:	0004      	movs	r4, r0
+20018724:	f7fe f982 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018728:	232e      	movs	r3, #46	@ 0x2e
+2001872a:	71eb      	strb	r3, [r5, #7]
+2001872c:	23fa      	movs	r3, #250	@ 0xfa
+2001872e:	3130      	adds	r1, #48	@ 0x30
+20018730:	7229      	strb	r1, [r5, #8]
+20018732:	009b      	lsls	r3, r3, #2
+20018734:	429e      	cmp	r6, r3
+20018736:	d300      	bcc.n	2001873a <pico9918_diag_update+0x9e>
+20018738:	e1cb      	b.n	20018ad2 <pico9918_diag_update+0x436>
+2001873a:	2306      	movs	r3, #6
+2001873c:	60eb      	str	r3, [r5, #12]
+2001873e:	332a      	adds	r3, #42	@ 0x2a
+20018740:	71ab      	strb	r3, [r5, #6]
+20018742:	4ca0      	ldr	r4, [pc, #640]	@ (200189c4 <pico9918_diag_update+0x328>)
+20018744:	4da0      	ldr	r5, [pc, #640]	@ (200189c8 <pico9918_diag_update+0x32c>)
+20018746:	6823      	ldr	r3, [r4, #0]
+20018748:	4698      	mov	r8, r3
+2001874a:	2b00      	cmp	r3, #0
+2001874c:	d000      	beq.n	20018750 <pico9918_diag_update+0xb4>
+2001874e:	e21d      	b.n	20018b8c <pico9918_diag_update+0x4f0>
+20018750:	2600      	movs	r6, #0
+20018752:	4a9e      	ldr	r2, [pc, #632]	@ (200189cc <pico9918_diag_update+0x330>)
+20018754:	4b9e      	ldr	r3, [pc, #632]	@ (200189d0 <pico9918_diag_update+0x334>)
+20018756:	6026      	str	r6, [r4, #0]
+20018758:	603e      	str	r6, [r7, #0]
+2001875a:	602e      	str	r6, [r5, #0]
+2001875c:	6a9b      	ldr	r3, [r3, #40]	@ 0x28
+2001875e:	6814      	ldr	r4, [r2, #0]
+20018760:	001f      	movs	r7, r3
+20018762:	1b1c      	subs	r4, r3, r4
+20018764:	0020      	movs	r0, r4
+20018766:	4690      	mov	r8, r2
+20018768:	f000 fef6 	bl	20019558 <pico9918_gpu_time>
+2001876c:	f7fe fa5d 	bl	20016c2a <__wrap___aeabi_ui2f>
+20018770:	1c05      	adds	r5, r0, #0
+20018772:	0020      	movs	r0, r4
+20018774:	f7fe fa59 	bl	20016c2a <__wrap___aeabi_ui2f>
+20018778:	1c01      	adds	r1, r0, #0
+2001877a:	1c28      	adds	r0, r5, #0
+2001877c:	f7fe fa07 	bl	20016b8e <__wrap___aeabi_fdiv>
+20018780:	4994      	ldr	r1, [pc, #592]	@ (200189d4 <pico9918_diag_update+0x338>)
+20018782:	f7fe fa18 	bl	20016bb6 <__wrap___aeabi_fmul>
+20018786:	498d      	ldr	r1, [pc, #564]	@ (200189bc <pico9918_diag_update+0x320>)
+20018788:	f7fe fa15 	bl	20016bb6 <__wrap___aeabi_fmul>
+2001878c:	21fc      	movs	r1, #252	@ 0xfc
+2001878e:	0589      	lsls	r1, r1, #22
+20018790:	f7fe f9fa 	bl	20016b88 <__wrap___aeabi_fadd>
+20018794:	f7fe faa2 	bl	20016cdc <__wrap___aeabi_f2uiz>
+20018798:	4c8f      	ldr	r4, [pc, #572]	@ (200189d8 <pico9918_diag_update+0x33c>)
+2001879a:	210a      	movs	r1, #10
+2001879c:	72e6      	strb	r6, [r4, #11]
+2001879e:	0005      	movs	r5, r0
+200187a0:	f7fe f944 	bl	20016a2c <__wrap___aeabi_uidiv>
+200187a4:	3130      	adds	r1, #48	@ 0x30
+200187a6:	72a1      	strb	r1, [r4, #10]
+200187a8:	0028      	movs	r0, r5
+200187aa:	210a      	movs	r1, #10
+200187ac:	f7fe f93e 	bl	20016a2c <__wrap___aeabi_uidiv>
+200187b0:	210a      	movs	r1, #10
+200187b2:	0006      	movs	r6, r0
+200187b4:	f7fe f93a 	bl	20016a2c <__wrap___aeabi_uidiv>
+200187b8:	3130      	adds	r1, #48	@ 0x30
+200187ba:	0030      	movs	r0, r6
+200187bc:	7261      	strb	r1, [r4, #9]
+200187be:	210a      	movs	r1, #10
+200187c0:	f7fe f934 	bl	20016a2c <__wrap___aeabi_uidiv>
+200187c4:	210a      	movs	r1, #10
+200187c6:	0006      	movs	r6, r0
+200187c8:	f7fe f930 	bl	20016a2c <__wrap___aeabi_uidiv>
+200187cc:	232e      	movs	r3, #46	@ 0x2e
+200187ce:	71e3      	strb	r3, [r4, #7]
+200187d0:	23fa      	movs	r3, #250	@ 0xfa
+200187d2:	3130      	adds	r1, #48	@ 0x30
+200187d4:	7221      	strb	r1, [r4, #8]
+200187d6:	009b      	lsls	r3, r3, #2
+200187d8:	429d      	cmp	r5, r3
+200187da:	d300      	bcc.n	200187de <pico9918_diag_update+0x142>
+200187dc:	e11c      	b.n	20018a18 <pico9918_diag_update+0x37c>
+200187de:	2306      	movs	r3, #6
+200187e0:	60e3      	str	r3, [r4, #12]
+200187e2:	332a      	adds	r3, #42	@ 0x2a
+200187e4:	71a3      	strb	r3, [r4, #6]
+200187e6:	f000 fec3 	bl	20019570 <pico9918_gpu_reset_time>
+200187ea:	4643      	mov	r3, r8
+200187ec:	601f      	str	r7, [r3, #0]
+200187ee:	e76c      	b.n	200186ca <pico9918_diag_update+0x2e>
+200187f0:	4b7a      	ldr	r3, [pc, #488]	@ (200189dc <pico9918_diag_update+0x340>)
+200187f2:	6818      	ldr	r0, [r3, #0]
+200187f4:	f7fe fa1e 	bl	20016c34 <__wrap___aeabi_i2f>
+200187f8:	1c01      	adds	r1, r0, #0
+200187fa:	2083      	movs	r0, #131	@ 0x83
+200187fc:	05c0      	lsls	r0, r0, #23
+200187fe:	f7fe f9c0 	bl	20016b82 <__wrap___aeabi_fsub>
+20018802:	21f6      	movs	r1, #246	@ 0xf6
+20018804:	4b76      	ldr	r3, [pc, #472]	@ (200189e0 <pico9918_diag_update+0x344>)
+20018806:	1c05      	adds	r5, r0, #0
+20018808:	0589      	lsls	r1, r1, #22
+2001880a:	6818      	ldr	r0, [r3, #0]
+2001880c:	f7fe f9d3 	bl	20016bb6 <__wrap___aeabi_fmul>
+20018810:	1c01      	adds	r1, r0, #0
+20018812:	1c28      	adds	r0, r5, #0
+20018814:	f7fe f9cf 	bl	20016bb6 <__wrap___aeabi_fmul>
+20018818:	4972      	ldr	r1, [pc, #456]	@ (200189e4 <pico9918_diag_update+0x348>)
+2001881a:	f7ff fafd 	bl	20017e18 <flt2Str.constprop.0>
+2001881e:	e754      	b.n	200186ca <pico9918_diag_update+0x2e>
+20018820:	4b71      	ldr	r3, [pc, #452]	@ (200189e8 <pico9918_diag_update+0x34c>)
+20018822:	21f0      	movs	r1, #240	@ 0xf0
+20018824:	5cea      	ldrb	r2, [r5, r3]
+20018826:	2000      	movs	r0, #0
+20018828:	0292      	lsls	r2, r2, #10
+2001882a:	0013      	movs	r3, r2
+2001882c:	4c6f      	ldr	r4, [pc, #444]	@ (200189ec <pico9918_diag_update+0x350>)
+2001882e:	0189      	lsls	r1, r1, #6
+20018830:	0026      	movs	r6, r4
+20018832:	400b      	ands	r3, r1
+20018834:	72e0      	strb	r0, [r4, #11]
+20018836:	420a      	tst	r2, r1
+20018838:	d100      	bne.n	2001883c <pico9918_diag_update+0x1a0>
+2001883a:	e20d      	b.n	20018c58 <pico9918_diag_update+0x5bc>
+2001883c:	2230      	movs	r2, #48	@ 0x30
+2001883e:	0a19      	lsrs	r1, r3, #8
+20018840:	72a2      	strb	r2, [r4, #10]
+20018842:	7262      	strb	r2, [r4, #9]
+20018844:	3a21      	subs	r2, #33	@ 0x21
+20018846:	400a      	ands	r2, r1
+20018848:	0b1b      	lsrs	r3, r3, #12
+2001884a:	2a09      	cmp	r2, #9
+2001884c:	d800      	bhi.n	20018850 <pico9918_diag_update+0x1b4>
+2001884e:	e1ac      	b.n	20018baa <pico9918_diag_update+0x50e>
+20018850:	3237      	adds	r2, #55	@ 0x37
+20018852:	7222      	strb	r2, [r4, #8]
+20018854:	2b00      	cmp	r3, #0
+20018856:	d100      	bne.n	2001885a <pico9918_diag_update+0x1be>
+20018858:	e1ac      	b.n	20018bb4 <pico9918_diag_update+0x518>
+2001885a:	2407      	movs	r4, #7
+2001885c:	3330      	adds	r3, #48	@ 0x30
+2001885e:	71f3      	strb	r3, [r6, #7]
+20018860:	60f4      	str	r4, [r6, #12]
+20018862:	f009 fc5d 	bl	20022120 <pico9918_display_mode>
+20018866:	4b62      	ldr	r3, [pc, #392]	@ (200189f0 <pico9918_diag_update+0x354>)
+20018868:	2801      	cmp	r0, #1
+2001886a:	d100      	bne.n	2001886e <pico9918_diag_update+0x1d2>
+2001886c:	e1cc      	b.n	20018c08 <pico9918_diag_update+0x56c>
+2001886e:	2100      	movs	r1, #0
+20018870:	5cea      	ldrb	r2, [r5, r3]
+20018872:	4860      	ldr	r0, [pc, #384]	@ (200189f4 <pico9918_diag_update+0x358>)
+20018874:	0193      	lsls	r3, r2, #6
+20018876:	0006      	movs	r6, r0
+20018878:	72c1      	strb	r1, [r0, #11]
+2001887a:	2a00      	cmp	r2, #0
+2001887c:	d100      	bne.n	20018880 <pico9918_diag_update+0x1e4>
+2001887e:	e21e      	b.n	20018cbe <pico9918_diag_update+0x622>
+20018880:	2230      	movs	r2, #48	@ 0x30
+20018882:	0919      	lsrs	r1, r3, #4
+20018884:	7282      	strb	r2, [r0, #10]
+20018886:	3a21      	subs	r2, #33	@ 0x21
+20018888:	400a      	ands	r2, r1
+2001888a:	0a19      	lsrs	r1, r3, #8
+2001888c:	2a09      	cmp	r2, #9
+2001888e:	d800      	bhi.n	20018892 <pico9918_diag_update+0x1f6>
+20018890:	e1c9      	b.n	20018c26 <pico9918_diag_update+0x58a>
+20018892:	3237      	adds	r2, #55	@ 0x37
+20018894:	7272      	strb	r2, [r6, #9]
+20018896:	2900      	cmp	r1, #0
+20018898:	d100      	bne.n	2001889c <pico9918_diag_update+0x200>
+2001889a:	e1ef      	b.n	20018c7c <pico9918_diag_update+0x5e0>
+2001889c:	220f      	movs	r2, #15
+2001889e:	0b1b      	lsrs	r3, r3, #12
+200188a0:	400a      	ands	r2, r1
+200188a2:	2a09      	cmp	r2, #9
+200188a4:	d800      	bhi.n	200188a8 <pico9918_diag_update+0x20c>
+200188a6:	e18f      	b.n	20018bc8 <pico9918_diag_update+0x52c>
+200188a8:	3237      	adds	r2, #55	@ 0x37
+200188aa:	7232      	strb	r2, [r6, #8]
+200188ac:	2b00      	cmp	r3, #0
+200188ae:	d100      	bne.n	200188b2 <pico9918_diag_update+0x216>
+200188b0:	e18f      	b.n	20018bd2 <pico9918_diag_update+0x536>
+200188b2:	2407      	movs	r4, #7
+200188b4:	3330      	adds	r3, #48	@ 0x30
+200188b6:	71f3      	strb	r3, [r6, #7]
+200188b8:	60f4      	str	r4, [r6, #12]
+200188ba:	f009 fc31 	bl	20022120 <pico9918_display_mode>
+200188be:	3801      	subs	r0, #1
+200188c0:	1e43      	subs	r3, r0, #1
+200188c2:	4198      	sbcs	r0, r3
+200188c4:	2203      	movs	r2, #3
+200188c6:	2100      	movs	r1, #0
+200188c8:	4243      	negs	r3, r0
+200188ca:	4013      	ands	r3, r2
+200188cc:	4a4a      	ldr	r2, [pc, #296]	@ (200189f8 <pico9918_diag_update+0x35c>)
+200188ce:	484b      	ldr	r0, [pc, #300]	@ (200189fc <pico9918_diag_update+0x360>)
+200188d0:	5caa      	ldrb	r2, [r5, r2]
+200188d2:	3304      	adds	r3, #4
+200188d4:	4013      	ands	r3, r2
+200188d6:	0006      	movs	r6, r0
+200188d8:	02da      	lsls	r2, r3, #11
+200188da:	72c1      	strb	r1, [r0, #11]
+200188dc:	2b00      	cmp	r3, #0
+200188de:	d100      	bne.n	200188e2 <pico9918_diag_update+0x246>
+200188e0:	e1a6      	b.n	20018c30 <pico9918_diag_update+0x594>
+200188e2:	2330      	movs	r3, #48	@ 0x30
+200188e4:	0b11      	lsrs	r1, r2, #12
+200188e6:	7283      	strb	r3, [r0, #10]
+200188e8:	7243      	strb	r3, [r0, #9]
+200188ea:	0a12      	lsrs	r2, r2, #8
+200188ec:	3b21      	subs	r3, #33	@ 0x21
+200188ee:	4013      	ands	r3, r2
+200188f0:	3330      	adds	r3, #48	@ 0x30
+200188f2:	7203      	strb	r3, [r0, #8]
+200188f4:	2900      	cmp	r1, #0
+200188f6:	d100      	bne.n	200188fa <pico9918_diag_update+0x25e>
+200188f8:	e1b4      	b.n	20018c64 <pico9918_diag_update+0x5c8>
+200188fa:	2407      	movs	r4, #7
+200188fc:	3130      	adds	r1, #48	@ 0x30
+200188fe:	71c1      	strb	r1, [r0, #7]
+20018900:	4b3f      	ldr	r3, [pc, #252]	@ (20018a00 <pico9918_diag_update+0x364>)
+20018902:	60f4      	str	r4, [r6, #12]
+20018904:	5cea      	ldrb	r2, [r5, r3]
+20018906:	21fe      	movs	r1, #254	@ 0xfe
+20018908:	01d2      	lsls	r2, r2, #7
+2001890a:	0013      	movs	r3, r2
+2001890c:	2000      	movs	r0, #0
+2001890e:	4c3d      	ldr	r4, [pc, #244]	@ (20018a04 <pico9918_diag_update+0x368>)
+20018910:	0189      	lsls	r1, r1, #6
+20018912:	0026      	movs	r6, r4
+20018914:	400b      	ands	r3, r1
+20018916:	72e0      	strb	r0, [r4, #11]
+20018918:	420a      	tst	r2, r1
+2001891a:	d100      	bne.n	2001891e <pico9918_diag_update+0x282>
+2001891c:	e185      	b.n	20018c2a <pico9918_diag_update+0x58e>
+2001891e:	2230      	movs	r2, #48	@ 0x30
+20018920:	0919      	lsrs	r1, r3, #4
+20018922:	72a2      	strb	r2, [r4, #10]
+20018924:	3a21      	subs	r2, #33	@ 0x21
+20018926:	4011      	ands	r1, r2
+20018928:	3130      	adds	r1, #48	@ 0x30
+2001892a:	0a18      	lsrs	r0, r3, #8
+2001892c:	7261      	strb	r1, [r4, #9]
+2001892e:	d100      	bne.n	20018932 <pico9918_diag_update+0x296>
+20018930:	e19b      	b.n	20018c6a <pico9918_diag_update+0x5ce>
+20018932:	4002      	ands	r2, r0
+20018934:	0b1b      	lsrs	r3, r3, #12
+20018936:	2a09      	cmp	r2, #9
+20018938:	d800      	bhi.n	2001893c <pico9918_diag_update+0x2a0>
+2001893a:	e155      	b.n	20018be8 <pico9918_diag_update+0x54c>
+2001893c:	3237      	adds	r2, #55	@ 0x37
+2001893e:	7222      	strb	r2, [r4, #8]
+20018940:	2b00      	cmp	r3, #0
+20018942:	d100      	bne.n	20018946 <pico9918_diag_update+0x2aa>
+20018944:	e155      	b.n	20018bf2 <pico9918_diag_update+0x556>
+20018946:	2407      	movs	r4, #7
+20018948:	3330      	adds	r3, #48	@ 0x30
+2001894a:	71f3      	strb	r3, [r6, #7]
+2001894c:	4b2e      	ldr	r3, [pc, #184]	@ (20018a08 <pico9918_diag_update+0x36c>)
+2001894e:	60f4      	str	r4, [r6, #12]
+20018950:	5ceb      	ldrb	r3, [r5, r3]
+20018952:	21e0      	movs	r1, #224	@ 0xe0
+20018954:	02db      	lsls	r3, r3, #11
+20018956:	001a      	movs	r2, r3
+20018958:	2000      	movs	r0, #0
+2001895a:	4d2c      	ldr	r5, [pc, #176]	@ (20018a0c <pico9918_diag_update+0x370>)
+2001895c:	0189      	lsls	r1, r1, #6
+2001895e:	400a      	ands	r2, r1
+20018960:	72e8      	strb	r0, [r5, #11]
+20018962:	420b      	tst	r3, r1
+20018964:	d100      	bne.n	20018968 <pico9918_diag_update+0x2cc>
+20018966:	e16d      	b.n	20018c44 <pico9918_diag_update+0x5a8>
+20018968:	2330      	movs	r3, #48	@ 0x30
+2001896a:	0b11      	lsrs	r1, r2, #12
+2001896c:	72ab      	strb	r3, [r5, #10]
+2001896e:	726b      	strb	r3, [r5, #9]
+20018970:	0a12      	lsrs	r2, r2, #8
+20018972:	3b21      	subs	r3, #33	@ 0x21
+20018974:	4013      	ands	r3, r2
+20018976:	3330      	adds	r3, #48	@ 0x30
+20018978:	722b      	strb	r3, [r5, #8]
+2001897a:	2900      	cmp	r1, #0
+2001897c:	d100      	bne.n	20018980 <pico9918_diag_update+0x2e4>
+2001897e:	e16e      	b.n	20018c5e <pico9918_diag_update+0x5c2>
+20018980:	2407      	movs	r4, #7
+20018982:	3130      	adds	r1, #48	@ 0x30
+20018984:	71e9      	strb	r1, [r5, #7]
+20018986:	60ec      	str	r4, [r5, #12]
+20018988:	f009 fbca 	bl	20022120 <pico9918_display_mode>
+2001898c:	4b20      	ldr	r3, [pc, #128]	@ (20018a10 <pico9918_diag_update+0x374>)
+2001898e:	0080      	lsls	r0, r0, #2
+20018990:	58c0      	ldr	r0, [r0, r3]
+20018992:	4a20      	ldr	r2, [pc, #128]	@ (20018a14 <pico9918_diag_update+0x378>)
+20018994:	7801      	ldrb	r1, [r0, #0]
+20018996:	2900      	cmp	r1, #0
+20018998:	d005      	beq.n	200189a6 <pico9918_diag_update+0x30a>
+2001899a:	7011      	strb	r1, [r2, #0]
+2001899c:	7841      	ldrb	r1, [r0, #1]
+2001899e:	3001      	adds	r0, #1
+200189a0:	3201      	adds	r2, #1
+200189a2:	2900      	cmp	r1, #0
+200189a4:	d1f9      	bne.n	2001899a <pico9918_diag_update+0x2fe>
+200189a6:	2300      	movs	r3, #0
+200189a8:	7013      	strb	r3, [r2, #0]
+200189aa:	e68e      	b.n	200186ca <pico9918_diag_update+0x2e>
+200189ac:	20022eb0 	.word	0x20022eb0
+200189b0:	00010062 	.word	0x00010062
+200189b4:	00010064 	.word	0x00010064
+200189b8:	200288c4 	.word	0x200288c4
+200189bc:	447a0000 	.word	0x447a0000
+200189c0:	20028570 	.word	0x20028570
+200189c4:	200288cc 	.word	0x200288cc
+200189c8:	200288c8 	.word	0x200288c8
+200189cc:	20028e30 	.word	0x20028e30
+200189d0:	40054000 	.word	0x40054000
+200189d4:	42c80000 	.word	0x42c80000
+200189d8:	20028590 	.word	0x20028590
+200189dc:	20028ea4 	.word	0x20028ea4
+200189e0:	20028e2c 	.word	0x20028e2c
+200189e4:	20028560 	.word	0x20028560
+200189e8:	00006002 	.word	0x00006002
+200189ec:	200285c0 	.word	0x200285c0
+200189f0:	00006003 	.word	0x00006003
+200189f4:	20028550 	.word	0x20028550
+200189f8:	00006004 	.word	0x00006004
+200189fc:	200285e0 	.word	0x200285e0
+20018a00:	00006005 	.word	0x00006005
+20018a04:	20028800 	.word	0x20028800
+20018a08:	00006006 	.word	0x00006006
+20018a0c:	20028810 	.word	0x20028810
+20018a10:	20023204 	.word	0x20023204
+20018a14:	200285b0 	.word	0x200285b0
+20018a18:	210a      	movs	r1, #10
+20018a1a:	0030      	movs	r0, r6
+20018a1c:	f7fe f806 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a20:	210a      	movs	r1, #10
+20018a22:	0006      	movs	r6, r0
+20018a24:	f7fe f802 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a28:	4ba6      	ldr	r3, [pc, #664]	@ (20018cc4 <pico9918_diag_update+0x628>)
+20018a2a:	3130      	adds	r1, #48	@ 0x30
+20018a2c:	71a1      	strb	r1, [r4, #6]
+20018a2e:	429d      	cmp	r5, r3
+20018a30:	d800      	bhi.n	20018a34 <pico9918_diag_update+0x398>
+20018a32:	e120      	b.n	20018c76 <pico9918_diag_update+0x5da>
+20018a34:	210a      	movs	r1, #10
+20018a36:	0030      	movs	r0, r6
+20018a38:	f7fd fff8 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a3c:	210a      	movs	r1, #10
+20018a3e:	0006      	movs	r6, r0
+20018a40:	f7fd fff4 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a44:	4ba0      	ldr	r3, [pc, #640]	@ (20018cc8 <pico9918_diag_update+0x62c>)
+20018a46:	3130      	adds	r1, #48	@ 0x30
+20018a48:	7161      	strb	r1, [r4, #5]
+20018a4a:	429d      	cmp	r5, r3
+20018a4c:	d800      	bhi.n	20018a50 <pico9918_diag_update+0x3b4>
+20018a4e:	e11b      	b.n	20018c88 <pico9918_diag_update+0x5ec>
+20018a50:	210a      	movs	r1, #10
+20018a52:	0030      	movs	r0, r6
+20018a54:	f7fd ffea 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a58:	210a      	movs	r1, #10
+20018a5a:	0006      	movs	r6, r0
+20018a5c:	f7fd ffe6 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a60:	4b9a      	ldr	r3, [pc, #616]	@ (20018ccc <pico9918_diag_update+0x630>)
+20018a62:	3130      	adds	r1, #48	@ 0x30
+20018a64:	7121      	strb	r1, [r4, #4]
+20018a66:	429d      	cmp	r5, r3
+20018a68:	d800      	bhi.n	20018a6c <pico9918_diag_update+0x3d0>
+20018a6a:	e113      	b.n	20018c94 <pico9918_diag_update+0x5f8>
+20018a6c:	210a      	movs	r1, #10
+20018a6e:	0030      	movs	r0, r6
+20018a70:	f7fd ffdc 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a74:	210a      	movs	r1, #10
+20018a76:	0006      	movs	r6, r0
+20018a78:	f7fd ffd8 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a7c:	4b94      	ldr	r3, [pc, #592]	@ (20018cd0 <pico9918_diag_update+0x634>)
+20018a7e:	3130      	adds	r1, #48	@ 0x30
+20018a80:	70e1      	strb	r1, [r4, #3]
+20018a82:	429d      	cmp	r5, r3
+20018a84:	d800      	bhi.n	20018a88 <pico9918_diag_update+0x3ec>
+20018a86:	e108      	b.n	20018c9a <pico9918_diag_update+0x5fe>
+20018a88:	210a      	movs	r1, #10
+20018a8a:	0030      	movs	r0, r6
+20018a8c:	f7fd ffce 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a90:	210a      	movs	r1, #10
+20018a92:	0006      	movs	r6, r0
+20018a94:	f7fd ffca 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018a98:	4b8e      	ldr	r3, [pc, #568]	@ (20018cd4 <pico9918_diag_update+0x638>)
+20018a9a:	3130      	adds	r1, #48	@ 0x30
+20018a9c:	70a1      	strb	r1, [r4, #2]
+20018a9e:	429d      	cmp	r5, r3
+20018aa0:	d800      	bhi.n	20018aa4 <pico9918_diag_update+0x408>
+20018aa2:	e100      	b.n	20018ca6 <pico9918_diag_update+0x60a>
+20018aa4:	210a      	movs	r1, #10
+20018aa6:	0030      	movs	r0, r6
+20018aa8:	f7fd ffc0 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018aac:	210a      	movs	r1, #10
+20018aae:	0006      	movs	r6, r0
+20018ab0:	f7fd ffbc 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018ab4:	4b88      	ldr	r3, [pc, #544]	@ (20018cd8 <pico9918_diag_update+0x63c>)
+20018ab6:	3130      	adds	r1, #48	@ 0x30
+20018ab8:	7061      	strb	r1, [r4, #1]
+20018aba:	429d      	cmp	r5, r3
+20018abc:	d800      	bhi.n	20018ac0 <pico9918_diag_update+0x424>
+20018abe:	e0fb      	b.n	20018cb8 <pico9918_diag_update+0x61c>
+20018ac0:	210a      	movs	r1, #10
+20018ac2:	0030      	movs	r0, r6
+20018ac4:	f7fd ffb2 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018ac8:	2300      	movs	r3, #0
+20018aca:	3030      	adds	r0, #48	@ 0x30
+20018acc:	7020      	strb	r0, [r4, #0]
+20018ace:	60e3      	str	r3, [r4, #12]
+20018ad0:	e689      	b.n	200187e6 <pico9918_diag_update+0x14a>
+20018ad2:	210a      	movs	r1, #10
+20018ad4:	0020      	movs	r0, r4
+20018ad6:	f7fd ffa9 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018ada:	210a      	movs	r1, #10
+20018adc:	0004      	movs	r4, r0
+20018ade:	f7fd ffa5 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018ae2:	4b78      	ldr	r3, [pc, #480]	@ (20018cc4 <pico9918_diag_update+0x628>)
+20018ae4:	3130      	adds	r1, #48	@ 0x30
+20018ae6:	71a9      	strb	r1, [r5, #6]
+20018ae8:	429e      	cmp	r6, r3
+20018aea:	d800      	bhi.n	20018aee <pico9918_diag_update+0x452>
+20018aec:	e0c0      	b.n	20018c70 <pico9918_diag_update+0x5d4>
+20018aee:	210a      	movs	r1, #10
+20018af0:	0020      	movs	r0, r4
+20018af2:	f7fd ff9b 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018af6:	210a      	movs	r1, #10
+20018af8:	0004      	movs	r4, r0
+20018afa:	f7fd ff97 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018afe:	4b72      	ldr	r3, [pc, #456]	@ (20018cc8 <pico9918_diag_update+0x62c>)
+20018b00:	3130      	adds	r1, #48	@ 0x30
+20018b02:	7169      	strb	r1, [r5, #5]
+20018b04:	429e      	cmp	r6, r3
+20018b06:	d800      	bhi.n	20018b0a <pico9918_diag_update+0x46e>
+20018b08:	e0bb      	b.n	20018c82 <pico9918_diag_update+0x5e6>
+20018b0a:	210a      	movs	r1, #10
+20018b0c:	0020      	movs	r0, r4
+20018b0e:	f7fd ff8d 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b12:	210a      	movs	r1, #10
+20018b14:	0004      	movs	r4, r0
+20018b16:	f7fd ff89 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b1a:	4b6c      	ldr	r3, [pc, #432]	@ (20018ccc <pico9918_diag_update+0x630>)
+20018b1c:	3130      	adds	r1, #48	@ 0x30
+20018b1e:	7129      	strb	r1, [r5, #4]
+20018b20:	429e      	cmp	r6, r3
+20018b22:	d800      	bhi.n	20018b26 <pico9918_diag_update+0x48a>
+20018b24:	e0b3      	b.n	20018c8e <pico9918_diag_update+0x5f2>
+20018b26:	210a      	movs	r1, #10
+20018b28:	0020      	movs	r0, r4
+20018b2a:	f7fd ff7f 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b2e:	210a      	movs	r1, #10
+20018b30:	0004      	movs	r4, r0
+20018b32:	f7fd ff7b 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b36:	4b66      	ldr	r3, [pc, #408]	@ (20018cd0 <pico9918_diag_update+0x634>)
+20018b38:	3130      	adds	r1, #48	@ 0x30
+20018b3a:	70e9      	strb	r1, [r5, #3]
+20018b3c:	429e      	cmp	r6, r3
+20018b3e:	d800      	bhi.n	20018b42 <pico9918_diag_update+0x4a6>
+20018b40:	e0ae      	b.n	20018ca0 <pico9918_diag_update+0x604>
+20018b42:	210a      	movs	r1, #10
+20018b44:	0020      	movs	r0, r4
+20018b46:	f7fd ff71 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b4a:	210a      	movs	r1, #10
+20018b4c:	0004      	movs	r4, r0
+20018b4e:	f7fd ff6d 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b52:	4b60      	ldr	r3, [pc, #384]	@ (20018cd4 <pico9918_diag_update+0x638>)
+20018b54:	3130      	adds	r1, #48	@ 0x30
+20018b56:	70a9      	strb	r1, [r5, #2]
+20018b58:	429e      	cmp	r6, r3
+20018b5a:	d800      	bhi.n	20018b5e <pico9918_diag_update+0x4c2>
+20018b5c:	e0a6      	b.n	20018cac <pico9918_diag_update+0x610>
+20018b5e:	210a      	movs	r1, #10
+20018b60:	0020      	movs	r0, r4
+20018b62:	f7fd ff63 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b66:	210a      	movs	r1, #10
+20018b68:	0004      	movs	r4, r0
+20018b6a:	f7fd ff5f 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b6e:	4b5a      	ldr	r3, [pc, #360]	@ (20018cd8 <pico9918_diag_update+0x63c>)
+20018b70:	3130      	adds	r1, #48	@ 0x30
+20018b72:	7069      	strb	r1, [r5, #1]
+20018b74:	429e      	cmp	r6, r3
+20018b76:	d800      	bhi.n	20018b7a <pico9918_diag_update+0x4de>
+20018b78:	e09b      	b.n	20018cb2 <pico9918_diag_update+0x616>
+20018b7a:	210a      	movs	r1, #10
+20018b7c:	0020      	movs	r0, r4
+20018b7e:	f7fd ff55 	bl	20016a2c <__wrap___aeabi_uidiv>
+20018b82:	2300      	movs	r3, #0
+20018b84:	3030      	adds	r0, #48	@ 0x30
+20018b86:	7028      	strb	r0, [r5, #0]
+20018b88:	60eb      	str	r3, [r5, #12]
+20018b8a:	e5da      	b.n	20018742 <pico9918_diag_update+0xa6>
+20018b8c:	6828      	ldr	r0, [r5, #0]
+20018b8e:	f7fe f84c 	bl	20016c2a <__wrap___aeabi_ui2f>
+20018b92:	1c06      	adds	r6, r0, #0
+20018b94:	4640      	mov	r0, r8
+20018b96:	f7fe f848 	bl	20016c2a <__wrap___aeabi_ui2f>
+20018b9a:	1c01      	adds	r1, r0, #0
+20018b9c:	1c30      	adds	r0, r6, #0
+20018b9e:	f7fd fff6 	bl	20016b8e <__wrap___aeabi_fdiv>
+20018ba2:	494e      	ldr	r1, [pc, #312]	@ (20018cdc <pico9918_diag_update+0x640>)
+20018ba4:	f7ff f938 	bl	20017e18 <flt2Str.constprop.0>
+20018ba8:	e5d2      	b.n	20018750 <pico9918_diag_update+0xb4>
+20018baa:	3230      	adds	r2, #48	@ 0x30
+20018bac:	7222      	strb	r2, [r4, #8]
+20018bae:	2b00      	cmp	r3, #0
+20018bb0:	d000      	beq.n	20018bb4 <pico9918_diag_update+0x518>
+20018bb2:	e652      	b.n	2001885a <pico9918_diag_update+0x1be>
+20018bb4:	2408      	movs	r4, #8
+20018bb6:	2200      	movs	r2, #0
+20018bb8:	3c01      	subs	r4, #1
+20018bba:	1aa4      	subs	r4, r4, r2
+20018bbc:	2130      	movs	r1, #48	@ 0x30
+20018bbe:	3201      	adds	r2, #1
+20018bc0:	1930      	adds	r0, r6, r4
+20018bc2:	f7fe f8ef 	bl	20016da4 <__wrap_memset>
+20018bc6:	e64b      	b.n	20018860 <pico9918_diag_update+0x1c4>
+20018bc8:	3230      	adds	r2, #48	@ 0x30
+20018bca:	7232      	strb	r2, [r6, #8]
+20018bcc:	2b00      	cmp	r3, #0
+20018bce:	d000      	beq.n	20018bd2 <pico9918_diag_update+0x536>
+20018bd0:	e66f      	b.n	200188b2 <pico9918_diag_update+0x216>
+20018bd2:	2201      	movs	r2, #1
+20018bd4:	2408      	movs	r4, #8
+20018bd6:	3a01      	subs	r2, #1
+20018bd8:	3c01      	subs	r4, #1
+20018bda:	1aa4      	subs	r4, r4, r2
+20018bdc:	2130      	movs	r1, #48	@ 0x30
+20018bde:	3201      	adds	r2, #1
+20018be0:	1930      	adds	r0, r6, r4
+20018be2:	f7fe f8df 	bl	20016da4 <__wrap_memset>
+20018be6:	e667      	b.n	200188b8 <pico9918_diag_update+0x21c>
+20018be8:	3230      	adds	r2, #48	@ 0x30
+20018bea:	7222      	strb	r2, [r4, #8]
+20018bec:	2b00      	cmp	r3, #0
+20018bee:	d000      	beq.n	20018bf2 <pico9918_diag_update+0x556>
+20018bf0:	e6a9      	b.n	20018946 <pico9918_diag_update+0x2aa>
+20018bf2:	2201      	movs	r2, #1
+20018bf4:	2408      	movs	r4, #8
+20018bf6:	3a01      	subs	r2, #1
+20018bf8:	3c01      	subs	r4, #1
+20018bfa:	1aa4      	subs	r4, r4, r2
+20018bfc:	2130      	movs	r1, #48	@ 0x30
+20018bfe:	3201      	adds	r2, #1
+20018c00:	1930      	adds	r0, r6, r4
+20018c02:	f7fe f8cf 	bl	20016da4 <__wrap_memset>
+20018c06:	e6a1      	b.n	2001894c <pico9918_diag_update+0x2b0>
+20018c08:	2200      	movs	r2, #0
+20018c0a:	5ceb      	ldrb	r3, [r5, r3]
+20018c0c:	4934      	ldr	r1, [pc, #208]	@ (20018ce0 <pico9918_diag_update+0x644>)
+20018c0e:	09db      	lsrs	r3, r3, #7
+20018c10:	000e      	movs	r6, r1
+20018c12:	72ca      	strb	r2, [r1, #11]
+20018c14:	2b00      	cmp	r3, #0
+20018c16:	d052      	beq.n	20018cbe <pico9918_diag_update+0x622>
+20018c18:	2330      	movs	r3, #48	@ 0x30
+20018c1a:	72b3      	strb	r3, [r6, #10]
+20018c1c:	7273      	strb	r3, [r6, #9]
+20018c1e:	2380      	movs	r3, #128	@ 0x80
+20018c20:	2120      	movs	r1, #32
+20018c22:	019b      	lsls	r3, r3, #6
+20018c24:	e63a      	b.n	2001889c <pico9918_diag_update+0x200>
+20018c26:	3230      	adds	r2, #48	@ 0x30
+20018c28:	e634      	b.n	20018894 <pico9918_diag_update+0x1f8>
+20018c2a:	240b      	movs	r4, #11
+20018c2c:	2203      	movs	r2, #3
+20018c2e:	e7e3      	b.n	20018bf8 <pico9918_diag_update+0x55c>
+20018c30:	240b      	movs	r4, #11
+20018c32:	2203      	movs	r2, #3
+20018c34:	3c01      	subs	r4, #1
+20018c36:	1aa4      	subs	r4, r4, r2
+20018c38:	2130      	movs	r1, #48	@ 0x30
+20018c3a:	3201      	adds	r2, #1
+20018c3c:	1930      	adds	r0, r6, r4
+20018c3e:	f7fe f8b1 	bl	20016da4 <__wrap_memset>
+20018c42:	e65d      	b.n	20018900 <pico9918_diag_update+0x264>
+20018c44:	240b      	movs	r4, #11
+20018c46:	2203      	movs	r2, #3
+20018c48:	3c01      	subs	r4, #1
+20018c4a:	1aa4      	subs	r4, r4, r2
+20018c4c:	2130      	movs	r1, #48	@ 0x30
+20018c4e:	3201      	adds	r2, #1
+20018c50:	1928      	adds	r0, r5, r4
+20018c52:	f7fe f8a7 	bl	20016da4 <__wrap_memset>
+20018c56:	e696      	b.n	20018986 <pico9918_diag_update+0x2ea>
+20018c58:	240b      	movs	r4, #11
+20018c5a:	2203      	movs	r2, #3
+20018c5c:	e7ac      	b.n	20018bb8 <pico9918_diag_update+0x51c>
+20018c5e:	2408      	movs	r4, #8
+20018c60:	2200      	movs	r2, #0
+20018c62:	e7f1      	b.n	20018c48 <pico9918_diag_update+0x5ac>
+20018c64:	2408      	movs	r4, #8
+20018c66:	2200      	movs	r2, #0
+20018c68:	e7e4      	b.n	20018c34 <pico9918_diag_update+0x598>
+20018c6a:	2202      	movs	r2, #2
+20018c6c:	2409      	movs	r4, #9
+20018c6e:	e7c2      	b.n	20018bf6 <pico9918_diag_update+0x55a>
+20018c70:	2306      	movs	r3, #6
+20018c72:	60eb      	str	r3, [r5, #12]
+20018c74:	e565      	b.n	20018742 <pico9918_diag_update+0xa6>
+20018c76:	2306      	movs	r3, #6
+20018c78:	60e3      	str	r3, [r4, #12]
+20018c7a:	e5b4      	b.n	200187e6 <pico9918_diag_update+0x14a>
+20018c7c:	2202      	movs	r2, #2
+20018c7e:	2409      	movs	r4, #9
+20018c80:	e7a9      	b.n	20018bd6 <pico9918_diag_update+0x53a>
+20018c82:	2305      	movs	r3, #5
+20018c84:	60eb      	str	r3, [r5, #12]
+20018c86:	e55c      	b.n	20018742 <pico9918_diag_update+0xa6>
+20018c88:	2305      	movs	r3, #5
+20018c8a:	60e3      	str	r3, [r4, #12]
+20018c8c:	e5ab      	b.n	200187e6 <pico9918_diag_update+0x14a>
+20018c8e:	2304      	movs	r3, #4
+20018c90:	60eb      	str	r3, [r5, #12]
+20018c92:	e556      	b.n	20018742 <pico9918_diag_update+0xa6>
+20018c94:	2304      	movs	r3, #4
+20018c96:	60e3      	str	r3, [r4, #12]
+20018c98:	e5a5      	b.n	200187e6 <pico9918_diag_update+0x14a>
+20018c9a:	2303      	movs	r3, #3
+20018c9c:	60e3      	str	r3, [r4, #12]
+20018c9e:	e5a2      	b.n	200187e6 <pico9918_diag_update+0x14a>
+20018ca0:	2303      	movs	r3, #3
+20018ca2:	60eb      	str	r3, [r5, #12]
+20018ca4:	e54d      	b.n	20018742 <pico9918_diag_update+0xa6>
+20018ca6:	2302      	movs	r3, #2
+20018ca8:	60e3      	str	r3, [r4, #12]
+20018caa:	e59c      	b.n	200187e6 <pico9918_diag_update+0x14a>
+20018cac:	2302      	movs	r3, #2
+20018cae:	60eb      	str	r3, [r5, #12]
+20018cb0:	e547      	b.n	20018742 <pico9918_diag_update+0xa6>
+20018cb2:	2301      	movs	r3, #1
+20018cb4:	60eb      	str	r3, [r5, #12]
+20018cb6:	e544      	b.n	20018742 <pico9918_diag_update+0xa6>
+20018cb8:	2301      	movs	r3, #1
+20018cba:	60e3      	str	r3, [r4, #12]
+20018cbc:	e593      	b.n	200187e6 <pico9918_diag_update+0x14a>
+20018cbe:	240b      	movs	r4, #11
+20018cc0:	2203      	movs	r2, #3
+20018cc2:	e789      	b.n	20018bd8 <pico9918_diag_update+0x53c>
+20018cc4:	0000270f 	.word	0x0000270f
+20018cc8:	0001869f 	.word	0x0001869f
+20018ccc:	000f423f 	.word	0x000f423f
+20018cd0:	0098967f 	.word	0x0098967f
+20018cd4:	05f5e0ff 	.word	0x05f5e0ff
+20018cd8:	3b9ac9ff 	.word	0x3b9ac9ff
+20018cdc:	200285f0 	.word	0x200285f0
+20018ce0:	20028550 	.word	0x20028550

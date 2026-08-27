@@ -1,0 +1,97 @@
+20003e20 <vrEmuTmsSplashRender>:
+20003e20:	b5f0      	push	{r4, r5, r6, r7, lr}
+20003e22:	46d6      	mov	lr, sl
+20003e24:	464f      	mov	r7, r9
+20003e26:	4646      	mov	r6, r8
+20003e28:	b5c0      	push	{r6, r7, lr}
+20003e2a:	2800      	cmp	r0, #0
+20003e2c:	d14d      	bne.n	20003eca <vrEmuTmsSplashRender+0xaa>
+20003e2e:	4d2a      	ldr	r5, [pc, #168]	@ (20003ed8 <vrEmuTmsSplashRender+0xb8>)
+20003e30:	682c      	ldr	r4, [r5, #0]
+20003e32:	293b      	cmp	r1, #59	@ 0x3b
+20003e34:	d840      	bhi.n	20003eb8 <vrEmuTmsSplashRender+0x98>
+20003e36:	3c01      	subs	r4, #1
+20003e38:	602c      	str	r4, [r5, #0]
+20003e3a:	18d3      	adds	r3, r2, r3
+20003e3c:	1ac3      	subs	r3, r0, r3
+20003e3e:	1b1b      	subs	r3, r3, r4
+20003e40:	b29b      	uxth	r3, r3
+20003e42:	2b09      	cmp	r3, #9
+20003e44:	d833      	bhi.n	20003eae <vrEmuTmsSplashRender+0x8e>
+20003e46:	212c      	movs	r1, #44	@ 0x2c
+20003e48:	4359      	muls	r1, r3
+20003e4a:	4b24      	ldr	r3, [pc, #144]	@ (20003edc <vrEmuTmsSplashRender+0xbc>)
+20003e4c:	2730      	movs	r7, #48	@ 0x30
+20003e4e:	18c9      	adds	r1, r1, r3
+20003e50:	232c      	movs	r3, #44	@ 0x2c
+20003e52:	4698      	mov	r8, r3
+20003e54:	3313      	adds	r3, #19
+20003e56:	469c      	mov	ip, r3
+20003e58:	3b33      	subs	r3, #51	@ 0x33
+20003e5a:	469a      	mov	sl, r3
+20003e5c:	2403      	movs	r4, #3
+20003e5e:	9809      	ldr	r0, [sp, #36]	@ 0x24
+20003e60:	4d1f      	ldr	r5, [pc, #124]	@ (20003ee0 <vrEmuTmsSplashRender+0xc0>)
+20003e62:	3008      	adds	r0, #8
+20003e64:	4488      	add	r8, r1
+20003e66:	780b      	ldrb	r3, [r1, #0]
+20003e68:	4666      	mov	r6, ip
+20003e6a:	001a      	movs	r2, r3
+20003e6c:	43b2      	bics	r2, r6
+20003e6e:	1192      	asrs	r2, r2, #6
+20003e70:	d002      	beq.n	20003e78 <vrEmuTmsSplashRender+0x58>
+20003e72:	0052      	lsls	r2, r2, #1
+20003e74:	5b52      	ldrh	r2, [r2, r5]
+20003e76:	8002      	strh	r2, [r0, #0]
+20003e78:	003a      	movs	r2, r7
+20003e7a:	401a      	ands	r2, r3
+20003e7c:	1116      	asrs	r6, r2, #4
+20003e7e:	2a00      	cmp	r2, #0
+20003e80:	d002      	beq.n	20003e88 <vrEmuTmsSplashRender+0x68>
+20003e82:	0072      	lsls	r2, r6, #1
+20003e84:	5aaa      	ldrh	r2, [r5, r2]
+20003e86:	8042      	strh	r2, [r0, #2]
+20003e88:	4652      	mov	r2, sl
+20003e8a:	401a      	ands	r2, r3
+20003e8c:	1096      	asrs	r6, r2, #2
+20003e8e:	2a00      	cmp	r2, #0
+20003e90:	d002      	beq.n	20003e98 <vrEmuTmsSplashRender+0x78>
+20003e92:	0072      	lsls	r2, r6, #1
+20003e94:	5aaa      	ldrh	r2, [r5, r2]
+20003e96:	8082      	strh	r2, [r0, #4]
+20003e98:	0022      	movs	r2, r4
+20003e9a:	401a      	ands	r2, r3
+20003e9c:	421c      	tst	r4, r3
+20003e9e:	d002      	beq.n	20003ea6 <vrEmuTmsSplashRender+0x86>
+20003ea0:	0052      	lsls	r2, r2, #1
+20003ea2:	5aab      	ldrh	r3, [r5, r2]
+20003ea4:	80c3      	strh	r3, [r0, #6]
+20003ea6:	3101      	adds	r1, #1
+20003ea8:	3008      	adds	r0, #8
+20003eaa:	4588      	cmp	r8, r1
+20003eac:	d1db      	bne.n	20003e66 <vrEmuTmsSplashRender+0x46>
+20003eae:	bce0      	pop	{r5, r6, r7}
+20003eb0:	46ba      	mov	sl, r7
+20003eb2:	46b1      	mov	r9, r6
+20003eb4:	46a8      	mov	r8, r5
+20003eb6:	bdf0      	pop	{r4, r5, r6, r7, pc}
+20003eb8:	4e0a      	ldr	r6, [pc, #40]	@ (20003ee4 <vrEmuTmsSplashRender+0xc4>)
+20003eba:	7836      	ldrb	r6, [r6, #0]
+20003ebc:	2e00      	cmp	r6, #0
+20003ebe:	d0bc      	beq.n	20003e3a <vrEmuTmsSplashRender+0x1a>
+20003ec0:	29f0      	cmp	r1, #240	@ 0xf0
+20003ec2:	d9ba      	bls.n	20003e3a <vrEmuTmsSplashRender+0x1a>
+20003ec4:	3401      	adds	r4, #1
+20003ec6:	602c      	str	r4, [r5, #0]
+20003ec8:	e7b7      	b.n	20003e3a <vrEmuTmsSplashRender+0x1a>
+20003eca:	9908      	ldr	r1, [sp, #32]
+20003ecc:	4288      	cmp	r0, r1
+20003ece:	d8ee      	bhi.n	20003eae <vrEmuTmsSplashRender+0x8e>
+20003ed0:	4901      	ldr	r1, [pc, #4]	@ (20003ed8 <vrEmuTmsSplashRender+0xb8>)
+20003ed2:	680c      	ldr	r4, [r1, #0]
+20003ed4:	e7b1      	b.n	20003e3a <vrEmuTmsSplashRender+0x1a>
+20003ed6:	46c0      	nop			@ (mov r8, r8)
+20003ed8:	2000d53c 	.word	0x2000d53c
+20003edc:	20012470 	.word	0x20012470
+20003ee0:	20012628 	.word	0x20012628
+20003ee4:	20028673 	.word	0x20028673

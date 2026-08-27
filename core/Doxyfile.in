@@ -1,0 +1,132 @@
+# Doxygen configuration for the pico9918-core library - a CMake template.
+#
+# CMake configures this into the build directory, so PROJECT_NUMBER comes from
+# project() and a version bump has one place to happen. Doxygen resolves INPUT and
+# OUTPUT_DIRECTORY against the working directory, so run it from here:
+#
+#   cmake -S . -B build
+#   doxygen build/Doxyfile  (run from this directory)
+#
+# or `cmake --build build --target docs`, which is exactly that.
+#
+# The firmware's Doxyfile also has src/ in its INPUT, so the library is
+# documented there as part of the firmware. This one is what a standalone
+# checkout publishes: it reads nothing outside src, and no firmware-only macro
+# appears below. Both are wanted - neither is redundant.
+#
+# Only the settings that differ from the defaults are listed, so this stays
+# readable and survives `doxygen -u` without turning into 2500 lines.
+
+PROJECT_NAME           = pico9918-core
+PROJECT_NUMBER         = @PROJECT_VERSION@
+PROJECT_BRIEF          = "TMS9918A / F18A video display processor emulation in C99"
+OUTPUT_DIRECTORY       = doc
+HTML_OUTPUT            = code
+
+# ---------------------------------------------------------------------------
+# What to read
+# ---------------------------------------------------------------------------
+# The tests and the examples are read alongside the library: a test nobody can
+# read is a test nobody maintains, and the examples are the shortest statement
+# of how the API is meant to be used.
+INPUT                  = README.md \
+                         src \
+                         test \
+                         examples
+FILE_PATTERNS          = *.c *.h *.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+
+# ---------------------------------------------------------------------------
+# What to document
+# ---------------------------------------------------------------------------
+# Everything, statics included: the renderer's emitters are static and are the
+# part a reader most needs explained.
+EXTRACT_ALL            = NO
+EXTRACT_STATIC         = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_PACKAGE        = YES
+EXTRACT_LOCAL_CLASSES  = YES
+INTERNAL_DOCS          = YES
+
+# EXTRACT_ALL is off so that these warnings mean something: an undocumented
+# function is a gap to fill, not noise to silence.
+#
+# WARN_NO_PARAMDOC stays off. The house style is a one-line \brief, and a full
+# \param list per function would be the comment bloat this codebase avoids;
+# \param and \return are written where the answer is not in the signature.
+#
+# Every function is documented; file-scope macros and variables are covered by a
+# group comment over the block instead, so doxygen still warns for each one, and
+# structs declared inside a function body warn as well. Filter those out to read
+# the list:
+#   doxygen Doxyfile 2>&1 | grep -v "(macro definition)\|(variable)\|Compound"
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
+
+# ---------------------------------------------------------------------------
+# C, not C++
+# ---------------------------------------------------------------------------
+OPTIMIZE_OUTPUT_FOR_C  = YES
+TYPEDEF_HIDES_STRUCT   = YES
+# A doc comment's first sentence is its summary line. The public headers document
+# their declarations in prose rather than with explicit rief tags, and this is what
+# gives each of them a one-line entry in the member list.
+JAVADOC_AUTOBRIEF      = YES
+QT_AUTOBRIEF           = NO
+TAB_SIZE               = 2
+
+# ---------------------------------------------------------------------------
+# Preprocessing
+# ---------------------------------------------------------------------------
+# Without these the placement wrappers and the instance-argument macros swallow
+# the signatures and half the file comes out undocumented.
+#
+# PICO_BUILD is defined and PICO_RP2040 is not, so the documented build is the
+# RP2350 one - the 8bpp 80-column tier only exists there.
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+EXPAND_ONLY_PREDEF     = YES
+SKIP_FUNCTION_MACROS   = NO
+INCLUDE_PATH           = src
+
+# these stand in for an argument list, so the signature is wrong without them
+EXPAND_AS_DEFINED      = TILE_ROW_PARAMS \
+                         TEXT_ROW_PARAMS
+
+PREDEFINED             = __attribute__(x)= \
+                         TEXT_ROW_CLONE(a,b,c,d)= \
+                         TEXT80_ROW_CLONE(a,b,c)= \
+                         LOCKED_ROW_CLONE(a,b,c)= \
+                         TILE_ROW_CLONE(a,b,c,d,e)= \
+                         __aligned(x)= \
+                         __time_critical_func(x)=x \
+                         __not_in_flash_func(x)=x \
+                         __in_flash_func(x)=x \
+                         __uninitialized_ram(x)=x \
+                         PICO9918_IN_FLASH_FUNC(x)=x \
+                         EMITTER_NOINLINE= \
+                         PICO9918_DLLEXPORT= \
+                         PICO9918_DLLEXPORT_CONST= \
+                         PICO9918_SINGLE_INSTANCE=1 \
+                         PICO9918_INST_ARG= \
+                         PICO9918_INST_ONLY_ARG=void \
+                         PICO9918_INST= \
+                         PICO9918_INST_ONLY= \
+                         PICO_BUILD=1 \
+                         PICO9918_TEXT80_8BPP=1
+
+# ---------------------------------------------------------------------------
+# Output
+# ---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_TREEVIEW      = YES
+HTML_DYNAMIC_SECTIONS  = YES
+SOURCE_BROWSER         = YES
+STRIP_CODE_COMMENTS    = NO
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+ALPHABETICAL_INDEX     = YES
+SORT_MEMBER_DOCS       = NO

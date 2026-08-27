@@ -1,0 +1,489 @@
+20004bb0 <tmsScanline>:
+push	{r4, r5, r6, r7, lr}
+mov	r7, sl
+mov	lr, fp
+mov	r6, r9
+mov	r5, r8
+push	{r5, r6, r7, lr}
+ldr	r7, [pc, #824]	@ (20004ef8 <tmsScanline+0x348>)
+sub	sp, #36	@ 0x24
+str	r2, [sp, #16]
+ldr	r3, [r7, #0]
+ldr	r2, [pc, #820]	@ (20004efc <tmsScanline+0x34c>)
+mov	sl, r0
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #25
+bmi.n	20004bd0 <tmsScanline+0x20>
+b.n	20004d12 <tmsScanline+0x162>
+movs	r2, #240	@ 0xf0
+lsls	r2, r2, #1
+movs	r0, #240	@ 0xf0
+mov	fp, r2
+mov	r9, r2
+movs	r1, #240	@ 0xf0
+ldr	r2, [pc, #800]	@ (20004f00 <tmsScanline+0x350>)
+ldrb	r3, [r3, r2]
+lsls	r3, r3, #28
+bmi.n	20004be8 <tmsScanline+0x38>
+mov	fp, r0
+mov	r9, r1
+bl	200043b4 <vgaCurrentParams>
+mov	r3, fp
+ldr	r5, [r0, #72]	@ 0x48
+movs	r0, #7
+subs	r5, r5, r3
+bl	2000b4a4 <vrEmuTms9918RegValue>
+movs	r3, #15
+ldr	r4, [pc, #776]	@ (20004f04 <tmsScanline+0x354>)
+ands	r3, r0
+lsls	r3, r3, #2
+ldr	r3, [r4, r3]
+ldr	r2, [pc, #772]	@ (20004f08 <tmsScanline+0x358>)
+lsrs	r5, r5, #1
+str	r3, [r2, #0]
+mov	r3, sl
+cmp	r3, #0
+bne.n	20004c14 <tmsScanline+0x64>
+mov	r2, sl
+ldr	r3, [pc, #760]	@ (20004f0c <tmsScanline+0x35c>)
+strb	r2, [r3, #0]
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+movs	r6, r3
+ands	r6, r2
+tst	r3, r2
+bne.n	20004c1e <tmsScanline+0x6e>
+mov	r2, sl
+subs	r2, r2, r5
+uxth	r1, r2
+mov	r8, r1
+ldr	r3, [r7, #0]
+cmp	sl, r5
+bcs.n	20004c38 <tmsScanline+0x88>
+b.n	20004d20 <tmsScanline+0x170>
+mov	r1, fp
+adds	r1, r5, r1
+cmp	sl, r1
+bcs.n	20004c42 <tmsScanline+0x92>
+b.n	20004d76 <tmsScanline+0x1c6>
+ldr	r1, [pc, #716]	@ (20004f10 <tmsScanline+0x360>)
+ldr	r0, [sp, #16]
+uxtb	r2, r2
+str	r0, [r1, #4]
+movs	r0, #160	@ 0xa0
+lsls	r0, r0, #1
+str	r0, [r1, #28]
+ldr	r1, [pc, #704]	@ (20004f14 <tmsScanline+0x364>)
+subs	r0, #64	@ 0x40
+subs	r0, #255	@ 0xff
+strb	r0, [r3, r1]
+ldr	r1, [pc, #700]	@ (20004f18 <tmsScanline+0x368>)
+ldr	r6, [pc, #704]	@ (20004f1c <tmsScanline+0x36c>)
+strb	r2, [r3, r1]
+ldr	r1, [pc, #704]	@ (20004f20 <tmsScanline+0x370>)
+strb	r2, [r3, r1]
+ldr	r3, [pc, #704]	@ (20004f24 <tmsScanline+0x374>)
+ldrb	r3, [r3, #0]
+cmp	r3, #0
+beq.n	20004c6c <tmsScanline+0xbc>
+b.n	20004d40 <tmsScanline+0x190>
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+movs	r4, r3
+ands	r4, r2
+tst	r3, r2
+bne.n	20004c76 <tmsScanline+0xc6>
+ldr	r3, [sp, #16]
+ldr	r1, [r6, #0]
+movs	r2, r5
+str	r3, [sp, #0]
+mov	r0, sl
+mov	r3, fp
+bl	20002478 <outputSplash>
+ldr	r2, [pc, #660]	@ (20004f28 <tmsScanline+0x378>)
+ldr	r3, [r6, #0]
+ldrb	r1, [r2, #0]
+cmp	r1, #0
+beq.n	20004cc8 <tmsScanline+0x118>
+movs	r1, #200	@ 0xc8
+lsls	r1, r1, #1
+cmp	r3, r1
+bge.n	20004ca4 <tmsScanline+0xf4>
+b.n	20004eb4 <tmsScanline+0x304>
+movs	r1, #250	@ 0xfa
+lsls	r1, r1, #1
+cmp	r3, r1
+bge.n	20004cae <tmsScanline+0xfe>
+b.n	20004edc <tmsScanline+0x32c>
+ldr	r1, [pc, #636]	@ (20004f2c <tmsScanline+0x37c>)
+cmp	r3, r1
+bgt.n	20004cb6 <tmsScanline+0x106>
+b.n	20004f78 <tmsScanline+0x3c8>
+ldr	r1, [r7, #0]
+ldr	r0, [pc, #628]	@ (20004f30 <tmsScanline+0x380>)
+ldrb	r6, [r1, r0]
+ldr	r0, [pc, #628]	@ (20004f34 <tmsScanline+0x384>)
+strb	r4, [r2, #0]
+strb	r6, [r1, r0]
+movs	r6, #1
+ldr	r0, [pc, #624]	@ (20004f38 <tmsScanline+0x388>)
+strb	r6, [r1, r0]
+movs	r2, #150	@ 0x96
+lsls	r2, r2, #2
+cmp	r3, r2
+bgt.n	20004d66 <tmsScanline+0x1b6>
+subs	r3, r5, #1
+cmp	sl, r3
+beq.n	20004d52 <tmsScanline+0x1a2>
+ldr	r3, [r7, #0]
+ldr	r2, [pc, #608]	@ (20004f3c <tmsScanline+0x38c>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #25
+bmi.n	20004d60 <tmsScanline+0x1b0>
+ldr	r2, [pc, #604]	@ (20004f40 <tmsScanline+0x390>)
+ldrb	r3, [r3, r2]
+cmp	r3, #0
+beq.n	20004d04 <tmsScanline+0x154>
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+tst	r3, r2
+bne.n	20004cf2 <tmsScanline+0x142>
+movs	r0, r5
+add	r0, r8
+ldr	r1, [sp, #16]
+uxth	r0, r0
+bl	20001d38 <renderDiagnostics>
+add	sp, #36	@ 0x24
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+movs	r2, #192	@ 0xc0
+lsls	r2, r2, #1
+movs	r0, #192	@ 0xc0
+mov	fp, r2
+mov	r9, r2
+movs	r1, #192	@ 0xc0
+b.n	20004bdc <tmsScanline+0x2c>
+ldr	r2, [pc, #492]	@ (20004f10 <tmsScanline+0x360>)
+ldr	r1, [sp, #16]
+ldr	r6, [pc, #500]	@ (20004f1c <tmsScanline+0x36c>)
+str	r1, [r2, #4]
+movs	r1, #160	@ 0xa0
+lsls	r1, r1, #1
+str	r1, [r2, #28]
+ldr	r2, [pc, #484]	@ (20004f14 <tmsScanline+0x364>)
+subs	r1, #64	@ 0x40
+subs	r1, #255	@ 0xff
+strb	r1, [r3, r2]
+ldr	r3, [pc, #492]	@ (20004f24 <tmsScanline+0x374>)
+ldrb	r3, [r3, #0]
+cmp	r3, #0
+bne.n	20004d40 <tmsScanline+0x190>
+b.n	20004c6c <tmsScanline+0xbc>
+movs	r3, #150	@ 0x96
+ldr	r2, [r6, #0]
+lsls	r3, r3, #2
+cmp	r2, r3
+bge.n	20004d4c <tmsScanline+0x19c>
+b.n	20004c6c <tmsScanline+0xbc>
+subs	r3, r5, #1
+cmp	sl, r3
+bne.n	20004cd6 <tmsScanline+0x126>
+bl	20000390 <generateRgbCache>
+ldr	r3, [r7, #0]
+ldr	r2, [pc, #480]	@ (20004f3c <tmsScanline+0x38c>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #25
+bpl.n	20004ce0 <tmsScanline+0x130>
+movs	r2, #1
+strb	r2, [r3, #12]
+b.n	20004ce0 <tmsScanline+0x130>
+ldr	r3, [r7, #0]
+ldr	r2, [pc, #468]	@ (20004f40 <tmsScanline+0x390>)
+ldr	r1, [pc, #472]	@ (20004f44 <tmsScanline+0x394>)
+str	r1, [r3, r2]
+movs	r1, #1
+ldr	r2, [pc, #468]	@ (20004f48 <tmsScanline+0x398>)
+strb	r1, [r3, r2]
+b.n	20004cd0 <tmsScanline+0x120>
+ldr	r2, [pc, #468]	@ (20004f4c <tmsScanline+0x39c>)
+ldr	r1, [pc, #412]	@ (20004f18 <tmsScanline+0x368>)
+ldr	r2, [r2, #40]	@ 0x28
+str	r2, [sp, #24]
+ldr	r2, [pc, #404]	@ (20004f14 <tmsScanline+0x364>)
+strb	r6, [r3, r2]
+mov	r2, r8
+uxtb	r2, r2
+strb	r2, [r3, r1]
+ldr	r1, [pc, #404]	@ (20004f20 <tmsScanline+0x370>)
+strb	r2, [r3, r1]
+ldr	r2, [pc, #384]	@ (20004f10 <tmsScanline+0x360>)
+ldr	r1, [sp, #16]
+str	r1, [r2, #4]
+movs	r1, #32
+str	r1, [r2, #28]
+ldrb	r2, [r3, #16]
+cmp	r2, #0
+beq.n	20004d9e <tmsScanline+0x1ee>
+b.n	20004ed0 <tmsScanline+0x320>
+ldr	r2, [pc, #432]	@ (20004f50 <tmsScanline+0x3a0>)
+ldrb	r3, [r3, r2]
+cmp	r3, #127	@ 0x7f
+bls.n	20004da8 <tmsScanline+0x1f8>
+b.n	20004ed0 <tmsScanline+0x320>
+ldr	r3, [pc, #416]	@ (20004f4c <tmsScanline+0x39c>)
+mov	r0, r8
+mov	sl, r3
+ldr	r3, [r3, #40]	@ 0x28
+mov	fp, r3
+ldr	r3, [pc, #416]	@ (20004f54 <tmsScanline+0x3a4>)
+movs	r1, r3
+str	r3, [sp, #28]
+bl	2000b260 <vrEmuTms9918ScanLine>
+mov	r3, sl
+mov	r2, fp
+mov	r1, r9
+ldr	r3, [r3, #40]	@ 0x28
+str	r0, [sp, #20]
+subs	r3, r3, r2
+mov	fp, r3
+ldr	r2, [pc, #396]	@ (20004f58 <tmsScanline+0x3a8>)
+ldr	r3, [r7, #0]
+subs	r1, #1
+ldrb	r2, [r3, r2]
+cmp	r8, r1
+blt.n	20004dd8 <tmsScanline+0x228>
+b.n	20004ed6 <tmsScanline+0x326>
+movs	r6, #3
+bics	r2, r6
+ldr	r6, [pc, #376]	@ (20004f58 <tmsScanline+0x3a8>)
+strb	r2, [r3, r6]
+mov	r9, r6
+ldr	r6, [pc, #308]	@ (20004f18 <tmsScanline+0x368>)
+ldrb	r6, [r3, r6]
+mov	ip, r6
+cmp	r6, #0
+beq.n	20004e0a <tmsScanline+0x25a>
+ldr	r6, [pc, #364]	@ (20004f5c <tmsScanline+0x3ac>)
+ldrb	r6, [r3, r6]
+cmp	r6, ip
+bne.n	20004e0a <tmsScanline+0x25a>
+movs	r6, #1
+mov	ip, r6
+mov	r6, ip
+orrs	r2, r6
+mov	r6, r9
+strb	r2, [r3, r6]
+movs	r2, #128	@ 0x80
+negs	r2, r2
+orrs	r2, r0
+uxtb	r2, r2
+str	r2, [sp, #20]
+ldr	r2, [pc, #304]	@ (20004f3c <tmsScanline+0x38c>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #25
+bpl.n	20004e16 <tmsScanline+0x266>
+movs	r2, #1
+strb	r2, [r3, #12]
+ldr	r3, [pc, #244]	@ (20004f0c <tmsScanline+0x35c>)
+ldrb	r3, [r3, #0]
+cmp	r3, #0
+bne.n	20004e24 <tmsScanline+0x274>
+cmp	r8, r1
+blt.n	20004e24 <tmsScanline+0x274>
+b.n	20004f94 <tmsScanline+0x3e4>
+ldr	r0, [sp, #20]
+bl	20000134 <updateInterrupts>
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+tst	r3, r2
+bne.n	20004e34 <tmsScanline+0x284>
+movs	r0, #1
+ldr	r3, [pc, #212]	@ (20004f14 <tmsScanline+0x364>)
+ldr	r1, [r7, #0]
+ldr	r2, [sp, #16]
+strb	r0, [r1, r3]
+ldr	r3, [sp, #28]
+adds	r2, #128	@ 0x80
+adds	r0, r3, #1
+adds	r0, #255	@ 0xff
+ldrb	r1, [r3, #0]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #0]
+ldrb	r1, [r3, #1]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #4]
+ldrb	r1, [r3, #2]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #8]
+ldrb	r1, [r3, #3]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #12]
+ldrb	r1, [r3, #4]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #16]
+ldrb	r1, [r3, #5]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #20]
+ldrb	r1, [r3, #6]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #24]
+ldrb	r1, [r3, #7]
+adds	r3, #8
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #28]
+adds	r2, #32
+cmp	r3, r0
+bne.n	20004e4c <tmsScanline+0x29c>
+movs	r1, #144	@ 0x90
+lsls	r1, r1, #3
+mov	ip, r1
+ldr	r3, [sp, #16]
+ldr	r2, [pc, #112]	@ (20004f10 <tmsScanline+0x360>)
+add	r3, ip
+str	r3, [r2, #44]	@ 0x2c
+ldr	r3, [pc, #168]	@ (20004f4c <tmsScanline+0x39c>)
+mov	r0, fp
+ldr	r1, [r3, #40]	@ 0x28
+ldr	r3, [sp, #24]
+subs	r1, r1, r3
+bl	20001c9c <updateRenderTime>
+ldr	r3, [r7, #0]
+b.n	20004ce0 <tmsScanline+0x130>
+ldr	r3, [sp, #16]
+movs	r2, #231	@ 0xe7
+str	r3, [sp, #8]
+ldr	r3, [pc, #164]	@ (20004f60 <tmsScanline+0x3b0>)
+mov	r0, sl
+str	r3, [sp, #4]
+ldr	r3, [pc, #160]	@ (20004f64 <tmsScanline+0x3b4>)
+ldr	r1, [pc, #164]	@ (20004f68 <tmsScanline+0x3b8>)
+str	r3, [sp, #0]
+movs	r3, #8
+bl	20001b7c <renderText>
+ldr	r3, [r6, #0]
+b.n	20004cc8 <tmsScanline+0x118>
+bl	20000390 <generateRgbCache>
+b.n	20004da8 <tmsScanline+0x1f8>
+movs	r6, #1
+bics	r2, r6
+b.n	20004ddc <tmsScanline+0x22c>
+ldr	r3, [sp, #16]
+movs	r2, #234	@ 0xea
+str	r3, [sp, #8]
+ldr	r3, [pc, #136]	@ (20004f6c <tmsScanline+0x3bc>)
+mov	r0, sl
+str	r3, [sp, #4]
+ldr	r3, [pc, #132]	@ (20004f70 <tmsScanline+0x3c0>)
+ldr	r1, [pc, #136]	@ (20004f74 <tmsScanline+0x3c4>)
+str	r3, [sp, #0]
+movs	r3, #8
+bl	20001b7c <renderText>
+ldr	r3, [r6, #0]
+b.n	20004cc8 <tmsScanline+0x118>
+20004ef8:	2000c7e4 	.word	0x2000c7e4
+20004efc:	0000605d 	.word	0x0000605d
+20004f00:	0000602c 	.word	0x0000602c
+20004f04:	20025b68 	.word	0x20025b68
+20004f08:	20041000 	.word	0x20041000
+20004f0c:	200274d7 	.word	0x200274d7
+20004f10:	50000080 	.word	0x50000080
+20004f14:	0000702d 	.word	0x0000702d
+20004f18:	0000702c 	.word	0x0000702c
+20004f1c:	2002636c 	.word	0x2002636c
+20004f20:	0000b02f 	.word	0x0000b02f
+20004f24:	200274dd 	.word	0x200274dd
+20004f28:	200274db 	.word	0x200274db
+20004f2c:	00000256 	.word	0x00000256
+20004f30:	0001005a 	.word	0x0001005a
+20004f34:	00010054 	.word	0x00010054
+20004f38:	0001014f 	.word	0x0001014f
+20004f3c:	0000605e 	.word	0x0000605e
+20004f40:	00010060 	.word	0x00010060
+20004f44:	01010101 	.word	0x01010101
+20004f48:	00010064 	.word	0x00010064
+20004f4c:	40054000 	.word	0x40054000
+20004f50:	0000b02e 	.word	0x0000b02e
+20004f54:	20040000 	.word	0x20040000
+20004f58:	0000b02d 	.word	0x0000b02d
+20004f5c:	0000603f 	.word	0x0000603f
+20004f60:	00000222 	.word	0x00000222
+20004f64:	00000fff 	.word	0x00000fff
+20004f68:	2000b720 	.word	0x2000b720
+20004f6c:	00000444 	.word	0x00000444
+20004f70:	000007f7 	.word	0x000007f7
+20004f74:	2000b740 	.word	0x2000b740
+ldr	r3, [sp, #16]
+movs	r2, #222	@ 0xde
+str	r3, [sp, #8]
+ldr	r3, [pc, #76]	@ (20004fcc <tmsScanline+0x41c>)
+mov	r0, sl
+str	r3, [sp, #4]
+ldr	r3, [pc, #72]	@ (20004fd0 <tmsScanline+0x420>)
+ldr	r1, [pc, #76]	@ (20004fd4 <tmsScanline+0x424>)
+str	r3, [sp, #0]
+movs	r3, #8
+bl	20001b7c <renderText>
+ldr	r3, [r6, #0]
+b.n	20004cc8 <tmsScanline+0x118>
+bl	2000022c <eofInterrupt>
+movs	r3, #128	@ 0x80
+ldr	r2, [sp, #20]
+negs	r3, r3
+orrs	r3, r2
+uxtb	r3, r3
+str	r3, [sp, #20]
+ldr	r3, [pc, #48]	@ (20004fd8 <tmsScanline+0x428>)
+ldr	r0, [pc, #52]	@ (20004fdc <tmsScanline+0x42c>)
+ldrb	r2, [r3, #0]
+ldr	r3, [pc, #52]	@ (20004fe0 <tmsScanline+0x430>)
+ldr	r6, [r0, #0]
+ldr	r1, [r3, #0]
+movs	r3, #15
+ands	r1, r3
+mov	r9, r1
+mov	r3, r9
+mov	ip, r6
+ldr	r1, [pc, #40]	@ (20004fe4 <tmsScanline+0x434>)
+lsrs	r2, r2, #7
+ldrb	r3, [r1, r3]
+subs	r3, r2, r3
+add	r3, ip
+str	r3, [r0, #0]
+mov	r3, r9
+strb	r2, [r1, r3]
+b.n	20004e24 <tmsScanline+0x274>
+20004fcc:	00000444 	.word	0x00000444
+20004fd0:	00000fff 	.word	0x00000fff
+20004fd4:	2000b760 	.word	0x2000b760
+20004fd8:	2000c374 	.word	0x2000c374
+20004fdc:	20026364 	.word	0x20026364
+20004fe0:	2002636c 	.word	0x2002636c
+20004fe4:	20026354 	.word	0x20026354

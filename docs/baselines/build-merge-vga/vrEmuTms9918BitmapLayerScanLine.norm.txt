@@ -1,0 +1,699 @@
+<ADDR> <vrEmuTms9918BitmapLayerScanLine>:
+push	{r4, r5, r6, r7, lr}
+mov	r7, sl
+mov	r6, r9
+mov	r5, r8
+mov	lr, fp
+movs	r2, #1
+push	{r5, r6, r7, lr}
+ldr	r5, [pc, #564]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+ldr	r3, [pc, #564]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+ldr	r6, [r5, #0]
+mov	sl, r2
+ldrb	r7, [r6, r3]
+ldrsb	r3, [r6, r3]
+sub	sp, #36	@ 0x24
+cmp	r3, #0
+bge.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r2, [pc, #552]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+ldrh	r3, [r6, #32]
+ldrb	r2, [r6, r2]
+cmp	r2, r3
+bhi.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+subs	r2, r3, r2
+ldr	r3, [pc, #544]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+uxth	r2, r2
+ldrb	r3, [r6, r3]
+cmp	r3, r2
+bls.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r3, [pc, #540]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+ldr	r4, [r6, #40]	@ 0x28
+ldrb	r3, [r6, r3]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r3, #64	@ 0x40
+movs	r1, #64	@ 0x40
+mov	r9, r3
+mov	r8, r3
+ldr	r3, [pc, #524]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+muls	r2, r1
+ldrb	r3, [r6, r3]
+lsls	r3, r3, #6
+adds	r3, r3, r2
+str	r3, [sp, #8]
+movs	r3, #32
+ands	r3, r7
+movs	r2, r3
+mov	fp, r3
+lsls	r3, r7, #25
+bmi.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, r8
+cmp	r3, #64	@ 0x40
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r3, #1
+mov	sl, r3
+str	r3, [sp, #12]
+movs	r2, #208	@ 0xd0
+ldr	r3, [pc, #484]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+mov	ip, r2
+ldrb	r6, [r6, r3]
+lsls	r3, r7, #2
+movs	r2, #128	@ 0x80
+str	r3, [sp, #4]
+movs	r3, #160	@ 0xa0
+str	r6, [sp, #16]
+lsls	r3, r3, #23
+lsls	r2, r2, #17
+lsls	r7, r7, #27
+bpl.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r1, ip
+ldr	r0, [r3, r1]
+movs	r1, r0
+ands	r1, r2
+tst	r0, r2
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, r8
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r0, #48	@ 0x30
+ldr	r3, [sp, #4]
+ands	r0, r3
+ldr	r3, [sp, #12]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, fp
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, sp
+movs	r1, #0
+mov	r8, r0
+ldrh	r3, [r3, #8]
+ldr	r2, [r5, #0]
+movs	r0, #15
+adds	r2, r2, r3
+adds	r2, #44	@ 0x2c
+ldrb	r2, [r2, #0]
+movs	r7, r2
+lsls	r2, r2, #4
+bics	r7, r0
+uxtb	r2, r2
+cmp	r7, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r0, r8
+asrs	r7, r7, #4
+orrs	r7, r0
+movs	r0, r7
+strb	r7, [r4, r6]
+adds	r7, r4, r6
+strb	r0, [r7, #1]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+adds	r7, r6, #2
+uxtb	r7, r7
+mov	ip, r7
+mov	r0, r8
+asrs	r2, r2, #4
+add	ip, r4
+orrs	r2, r0
+mov	r0, ip
+strb	r2, [r4, r7]
+strb	r2, [r0, #1]
+adds	r6, #4
+adds	r1, #1
+uxtb	r6, r6
+adds	r3, #1
+cmp	r9, r1
+bgt.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r0, sl
+add	sp, #36	@ 0x24
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+lsrs	r3, r3, #2
+mov	r8, r3
+movs	r1, r3
+mov	r9, r3
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r1, ip
+ldr	r0, [r3, r1]
+movs	r1, r0
+ands	r1, r2
+tst	r0, r2
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, r8
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r0, #60	@ 0x3c
+ldr	r3, [sp, #4]
+ands	r0, r3
+mov	r3, fp
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r3, [sp, #12]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, sp
+ldrh	r3, [r3, #8]
+str	r4, [sp, #4]
+mov	r8, r3
+movs	r3, #128	@ 0x80
+lsls	r3, r3, #24
+mov	ip, r3
+movs	r3, #0
+str	r0, [sp, #8]
+mov	r4, ip
+movs	r0, r6
+mov	fp, r3
+ldr	r2, [pc, #252]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+str	r6, [sp, #24]
+str	r2, [sp, #20]
+str	r5, [sp, #12]
+movs	r2, #63	@ 0x3f
+ldr	r3, [sp, #12]
+movs	r6, r2
+ldr	r3, [r3, #0]
+add	r3, r8
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+movs	r5, r3
+lsls	r7, r3, #2
+bics	r7, r2
+bics	r5, r2
+lsls	r2, r3, #4
+bics	r2, r6
+lsls	r3, r3, #6
+uxtb	r7, r7
+uxtb	r2, r2
+uxtb	r3, r3
+cmp	r5, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r6, [sp, #8]
+asrs	r5, r5, #6
+orrs	r5, r6
+ldr	r6, [sp, #4]
+orrs	r1, r4
+strb	r5, [r6, r0]
+cmp	r7, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r6, [sp, #8]
+asrs	r7, r7, #6
+orrs	r7, r6
+adds	r5, r0, #1
+ldr	r6, [sp, #4]
+uxtb	r5, r5
+strb	r7, [r6, r5]
+lsrs	r5, r4, #1
+orrs	r1, r5
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r6, [sp, #8]
+asrs	r2, r2, #6
+orrs	r2, r6
+adds	r5, r0, #2
+ldr	r6, [sp, #4]
+uxtb	r5, r5
+strb	r2, [r6, r5]
+lsrs	r2, r4, #2
+orrs	r1, r2
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r5, [sp, #8]
+asrs	r3, r3, #6
+orrs	r3, r5
+adds	r2, r0, #3
+ldr	r5, [sp, #4]
+uxtb	r2, r2
+strb	r3, [r5, r2]
+lsrs	r3, r4, #3
+orrs	r1, r3
+adds	r0, #4
+uxtb	r0, r0
+lsrs	r4, r4, #4
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r3, [sp, #16]
+adds	r4, #31
+lsrs	r2, r3, #5
+ands	r3, r4
+movs	r4, r1
+lsrs	r4, r3
+ldr	r6, [sp, #20]
+lsls	r5, r2, #2
+ldr	r7, [r5, r6]
+orrs	r4, r7
+str	r4, [r5, r6]
+subs	r4, r3, #1
+cmp	r4, #31
+bhi.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r4, #32
+subs	r3, r4, r3
+lsls	r1, r3
+ldr	r4, [sp, #20]
+adds	r2, #1
+lsls	r2, r2, #2
+ldr	r3, [r4, r2]
+orrs	r1, r3
+str	r1, [r4, r2]
+movs	r4, #128	@ 0x80
+movs	r1, #0
+str	r0, [sp, #16]
+lsls	r4, r4, #24
+movs	r3, #1
+add	fp, r3
+mov	r3, r8
+adds	r3, #1
+mov	r8, r3
+cmp	r9, fp
+bgt.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r2, r9
+movs	r3, #0
+ldr	r6, [sp, #24]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r3, #1
+mov	sl, r3
+movs	r3, #0
+str	r3, [sp, #12]
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+mov	r3, sp
+ldrh	r7, [r3, #8]
+movs	r3, #0
+str	r5, [sp, #20]
+movs	r5, #128	@ 0x80
+movs	r2, r6
+mov	fp, r7
+str	r3, [sp, #8]
+adds	r3, #63	@ 0x3f
+mov	ip, r3
+ldr	r3, [pc, #776]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+str	r1, [sp, #4]
+str	r3, [sp, #24]
+str	r6, [sp, #28]
+lsls	r5, r5, #24
+ldr	r3, [sp, #20]
+mov	r1, ip
+ldr	r3, [r3, #0]
+mov	r7, ip
+add	r3, fp
+adds	r3, #44	@ 0x2c
+ldrb	r6, [r3, #0]
+movs	r3, r6
+bics	r3, r1
+asrs	r3, r3, #6
+orrs	r3, r0
+strb	r3, [r4, r2]
+adds	r3, r2, #1
+uxtb	r1, r3
+lsls	r3, r6, #2
+bics	r3, r7
+uxtb	r3, r3
+asrs	r3, r3, #6
+orrs	r3, r0
+strb	r3, [r4, r1]
+adds	r3, r2, #2
+uxtb	r1, r3
+lsls	r3, r6, #4
+bics	r3, r7
+uxtb	r3, r3
+asrs	r3, r3, #6
+orrs	r3, r0
+strb	r3, [r4, r1]
+movs	r1, #3
+adds	r3, r2, #3
+ands	r1, r6
+uxtb	r3, r3
+orrs	r1, r0
+strb	r1, [r4, r3]
+lsrs	r1, r5, #2
+lsrs	r3, r5, #1
+orrs	r3, r1
+ldr	r6, [sp, #4]
+orrs	r3, r5
+lsrs	r1, r5, #3
+orrs	r3, r1
+orrs	r6, r3
+ldr	r3, [sp, #12]
+adds	r2, #4
+str	r6, [sp, #4]
+uxtb	r2, r2
+lsrs	r5, r5, #4
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+cmp	r5, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+cmp	r6, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r1, #31
+ldr	r3, [sp, #16]
+ldr	r7, [sp, #24]
+lsrs	r5, r3, #5
+ands	r3, r1
+movs	r1, r6
+lsrs	r1, r3
+str	r5, [sp, #16]
+lsls	r5, r5, #2
+ldr	r6, [r5, r7]
+orrs	r1, r6
+str	r1, [r5, r7]
+subs	r1, r3, #1
+cmp	r1, #31
+bhi.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r3, #0
+movs	r5, #128	@ 0x80
+str	r2, [sp, #16]
+str	r3, [sp, #4]
+lsls	r5, r5, #24
+movs	r1, #1
+ldr	r3, [sp, #8]
+add	fp, r1
+adds	r3, #1
+str	r3, [sp, #8]
+cmp	r9, r3
+bgt.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r3, [sp, #12]
+ldr	r1, [sp, #4]
+ldr	r6, [sp, #28]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r2, r9
+movs	r3, #0
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+subs	r3, r2, #1
+lsls	r3, r3, #2
+adds	r6, #4
+adds	r3, r6, r3
+uxtb	r3, r3
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r2, #31
+movs	r7, r1
+ldr	r0, [sp, #16]
+ldr	r4, [pc, #564]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+ands	r2, r0
+lsrs	r7, r2
+lsrs	r5, r0, #5
+movs	r0, r7
+lsls	r6, r5, #2
+ldr	r7, [r6, r4]
+orrs	r0, r7
+str	r0, [r6, r4]
+movs	r0, #32
+subs	r0, r0, r2
+ldr	r2, [sp, #16]
+subs	r3, r3, r2
+cmp	r3, r0
+bhi.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+lsls	r1, r0
+adds	r5, #1
+lsls	r3, r5, #2
+ldr	r2, [r3, r4]
+orrs	r1, r2
+str	r1, [r3, r4]
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, sp
+ldrh	r3, [r3, #8]
+ldr	r2, [pc, #512]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+str	r3, [sp, #8]
+ldr	r3, [sp, #8]
+str	r0, [sp, #4]
+movs	r0, #192	@ 0xc0
+str	r2, [sp, #20]
+movs	r7, #0
+movs	r2, r6
+mov	r8, r3
+lsls	r0, r0, #24
+str	r6, [sp, #24]
+str	r5, [sp, #8]
+ldr	r3, [sp, #8]
+ldr	r6, [r3, #0]
+movs	r3, #15
+add	r6, r8
+adds	r6, #44	@ 0x2c
+ldrb	r6, [r6, #0]
+movs	r5, r6
+bics	r5, r3
+mov	r3, fp
+lsls	r6, r6, #4
+uxtb	r6, r6
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+cmp	r5, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+asrs	r3, r5, #4
+ldr	r5, [sp, #4]
+orrs	r1, r0
+orrs	r3, r5
+movs	r5, r3
+strb	r3, [r4, r2]
+adds	r3, r4, r2
+strb	r5, [r3, #1]
+cmp	r6, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r5, [sp, #4]
+asrs	r6, r6, #4
+orrs	r5, r6
+adds	r6, r2, #2
+uxtb	r6, r6
+strb	r5, [r4, r6]
+adds	r6, r4, r6
+strb	r5, [r6, #1]
+lsrs	r6, r0, #2
+orrs	r1, r6
+adds	r2, #4
+uxtb	r2, r2
+lsrs	r0, r0, #4
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r5, #31
+ldr	r3, [sp, #16]
+lsrs	r0, r3, #5
+ands	r3, r5
+movs	r6, r3
+lsls	r3, r0, #2
+mov	ip, r3
+movs	r3, r1
+str	r0, [sp, #12]
+mov	r0, ip
+lsrs	r3, r6
+ldr	r5, [sp, #20]
+ldr	r0, [r0, r5]
+orrs	r3, r0
+mov	r0, ip
+str	r3, [r0, r5]
+subs	r3, r6, #1
+cmp	r3, #31
+bls.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r0, #192	@ 0xc0
+movs	r1, #0
+str	r2, [sp, #16]
+lsls	r0, r0, #24
+movs	r3, #1
+adds	r7, #1
+add	r8, r3
+cmp	r9, r7
+bgt.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+ldr	r6, [sp, #24]
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r3, #31
+movs	r4, r1
+ldr	r0, [sp, #16]
+ands	r3, r0
+lsrs	r4, r3
+lsrs	r2, r0, #5
+ldr	r0, [pc, #332]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+lsls	r5, r2, #2
+ldr	r7, [r0, r5]
+orrs	r4, r7
+str	r4, [r0, r5]
+movs	r4, #32
+subs	r4, r4, r3
+mov	r3, r9
+movs	r5, #0
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+subs	r5, r3, #1
+lsls	r5, r5, #2
+adds	r6, #4
+adds	r3, r6, r5
+ldr	r5, [sp, #16]
+uxtb	r3, r3
+subs	r3, r3, r5
+cmp	r3, r4
+bhi.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+lsls	r1, r4
+adds	r2, #1
+lsls	r2, r2, #2
+ldr	r3, [r0, r2]
+orrs	r1, r3
+str	r1, [r0, r2]
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+asrs	r3, r5, #4
+ldr	r5, [sp, #4]
+orrs	r1, r0
+orrs	r3, r5
+movs	r5, r3
+strb	r3, [r4, r2]
+adds	r3, r4, r2
+strb	r5, [r3, #1]
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r3, #32
+subs	r6, r3, r6
+lsls	r1, r6
+ldr	r0, [sp, #12]
+adds	r0, #1
+lsls	r0, r0, #2
+ldr	r6, [r5, r0]
+orrs	r1, r6
+str	r1, [r5, r0]
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r1, #32
+subs	r3, r1, r3
+ldr	r1, [sp, #4]
+ldr	r5, [sp, #16]
+lsls	r1, r3
+adds	r5, #1
+lsls	r5, r5, #2
+ldr	r3, [r7, r5]
+orrs	r1, r3
+str	r1, [r7, r5]
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r3, sp
+movs	r7, #0
+mov	ip, r5
+ldrh	r3, [r3, #8]
+mov	r2, ip
+ldr	r2, [r2, #0]
+movs	r5, #15
+adds	r2, r2, r3
+adds	r2, #44	@ 0x2c
+ldrb	r2, [r2, #0]
+adds	r7, #1
+movs	r1, r2
+bics	r1, r5
+asrs	r1, r1, #4
+orrs	r1, r0
+adds	r5, r4, r6
+strb	r1, [r4, r6]
+strb	r1, [r5, #1]
+movs	r1, #15
+ands	r2, r1
+adds	r1, r6, #2
+orrs	r2, r0
+uxtb	r1, r1
+strb	r2, [r4, r1]
+adds	r6, #4
+adds	r1, r4, r1
+strb	r2, [r1, #1]
+uxtb	r6, r6
+adds	r3, #1
+cmp	r9, r7
+bgt.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r1, #63	@ 0x3f
+mov	r3, sp
+mov	fp, r0
+mov	ip, r1
+movs	r0, #0
+mov	r8, r4
+ldrh	r4, [r3, #8]
+str	r5, [sp, #4]
+ldr	r3, [sp, #4]
+mov	r2, ip
+ldr	r3, [r3, #0]
+mov	r1, ip
+adds	r3, r3, r4
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+mov	r5, ip
+movs	r7, r3
+bics	r7, r2
+lsls	r2, r3, #2
+bics	r2, r1
+lsls	r1, r3, #4
+bics	r1, r5
+lsls	r3, r3, #6
+uxtb	r2, r2
+uxtb	r1, r1
+uxtb	r3, r3
+cmp	r7, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r5, fp
+asrs	r7, r7, #6
+orrs	r7, r5
+mov	r5, r8
+strb	r7, [r5, r6]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r5, fp
+asrs	r2, r2, #6
+orrs	r2, r5
+mov	r5, r8
+adds	r7, r6, #1
+uxtb	r7, r7
+strb	r2, [r5, r7]
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r5, fp
+asrs	r1, r1, #6
+orrs	r1, r5
+mov	r5, r8
+adds	r2, r6, #2
+uxtb	r2, r2
+strb	r1, [r5, r2]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+mov	r1, fp
+asrs	r3, r3, #6
+orrs	r3, r1
+mov	r1, r8
+adds	r2, r6, #3
+uxtb	r2, r2
+strb	r3, [r1, r2]
+adds	r6, #4
+adds	r0, #1
+uxtb	r6, r6
+adds	r4, #1
+cmp	r9, r0
+bgt.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+movs	r1, #255	@ 0xff
+ldr	r0, [pc, #16]	@ (<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>)
+adds	r2, #32
+bl	<ADDR> <__wrap_memset>
+movs	r3, #0
+mov	sl, r3
+str	r3, [sp, #12]
+b.n	<ADDR> <vrEmuTms9918BitmapLayerScanLine+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>

@@ -1,0 +1,32 @@
+E:/projects/pico9918/dev/build-step0/src/pico9918-vga-v1-1-0-refactor.elf  :
+section                 size        addr
+.boot2                   256   268435456
+.flashtext               400   268435712
+.rodata                    0   268436112
+.binary_info              96   268436112
+.ram_vector_table        192   536870912
+.uninitialized_data        0   536871104
+.text                  19180   536871104
+.data                  52080   536890288
+.tdata                     0   536942368
+.tbss                      0   536942368
+.bss                   89312   536942592
+.heap                   2048   537031904
+.scratch_x              1452   537133056
+.scratch_y              2564   537137152
+.stack1_dummy           2048   537134508
+.stack_dummy            2048   537139744
+.ARM.attributes           40           0
+.comment                  69           0
+.debug_info           226869           0
+.debug_abbrev          34762           0
+.debug_loclists       189088           0
+.debug_aranges          5424           0
+.debug_rnglists        27028           0
+.debug_line           192222           0
+.debug_str             35030           0
+.debug_frame           11504           0
+.debug_line_str          854           0
+Total                 894566
+
+

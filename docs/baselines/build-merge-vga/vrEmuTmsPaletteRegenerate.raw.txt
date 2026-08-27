@@ -1,0 +1,287 @@
+20005ae4 <vrEmuTmsPaletteRegenerate>:
+20005ae4:	2300      	movs	r3, #0
+20005ae6:	b570      	push	{r4, r5, r6, lr}
+20005ae8:	4c84      	ldr	r4, [pc, #528]	@ (20005cfc <vrEmuTmsPaletteRegenerate+0x218>)
+20005aea:	b088      	sub	sp, #32
+20005aec:	6820      	ldr	r0, [r4, #0]
+20005aee:	7403      	strb	r3, [r0, #16]
+20005af0:	f006 fcd0 	bl	2000c494 <vrEmuTms9918DisplayMode>
+20005af4:	6821      	ldr	r1, [r4, #0]
+20005af6:	4b82      	ldr	r3, [pc, #520]	@ (20005d00 <vrEmuTmsPaletteRegenerate+0x21c>)
+20005af8:	2804      	cmp	r0, #4
+20005afa:	d04a      	beq.n	20005b92 <vrEmuTmsPaletteRegenerate+0xae>
+20005afc:	4881      	ldr	r0, [pc, #516]	@ (20005d04 <vrEmuTmsPaletteRegenerate+0x220>)
+20005afe:	18cb      	adds	r3, r1, r3
+20005b00:	180c      	adds	r4, r1, r0
+20005b02:	21f0      	movs	r1, #240	@ 0xf0
+20005b04:	4a80      	ldr	r2, [pc, #512]	@ (20005d08 <vrEmuTmsPaletteRegenerate+0x224>)
+20005b06:	881d      	ldrh	r5, [r3, #0]
+20005b08:	0b28      	lsrs	r0, r5, #12
+20005b0a:	0100      	lsls	r0, r0, #4
+20005b0c:	438d      	bics	r5, r1
+20005b0e:	4328      	orrs	r0, r5
+20005b10:	0405      	lsls	r5, r0, #16
+20005b12:	1828      	adds	r0, r5, r0
+20005b14:	885d      	ldrh	r5, [r3, #2]
+20005b16:	6010      	str	r0, [r2, #0]
+20005b18:	0b28      	lsrs	r0, r5, #12
+20005b1a:	0100      	lsls	r0, r0, #4
+20005b1c:	438d      	bics	r5, r1
+20005b1e:	4328      	orrs	r0, r5
+20005b20:	0405      	lsls	r5, r0, #16
+20005b22:	1828      	adds	r0, r5, r0
+20005b24:	889d      	ldrh	r5, [r3, #4]
+20005b26:	6050      	str	r0, [r2, #4]
+20005b28:	0b28      	lsrs	r0, r5, #12
+20005b2a:	0100      	lsls	r0, r0, #4
+20005b2c:	438d      	bics	r5, r1
+20005b2e:	4328      	orrs	r0, r5
+20005b30:	0405      	lsls	r5, r0, #16
+20005b32:	1828      	adds	r0, r5, r0
+20005b34:	88dd      	ldrh	r5, [r3, #6]
+20005b36:	6090      	str	r0, [r2, #8]
+20005b38:	0b28      	lsrs	r0, r5, #12
+20005b3a:	0100      	lsls	r0, r0, #4
+20005b3c:	438d      	bics	r5, r1
+20005b3e:	4328      	orrs	r0, r5
+20005b40:	0405      	lsls	r5, r0, #16
+20005b42:	1828      	adds	r0, r5, r0
+20005b44:	891d      	ldrh	r5, [r3, #8]
+20005b46:	60d0      	str	r0, [r2, #12]
+20005b48:	0b28      	lsrs	r0, r5, #12
+20005b4a:	0100      	lsls	r0, r0, #4
+20005b4c:	438d      	bics	r5, r1
+20005b4e:	4328      	orrs	r0, r5
+20005b50:	0405      	lsls	r5, r0, #16
+20005b52:	1828      	adds	r0, r5, r0
+20005b54:	895d      	ldrh	r5, [r3, #10]
+20005b56:	6110      	str	r0, [r2, #16]
+20005b58:	0b28      	lsrs	r0, r5, #12
+20005b5a:	0100      	lsls	r0, r0, #4
+20005b5c:	438d      	bics	r5, r1
+20005b5e:	4328      	orrs	r0, r5
+20005b60:	0405      	lsls	r5, r0, #16
+20005b62:	1828      	adds	r0, r5, r0
+20005b64:	899d      	ldrh	r5, [r3, #12]
+20005b66:	6150      	str	r0, [r2, #20]
+20005b68:	0b28      	lsrs	r0, r5, #12
+20005b6a:	0100      	lsls	r0, r0, #4
+20005b6c:	438d      	bics	r5, r1
+20005b6e:	4328      	orrs	r0, r5
+20005b70:	0405      	lsls	r5, r0, #16
+20005b72:	1828      	adds	r0, r5, r0
+20005b74:	89dd      	ldrh	r5, [r3, #14]
+20005b76:	6190      	str	r0, [r2, #24]
+20005b78:	0b28      	lsrs	r0, r5, #12
+20005b7a:	0100      	lsls	r0, r0, #4
+20005b7c:	438d      	bics	r5, r1
+20005b7e:	4328      	orrs	r0, r5
+20005b80:	0405      	lsls	r5, r0, #16
+20005b82:	1828      	adds	r0, r5, r0
+20005b84:	3310      	adds	r3, #16
+20005b86:	61d0      	str	r0, [r2, #28]
+20005b88:	3220      	adds	r2, #32
+20005b8a:	429c      	cmp	r4, r3
+20005b8c:	d1bb      	bne.n	20005b06 <vrEmuTmsPaletteRegenerate+0x22>
+20005b8e:	b008      	add	sp, #32
+20005b90:	bd70      	pop	{r4, r5, r6, pc}
+20005b92:	5ac8      	ldrh	r0, [r1, r3]
+20005b94:	23f0      	movs	r3, #240	@ 0xf0
+20005b96:	466c      	mov	r4, sp
+20005b98:	0b02      	lsrs	r2, r0, #12
+20005b9a:	0112      	lsls	r2, r2, #4
+20005b9c:	4398      	bics	r0, r3
+20005b9e:	4302      	orrs	r2, r0
+20005ba0:	0415      	lsls	r5, r2, #16
+20005ba2:	4859      	ldr	r0, [pc, #356]	@ (20005d08 <vrEmuTmsPaletteRegenerate+0x224>)
+20005ba4:	8022      	strh	r2, [r4, #0]
+20005ba6:	18aa      	adds	r2, r5, r2
+20005ba8:	6002      	str	r2, [r0, #0]
+20005baa:	4a58      	ldr	r2, [pc, #352]	@ (20005d0c <vrEmuTmsPaletteRegenerate+0x228>)
+20005bac:	5a8d      	ldrh	r5, [r1, r2]
+20005bae:	0b2a      	lsrs	r2, r5, #12
+20005bb0:	0112      	lsls	r2, r2, #4
+20005bb2:	439d      	bics	r5, r3
+20005bb4:	432a      	orrs	r2, r5
+20005bb6:	0415      	lsls	r5, r2, #16
+20005bb8:	8062      	strh	r2, [r4, #2]
+20005bba:	18aa      	adds	r2, r5, r2
+20005bbc:	6042      	str	r2, [r0, #4]
+20005bbe:	4a54      	ldr	r2, [pc, #336]	@ (20005d10 <vrEmuTmsPaletteRegenerate+0x22c>)
+20005bc0:	5a8d      	ldrh	r5, [r1, r2]
+20005bc2:	0b2a      	lsrs	r2, r5, #12
+20005bc4:	0112      	lsls	r2, r2, #4
+20005bc6:	439d      	bics	r5, r3
+20005bc8:	432a      	orrs	r2, r5
+20005bca:	0415      	lsls	r5, r2, #16
+20005bcc:	80a2      	strh	r2, [r4, #4]
+20005bce:	18aa      	adds	r2, r5, r2
+20005bd0:	6082      	str	r2, [r0, #8]
+20005bd2:	4a50      	ldr	r2, [pc, #320]	@ (20005d14 <vrEmuTmsPaletteRegenerate+0x230>)
+20005bd4:	5a8d      	ldrh	r5, [r1, r2]
+20005bd6:	0b2a      	lsrs	r2, r5, #12
+20005bd8:	0112      	lsls	r2, r2, #4
+20005bda:	439d      	bics	r5, r3
+20005bdc:	432a      	orrs	r2, r5
+20005bde:	0415      	lsls	r5, r2, #16
+20005be0:	80e2      	strh	r2, [r4, #6]
+20005be2:	18aa      	adds	r2, r5, r2
+20005be4:	60c2      	str	r2, [r0, #12]
+20005be6:	4a4c      	ldr	r2, [pc, #304]	@ (20005d18 <vrEmuTmsPaletteRegenerate+0x234>)
+20005be8:	5a8d      	ldrh	r5, [r1, r2]
+20005bea:	0b2a      	lsrs	r2, r5, #12
+20005bec:	0112      	lsls	r2, r2, #4
+20005bee:	439d      	bics	r5, r3
+20005bf0:	432a      	orrs	r2, r5
+20005bf2:	0415      	lsls	r5, r2, #16
+20005bf4:	8122      	strh	r2, [r4, #8]
+20005bf6:	18aa      	adds	r2, r5, r2
+20005bf8:	6102      	str	r2, [r0, #16]
+20005bfa:	4a48      	ldr	r2, [pc, #288]	@ (20005d1c <vrEmuTmsPaletteRegenerate+0x238>)
+20005bfc:	5a8d      	ldrh	r5, [r1, r2]
+20005bfe:	0b2a      	lsrs	r2, r5, #12
+20005c00:	0112      	lsls	r2, r2, #4
+20005c02:	439d      	bics	r5, r3
+20005c04:	432a      	orrs	r2, r5
+20005c06:	0415      	lsls	r5, r2, #16
+20005c08:	8162      	strh	r2, [r4, #10]
+20005c0a:	18aa      	adds	r2, r5, r2
+20005c0c:	6142      	str	r2, [r0, #20]
+20005c0e:	4a44      	ldr	r2, [pc, #272]	@ (20005d20 <vrEmuTmsPaletteRegenerate+0x23c>)
+20005c10:	5a8d      	ldrh	r5, [r1, r2]
+20005c12:	0b2a      	lsrs	r2, r5, #12
+20005c14:	0112      	lsls	r2, r2, #4
+20005c16:	439d      	bics	r5, r3
+20005c18:	432a      	orrs	r2, r5
+20005c1a:	0415      	lsls	r5, r2, #16
+20005c1c:	81a2      	strh	r2, [r4, #12]
+20005c1e:	18aa      	adds	r2, r5, r2
+20005c20:	6182      	str	r2, [r0, #24]
+20005c22:	4a40      	ldr	r2, [pc, #256]	@ (20005d24 <vrEmuTmsPaletteRegenerate+0x240>)
+20005c24:	5a8d      	ldrh	r5, [r1, r2]
+20005c26:	0b2a      	lsrs	r2, r5, #12
+20005c28:	0112      	lsls	r2, r2, #4
+20005c2a:	439d      	bics	r5, r3
+20005c2c:	432a      	orrs	r2, r5
+20005c2e:	0415      	lsls	r5, r2, #16
+20005c30:	81e2      	strh	r2, [r4, #14]
+20005c32:	18aa      	adds	r2, r5, r2
+20005c34:	61c2      	str	r2, [r0, #28]
+20005c36:	4a3c      	ldr	r2, [pc, #240]	@ (20005d28 <vrEmuTmsPaletteRegenerate+0x244>)
+20005c38:	5a8d      	ldrh	r5, [r1, r2]
+20005c3a:	0b2a      	lsrs	r2, r5, #12
+20005c3c:	0112      	lsls	r2, r2, #4
+20005c3e:	439d      	bics	r5, r3
+20005c40:	432a      	orrs	r2, r5
+20005c42:	0415      	lsls	r5, r2, #16
+20005c44:	8222      	strh	r2, [r4, #16]
+20005c46:	18aa      	adds	r2, r5, r2
+20005c48:	6202      	str	r2, [r0, #32]
+20005c4a:	4a38      	ldr	r2, [pc, #224]	@ (20005d2c <vrEmuTmsPaletteRegenerate+0x248>)
+20005c4c:	5a8d      	ldrh	r5, [r1, r2]
+20005c4e:	0b2a      	lsrs	r2, r5, #12
+20005c50:	0112      	lsls	r2, r2, #4
+20005c52:	439d      	bics	r5, r3
+20005c54:	432a      	orrs	r2, r5
+20005c56:	0415      	lsls	r5, r2, #16
+20005c58:	8262      	strh	r2, [r4, #18]
+20005c5a:	18aa      	adds	r2, r5, r2
+20005c5c:	6242      	str	r2, [r0, #36]	@ 0x24
+20005c5e:	4a34      	ldr	r2, [pc, #208]	@ (20005d30 <vrEmuTmsPaletteRegenerate+0x24c>)
+20005c60:	5a8d      	ldrh	r5, [r1, r2]
+20005c62:	0b2a      	lsrs	r2, r5, #12
+20005c64:	0112      	lsls	r2, r2, #4
+20005c66:	439d      	bics	r5, r3
+20005c68:	432a      	orrs	r2, r5
+20005c6a:	0415      	lsls	r5, r2, #16
+20005c6c:	82a2      	strh	r2, [r4, #20]
+20005c6e:	18aa      	adds	r2, r5, r2
+20005c70:	6282      	str	r2, [r0, #40]	@ 0x28
+20005c72:	4a30      	ldr	r2, [pc, #192]	@ (20005d34 <vrEmuTmsPaletteRegenerate+0x250>)
+20005c74:	5a8d      	ldrh	r5, [r1, r2]
+20005c76:	0b2a      	lsrs	r2, r5, #12
+20005c78:	0112      	lsls	r2, r2, #4
+20005c7a:	439d      	bics	r5, r3
+20005c7c:	432a      	orrs	r2, r5
+20005c7e:	0415      	lsls	r5, r2, #16
+20005c80:	82e2      	strh	r2, [r4, #22]
+20005c82:	18aa      	adds	r2, r5, r2
+20005c84:	62c2      	str	r2, [r0, #44]	@ 0x2c
+20005c86:	4a2c      	ldr	r2, [pc, #176]	@ (20005d38 <vrEmuTmsPaletteRegenerate+0x254>)
+20005c88:	5a8d      	ldrh	r5, [r1, r2]
+20005c8a:	0b2a      	lsrs	r2, r5, #12
+20005c8c:	0112      	lsls	r2, r2, #4
+20005c8e:	439d      	bics	r5, r3
+20005c90:	432a      	orrs	r2, r5
+20005c92:	0415      	lsls	r5, r2, #16
+20005c94:	8322      	strh	r2, [r4, #24]
+20005c96:	18aa      	adds	r2, r5, r2
+20005c98:	6302      	str	r2, [r0, #48]	@ 0x30
+20005c9a:	4a28      	ldr	r2, [pc, #160]	@ (20005d3c <vrEmuTmsPaletteRegenerate+0x258>)
+20005c9c:	5a8d      	ldrh	r5, [r1, r2]
+20005c9e:	0b2a      	lsrs	r2, r5, #12
+20005ca0:	0112      	lsls	r2, r2, #4
+20005ca2:	439d      	bics	r5, r3
+20005ca4:	432a      	orrs	r2, r5
+20005ca6:	0415      	lsls	r5, r2, #16
+20005ca8:	8362      	strh	r2, [r4, #26]
+20005caa:	18aa      	adds	r2, r5, r2
+20005cac:	6342      	str	r2, [r0, #52]	@ 0x34
+20005cae:	4a24      	ldr	r2, [pc, #144]	@ (20005d40 <vrEmuTmsPaletteRegenerate+0x25c>)
+20005cb0:	5a8d      	ldrh	r5, [r1, r2]
+20005cb2:	0b2a      	lsrs	r2, r5, #12
+20005cb4:	0112      	lsls	r2, r2, #4
+20005cb6:	439d      	bics	r5, r3
+20005cb8:	432a      	orrs	r2, r5
+20005cba:	0415      	lsls	r5, r2, #16
+20005cbc:	83a2      	strh	r2, [r4, #28]
+20005cbe:	18aa      	adds	r2, r5, r2
+20005cc0:	6382      	str	r2, [r0, #56]	@ 0x38
+20005cc2:	4a20      	ldr	r2, [pc, #128]	@ (20005d44 <vrEmuTmsPaletteRegenerate+0x260>)
+20005cc4:	2580      	movs	r5, #128	@ 0x80
+20005cc6:	5a89      	ldrh	r1, [r1, r2]
+20005cc8:	006d      	lsls	r5, r5, #1
+20005cca:	0b0a      	lsrs	r2, r1, #12
+20005ccc:	0112      	lsls	r2, r2, #4
+20005cce:	4399      	bics	r1, r3
+20005cd0:	4311      	orrs	r1, r2
+20005cd2:	2210      	movs	r2, #16
+20005cd4:	040b      	lsls	r3, r1, #16
+20005cd6:	185b      	adds	r3, r3, r1
+20005cd8:	63c3      	str	r3, [r0, #60]	@ 0x3c
+20005cda:	83e1      	strh	r1, [r4, #30]
+20005cdc:	3040      	adds	r0, #64	@ 0x40
+20005cde:	230f      	movs	r3, #15
+20005ce0:	4013      	ands	r3, r2
+20005ce2:	1111      	asrs	r1, r2, #4
+20005ce4:	005b      	lsls	r3, r3, #1
+20005ce6:	5ae3      	ldrh	r3, [r4, r3]
+20005ce8:	0049      	lsls	r1, r1, #1
+20005cea:	5a61      	ldrh	r1, [r4, r1]
+20005cec:	041b      	lsls	r3, r3, #16
+20005cee:	430b      	orrs	r3, r1
+20005cf0:	3201      	adds	r2, #1
+20005cf2:	c008      	stmia	r0!, {r3}
+20005cf4:	42aa      	cmp	r2, r5
+20005cf6:	d1f2      	bne.n	20005cde <vrEmuTmsPaletteRegenerate+0x1fa>
+20005cf8:	e749      	b.n	20005b8e <vrEmuTmsPaletteRegenerate+0xaa>
+20005cfa:	46c0      	nop			@ (mov r8, r8)
+20005cfc:	2000d534 	.word	0x2000d534
+20005d00:	0000502c 	.word	0x0000502c
+20005d04:	000050ac 	.word	0x000050ac
+20005d08:	20026f08 	.word	0x20026f08
+20005d0c:	0000502e 	.word	0x0000502e
+20005d10:	00005030 	.word	0x00005030
+20005d14:	00005032 	.word	0x00005032
+20005d18:	00005034 	.word	0x00005034
+20005d1c:	00005036 	.word	0x00005036
+20005d20:	00005038 	.word	0x00005038
+20005d24:	0000503a 	.word	0x0000503a
+20005d28:	0000503c 	.word	0x0000503c
+20005d2c:	0000503e 	.word	0x0000503e
+20005d30:	00005040 	.word	0x00005040
+20005d34:	00005042 	.word	0x00005042
+20005d38:	00005044 	.word	0x00005044
+20005d3c:	00005046 	.word	0x00005046
+20005d40:	00005048 	.word	0x00005048
+20005d44:	0000504a 	.word	0x0000504a

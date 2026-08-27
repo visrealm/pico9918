@@ -1,0 +1,4 @@
+20000118 <tmsEndOfScanline>:
+20000118:	b510      	push	{r4, lr}
+2000011a:	f003 fd31 	bl	20003b80 <vrEmuTmsFrameEndOfScanline>
+2000011e:	bd10      	pop	{r4, pc}

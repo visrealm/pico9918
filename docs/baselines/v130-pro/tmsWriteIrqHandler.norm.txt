@@ -1,0 +1,132 @@
+<ADDR> <tmsWriteIrqHandler>:
+push	{r4, lr}
+ldr	r2, [pc, #380]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldr	r3, [pc, #380]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldr	r1, [r2, #32]
+ldr	r3, [r3, #0]
+ands.w	lr, r1, #1073741824	@ 0xADDR
+sub	sp, #8
+uxtb	r0, r1
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+add.w	r2, r3, #65536	@ 0x10000
+ldrb.w	ip, [r2, #42]	@ 0x2a
+cmp.w	ip, #0
+bne.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r1, #1
+strb.w	r0, [r2, #43]	@ 0x2b
+ldrb.w	r0, [r2, #44]	@ 0x2c
+add.w	ip, r3, #24576	@ 0x6000
+strb.w	r1, [r2, #42]	@ 0x2a
+ldrb.w	r1, [ip, #1]
+ands.w	r1, r1, #32
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+add.w	r1, r3, #45056	@ 0xb000
+ldrb	r1, [r1, #0]
+lsrs	r1, r1, #7
+ldrb.w	lr, [r2, #1516]	@ 0x5ec
+cmp	lr, r1
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+strb.w	r1, [r2, #1516]	@ 0x5ec
+mov.w	lr, #22
+eor.w	r1, r1, #1
+mcrr	0, 4, lr, r1, cr0
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+add.w	ip, r3, #24576	@ 0x6000
+ldrsb.w	r2, [ip, #47]	@ 0x2f
+ldrb.w	r1, [ip, #47]	@ 0x2f
+cmp	r2, #0
+add.w	r2, r3, #65536	@ 0x10000
+blt.n	<ADDR> <tmsWriteIrqHandler+OFF>
+strb.w	lr, [r2, #42]	@ 0x2a
+strb.w	r0, [r2, #44]	@ 0x2c
+ldr	r1, [r2, #36]	@ 0x24
+ldrsb.w	lr, [ip, #48]	@ 0x30
+add	lr, r1
+ubfx	r1, r1, #0, #14
+strb	r0, [r3, r1]
+str.w	lr, [r2, #36]	@ 0x24
+ldr	r1, [pc, #248]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldrb.w	r2, [r2, #47]	@ 0x2f
+strb	r0, [r1, #0]
+lsls	r0, r0, #8
+orr.w	r0, r0, #255	@ 0xff
+cmp	r2, #0
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb.w	r2, [ip, #15]
+and.w	r2, r2, #15
+add	r3, r2
+add.w	r3, r3, #45056	@ 0xb000
+ldrb	r3, [r3, #0]
+lsls	r2, r2, #24
+orr.w	r2, r2, r3, lsl #16
+ldr	r3, [pc, #200]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+orrs	r0, r2
+str	r0, [r3, #20]
+add	sp, #8
+pop	{r4, pc}
+lsls	r4, r1, #24
+and.w	ip, r0, #64	@ 0x40
+bmi.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb.w	r0, [r2, #43]	@ 0x2b
+lsls	r1, r1, #8
+and.w	r1, r1, #16128	@ 0x3f00
+orrs	r1, r0
+str	r1, [r2, #36]	@ 0x24
+cmp.w	ip, #0
+bne.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb	r0, [r3, r1]
+add.w	ip, r3, #24576	@ 0x6000
+strb.w	r0, [r2, #44]	@ 0x2c
+ldrsb.w	lr, [ip, #48]	@ 0x30
+add	r1, lr
+str	r1, [r2, #36]	@ 0x24
+movs	r1, #0
+strb.w	r1, [r2, #42]	@ 0x2a
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb.w	r4, [r2, #50]	@ 0x32
+cbnz	r4, <ADDR> <tmsWriteIrqHandler+OFF>
+movs	r1, #1
+and.w	r0, r0, #15
+strb.w	r0, [r2, #51]	@ 0x33
+strb.w	r1, [r2, #50]	@ 0x32
+ldrb.w	r0, [r2, #44]	@ 0x2c
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+add.w	r3, r3, #45056	@ 0xb000
+ldrb	r3, [r3, #0]
+orr.w	r0, r0, r3, lsl #16
+ldr	r3, [pc, #100]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+str	r0, [r3, #20]
+add	sp, #8
+pop	{r4, pc}
+cmp.w	ip, #0
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb.w	r0, [r2, #44]	@ 0x2c
+add.w	ip, r3, #24576	@ 0x6000
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+strb.w	lr, [r2, #50]	@ 0x32
+ldrb.w	lr, [r2, #51]	@ 0x33
+orr.w	lr, lr, r0, lsl #8
+and.w	r0, r1, #63	@ 0x3f
+add.w	r0, r0, #10240	@ 0x2800
+strh.w	lr, [r3, r0, lsl #1]
+mov.w	r0, #1
+strb.w	r0, [r2, #52]	@ 0x34
+lsls	r0, r1, #25
+ite	mi
+addmi	r1, #1
+andpl.w	r1, r1, #127	@ 0x7f
+strb.w	r1, [ip, #47]	@ 0x2f
+ldrb.w	r0, [r2, #44]	@ 0x2c
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb.w	r1, [r2, #43]	@ 0x2b
+str	r3, [sp, #4]
+str	r2, [sp, #0]
+bl	<ADDR> <pico9918_write_reg_value>
+ldr	r2, [sp, #0]
+ldr	r3, [sp, #4]
+ldrb.w	r0, [r2, #44]	@ 0x2c
+add.w	ip, r3, #24576	@ 0x6000
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

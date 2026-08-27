@@ -1,0 +1,192 @@
+20021d54 <pico9918_scan_line>:
+20021d54:	b5f0      	push	{r4, r5, r6, r7, lr}
+20021d56:	46c6      	mov	lr, r8
+20021d58:	4b56      	ldr	r3, [pc, #344]	@ (20021eb4 <pico9918_scan_line+0x160>)
+20021d5a:	4680      	mov	r8, r0
+20021d5c:	781b      	ldrb	r3, [r3, #0]
+20021d5e:	b500      	push	{lr}
+20021d60:	2b00      	cmp	r3, #0
+20021d62:	d100      	bne.n	20021d66 <pico9918_scan_line+0x12>
+20021d64:	e08d      	b.n	20021e82 <pico9918_scan_line+0x12e>
+20021d66:	23c0      	movs	r3, #192	@ 0xc0
+20021d68:	4c53      	ldr	r4, [pc, #332]	@ (20021eb8 <pico9918_scan_line+0x164>)
+20021d6a:	01db      	lsls	r3, r3, #7
+20021d6c:	4a53      	ldr	r2, [pc, #332]	@ (20021ebc <pico9918_scan_line+0x168>)
+20021d6e:	5ce3      	ldrb	r3, [r4, r3]
+20021d70:	5ca1      	ldrb	r1, [r4, r2]
+20021d72:	079a      	lsls	r2, r3, #30
+20021d74:	d500      	bpl.n	20021d78 <pico9918_scan_line+0x24>
+20021d76:	e077      	b.n	20021e68 <pico9918_scan_line+0x114>
+20021d78:	2204      	movs	r2, #4
+20021d7a:	421a      	tst	r2, r3
+20021d7c:	d146      	bne.n	20021e0c <pico9918_scan_line+0xb8>
+20021d7e:	4a50      	ldr	r2, [pc, #320]	@ (20021ec0 <pico9918_scan_line+0x16c>)
+20021d80:	4d50      	ldr	r5, [pc, #320]	@ (20021ec4 <pico9918_scan_line+0x170>)
+20021d82:	06cb      	lsls	r3, r1, #27
+20021d84:	0f9b      	lsrs	r3, r3, #30
+20021d86:	5cd3      	ldrb	r3, [r2, r3]
+20021d88:	782a      	ldrb	r2, [r5, #0]
+20021d8a:	429a      	cmp	r2, r3
+20021d8c:	d003      	beq.n	20021d96 <pico9918_scan_line+0x42>
+20021d8e:	2001      	movs	r0, #1
+20021d90:	4a4d      	ldr	r2, [pc, #308]	@ (20021ec8 <pico9918_scan_line+0x174>)
+20021d92:	702b      	strb	r3, [r5, #0]
+20021d94:	54a0      	strb	r0, [r4, r2]
+20021d96:	4a4d      	ldr	r2, [pc, #308]	@ (20021ecc <pico9918_scan_line+0x178>)
+20021d98:	5ca0      	ldrb	r0, [r4, r2]
+20021d9a:	220f      	movs	r2, #15
+20021d9c:	4002      	ands	r2, r0
+20021d9e:	2b04      	cmp	r3, #4
+20021da0:	d040      	beq.n	20021e24 <pico9918_scan_line+0xd0>
+20021da2:	4b4b      	ldr	r3, [pc, #300]	@ (20021ed0 <pico9918_scan_line+0x17c>)
+20021da4:	5ce0      	ldrb	r0, [r4, r3]
+20021da6:	2330      	movs	r3, #48	@ 0x30
+20021da8:	0100      	lsls	r0, r0, #4
+20021daa:	4003      	ands	r3, r0
+20021dac:	2600      	movs	r6, #0
+20021dae:	4313      	orrs	r3, r2
+20021db0:	4a48      	ldr	r2, [pc, #288]	@ (20021ed4 <pico9918_scan_line+0x180>)
+20021db2:	4353      	muls	r3, r2
+20021db4:	4a48      	ldr	r2, [pc, #288]	@ (20021ed8 <pico9918_scan_line+0x184>)
+20021db6:	6013      	str	r3, [r2, #0]
+20021db8:	4b48      	ldr	r3, [pc, #288]	@ (20021edc <pico9918_scan_line+0x188>)
+20021dba:	4a49      	ldr	r2, [pc, #292]	@ (20021ee0 <pico9918_scan_line+0x18c>)
+20021dbc:	62d3      	str	r3, [r2, #44]	@ 0x2c
+20021dbe:	4a49      	ldr	r2, [pc, #292]	@ (20021ee4 <pico9918_scan_line+0x190>)
+20021dc0:	6013      	str	r3, [r2, #0]
+20021dc2:	4b49      	ldr	r3, [pc, #292]	@ (20021ee8 <pico9918_scan_line+0x194>)
+20021dc4:	701e      	strb	r6, [r3, #0]
+20021dc6:	0649      	lsls	r1, r1, #25
+20021dc8:	d537      	bpl.n	20021e3a <pico9918_scan_line+0xe6>
+20021dca:	4b48      	ldr	r3, [pc, #288]	@ (20021eec <pico9918_scan_line+0x198>)
+20021dcc:	4f48      	ldr	r7, [pc, #288]	@ (20021ef0 <pico9918_scan_line+0x19c>)
+20021dce:	4a49      	ldr	r2, [pc, #292]	@ (20021ef4 <pico9918_scan_line+0x1a0>)
+20021dd0:	2100      	movs	r1, #0
+20021dd2:	62d3      	str	r3, [r2, #44]	@ 0x2c
+20021dd4:	0038      	movs	r0, r7
+20021dd6:	2248      	movs	r2, #72	@ 0x48
+20021dd8:	f7f4 ffe4 	bl	20016da4 <__wrap_memset>
+20021ddc:	4a46      	ldr	r2, [pc, #280]	@ (20021ef8 <pico9918_scan_line+0x1a4>)
+20021dde:	20a0      	movs	r0, #160	@ 0xa0
+20021de0:	18bb      	adds	r3, r7, r2
+20021de2:	4a46      	ldr	r2, [pc, #280]	@ (20021efc <pico9918_scan_line+0x1a8>)
+20021de4:	21a8      	movs	r1, #168	@ 0xa8
+20021de6:	549e      	strb	r6, [r3, r2]
+20021de8:	2280      	movs	r2, #128	@ 0x80
+20021dea:	05c0      	lsls	r0, r0, #23
+20021dec:	0049      	lsls	r1, r1, #1
+20021dee:	0452      	lsls	r2, r2, #17
+20021df0:	5843      	ldr	r3, [r0, r1]
+20021df2:	4213      	tst	r3, r2
+20021df4:	d1fc      	bne.n	20021df0 <pico9918_scan_line+0x9c>
+20021df6:	782b      	ldrb	r3, [r5, #0]
+20021df8:	2b03      	cmp	r3, #3
+20021dfa:	d002      	beq.n	20021e02 <pico9918_scan_line+0xae>
+20021dfc:	d814      	bhi.n	20021e28 <pico9918_scan_line+0xd4>
+20021dfe:	2b02      	cmp	r3, #2
+20021e00:	d042      	beq.n	20021e88 <pico9918_scan_line+0x134>
+20021e02:	4640      	mov	r0, r8
+20021e04:	f7fe f9a8 	bl	20020158 <graphics_i_scan_line.constprop.0>
+20021e08:	0004      	movs	r4, r0
+20021e0a:	e017      	b.n	20021e3c <pico9918_scan_line+0xe8>
+20021e0c:	4d2d      	ldr	r5, [pc, #180]	@ (20021ec4 <pico9918_scan_line+0x170>)
+20021e0e:	782b      	ldrb	r3, [r5, #0]
+20021e10:	2b04      	cmp	r3, #4
+20021e12:	d03e      	beq.n	20021e92 <pico9918_scan_line+0x13e>
+20021e14:	4b2c      	ldr	r3, [pc, #176]	@ (20021ec8 <pico9918_scan_line+0x174>)
+20021e16:	702a      	strb	r2, [r5, #0]
+20021e18:	3a03      	subs	r2, #3
+20021e1a:	54e2      	strb	r2, [r4, r3]
+20021e1c:	4b2b      	ldr	r3, [pc, #172]	@ (20021ecc <pico9918_scan_line+0x178>)
+20021e1e:	320e      	adds	r2, #14
+20021e20:	5ce3      	ldrb	r3, [r4, r3]
+20021e22:	401a      	ands	r2, r3
+20021e24:	0113      	lsls	r3, r2, #4
+20021e26:	e7c1      	b.n	20021dac <pico9918_scan_line+0x58>
+20021e28:	2b04      	cmp	r3, #4
+20021e2a:	d106      	bne.n	20021e3a <pico9918_scan_line+0xe6>
+20021e2c:	4640      	mov	r0, r8
+20021e2e:	f7fd f9b3 	bl	2001f198 <text_scan_line.constprop.0>
+20021e32:	4b33      	ldr	r3, [pc, #204]	@ (20021f00 <pico9918_scan_line+0x1ac>)
+20021e34:	5ce3      	ldrb	r3, [r4, r3]
+20021e36:	2b00      	cmp	r3, #0
+20021e38:	d136      	bne.n	20021ea8 <pico9918_scan_line+0x154>
+20021e3a:	2400      	movs	r4, #0
+20021e3c:	20a0      	movs	r0, #160	@ 0xa0
+20021e3e:	21c8      	movs	r1, #200	@ 0xc8
+20021e40:	2280      	movs	r2, #128	@ 0x80
+20021e42:	05c0      	lsls	r0, r0, #23
+20021e44:	0049      	lsls	r1, r1, #1
+20021e46:	0452      	lsls	r2, r2, #17
+20021e48:	5843      	ldr	r3, [r0, r1]
+20021e4a:	4213      	tst	r3, r2
+20021e4c:	d1fc      	bne.n	20021e48 <pico9918_scan_line+0xf4>
+20021e4e:	20a0      	movs	r0, #160	@ 0xa0
+20021e50:	21e8      	movs	r1, #232	@ 0xe8
+20021e52:	2280      	movs	r2, #128	@ 0x80
+20021e54:	05c0      	lsls	r0, r0, #23
+20021e56:	0049      	lsls	r1, r1, #1
+20021e58:	0452      	lsls	r2, r2, #17
+20021e5a:	5843      	ldr	r3, [r0, r1]
+20021e5c:	4213      	tst	r3, r2
+20021e5e:	d1fc      	bne.n	20021e5a <pico9918_scan_line+0x106>
+20021e60:	0020      	movs	r0, r4
+20021e62:	bc80      	pop	{r7}
+20021e64:	46b8      	mov	r8, r7
+20021e66:	bdf0      	pop	{r4, r5, r6, r7, pc}
+20021e68:	4d16      	ldr	r5, [pc, #88]	@ (20021ec4 <pico9918_scan_line+0x170>)
+20021e6a:	782b      	ldrb	r3, [r5, #0]
+20021e6c:	2b01      	cmp	r3, #1
+20021e6e:	d016      	beq.n	20021e9e <pico9918_scan_line+0x14a>
+20021e70:	2301      	movs	r3, #1
+20021e72:	4a15      	ldr	r2, [pc, #84]	@ (20021ec8 <pico9918_scan_line+0x174>)
+20021e74:	702b      	strb	r3, [r5, #0]
+20021e76:	54a3      	strb	r3, [r4, r2]
+20021e78:	220f      	movs	r2, #15
+20021e7a:	4b14      	ldr	r3, [pc, #80]	@ (20021ecc <pico9918_scan_line+0x178>)
+20021e7c:	5ce3      	ldrb	r3, [r4, r3]
+20021e7e:	401a      	ands	r2, r3
+20021e80:	e78f      	b.n	20021da2 <pico9918_scan_line+0x4e>
+20021e82:	f000 fb3d 	bl	20022500 <__initLookups_veneer>
+20021e86:	e76e      	b.n	20021d66 <pico9918_scan_line+0x12>
+20021e88:	4b1d      	ldr	r3, [pc, #116]	@ (20021f00 <pico9918_scan_line+0x1ac>)
+20021e8a:	5ce3      	ldrb	r3, [r4, r3]
+20021e8c:	2b00      	cmp	r3, #0
+20021e8e:	d1b8      	bne.n	20021e02 <pico9918_scan_line+0xae>
+20021e90:	e7cc      	b.n	20021e2c <pico9918_scan_line+0xd8>
+20021e92:	220f      	movs	r2, #15
+20021e94:	4b0d      	ldr	r3, [pc, #52]	@ (20021ecc <pico9918_scan_line+0x178>)
+20021e96:	5ce3      	ldrb	r3, [r4, r3]
+20021e98:	401a      	ands	r2, r3
+20021e9a:	0113      	lsls	r3, r2, #4
+20021e9c:	e786      	b.n	20021dac <pico9918_scan_line+0x58>
+20021e9e:	220f      	movs	r2, #15
+20021ea0:	4b0a      	ldr	r3, [pc, #40]	@ (20021ecc <pico9918_scan_line+0x178>)
+20021ea2:	5ce3      	ldrb	r3, [r4, r3]
+20021ea4:	401a      	ands	r2, r3
+20021ea6:	e77c      	b.n	20021da2 <pico9918_scan_line+0x4e>
+20021ea8:	4640      	mov	r0, r8
+20021eaa:	f7f9 fdd7 	bl	2001ba5c <pico9918_output_sprites.constprop.0>
+20021eae:	0004      	movs	r4, r0
+20021eb0:	e7c4      	b.n	20021e3c <pico9918_scan_line+0xe8>
+20021eb2:	46c0      	nop			@ (mov r8, r8)
+20021eb4:	200292d9 	.word	0x200292d9
+20021eb8:	20005200 	.word	0x20005200
+20021ebc:	00006001 	.word	0x00006001
+20021ec0:	200231f8 	.word	0x200231f8
+20021ec4:	200292df 	.word	0x200292df
+20021ec8:	00010034 	.word	0x00010034
+20021ecc:	00006007 	.word	0x00006007
+20021ed0:	00006018 	.word	0x00006018
+20021ed4:	01010101 	.word	0x01010101
+20021ed8:	20041a08 	.word	0x20041a08
+20021edc:	2004064c 	.word	0x2004064c
+20021ee0:	50000180 	.word	0x50000180
+20021ee4:	20028e80 	.word	0x20028e80
+20021ee8:	200292e0 	.word	0x200292e0
+20021eec:	200405e0 	.word	0x200405e0
+20021ef0:	20015564 	.word	0x20015564
+20021ef4:	50000140 	.word	0x50000140
+20021ef8:	fffefc9c 	.word	0xfffefc9c
+20021efc:	00010036 	.word	0x00010036
+20021f00:	0001002f 	.word	0x0001002f

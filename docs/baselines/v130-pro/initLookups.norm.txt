@@ -1,0 +1,53 @@
+<ADDR> <initLookups>:
+ldr	r2, [pc, #116]	@ (<ADDR> <initLookups+OFF>)
+push	{r3, lr}
+ldrb	r3, [r2, #0]
+cbz	r3, <ADDR> <initLookups+OFF>
+pop	{r3, pc}
+movs	r0, #228	@ 0xe4
+bl	<ADDR> <__dma_claim_mask_veneer>
+bl	<ADDR> <ecmLookupInit>
+bl	<ADDR> <doubledBitsInit>
+bl	<ADDR> <reversedBitsInit>
+bl	<ADDR> <ecm0PaletteInit>
+ldr	r3, [pc, #88]	@ (<ADDR> <initLookups+OFF>)
+ldr	r2, [pc, #92]	@ (<ADDR> <initLookups+OFF>)
+mov.w	lr, #27
+str.w	r2, [r3, #144]	@ 0x90
+ldr	r2, [pc, #84]	@ (<ADDR> <initLookups+OFF>)
+mov.w	r0, #1342177280	@ 0xADDR
+str.w	r2, [r3, #128]	@ 0x80
+movs	r2, #64	@ 0x40
+mov.w	ip, #1
+str.w	r2, [r3, #136]	@ 0x88
+ldr	r2, [pc, #68]	@ (<ADDR> <initLookups+OFF>)
+ldr	r1, [pc, #72]	@ (<ADDR> <initLookups+OFF>)
+str	r2, [r3, #80]	@ 0x50
+ldr	r2, [pc, #72]	@ (<ADDR> <initLookups+OFF>)
+str	r2, [r3, #64]	@ 0x40
+str.w	lr, [r3, #72]	@ 0x48
+ldr.w	lr, [pc, #76]	@ <ADDR> <initLookups+OFF>
+ldr	r2, [pc, #36]	@ (<ADDR> <initLookups+OFF>)
+str.w	lr, [r0, #144]	@ 0x90
+ldr.w	lr, [pc, #68]	@ <ADDR> <initLookups+OFF>
+str.w	lr, [r0, #128]	@ 0x80
+ldr	r0, [pc, #48]	@ (<ADDR> <initLookups+OFF>)
+ldr.w	lr, [pc, #64]	@ <ADDR> <initLookups+OFF>
+str	r1, [r0, #0]
+ldr	r0, [pc, #44]	@ (<ADDR> <initLookups+OFF>)
+str.w	lr, [r0]
+str.w	r1, [r3, #208]	@ 0xd0
+strb.w	ip, [r2]
+pop	{r3, pc}
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

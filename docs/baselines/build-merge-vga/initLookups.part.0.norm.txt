@@ -1,0 +1,152 @@
+<ADDR> <initLookups.part.0>:
+push	{r3, r4, r5, r6, r7, lr}
+movs	r0, #28
+bl	<ADDR> <dma_claim_mask>
+ldr	r2, [pc, #260]	@ (<ADDR> <initLookups.part.0+OFF>)
+ldr	r3, [pc, #264]	@ (<ADDR> <initLookups.part.0+OFF>)
+movs	r4, #128	@ 0x80
+str	r2, [r3, #16]
+movs	r2, #0
+ldr	r0, [pc, #260]	@ (<ADDR> <initLookups.part.0+OFF>)
+lsls	r4, r4, #5
+lsls	r3, r2, #21
+lsls	r1, r2, #25
+lsrs	r3, r3, #31
+lsrs	r1, r1, #31
+lsls	r1, r1, #1
+lsls	r3, r3, #2
+orrs	r3, r1
+lsls	r1, r2, #29
+lsrs	r1, r1, #31
+orrs	r3, r1
+lsls	r6, r2, #26
+lsls	r1, r2, #22
+lsrs	r1, r1, #31
+lsrs	r6, r6, #31
+lsls	r6, r6, #1
+lsls	r1, r1, #2
+orrs	r1, r6
+lsls	r6, r2, #30
+lsrs	r6, r6, #31
+orrs	r1, r6
+sxtb	r3, r3
+sxtb	r1, r1
+lsls	r1, r1, #16
+lsls	r3, r3, #8
+orrs	r3, r1
+lsls	r6, r2, #24
+lsls	r1, r2, #20
+lsrs	r1, r1, #31
+lsrs	r6, r6, #31
+lsls	r6, r6, #1
+lsls	r1, r1, #2
+orrs	r1, r6
+lsls	r6, r2, #28
+lsrs	r6, r6, #31
+orrs	r1, r6
+sxtb	r1, r1
+orrs	r3, r1
+lsls	r6, r2, #27
+lsls	r1, r2, #23
+lsrs	r1, r1, #31
+lsrs	r6, r6, #31
+lsls	r6, r6, #1
+lsls	r1, r1, #2
+orrs	r1, r6
+movs	r6, #1
+ands	r6, r2
+orrs	r1, r6
+lsls	r1, r1, #24
+adds	r2, #1
+orrs	r3, r1
+uxth	r2, r2
+stmia	r0!, {r3}
+cmp	r2, r4
+bne.n	<ADDR> <initLookups.part.0+OFF>
+movs	r3, #0
+movs	r5, #128	@ 0x80
+ldr	r0, [pc, #148]	@ (<ADDR> <initLookups.part.0+OFF>)
+ldr	r4, [pc, #148]	@ (<ADDR> <initLookups.part.0+OFF>)
+strh	r3, [r0, #0]
+lsls	r5, r5, #1
+adds	r0, #2
+adds	r3, #1
+asrs	r2, r3, #4
+ldrb	r1, [r4, r2]
+movs	r2, #15
+ands	r2, r3
+ldrb	r2, [r4, r2]
+lsls	r1, r1, #8
+orrs	r2, r1
+adds	r3, #1
+strh	r2, [r0, #0]
+adds	r0, #2
+cmp	r3, r5
+bne.n	<ADDR> <initLookups.part.0+OFF>
+movs	r6, #128	@ 0x80
+movs	r0, #0
+movs	r1, #0
+movs	r5, #51	@ 0x33
+movs	r4, #85	@ 0x55
+ldr	r7, [pc, #108]	@ (<ADDR> <initLookups.part.0+OFF>)
+lsls	r6, r6, #1
+uxtb	r2, r1
+lsrs	r2, r2, #4
+orrs	r2, r0
+uxtb	r2, r2
+asrs	r3, r2, #2
+lsls	r2, r2, #2
+bics	r2, r5
+ands	r3, r5
+orrs	r3, r2
+sxtb	r2, r3
+lsls	r2, r2, #1
+lsrs	r3, r3, #1
+ands	r3, r4
+bics	r2, r4
+orrs	r3, r2
+strb	r3, [r7, r1]
+adds	r1, #1
+adds	r0, #16
+cmp	r1, r6
+bne.n	<ADDR> <initLookups.part.0+OFF>
+movs	r3, #0
+ldr	r2, [pc, #68]	@ (<ADDR> <initLookups.part.0+OFF>)
+ldr	r1, [pc, #68]	@ (<ADDR> <initLookups.part.0+OFF>)
+ldr	r0, [pc, #72]	@ (<ADDR> <initLookups.part.0+OFF>)
+stmia	r2!, {r3}
+adds	r3, r3, r0
+cmp	r3, r1
+bne.n	<ADDR> <initLookups.part.0+OFF>
+ldr	r3, [pc, #64]	@ (<ADDR> <initLookups.part.0+OFF>)
+ldr	r2, [pc, #68]	@ (<ADDR> <initLookups.part.0+OFF>)
+str	r2, [r3, #16]
+ldr	r2, [pc, #68]	@ (<ADDR> <initLookups.part.0+OFF>)
+str	r2, [r3, #0]
+movs	r2, #64	@ 0x40
+str	r2, [r3, #8]
+ldr	r3, [pc, #64]	@ (<ADDR> <initLookups.part.0+OFF>)
+ldr	r2, [pc, #64]	@ (<ADDR> <initLookups.part.0+OFF>)
+str	r2, [r3, #16]
+ldr	r2, [pc, #64]	@ (<ADDR> <initLookups.part.0+OFF>)
+str	r2, [r3, #0]
+movs	r2, #1
+ldr	r3, [pc, #64]	@ (<ADDR> <initLookups.part.0+OFF>)
+strb	r2, [r3, #0]
+pop	{r3, r4, r5, r6, r7, pc}
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

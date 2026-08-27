@@ -1,0 +1,4 @@
+20000110 <tmsPorch>:
+20000110:	b510      	push	{r4, lr}
+20000112:	f003 fd23 	bl	20003b5c <vrEmuTmsFramePorch>
+20000116:	bd10      	pop	{r4, pc}

@@ -1,0 +1,344 @@
+<ADDR> <vrEmuTmsFrameScanline>:
+push	{r4, r5, r6, r7, lr}
+mov	lr, fp
+mov	r7, sl
+mov	r6, r9
+mov	r5, r8
+push	{r5, r6, r7, lr}
+ldrh	r3, [r1, #0]
+lsls	r7, r0, #20
+mov	fp, r0
+sub	sp, #20
+movs	r0, #7
+mov	r8, r2
+mov	sl, r3
+mov	r9, r1
+bl	<ADDR> <vrEmuTms9918RegValue>
+movs	r3, #15
+ldr	r4, [pc, #616]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ands	r3, r0
+lsls	r3, r3, #2
+ldr	r2, [pc, #612]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldr	r3, [r4, r3]
+ldr	r6, [pc, #612]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+lsrs	r7, r7, #20
+str	r3, [r2, #0]
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r2, [r6, #0]
+ldr	r3, [pc, #608]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r7, [r2, r3]
+movs	r1, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r5, #144	@ 0x90
+lsls	r1, r1, #23
+lsls	r2, r2, #17
+ldr	r3, [r1, r5]
+movs	r0, r3
+ands	r0, r2
+tst	r3, r2
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r2, [pc, #588]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldr	r5, [pc, #588]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldr	r1, [r2, #0]
+ldr	r3, [r5, #0]
+mov	ip, r2
+adds	r1, r3, r1
+ldr	r2, [r6, #0]
+cmp	r7, r3
+bcs.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+cmp	r7, r1
+bcc.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+mov	r1, sl
+ldr	r5, [pc, #568]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+subs	r3, r7, r3
+adds	r1, r1, r5
+movs	r5, #3
+str	r1, [sp, #8]
+asrs	r1, r1, #31
+ands	r1, r5
+movs	r5, r1
+ldr	r1, [sp, #8]
+adds	r1, r5, r1
+asrs	r1, r1, #2
+str	r1, [sp, #8]
+ldr	r1, [pc, #548]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldr	r5, [r1, #40]	@ 0x28
+ldr	r1, [sp, #8]
+mov	sl, r5
+uxth	r5, r3
+ldr	r3, [pc, #540]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r0, [r2, r3]
+ldr	r3, [pc, #540]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r5, [r2, r3]
+ldr	r3, [pc, #540]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r5, [r2, r3]
+ldr	r3, [pc, #540]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+str	r1, [r3, #8]
+mov	r1, r8
+str	r1, [r3, #44]	@ 0x2c
+ldrb	r3, [r2, #16]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r3, [pc, #528]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldrb	r3, [r2, r3]
+cmp	r3, #127	@ 0x7f
+bls.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+mov	r1, r9
+ldrb	r3, [r1, #4]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r2, [r6, #0]
+ldr	r3, [pc, #512]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #28
+bpl.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r7, [pc, #480]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+movs	r0, r5
+ldr	r3, [r7, #40]	@ 0x28
+str	r3, [sp, #12]
+ldr	r3, [pc, #500]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+movs	r1, r3
+mov	r9, r3
+bl	<ADDR> <vrEmuTms9918ScanLine>
+ldr	r3, [r7, #40]	@ 0x28
+movs	r7, #3
+ldr	r1, [pc, #488]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+mov	fp, r3
+ldr	r3, [r6, #0]
+ldrb	r2, [r3, r1]
+bics	r2, r7
+ldr	r7, [pc, #456]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r2, [r3, r1]
+ldrb	r7, [r3, r7]
+cmp	r7, #0
+beq.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r5, [pc, #472]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldrb	r5, [r3, r5]
+cmp	r5, r7
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r2, [pc, #468]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #25
+bpl.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+movs	r2, #1
+strb	r2, [r3, #12]
+bl	<ADDR> <vrEmuTmsFrameUpdateInterrupts>
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+tst	r3, r2
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+movs	r2, #1
+ldr	r0, [r6, #0]
+ldr	r3, [pc, #396]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r2, [r0, r3]
+ldr	r3, [sp, #8]
+lsls	r6, r3, #2
+mov	r3, r8
+adds	r2, r3, r6
+mov	r3, r9
+adds	r7, r3, #1
+adds	r7, #255	@ 0xff
+ldrb	r1, [r3, #0]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #0]
+ldrb	r1, [r3, #1]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #4]
+ldrb	r1, [r3, #2]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #8]
+ldrb	r1, [r3, #3]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #12]
+ldrb	r1, [r3, #4]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #16]
+ldrb	r1, [r3, #5]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #20]
+ldrb	r1, [r3, #6]
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #24]
+ldrb	r1, [r3, #7]
+adds	r3, #8
+lsls	r1, r1, #2
+ldr	r1, [r4, r1]
+str	r1, [r2, #28]
+adds	r2, #32
+cmp	r3, r7
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+movs	r3, #128	@ 0x80
+lsls	r3, r3, #3
+adds	r6, r6, r3
+ldr	r3, [pc, #312]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+add	r6, r8
+str	r6, [r3, #44]	@ 0x2c
+ldr	r3, [pc, #332]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldrb	r3, [r0, r3]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+movs	r0, #0
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+mov	r1, r9
+ldrh	r1, [r1, #0]
+ldr	r0, [pc, #288]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+lsrs	r1, r1, #1
+str	r1, [r0, #8]
+mov	r1, r8
+str	r1, [r0, #44]	@ 0x2c
+movs	r0, #1
+ldr	r1, [pc, #264]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r0, [r2, r1]
+ldr	r0, [pc, #264]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+subs	r1, r7, r3
+strb	r1, [r2, r0]
+ldr	r0, [pc, #264]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r1, [r2, r0]
+ldr	r2, [pc, #296]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldr	r4, [pc, #296]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldrb	r2, [r2, #0]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+movs	r2, #150	@ 0x96
+ldr	r1, [r4, #0]
+lsls	r2, r2, #2
+cmp	r1, r2
+blt.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+subs	r3, #1
+cmp	r7, r3
+beq.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r2, [r6, #0]
+ldr	r3, [pc, #260]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #25
+bpl.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+movs	r3, #1
+strb	r3, [r2, #12]
+movs	r0, #1
+add	sp, #20
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+movs	r1, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r0, #144	@ 0x90
+lsls	r1, r1, #23
+lsls	r2, r2, #17
+ldr	r3, [r1, r0]
+tst	r3, r2
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+mov	r3, ip
+mov	r0, r8
+ldr	r3, [r3, #0]
+ldr	r2, [r5, #0]
+ldr	r1, [r4, #0]
+str	r0, [sp, #4]
+mov	r0, r9
+ldrh	r0, [r0, #2]
+str	r0, [sp, #0]
+movs	r0, r7
+bl	<ADDR> <vrEmuTmsSplashRender>
+movs	r3, #225	@ 0xe1
+ldr	r2, [r4, #0]
+lsls	r3, r3, #2
+cmp	r2, r3
+ble.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r3, [r6, #0]
+ldr	r2, [pc, #196]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldr	r1, [pc, #196]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+str	r1, [r3, r2]
+movs	r1, #1
+ldr	r2, [pc, #196]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r1, [r3, r2]
+ldr	r3, [r5, #0]
+subs	r3, #1
+cmp	r7, r3
+bne.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+bl	<ADDR> <vrEmuTmsPaletteRegenerate>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+bl	<ADDR> <vrEmuTmsPaletteRegenerate>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+mov	r0, r9
+ldrh	r0, [r0, #0]
+ldr	r4, [pc, #120]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+lsrs	r0, r0, #1
+str	r0, [r4, #8]
+mov	r0, r8
+str	r0, [r4, #44]	@ 0x2c
+movs	r4, #1
+ldr	r0, [pc, #96]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+strb	r4, [r2, r0]
+cmp	r7, r1
+bcc.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+ldr	r3, [pc, #80]	@ (<ADDR> <vrEmuTmsFrameScanline+OFF>)
+ldr	r2, [sp, #12]
+ldr	r1, [r3, #40]	@ 0x28
+mov	r3, sl
+subs	r1, r1, r3
+mov	r3, fp
+subs	r0, r3, r2
+bl	<ADDR> <vrEmuTmsDiagUpdateRenderTime>
+movs	r0, #0
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+mov	r3, fp
+ldrb	r2, [r1, #5]
+lsls	r3, r3, #19
+lsrs	r3, r3, #31
+lsls	r5, r5, #1
+eors	r3, r2
+adds	r3, r3, r5
+uxth	r5, r3
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+movs	r7, #1
+orrs	r2, r7
+strb	r2, [r3, r1]
+movs	r2, #128	@ 0x80
+negs	r2, r2
+orrs	r0, r2
+uxtb	r0, r0
+b.n	<ADDR> <vrEmuTmsFrameScanline+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

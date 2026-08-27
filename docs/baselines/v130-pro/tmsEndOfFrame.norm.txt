@@ -1,0 +1,27 @@
+<ADDR> <tmsEndOfFrame>:
+push	{r4, lr}
+sub	sp, #24
+bl	<ADDR> <vgaCurrentParams>
+mov	r4, r0
+ldrh	r0, [r0, #24]
+ldrb.w	r1, [r4, #68]	@ 0x44
+ldrb.w	r2, [r4, #72]	@ 0x48
+ldrh	r3, [r4, #46]	@ 0x2e
+strb.w	r1, [sp, #8]
+strb.w	r2, [sp, #9]
+strh.w	r3, [sp, #10]
+str	r0, [sp, #4]
+bl	<ADDR> <coreTemperatureC>
+ldr	r2, [r4, #64]	@ 0x40
+mov	r1, r0
+add	r3, sp, #4
+add	r0, sp, #12
+bl	<ADDR> <pico9918_frame_end>
+ldrb.w	r2, [sp, #9]
+ldrh.w	r3, [sp, #10]
+ldr	r0, [sp, #20]
+strb.w	r2, [r4, #72]	@ 0x48
+strh	r3, [r4, #46]	@ 0x2e
+bl	<ADDR> <vgaSetTriggerScanline>
+add	sp, #24
+pop	{r4, pc}

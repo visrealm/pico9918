@@ -1,0 +1,334 @@
+<ADDR> <f18a_tile_layer_scan_line>:
+stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ldr	r6, [pc, #712]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+sub	sp, #84	@ 0x54
+str	r2, [sp, #56]	@ 0x38
+ldr	r2, [pc, #712]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+add.w	r7, r6, #24576	@ 0x6000
+mov	r5, r1
+ldrb.w	fp, [r2]
+ldrb.w	r1, [r7, #49]	@ 0x31
+cmp.w	fp, #4
+ubfx	sl, r1, #4, #2
+mov	r8, r0
+str.w	sl, [sp, #40]	@ 0x28
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+cmp.w	fp, #2
+beq.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+cmp.w	sl, #0
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldrb.w	r3, [r7, #50]	@ 0x32
+ands.w	r3, r3, #2
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+movs	r3, #1
+movs	r0, #0
+str	r3, [sp, #60]	@ 0x3c
+str	r3, [sp, #28]
+str	r3, [sp, #52]	@ 0x34
+ldrb	r3, [r5, #0]
+mov.w	r9, #32
+add	r3, r6
+add.w	r3, r3, #24576	@ 0x6000
+ldrb	r4, [r3, #0]
+str	r0, [sp, #48]	@ 0x30
+str	r0, [sp, #44]	@ 0x2c
+str	r0, [sp, #32]
+cbnz	r4, <ADDR> <f18a_tile_layer_scan_line+OFF>
+mov	r1, r4
+mov	r4, r8
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+movs	r3, #0
+str	r3, [sp, #48]	@ 0x30
+ldrb.w	r3, [r7, #50]	@ 0x32
+mov.w	r9, #40	@ 0x28
+ands.w	r3, r3, #2
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+movs	r3, #1
+str	r3, [sp, #60]	@ 0x3c
+str	r3, [sp, #28]
+str	r3, [sp, #44]	@ 0x2c
+str	r3, [sp, #52]	@ 0x34
+str	r3, [sp, #32]
+ldrb	r3, [r5, #0]
+add	r3, r6
+add.w	r3, r3, #24576	@ 0x6000
+ldrb	r4, [r3, #0]
+cmp	r4, #0
+beq.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+tst.w	r1, #64	@ 0x40
+ite	eq
+moveq	r3, #192	@ 0xc0
+movne	r3, #240	@ 0xf0
+ldrb	r1, [r7, #0]
+add	r4, r8
+ubfx	r1, r1, #3, #1
+lsls	r3, r1
+cmp	r4, r3
+blt.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+subs	r4, r4, r3
+ldr	r3, [sp, #44]	@ 0x2c
+cmp	r3, #0
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+movs	r1, #0
+uxth	r4, r4
+lsrs	r3, r4, #3
+mul.w	r9, r3, r9
+ldr	r0, [pc, #520]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+ldr	r3, [r5, #12]
+str	r1, [sp, #36]	@ 0x24
+blx	r3
+ldr	r1, [sp, #36]	@ 0x24
+and.w	r3, r0, #15360	@ 0x3c00
+add	r3, r9
+eors	r1, r3
+uxth	r1, r1
+ldr	r3, [r5, #16]
+ldr	r0, [pc, #496]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+str	r1, [sp, #36]	@ 0x24
+blx	r3
+ldr	r3, [sp, #28]
+mov	ip, r0
+ldr	r1, [sp, #36]	@ 0x24
+ldr	r2, [pc, #488]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+cbz	r3, <ADDR> <f18a_tile_layer_scan_line+OFF>
+and.w	r3, r1, #3072	@ 0xc00
+add	r3, r0
+ldr	r0, [sp, #44]	@ 0x2c
+uxth	r3, r3
+cmp	r0, #0
+it	eq
+moveq	ip, r3
+add	r9, ip
+ubfx	ip, r9, #0, #14
+cmp.w	fp, #3
+ldrb	r0, [r7, #4]
+bne.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+mov.w	r3, #65280	@ 0xff00
+movs	r4, #0
+ubfx	r8, r8, #2, #3
+strh.w	r3, [sp, #76]	@ 0x4c
+ldrb	r3, [r2, #0]
+add	r4, r8
+cmp	r3, #1
+ite	ne
+movne	r3, #7
+moveq	r3, #4
+ands	r3, r0
+add.w	r4, r4, r3, lsl #11
+ldrb.w	lr, [r5, #3]
+ldrb	r3, [r7, #24]
+add	r4, r6
+and.w	lr, r3, lr
+ldrb	r3, [r5, #2]
+str	r4, [sp, #72]	@ 0x48
+lsl.w	lr, lr, r3
+ldrb	r3, [r5, #6]
+cmp	r3, #0
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+add.w	r8, r6, r3
+add.w	r8, r8, #24576	@ 0x6000
+ldrb.w	r2, [r8]
+ldrb	r3, [r5, #7]
+tst	r2, r3
+ite	eq
+moveq.w	r8, #1
+movne.w	r8, #0
+ldrb	r3, [r5, #4]
+ldr	r2, [sp, #32]
+add	r3, r6
+add.w	r3, r3, #24576	@ 0x6000
+ldrb	r3, [r3, #0]
+cmp	r2, #0
+beq.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldrb	r2, [r7, #7]
+ldrb	r5, [r5, #9]
+lsrs	r0, r2, #4
+it	eq
+moveq	r0, r2
+and.w	r2, r2, #15
+orr.w	r2, r2, r0, lsl #4
+strb.w	r2, [sp, #71]	@ 0x47
+ldr	r2, [sp, #52]	@ 0x34
+orrs.w	r2, sl, r2
+ite	ne
+addne.w	r2, r6, ip
+addeq.w	r2, sp, #71	@ 0x47
+cmp	r5, #0
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+adds	r0, r6, r1
+ldr	r6, [sp, #48]	@ 0x30
+ldr.w	ip, [pc, #316]	@ <ADDR> <f18a_tile_layer_scan_line+OFF>
+uxtb.w	r1, lr
+cmp	r6, #0
+bne.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldr	r6, [sp, #56]	@ 0x38
+cmp	r6, #0
+bne.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldr	r4, [pc, #284]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+strd	r3, r8, [sp, #8]
+add.w	r5, sl, r5, lsl #2
+add.w	r3, ip, #8
+str	r1, [sp, #0]
+str	r3, [sp, #4]
+ldr.w	r4, [r4, r5, lsl #2]
+ldr	r3, [sp, #60]	@ 0x3c
+add	r1, sp, #72	@ 0x48
+blx	r4
+add	sp, #84	@ 0x54
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+mov.w	r9, #32
+str.w	sl, [sp, #60]	@ 0x3c
+str.w	sl, [sp, #48]	@ 0x30
+str.w	sl, [sp, #28]
+str.w	sl, [sp, #44]	@ 0x2c
+str.w	sl, [sp, #52]	@ 0x34
+str.w	sl, [sp, #32]
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldrb	r0, [r7, #29]
+ldrb	r2, [r5, #5]
+uxtb.w	r4, lr
+tst	r0, r2
+it	ne
+movne	r0, #1
+and.w	r2, r3, #7
+it	eq
+moveq	r0, #0
+lsrs	r3, r3, #3
+cmp.w	sl, #0
+bne.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+cmp.w	fp, #1
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+cmp.w	fp, #3
+ite	ne
+movne	r6, sl
+moveq	r6, #5
+str	r6, [sp, #40]	@ 0x28
+strd	r4, r8, [sp, #8]
+ldr	r4, [sp, #28]
+strd	r2, r4, [sp]
+ldrb	r2, [r5, #9]
+ldr	r4, [sp, #40]	@ 0x28
+ldr	r5, [pc, #160]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+add.w	r2, r2, r2, lsl #1
+add.w	r4, r4, r2, lsl #1
+ldr.w	r4, [r5, r4, lsl #2]
+add	r5, sp, #72	@ 0x48
+mov	r2, ip
+str	r5, [sp, #16]
+blx	r4
+add	sp, #84	@ 0x54
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+mov	r8, r3
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+movs	r3, #255	@ 0xff
+strb.w	r3, [sp, #77]	@ 0x4d
+ldrb	r3, [r5, #8]
+and.w	r8, r4, #7
+add	r3, r6
+mov.w	lr, r8, lsl #1
+add.w	r3, r3, #24576	@ 0x6000
+rsb	lr, lr, #7
+cmp.w	fp, #1
+ldrb	r3, [r3, #0]
+strb.w	lr, [sp, #76]	@ 0x4c
+bne.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+and.w	r4, r0, r4, lsr #6
+lsls	r4, r4, #11
+and.w	r4, r4, #6144	@ 0x1800
+and.w	lr, r4, r3, lsl #6
+add	lr, r8
+lsls	r3, r3, #3
+add	lr, ip
+orr.w	r3, r3, #7
+strb.w	r3, [sp, #77]	@ 0x4d
+uxth.w	ip, lr
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+add.w	r3, r6, #65536	@ 0x10000
+ldrb.w	r3, [r3, #47]	@ 0x2f
+str	r3, [sp, #48]	@ 0x30
+cmp	r3, #0
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldrb.w	r3, [r7, #50]	@ 0x32
+mov.w	r9, #80	@ 0x50
+ands.w	r3, r3, #2
+bne.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+movs	r0, #1
+str	r3, [sp, #60]	@ 0x3c
+str	r0, [sp, #44]	@ 0x2c
+str	r3, [sp, #28]
+str	r3, [sp, #52]	@ 0x34
+str	r0, [sp, #32]
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+adds	r0, r6, r1
+ldr	r6, [sp, #48]	@ 0x30
+ldr.w	ip, [pc, #168]	@ <ADDR> <f18a_tile_layer_scan_line+OFF>
+uxtb.w	r1, lr
+cmp	r6, #0
+beq.w	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldr	r6, [sp, #56]	@ 0x38
+cbnz	r6, <ADDR> <f18a_tile_layer_scan_line+OFF>
+ldr	r4, [pc, #148]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+strd	r3, r8, [sp, #8]
+add.w	r5, sl, r5, lsl #2
+add.w	r3, ip, #16
+str	r1, [sp, #0]
+str	r3, [sp, #4]
+ldr.w	r4, [r4, r5, lsl #2]
+ldr	r3, [sp, #60]	@ 0x3c
+add	r1, sp, #72	@ 0x48
+blx	r4
+add	sp, #84	@ 0x54
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+mov.w	r9, #32
+str	r3, [sp, #60]	@ 0x3c
+str	r3, [sp, #48]	@ 0x30
+str	r3, [sp, #28]
+str	r3, [sp, #44]	@ 0x2c
+str	r3, [sp, #52]	@ 0x34
+str	r3, [sp, #32]
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+ldrb	r1, [r7, #29]
+ldrb	r3, [r5, #1]
+tst	r1, r3
+ite	ne
+movne	r1, #1
+moveq	r1, #0
+lsls	r1, r1, #11
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+movs	r6, #4
+str	r6, [sp, #40]	@ 0x28
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+mov.w	lr, #684	@ 0x2ac
+str	r3, [sp, #8]
+str	r1, [sp, #0]
+ldrb.w	ip, [r7, #25]
+ldrb	r5, [r7, #27]
+mul.w	r7, lr, ip
+mov	r1, r4
+lsls	r4, r5, #1
+mul.w	r5, lr, r5
+adds	r4, #16
+lsrs	r7, r7, #11
+sub.w	r4, r4, ip, lsl #1
+add.w	r7, r7, r7, lsl #1
+lsrs	r5, r5, #11
+ldr	r6, [pc, #36]	@ (<ADDR> <f18a_tile_layer_scan_line+OFF>)
+add.w	r4, r4, r7, lsl #1
+add.w	r5, r5, r5, lsl #1
+sub.w	r4, r4, r5, lsl #1
+add	r4, r6
+ldr	r3, [sp, #60]	@ 0x3c
+str	r4, [sp, #4]
+bl	<ADDR> <text80RowT2Blend.isra.0>
+add	sp, #84	@ 0x54
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+movs	r4, #0
+b.n	<ADDR> <f18a_tile_layer_scan_line+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>

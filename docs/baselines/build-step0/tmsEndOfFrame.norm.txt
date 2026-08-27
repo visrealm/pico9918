@@ -1,0 +1,80 @@
+200002d4 <tmsEndOfFrame>:
+push	{r3, r4, r5, r6, r7, lr}
+ldr	r4, [pc, #152]	@ (20000370 <tmsEndOfFrame+0x9c>)
+ldr	r2, [pc, #152]	@ (20000374 <tmsEndOfFrame+0xa0>)
+ldr	r3, [r4, #0]
+ldr	r6, [pc, #152]	@ (20000378 <tmsEndOfFrame+0xa4>)
+adds	r3, #1
+str	r3, [r4, #0]
+ldrb	r3, [r2, #0]
+ldr	r0, [r6, #0]
+cmp	r3, #0
+bne.n	200002fc <tmsEndOfFrame+0x28>
+ldr	r3, [pc, #144]	@ (2000037c <tmsEndOfFrame+0xa8>)
+ldrb	r1, [r0, r3]
+movs	r3, #64	@ 0x40
+ands	r3, r1
+lsls	r1, r3, #25
+lsrs	r1, r1, #31
+strb	r1, [r2, #0]
+cmp	r3, #0
+bne.n	20000352 <tmsEndOfFrame+0x7e>
+ldr	r3, [pc, #128]	@ (20000380 <tmsEndOfFrame+0xac>)
+ldrb	r3, [r0, r3]
+cmp	r3, #0
+bne.n	2000034a <tmsEndOfFrame+0x76>
+ldr	r3, [pc, #124]	@ (20000384 <tmsEndOfFrame+0xb0>)
+ldrb	r3, [r3, #0]
+cmp	r3, #0
+beq.n	2000033e <tmsEndOfFrame+0x6a>
+movs	r4, #8
+ldr	r3, [r6, #0]
+ldr	r7, [pc, #116]	@ (20000388 <tmsEndOfFrame+0xb4>)
+ldrb	r5, [r3, r7]
+bl	200043b4 <vgaCurrentParams>
+ands	r5, r4
+negs	r3, r5
+adcs	r5, r3
+ldr	r3, [r6, #0]
+adds	r5, #1
+str	r5, [r0, #64]	@ 0x40
+ldrb	r3, [r3, r7]
+ands	r4, r3
+negs	r3, r4
+adcs	r4, r3
+movs	r3, #239	@ 0xef
+negs	r4, r4
+bics	r4, r3
+bl	200043b4 <vgaCurrentParams>
+adds	r4, #225	@ 0xe1
+adds	r4, #255	@ 0xff
+str	r4, [r0, #72]	@ 0x48
+pop	{r3, r4, r5, r6, r7, pc}
+bl	2000022c <eofInterrupt>
+movs	r0, #128	@ 0x80
+bl	20000134 <updateInterrupts>
+b.n	2000030c <tmsEndOfFrame+0x38>
+ldr	r0, [r4, #0]
+bl	200016f0 <updateDiagnostics>
+b.n	20000304 <tmsEndOfFrame+0x30>
+bl	2000246c <allowSplashHide>
+movs	r3, #150	@ 0x96
+ldr	r2, [r4, #0]
+ldr	r0, [r6, #0]
+lsls	r3, r3, #2
+cmp	r2, r3
+ble.n	200002fc <tmsEndOfFrame+0x28>
+ldr	r3, [pc, #40]	@ (2000038c <tmsEndOfFrame+0xb8>)
+mov	ip, r3
+add	r0, ip
+bl	20000d50 <readConfig>
+ldr	r0, [r6, #0]
+b.n	200002fc <tmsEndOfFrame+0x28>
+20000370:	2002636c 	.word	0x2002636c
+20000374:	200274dd 	.word	0x200274dd
+20000378:	2000c7e4 	.word	0x2000c7e4
+2000037c:	0000602d 	.word	0x0000602d
+20000380:	00010060 	.word	0x00010060
+20000384:	200274d7 	.word	0x200274d7
+20000388:	0000602c 	.word	0x0000602c
+2000038c:	00010050 	.word	0x00010050

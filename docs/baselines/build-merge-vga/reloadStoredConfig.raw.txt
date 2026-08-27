@@ -1,0 +1,102 @@
+20000814 <reloadStoredConfig>:
+20000814:	2280      	movs	r2, #128	@ 0x80
+20000816:	b5f0      	push	{r4, r5, r6, r7, lr}
+20000818:	4e2e      	ldr	r6, [pc, #184]	@ (200008d4 <reloadStoredConfig+0xc0>)
+2000081a:	4b2f      	ldr	r3, [pc, #188]	@ (200008d8 <reloadStoredConfig+0xc4>)
+2000081c:	6834      	ldr	r4, [r6, #0]
+2000081e:	b083      	sub	sp, #12
+20000820:	18e7      	adds	r7, r4, r3
+20000822:	0038      	movs	r0, r7
+20000824:	492d      	ldr	r1, [pc, #180]	@ (200008dc <reloadStoredConfig+0xc8>)
+20000826:	0052      	lsls	r2, r2, #1
+20000828:	f001 ff7e 	bl	20002728 <__wrap___aeabi_memcpy>
+2000082c:	466a      	mov	r2, sp
+2000082e:	2300      	movs	r3, #0
+20000830:	71d3      	strb	r3, [r2, #7]
+20000832:	4b29      	ldr	r3, [pc, #164]	@ (200008d8 <reloadStoredConfig+0xc4>)
+20000834:	1dd5      	adds	r5, r2, #7
+20000836:	5ce1      	ldrb	r1, [r4, r3]
+20000838:	0038      	movs	r0, r7
+2000083a:	3901      	subs	r1, #1
+2000083c:	424b      	negs	r3, r1
+2000083e:	4159      	adcs	r1, r3
+20000840:	4a27      	ldr	r2, [pc, #156]	@ (200008e0 <reloadStoredConfig+0xcc>)
+20000842:	002b      	movs	r3, r5
+20000844:	b2c9      	uxtb	r1, r1
+20000846:	f002 ff1b 	bl	20003680 <vrEmuTmsConfigValidate>
+2000084a:	782b      	ldrb	r3, [r5, #0]
+2000084c:	0007      	movs	r7, r0
+2000084e:	2b00      	cmp	r3, #0
+20000850:	d00a      	beq.n	20000868 <reloadStoredConfig+0x54>
+20000852:	2301      	movs	r3, #1
+20000854:	4a20      	ldr	r2, [pc, #128]	@ (200008d8 <reloadStoredConfig+0xc4>)
+20000856:	4d23      	ldr	r5, [pc, #140]	@ (200008e4 <reloadStoredConfig+0xd0>)
+20000858:	54a3      	strb	r3, [r4, r2]
+2000085a:	782b      	ldrb	r3, [r5, #0]
+2000085c:	2b00      	cmp	r3, #0
+2000085e:	d013      	beq.n	20000888 <reloadStoredConfig+0x74>
+20000860:	4b21      	ldr	r3, [pc, #132]	@ (200008e8 <reloadStoredConfig+0xd4>)
+20000862:	781b      	ldrb	r3, [r3, #0]
+20000864:	4a21      	ldr	r2, [pc, #132]	@ (200008ec <reloadStoredConfig+0xd8>)
+20000866:	54a3      	strb	r3, [r4, r2]
+20000868:	2f00      	cmp	r7, #0
+2000086a:	d007      	beq.n	2000087c <reloadStoredConfig+0x68>
+2000086c:	2212      	movs	r2, #18
+2000086e:	4b20      	ldr	r3, [pc, #128]	@ (200008f0 <reloadStoredConfig+0xdc>)
+20000870:	54e2      	strb	r2, [r4, r3]
+20000872:	2301      	movs	r3, #1
+20000874:	4a1f      	ldr	r2, [pc, #124]	@ (200008f4 <reloadStoredConfig+0xe0>)
+20000876:	54a3      	strb	r3, [r4, r2]
+20000878:	4a1f      	ldr	r2, [pc, #124]	@ (200008f8 <reloadStoredConfig+0xe4>)
+2000087a:	54a3      	strb	r3, [r4, r2]
+2000087c:	2101      	movs	r1, #1
+2000087e:	6832      	ldr	r2, [r6, #0]
+20000880:	4b1e      	ldr	r3, [pc, #120]	@ (200008fc <reloadStoredConfig+0xe8>)
+20000882:	54d1      	strb	r1, [r2, r3]
+20000884:	b003      	add	sp, #12
+20000886:	bdf0      	pop	{r4, r5, r6, r7, pc}
+20000888:	2201      	movs	r2, #1
+2000088a:	2100      	movs	r1, #0
+2000088c:	2017      	movs	r0, #23
+2000088e:	f000 fd25 	bl	200012dc <gpio_set_pulls>
+20000892:	2001      	movs	r0, #1
+20000894:	f001 f940 	bl	20001b18 <sleep_ms>
+20000898:	23d0      	movs	r3, #208	@ 0xd0
+2000089a:	2280      	movs	r2, #128	@ 0x80
+2000089c:	061b      	lsls	r3, r3, #24
+2000089e:	685b      	ldr	r3, [r3, #4]
+200008a0:	0412      	lsls	r2, r2, #16
+200008a2:	4213      	tst	r3, r2
+200008a4:	d005      	beq.n	200008b2 <reloadStoredConfig+0x9e>
+200008a6:	2310      	movs	r3, #16
+200008a8:	4a0f      	ldr	r2, [pc, #60]	@ (200008e8 <reloadStoredConfig+0xd4>)
+200008aa:	7013      	strb	r3, [r2, #0]
+200008ac:	2201      	movs	r2, #1
+200008ae:	702a      	strb	r2, [r5, #0]
+200008b0:	e7d8      	b.n	20000864 <reloadStoredConfig+0x50>
+200008b2:	2200      	movs	r2, #0
+200008b4:	2101      	movs	r1, #1
+200008b6:	2017      	movs	r0, #23
+200008b8:	f000 fd10 	bl	200012dc <gpio_set_pulls>
+200008bc:	2001      	movs	r0, #1
+200008be:	f001 f92b 	bl	20001b18 <sleep_ms>
+200008c2:	23d0      	movs	r3, #208	@ 0xd0
+200008c4:	2280      	movs	r2, #128	@ 0x80
+200008c6:	061b      	lsls	r3, r3, #24
+200008c8:	685b      	ldr	r3, [r3, #4]
+200008ca:	0412      	lsls	r2, r2, #16
+200008cc:	4213      	tst	r3, r2
+200008ce:	d0ea      	beq.n	200008a6 <reloadStoredConfig+0x92>
+200008d0:	2303      	movs	r3, #3
+200008d2:	e7e9      	b.n	200008a8 <reloadStoredConfig+0x94>
+200008d4:	2000d534 	.word	0x2000d534
+200008d8:	00010050 	.word	0x00010050
+200008dc:	101ff000 	.word	0x101ff000
+200008e0:	00001201 	.word	0x00001201
+200008e4:	20028674 	.word	0x20028674
+200008e8:	2000d4d8 	.word	0x2000d4d8
+200008ec:	00010051 	.word	0x00010051
+200008f0:	00010052 	.word	0x00010052
+200008f4:	00010053 	.word	0x00010053
+200008f8:	0001014c 	.word	0x0001014c
+200008fc:	00010150 	.word	0x00010150

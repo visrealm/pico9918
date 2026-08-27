@@ -1,0 +1,4 @@
+20015730 <tmsEndOfScanline>:
+20015730:	b510      	push	{r4, lr}
+20015732:	f002 f9bb 	bl	20017aac <pico9918_frame_end_of_scanline>
+20015736:	bd10      	pop	{r4, pc}

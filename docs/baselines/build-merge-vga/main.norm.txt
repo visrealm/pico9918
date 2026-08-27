@@ -1,0 +1,267 @@
+<ADDR> <main>:
+push	{r4, r5, r6, r7, lr}
+mov	lr, r9
+mov	r7, r8
+movs	r3, #208	@ 0xd0
+movs	r2, #0
+push	{r7, lr}
+lsls	r3, r3, #24
+sub	sp, #316	@ 0x13c
+str	r2, [r3, #16]
+movs	r2, #128	@ 0x80
+lsls	r2, r2, #15
+movs	r1, #5
+str	r2, [r3, #32]
+ldr	r0, [pc, #532]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <gpio_set_function_masked>
+bl	<ADDR> <currentHwVersion>
+bl	<ADDR> <detectScartDongle>
+bl	<ADDR> <shouldUseScartClock>
+ldr	r6, [pc, #516]	@ (<ADDR> <main+OFF>)
+cmp	r0, #0
+beq.n	<ADDR> <main+OFF>
+ldr	r3, [pc, #516]	@ (<ADDR> <main+OFF>)
+str	r3, [r6, #0]
+ldr	r5, [pc, #516]	@ (<ADDR> <main+OFF>)
+ldr	r3, [r5, #0]
+lsls	r2, r3, #2
+adds	r2, r2, r3
+ldr	r3, [r6, #0]
+lsls	r2, r2, #2
+adds	r3, r3, r2
+ldr	r2, [r3, #8]
+ldr	r4, [r3, #0]
+ldr	r7, [r3, #4]
+ldrb	r0, [r3, #12]
+str	r2, [sp, #148]	@ 0x94
+bl	<ADDR> <vreg_set_voltage>
+movs	r0, #1
+bl	<ADDR> <sleep_ms>
+ldr	r2, [sp, #148]	@ 0x94
+movs	r1, r7
+movs	r0, r4
+bl	<ADDR> <set_sys_clock_pll>
+bl	<ADDR> <vrEmuTms9918Init>
+ldr	r0, [pc, #472]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <multicore_launch_core1>
+ldr	r4, [pc, #468]	@ (<ADDR> <main+OFF>)
+ldr	r3, [pc, #472]	@ (<ADDR> <main+OFF>)
+ldr	r0, [r4, #0]
+adds	r0, r0, r3
+bl	<ADDR> <readConfig>
+ldr	r3, [pc, #460]	@ (<ADDR> <main+OFF>)
+ldr	r0, [r4, #0]
+adds	r0, r0, r3
+bl	<ADDR> <applyPendingDisplay>
+bl	<ADDR> <updateDispDriver>
+ldr	r2, [r4, #0]
+ldr	r3, [pc, #448]	@ (<ADDR> <main+OFF>)
+ldrb	r3, [r2, r3]
+ldr	r2, [r5, #0]
+cmp	r3, r2
+beq.n	<ADDR> <main+OFF>
+movs	r2, #20
+muls	r2, r3
+str	r3, [r5, #0]
+ldr	r3, [r6, #0]
+adds	r3, r3, r2
+ldrb	r0, [r3, #12]
+ldr	r5, [r3, #0]
+ldr	r6, [r3, #4]
+ldr	r7, [r3, #8]
+uxtb	r0, r0
+bl	<ADDR> <vreg_set_voltage>
+movs	r0, #1
+bl	<ADDR> <sleep_ms>
+movs	r2, r7
+movs	r1, r6
+movs	r0, r5
+bl	<ADDR> <set_sys_clock_pll>
+bl	<ADDR> <currentHwVersion>
+ldr	r2, [r4, #0]
+ldr	r3, [pc, #396]	@ (<ADDR> <main+OFF>)
+ldrb	r6, [r2, r3]
+cmp	r0, #3
+bne.n	<ADDR> <main+OFF>
+b.n	<ADDR> <main+OFF>
+movs	r3, #25
+mov	r9, r3
+subs	r3, #1
+mov	r8, r3
+ldr	r5, [pc, #384]	@ (<ADDR> <main+OFF>)
+lsls	r6, r6, #3
+ldr	r7, [r5, r6]
+movs	r1, #0
+adds	r0, r7, #0
+bl	<ADDR> <__wrap___aeabi_fcmpgt>
+cmp	r0, #0
+bne.n	<ADDR> <main+OFF>
+b.n	<ADDR> <main+OFF>
+movs	r1, #2
+mov	r0, r9
+adds	r2, r7, #0
+bl	<ADDR> <initClock>
+adds	r5, r5, r6
+ldr	r5, [r5, #4]
+movs	r1, #0
+adds	r0, r5, #0
+bl	<ADDR> <__wrap___aeabi_fcmpgt>
+cmp	r0, #0
+bne.n	<ADDR> <main+OFF>
+b.n	<ADDR> <main+OFF>
+movs	r1, #3
+mov	r0, r8
+adds	r2, r5, #0
+bl	<ADDR> <initClock>
+movs	r3, #1
+ldr	r5, [r4, #0]
+movs	r2, #160	@ 0xa0
+strb	r3, [r5, #16]
+movs	r1, #0
+add	r0, sp, #152	@ 0x98
+bl	<ADDR> <__wrap_memset>
+ldr	r3, [pc, #312]	@ (<ADDR> <main+OFF>)
+ldrb	r3, [r5, r3]
+cmp	r3, #0
+bne.n	<ADDR> <main+OFF>
+b.n	<ADDR> <main+OFF>
+ldr	r3, [pc, #308]	@ (<ADDR> <main+OFF>)
+add	r0, sp, #152	@ 0x98
+ldrb	r1, [r5, r3]
+subs	r3, r1, #1
+sbcs	r1, r3
+adds	r1, #1
+bl	<ADDR> <vgaGetParams>
+movs	r1, #144	@ 0x90
+movs	r2, #136	@ 0x88
+ldr	r3, [pc, #292]	@ (<ADDR> <main+OFF>)
+add	r0, sp, #8
+adds	r0, r0, r1
+str	r3, [r0, r2]
+ldr	r3, [pc, #288]	@ (<ADDR> <main+OFF>)
+add	r0, sp, #8
+adds	r0, r0, r1
+adds	r2, #4
+str	r3, [r0, r2]
+ldr	r3, [pc, #280]	@ (<ADDR> <main+OFF>)
+add	r0, sp, #8
+adds	r0, r0, r1
+adds	r2, #4
+str	r3, [r0, r2]
+ldr	r3, [pc, #276]	@ (<ADDR> <main+OFF>)
+add	r0, sp, #8
+adds	r0, r0, r1
+adds	r2, #4
+str	r3, [r0, r2]
+movs	r3, #156	@ 0x9c
+add	r0, sp, #8
+adds	r1, r0, r1
+subs	r2, #149	@ 0x95
+str	r2, [r1, r3]
+mov	r0, sp
+adds	r2, #145	@ 0x91
+add	r1, sp, #168	@ 0xa8
+bl	<ADDR> <__wrap___aeabi_memcpy>
+ldr	r3, [sp, #164]	@ 0xa4
+ldr	r1, [sp, #156]	@ 0x9c
+ldr	r2, [sp, #160]	@ 0xa0
+ldr	r0, [sp, #152]	@ 0x98
+bl	<ADDR> <vgaInit>
+ldr	r0, [pc, #236]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <vrEmuTmsConfigSetAppliedCallback>
+ldr	r0, [pc, #236]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <vrEmuTmsFrameSetConfigReloadCallback>
+bl	<ADDR> <initTemperature>
+bl	<ADDR> <vrEmuTmsDiagInit>
+bl	<ADDR> <currentHwVersion>
+ldr	r3, [pc, #220]	@ (<ADDR> <main+OFF>)
+cmp	r0, #3
+bne.n	<ADDR> <main+OFF>
+ldr	r3, [pc, #220]	@ (<ADDR> <main+OFF>)
+movs	r0, r3
+ldr	r1, [pc, #220]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <vrEmuTmsDiagSetVersionInfo>
+ldr	r2, [r4, #0]
+ldr	r3, [pc, #172]	@ (<ADDR> <main+OFF>)
+movs	r1, #2
+ldrb	r3, [r2, r3]
+movs	r2, #0
+cmp	r1, r3
+adcs	r2, r2
+negs	r2, r2
+ands	r3, r2
+ldr	r2, [pc, #200]	@ (<ADDR> <main+OFF>)
+lsls	r3, r3, #2
+ldr	r1, [r3, r2]
+ldr	r2, [pc, #196]	@ (<ADDR> <main+OFF>)
+ldr	r0, [r3, r2]
+bl	<ADDR> <vrEmuTmsDiagSetOutputName>
+movs	r0, #0
+bl	<ADDR> <multicore_fifo_push_blocking>
+bl	<ADDR> <vrEmuTmsGpuInit>
+ldr	r0, [pc, #184]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <vrEmuTmsGpuSetFlashCallback>
+ldr	r0, [pc, #180]	@ (<ADDR> <main+OFF>)
+bl	<ADDR> <vrEmuTmsGpuSetConfigSaveCallback>
+bl	<ADDR> <vrEmuTmsGpuLoop>
+movs	r0, #0
+add	sp, #316	@ 0x13c
+pop	{r6, r7}
+mov	r9, r7
+mov	r8, r6
+pop	{r4, r5, r6, r7, pc}
+mov	r0, r8
+bl	<ADDR> <gpio_init>
+mov	r2, r8
+movs	r3, #1
+lsls	r3, r2
+movs	r2, #208	@ 0xd0
+lsls	r2, r2, #24
+str	r3, [r2, #36]	@ 0x24
+str	r3, [r2, #24]
+b.n	<ADDR> <main+OFF>
+mov	r7, r9
+movs	r0, r7
+bl	<ADDR> <gpio_init>
+movs	r3, #1
+movs	r2, #208	@ 0xd0
+lsls	r3, r7
+lsls	r2, r2, #24
+str	r3, [r2, #36]	@ 0x24
+str	r3, [r2, #24]
+b.n	<ADDR> <main+OFF>
+movs	r3, #29
+mov	r9, r3
+subs	r3, #6
+mov	r8, r3
+b.n	<ADDR> <main+OFF>
+movs	r1, r3
+add	r0, sp, #152	@ 0x98
+bl	<ADDR> <vgaGetParams>
+b.n	<ADDR> <main+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

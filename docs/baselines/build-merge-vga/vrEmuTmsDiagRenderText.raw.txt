@@ -1,0 +1,137 @@
+20005234 <vrEmuTmsDiagRenderText>:
+20005234:	b5f0      	push	{r4, r5, r6, r7, lr}
+20005236:	464f      	mov	r7, r9
+20005238:	46d6      	mov	lr, sl
+2000523a:	4646      	mov	r6, r8
+2000523c:	b5c0      	push	{r6, r7, lr}
+2000523e:	000f      	movs	r7, r1
+20005240:	4669      	mov	r1, sp
+20005242:	1ac3      	subs	r3, r0, r3
+20005244:	8c0d      	ldrh	r5, [r1, #32]
+20005246:	0010      	movs	r0, r2
+20005248:	9c0a      	ldr	r4, [sp, #40]	@ 0x28
+2000524a:	2b05      	cmp	r3, #5
+2000524c:	d872      	bhi.n	20005334 <vrEmuTmsDiagRenderText+0x100>
+2000524e:	0050      	lsls	r0, r2, #1
+20005250:	5a21      	ldrh	r1, [r4, r0]
+20005252:	4e3b      	ldr	r6, [pc, #236]	@ (20005340 <vrEmuTmsDiagRenderText+0x10c>)
+20005254:	0889      	lsrs	r1, r1, #2
+20005256:	4031      	ands	r1, r6
+20005258:	5221      	strh	r1, [r4, r0]
+2000525a:	3201      	adds	r2, #1
+2000525c:	b290      	uxth	r0, r2
+2000525e:	783a      	ldrb	r2, [r7, #0]
+20005260:	2a00      	cmp	r2, #0
+20005262:	d067      	beq.n	20005334 <vrEmuTmsDiagRenderText+0x100>
+20005264:	005b      	lsls	r3, r3, #1
+20005266:	469c      	mov	ip, r3
+20005268:	4b36      	ldr	r3, [pc, #216]	@ (20005344 <vrEmuTmsDiagRenderText+0x110>)
+2000526a:	46b9      	mov	r9, r7
+2000526c:	469a      	mov	sl, r3
+2000526e:	e009      	b.n	20005284 <vrEmuTmsDiagRenderText+0x50>
+20005270:	881a      	ldrh	r2, [r3, #0]
+20005272:	0892      	lsrs	r2, r2, #2
+20005274:	4032      	ands	r2, r6
+20005276:	801a      	strh	r2, [r3, #0]
+20005278:	2301      	movs	r3, #1
+2000527a:	4499      	add	r9, r3
+2000527c:	464b      	mov	r3, r9
+2000527e:	781a      	ldrb	r2, [r3, #0]
+20005280:	2a00      	cmp	r2, #0
+20005282:	d057      	beq.n	20005334 <vrEmuTmsDiagRenderText+0x100>
+20005284:	2330      	movs	r3, #48	@ 0x30
+20005286:	210f      	movs	r1, #15
+20005288:	3a20      	subs	r2, #32
+2000528a:	4013      	ands	r3, r2
+2000528c:	4463      	add	r3, ip
+2000528e:	00db      	lsls	r3, r3, #3
+20005290:	400a      	ands	r2, r1
+20005292:	4453      	add	r3, sl
+20005294:	5699      	ldrsb	r1, [r3, r2]
+20005296:	0043      	lsls	r3, r0, #1
+20005298:	4698      	mov	r8, r3
+2000529a:	1c43      	adds	r3, r0, #1
+2000529c:	002a      	movs	r2, r5
+2000529e:	44a0      	add	r8, r4
+200052a0:	b29b      	uxth	r3, r3
+200052a2:	2900      	cmp	r1, #0
+200052a4:	db03      	blt.n	200052ae <vrEmuTmsDiagRenderText+0x7a>
+200052a6:	4642      	mov	r2, r8
+200052a8:	8812      	ldrh	r2, [r2, #0]
+200052aa:	0892      	lsrs	r2, r2, #2
+200052ac:	4032      	ands	r2, r6
+200052ae:	4647      	mov	r7, r8
+200052b0:	005b      	lsls	r3, r3, #1
+200052b2:	803a      	strh	r2, [r7, #0]
+200052b4:	1c82      	adds	r2, r0, #2
+200052b6:	46a8      	mov	r8, r5
+200052b8:	18e3      	adds	r3, r4, r3
+200052ba:	b292      	uxth	r2, r2
+200052bc:	064f      	lsls	r7, r1, #25
+200052be:	d403      	bmi.n	200052c8 <vrEmuTmsDiagRenderText+0x94>
+200052c0:	881f      	ldrh	r7, [r3, #0]
+200052c2:	08bf      	lsrs	r7, r7, #2
+200052c4:	4037      	ands	r7, r6
+200052c6:	46b8      	mov	r8, r7
+200052c8:	4647      	mov	r7, r8
+200052ca:	0052      	lsls	r2, r2, #1
+200052cc:	801f      	strh	r7, [r3, #0]
+200052ce:	1cc3      	adds	r3, r0, #3
+200052d0:	46a8      	mov	r8, r5
+200052d2:	18a2      	adds	r2, r4, r2
+200052d4:	b29b      	uxth	r3, r3
+200052d6:	068f      	lsls	r7, r1, #26
+200052d8:	d403      	bmi.n	200052e2 <vrEmuTmsDiagRenderText+0xae>
+200052da:	8817      	ldrh	r7, [r2, #0]
+200052dc:	08bf      	lsrs	r7, r7, #2
+200052de:	4037      	ands	r7, r6
+200052e0:	46b8      	mov	r8, r7
+200052e2:	4647      	mov	r7, r8
+200052e4:	005b      	lsls	r3, r3, #1
+200052e6:	8017      	strh	r7, [r2, #0]
+200052e8:	1d02      	adds	r2, r0, #4
+200052ea:	46a8      	mov	r8, r5
+200052ec:	18e3      	adds	r3, r4, r3
+200052ee:	b292      	uxth	r2, r2
+200052f0:	06cf      	lsls	r7, r1, #27
+200052f2:	d403      	bmi.n	200052fc <vrEmuTmsDiagRenderText+0xc8>
+200052f4:	881f      	ldrh	r7, [r3, #0]
+200052f6:	08bf      	lsrs	r7, r7, #2
+200052f8:	4037      	ands	r7, r6
+200052fa:	46b8      	mov	r8, r7
+200052fc:	4647      	mov	r7, r8
+200052fe:	0052      	lsls	r2, r2, #1
+20005300:	801f      	strh	r7, [r3, #0]
+20005302:	1d43      	adds	r3, r0, #5
+20005304:	46a8      	mov	r8, r5
+20005306:	18a2      	adds	r2, r4, r2
+20005308:	b29b      	uxth	r3, r3
+2000530a:	070f      	lsls	r7, r1, #28
+2000530c:	d403      	bmi.n	20005316 <vrEmuTmsDiagRenderText+0xe2>
+2000530e:	8817      	ldrh	r7, [r2, #0]
+20005310:	08bf      	lsrs	r7, r7, #2
+20005312:	4037      	ands	r7, r6
+20005314:	46b8      	mov	r8, r7
+20005316:	4647      	mov	r7, r8
+20005318:	005b      	lsls	r3, r3, #1
+2000531a:	3006      	adds	r0, #6
+2000531c:	8017      	strh	r7, [r2, #0]
+2000531e:	18e3      	adds	r3, r4, r3
+20005320:	b280      	uxth	r0, r0
+20005322:	0749      	lsls	r1, r1, #29
+20005324:	d5a4      	bpl.n	20005270 <vrEmuTmsDiagRenderText+0x3c>
+20005326:	801d      	strh	r5, [r3, #0]
+20005328:	2301      	movs	r3, #1
+2000532a:	4499      	add	r9, r3
+2000532c:	464b      	mov	r3, r9
+2000532e:	781a      	ldrb	r2, [r3, #0]
+20005330:	2a00      	cmp	r2, #0
+20005332:	d1a7      	bne.n	20005284 <vrEmuTmsDiagRenderText+0x50>
+20005334:	bce0      	pop	{r5, r6, r7}
+20005336:	46ba      	mov	sl, r7
+20005338:	46b1      	mov	r9, r6
+2000533a:	46a8      	mov	r8, r5
+2000533c:	bdf0      	pop	{r4, r5, r6, r7, pc}
+2000533e:	46c0      	nop			@ (mov r8, r8)
+20005340:	00000333 	.word	0x00000333
+20005344:	20012630 	.word	0x20012630

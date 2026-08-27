@@ -1,0 +1,89 @@
+<ADDR> <tmsScanline>:
+push	{r4, r5, r6, lr}
+ldr	r3, [r1, #44]	@ 0x2c
+sub	sp, #24
+movs	r6, r1
+str	r3, [sp, #16]
+movs	r3, #68	@ 0x44
+ldrh	r3, [r6, r3]
+movs	r4, r0
+add	r1, sp, #16
+movs	r5, r2
+strh	r3, [r1, #4]
+bl	<ADDR> <vrEmuTmsFrameScanline>
+lsls	r4, r4, #20
+lsrs	r4, r4, #20
+cmp	r0, #0
+bne.n	<ADDR> <tmsScanline+OFF>
+ldr	r3, [pc, #140]	@ (<ADDR> <tmsScanline+OFF>)
+ldr	r2, [r3, #0]
+ldr	r3, [pc, #140]	@ (<ADDR> <tmsScanline+OFF>)
+ldrb	r3, [r2, r3]
+cmp	r3, #0
+beq.n	<ADDR> <tmsScanline+OFF>
+movs	r1, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r0, #144	@ 0x90
+ldrh	r6, [r6, #46]	@ 0x2e
+lsls	r1, r1, #23
+lsls	r2, r2, #17
+ldr	r3, [r1, r0]
+tst	r3, r2
+bne.n	<ADDR> <tmsScanline+OFF>
+movs	r2, r5
+movs	r1, r6
+movs	r0, r4
+bl	<ADDR> <vrEmuTmsDiagRender>
+add	sp, #24
+pop	{r4, r5, r6, pc}
+bl	<ADDR> <pendingDisplayBanner>
+cmp	r0, #1
+beq.n	<ADDR> <tmsScanline+OFF>
+cmp	r0, #2
+bne.n	<ADDR> <tmsScanline+OFF>
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r2, r2, #17
+movs	r3, #160	@ 0xa0
+lsls	r3, r3, #23
+ldr	r3, [r3, r1]
+movs	r0, r3
+ands	r0, r2
+tst	r3, r2
+bne.n	<ADDR> <tmsScanline+OFF>
+ldr	r3, [pc, #72]	@ (<ADDR> <tmsScanline+OFF>)
+str	r0, [sp, #4]
+str	r3, [sp, #0]
+movs	r2, #198	@ 0xc6
+movs	r3, #8
+movs	r0, r4
+ldr	r1, [pc, #64]	@ (<ADDR> <tmsScanline+OFF>)
+str	r5, [sp, #8]
+bl	<ADDR> <vrEmuTmsDiagRenderText>
+b.n	<ADDR> <tmsScanline+OFF>
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r2, r2, #17
+movs	r3, #160	@ 0xa0
+lsls	r3, r3, #23
+ldr	r3, [r3, r1]
+movs	r0, r3
+ands	r0, r2
+tst	r3, r2
+bne.n	<ADDR> <tmsScanline+OFF>
+ldr	r3, [pc, #28]	@ (<ADDR> <tmsScanline+OFF>)
+str	r0, [sp, #4]
+str	r3, [sp, #0]
+movs	r2, #210	@ 0xd2
+movs	r3, #8
+movs	r0, r4
+ldr	r1, [pc, #24]	@ (<ADDR> <tmsScanline+OFF>)
+str	r5, [sp, #8]
+bl	<ADDR> <vrEmuTmsDiagRenderText>
+b.n	<ADDR> <tmsScanline+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

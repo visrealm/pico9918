@@ -1,0 +1,3249 @@
+<ADDR> <graphics_i_scan_line.constprop.0>:
+push	{r4, r5, r6, r7, lr}
+mov	r6, r9
+mov	lr, fp
+mov	r7, sl
+mov	r5, r8
+push	{r5, r6, r7, lr}
+ldr	r2, [pc, #756]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+sub	sp, #108	@ 0x6c
+ldr	r3, [pc, #756]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r0, [sp, #44]	@ 0x2c
+str	r2, [sp, #36]	@ 0x24
+ldrb	r3, [r2, r3]
+mov	r9, r3
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, #160	@ 0xa0
+movs	r1, #200	@ 0xc8
+movs	r2, #128	@ 0x80
+lsls	r0, r0, #23
+lsls	r1, r1, #1
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+tst	r3, r2
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #728]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r1, [sp, #36]	@ 0x24
+ldrb	r5, [r1, r3]
+ldrsb	r3, [r1, r3]
+cmp	r3, #0
+blt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #716]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #44]	@ 0x2c
+ldrb	r3, [r1, r3]
+cmp	r2, r3
+bcs.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+subs	r3, r2, r3
+ldr	r2, [pc, #708]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+uxth	r3, r3
+ldrb	r2, [r1, r2]
+cmp	r2, r3
+bhi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [pc, #700]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r2, [r1, r2]
+cmp	r2, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsrs	r2, r2, #2
+movs	r1, r2
+mov	sl, r2
+ldr	r0, [pc, #684]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r4, [sp, #36]	@ 0x24
+muls	r3, r1
+movs	r6, #64	@ 0x40
+ldrb	r4, [r4, r0]
+movs	r0, #1
+lsls	r4, r4, #6
+adds	r4, r4, r3
+movs	r3, #32
+ands	r6, r5
+lsls	r1, r6, #25
+ldr	r7, [pc, #668]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsrs	r1, r1, #31
+eors	r1, r0
+uxth	r4, r4
+ands	r3, r5
+str	r6, [sp, #60]	@ 0x3c
+str	r7, [sp, #40]	@ 0x28
+strb	r1, [r7, #0]
+cmp	r6, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r1, r9
+str	r1, [sp, #28]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r2, #64	@ 0x40
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #255	@ 0xff
+subs	r2, #32
+ldr	r0, [pc, #628]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+bl	<ADDR> <__wrap_memset>
+ldr	r3, [pc, #628]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+lsls	r1, r5, #2
+ldrb	r3, [r2, r3]
+mov	fp, r3
+str	r3, [sp, #52]	@ 0x34
+lsls	r5, r5, #27
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #0
+movs	r6, #0
+str	r3, [sp, #28]
+movs	r2, #128	@ 0x80
+lsls	r2, r2, #24
+mov	ip, r2
+ldr	r7, [sp, #36]	@ 0x24
+mov	r3, fp
+adds	r4, r7, r4
+ldr	r7, [pc, #584]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r0, #0
+str	r4, [sp, #56]	@ 0x38
+str	r7, [sp, #64]	@ 0x40
+movs	r5, #0
+mov	r7, ip
+movs	r4, #63	@ 0x3f
+mov	ip, sl
+mov	fp, r6
+mov	sl, r9
+ldr	r2, [pc, #572]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r3, [sp, #68]	@ 0x44
+str	r0, [sp, #32]
+ldr	r0, [sp, #56]	@ 0x38
+ldrb	r0, [r0, r5]
+movs	r6, r0
+mov	r8, r0
+bics	r6, r4
+asrs	r6, r6, #6
+orrs	r6, r1
+strb	r6, [r2, r3]
+adds	r6, r3, #1
+uxtb	r0, r6
+mov	r9, r0
+mov	r0, r8
+lsls	r6, r0, #2
+mov	r0, r9
+bics	r6, r4
+uxtb	r6, r6
+asrs	r6, r6, #6
+orrs	r6, r1
+strb	r6, [r2, r0]
+adds	r6, r3, #2
+uxtb	r0, r6
+mov	r9, r0
+mov	r0, r8
+lsls	r6, r0, #4
+mov	r0, r9
+bics	r6, r4
+uxtb	r6, r6
+asrs	r6, r6, #6
+orrs	r6, r1
+strb	r6, [r2, r0]
+movs	r0, #3
+adds	r6, r3, #3
+uxtb	r6, r6
+str	r6, [sp, #48]	@ 0x30
+movs	r6, r0
+mov	r0, r8
+ands	r0, r6
+ldr	r6, [sp, #48]	@ 0x30
+orrs	r0, r1
+strb	r0, [r2, r6]
+lsrs	r0, r7, #2
+lsrs	r6, r7, #1
+orrs	r6, r0
+orrs	r6, r7
+lsrs	r0, r7, #3
+orrs	r6, r0
+ldr	r0, [sp, #32]
+adds	r3, #4
+orrs	r0, r6
+movs	r6, r0
+str	r0, [sp, #32]
+ldr	r0, [sp, #28]
+uxtb	r3, r3
+lsrs	r7, r7, #4
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r7, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r6, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r6, #31
+ldr	r0, [sp, #52]	@ 0x34
+lsrs	r7, r0, #5
+ands	r0, r6
+str	r7, [sp, #52]	@ 0x34
+movs	r7, r0
+ldr	r0, [sp, #52]	@ 0x34
+str	r7, [sp, #48]	@ 0x30
+lsls	r0, r0, #2
+mov	r9, r0
+ldr	r0, [sp, #32]
+ldr	r6, [sp, #64]	@ 0x40
+lsrs	r0, r7
+mov	r7, r9
+mov	r8, r0
+ldr	r7, [r6, r7]
+movs	r0, r7
+mov	r7, r8
+orrs	r7, r0
+movs	r0, r6
+movs	r6, r7
+mov	r7, r9
+str	r6, [r7, r0]
+ldr	r0, [sp, #48]	@ 0x30
+subs	r7, r0, #1
+cmp	r7, #31
+bhi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r6, [sp, #52]	@ 0x34
+adds	r7, r6, #1
+movs	r6, #32
+subs	r6, r6, r0
+ldr	r0, [sp, #32]
+lsls	r7, r7, #2
+lsls	r0, r6
+ldr	r6, [sp, #64]	@ 0x40
+ldr	r6, [r6, r7]
+orrs	r0, r6
+ldr	r6, [sp, #64]	@ 0x40
+str	r0, [r6, r7]
+movs	r0, #0
+movs	r7, #128	@ 0x80
+str	r3, [sp, #52]	@ 0x34
+str	r0, [sp, #32]
+lsls	r7, r7, #24
+adds	r5, #1
+cmp	r5, ip
+blt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #68]	@ 0x44
+mov	r6, fp
+mov	fp, r3
+ldr	r3, [sp, #28]
+mov	r9, sl
+ldr	r0, [sp, #32]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r3, ip
+movs	r2, #0
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r2, ip
+subs	r2, #1
+lsls	r2, r2, #2
+mov	r3, fp
+adds	r3, #4
+adds	r3, r3, r2
+uxtb	r3, r3
+mov	r8, r3
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r4, #31
+movs	r5, r0
+ldr	r1, [sp, #52]	@ 0x34
+ands	r4, r1
+lsrs	r5, r4
+lsrs	r2, r1, #5
+ldr	r1, [pc, #288]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsls	r7, r2, #2
+ldr	r3, [r7, r1]
+orrs	r5, r3
+str	r5, [r7, r1]
+movs	r5, #32
+mov	r3, r8
+subs	r4, r5, r4
+ldr	r5, [sp, #52]	@ 0x34
+subs	r3, r3, r5
+cmp	r3, r4
+bls.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r0, r4
+adds	r2, #1
+lsls	r2, r2, #2
+ldr	r3, [r2, r1]
+orrs	r0, r3
+str	r0, [r2, r1]
+ldr	r2, [sp, #60]	@ 0x3c
+movs	r3, #0
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #256]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [r3, #0]
+movs	r1, #192	@ 0xc0
+ldr	r2, [pc, #256]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r0, [sp, #44]	@ 0x2c
+str	r3, [r2, #0]
+str	r3, [r2, #4]
+ldr	r2, [pc, #252]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r3, [r2, r1]
+subs	r1, #64	@ 0x40
+str	r3, [r2, r1]
+str	r3, [r2, #64]	@ 0x40
+str	r3, [r2, #0]
+bl	<ADDR> <pico9918_output_sprites.constprop.0>
+movs	r7, r0
+cmp	r6, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, r7
+add	sp, #108	@ 0x6c
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+ldr	r3, [pc, #188]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	r6, r9
+str	r3, [sp, #40]	@ 0x28
+ldrb	r3, [r3, #0]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, #0
+movs	r1, #0
+ldr	r3, [pc, #192]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r2, #0
+stmia	r3!, {r0, r1}
+movs	r1, #192	@ 0xc0
+ldr	r3, [pc, #188]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r0, [sp, #44]	@ 0x2c
+str	r2, [r3, r1]
+subs	r1, #64	@ 0x40
+str	r2, [r3, r1]
+str	r2, [r3, #64]	@ 0x40
+str	r2, [r3, #0]
+bl	<ADDR> <pico9918_output_sprites.constprop.0>
+movs	r7, r0
+movs	r0, #16
+ldr	r3, [pc, #172]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r6, [sp, #36]	@ 0x24
+ldr	r2, [pc, #172]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r3, [sp, #52]	@ 0x34
+ldrb	r4, [r3, #0]
+ldr	r3, [pc, #168]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r2, [r6, r2]
+ldrb	r1, [r6, r3]
+ldr	r3, [pc, #168]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r5, [pc, #168]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ands	r0, r2
+ldrb	r3, [r6, r3]
+str	r0, [sp, #32]
+ldrb	r0, [r6, r5]
+ldrsb	r5, [r6, r5]
+mov	fp, r5
+cmp	r4, #2
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, #171	@ 0xab
+lsls	r5, r5, #1
+movs	r6, r5
+muls	r6, r1
+lsrs	r6, r6, #11
+mov	ip, r6
+muls	r5, r3
+lsls	r6, r6, #1
+add	r6, ip
+lsls	r6, r6, #1
+lsrs	r5, r5, #11
+subs	r6, r1, r6
+str	r6, [sp, #28]
+lsls	r6, r5, #1
+adds	r6, r6, r5
+lsls	r6, r6, #1
+subs	r5, r3, r6
+mov	sl, r5
+mov	r5, fp
+cmp	r5, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #32]
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #255	@ 0xff
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r2, [pc, #92]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [r0, r2]
+lsls	r3, r3, #8
+lsrs	r3, r3, #8
+str	r3, [r0, r2]
+ldr	r2, [pc, #88]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [r0, r2]
+bics	r3, r1
+str	r3, [r0, r2]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r2, #240	@ 0xf0
+lsrs	r4, r0, #3
+ldr	r3, [pc, #832]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r0, [sp, #36]	@ 0x24
+lsls	r2, r2, #6
+ldrb	r3, [r0, r3]
+lsls	r3, r3, #10
+ands	r3, r2
+movs	r2, #255	@ 0xff
+ands	r2, r4
+lsls	r2, r2, #5
+adds	r3, r3, r2
+ldr	r2, [pc, #816]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r6, [r2, #0]
+ldr	r2, [pc, #816]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r0, r2]
+ldr	r2, [pc, #816]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r0, [r0, r2]
+lsls	r2, r0, #6
+str	r2, [sp, #40]	@ 0x28
+cmp	r6, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r6, #3
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #44]	@ 0x2c
+ands	r4, r6
+lsls	r2, r2, #29
+lsls	r0, r4, #1
+lsrs	r2, r2, #31
+movs	r4, #255	@ 0xff
+adds	r2, r2, r0
+movs	r0, #0
+mov	r9, r4
+uxtb	r2, r2
+subs	r4, #248	@ 0xf8
+ands	r1, r4
+lsls	r1, r1, #11
+adds	r2, r2, r0
+adds	r2, r1, r2
+ldr	r1, [sp, #36]	@ 0x24
+movs	r0, #160	@ 0xa0
+mov	fp, r1
+movs	r4, #200	@ 0xc8
+movs	r1, #128	@ 0x80
+add	fp, r2
+lsls	r0, r0, #23
+lsls	r4, r4, #1
+lsls	r1, r1, #17
+ldr	r2, [r0, r4]
+tst	r2, r1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r2, fp
+ldr	r1, [sp, #36]	@ 0x24
+ldrb	r5, [r2, #0]
+ldr	r2, [pc, #740]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	ip, r1
+ldrb	r2, [r1, r2]
+movs	r1, #15
+ands	r2, r1
+add	r3, ip
+str	r2, [sp, #32]
+cmp	r6, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r6, #3
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r4, r1
+ldr	r2, [sp, #36]	@ 0x24
+ldr	r0, [sp, #40]	@ 0x28
+ldrb	r2, [r2, r0]
+mov	r9, r2
+ands	r4, r2
+tst	r1, r2
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r4, [sp, #32]
+ldr	r1, [pc, #700]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsrs	r2, r2, #4
+muls	r4, r1
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [pc, #692]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r0, [pc, #692]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+muls	r2, r1
+mov	sl, r1
+adds	r1, r0, #1
+adds	r1, #255	@ 0xff
+mov	ip, r1
+str	r3, [sp, #28]
+ldr	r1, [sp, #36]	@ 0x24
+ldr	r3, [sp, #40]	@ 0x28
+movs	r6, #0
+adds	r1, r1, r3
+movs	r3, #15
+mov	r8, r3
+ldr	r7, [pc, #672]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+eors	r2, r4
+str	r1, [sp, #36]	@ 0x24
+ldr	r3, [sp, #28]
+movs	r1, r6
+ldrb	r6, [r3, #0]
+cmp	r1, r6
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r3, fp
+ldr	r5, [sp, #36]	@ 0x24
+lsrs	r1, r6, #3
+ldrb	r1, [r5, r1]
+lsls	r5, r6, #3
+ldrb	r5, [r5, r3]
+cmp	r9, r1
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r4, r8
+mov	r3, r8
+ands	r4, r1
+tst	r3, r1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r4, [sp, #32]
+mov	r3, sl
+muls	r4, r3
+lsrs	r2, r1, #4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #32]
+mov	r9, r1
+mov	r3, sl
+muls	r2, r3
+eors	r2, r4
+lsrs	r1, r5, #4
+lsls	r1, r1, #2
+ldr	r1, [r7, r1]
+ldr	r3, [sp, #28]
+ands	r1, r2
+eors	r1, r4
+str	r1, [r0, #0]
+mov	r1, r8
+ands	r1, r5
+lsls	r1, r1, #2
+ldr	r1, [r7, r1]
+adds	r3, #1
+ands	r1, r2
+eors	r1, r4
+str	r1, [r0, #4]
+adds	r0, #8
+str	r3, [sp, #28]
+cmp	r0, ip
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #44]	@ 0x2c
+bl	<ADDR> <pico9918_output_sprites.constprop.0>
+movs	r7, r0
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r2, #7
+movs	r5, #192	@ 0xc0
+ldr	r4, [sp, #44]	@ 0x2c
+lsls	r5, r5, #5
+ands	r2, r4
+lsrs	r4, r4, #6
+ands	r4, r1
+lsls	r4, r4, #11
+ands	r4, r5
+movs	r5, #7
+lsls	r7, r0, #3
+orrs	r7, r5
+movs	r5, #127	@ 0x7f
+bics	r0, r5
+ldr	r5, [sp, #40]	@ 0x28
+lsls	r0, r0, #6
+ands	r5, r4
+adds	r0, r2, r0
+adds	r0, r0, r5
+str	r0, [sp, #40]	@ 0x28
+mov	r9, r7
+movs	r0, r4
+movs	r4, #4
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #32]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, #7
+movs	r6, r5
+ands	r5, r3
+mov	sl, r5
+mov	r5, fp
+ands	r6, r1
+str	r6, [sp, #28]
+cmp	r5, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #32]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r3, r0, #26
+lsrs	r3, r3, #30
+str	r3, [sp, #56]	@ 0x38
+add	r3, sp, #96	@ 0x60
+str	r4, [sp, #32]
+str	r3, [sp, #48]	@ 0x30
+ldr	r3, [sp, #56]	@ 0x38
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #460]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #30
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #0
+movs	r5, #32
+mov	r9, r3
+str	r3, [sp, #68]	@ 0x44
+str	r3, [sp, #64]	@ 0x40
+ldr	r2, [sp, #36]	@ 0x24
+ldr	r3, [pc, #440]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r6, [r2, r3]
+ldr	r3, [pc, #400]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r3, [r2, r3]
+movs	r2, #240	@ 0xf0
+lsls	r3, r3, #10
+lsls	r2, r2, #6
+ands	r2, r3
+cmp	r6, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r6, [sp, #44]	@ 0x2c
+lsrs	r0, r6, #3
+muls	r0, r5
+adds	r2, r0, r2
+uxth	r3, r2
+str	r3, [sp, #52]	@ 0x34
+str	r6, [sp, #60]	@ 0x3c
+ldr	r3, [pc, #376]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r5, [r2, r3]
+ldr	r3, [sp, #32]
+cmp	r3, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r3, r5, #6
+mov	ip, r3
+mov	r3, r9
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #32]
+cmp	r3, #2
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+add	r0, ip
+lsls	r0, r0, #18
+lsrs	r3, r0, #18
+movs	r0, #7
+mov	ip, r3
+ldr	r3, [sp, #60]	@ 0x3c
+ldr	r5, [sp, #48]	@ 0x30
+ands	r0, r3
+movs	r3, #255	@ 0xff
+strb	r3, [r5, #5]
+movs	r3, #7
+lsls	r2, r0, #1
+subs	r3, r3, r2
+strb	r3, [r5, #4]
+ldr	r2, [sp, #36]	@ 0x24
+ldr	r3, [pc, #304]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r5, #7
+ldrb	r3, [r2, r3]
+movs	r2, #0
+ands	r3, r5
+adds	r2, r0, r2
+lsls	r3, r3, #11
+adds	r3, r3, r2
+ldr	r2, [sp, #36]	@ 0x24
+adds	r3, r2, r3
+str	r3, [sp, #96]	@ 0x60
+ldr	r3, [pc, #312]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r0, r2
+ldrb	r2, [r2, r3]
+movs	r3, #3
+ands	r3, r2
+ldr	r2, [sp, #32]
+cmp	r2, #2
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r6, #7
+ldr	r0, [sp, #36]	@ 0x24
+lsls	r2, r3, #4
+ands	r6, r1
+lsrs	r3, r1, #3
+ldr	r1, [pc, #288]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r0, [r0, r1]
+ldr	r1, [sp, #56]	@ 0x38
+lsls	r0, r0, #30
+lsrs	r0, r0, #31
+cmp	r1, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [pc, #272]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsls	r1, r1, #2
+ldr	r5, [r1, r5]
+ldr	r1, [sp, #48]	@ 0x30
+str	r2, [sp, #8]
+str	r1, [sp, #16]
+mov	r2, r9
+movs	r1, #0
+str	r2, [sp, #4]
+str	r1, [sp, #12]
+mov	r2, ip
+ldr	r1, [sp, #52]	@ 0x34
+str	r6, [sp, #0]
+blx	r5
+ldr	r5, [pc, #248]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [sp, #28]
+adds	r6, r5, r3
+cmp	r4, #2
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r3, fp
+cmp	r3, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #40]	@ 0x28
+ldrb	r3, [r3, #0]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #28]
+lsls	r3, r3, #30
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #212]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r3, [r2, r3]
+cmp	r3, #127	@ 0x7f
+bls.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #204]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r3, [r2, r3]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #196]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r6, [r3, #0]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #0
+str	r1, [sp, #28]
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r1, [pc, #188]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r0, r1]
+lsls	r0, r5, #2
+mov	fp, r1
+str	r1, [sp, #52]	@ 0x34
+lsls	r5, r5, #27
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, #48	@ 0x30
+ands	r5, r0
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #28]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [pc, #104]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r2, #0
+mov	ip, r1
+mov	r7, fp
+mov	r1, sl
+ldr	r3, [sp, #36]	@ 0x24
+adds	r4, r3, r4
+ldrb	r3, [r4, r2]
+movs	r0, #15
+movs	r6, r3
+lsls	r3, r3, #4
+bics	r6, r0
+uxtb	r3, r3
+cmp	r6, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+asrs	r0, r6, #4
+orrs	r0, r5
+mov	r8, r0
+mov	r0, ip
+mov	r6, r8
+strb	r6, [r0, r7]
+mov	r0, r8
+ldr	r6, [pc, #108]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+strb	r0, [r6, r7]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+adds	r6, r7, #2
+uxtb	r6, r6
+movs	r0, r6
+mov	r6, ip
+asrs	r3, r3, #4
+orrs	r3, r5
+strb	r3, [r6, r0]
+ldr	r6, [pc, #88]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+strb	r3, [r6, r0]
+adds	r7, #4
+adds	r2, #1
+uxtb	r7, r7
+cmp	r1, r2
+bgt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r6, r9
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r0, r1
+ands	r0, r5
+tst	r1, r5
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, r2
+ldr	r2, [pc, #628]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+muls	r0, r2
+lsrs	r2, r5, #4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #32]
+ldr	r1, [pc, #616]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+muls	r2, r1
+mov	sl, r1
+ldr	r1, [pc, #616]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r7, #0
+ldr	r4, [r1, #60]	@ 0x3c
+ldr	r1, [r1, #0]
+mov	r9, r4
+mov	r8, r1
+ldr	r1, [pc, #608]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+eors	r2, r0
+adds	r4, r1, #1
+adds	r4, #255	@ 0xff
+mov	ip, r4
+ldrb	r4, [r3, #0]
+cmp	r4, r7
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r7, fp
+lsls	r6, r4, #3
+ldrb	r6, [r6, r7]
+movs	r7, r4
+cmp	r6, r5
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, #15
+movs	r2, #15
+ands	r0, r6
+tst	r2, r6
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #32]
+mov	r2, sl
+muls	r0, r2
+lsrs	r2, r6, #4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #32]
+mov	r5, sl
+muls	r2, r5
+movs	r7, r4
+movs	r5, r6
+eors	r2, r0
+mov	r4, r9
+ands	r4, r2
+eors	r4, r0
+str	r4, [r1, #0]
+mov	r4, r8
+ands	r4, r2
+eors	r4, r0
+str	r4, [r1, #4]
+adds	r1, #8
+adds	r3, #1
+cmp	r1, ip
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #44]	@ 0x2c
+bl	<ADDR> <pico9918_output_sprites.constprop.0>
+movs	r7, r0
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r2, ip
+ldr	r0, [sp, #40]	@ 0x28
+ldrb	r2, [r2, r0]
+movs	r0, r1
+mov	r8, r2
+ands	r0, r2
+tst	r1, r2
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #32]
+ldr	r1, [pc, #488]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsrs	r2, r2, #4
+muls	r0, r1
+cmp	r2, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #32]
+ldr	r1, [pc, #476]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+muls	r2, r1
+ldr	r1, [pc, #480]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r4, #0
+adds	r6, r1, #1
+adds	r6, #255	@ 0xff
+mov	ip, r6
+movs	r6, #15
+mov	sl, r6
+mov	r6, fp
+mov	fp, r9
+ldr	r7, [pc, #456]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+eors	r2, r0
+str	r6, [sp, #48]	@ 0x30
+str	r3, [sp, #28]
+ldr	r3, [sp, #28]
+ldrb	r6, [r3, #0]
+mov	r3, fp
+mov	r9, r6
+movs	r6, r4
+mov	r4, r9
+ands	r4, r3
+cmp	r6, r4
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+lsls	r5, r4, #3
+adds	r6, r3, r5
+ldr	r3, [sp, #40]	@ 0x28
+ldrb	r6, [r6, r3]
+ldr	r3, [sp, #48]	@ 0x30
+ldrb	r5, [r3, r5]
+cmp	r8, r6
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r0, sl
+mov	r3, sl
+ands	r0, r6
+tst	r3, r6
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #32]
+ldr	r3, [pc, #396]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsrs	r2, r6, #4
+muls	r0, r3
+cmp	r2, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #32]
+mov	r8, r6
+ldr	r3, [pc, #384]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+muls	r2, r3
+eors	r2, r0
+lsrs	r6, r5, #4
+lsls	r6, r6, #2
+ldr	r6, [r7, r6]
+ldr	r3, [sp, #28]
+ands	r6, r2
+eors	r6, r0
+str	r6, [r1, #0]
+mov	r6, sl
+ands	r6, r5
+lsls	r6, r6, #2
+ldr	r6, [r7, r6]
+adds	r3, #1
+ands	r6, r2
+eors	r6, r0
+str	r6, [r1, #4]
+adds	r1, #8
+str	r3, [sp, #28]
+cmp	r1, ip
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #44]	@ 0x2c
+bl	<ADDR> <pico9918_output_sprites.constprop.0>
+movs	r7, r0
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r4, #255	@ 0xff
+movs	r2, #7
+ldr	r0, [sp, #44]	@ 0x2c
+mov	r9, r4
+ands	r2, r0
+subs	r4, #248	@ 0xf8
+movs	r0, #0
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r2, #64	@ 0x40
+movs	r1, #64	@ 0x40
+mov	sl, r2
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r2, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #60	@ 0x3c
+ands	r1, r0
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #28]
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #36]	@ 0x24
+movs	r0, #0
+adds	r3, r2, r4
+str	r3, [sp, #48]	@ 0x30
+movs	r3, #63	@ 0x3f
+ldr	r2, [pc, #280]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	ip, r3
+ldr	r3, [pc, #272]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r6, #128	@ 0x80
+str	r2, [sp, #56]	@ 0x38
+mov	r2, r9
+mov	r5, fp
+movs	r7, #0
+mov	r8, r1
+mov	r9, r3
+lsls	r6, r6, #24
+str	r2, [sp, #64]	@ 0x40
+str	r0, [sp, #32]
+ldr	r3, [sp, #48]	@ 0x30
+mov	r2, ip
+ldrb	r3, [r3, r7]
+mov	r0, ip
+movs	r1, r3
+lsls	r4, r3, #2
+bics	r1, r2
+lsls	r2, r3, #6
+lsls	r3, r3, #4
+bics	r4, r0
+bics	r3, r0
+uxtb	r2, r2
+uxtb	r4, r4
+uxtb	r3, r3
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r0, r8
+asrs	r1, r1, #6
+orrs	r1, r0
+mov	r0, r9
+strb	r1, [r0, r5]
+ldr	r1, [sp, #32]
+orrs	r1, r6
+str	r1, [sp, #32]
+cmp	r4, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r0, r8
+asrs	r4, r4, #6
+orrs	r4, r0
+mov	r0, r9
+adds	r1, r5, #1
+uxtb	r1, r1
+strb	r4, [r0, r1]
+ldr	r0, [sp, #32]
+lsrs	r1, r6, #1
+orrs	r0, r1
+str	r0, [sp, #32]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r0, r8
+asrs	r3, r3, #6
+orrs	r3, r0
+mov	r0, r9
+adds	r1, r5, #2
+uxtb	r1, r1
+strb	r3, [r0, r1]
+ldr	r1, [sp, #32]
+lsrs	r3, r6, #2
+orrs	r1, r3
+str	r1, [sp, #32]
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r1, r8
+asrs	r2, r2, #6
+orrs	r2, r1
+mov	r1, r9
+adds	r3, r5, #3
+uxtb	r3, r3
+strb	r2, [r1, r3]
+ldr	r2, [sp, #32]
+lsrs	r3, r6, #3
+orrs	r2, r3
+str	r2, [sp, #32]
+adds	r5, #4
+uxtb	r5, r5
+lsrs	r6, r6, #4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #32]
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #31
+ldr	r2, [sp, #52]	@ 0x34
+lsrs	r3, r2, #5
+ands	r2, r1
+lsrs	r0, r2
+movs	r6, r0
+ldr	r0, [sp, #56]	@ 0x38
+lsls	r4, r3, #2
+ldr	r1, [r4, r0]
+orrs	r1, r6
+str	r1, [r4, r0]
+subs	r1, r2, #1
+cmp	r1, #31
+bhi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #32
+ldr	r0, [sp, #32]
+subs	r1, r1, r2
+lsls	r0, r1
+adds	r3, #1
+ldr	r1, [sp, #56]	@ 0x38
+lsls	r3, r3, #2
+ldr	r2, [r1, r3]
+orrs	r0, r2
+str	r0, [r1, r3]
+movs	r3, #0
+movs	r6, #128	@ 0x80
+str	r5, [sp, #52]	@ 0x34
+str	r3, [sp, #32]
+lsls	r6, r6, #24
+adds	r7, #1
+cmp	sl, r7
+bgt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+movs	r2, #0
+mov	r9, r3
+mov	r3, sl
+ldr	r0, [sp, #32]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r2, sl
+subs	r2, #1
+lsls	r2, r2, #2
+mov	r3, fp
+adds	r3, #4
+adds	r3, r3, r2
+uxtb	r3, r3
+mov	r8, r3
+ldr	r6, [sp, #28]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r6, r9
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+mov	r6, r9
+movs	r2, #192	@ 0xc0
+lsls	r2, r2, #24
+mov	ip, r2
+ldr	r7, [sp, #36]	@ 0x24
+movs	r1, #0
+adds	r4, r7, r4
+mov	r3, fp
+mov	r7, ip
+movs	r0, #0
+mov	ip, sl
+mov	sl, r6
+str	r4, [sp, #48]	@ 0x30
+ldr	r4, [pc, #784]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [pc, #784]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r4, [sp, #56]	@ 0x38
+str	r1, [sp, #32]
+ldr	r1, [sp, #48]	@ 0x30
+movs	r4, #15
+ldrb	r6, [r1, r0]
+movs	r1, r6
+bics	r1, r4
+asrs	r1, r1, #4
+ldr	r4, [pc, #772]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+orrs	r1, r5
+strb	r1, [r2, r3]
+strb	r1, [r4, r3]
+movs	r1, #15
+ands	r6, r1
+adds	r1, r3, #2
+orrs	r6, r5
+uxtb	r1, r1
+strb	r6, [r2, r1]
+strb	r6, [r4, r1]
+ldr	r4, [sp, #32]
+lsrs	r6, r7, #2
+orrs	r6, r7
+ldr	r1, [sp, #28]
+orrs	r4, r6
+adds	r3, #4
+str	r4, [sp, #32]
+uxtb	r3, r3
+lsrs	r7, r7, #4
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r7, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r4, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r4, #31
+ldr	r1, [sp, #52]	@ 0x34
+lsrs	r7, r1, #5
+ands	r1, r4
+movs	r6, r1
+lsls	r1, r7, #2
+mov	r8, r1
+str	r7, [sp, #52]	@ 0x34
+ldr	r1, [sp, #32]
+mov	r7, r8
+lsrs	r1, r6
+ldr	r4, [sp, #56]	@ 0x38
+ldr	r7, [r7, r4]
+orrs	r1, r7
+mov	r7, r8
+str	r1, [r7, r4]
+subs	r1, r6, #1
+cmp	r1, #31
+bhi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #32
+subs	r6, r1, r6
+ldr	r1, [sp, #32]
+ldr	r7, [sp, #52]	@ 0x34
+lsls	r1, r6
+adds	r7, #1
+lsls	r7, r7, #2
+ldr	r6, [r4, r7]
+orrs	r1, r6
+str	r1, [r4, r7]
+movs	r1, #0
+movs	r7, #192	@ 0xc0
+str	r3, [sp, #52]	@ 0x34
+str	r1, [sp, #32]
+lsls	r7, r7, #24
+adds	r0, #1
+cmp	r0, ip
+blt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #28]
+mov	r6, sl
+ldr	r1, [sp, #32]
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r3, ip
+movs	r2, #0
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r2, ip
+subs	r2, #1
+lsls	r2, r2, #2
+mov	r3, fp
+adds	r3, #4
+adds	r3, r3, r2
+uxtb	r3, r3
+mov	r8, r3
+cmp	r1, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r4, #31
+movs	r5, r1
+ldr	r0, [sp, #52]	@ 0x34
+ands	r4, r0
+lsrs	r5, r4
+lsrs	r2, r0, #5
+ldr	r0, [pc, #580]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsls	r7, r2, #2
+ldr	r3, [r7, r0]
+orrs	r5, r3
+str	r5, [r7, r0]
+movs	r5, #32
+mov	r3, r8
+subs	r4, r5, r4
+ldr	r5, [sp, #52]	@ 0x34
+subs	r3, r3, r5
+cmp	r3, r4
+bhi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r1, r4
+adds	r2, #1
+lsls	r2, r2, #2
+ldr	r3, [r2, r0]
+orrs	r1, r3
+str	r1, [r2, r0]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, r5
+movs	r0, r5
+ldr	r3, [sp, #28]
+adds	r1, #45	@ 0x2d
+adds	r0, #9
+negs	r2, r3
+adds	r1, #255	@ 0xff
+adds	r0, #255	@ 0xff
+bl	<ADDR> <tmsCopyAlignMask>
+mov	r2, sl
+ldr	r3, [sp, #28]
+ldr	r5, [pc, #524]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+orrs	r3, r2
+movs	r2, #3
+movs	r1, r2
+ands	r1, r3
+add	r5, sl
+str	r1, [sp, #44]	@ 0x2c
+tst	r2, r3
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #8
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [pc, #504]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [r3, #0]
+ldr	r3, [pc, #504]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r4, [pc, #484]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r2, [r3, #16]
+ldr	r3, [sp, #36]	@ 0x24
+ldr	r2, [pc, #500]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r0, r6
+adds	r3, r3, r2
+mov	ip, r3
+ldr	r3, [pc, #468]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r4, [sp, #28]
+str	r3, [sp, #32]
+adds	r3, r5, #1
+adds	r3, #255	@ 0xff
+str	r3, [sp, #36]	@ 0x24
+str	r7, [sp, #48]	@ 0x30
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+adds	r2, r3, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #44]	@ 0x2c
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [pc, #448]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsrs	r7, r3, #28
+ldr	r6, [r0, #0]
+lsls	r1, r7, #2
+ldr	r7, [r5, #0]
+ldr	r1, [r1, r2]
+eors	r7, r6
+ands	r7, r1
+eors	r7, r6
+str	r7, [r4, #0]
+lsls	r7, r3, #4
+lsrs	r7, r7, #28
+ldr	r6, [r0, #4]
+ldr	r1, [r5, #4]
+lsls	r7, r7, #2
+ldr	r7, [r7, r2]
+eors	r1, r6
+ands	r7, r1
+eors	r7, r6
+str	r7, [r4, #4]
+lsls	r7, r3, #8
+lsrs	r7, r7, #28
+ldr	r6, [r0, #8]
+ldr	r1, [r5, #8]
+lsls	r7, r7, #2
+ldr	r7, [r7, r2]
+eors	r1, r6
+ands	r7, r1
+eors	r7, r6
+str	r7, [r4, #8]
+lsls	r7, r3, #12
+lsrs	r7, r7, #28
+ldr	r6, [r0, #12]
+ldr	r1, [r5, #12]
+lsls	r7, r7, #2
+ldr	r7, [r7, r2]
+eors	r1, r6
+ands	r7, r1
+eors	r7, r6
+str	r7, [r4, #12]
+lsls	r7, r3, #16
+lsrs	r7, r7, #28
+ldr	r6, [r0, #16]
+ldr	r1, [r5, #16]
+lsls	r7, r7, #2
+ldr	r7, [r7, r2]
+eors	r1, r6
+ands	r7, r1
+eors	r7, r6
+str	r7, [r4, #16]
+lsls	r7, r3, #20
+lsrs	r7, r7, #28
+ldr	r6, [r0, #20]
+ldr	r1, [r5, #20]
+lsls	r7, r7, #2
+ldr	r7, [r7, r2]
+eors	r1, r6
+ands	r7, r1
+eors	r7, r6
+str	r7, [r4, #20]
+lsls	r7, r3, #24
+lsrs	r7, r7, #28
+ldr	r6, [r0, #24]
+ldr	r1, [r5, #24]
+lsls	r7, r7, #2
+ldr	r7, [r7, r2]
+eors	r1, r6
+ands	r7, r1
+eors	r7, r6
+movs	r6, #15
+ands	r3, r6
+str	r7, [r4, #24]
+ldr	r6, [r5, #28]
+ldr	r7, [r0, #28]
+lsls	r3, r3, #2
+ldr	r3, [r3, r2]
+eors	r6, r7
+ands	r3, r6
+eors	r3, r7
+str	r3, [r4, #28]
+movs	r3, #4
+add	ip, r3
+ldr	r3, [sp, #32]
+adds	r5, #32
+adds	r3, #4
+str	r3, [sp, #32]
+ldr	r3, [sp, #36]	@ 0x24
+adds	r4, #32
+adds	r0, #32
+cmp	r5, r3
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r3, ip
+ldr	r6, [sp, #32]
+ldr	r3, [r3, #0]
+ldr	r2, [r6, #0]
+ldr	r1, [sp, #28]
+ldr	r7, [r6, #72]	@ 0x48
+bics	r2, r3
+orrs	r2, r7
+movs	r7, r1
+adds	r1, #32
+str	r1, [sp, #28]
+adds	r6, r2, #1
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [sp, #40]	@ 0x28
+movs	r6, r0
+ldrb	r1, [r1, #0]
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r8, r4
+movs	r1, r5
+mov	r9, r0
+ldr	r4, [sp, #28]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #0]
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r0, [r7, #0]
+lsls	r0, r2, #1
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r0, r3, #1
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #1]
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r0, [r7, #1]
+lsls	r0, r2, #2
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r0, r3, #2
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #2]
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r0, [r7, #2]
+lsls	r0, r2, #3
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r0, r3, #3
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #3]
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r0, [r7, #3]
+adds	r7, #4
+lsls	r3, r3, #4
+lsls	r2, r2, #4
+adds	r6, #4
+adds	r1, #4
+cmp	r7, r4
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r2, #0
+blt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r3, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #0]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #1]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #2]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #3]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, r5
+mov	r9, r0
+mov	r8, r4
+ldr	r4, [sp, #28]
+cmp	r2, #0
+blt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r3, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #0]
+strb	r0, [r7, #0]
+lsls	r0, r2, #1
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r0, r3, #1
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #1]
+strb	r0, [r7, #1]
+lsls	r0, r2, #2
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r0, r3, #2
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #2]
+strb	r0, [r7, #2]
+lsls	r0, r2, #3
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r0, r3, #3
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r6, #3]
+strb	r0, [r7, #3]
+adds	r7, #4
+lsls	r3, r3, #4
+lsls	r2, r2, #4
+adds	r6, #4
+adds	r1, #4
+cmp	r7, r4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+str	r4, [sp, #28]
+mov	r0, r9
+mov	r4, r8
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r8, r0
+movs	r2, r5
+ldr	r0, [sp, #28]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldrb	r1, [r6, #0]
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r1, [r7, #0]
+lsls	r1, r3, #1
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r1, [r6, #1]
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r1, [r7, #1]
+lsls	r1, r3, #2
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r1, [r6, #2]
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r1, [r7, #2]
+lsls	r1, r3, #3
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r1, [r6, #3]
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+strb	r1, [r7, #3]
+adds	r7, #4
+lsls	r3, r3, #4
+adds	r6, #4
+adds	r2, #4
+cmp	r7, r0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r3, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r1, [r2, #0]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r1, [r2, #3]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r1, [r2, #2]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r1, [r2, #1]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [sp, #44]	@ 0x2c
+cmp	r1, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [r0, #0]
+ldr	r7, [r5, #0]
+mov	r8, r1
+ldr	r1, [r4, #0]
+mvns	r2, r2
+mov	fp, r1
+mov	r1, r8
+eors	r1, r7
+mov	r9, r1
+ldr	r7, [pc, #888]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsrs	r1, r3, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r9
+ands	r1, r6
+mov	sl, r1
+mov	r6, fp
+mov	r1, r8
+eors	r1, r6
+movs	r6, r1
+mov	r1, sl
+eors	r1, r6
+mov	r8, r1
+lsrs	r1, r2, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r8
+ands	r1, r6
+movs	r6, r1
+mov	r1, fp
+eors	r1, r6
+str	r1, [r4, #0]
+ldr	r1, [r0, #4]
+mov	r9, r1
+ldr	r1, [r4, #4]
+mov	r6, r9
+mov	fp, r1
+lsls	r1, r3, #4
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+mov	r8, r1
+ldr	r1, [r5, #4]
+eors	r1, r6
+mov	sl, r1
+mov	r1, r8
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, sl
+ands	r1, r6
+mov	r8, r1
+mov	r6, fp
+mov	r1, r9
+eors	r1, r6
+movs	r6, r1
+mov	r1, r8
+eors	r1, r6
+mov	r8, r1
+lsls	r1, r2, #4
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r8
+ands	r1, r6
+movs	r6, r1
+mov	r1, fp
+eors	r1, r6
+str	r1, [r4, #4]
+ldr	r1, [r0, #8]
+mov	r9, r1
+ldr	r1, [r4, #8]
+mov	r6, r9
+mov	fp, r1
+lsls	r1, r3, #8
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+mov	r8, r1
+ldr	r1, [r5, #8]
+eors	r1, r6
+mov	sl, r1
+mov	r1, r8
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, sl
+ands	r1, r6
+mov	r8, r1
+mov	r6, fp
+mov	r1, r9
+eors	r1, r6
+movs	r6, r1
+mov	r1, r8
+eors	r1, r6
+mov	r8, r1
+lsls	r1, r2, #8
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r8
+ands	r1, r6
+movs	r6, r1
+mov	r1, fp
+eors	r1, r6
+str	r1, [r4, #8]
+ldr	r1, [r0, #12]
+mov	r9, r1
+ldr	r1, [r4, #12]
+mov	r6, r9
+mov	fp, r1
+lsls	r1, r3, #12
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+mov	r8, r1
+ldr	r1, [r5, #12]
+eors	r1, r6
+mov	sl, r1
+mov	r1, r8
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, sl
+ands	r1, r6
+mov	r8, r1
+mov	r6, fp
+mov	r1, r9
+eors	r1, r6
+movs	r6, r1
+mov	r1, r8
+eors	r1, r6
+mov	r8, r1
+lsls	r1, r2, #12
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r8
+ands	r1, r6
+movs	r6, r1
+mov	r1, fp
+eors	r1, r6
+str	r1, [r4, #12]
+ldr	r1, [r0, #16]
+mov	r9, r1
+ldr	r1, [r4, #16]
+mov	r6, r9
+mov	fp, r1
+lsls	r1, r3, #16
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+mov	r8, r1
+ldr	r1, [r5, #16]
+eors	r1, r6
+mov	sl, r1
+mov	r1, r8
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, sl
+ands	r1, r6
+mov	r8, r1
+mov	r6, fp
+mov	r1, r9
+eors	r1, r6
+movs	r6, r1
+mov	r1, r8
+eors	r1, r6
+mov	r8, r1
+lsls	r1, r2, #16
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r8
+ands	r1, r6
+movs	r6, r1
+mov	r1, fp
+eors	r1, r6
+str	r1, [r4, #16]
+ldr	r1, [r0, #20]
+mov	r9, r1
+ldr	r1, [r4, #20]
+mov	r6, r9
+mov	fp, r1
+lsls	r1, r3, #20
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+mov	r8, r1
+ldr	r1, [r5, #20]
+eors	r1, r6
+mov	sl, r1
+mov	r1, r8
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, sl
+ands	r1, r6
+mov	r8, r1
+mov	r6, fp
+mov	r1, r9
+eors	r1, r6
+movs	r6, r1
+mov	r1, r8
+eors	r1, r6
+mov	r8, r1
+lsls	r1, r2, #20
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r8
+ands	r1, r6
+movs	r6, r1
+mov	r1, fp
+eors	r1, r6
+str	r1, [r4, #20]
+ldr	r1, [r0, #24]
+mov	r9, r1
+ldr	r1, [r4, #24]
+mov	r6, r9
+mov	fp, r1
+lsls	r1, r3, #24
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+mov	r8, r1
+ldr	r1, [r5, #24]
+eors	r1, r6
+mov	sl, r1
+mov	r1, r8
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, sl
+ands	r1, r6
+mov	r8, r1
+mov	r6, fp
+mov	r1, r9
+eors	r1, r6
+movs	r6, r1
+mov	r1, r8
+eors	r1, r6
+mov	r8, r1
+lsls	r1, r2, #24
+lsrs	r1, r1, #28
+lsls	r1, r1, #2
+ldr	r1, [r1, r7]
+movs	r6, r1
+mov	r1, r8
+ands	r1, r6
+movs	r6, r1
+mov	r1, fp
+eors	r1, r6
+str	r1, [r4, #24]
+ldr	r1, [r0, #28]
+mov	r9, r1
+ldr	r1, [r4, #28]
+mov	r6, r9
+mov	sl, r1
+movs	r1, #15
+ands	r3, r1
+mov	r8, r1
+lsls	r3, r3, #2
+ldr	r1, [r5, #28]
+ldr	r3, [r3, r7]
+eors	r1, r6
+ands	r3, r1
+mov	r6, sl
+mov	r1, r9
+eors	r1, r6
+eors	r3, r1
+mov	r1, r8
+ands	r2, r1
+lsls	r2, r2, #2
+ldr	r2, [r2, r7]
+ands	r3, r2
+eors	r3, r6
+str	r3, [r4, #28]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+str	r0, [sp, #28]
+mov	r0, r8
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r7, [sp, #48]	@ 0x30
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #3]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #2]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #1]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r0, [r1, #0]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r3, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #0]
+strb	r2, [r4, #0]
+lsls	r2, r3, #1
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #1]
+strb	r2, [r4, #1]
+lsls	r2, r3, #2
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #2]
+strb	r2, [r4, #2]
+lsls	r2, r3, #3
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #3]
+strb	r2, [r4, #3]
+lsls	r2, r3, #4
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #4]
+strb	r2, [r4, #4]
+lsls	r2, r3, #5
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #5]
+strb	r2, [r4, #5]
+lsls	r2, r3, #6
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #6]
+strb	r2, [r4, #6]
+lsls	r2, r3, #7
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #7]
+strb	r2, [r4, #7]
+lsls	r2, r3, #8
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #8]
+strb	r2, [r4, #8]
+lsls	r2, r3, #9
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #9]
+strb	r2, [r4, #9]
+lsls	r2, r3, #10
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #10]
+strb	r2, [r4, #10]
+lsls	r2, r3, #11
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #11]
+strb	r2, [r4, #11]
+lsls	r2, r3, #12
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #12]
+strb	r2, [r4, #12]
+lsls	r2, r3, #13
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #13]
+strb	r2, [r4, #13]
+lsls	r2, r3, #14
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #14]
+strb	r2, [r4, #14]
+lsls	r2, r3, #15
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #15]
+strb	r2, [r4, #15]
+lsls	r2, r3, #16
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #16]
+strb	r2, [r4, #16]
+lsls	r2, r3, #17
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #17]
+strb	r2, [r4, #17]
+lsls	r2, r3, #18
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #18]
+strb	r2, [r4, #18]
+lsls	r2, r3, #19
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #19]
+strb	r2, [r4, #19]
+lsls	r2, r3, #20
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #20]
+strb	r2, [r4, #20]
+lsls	r2, r3, #21
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #21]
+strb	r2, [r4, #21]
+lsls	r2, r3, #22
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #22]
+strb	r2, [r4, #22]
+lsls	r2, r3, #23
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #23]
+strb	r2, [r4, #23]
+lsls	r2, r3, #24
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #24]
+strb	r2, [r4, #24]
+lsls	r2, r3, #25
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #25]
+strb	r2, [r4, #25]
+lsls	r2, r3, #26
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #26]
+strb	r2, [r4, #26]
+lsls	r2, r3, #27
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #27]
+strb	r2, [r4, #27]
+lsls	r2, r3, #28
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #28]
+strb	r2, [r4, #28]
+lsls	r2, r3, #29
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #29]
+strb	r2, [r4, #29]
+lsls	r2, r3, #30
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r0, #30]
+strb	r2, [r4, #30]
+lsls	r3, r3, #31
+bpl.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r3, [r0, #31]
+strb	r3, [r4, #31]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #32
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [pc, #4]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+lsls	r1, r0, #26
+lsrs	r1, r1, #30
+mov	ip, r1
+str	r1, [sp, #76]	@ 0x4c
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+str	r1, [sp, #84]	@ 0x54
+str	r1, [sp, #80]	@ 0x50
+adds	r1, #32
+str	r1, [sp, #48]	@ 0x30
+movs	r1, #0
+str	r1, [sp, #64]	@ 0x40
+ldr	r5, [sp, #36]	@ 0x24
+ldr	r1, [pc, #840]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r6, [r5, r1]
+ldr	r1, [pc, #840]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r5, r1]
+movs	r5, #240	@ 0xf0
+lsls	r1, r1, #10
+lsls	r5, r5, #6
+ands	r5, r1
+cmp	r6, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r6, [sp, #44]	@ 0x2c
+ldr	r1, [sp, #48]	@ 0x30
+lsrs	r0, r6, #3
+muls	r0, r1
+adds	r5, r0, r5
+uxth	r1, r5
+str	r1, [sp, #60]	@ 0x3c
+ldr	r5, [sp, #36]	@ 0x24
+ldr	r1, [pc, #808]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r5, r1]
+str	r1, [sp, #72]	@ 0x48
+cmp	r4, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r1, r1, #6
+str	r1, [sp, #56]	@ 0x38
+ldr	r1, [sp, #64]	@ 0x40
+cmp	r1, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r4, #2
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [sp, #56]	@ 0x38
+movs	r5, #7
+adds	r1, r0, r1
+lsls	r1, r1, #18
+lsrs	r1, r1, #18
+str	r1, [sp, #56]	@ 0x38
+movs	r1, #255	@ 0xff
+ands	r5, r6
+add	r6, sp, #96	@ 0x60
+strb	r1, [r6, #5]
+movs	r1, #7
+lsls	r0, r5, #1
+subs	r1, r1, r0
+strb	r1, [r6, #4]
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r1, [pc, #752]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r6, [sp, #48]	@ 0x30
+ldrb	r1, [r0, r1]
+movs	r6, #7
+movs	r0, #0
+str	r1, [sp, #68]	@ 0x44
+ldr	r1, [sp, #68]	@ 0x44
+adds	r0, r5, r0
+ands	r1, r6
+lsls	r1, r1, #11
+adds	r1, r1, r0
+ldr	r0, [sp, #36]	@ 0x24
+adds	r1, r0, r1
+str	r1, [sp, #96]	@ 0x60
+ldr	r1, [pc, #728]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r5, r0
+ldrb	r0, [r0, r1]
+movs	r1, #12
+ands	r1, r0
+movs	r0, #1
+bics	r0, r2
+movs	r2, r0
+cmp	r4, #2
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [sp, #36]	@ 0x24
+ldr	r0, [pc, #708]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r6, #7
+ldrb	r0, [r5, r0]
+mov	r5, ip
+ands	r6, r3
+lsls	r0, r0, #26
+lsrs	r3, r3, #3
+mov	r8, r3
+lsls	r1, r1, #2
+lsrs	r0, r0, #31
+cmp	r5, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, #6
+ldr	r3, [pc, #684]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r3, [sp, #68]	@ 0x44
+ldr	r3, [sp, #76]	@ 0x4c
+adds	r3, r3, r5
+ldr	r5, [sp, #68]	@ 0x44
+lsls	r3, r3, #2
+ldr	r5, [r3, r5]
+ldr	r3, [sp, #48]	@ 0x30
+str	r2, [sp, #12]
+str	r3, [sp, #16]
+ldr	r3, [sp, #64]	@ 0x40
+ldr	r2, [sp, #56]	@ 0x38
+str	r1, [sp, #8]
+str	r3, [sp, #4]
+ldr	r1, [sp, #60]	@ 0x3c
+mov	r3, r8
+str	r6, [sp, #0]
+blx	r5
+ldr	r5, [pc, #652]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	r2, sl
+movs	r6, r5
+ldr	r3, [sp, #28]
+adds	r6, #36	@ 0x24
+subs	r2, r3, r2
+movs	r1, r5
+movs	r0, r6
+bl	<ADDR> <tmsCopyAlignMask>
+ldr	r3, [sp, #32]
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #28]
+movs	r1, r6
+movs	r0, r5
+negs	r2, r3
+bl	<ADDR> <tmsCopyAlignMask>
+mov	r0, sl
+bl	<ADDR> <compositeTile2OnlyBuffer.constprop.0>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #44]	@ 0x2c
+adds	r6, r6, r3
+movs	r3, #64	@ 0x40
+ands	r3, r0
+negs	r0, r3
+adcs	r3, r0
+movs	r0, #47	@ 0x2f
+negs	r3, r3
+bics	r3, r0
+mov	r8, r3
+movs	r3, #240	@ 0xf0
+movs	r0, #192	@ 0xc0
+add	r8, r3
+ldr	r3, [sp, #36]	@ 0x24
+lsls	r0, r0, #7
+ldrb	r0, [r3, r0]
+mov	r3, r8
+lsls	r0, r0, #28
+lsrs	r0, r0, #31
+lsls	r3, r0
+cmp	r6, r3
+blt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+uxth	r3, r6
+lsrs	r0, r3, #3
+muls	r0, r5
+adds	r2, r0, r2
+str	r3, [sp, #60]	@ 0x3c
+uxth	r3, r2
+str	r3, [sp, #52]	@ 0x34
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [sp, #32]
+cmp	r1, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r1, #3
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [pc, #528]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r1, r0, #26
+lsrs	r1, r1, #30
+mov	ip, r1
+str	r1, [sp, #76]	@ 0x4c
+tst	r4, r2
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r1, r9
+str	r1, [sp, #64]	@ 0x40
+movs	r1, #1
+str	r1, [sp, #84]	@ 0x54
+adds	r1, #39	@ 0x27
+str	r1, [sp, #48]	@ 0x30
+subs	r1, #39	@ 0x27
+str	r1, [sp, #80]	@ 0x50
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [sp, #44]	@ 0x2c
+mov	r8, r1
+movs	r1, #64	@ 0x40
+ands	r1, r0
+negs	r0, r1
+adcs	r1, r0
+movs	r0, #47	@ 0x2f
+negs	r1, r1
+bics	r1, r0
+movs	r0, #192	@ 0xc0
+add	r8, r6
+ldr	r6, [sp, #36]	@ 0x24
+lsls	r0, r0, #7
+ldrb	r0, [r6, r0]
+adds	r1, #240	@ 0xf0
+lsls	r0, r0, #28
+lsrs	r0, r0, #31
+lsls	r1, r0
+cmp	r8, r1
+blt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r1, r8
+uxth	r6, r1
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #432]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #31
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #436]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r5, [r2, r3]
+ldr	r3, [sp, #32]
+cmp	r3, #1
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r3, r5, #6
+mov	ip, r3
+mov	r3, r9
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #192	@ 0xc0
+ldr	r2, [sp, #52]	@ 0x34
+lsls	r3, r3, #4
+ands	r3, r2
+adds	r0, r0, r3
+add	r0, ip
+lsls	r0, r0, #18
+lsrs	r3, r0, #18
+mov	ip, r3
+ldr	r2, [sp, #36]	@ 0x24
+ldr	r3, [pc, #372]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r3, [r2, r3]
+ldr	r2, [sp, #32]
+cmp	r2, #3
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, r2
+ldr	r2, [sp, #44]	@ 0x2c
+lsrs	r0, r2, #3
+ands	r0, r5
+lsls	r2, r2, #29
+lsrs	r2, r2, #31
+lsls	r0, r0, #1
+ldr	r5, [sp, #48]	@ 0x30
+adds	r0, r0, r2
+ldr	r2, [pc, #372]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+uxtb	r0, r0
+strh	r2, [r5, #4]
+movs	r2, #0
+movs	r5, #7
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #128	@ 0x80
+ldr	r2, [sp, #52]	@ 0x34
+lsls	r3, r3, #4
+eors	r2, r3
+str	r2, [sp, #52]	@ 0x34
+ldr	r3, [pc, #344]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r5, [r2, r3]
+ldr	r3, [sp, #32]
+cmp	r3, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #127	@ 0x7f
+movs	r2, r5
+bics	r2, r3
+lsls	r3, r2, #6
+mov	ip, r3
+mov	r3, r9
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #192	@ 0xc0
+ldr	r2, [sp, #52]	@ 0x34
+lsls	r3, r3, #4
+ands	r3, r2
+adds	r3, r0, r3
+add	r3, ip
+lsls	r3, r3, #18
+lsrs	r3, r3, #18
+mov	ip, r3
+ldr	r2, [sp, #36]	@ 0x24
+ldr	r3, [pc, #272]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r3, [r2, r3]
+movs	r0, #7
+ldr	r2, [sp, #60]	@ 0x3c
+ldr	r6, [sp, #48]	@ 0x30
+ands	r0, r2
+movs	r2, #255	@ 0xff
+strb	r2, [r6, #5]
+lsls	r2, r0, #1
+movs	r6, r2
+movs	r2, #7
+subs	r2, r2, r6
+ldr	r6, [sp, #48]	@ 0x30
+strb	r2, [r6, #4]
+ldr	r2, [sp, #32]
+cmp	r2, #1
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r6, #192	@ 0xc0
+ldr	r2, [sp, #36]	@ 0x24
+ldr	r3, [pc, #232]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+lsls	r6, r6, #5
+ldrb	r3, [r2, r3]
+ldr	r2, [sp, #60]	@ 0x3c
+lsrs	r2, r2, #6
+ands	r2, r3
+lsls	r2, r2, #11
+ands	r2, r6
+str	r2, [sp, #44]	@ 0x2c
+movs	r2, #7
+mov	r8, r2
+mov	r2, r8
+lsls	r6, r5, #3
+orrs	r6, r2
+ldr	r2, [sp, #48]	@ 0x30
+lsls	r5, r5, #6
+strb	r6, [r2, #5]
+ldr	r2, [sp, #44]	@ 0x2c
+ands	r5, r2
+mov	r2, ip
+adds	r6, r0, r2
+adds	r5, r5, r6
+uxth	r2, r5
+mov	ip, r2
+movs	r5, #4
+ldr	r2, [sp, #44]	@ 0x2c
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r3, r0, #26
+lsrs	r3, r3, #30
+str	r3, [sp, #56]	@ 0x38
+add	r3, sp, #96	@ 0x60
+str	r3, [sp, #48]	@ 0x30
+lsls	r2, r2, #30
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #1
+str	r3, [sp, #68]	@ 0x44
+adds	r3, #1
+str	r3, [sp, #32]
+subs	r3, #1
+movs	r5, #40	@ 0x28
+str	r3, [sp, #64]	@ 0x40
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #27]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #19]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #18]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #17]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #16]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #15]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #14]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #13]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #12]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #23]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #22]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #21]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #20]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #25]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #24]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #26]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r3, [r5, #31]
+strb	r3, [r4, #31]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #30]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #29]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #28]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #3]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #2]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #1]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #0]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #11]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #10]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #9]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #8]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #7]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #6]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #5]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldrb	r2, [r5, #4]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r2, #255	@ 0xff
+ldr	r3, [pc, #736]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	r9, r2
+ldrb	r4, [r3, #0]
+subs	r2, #247	@ 0xf7
+movs	r1, r4
+movs	r0, r6
+bl	<ADDR> <__wrap_memset>
+movs	r0, r6
+movs	r2, #8
+movs	r1, r4
+adds	r0, #248	@ 0xf8
+bl	<ADDR> <__wrap_memset>
+mov	r3, fp
+cmp	r3, #0
+bge.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r1, r9
+ldr	r3, [pc, #700]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [pc, #704]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+adds	r5, r5, r3
+ldr	r3, [r5, r2]
+lsls	r3, r3, #8
+lsrs	r3, r3, #8
+str	r3, [r5, r2]
+ldr	r2, [pc, #696]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [r5, r2]
+bics	r3, r1
+str	r3, [r5, r2]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #160	@ 0xa0
+movs	r6, #232	@ 0xe8
+movs	r7, #128	@ 0x80
+ldr	r1, [sp, #28]
+lsls	r3, r3, #23
+lsls	r6, r6, #1
+lsls	r7, r7, #17
+ldr	r2, [r3, r6]
+tst	r2, r7
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+str	r1, [sp, #28]
+ldr	r3, [pc, #664]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #52]	@ 0x34
+str	r0, [r3, #0]
+str	r4, [r3, #4]
+str	r2, [r3, #28]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, #32
+mov	r9, r3
+str	r3, [sp, #68]	@ 0x44
+str	r3, [sp, #64]	@ 0x40
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r4, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r4, #3
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [pc, #632]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [pc, #632]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r5, [sp, #36]	@ 0x24
+ldrb	r1, [r5, r1]
+lsls	r1, r1, #27
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [pc, #624]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r5, r1]
+str	r1, [sp, #72]	@ 0x48
+cmp	r4, #1
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r1, r1, #6
+str	r1, [sp, #56]	@ 0x38
+ldr	r1, [sp, #64]	@ 0x40
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #192	@ 0xc0
+ldr	r5, [sp, #60]	@ 0x3c
+lsls	r1, r1, #4
+ands	r1, r5
+adds	r1, r0, r1
+ldr	r0, [sp, #56]	@ 0x38
+adds	r1, r1, r0
+lsls	r1, r1, #18
+lsrs	r1, r1, #18
+str	r1, [sp, #56]	@ 0x38
+ldr	r1, [pc, #588]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r0, [sp, #36]	@ 0x24
+ldrb	r1, [r0, r1]
+str	r1, [sp, #68]	@ 0x44
+cmp	r4, #3
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #44]	@ 0x2c
+add	r6, sp, #96	@ 0x60
+lsrs	r5, r0, #3
+ands	r5, r4
+lsls	r0, r0, #29
+lsrs	r0, r0, #31
+lsls	r5, r5, #1
+adds	r5, r5, r0
+ldr	r0, [pc, #564]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+str	r6, [sp, #48]	@ 0x30
+strh	r0, [r6, #4]
+uxtb	r5, r5
+movs	r0, #0
+movs	r6, #7
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #128	@ 0x80
+ldr	r5, [sp, #60]	@ 0x3c
+lsls	r1, r1, #4
+eors	r5, r1
+str	r5, [sp, #60]	@ 0x3c
+ldr	r1, [pc, #532]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r5, [sp, #36]	@ 0x24
+ldrb	r1, [r5, r1]
+str	r1, [sp, #72]	@ 0x48
+cmp	r4, #1
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #127	@ 0x7f
+ldr	r5, [sp, #72]	@ 0x48
+bics	r5, r1
+lsls	r1, r5, #6
+str	r1, [sp, #56]	@ 0x38
+ldr	r1, [sp, #64]	@ 0x40
+cmp	r1, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #192	@ 0xc0
+ldr	r5, [sp, #60]	@ 0x3c
+lsls	r1, r1, #4
+ands	r1, r5
+adds	r1, r0, r1
+ldr	r0, [sp, #56]	@ 0x38
+adds	r1, r1, r0
+lsls	r1, r1, #18
+lsrs	r1, r1, #18
+str	r1, [sp, #56]	@ 0x38
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r1, [pc, #484]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r0, r1]
+str	r1, [sp, #68]	@ 0x44
+movs	r5, #7
+movs	r0, #255	@ 0xff
+add	r1, sp, #96	@ 0x60
+ands	r5, r6
+strb	r0, [r1, #5]
+lsls	r0, r5, #1
+str	r1, [sp, #48]	@ 0x30
+movs	r1, r0
+movs	r0, #7
+subs	r0, r0, r1
+ldr	r1, [sp, #48]	@ 0x30
+strb	r0, [r1, #4]
+cmp	r4, #1
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r1, [pc, #448]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r0, r1]
+lsrs	r0, r6, #6
+ands	r0, r1
+str	r1, [sp, #68]	@ 0x44
+movs	r1, #7
+mov	r8, r1
+movs	r6, #192	@ 0xc0
+mov	r1, r8
+lsls	r6, r6, #5
+lsls	r0, r0, #11
+ands	r0, r6
+ldr	r6, [sp, #72]	@ 0x48
+lsls	r6, r6, #3
+orrs	r6, r1
+ldr	r1, [sp, #48]	@ 0x30
+strb	r6, [r1, #5]
+ldr	r1, [sp, #56]	@ 0x38
+ldr	r6, [sp, #72]	@ 0x48
+mov	r8, r1
+lsls	r6, r6, #6
+ands	r6, r0
+add	r8, r5
+add	r6, r8
+uxth	r1, r6
+str	r1, [sp, #56]	@ 0x38
+movs	r6, #4
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #400]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r0, [r2, r3]
+lsls	r3, r0, #26
+lsrs	r3, r3, #30
+str	r3, [sp, #56]	@ 0x38
+ldr	r3, [sp, #52]	@ 0x34
+ldrb	r3, [r3, #0]
+str	r3, [sp, #32]
+ldr	r3, [pc, #384]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r1, [r2, r3]
+ldr	r3, [sp, #32]
+cmp	r3, #2
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #376]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r2, [r2, r3]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r1, r2, #30
+bmi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r1, r9
+str	r1, [sp, #64]	@ 0x40
+movs	r1, #1
+str	r1, [sp, #84]	@ 0x54
+adds	r1, #31
+str	r1, [sp, #48]	@ 0x30
+subs	r1, #31
+str	r1, [sp, #80]	@ 0x50
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+subs	r3, r6, r3
+mov	r8, r3
+uxth	r3, r3
+lsrs	r0, r3, #3
+muls	r0, r5
+adds	r2, r0, r2
+str	r3, [sp, #60]	@ 0x3c
+uxth	r3, r2
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [sp, #32]
+cmp	r3, #2
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #320]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #36]	@ 0x24
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #6
+mov	ip, r3
+mov	r3, r9
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #280]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r0, #7
+ldrb	r3, [r2, r3]
+mov	r2, r8
+ands	r0, r2
+movs	r2, #255	@ 0xff
+ldr	r6, [sp, #48]	@ 0x30
+lsls	r5, r0, #1
+strb	r2, [r6, #5]
+movs	r2, #7
+subs	r2, r2, r5
+strb	r2, [r6, #4]
+movs	r5, #7
+movs	r2, #0
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r2, [pc, #272]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r6, [r0, r2]
+lsrs	r5, r6, #4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, r6
+movs	r2, #31
+add	r0, sp, #64	@ 0x40
+adds	r2, r2, r0
+movs	r0, #15
+lsls	r5, r5, #4
+ands	r0, r6
+orrs	r0, r5
+strb	r0, [r2, #0]
+ldr	r5, [sp, #56]	@ 0x38
+ldr	r0, [sp, #64]	@ 0x40
+orrs	r0, r5
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r2, ip
+ldr	r0, [sp, #36]	@ 0x24
+adds	r2, r0, r2
+ldr	r5, [sp, #36]	@ 0x24
+ldr	r0, [sp, #52]	@ 0x34
+str	r1, [sp, #8]
+adds	r0, r5, r0
+mov	r8, r0
+ldr	r0, [sp, #56]	@ 0x38
+ldr	r1, [sp, #36]	@ 0x24
+lsls	r6, r0, #2
+movs	r0, #0
+str	r0, [sp, #12]
+ldr	r0, [pc, #216]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r5, [pc, #220]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+adds	r1, r0, r1
+lsls	r3, r3, #4
+str	r1, [sp, #4]
+str	r3, [sp, #0]
+mov	r0, r8
+ldr	r5, [r6, r5]
+ldr	r3, [sp, #68]	@ 0x44
+ldr	r1, [sp, #48]	@ 0x30
+blx	r5
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r0, r8
+subs	r1, r0, r1
+uxth	r6, r1
+mov	r8, r1
+ldr	r1, [sp, #48]	@ 0x30
+lsrs	r0, r6, #3
+muls	r0, r1
+adds	r5, r0, r5
+uxth	r1, r5
+str	r1, [sp, #60]	@ 0x3c
+cmp	r4, #2
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [pc, #132]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r5, [sp, #36]	@ 0x24
+ldrb	r1, [r5, r1]
+lsls	r1, r1, #6
+str	r1, [sp, #56]	@ 0x38
+ldr	r1, [sp, #64]	@ 0x40
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r1, [pc, #120]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r0, #255	@ 0xff
+ldrb	r1, [r5, r1]
+movs	r5, #7
+str	r1, [sp, #68]	@ 0x44
+mov	r1, r8
+ands	r5, r1
+add	r1, sp, #96	@ 0x60
+strb	r0, [r1, #5]
+movs	r0, #7
+lsls	r6, r5, #1
+subs	r0, r0, r6
+strb	r0, [r1, #4]
+movs	r6, #7
+movs	r0, #0
+str	r1, [sp, #48]	@ 0x30
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #0
+str	r1, [sp, #84]	@ 0x54
+adds	r1, #40	@ 0x28
+str	r1, [sp, #48]	@ 0x30
+movs	r1, #0
+str	r1, [sp, #64]	@ 0x40
+str	r1, [sp, #80]	@ 0x50
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, #7
+ldr	r3, [sp, #60]	@ 0x3c
+ands	r0, r3
+movs	r3, #7
+lsls	r2, r0, #1
+subs	r3, r3, r2
+ldr	r2, [sp, #48]	@ 0x30
+strb	r3, [r2, #4]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #0
+str	r3, [sp, #68]	@ 0x44
+adds	r3, #2
+str	r3, [sp, #32]
+movs	r3, #0
+movs	r5, #40	@ 0x28
+mov	r9, r3
+str	r3, [sp, #64]	@ 0x40
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldr	r7, [sp, #36]	@ 0x24
+str	r5, [sp, #48]	@ 0x30
+adds	r0, r7, r4
+ldr	r4, [pc, #768]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	r5, sl
+mov	ip, r4
+ldr	r4, [pc, #764]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r3, r1
+str	r4, [sp, #56]	@ 0x38
+movs	r4, #192	@ 0xc0
+mov	sl, r9
+movs	r1, #0
+movs	r2, #0
+movs	r7, #15
+mov	r9, r0
+lsls	r4, r4, #24
+str	r5, [sp, #32]
+mov	r0, r9
+ldrb	r6, [r0, r2]
+movs	r0, r6
+lsls	r6, r6, #4
+bics	r0, r7
+uxtb	r6, r6
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [sp, #48]	@ 0x30
+asrs	r0, r0, #4
+orrs	r0, r5
+movs	r5, r0
+mov	r0, ip
+strb	r5, [r0, r3]
+ldr	r0, [pc, #720]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+orrs	r1, r4
+strb	r5, [r0, r3]
+cmp	r6, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #48]	@ 0x30
+asrs	r6, r6, #4
+orrs	r6, r0
+adds	r0, r3, #2
+uxtb	r0, r0
+movs	r5, r0
+mov	r0, ip
+strb	r6, [r0, r5]
+ldr	r0, [pc, #692]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+strb	r6, [r0, r5]
+lsrs	r6, r4, #2
+orrs	r1, r6
+adds	r3, #4
+uxtb	r3, r3
+lsrs	r4, r4, #4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [sp, #52]	@ 0x34
+adds	r4, #31
+lsrs	r5, r0, #5
+ands	r0, r4
+movs	r4, r0
+movs	r0, r1
+lsrs	r0, r4
+ldr	r6, [sp, #56]	@ 0x38
+str	r5, [sp, #52]	@ 0x34
+lsls	r5, r5, #2
+ldr	r6, [r5, r6]
+orrs	r0, r6
+movs	r6, r0
+ldr	r0, [sp, #56]	@ 0x38
+str	r6, [r5, r0]
+subs	r0, r4, #1
+cmp	r0, #31
+bhi.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, #32
+subs	r4, r0, r4
+lsls	r1, r4
+ldr	r6, [sp, #52]	@ 0x34
+ldr	r0, [sp, #56]	@ 0x38
+adds	r6, #1
+lsls	r6, r6, #2
+ldr	r4, [r0, r6]
+orrs	r1, r4
+str	r1, [r0, r6]
+movs	r4, #192	@ 0xc0
+movs	r1, #0
+str	r3, [sp, #52]	@ 0x34
+lsls	r4, r4, #24
+ldr	r0, [sp, #32]
+adds	r2, #1
+cmp	r0, r2
+bgt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r9, sl
+movs	r2, #0
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+subs	r2, r0, #1
+lsls	r2, r2, #2
+mov	r3, fp
+adds	r3, #4
+adds	r3, r3, r2
+uxtb	r3, r3
+mov	r8, r3
+ldr	r6, [sp, #28]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r0, [pc, #576]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldrb	r6, [r5, r0]
+lsrs	r5, r6, #4
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, r6
+add	r0, sp, #64	@ 0x40
+mov	r8, r0
+movs	r0, #31
+add	r0, r8
+mov	r8, r0
+str	r0, [sp, #24]
+movs	r0, #15
+lsls	r5, r5, #4
+ands	r0, r6
+orrs	r0, r5
+mov	r5, r8
+strb	r0, [r5, #0]
+mov	r0, ip
+ldr	r5, [sp, #80]	@ 0x50
+mov	r6, r8
+orrs	r0, r5
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r6, [sp, #56]	@ 0x38
+ldr	r0, [sp, #36]	@ 0x24
+adds	r6, r0, r6
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r5, [sp, #60]	@ 0x3c
+str	r2, [sp, #12]
+adds	r5, r0, r5
+mov	ip, r5
+ldr	r0, [sp, #76]	@ 0x4c
+ldr	r2, [sp, #36]	@ 0x24
+str	r3, [sp, #8]
+ldr	r3, [pc, #516]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r5, [pc, #516]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+adds	r0, #4
+adds	r3, r3, r2
+lsls	r0, r0, #2
+lsls	r1, r1, #2
+movs	r2, r6
+ldr	r5, [r0, r5]
+str	r3, [sp, #4]
+mov	r0, ip
+ldr	r3, [sp, #84]	@ 0x54
+str	r1, [sp, #0]
+ldr	r1, [sp, #48]	@ 0x30
+blx	r5
+mov	r2, sl
+ldr	r1, [sp, #36]	@ 0x24
+ldr	r5, [pc, #492]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r6, [pc, #492]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [sp, #28]
+adds	r6, r6, r1
+adds	r5, r5, r1
+subs	r2, r3, r2
+movs	r1, r5
+movs	r0, r6
+bl	<ADDR> <tmsCopyAlignMask>
+ldr	r3, [sp, #32]
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #28]
+movs	r1, r6
+negs	r2, r3
+movs	r0, r5
+bl	<ADDR> <tmsCopyAlignMask>
+movs	r1, #255	@ 0xff
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r2, [pc, #448]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [r0, r2]
+lsls	r3, r3, #8
+lsrs	r3, r3, #8
+str	r3, [r0, r2]
+ldr	r2, [pc, #444]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [r0, r2]
+bics	r3, r1
+str	r3, [r0, r2]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #1
+movs	r5, #32
+str	r3, [sp, #68]	@ 0x44
+str	r3, [sp, #64]	@ 0x40
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #160	@ 0xa0
+movs	r6, #232	@ 0xe8
+movs	r7, #128	@ 0x80
+ldr	r1, [sp, #28]
+lsls	r3, r3, #23
+lsls	r6, r6, #1
+lsls	r7, r7, #17
+ldr	r2, [r3, r6]
+tst	r2, r7
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+str	r1, [sp, #28]
+ldr	r3, [pc, #404]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [sp, #52]	@ 0x34
+str	r5, [r3, #0]
+str	r4, [r3, #4]
+str	r2, [r3, #28]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+ldr	r7, [pc, #352]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	ip, r3
+mov	r6, fp
+add	ip, r4
+movs	r5, #0
+movs	r4, #63	@ 0x3f
+mov	r8, r7
+mov	fp, r1
+mov	r3, ip
+ldrb	r3, [r3, r5]
+movs	r1, r3
+lsls	r2, r3, #6
+lsls	r0, r3, #2
+lsls	r3, r3, #4
+bics	r0, r4
+bics	r3, r4
+bics	r1, r4
+uxtb	r2, r2
+uxtb	r0, r0
+uxtb	r3, r3
+cmp	r1, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r7, fp
+asrs	r1, r1, #6
+orrs	r1, r7
+mov	r7, r8
+strb	r1, [r7, r6]
+cmp	r0, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r7, fp
+asrs	r0, r0, #6
+orrs	r0, r7
+mov	r7, r8
+adds	r1, r6, #1
+uxtb	r1, r1
+strb	r0, [r7, r1]
+cmp	r3, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r0, fp
+asrs	r3, r3, #6
+orrs	r3, r0
+mov	r0, r8
+adds	r1, r6, #2
+uxtb	r1, r1
+strb	r3, [r0, r1]
+cmp	r2, #0
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r1, fp
+asrs	r2, r2, #6
+orrs	r2, r1
+mov	r1, r8
+adds	r3, r6, #3
+uxtb	r3, r3
+strb	r2, [r1, r3]
+adds	r6, #4
+adds	r5, #1
+uxtb	r6, r6
+cmp	sl, r5
+bgt.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r6, r9
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [pc, #268]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, #7
+add	r1, sp, #96	@ 0x60
+str	r1, [sp, #48]	@ 0x30
+movs	r1, #7
+ands	r5, r6
+lsls	r0, r5, #1
+subs	r1, r1, r0
+ldr	r0, [sp, #48]	@ 0x30
+strb	r1, [r0, #4]
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, #0
+str	r1, [sp, #84]	@ 0x54
+adds	r1, #32
+str	r1, [sp, #48]	@ 0x30
+movs	r1, #0
+str	r1, [sp, #64]	@ 0x40
+str	r1, [sp, #80]	@ 0x50
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [pc, #228]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [pc, #228]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r1, r5
+movs	r0, r5
+ldr	r3, [sp, #28]
+adds	r1, #45	@ 0x2d
+adds	r0, #9
+negs	r2, r3
+adds	r1, #255	@ 0xff
+adds	r0, #255	@ 0xff
+bl	<ADDR> <tmsCopyAlignMask>
+mov	r1, r9
+ldr	r3, [pc, #204]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r2, [pc, #172]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+adds	r5, r5, r3
+ldr	r3, [r5, r2]
+lsls	r3, r3, #8
+lsrs	r3, r3, #8
+str	r3, [r5, r2]
+ldr	r2, [pc, #168]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r3, [r5, r2]
+bics	r3, r1
+str	r3, [r5, r2]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r5, [pc, #180]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r5, #48	@ 0x30
+movs	r3, #0
+movs	r6, #0
+ands	r5, r1
+str	r3, [sp, #28]
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #108]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+movs	r0, r6
+mov	fp, r3
+adds	r3, r6, #1
+adds	r3, #255	@ 0xff
+mov	r9, r3
+mov	r8, r7
+mov	ip, r6
+ldr	r4, [pc, #88]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+ldr	r5, [pc, #148]	@ (<ADDR> <graphics_i_scan_line.constprop.0+OFF>)
+mov	r3, fp
+ldr	r3, [r3, #72]	@ 0x48
+movs	r1, #0
+cmp	r3, #0
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r3, r3, #4
+adds	r1, #4
+lsrs	r2, r3, #28
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+lsls	r3, r3, #4
+adds	r1, #4
+lsrs	r2, r3, #28
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+ldr	r7, [r0, r1]
+ldr	r6, [r4, r1]
+lsls	r2, r2, #2
+ldr	r2, [r5, r2]
+eors	r6, r7
+ands	r2, r6
+eors	r2, r7
+str	r2, [r0, r1]
+lsls	r3, r3, #4
+beq.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+adds	r1, #4
+b.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r3, #4
+adds	r0, #32
+adds	r4, #32
+add	fp, r3
+cmp	r0, r9
+bne.n	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+mov	r6, ip
+mov	r7, r8
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r2, #0
+movs	r5, #7
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+movs	r0, #0
+movs	r6, #7
+bl	<ADDR> <graphics_i_scan_line.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

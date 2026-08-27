@@ -1,0 +1,949 @@
+<title>Scanline Report</title>
+<!-- The report page itself, and the whole of it: open this file and drop one run
+     record on it for a report, or two for a comparison. `report.py` writes copies
+     with a pair already embedded, but it only substitutes the data - the page it
+     substitutes into is this one, so what you get from disk and what you get from
+     the generator are the same program. Nothing loads over the network. -->
+<style>
+:root{
+ --ground:#f1f2f6;--surface:#fff;--surface-2:#e9ebf1;--rule:#d8dbe4;--rule-soft:#e6e8ef;
+ --ink:#161922;--ink-2:#3d4354;--muted:#5d6478;--accent:#0a6e7a;--accent-soft:rgba(10,110,122,.12);
+ --over:#b93430;--tight:#8a6a08;--good:#1a7f2e;
+ --g-gm1:#1a7f2e;--g-gm2:#2aa84e;--g-mcm:#9b3b8e;--g-t40:#3a3bc4;--g-t80:#6a62dc;--g-dump:#6e7484;
+ --track:#e4e6ee;--tick:rgba(22,25,34,.10);--hatch:rgba(185,52,48,.10);
+ --mono:ui-monospace,"Cascadia Code","Cascadia Mono",Consolas,SFMono-Regular,Menlo,monospace;
+ --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --ground:#0e1016;--surface:#171a23;--surface-2:#1e222d;--rule:#2a3040;--rule-soft:#212633;
+ --ink:#e3e6ef;--ink-2:#b9bfd0;--muted:#868da0;--accent:#42ebf5;--accent-soft:rgba(66,235,245,.14);
+ --over:#fc5554;--tight:#d4c154;--good:#21c842;
+ --g-gm1:#21b03b;--g-gm2:#5edc78;--g-mcm:#c95bba;--g-t40:#5455ed;--g-t80:#7e75fc;--g-dump:#9aa0b2;
+ --track:#212632;--tick:rgba(227,230,239,.09);--hatch:rgba(252,85,84,.13);
+}}
+:root[data-theme="dark"]{
+ --ground:#0e1016;--surface:#171a23;--surface-2:#1e222d;--rule:#2a3040;--rule-soft:#212633;
+ --ink:#e3e6ef;--ink-2:#b9bfd0;--muted:#868da0;--accent:#42ebf5;--accent-soft:rgba(66,235,245,.14);
+ --over:#fc5554;--tight:#d4c154;--good:#21c842;
+ --g-gm1:#21b03b;--g-gm2:#5edc78;--g-mcm:#c95bba;--g-t40:#5455ed;--g-t80:#7e75fc;--g-dump:#9aa0b2;
+ --track:#212632;--tick:rgba(227,230,239,.09);--hatch:rgba(252,85,84,.13);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1300px;margin:0 auto;padding:36px 22px 80px;display:flex;flex-direction:column;gap:26px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--mono);font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.02em;margin:10px 0 8px;text-wrap:balance}
+header p{margin:0;max-width:64ch;color:var(--ink-2)}
+.facts{display:flex;flex-wrap:wrap;margin-top:22px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.fact{flex:1 1 140px;padding:13px 16px 13px 0;display:flex;flex-direction:column;gap:1px}
+.fact+.fact{padding-left:16px;border-left:1px solid var(--rule-soft)}
+.fact b{font-family:var(--mono);font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.fact span{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.warn{border-left:3px solid var(--tight);background:var(--surface);padding:12px 16px;border-radius:3px;font-size:14px;color:var(--ink-2)}
+.warn b{color:var(--ink)}
+.rail{display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;padding:14px 16px;background:var(--surface);border:1px solid var(--rule);border-radius:3px}
+.ctl{display:flex;align-items:center;gap:9px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.seg button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:var(--mono);font-size:12px;padding:6px 13px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:transparent;color:var(--muted);font-family:var(--mono);font-size:12px;padding:5px 10px;border-radius:2px;cursor:pointer}
+.chip i{width:8px;height:8px;border-radius:1px;background:var(--dot);opacity:.4}
+.chip[aria-pressed="true"]{color:var(--ink);border-color:var(--dot)}
+.chip[aria-pressed="true"] i{opacity:1}
+select{font-family:var(--mono);font-size:12px;padding:6px 9px;color:var(--ink);background:var(--surface-2);border:1px solid var(--rule);border-radius:2px}
+button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--edge,var(--rule));border-radius:3px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.card b{font-family:var(--mono);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--edge,var(--ink))}
+.card small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.board{background:var(--surface);border:1px solid var(--rule);border-radius:3px;overflow-x:auto}
+table{border-collapse:collapse;width:100%}
+/* only the scene table is wide enough to need scrolling; the build and section
+   tables inherited this and scrolled for no reason */
+#table{min-width:760px}
+th{position:sticky;top:0;background:var(--surface-2);border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:400;text-align:left;padding:9px 8px;white-space:nowrap;z-index:2}
+td{border-bottom:1px solid var(--rule-soft);padding:0 8px;height:29px;font-family:var(--mono);font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.mid{text-align:center}
+td.name{border-left:3px solid var(--dot);padding-left:9px;max-width:250px;overflow:hidden;text-overflow:ellipsis}
+.on{color:var(--accent);font-weight:700}
+.off{color:var(--muted);opacity:.32}
+.mode{color:var(--dot);font-weight:700}
+.track{position:relative;height:13px;min-width:190px;background:var(--track);background-image:repeating-linear-gradient(to right,var(--tick) 0 1px,transparent 1px calc(100%/8));border-radius:1px;overflow:hidden}
+.track::after{content:"";position:absolute;inset:0 0 0 var(--budget);background:var(--hatch);background-image:repeating-linear-gradient(135deg,transparent 0 4px,var(--hatch) 4px 5px);border-left:1px solid var(--over)}
+.bar-line,.bar-render{position:absolute;top:0;bottom:0;left:0;border-radius:1px}
+.bar-line{background:var(--dot);opacity:.28}
+.bar-render{background:var(--dot)}
+/* The compare view's diverging bar: centre is no change, a loss grows left in red
+   and a win grows right in green. Render on the upper half, line on the lower, so
+   the two can disagree and still both be read. */
+.dv{position:relative;height:13px;min-width:200px;background:var(--track);border-radius:1px;overflow:hidden}
+.dv-mid{position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--muted);opacity:.55}
+.dv-tick{position:absolute;top:0;bottom:0;width:1px;background:var(--tick)}
+.dv-bar{position:absolute;height:5px;border-radius:1px}
+.dv-top{top:1px}
+.dv-bot{bottom:1px;opacity:.5}
+tr.over .line{color:var(--over);font-weight:700}
+tr.tight .line{color:var(--tight);font-weight:600}
+.pill{display:inline-block;padding:1px 6px;border-radius:2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+.pill.bad{background:rgba(185,52,48,.14);color:var(--over)}
+.pill.warnp{background:rgba(138,106,8,.14);color:var(--tight)}
+.pill.okp{background:rgba(26,127,46,.13);color:var(--good)}
+/* delta cells take their colour inline, ramped by magnitude; these carry the rest */
+.delta{font-variant-numeric:tabular-nums}
+.delta.strong{font-weight:700}
+section h2{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:0 0 12px;padding-bottom:9px;border-bottom:1px solid var(--rule)}
+section p{margin:12px 0 0;color:var(--ink-2);font-size:14px;max-width:66ch}
+section p strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:2px}
+.axes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.axis{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:11px 14px}
+.axis h3{margin:0 0 7px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.vals{display:flex;flex-wrap:wrap;gap:5px}
+.val{font-family:var(--mono);font-size:11.5px;padding:2px 7px;border-radius:2px;border:1px solid var(--rule);background:var(--surface-2)}
+.val.gap{border-color:var(--over);color:var(--over);background:transparent}
+.val b{font-weight:400;color:var(--muted);margin-left:5px}
+.props{display:flex;flex-direction:column;gap:10px}
+.prop{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--edge);border-radius:3px;padding:12px 15px}
+.prop h3{margin:0;font-family:var(--mono);font-size:13px;font-weight:700;display:flex;gap:10px;align-items:center}
+.prop ul{margin:8px 0 0;padding-left:18px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.prop li{margin:2px 0}
+.prop li.fail{color:var(--over)}
+.empty{padding:26px 16px;color:var(--muted);font-family:var(--mono);font-size:13px}
+.loadnote{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.loadnote.bad{color:var(--over)}
+body.dropping::after{content:"Drop one record, or two to compare";position:fixed;inset:0;z-index:9;
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;
+  color:var(--accent);background:var(--accent-soft);border:3px dashed var(--accent);
+  pointer-events:none}
+.legend{background:var(--surface);border:1px solid var(--rule);
+        border-left:3px solid var(--accent);border-radius:3px;padding:11px 15px;font-size:13.5px;color:var(--ink-2)}
+.legend b{color:var(--ink)}
+.legend code{font-size:12px}
+.legend .up{color:var(--over);font-weight:700}
+.legend .down{color:var(--good);font-weight:700}
+.hide{display:none}
+.split{display:flex;flex-direction:column;gap:12px}
+#build td:first-child,#sections td:first-child{color:var(--muted)}
+tr.differs td{background:var(--accent-soft)}
+tr.differs td:first-child{color:var(--ink);font-weight:700}
+td.opt{font-size:11.5px}
+/* opened straight from the repo there is nothing to show yet, so the page is the
+   drop target and nothing else */
+.dropzone{background:var(--surface);border:1px dashed var(--rule);border-radius:3px;padding:40px 28px;text-align:center}
+.dropzone p{margin:0 auto;max-width:60ch;color:var(--ink-2)}
+.dropzone p+p{margin-top:12px;font-size:13.5px;color:var(--muted)}
+body[data-state="empty"] .needsdata{display:none}
+body[data-state="loaded"] .dropzone{display:none}
+@media (max-width:700px){.wrap{padding:24px 12px 60px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow"></div>
+    <h1 id="title">Scanline Report</h1>
+    <p id="blurb"></p>
+    <div class="facts needsdata" id="facts"></div>
+  </header>
+
+  <div class="dropzone">
+    <p><b>Drop a run record here</b>, or
+      <button type="button" class="chip" id="load-empty">choose one&hellip;</button>
+      Two records open on the difference between them.</p>
+    <p>Records are the JSON files in <code>test/live/runs/</code>, written by
+      <code>runner.py --save</code>. They are read in the browser and go nowhere: this page makes
+      no network request of any kind.</p>
+  </div>
+
+  <div class="needsdata" id="warnings"></div>
+  <div class="summary needsdata" id="summary"></div>
+
+  <section class="needsdata">
+    <h2 id="build-head">The build these numbers came from</h2>
+    <div class="split">
+      <div class="board"><table id="build"></table></div>
+      <div class="board"><table id="sections"></table></div>
+    </div>
+  </section>
+
+  <div class="rail needsdata">
+    <div class="ctl"><span class="eyebrow">View</span>
+      <div class="seg" id="seg-view">
+        <button type="button" data-v="budget" aria-pressed="true">Budget</button>
+        <button type="button" data-v="coverage" aria-pressed="false">Coverage</button>
+        <button type="button" data-v="compare" aria-pressed="false">Compare</button>
+      </div>
+    </div>
+    <div class="ctl" id="ctl-overlay"><span class="eyebrow">Overlay</span>
+      <div class="seg" id="seg-panels">
+        <button type="button" data-v="one" aria-pressed="true">Performance panel</button>
+        <button type="button" data-v="all" aria-pressed="false">All five panels</button>
+      </div>
+    </div>
+    <div class="ctl"><span class="eyebrow">Sort</span>
+      <select id="sort"></select>
+    </div>
+    <div class="ctl"><span class="eyebrow">Records</span>
+      <button type="button" class="chip" id="load">Load JSON&hellip;</button>
+      <button type="button" class="chip hide" id="swap">Swap A/B</button>
+      <span class="loadnote" id="loadnote"></span>
+    </div>
+    <div class="ctl" style="flex:1 1 100%"><span class="eyebrow">Mode</span>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+
+  <input type="file" id="files" accept=".json,application/json" multiple hidden>
+
+  <div class="legend hide" id="legend"></div>
+  <div class="board needsdata"><table id="table"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+
+  <section id="cov-section" class="hide">
+    <h2>Coverage - what nothing in the library turns on</h2>
+    <div class="axes" id="axes"></div>
+    <p>Every value is read out of the scene's own register file, so it cannot drift from what the
+      scene actually does and it works for the VDP dumps, which are someone else's content. A value
+      in red is reached by no scene: either a scene worth writing, or a feature this firmware does
+      not have. The matrix cannot tell those apart, which is the point of listing them.</p>
+  </section>
+
+  <section class="needsdata">
+    <h2>Properties</h2>
+    <div class="props" id="props"></div>
+  </section>
+
+  <section class="needsdata">
+    <h2>Reading this</h2>
+    <p><strong>The bar is the line, not the verdict.</strong> Render and line are averaged over four
+      frames, so a scene can sit well inside budget and still drop a scanline. The
+      <code>DROPPED</code> pill is the acceptance test - an over-budget line is skipped rather than
+      drawn late, so its row holds the previous capture's pixels and is not compared at all.</p>
+    <p><strong>Render is the library; line is everything.</strong> <code>render</code> times
+      <code>pico9918_scan_line</code> alone. <code>line</code> closes after the diagnostic overlay
+      draws, so it only compares against runs taken with the same overlay setting - which is why the
+      record stamps it.</p>
+    <p id="floor-note"></p>
+  </section>
+</div>
+
+<script>
+/* The page derives everything it shows from the records themselves, so a pair
+   dropped in at runtime renders exactly as a pair baked in at generation time.
+   report.py replaces the line below with the records; left as it is, the page
+   waits for a drop. */
+const RAW = null;
+
+const GROUPS = [["gm1", "Graphics I"], ["gm2", "Graphics II"], ["mcm", "Multicolor"],
+                ["t40", "Text 40"], ["t80", "Text 80"], ["dump", "Real software"]];
+
+/* The coverage matrix's axes: which feature, and every value worth having a scene
+   for. A value no scene reaches is reported as a gap, so this list is also the
+   statement of what the library is supposed to cover. */
+const AXES = [
+  ["mode", "Mode", ["GM1", "GM2", "MCM", "T40", "T80"]],
+  ["ecm", "Tile ECM", [0, 1, 2, 3]],
+  ["sprecm", "Sprite ECM", [0, 1, 2, 3]],
+  ["t1scroll", "Layer 1 scroll", ["", "X", "Y", "XY"]],
+  ["t2scroll", "Layer 2 scroll", ["", "X", "Y", "XY"]],
+  ["t1pages", "Layer 1 pages", ["1x1", "2x1", "1x2", "2x2"]],
+  ["t2pages", "Layer 2 pages", ["1x1", "2x1", "1x2", "2x2"]],
+  ["rows", "Rows", [24, 30, 48, 60]],
+  ["t1ps", "Layer 1 palette", [0, 1, 2, 3]],
+  ["t2ps", "Layer 2 palette", [0, 1, 2, 3]],
+  ["sprps", "Sprite palette", [0, 1, 2, 3]],
+];
+const FLAGS = [["t1", "T1"], ["t2", "T2"], ["t2pri", "T2 PRI"], ["bml", "BML"],
+               ["bmlpri", "BML PRI"], ["bmltrns", "BML TRNS"], ["bmlfat", "BML FAT"],
+               ["posattr", "POS ATTR"], ["spr16", "SPR 16"], ["sprmag", "SPR MAG"],
+               ["locked", "LOCKED"]];
+
+/* Records written before the run stamped its own budget and floor - there are a
+   few in runs/ - fall back to these. Everything written since carries them. */
+const WAS_BUDGET_US = 63.6;
+const WAS_FLOOR_US = {"2040": 1.5, "pro": 0.5};
+
+const SCALE = 72;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct = v => Math.min(100, (v / SCALE) * 100).toFixed(3) + "%";
+const tick = on => on ? '<span class="on">&#10003;</span>' : '<span class="off">&#10007;</span>';
+const has = key => D.rows.some(r => r[key] !== undefined);
+const round2 = v => Number(v.toFixed(2));
+const mhz = hz => hz ? (hz / 1e6).toFixed(0) + " MHz" : "unknown";
+const signed = v => v === undefined ? "-" : (v > 0 ? "+" : "") + v.toFixed(2);
+
+/* ---- derivation ---- */
+
+function groupOf(name) {
+  const head = name.split("-")[0];
+  return GROUPS.some(([k]) => k === head) ? head : "dump";
+}
+
+function sceneRows(rec, against) {
+  const pOne = (rec.perf || {}).one || {}, pAll = (rec.perf || {}).all || {};
+  const fOff = (rec.freeze || {}).off || {}, fDiag = (rec.freeze || {}).diag || {};
+  const wOne = ((against || {}).perf || {}).one || {};
+  const wFreeze = ((against || {}).freeze || {}).off || {};
+  const names = [...new Set([].concat(Object.keys(pOne), Object.keys(pAll),
+                                      Object.keys(fOff), Object.keys(fDiag)))].sort();
+  return names.map(name => {
+    const row = {name: name, group: groupOf(name)};
+    // the record's own snapshot: a scene edited or deleted since the run must
+    // still render as it was, which is the whole point of storing it
+    const described = (rec.scenes || {})[name];
+    if (described) { row.f = described.features; row.note = described.note;
+                     row.budget = described.budget_us;
+                     row.overbudget = described.overbudget; }
+    if (pOne[name]) { row.render = pOne[name].render; row.line = pOne[name].line; }
+    if (pAll[name]) row.lineAll = pAll[name].line;
+    for (const [key, src] of [["off", fOff], ["diag", fDiag]]) {
+      const e = src[name];
+      if (e) row[key] = {state: e.state, dropped: (e.dropped || []).length,
+                         rows: e.rows, differ: e.differ, why: e.why};
+    }
+    if (wOne[name] && row.render !== undefined) {
+      row.dRender = round2(row.render - wOne[name].render);
+      row.dLine = round2(row.line - wOne[name].line);
+    }
+    if (wFreeze[name] && row.off && wFreeze[name].state !== row.off.state)
+      row.wasState = wFreeze[name].state;
+    return row;
+  });
+}
+
+function coverageOf(rows) {
+  const seen = {}, flags = {};
+  for (const [key] of AXES) seen[key] = new Map();
+  for (const [key] of FLAGS) flags[key] = 0;
+  for (const row of rows) {
+    if (!row.f) continue;
+    for (const [key] of AXES) {
+      const v = row.f[key];
+      seen[key].set(v, (seen[key].get(v) || 0) + 1);
+    }
+    for (const [key] of FLAGS) if (row.f[key]) flags[key]++;
+  }
+  return {
+    axes: AXES.map(([key, label, values]) => ({
+      label: label,
+      values: values.map(v => ({v: v === "" ? "none" : String(v),
+                                n: seen[key].get(v) || 0})),
+      extra: [...seen[key].keys()].filter(v => !values.some(x => x === v))
+                                  .map(String).sort(),
+    })),
+    flags: FLAGS.map(([key, label]) => ({label: label, n: flags[key]})),
+  };
+}
+
+function summaryOf(rec, rows) {
+  const named = key => rows.filter(r => (r[key] || {}).dropped).map(r => r.name);
+  const state = s => rows.filter(r => (r.off || {}).state === s).map(r => r.name);
+  const timed = rows.filter(r => r.line !== undefined);
+  // "heaviest" is the least headroom, not the largest number: a 28 us line in a
+  // doubled-row scene is tighter than a 50 us one that gets the whole 63.6
+  const spare = r => (r.budget || 63.6) - r.line;
+  const worst = timed.length ? timed.reduce((a, b) => (spare(b) < spare(a) ? b : a)) : null;
+  const props = rec.properties || {};
+  return {
+    regressions: state("REGRESSION"), changed: state("CHANGED"),
+    droppedOff: named("off"), droppedDiag: named("diag"),
+    worst: worst ? worst.line : null, worstName: worst ? worst.name : null,
+    worstBudget: worst ? (worst.budget || 63.6) : null,
+    properties: props,
+    propsFailed: Object.keys(props).filter(k => !props[k].ok && !props[k].skipped),
+  };
+}
+
+function buildRows(rec, against) {
+  const a = (against || {}).run, b = rec.run, out = [];
+  const add = (label, key, fmt) => {
+    const f = fmt || String;
+    const missing = r => r[key] === undefined || r[key] === null;
+    // a field neither record carries is one that did not exist when they were
+    // written, so the row says nothing: leave it out rather than print a dash
+    if (missing(b) && (!a || missing(a))) return;
+    const va = a ? (missing(a) ? "-" : f(a[key])) : null;
+    const vb = missing(b) ? "-" : f(b[key]);
+    out.push({label: label, a: va, b: vb, differs: !!a && va !== vb});
+  };
+  add("Board", "board", v => String(v).toUpperCase());
+  add("Firmware", "version");
+  add("Board definition", "board_def");
+  add("Clock", "clock_hz", mhz);
+  add("Pico SDK", "sdk");
+  add("Commit", "commit");
+  add("Subject", "subject");
+  add("Branch", "branch");
+  add("Dirty tree", "dirty", v => v ? "yes" : "no");
+  add("Library", "submodule");
+  add("Toolchain", "toolchain");
+  add("ELF", "elf");
+  add("Built", "elf_built");
+  const keys = [...new Set([].concat(Object.keys(b.options || {}),
+                                     Object.keys((a || {}).options || {})))].sort();
+  for (const key of keys) {
+    const va = a ? ((a.options || {})[key] === undefined ? "-" : a.options[key]) : null;
+    const vb = (b.options || {})[key] === undefined ? "-" : b.options[key];
+    out.push({label: key.replace("PICO9918_", ""), a: va, b: vb,
+              differs: !!a && va !== vb, option: true});
+  }
+  return out;
+}
+
+/* Section order comes from the records rather than from a list here, so a build
+   that grows a section still reports it. */
+function sectionRows(rec, against) {
+  const a = (((against || {}).run) || {}).sections || {}, b = rec.run.sections || {};
+  const names = [...new Set([].concat(Object.keys(b), Object.keys(a)))];
+  return names.map(n => {
+    const row = {label: n, b: n in b ? b[n] : null, a: n in a ? a[n] : null};
+    if (n in a && n in b) row.d = b[n] - a[n];
+    return row;
+  });
+}
+
+function labelFor(run, tag) {
+  return tag || (run || {}).commit || "run";
+}
+
+function derive(a, b, labels, view) {
+  const rows = sceneRows(b, a);
+  const ra = (a || {}).run, rb = b.run;
+  return {
+    run: rb, against: ra, rows: rows,
+    coverage: coverageOf(rows), summary: summaryOf(b, rows),
+    budget: rb.budget_us || WAS_BUDGET_US,
+    floor: rb.floor_us || WAS_FLOOR_US[rb.board] || 0.5,
+    // read out of the run rather than declared: a canary is a scene that dropped
+    // a row while its own average said it had room, and the run knows which those
+    // were far better than a list written months ago does
+    canaries: rows.filter(r => ((r.off || {}).dropped || (r.diag || {}).dropped)
+                               && r.line !== undefined).map(r => r.name),
+    view: view,
+    labels: {a: labelFor(ra, (labels || {}).a), b: labelFor(rb, (labels || {}).b)},
+    build: buildRows(b, a), sections: sectionRows(b, a),
+    // False means the pair still compares, but a delta in it is the hardware and
+    // not the change, and neither run's noise floor can rule on the other's numbers.
+    timingComparable: !!ra && ra.board === rb.board && ra.clock_hz === rb.clock_hz,
+  };
+}
+
+/* The pair on show, kept whole so Swap and a later drop have something to work
+   from - `D` is derived output and cannot be turned back into its inputs. */
+let PAIR = RAW ? {a: RAW.a, b: RAW.b, labels: RAW.labels || {}} : null;
+let D = PAIR ? derive(PAIR.a, PAIR.b, PAIR.labels, RAW.view) : null;
+const state = {view: (D && D.view) || "budget", panels: "one", sort: "line", groups: new Set()};
+
+/* ---- header ---- */
+function renderHeader() {
+  const run = D.run, a = D.against;
+  document.getElementById("eyebrow").textContent =
+    ["PICO9918" + (run.version ? " v" + run.version : ""), run.branch,
+     run.board.toUpperCase(), run.date].join(" · ");
+  const title = a ? "Scanline Diff " + D.labels.a + " to " + D.labels.b
+                  : "Scanline Report " + run.board + " " + (run.commit || "");
+  document.getElementById("title").textContent = title;
+  document.title = title;
+  document.getElementById("blurb").innerHTML =
+    esc(run.subject || "") + (a ? " &mdash; compared against <b>" + esc(D.labels.a) + "</b>" : "");
+  const facts = [
+    [D.budget.toFixed(1) + " us", "Line budget"],
+    [String(D.rows.length), "Scenes"],
+    [(run.stages || []).length + (run.allStages ? " / " + run.allStages.length : ""), "Stages run"],
+    [(run.seconds || 0).toFixed(0) + " s", "Run time"],
+    [run.submodule || "-", "Library"],
+  ];
+  document.getElementById("facts").innerHTML = facts.map(
+    ([v, k]) => '<div class="fact"><b>' + esc(v) + "</b><span>" + esc(k) + "</span></div>").join("");
+
+  const warn = [];
+  if (run.dirty || (a && a.dirty)) warn.push("<b>A working tree was dirty.</b> "
+    + [a && a.dirty ? esc(a.commit) : null, run.dirty ? esc(run.commit) : null].filter(Boolean)
+        .join(" and ")
+    + " had uncommitted edits in the build, so the numbers are not a reading of that commit.");
+  if (a && !D.timingComparable) warn.push("<b>This pair is a hardware comparison.</b> "
+    + (a.board !== run.board
+        ? "These are different boards (" + esc(a.board) + " and " + esc(run.board) + ")."
+        : "The clocks differ (" + esc(mhz(a.clock_hz)) + " and " + esc(mhz(run.clock_hz)) + ").")
+    + " Every timing delta is what the hardware costs rather than what a change did, so it ramps "
+    + "against the largest move in the pair and none of it is emboldened: a noise floor belongs to "
+    + "one of them and cannot rule on the other. Pixels and properties read as they always do.");
+  const partial = r => r && r.allStages && (r.stages || []).length < r.allStages.length;
+  if (partial(run)) warn.push("<b>Partial run.</b> Only " + esc((run.stages || []).join(", "))
+    + " ran, so anything else is absent rather than passing.");
+  if (a && partial(a)) warn.push("<b>The baseline was a partial run.</b> It ran "
+    + esc((a.stages || []).join(", ")) + ", so scenes it never measured have no delta.");
+  document.getElementById("warnings").innerHTML =
+    warn.map(w => '<div class="warn">' + w + "</div>").join("");
+}
+
+/* ---- summary cards ---- */
+function renderCards() {
+  const s = D.summary, out = [];
+  const worstHead = s.worst === null ? null : s.worstBudget - s.worst;
+  if (s.worst !== null) out.push({k: "Tightest line", v: s.worst.toFixed(2) + " us",
+    s: s.worstName + ", " + worstHead.toFixed(2) + " us spare of " + s.worstBudget.toFixed(1),
+    edge: worstHead < 0 ? "var(--over)" : worstHead < 5 ? "var(--tight)" : "var(--accent)"});
+  out.push({k: "Regressions", v: String(s.regressions.length),
+    s: s.regressions.length ? s.regressions.slice(0, 3).join(", ") : "no frozen scene moved",
+    edge: s.regressions.length ? "var(--over)" : "var(--good)"});
+  out.push({k: "Scenes dropping a line", v: String(s.droppedOff.length),
+    s: "overlay off" + (s.droppedDiag.length ? ", " + s.droppedDiag.length + " with all panels" : ""),
+    edge: s.droppedOff.length ? "var(--over)" : "var(--good)"});
+  const pk = Object.keys(s.properties).filter(k => !s.properties[k].skipped);
+  out.push({k: "Properties", v: (pk.length - s.propsFailed.length) + " / " + pk.length,
+    s: s.propsFailed.length ? s.propsFailed.join(", ") : (pk.length ? "all passing" : "none run"),
+    edge: s.propsFailed.length ? "var(--over)" : "var(--good)"});
+  if (s.changed.length) out.push({k: "Provisional, moved", v: String(s.changed.length),
+    s: s.changed.join(", ") + " - review then re-freeze", edge: "var(--tight)"});
+  document.getElementById("summary").innerHTML = out.map(c =>
+    '<div class="card" style="--edge:' + c.edge + '"><span class="eyebrow">' + esc(c.k)
+    + "</span><b>" + esc(c.v) + '</b><small>' + esc(c.s) + "</small></div>").join("");
+}
+
+/* ---- chips ---- */
+function renderChips() {
+  const host = document.getElementById("chips");
+  host.innerHTML = "";
+  state.groups = new Set();
+  for (const [key, label] of GROUPS) {
+    const n = D.rows.filter(r => r.group === key).length;
+    if (!n) continue;
+    state.groups.add(key);
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.dataset.group = key;
+    b.style.setProperty("--dot", "var(--g-" + key + ")");
+    b.setAttribute("aria-pressed", "true");
+    b.innerHTML = '<i></i>' + label + ' <span style="opacity:.55">' + n + "</span>";
+    b.addEventListener("click", () => {
+      state.groups.has(key) ? state.groups.delete(key) : state.groups.add(key);
+      if (!state.groups.size) for (const el of host.children) state.groups.add(el.dataset.group);
+      for (const el of host.children)
+        el.setAttribute("aria-pressed", String(state.groups.has(el.dataset.group)));
+      draw();
+    });
+    host.appendChild(b);
+  }
+}
+
+const SORTS = {
+  budget: [["line", "Line time, heaviest first"], ["render", "Render time, heaviest first"],
+           ["drops", "Dropped rows first"], ["name", "Scene name"]],
+  coverage: [["name", "Scene name"], ["mode", "Mode, then name"], ["ecm", "ECM level"],
+             ["sprites", "Sprite count"]],
+  compare: [["dLine", "Line delta, largest first"], ["dRender", "Render delta, largest first"],
+            ["won", "Biggest wins first"], ["lost", "Biggest losses first"],
+            ["name", "Scene name"]],
+};
+
+function fillSorts() {
+  const sel = document.getElementById("sort");
+  sel.innerHTML = SORTS[state.view].map(([v, l]) =>
+    '<option value="' + v + '">' + esc(l) + "</option>").join("");
+  state.sort = SORTS[state.view][0][0];
+  sel.value = state.sort;
+}
+
+/* ---- table ---- */
+const COLUMNS = {
+  budget: () => ['<th>Scene</th>', '<th>Render, then the rest of the line</th>',
+                 '<th class="num">Render</th>', '<th class="num">Line</th>',
+                 '<th class="num">Head</th>', "<th>Goldens</th>"].join(""),
+  coverage: () => ['<th>Scene</th>', '<th class="mid">Mode</th>', '<th class="mid">T1</th>',
+    '<th class="mid">T2</th>', '<th class="mid">T2 pri</th>', '<th class="mid">BML</th>',
+    '<th class="mid">Pri</th>', '<th class="mid">Trns</th>', '<th class="mid">Fat</th>',
+    '<th class="mid">ECM</th>', '<th class="mid">Pos</th>', '<th class="num">Spr</th>',
+    '<th class="mid">16</th>', '<th class="mid">Mag</th>', '<th class="mid">S.ECM</th>',
+    '<th class="num">S.max</th>', '<th class="mid">T1 scr</th>', '<th class="mid">T2 scr</th>',
+    '<th class="mid">T1 pg</th>', '<th class="mid">T2 pg</th>', '<th class="mid">T1 ps</th>',
+    '<th class="mid">T2 ps</th>', '<th class="mid">S.ps</th>', '<th class="mid">Rows</th>',
+    '<th class="mid">Lock</th>'].join(""),
+  compare: () => ['<th>Scene</th>', '<th>Loss &#9664;&nbsp;&#9654; Win</th>',
+    '<th class="num">Render B</th>', '<th class="num">&Delta; B&minus;A</th>',
+    '<th class="num">Line B</th>', '<th class="num">&Delta; B&minus;A</th>',
+    "<th>Goldens</th>"].join(""),
+};
+
+function goldenCell(r) {
+  const off = r.off, diag = r.diag, bits = [];
+  if (off) {
+    // a scene already known not to fit this board is amber, not red: the drop is
+    // a standing fact about the mode rather than something this run broke
+    const known = (r.overbudget || []).indexOf(D.run.board) >= 0;
+    if (off.dropped) bits.push('<span class="pill ' + (known ? "warnp" : "bad") + '">dropped '
+                               + off.dropped + (known ? ", known" : "") + "</span>");
+    else if (off.state === "REGRESSION")
+      bits.push('<span class="pill bad">regression ' + (off.differ || "") + "</span>");
+    else if (off.state === "CHANGED") bits.push('<span class="pill warnp">changed</span>');
+    else if (off.state === "FREEZE") bits.push('<span class="pill warnp">frozen</span>');
+    else bits.push('<span class="pill okp">ok</span>');
+  }
+  if (diag && diag.dropped)
+    bits.push('<span class="pill warnp">overlay ' + diag.dropped + "</span>");
+  if (r.wasState) bits.push('<span class="off">was ' + esc(r.wasState) + "</span>");
+  return bits.join(" ");
+}
+
+function budgetRow(r) {
+  const line = state.panels === "all" && r.lineAll !== undefined ? r.lineAll : r.line;
+  if (line === undefined) return null;
+  // R0's row doubling halves what a line gets, so the budget is the scene's own
+  const budget = r.budget || D.budget;
+  const head = budget - line;
+  const cls = head < 0 ? "over" : head < budget / 12 ? "tight" : "";
+  return {cls, cells:
+    '<td class="name" title="' + esc(r.note || r.name) + '">' + esc(r.name) + "</td>" +
+    '<td><div class="track" style="--budget:' + pct(budget) + '">' +
+    '<div class="bar-line" style="width:' + pct(line) + '"></div>' +
+    '<div class="bar-render" style="width:' + pct(r.render) + '"></div></div></td>' +
+    '<td class="num">' + r.render.toFixed(2) + "</td>" +
+    '<td class="num line">' + line.toFixed(2) + "</td>" +
+    '<td class="num">' + (head >= 0 ? "+" : "") + head.toFixed(2) + "</td>" +
+    "<td>" + goldenCell(r) + "</td>"};
+}
+
+function coverageRow(r) {
+  const f = r.f;
+  if (!f) return {cls: "", cells: '<td class="name">' + esc(r.name) +
+    '</td><td colspan="24" class="off">not in the scene library</td>'};
+  const dim = v => v ? String(v) : '<span class="off">' + v + "</span>";
+  const scr = v => v ? '<span class="on">' + v + "</span>" : '<span class="off">&#10007;</span>';
+  const pg = v => v === "1x1" ? '<span class="off">1x1</span>' : '<span class="on">' + v + "</span>";
+  return {cls: "", cells:
+    '<td class="name" title="' + esc(r.note || "") + '">' + esc(r.name) + "</td>" +
+    '<td class="mid"><span class="mode">' + esc(f.mode) + "</span></td>" +
+    ["t1", "t2", "t2pri", "bml", "bmlpri", "bmltrns", "bmlfat"].map(
+      k => '<td class="mid">' + tick(f[k]) + "</td>").join("") +
+    '<td class="mid">' + dim(f.ecm) + "</td>" +
+    '<td class="mid">' + tick(f.posattr) + "</td>" +
+    '<td class="num">' + dim(f.sprites) + "</td>" +
+    '<td class="mid">' + tick(f.spr16) + "</td>" +
+    '<td class="mid">' + tick(f.sprmag) + "</td>" +
+    '<td class="mid">' + dim(f.sprecm) + "</td>" +
+    '<td class="num">' + dim(f.sprmax) + "</td>" +
+    '<td class="mid">' + scr(f.t1scroll) + "</td>" +
+    '<td class="mid">' + scr(f.t2scroll) + "</td>" +
+    '<td class="mid">' + pg(f.t1pages) + "</td>" +
+    '<td class="mid">' + pg(f.t2pages) + "</td>" +
+    '<td class="mid">' + dim(f.t1ps) + "</td>" +
+    '<td class="mid">' + dim(f.t2ps) + "</td>" +
+    '<td class="mid">' + dim(f.sprps) + "</td>" +
+    '<td class="mid">' + (f.rows === 24 ? '<span class="off">24</span>'
+                                        : '<span class="on">' + f.rows + "</span>") + "</td>" +
+    '<td class="mid">' + tick(f.locked) + "</td>"};
+}
+
+/* Ramp the colour by magnitude rather than switching at the floor: grey at zero,
+   full red or green at `scale` and beyond. The floor keeps its meaning - a delta
+   that reaches it is also emboldened - but every row now shows its size at a
+   glance instead of a page of identical grey below the threshold. */
+function deltaStyle(v, scale) {
+  const t = Math.min(1, Math.abs(v) / (scale || 1));
+  return "color:color-mix(in oklab, var(--muted), var(" + (v > 0 ? "--over" : "--good")
+         + ") " + Math.round(t * 100) + "%)";
+}
+
+function deltaCell(v, scale) {
+  if (v === undefined) return '<td class="num off">-</td>';
+  const text = signed(v);
+  /* Across boards or clocks the floor belongs to neither run, so the size is ramped against the
+     pair's own largest move and nothing is emboldened: this is what the hardware costs, which is
+     worth reading, and not a change to act on. */
+  if (!D.timingComparable)
+    return '<td class="num delta" title="hardware difference, not a change" style="'
+           + deltaStyle(v, scale) + '">' + text + "</td>";
+  return '<td class="num delta' + (Math.abs(v) >= D.floor ? " strong" : "")
+         + '" style="' + deltaStyle(v, D.floor) + '">' + text + "</td>";
+}
+
+/* One scale for the whole table, taken over every row rather than the filtered
+   ones, so hiding a mode does not silently rescale the bars beside it. Never
+   finer than the noise floor: a run where nothing moved should read as a page of
+   stubs, not as a page of full-width bars. */
+function deltaScale() {
+  let m = D.floor;
+  for (const r of D.rows)
+    for (const v of [r.dRender, r.dLine])
+      if (v !== undefined) m = Math.max(m, Math.abs(v));
+  return m;
+}
+
+function divergeBar(v, scale, cls) {
+  if (v === undefined || v === 0) return "";
+  const width = Math.min(1, Math.abs(v) / scale) * 50;
+  const win = v < 0;
+  return '<span class="dv-bar ' + cls + '" style="' + (win ? "left" : "right") + ":50%;width:"
+         + width.toFixed(3) + "%;background:var(" + (win ? "--good" : "--over") + ')"></span>';
+}
+
+function divergeCell(r, scale) {
+  if (r.dLine === undefined && r.dRender === undefined)
+    return '<td><span class="off">no baseline</span></td>';
+  /* one board's floor says nothing about the other's, so a hardware comparison draws the bars
+     without the ticks rather than not drawing them at all */
+  const f = D.timingComparable ? (D.floor / scale) * 50 : 50;
+  // the ticks sit on the floor, so when nothing in the pair beat it they land on
+  // the ends of the track and say nothing worth the pixels
+  const at = f >= 50 ? () => ""
+    : p => '<span class="dv-tick" style="left:' + p.toFixed(3) + '%"></span>';
+  return '<td><div class="dv" title="render ' + signed(r.dRender) + " us, line "
+    + signed(r.dLine) + ' us">' + at(50 - f) + at(50 + f) + '<span class="dv-mid"></span>'
+    + divergeBar(r.dRender, scale, "dv-top") + divergeBar(r.dLine, scale, "dv-bot")
+    + "</div></td>";
+}
+
+function compareRow(r, scale) {
+  if (r.render === undefined) return null;
+  return {cls: "", cells:
+    '<td class="name">' + esc(r.name) + "</td>" + divergeCell(r, scale) +
+    '<td class="num">' + r.render.toFixed(2) + "</td>" + deltaCell(r.dRender, scale) +
+    '<td class="num">' + r.line.toFixed(2) + "</td>" + deltaCell(r.dLine, scale) +
+    "<td>" + goldenCell(r) + "</td>"};
+}
+
+const BUILDERS = {budget: budgetRow, coverage: coverageRow, compare: compareRow};
+
+function sortRows(rows) {
+  const val = r => state.panels === "all" && r.lineAll !== undefined ? r.lineAll : r.line;
+  const cmp = {
+    line: (a, b) => (val(b) || 0) - (val(a) || 0),
+    render: (a, b) => (b.render || 0) - (a.render || 0),
+    drops: (a, b) => ((b.off && b.off.dropped) || 0) - ((a.off && a.off.dropped) || 0)
+                     || (val(b) || 0) - (val(a) || 0),
+    name: (a, b) => a.name.localeCompare(b.name),
+    mode: (a, b) => ((a.f && a.f.mode) || "").localeCompare((b.f && b.f.mode) || "")
+                    || a.name.localeCompare(b.name),
+    ecm: (a, b) => ((b.f && b.f.ecm) || 0) - ((a.f && a.f.ecm) || 0),
+    sprites: (a, b) => ((b.f && b.f.sprites) || 0) - ((a.f && a.f.sprites) || 0),
+    dRender: (a, b) => Math.abs(b.dRender || 0) - Math.abs(a.dRender || 0),
+    dLine: (a, b) => Math.abs(b.dLine || 0) - Math.abs(a.dLine || 0),
+    won: (a, b) => (a.dLine === undefined ? 0 : a.dLine) - (b.dLine === undefined ? 0 : b.dLine),
+    lost: (a, b) => (b.dLine === undefined ? 0 : b.dLine) - (a.dLine === undefined ? 0 : a.dLine),
+  }[state.sort];
+  return rows.slice().sort(cmp);
+}
+
+function draw() {
+  document.getElementById("thead").innerHTML = "<tr>" + COLUMNS[state.view]() + "</tr>";
+  const build = BUILDERS[state.view];
+  const scale = state.view === "compare" ? deltaScale() : 0;
+  const rows = sortRows(D.rows.filter(r => state.groups.has(r.group)));
+  const body = [];
+  for (const r of rows) {
+    const made = build(r, scale);
+    if (!made) continue;
+    body.push('<tr class="' + made.cls + '" style="--dot:var(--g-' + r.group + ')">'
+              + made.cells + "</tr>");
+  }
+  document.getElementById("tbody").innerHTML = body.length ? body.join("")
+    : '<tr><td class="empty" colspan="25">Nothing to show - this run did not include that stage.</td></tr>';
+  document.getElementById("legend").classList.toggle(
+    "hide", state.view !== "compare" || !D.against);
+  document.getElementById("cov-section").classList.toggle("hide", state.view !== "coverage");
+  document.getElementById("ctl-overlay").classList.toggle(
+    "hide", state.view !== "budget" || !has("lineAll"));
+  if (state.view === "compare" && D.against) renderLegend(scale);
+}
+
+/* ---- the build, and the sections ---- */
+function renderBuild() {
+  const two = !!D.against;
+  document.getElementById("build-head").textContent =
+    two ? "What differs between these two builds" : "The build these numbers came from";
+  const head = two ? "<tr><th>Field</th><th>A &middot; " + esc(D.labels.a)
+                     + "</th><th>B &middot; " + esc(D.labels.b) + "</th></tr>"
+                   : "<tr><th>Field</th><th>Value</th></tr>";
+  document.getElementById("build").innerHTML = head + D.build.map(r =>
+    '<tr class="' + (r.differs ? "differs" : "") + '"><td' + (r.option ? ' class="opt"' : "")
+    + ">" + esc(r.label) + "</td>"
+    + (two ? "<td>" + esc(r.a === null || r.a === undefined ? "-" : r.a) + "</td>" : "")
+    + "<td>" + esc(r.b === null || r.b === undefined ? "-" : r.b) + "</td></tr>").join("");
+
+  const rows = D.sections;
+  if (!rows.length) { document.getElementById("sections").innerHTML =
+    '<tr><td class="empty">No section sizes in this record.</td></tr>'; return; }
+  const n = v => v === null || v === undefined ? "-" : v.toLocaleString();
+  // bytes have no equivalent of the noise floor, so the ramp is scaled to the
+  // largest move in this table: the biggest section change is the brightest
+  const span = Math.max(1, ...rows.map(r => Math.abs(r.d || 0)));
+  document.getElementById("sections").innerHTML =
+    "<tr><th>Section</th>" + (two ? "<th class='num'>A</th>" : "")
+    + "<th class='num'>" + (two ? "B" : "Bytes") + "</th>"
+    + (two ? "<th class='num'>&Delta; B&minus;A</th>" : "") + "</tr>" +
+    rows.map(r => "<tr><td>" + esc(r.label) + "</td>"
+      + (two ? '<td class="num">' + n(r.a) + "</td>" : "")
+      + '<td class="num">' + n(r.b) + "</td>"
+      + (two ? (r.d === undefined ? '<td class="num off">-</td>'
+                : '<td class="num delta" style="' + deltaStyle(r.d, span) + '">'
+                  + (r.d > 0 ? "+" : "") + r.d.toLocaleString() + "</td>") : "")
+      + "</tr>").join("");
+}
+
+/* ---- coverage axes ---- */
+function renderAxes() {
+  document.getElementById("axes").innerHTML = D.coverage.axes.map(a =>
+    '<div class="axis"><h3>' + esc(a.label) + '</h3><div class="vals">' +
+    a.values.map(v => '<span class="val' + (v.n ? "" : " gap") + '">' + esc(v.v)
+      + "<b>" + v.n + "</b></span>").join("") +
+    a.extra.map(v => '<span class="val">' + esc(v) + "<b>?</b></span>").join("") +
+    "</div></div>").join("") +
+    '<div class="axis"><h3>Flags</h3><div class="vals">' + D.coverage.flags.map(f =>
+      '<span class="val' + (f.n ? "" : " gap") + '">' + esc(f.label) + "<b>" + f.n
+      + "</b></span>").join("") + "</div></div>";
+}
+
+/* ---- properties ---- */
+function renderProps() {
+  const host = document.getElementById("props");
+  const names = Object.keys(D.summary.properties);
+  if (!names.length) { host.innerHTML = '<div class="empty">No property test ran.</div>'; return; }
+  host.innerHTML = names.map(n => {
+    const p = D.summary.properties[n];
+    const edge = p.skipped ? "var(--muted)" : p.ok ? "var(--good)" : "var(--over)";
+    return '<div class="prop" style="--edge:' + edge + '">' +
+      "<h3>" + esc(n) + '<span class="pill ' + (p.skipped ? "warnp" : p.ok ? "okp" : "bad") + '">' +
+      (p.skipped ? "n/a" : p.ok ? "pass" : p.failures.length + " failures") + "</span>" +
+      '<span class="off" style="font-weight:400">' + p.checks.toLocaleString() +
+      " checks</span></h3><ul>" +
+      p.failures.slice(0, 12).map(f => '<li class="fail">' + esc(f) + "</li>").join("") +
+      p.notes.map(t => "<li>" + esc(t) + "</li>").join("") + "</ul></div>";
+  }).join("");
+}
+
+function renderLegend(scale) {
+  document.getElementById("legend").innerHTML =
+    "<b>&Delta; is B minus A</b> &mdash; <code>" + esc(D.labels.b) + "</code> minus <code>"
+    + esc(D.labels.a) + "</code>. So a <span class='down'>negative, green</span> value is faster or "
+    + "smaller on <code>" + esc(D.labels.b) + "</code>, and a <span class='up'>positive, red</span> "
+    + "one is slower or larger there. <b>The bar puts the same thing either side of no change</b>: "
+    + "a <span class='up'>loss grows left</span>, a <span class='down'>win grows right</span>, "
+    + "render on the upper half and line on the lower, both scaled to &plusmn;" + scale.toFixed(2)
+    + " us"
+    + (!D.timingComparable
+        ? " - the largest move anywhere in this pair. There are no floor ticks: a noise floor "
+          + "belongs to one of these two and cannot rule on the other."
+        : scale > D.floor
+        ? " - the largest move anywhere in this pair. The two faint ticks are this board's noise "
+          + "floor at &plusmn;" + D.floor.toFixed(2) + " us; a bar that does not reach one is "
+          + "placement rather than work."
+        : ", which is this board's noise floor: nothing in this pair moved further than that, so "
+          + "a full-width bar here is still only placement rather than work.")
+    + " <b>Numbers ramp the same way</b>: grey at zero and full strength at "
+    + (D.timingComparable ? "the floor, and emboldened once they reach it"
+                          : "the largest move in the pair")
+    + ". Section bytes ramp against the largest move in their own table"
+    + (D.timingComparable ? "." : ", and every timing delta here is what the hardware costs rather "
+       + "than what a change did - see the warning above.");
+}
+
+function renderNotes() {
+  document.getElementById("floor-note").innerHTML =
+    "<strong>The noise floor on this board is " + D.floor.toFixed(2) + " us.</strong> A change that "
+    + "merely resizes the library moves modes it never touched by about that much, so a delta under "
+    + "it is placement rather than work and is greyed out in the compare view."
+    + (D.canaries.length ? " The scenes that dropped a row in this run while their own average sat "
+       + "inside budget are <code>" + D.canaries.map(esc).join("</code>, <code>")
+       + "</code> - run those first after anything that resizes the library." : "");
+}
+
+function renderAll() {
+  document.body.dataset.state = D ? "loaded" : "empty";
+  if (!D) {
+    document.getElementById("eyebrow").textContent = "PICO9918 · live render harness";
+    document.getElementById("title").textContent = "Scanline Report";
+    document.getElementById("blurb").textContent =
+      "What each scene costs against the 63.6 us a scanline gets, what it exercises, and how it "
+      + "moved against another run.";
+    document.getElementById("legend").classList.add("hide");
+    document.getElementById("cov-section").classList.add("hide");
+    return;
+  }
+  renderHeader(); renderCards(); renderChips(); renderBuild(); renderAxes(); renderProps();
+  renderNotes();
+  document.querySelector('#seg-view button[data-v="compare"]').disabled = !D.against;
+  if (!D.against && state.view === "compare") state.view = "budget";
+  for (const b of document.querySelectorAll("#seg-view button"))
+    b.setAttribute("aria-pressed", String(b.dataset.v === state.view));
+  document.getElementById("swap").classList.toggle("hide", !D.against);
+  fillSorts();
+  draw();
+}
+
+/* ---- loading records at runtime ----
+   fetch() is blocked on file://, so records arrive through the file picker or a
+   drop. One file is a single run; two are a comparison, oldest first so A is the
+   baseline - the Swap button fixes it when that guess is wrong. */
+function show(pair) {
+  PAIR = pair;
+  state.view = pair.a ? "compare" : "budget";
+  D = derive(pair.a, pair.b, pair.labels, state.view);
+  renderAll();
+}
+
+function adopt(records, names) {
+  if (records.length === 1)
+    return show({a: null, b: records[0], labels: {a: null, b: names[0]}});
+  const [i, j] = records[0].run.date <= records[1].run.date ? [0, 1] : [1, 0];
+  show({a: records[i], b: records[j], labels: {a: names[i], b: names[j]}});
+}
+
+function note(message, bad) {
+  const el = document.getElementById("loadnote");
+  el.textContent = message;
+  el.className = "loadnote" + (bad ? " bad" : "");
+}
+
+function readFiles(fileList) {
+  const files = [...fileList].filter(f => f.name.endsWith(".json"));
+  if (!files.length) return note("No .json files in that drop.", true);
+  if (files.length > 2) return note("Drop one record, or two to compare - got "
+                                    + files.length + ".", true);
+  Promise.all(files.map(f => f.text().then(t => JSON.parse(t)))).then(records => {
+    for (const r of records)
+      if (!r || !r.run || !r.schema) throw new Error("not a run record");
+    adopt(records, files.map(f => f.name.replace(/\.json$/, "")));
+    note(files.map(f => f.name).join("  vs  "));
+  }).catch(e => note("Could not read that: " + e.message, true));
+}
+
+for (const id of ["load", "load-empty"])
+  document.getElementById(id).addEventListener("click",
+    () => document.getElementById("files").click());
+document.getElementById("files").addEventListener("change", e => readFiles(e.target.files));
+document.getElementById("swap").addEventListener("click", () => {
+  if (!PAIR || !PAIR.a) return;
+  show({a: PAIR.b, b: PAIR.a, labels: {a: PAIR.labels.b, b: PAIR.labels.a}});
+});
+for (const type of ["dragenter", "dragover"])
+  document.addEventListener(type, e => { e.preventDefault(); document.body.classList.add("dropping"); });
+for (const type of ["dragleave", "drop"])
+  document.addEventListener(type, e => {
+    e.preventDefault();
+    if (type === "dragleave" && e.relatedTarget) return;
+    document.body.classList.remove("dropping");
+    if (type === "drop") readFiles(e.dataTransfer.files);
+  });
+
+document.getElementById("seg-view").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  state.view = b.dataset.v;
+  for (const s of e.currentTarget.querySelectorAll("button"))
+    s.setAttribute("aria-pressed", String(s === b));
+  fillSorts(); draw();
+});
+document.getElementById("seg-panels").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.panels = b.dataset.v;
+  for (const s of e.currentTarget.querySelectorAll("button"))
+    s.setAttribute("aria-pressed", String(s === b));
+  draw();
+});
+document.getElementById("sort").addEventListener("change", e => {
+  state.sort = e.target.value; draw();
+});
+
+renderAll();
+</script>

@@ -1,0 +1,49 @@
+<ADDR> <reloadStoredConfig>:
+push	{r4, r5, lr}
+ldr	r3, [pc, #124]	@ (<ADDR> <reloadStoredConfig+OFF>)
+sub	sp, #12
+ldr	r4, [r3, #0]
+mov.w	r2, #256	@ 0x100
+add.w	r4, r4, #65536	@ 0x10000
+ldr	r1, [pc, #112]	@ (<ADDR> <reloadStoredConfig+OFF>)
+add.w	r0, r4, #80	@ 0x50
+bl	<ADDR> <memcpy>
+ldrb.w	r1, [r4, #80]	@ 0x50
+mov.w	ip, #0
+sub.w	r1, r1, #2
+clz	r1, r1
+add.w	r3, sp, #7
+mov.w	r2, #4864	@ 0x1300
+lsrs	r1, r1, #5
+strb.w	ip, [sp, #7]
+bl	<ADDR> <pico9918_config_validate>
+ldrb.w	r3, [sp, #7]
+cbz	r3, <ADDR> <reloadStoredConfig+OFF>
+movs	r1, #2
+ldr	r2, [pc, #64]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb.w	r1, [r4, #80]	@ 0x50
+ldrb	r3, [r2, #0]
+cbz	r3, <ADDR> <reloadStoredConfig+OFF>
+ldr	r3, [pc, #60]	@ (<ADDR> <reloadStoredConfig+OFF>)
+ldrb	r3, [r3, #0]
+strb.w	r3, [r4, #81]	@ 0x51
+cbz	r0, <ADDR> <reloadStoredConfig+OFF>
+mov.w	r2, #19
+movs	r3, #1
+strh.w	r2, [r4, #82]	@ 0x52
+strb.w	r3, [r4, #332]	@ 0x14c
+movw	r3, #257	@ 0x101
+strh.w	r3, [r4, #336]	@ 0x150
+add	sp, #12
+pop	{r4, r5, pc}
+movs	r3, #32
+movs	r1, #1
+ldr	r5, [pc, #20]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r1, [r2, #0]
+strb	r3, [r5, #0]
+b.n	<ADDR> <reloadStoredConfig+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

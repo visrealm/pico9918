@@ -1,0 +1,707 @@
+<title>PICO9918 Console</title>
+<!-- Served by console.py, which holds the openocd session. Opening this file
+     from disk gets you a page with nothing to talk to. -->
+<style>
+:root{
+ --ground:#f1f2f6;--surface:#fff;--surface-2:#e9ebf1;--rule:#d8dbe4;--rule-soft:#e6e8ef;
+ --ink:#161922;--ink-2:#3d4354;--muted:#5d6478;--accent:#0a6e7a;--accent-soft:rgba(10,110,122,.12);
+ --over:#b93430;--tight:#8a6a08;--good:#1a7f2e;
+ --g-gm1:#1a7f2e;--g-gm2:#2aa84e;--g-mcm:#9b3b8e;--g-t40:#3a3bc4;--g-t80:#6a62dc;--g-dump:#6e7484;
+ --mono:ui-monospace,"Cascadia Code","Cascadia Mono",Consolas,SFMono-Regular,Menlo,monospace;
+ --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --ground:#0e1016;--surface:#171a23;--surface-2:#1e222d;--rule:#2a3040;--rule-soft:#212633;
+ --ink:#e3e6ef;--ink-2:#b9bfd0;--muted:#868da0;--accent:#42ebf5;--accent-soft:rgba(66,235,245,.14);
+ --over:#fc5554;--tight:#d4c154;--good:#21c842;
+ --g-gm1:#21b03b;--g-gm2:#5edc78;--g-mcm:#c95bba;--g-t40:#5455ed;--g-t80:#7e75fc;--g-dump:#9aa0b2;
+}}
+:root[data-theme="dark"]{
+ --ground:#0e1016;--surface:#171a23;--surface-2:#1e222d;--rule:#2a3040;--rule-soft:#212633;
+ --ink:#e3e6ef;--ink-2:#b9bfd0;--muted:#868da0;--accent:#42ebf5;--accent-soft:rgba(66,235,245,.14);
+ --over:#fc5554;--tight:#d4c154;--good:#21c842;
+ --g-gm1:#21b03b;--g-gm2:#5edc78;--g-mcm:#c95bba;--g-t40:#5455ed;--g-t80:#7e75fc;--g-dump:#9aa0b2;
+}
+*{box-sizing:border-box}
+/* The console is one screen and never scrolls as a page: the picture and its controls have to
+   stay put while you pick the next scene, so the only thing that scrolls is the scene list. */
+html,body{height:100%}
+body{margin:0;overflow:hidden;background:var(--ground);color:var(--ink);
+     font-family:var(--sans);font-size:15px;line-height:1.5}
+/* no reading measure to hold to here: the wider the window, the bigger the picture, which
+   is the whole point of the page */
+.wrap{height:100%;padding:12px 16px 14px;display:flex;flex-direction:column;gap:12px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--mono);font-size:24px;font-weight:700;letter-spacing:-.02em;margin:6px 0 0}
+
+/* What the board is showing on the left with its controls under it, and the scene browser
+   taking every pixel the left column does not.
+
+   The left column is a share of the window and nothing to do with what the board is drawing.
+   Sizing it to the picture is what put a hole in the page: the picture's width comes from its
+   height, so it changed with the scene, and the leftover changed with it. The floor is the
+   control row's own width - under it that row wraps, the wrap takes the height the frame was
+   using, and a shorter frame is a narrower one again. */
+.stage{flex:1;min-height:0;display:grid;gap:14px;
+       grid-template-columns:minmax(0,clamp(1250px,58vw,1700px)) minmax(360px,1fr)}
+/* the picture takes the height the controls do not want, down to a floor - and on a screen
+   too short for both, this column is what scrolls rather than the two overlapping */
+.main{display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0;overflow-y:auto}
+/* takes the height the controls leave, from a basis of nothing rather than from its content -
+   a row measured from the picture is a row the picture can push the controls off the page with.
+   The floor is the facts beside it, which are as tall as they are: under that this column
+   scrolls rather than the two overlapping. */
+.viewer{flex:1 1 0;min-height:min-content;display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:12px}
+.browse{display:flex;flex-direction:column;gap:10px;min-height:0}
+/* start, not stretch: a stretched card is as tall as the tallest in its row, and the frame
+   inside it then has a height to fill rather than one to keep */
+.browse .grid{overflow-y:auto;min-height:0;align-content:start;align-items:start;
+              grid-auto-rows:max-content;padding-right:6px}
+/* The frame is the space the page gives it and holds that size whatever is on it. Shaping the
+   frame to the capture (`--ar`) instead resized it every time a scene was picked.
+   The picture keeps its own shape inside and is scaled to fit: `--ar` is 512 VGA columns over
+   the 384 or 480 lines the mode draws, which is not the shape of the bytes that carry it, so
+   the box is set to that ratio and the image stretched into it. */
+.screen{--ar:1.3333;background:#000;border:1px solid var(--rule);border-radius:4px;
+        overflow:hidden;position:relative;min-height:0;width:100%;height:100%;
+        container-type:size;display:flex;align-items:center;justify-content:center}
+/* whichever of the frame's two sides the picture reaches first, in one expression - and
+   `container-type` above is what stops the answer feeding back into the frame it measured */
+.screen img{display:block;aspect-ratio:var(--ar);width:auto;
+            height:min(100cqh, calc(100cqw / var(--ar)));
+            image-rendering:pixelated;object-fit:fill}
+.screen.busy::after{content:"";position:absolute;inset:0;border:2px solid var(--accent);
+                    background:var(--accent-soft)}
+.screen .placeholder{color:var(--muted);font-family:var(--mono);font-size:13px;padding:40px;text-align:center}
+/* what the board reports rather than what it draws: the diagnostic overlay and the raw
+   register write live here, under the picture's facts, and their height is what sets the
+   picture's - so nothing in this column is ever cut off */
+.side{display:flex;flex-direction:column;gap:12px}
+#extras{display:contents}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:13px 15px}
+.panel h2{margin:0 0 9px;font-family:var(--mono);font-size:11px;letter-spacing:.13em;
+          text-transform:uppercase;color:var(--muted);font-weight:400;
+          display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-family:var(--mono);font-size:12.5px}
+dt{color:var(--muted)}
+dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+dd.bad{color:var(--over);font-weight:700}
+.desc{margin:9px 0 0;font-size:13px;color:var(--ink-2)}
+
+button,.filebtn{appearance:none;font-family:var(--mono);font-size:12.5px;padding:7px 12px;
+  border:1px solid var(--rule);border-radius:3px;background:var(--surface-2);color:var(--ink);cursor:pointer}
+button:hover,.filebtn:hover{border-color:var(--accent);color:var(--accent)}
+button:disabled{opacity:.45;cursor:default;border-color:var(--rule);color:var(--muted)}
+button:focus-visible,.filebtn:focus-within,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.filebtn{display:inline-flex;align-items:center}
+.filebtn input{display:none}
+
+/* ---- the tweak panel ---- */
+.tweaks{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px;
+        align-content:start;flex:none}
+.tweak{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:11px 14px}
+.tweak h3{margin:0 0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+          text-transform:uppercase;color:var(--muted);font-weight:400}
+.ctl{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;
+     font-family:var(--mono);font-size:12.5px;padding:3px 0}
+.ctl+.ctl{border-top:1px solid var(--rule-soft)}
+.ctl label{color:var(--ink-2);cursor:pointer}
+.ctl .val{color:var(--muted);font-variant-numeric:tabular-nums;font-size:11.5px;text-align:right}
+.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:0}
+.ctl .seg{grid-column:2;display:inline-flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden}
+.ctl .seg button{border:0;border-radius:0;padding:2px 8px;font-size:11.5px;background:transparent;color:var(--muted)}
+.ctl .seg button+button{border-left:1px solid var(--rule)}
+.ctl .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:700}
+/* a switch that reads as the thing being on, not as the bit being set */
+.sw{grid-column:2;width:38px;height:20px;border-radius:10px;border:1px solid var(--rule);
+    background:var(--surface-2);position:relative;padding:0;cursor:pointer}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+           background:var(--muted);transition:left .12s,background .12s}
+.sw[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.sw[aria-pressed="true"]::after{left:20px;background:var(--accent)}
+.reg{font-size:10.5px;color:var(--muted);opacity:.7}
+.poke{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:12px;flex-wrap:wrap}
+.poke input{font-family:var(--mono);font-size:12px;width:64px;padding:5px 7px;color:var(--ink);
+            background:var(--surface-2);border:1px solid var(--rule);border-radius:3px}
+
+.rail{display:flex;flex-wrap:wrap;align-items:center;gap:9px 12px;padding:11px 13px;
+      background:var(--surface);border:1px solid var(--rule);border-radius:4px}
+/* the rail is the fixed head of a scrolling column now, so every row it wraps to is a row
+   the grid does not get */
+.rail input[type=search]{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:transparent;
+      border:1px solid var(--rule);color:var(--muted)}
+.chip i{width:8px;height:8px;border-radius:1px;background:var(--dot);opacity:.4}
+.chip[aria-pressed="true"]{color:var(--ink);border-color:var(--dot)}
+.chip[aria-pressed="true"] i{opacity:1}
+input[type=search]{font-family:var(--mono);font-size:12.5px;padding:6px 10px;min-width:150px;
+  color:var(--ink);background:var(--surface-2);border:1px solid var(--rule);border-radius:3px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.card{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--dot);
+      border-radius:4px;overflow:hidden;padding:0;display:flex;flex-direction:column;text-align:left}
+.card:hover{border-color:var(--accent);border-left-color:var(--dot)}
+.card[aria-current="true"]{outline:2px solid var(--accent);outline-offset:-2px}
+/* a sweep's verdicts, on the tiles you are already looking at: the border says what
+   happened and the picture is replaced only where it differs from the reference -
+   on a pass the two are the same bytes, so swapping it would say nothing */
+.card[data-verdict]{border-left-width:3px}
+.card[data-verdict="ok"]{border-color:rgba(10,110,122,.5);border-left-color:var(--accent)}
+.card[data-verdict="REGRESSION"]{border-color:var(--over);border-left-color:var(--over);
+  background:rgba(185,52,48,.10)}
+.card[data-verdict="CHANGED"],.card[data-verdict="FREEZE"]{border-color:var(--tight);
+  border-left-color:var(--tight);background:rgba(138,106,8,.10)}
+.card[data-verdict="OVER BUDGET"]{border-color:var(--tight);border-left-color:var(--tight)}
+.card[data-running="true"]{outline:2px dashed var(--accent);outline-offset:-2px}
+.card .verdict{font-weight:700}
+.card[data-verdict="REGRESSION"] .verdict{color:var(--over)}
+.card[data-verdict="CHANGED"] .verdict,.card[data-verdict="FREEZE"] .verdict,
+.card[data-verdict="OVER BUDGET"] .verdict{color:var(--tight)}
+.card[data-verdict="ok"] .verdict{color:var(--accent)}
+/* one frame for every thumbnail, shaped to the tallest picture the VDP draws: 512 VGA columns
+   by 480 lines. A 30 or 60 row scene fills it, a 24 or 48 row one is 4:3 and sits centred in it
+   with the black either side of it, so the captions line up across the grid whatever the mode.
+   Its height comes from the ratio and nothing else: `flex-grow` here asks for the card's spare
+   space, the card is a grid item as tall as its row, and the row is as tall as the card's
+   content - so once the grid had more rows than it could show, every frame resolved to zero */
+.card figure{margin:0;background:#000;aspect-ratio:512/480;overflow:hidden;
+             display:flex;align-items:center;justify-content:center}
+.card img{width:100%;height:auto;max-height:100%;object-fit:fill;image-rendering:pixelated}
+.card .none{color:var(--muted);font-family:var(--mono);font-size:11px;padding:12px;text-align:center}
+.card b{font-family:var(--mono);font-size:12px;font-weight:700;padding:8px 10px 0;
+        overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card small{font-family:var(--mono);font-size:10.5px;color:var(--muted);padding:2px 10px 9px;
+            display:flex;gap:6px;flex-wrap:wrap}
+.tag{padding:0 4px;border-radius:2px;font-weight:700}
+.tag.over{background:rgba(185,52,48,.14);color:var(--over)}
+.tag.prov{background:rgba(138,106,8,.14);color:var(--tight)}
+.tag.tall{background:rgba(10,110,122,.14);color:var(--accent)}
+.note{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.note.bad{color:var(--over)}
+body.dropping::after{content:"Drop a VDP dump to show it on the board";position:fixed;inset:0;z-index:9;
+  display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:18px;
+  color:var(--accent);background:var(--accent-soft);border:3px dashed var(--accent);pointer-events:none}
+@media (max-width:1180px){.viewer{grid-template-columns:1fr}}
+/* narrow enough that two columns of anything is worse than one: the browser goes back under
+   the viewer and scrolls with the page, because a scroll box inside a scrolling page is only
+   worth it when the two are side by side */
+@media (max-width:900px){
+  .stage{grid-template-columns:1fr}
+  .browse{position:static;max-height:none}
+  .browse .grid{overflow:visible;padding-right:0}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow" id="eyebrow">PICO9918 console</div>
+    <h1 id="heading">What the board is showing</h1>
+  </header>
+
+  <div class="stage">
+    <div class="main">
+      <div class="viewer">
+        <div class="screen" id="screen"><div class="placeholder">
+          Pick a scene on the right, or drop a VDP dump anywhere on this page.</div></div>
+        <div class="side">
+          <div class="panel">
+            <h2 id="live-name">Nothing applied yet</h2>
+            <dl id="live-facts"></dl>
+            <p class="desc" id="live-note"></p>
+          </div>
+          <div class="panel">
+            <h2>Board</h2>
+            <div class="row">
+              <button type="button" id="recapture">Re-capture</button>
+              <button type="button" id="reset" disabled>Re-apply scene</button>
+              <label class="filebtn">Load dump&hellip;<input type="file" id="file" accept=".bin"></label>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <button type="button" id="sweep" title="Every scene the grid is showing, captured and compared against its frozen reference - the same comparison runner.py's freeze stage makes">Run the suite</button>
+              <span class="desc" id="sweep-note"></span>
+            </div>
+            <div class="ctl" style="margin-top:10px">
+              <label for="live" title="Off, a control writes its register and stops there - so the monitor moves as fast as the board can draw it, and this picture waits for Re-capture">Live preview</label>
+              <button type="button" class="sw" id="live" aria-pressed="true"
+                      aria-label="Live preview"></button>
+            </div>
+            <p class="desc note" id="status"></p>
+          </div>
+          <div id="extras"></div>
+        </div>
+      </div>
+
+      <div class="tweaks" id="tweaks"></div>
+    </div>
+
+    <aside class="browse">
+      <div class="rail">
+        <div class="chips" id="chips"></div>
+        <input type="search" id="find" placeholder="filter by name, mode or note" autocomplete="off">
+        <span class="note" id="count"></span>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const GROUPS = [["gm1", "Graphics I"], ["gm2", "Graphics II"], ["mcm", "Multicolor"],
+                ["t40", "Text 40"], ["t80", "Text 80"], ["dump", "Real software"]];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hex2 = v => "0x" + v.toString(16).toUpperCase().padStart(2, "0");
+
+const state = {scenes: [], controls: [], groups: new Set(GROUPS.map(g => g[0])),
+               find: "", current: null, regs: null, conf: {}, unlocked: false, busy: false,
+               url: null, live: true,
+               // a sweep's verdicts, kept here rather than on the tiles so a filter
+               // change redraws them instead of wiping them
+               verdicts: {}, sweeping: false, sweepFrom: 0, sweepNames: []};
+
+function note(text, bad) {
+  const el = document.getElementById("status");
+  el.textContent = text || "";
+  el.className = "desc note" + (bad ? " bad" : "");
+}
+
+/* ---- talking to the board ----
+   Every board endpoint answers with the same object: the picture, and the
+   registers that produced it, read in the same locked section. So a control can
+   never show a value the picture on screen does not have. */
+async function board(url, options) {
+  if (state.busy) return null;
+  state.busy = true;
+  document.getElementById("screen").classList.add("busy");
+  try {
+    const r = await fetch(url, options);
+    const body = await r.text();
+    let data = null;
+    try { data = JSON.parse(body); } catch (e) { /* not JSON */ }
+    if (!r.ok) throw new Error((data && data.error) || body);
+    apply(data);
+    return data;
+  } finally {
+    state.busy = false;
+    document.getElementById("screen").classList.remove("busy");
+  }
+}
+
+function apply(data) {
+  if (!data) return;
+  state.regs = data.regs;
+  state.conf = data.conf;
+  state.unlocked = data.unlocked;
+  if (data.png) {
+    const screen = document.getElementById("screen");
+    if (state.url) URL.revokeObjectURL(state.url);
+    state.url = URL.createObjectURL(
+      new Blob([Uint8Array.from(atob(data.png), c => c.charCodeAt(0))], {type: "image/png"}));
+    screen.innerHTML = "<img alt=\"the board\">";
+    // the byte geometry is not the picture's shape: 256 indices are doubled across
+    // and every row is two VGA lines unless R0 doubles the rows, so the server says
+    // what shape it is and the frame takes that shape
+    if (data.aspect) screen.style.setProperty("--ar", String(data.aspect));
+    screen.firstChild.src = state.url;
+    showFacts(data);
+  }
+  // rebuilt only when there is nothing there yet: a poke that redrew the panel
+  // would take the slider out from under the hand that moved it
+  if (document.getElementById("tweaks").children.length) syncTweaks();
+  else drawTweaks();
+}
+
+/* the controls follow the board, not the click: a bit the firmware ignores -
+   anything F18A while locked - snaps back rather than lying about what it did */
+function syncTweaks() {
+  for (const g of state.controls) for (const c of g.items) {
+    const el = document.getElementById((c.conf ? "k" : "c") + c.reg + "_" + c.mask);
+    const v = value(c);
+    if (!el) continue;
+    if (c.kind === "bit") el.setAttribute("aria-pressed", String(c.invert ? !v : !!v));
+    else if (c.kind === "range") {
+      // not mid-drag: the answer to an earlier write would pull the thumb back to
+      // somewhere the hand has already left. The drain syncs once when it finishes
+      if (draining) continue;
+      el.value = v;
+      document.getElementById(el.id + "_v").textContent = v;
+    }
+  }
+  for (const b of document.querySelectorAll(".seg button[data-set]"))
+    b.setAttribute("aria-pressed",
+      String(+b.dataset.set === ((state.regs[+b.dataset.reg] & +b.dataset.mask)
+                                 >> ((+b.dataset.mask & -b.dataset.mask).toString(2).length - 1))));
+  document.getElementById("unlock").setAttribute("aria-pressed", String(state.unlocked));
+}
+
+function showFacts(data) {
+  const scene = state.scenes.find(s => s.name === state.current) || null;
+  document.getElementById("live-name").textContent = state.current || "the board";
+  const facts = [["Rows", data.rows], ["Line", data.width + " bytes"]];
+  if (scene) facts.push(["Mode", scene.mode], ["Budget", scene.budget.toFixed(1) + " us"]);
+  facts.push(["Unlocked", state.unlocked ? "yes" : "no"]);
+  document.getElementById("live-facts").innerHTML = facts.map(
+    ([k, v]) => "<dt>" + esc(k) + "</dt><dd>" + esc(v) + "</dd>").join("")
+    + "<dt>Rows dropped</dt><dd class=\"" + (data.dropped ? "bad" : "") + "\">"
+    + data.dropped + "</dd>";
+  document.getElementById("live-note").textContent = scene ? (scene.note || "") : "";
+  for (const card of document.querySelectorAll(".card"))
+    card.setAttribute("aria-current", String(card.dataset.name === state.current));
+  document.getElementById("reset").disabled = !state.current;
+}
+
+/* Turning a knob costs a frame over SWD, and the answer arrives after the monitor has
+   already moved. With the preview off the write is all that happens, so a slider tracks
+   the board rather than the transfer - and `Re-capture` says when to look again. */
+const capturing = url => url + (state.live ? "" : "&capture=0");
+
+const poke = (reg, mask, value) =>
+  board(capturing("/api/poke?reg=" + reg + "&mask=" + mask + "&value=" + value),
+        {method: "POST"}).catch(e => note(e.message, true));
+
+/* A slider writes while it moves, so the monitor tracks the hand rather than the drop.
+   A drag raises far more events than the board can take, so what is held is the slider
+   and not a queue of values: each write reads it at send time and therefore carries
+   wherever it has got to, and the one that settles it always goes. */
+let held = null, draining = false;
+async function slide(el) {
+  held = el;
+  if (draining) return;
+  draining = true;
+  try {
+    while (held) {
+      const r = held, mask = +r.dataset.mask;
+      held = null;
+      const answered = await poke(+r.dataset.reg, mask,
+                                  (+r.value) << ((mask & -mask).toString(2).length - 1));
+      // something else had the board and the write was turned away: keep it and wait
+      if (answered === null && !held) {
+        held = r;
+        await new Promise(go => setTimeout(go, 30));
+      }
+    }
+  } finally {
+    draining = false;
+    if (state.regs) syncTweaks();   // the one sync the drag skipped, now it has settled
+  }
+}
+
+async function show(name) {
+  note("applying " + name + "…");
+  try {
+    state.current = name;
+    const d = await board("/api/show?name=" + encodeURIComponent(name), {method: "POST"});
+    if (d) note(d.dropped ? d.dropped + " row" + (d.dropped === 1 ? "" : "s")
+                            + " never rendered - the line did not fit"
+                          : "showing " + name, d.dropped > 0);
+  } catch (e) { note(e.message, true); }
+}
+
+async function upload(file) {
+  note("loading " + file.name + "…");
+  try {
+    const d = await board("/api/upload?name=" + encodeURIComponent(file.name),
+                          {method: "POST", body: await file.arrayBuffer()});
+    if (!d) return;
+    state.current = d.name;
+    showFacts(d);
+    note("showing " + file.name + ", this session only");
+  } catch (e) { note(e.message, true); }
+}
+
+/* ---- the tweak panel ---- */
+/* a control reads either a VDP register or, for the diagnostic panels, a stored
+   configuration byte - which is a whole byte rather than a field of one */
+function value(c) {
+  return c.conf ? (state.conf[c.reg] ? 1 : 0) : (state.regs[c.reg] & c.mask) >> c.shift;
+}
+
+function control(c) {
+  const v = value(c);
+  const id = (c.conf ? "k" : "c") + c.reg + "_" + c.mask;
+  const head = c.conf
+    ? '<label for="' + id + '" title="stored configuration byte ' + c.reg
+      + ' - drawn after the capture, so it shows on the monitor and not here">'
+      + esc(c.label) + "</label>"
+    : '<label for="' + id + '" title="R' + hex2(c.reg) + " bit mask " + hex2(c.mask)
+      + (c.note ? " - " + esc(c.note) : "") + '">' + esc(c.label)
+      + ' <span class="reg">R' + hex2(c.reg) + "</span></label>";
+  if (c.kind === "bit") {
+    const on = c.invert ? !v : !!v;
+    return '<div class="ctl">' + head + '<button type="button" class="sw" id="' + id
+      + '" data-reg="' + c.reg + '" data-mask="' + c.mask + '" data-invert="' + !!c.invert
+      + (c.conf ? '" data-conf="1' : "")
+      + '" aria-pressed="' + on + '" aria-label="' + esc(c.label) + '"></button></div>';
+  }
+  if (c.kind === "field") {
+    let buttons = "";
+    for (let i = 0; i <= c.max; i++)
+      buttons += '<button type="button" data-reg="' + c.reg + '" data-mask="' + c.mask
+        + '" data-set="' + i + '" aria-pressed="' + (i === v) + '">' + i + "</button>";
+    return '<div class="ctl">' + head + '<span class="seg">' + buttons + "</span></div>";
+  }
+  return '<div class="ctl">' + head + '<span class="val" id="' + id + '_v">' + v + "</span>"
+    + '<input type="range" id="' + id + '" min="0" max="' + c.max + '" value="' + v
+    + '" data-reg="' + c.reg + '" data-mask="' + c.mask + '"></div>';
+}
+
+const panel = g => '<div class="tweak"><h3>' + esc(g.group) + "</h3>"
+  + g.items.map(control).join("") + "</div>";
+
+/* Two homes. The grid below the picture is what the board draws; beside it go the
+   groups that change what it reports about itself instead - the diagnostic overlay
+   and the raw register write, neither of which is part of a scene. */
+function drawTweaks() {
+  const host = document.getElementById("tweaks");
+  const extras = document.getElementById("extras");
+  if (!state.regs) { host.innerHTML = extras.innerHTML = ""; return; }
+  host.innerHTML = state.controls.filter(g => !g.side).map(panel).join("");
+  extras.innerHTML = state.controls.filter(g => g.side).map(panel).join("")
+    + '<div class="tweak"><h3>Any register</h3>'
+    + '<div class="poke">R<input id="poke-reg" value="0x1B" spellcheck="false">'
+    + '= <input id="poke-val" value="0x00" spellcheck="false">'
+    + '<button type="button" id="poke-go">Write</button></div>'
+    + '<div class="ctl" style="margin-top:8px"><label>Unlocked</label>'
+    + '<button type="button" class="sw" id="unlock" aria-pressed="' + state.unlocked
+    + '" aria-label="Unlocked"></button></div></div>';
+  wireTweaks();
+}
+
+function wireTweaks() {
+  for (const sw of document.querySelectorAll(".sw[data-reg]"))
+    sw.addEventListener("click", () => {
+      const on = sw.getAttribute("aria-pressed") !== "true";
+      if (sw.dataset.conf) {
+        board(capturing("/api/conf?index=" + sw.dataset.reg + "&on=" + (on ? 1 : 0)),
+              {method: "POST"})
+          .catch(e => note(e.message, true));
+        return;
+      }
+      const bit = sw.dataset.invert === "true" ? !on : on;
+      poke(+sw.dataset.reg, +sw.dataset.mask, bit ? +sw.dataset.mask : 0);
+    });
+  for (const b of document.querySelectorAll(".seg button[data-set]"))
+    b.addEventListener("click", () => {
+      const mask = +b.dataset.mask;
+      poke(+b.dataset.reg, mask, (+b.dataset.set) << ((mask & -mask).toString(2).length - 1));
+    });
+  for (const r of document.querySelectorAll('input[type=range][data-reg]')) {
+    const out = document.getElementById(r.id + "_v");
+    r.addEventListener("input", () => { out.textContent = r.value; slide(r); });
+    r.addEventListener("change", () => slide(r));
+  }
+  document.getElementById("unlock").addEventListener("click", e => {
+    board(capturing("/api/unlock?on="
+                    + (e.currentTarget.getAttribute("aria-pressed") === "true" ? 0 : 1)),
+          {method: "POST"}).catch(err => note(err.message, true));
+  });
+  document.getElementById("poke-go").addEventListener("click", () => {
+    const reg = Number(document.getElementById("poke-reg").value);
+    const val = Number(document.getElementById("poke-val").value);
+    if (!Number.isInteger(reg) || reg < 0 || reg > 63) return note("register 0 to 63", true);
+    if (!Number.isInteger(val) || val < 0 || val > 255) return note("value 0 to 255", true);
+    note("R" + hex2(reg) + " = " + hex2(val));
+    poke(reg, 255, val);
+  });
+}
+
+/* ---- the grid ---- */
+/* ---- watching the suite run ----
+   The sweep is the freeze stage itself, not a copy of it, so what fills the grid is
+   the comparison that decides pass or fail and each picture is the very bytes that
+   were compared. Progress is polled rather than streamed: a sweep holds the board
+   for its whole length, so the page has nothing else to ask it meanwhile. */
+function sweepStatus(d, finished) {
+  const bad = Object.values(state.verdicts).filter(v => v.state === "REGRESSION").length;
+  const moved = Object.values(state.verdicts).filter(
+    v => v.state === "CHANGED" || v.state === "OVER BUDGET").length;
+  const parts = [d.count + " / " + d.total];
+  if (bad) parts.push(bad + " regressed");
+  if (moved) parts.push(moved + " to look at");
+  if (finished) parts.push(d.seconds + " s");
+  document.getElementById("sweep-note").textContent = parts.join(" · ");
+}
+
+function paintVerdict(name) {
+  const v = state.verdicts[name];
+  const card = document.querySelector('.card[data-name="' + CSS.escape(name) + '"]');
+  if (!card || !v) return;
+  card.dataset.verdict = v.state;
+  card.removeAttribute("data-running");
+  const small = card.querySelector("small");
+  let el = small.querySelector(".verdict");
+  if (!el) { el = document.createElement("span"); el.className = "verdict"; small.appendChild(el); }
+  el.textContent = " " + (v.state === "ok" ? "ok" : v.state)
+                 + (v.differ ? " " + v.differ + "px" : "") + " " + v.ms + "ms";
+  // only where it differs: on a pass the capture and the thumbnail are the same
+  // bytes, so replacing the picture would claim a difference there is not
+  if (v.state !== "ok" && v.png) {
+    const img = card.querySelector("figure img");
+    if (img) img.src = "data:image/png;base64," + v.png;
+  }
+}
+
+function sweepScreen(name, png) {
+  const scene = state.scenes.find(s => s.name === name);
+  const screen = document.getElementById("screen");
+  screen.innerHTML = '<img alt="' + esc(name) + '">';
+  if (scene && scene.aspect) screen.style.setProperty("--ar", String(scene.aspect));
+  screen.firstChild.src = "data:image/png;base64," + png;
+  state.current = name;
+}
+
+async function sweepPoll() {
+  const r = await fetch("/api/sweep?from=" + state.sweepFrom);
+  const d = await r.json();
+  state.sweepFrom = d.since + d.results.length;
+  for (const res of d.results) {
+    state.verdicts[res.name] = res;
+    paintVerdict(res.name);
+    sweepScreen(res.name, res.png);
+  }
+  const next = state.scenes.filter(s => !(s.name in state.verdicts) &&
+    state.sweepNames.includes(s.name))[0];
+  for (const card of document.querySelectorAll(".card[data-running]"))
+    card.removeAttribute("data-running");
+  if (d.running && next)
+    document.querySelector('.card[data-name="' + CSS.escape(next.name) + '"]')
+      ?.setAttribute("data-running", "true");
+  sweepStatus(d, !d.running);
+  if (d.error) note("sweep failed: " + d.error, true);
+  if (d.running) return setTimeout(() => sweepPoll().catch(e => note(e.message, true)), 120);
+  state.sweeping = false;
+  document.getElementById("sweep").textContent = "Run the suite";
+  for (const card of document.querySelectorAll(".card[data-running]"))
+    card.removeAttribute("data-running");
+  // the controls have been following whatever the sweep applied; one read puts the
+  // panel back in step with the scene it stopped on
+  board("/api/state", {}).catch(e => note(e.message, true));
+}
+
+document.getElementById("sweep").addEventListener("click", async () => {
+  const btn = document.getElementById("sweep");
+  if (state.sweeping) {
+    await fetch("/api/sweep?stop=1", {method: "POST"});
+    return;
+  }
+  const q = state.find.toLowerCase();
+  state.sweepNames = state.scenes.filter(s => state.groups.has(s.group) &&
+    (!q || (s.name + " " + s.mode + " " + (s.note || "")).toLowerCase().includes(q)))
+    .map(s => s.name);
+  if (!state.sweepNames.length) return note("no scene is showing to sweep", true);
+  state.verdicts = {}; state.sweepFrom = 0; state.sweeping = true;
+  for (const card of document.querySelectorAll(".card")) {
+    card.removeAttribute("data-verdict");
+    const el = card.querySelector("small .verdict");
+    if (el) el.remove();
+  }
+  draw();
+  btn.textContent = "Stop";
+  note("");
+  const r = await fetch("/api/sweep", {method: "POST", body: state.sweepNames.join("\n")});
+  if (!r.ok) {
+    state.sweeping = false; btn.textContent = "Run the suite";
+    return note((await r.json()).error, true);
+  }
+  sweepPoll().catch(e => note(e.message, true));
+});
+
+function tags(s) {
+  const out = [];
+  if (s.rows > 30) out.push('<span class="tag tall">' + s.rows + " rows</span>");
+  if (s.overbudget.length) out.push('<span class="tag over">over budget</span>');
+  if (s.changes) out.push('<span class="tag prov">provisional</span>');
+  return out.join("");
+}
+
+function draw() {
+  const q = state.find.toLowerCase();
+  const shown = state.scenes.filter(s => state.groups.has(s.group) &&
+    (!q || (s.name + " " + s.mode + " " + (s.note || "")).toLowerCase().includes(q)));
+  document.getElementById("grid").innerHTML = shown.map(s =>
+    '<button type="button" class="card" data-name="' + esc(s.name) + '" title="' + esc(s.note || "")
+    + '" style="--dot:var(--g-' + s.group + ')">'
+    + "<figure>" + (s.golden
+        ? '<img loading="lazy" alt="" style="aspect-ratio:' + s.aspect
+          + '" src="/api/thumb?name=' + encodeURIComponent(s.name) + '">'
+        : '<span class="none">no golden<br>this scene overruns</span>') + "</figure>"
+    + "<b>" + esc(s.name) + "</b>"
+    + "<small>" + esc(s.mode) + " " + esc(s.rows) + tags(s) + "</small></button>").join("");
+  document.getElementById("count").textContent =
+    shown.length + " of " + state.scenes.length + " scenes";
+  for (const card of document.querySelectorAll(".card")) {
+    card.addEventListener("click", () => show(card.dataset.name));
+    card.setAttribute("aria-current", String(card.dataset.name === state.current));
+  }
+  // a sweep survives a filter change: the verdicts live in state, so a redraw puts
+  // them back rather than losing the run you were watching
+  for (const name of Object.keys(state.verdicts)) paintVerdict(name);
+}
+
+function drawChips() {
+  const host = document.getElementById("chips");
+  host.innerHTML = "";
+  for (const [key, label] of GROUPS) {
+    const n = state.scenes.filter(s => s.group === key).length;
+    if (!n) continue;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.dataset.group = key;
+    b.style.setProperty("--dot", "var(--g-" + key + ")");
+    b.setAttribute("aria-pressed", "true");
+    b.innerHTML = "<i></i>" + label + ' <span style="opacity:.55">' + n + "</span>";
+    b.addEventListener("click", () => {
+      state.groups.has(key) ? state.groups.delete(key) : state.groups.add(key);
+      if (!state.groups.size) for (const el of host.children) state.groups.add(el.dataset.group);
+      for (const el of host.children)
+        el.setAttribute("aria-pressed", String(state.groups.has(el.dataset.group)));
+      draw();
+    });
+    host.appendChild(b);
+  }
+}
+
+document.getElementById("live").addEventListener("click", e => {
+  state.live = e.currentTarget.getAttribute("aria-pressed") !== "true";
+  e.currentTarget.setAttribute("aria-pressed", String(state.live));
+  note(state.live ? "live preview on"
+                  : "live preview off - the board still follows every control, this picture does not");
+  if (state.live) board("/api/state", {}).catch(err => note(err.message, true));
+});
+document.getElementById("recapture").addEventListener("click",
+  () => board("/api/state", {}).then(() => note("re-captured")).catch(e => note(e.message, true)));
+document.getElementById("reset").addEventListener("click",
+  () => state.current && show(state.current));
+document.getElementById("file").addEventListener("change", e => {
+  if (e.target.files[0]) upload(e.target.files[0]);
+  e.target.value = "";
+});
+document.getElementById("find").addEventListener("input", e => {
+  state.find = e.target.value; draw();
+});
+for (const type of ["dragenter", "dragover"])
+  document.addEventListener(type, e => { e.preventDefault(); document.body.classList.add("dropping"); });
+for (const type of ["dragleave", "drop"])
+  document.addEventListener(type, e => {
+    e.preventDefault();
+    if (type === "dragleave" && e.relatedTarget) return;
+    document.body.classList.remove("dropping");
+    if (type === "drop" && e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]);
+  });
+
+fetch("/api/scenes").then(r => r.json()).then(d => {
+  state.scenes = d.scenes;
+  state.controls = d.controls;
+  document.getElementById("eyebrow").textContent =
+    "PICO9918 console · " + d.board + " · " + d.elf;
+  // the desktop backend renders the same picture from the same library, so the
+  // heading is where it says which one you are looking at
+  document.getElementById("heading").textContent = "What " + d.where + " is showing";
+  drawChips();
+  draw();
+  // capturing, not just the registers: the page is called what the board is showing, and
+  // the board is already showing something when you open it
+  return board("/api/state", {});
+}).catch(e => note("could not reach console.py: " + e.message, true));
+</script>

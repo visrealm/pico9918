@@ -1,0 +1,114 @@
+<ADDR> <gpioIrqHandler>:
+push	{r4, r5, r6, lr}
+movs	r1, #4
+movs	r0, #23
+bl	<ADDR> <gpio_acknowledge_irq>
+movs	r1, #0
+movs	r0, #9
+bl	<ADDR> <irq_set_enabled>
+movs	r1, #0
+movs	r0, #10
+bl	<ADDR> <irq_set_enabled>
+dmb	sy
+bl	<ADDR> <pico9918_reset>
+ldr	r3, [pc, #192]	@ (<ADDR> <gpioIrqHandler+OFF>)
+movs	r5, #176	@ 0xb0
+ldr	r4, [r3, #0]
+ldr	r3, [pc, #188]	@ (<ADDR> <gpioIrqHandler+OFF>)
+lsls	r5, r5, #8
+adds	r0, r4, r3
+bl	<ADDR> <readConfig>
+movs	r2, #128	@ 0x80
+ldr	r3, [pc, #180]	@ (<ADDR> <gpioIrqHandler+OFF>)
+lsls	r2, r2, #2
+str	r2, [r3, #0]
+movs	r2, #128	@ 0x80
+lsls	r2, r2, #3
+str	r2, [r3, #0]
+movs	r3, #128	@ 0x80
+ldr	r2, [pc, #172]	@ (<ADDR> <gpioIrqHandler+OFF>)
+lsls	r3, r3, #24
+str	r3, [r2, #0]
+str	r3, [r2, #0]
+ldr	r2, [pc, #168]	@ (<ADDR> <gpioIrqHandler+OFF>)
+ldr	r6, [pc, #168]	@ (<ADDR> <gpioIrqHandler+OFF>)
+str	r3, [r2, #0]
+str	r3, [r2, #0]
+movs	r3, #0
+movs	r2, #248	@ 0xf8
+strb	r3, [r6, #0]
+adds	r3, #31
+strb	r3, [r4, r5]
+ldr	r3, [pc, #156]	@ (<ADDR> <gpioIrqHandler+OFF>)
+lsls	r2, r2, #5
+strh	r2, [r4, r3]
+movs	r2, #1
+ldr	r3, [pc, #152]	@ (<ADDR> <gpioIrqHandler+OFF>)
+strb	r2, [r4, r3]
+bl	<ADDR> <rendererReset>
+movs	r3, #255	@ 0xff
+ldrb	r2, [r6, #0]
+lsls	r2, r2, #8
+orrs	r2, r3
+ldr	r3, [pc, #140]	@ (<ADDR> <gpioIrqHandler+OFF>)
+ldrb	r3, [r4, r3]
+cmp	r3, #0
+beq.n	<ADDR> <gpioIrqHandler+OFF>
+ldr	r3, [pc, #136]	@ (<ADDR> <gpioIrqHandler+OFF>)
+ldrb	r1, [r4, r3]
+movs	r3, #15
+ands	r3, r1
+lsls	r1, r3, #24
+adds	r3, r4, r3
+ldrb	r3, [r3, r5]
+orrs	r2, r1
+lsls	r3, r3, #16
+orrs	r3, r2
+ldr	r2, [pc, #120]	@ (<ADDR> <gpioIrqHandler+OFF>)
+str	r3, [r2, #20]
+bl	<ADDR> <pico9918_splash_reset>
+ldr	r3, [pc, #96]	@ (<ADDR> <gpioIrqHandler+OFF>)
+ldrb	r3, [r4, r3]
+cmp	r3, #0
+bne.n	<ADDR> <gpioIrqHandler+OFF>
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #20]
+dmb	sy
+movs	r1, #1
+movs	r0, #9
+bl	<ADDR> <irq_set_enabled>
+movs	r1, #1
+movs	r0, #10
+bl	<ADDR> <irq_set_enabled>
+pop	{r4, r5, r6, pc}
+ldrb	r3, [r4, r5]
+lsls	r3, r3, #16
+orrs	r3, r2
+ldr	r2, [pc, #68]	@ (<ADDR> <gpioIrqHandler+OFF>)
+str	r3, [r2, #20]
+bl	<ADDR> <pico9918_splash_reset>
+ldr	r3, [pc, #44]	@ (<ADDR> <gpioIrqHandler+OFF>)
+ldrb	r3, [r4, r3]
+cmp	r3, #0
+beq.n	<ADDR> <gpioIrqHandler+OFF>
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #24]
+b.n	<ADDR> <gpioIrqHandler+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

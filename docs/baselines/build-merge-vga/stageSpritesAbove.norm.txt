@@ -1,0 +1,4 @@
+<ADDR> <stageSpritesAbove>:
+push	{r4, lr}
+bl	<ADDR> <vrEmuTms9918OutputSprites>
+pop	{r4, pc}

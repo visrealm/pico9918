@@ -1,0 +1,70 @@
+20017aa8 <pico9918_splash_render>:
+20017aa8:	b530      	push	{r4, r5, lr}
+20017aaa:	2800      	cmp	r0, #0
+20017aac:	d147      	bne.n	20017b3e <pico9918_splash_render+0x96>
+20017aae:	4d27      	ldr	r5, [pc, #156]	@ (20017b4c <pico9918_splash_render+0xa4>)
+20017ab0:	293b      	cmp	r1, #59	@ 0x3b
+20017ab2:	682c      	ldr	r4, [r5, #0]
+20017ab4:	d837      	bhi.n	20017b26 <pico9918_splash_render+0x7e>
+20017ab6:	3c01      	subs	r4, #1
+20017ab8:	602c      	str	r4, [r5, #0]
+20017aba:	441a      	add	r2, r3
+20017abc:	1a83      	subs	r3, r0, r2
+20017abe:	1b1b      	subs	r3, r3, r4
+20017ac0:	b29b      	uxth	r3, r3
+20017ac2:	2b09      	cmp	r3, #9
+20017ac4:	d82e      	bhi.n	20017b24 <pico9918_splash_render+0x7c>
+20017ac6:	b21b      	sxth	r3, r3
+20017ac8:	eb03 0143 	add.w	r1, r3, r3, lsl #1
+20017acc:	4820      	ldr	r0, [pc, #128]	@ (20017b50 <pico9918_splash_render+0xa8>)
+20017ace:	eb03 0181 	add.w	r1, r3, r1, lsl #2
+20017ad2:	eb03 0381 	add.w	r3, r3, r1, lsl #2
+20017ad6:	1819      	adds	r1, r3, r0
+20017ad8:	9a04      	ldr	r2, [sp, #16]
+20017ada:	481e      	ldr	r0, [pc, #120]	@ (20017b54 <pico9918_splash_render+0xac>)
+20017adc:	f101 0535 	add.w	r5, r1, #53	@ 0x35
+20017ae0:	f811 3b01 	ldrb.w	r3, [r1], #1
+20017ae4:	3208      	adds	r2, #8
+20017ae6:	099c      	lsrs	r4, r3, #6
+20017ae8:	bf18      	it	ne
+20017aea:	f830 4014 	ldrhne.w	r4, [r0, r4, lsl #1]
+20017aee:	f3c3 1e01 	ubfx	lr, r3, #4, #2
+20017af2:	bf18      	it	ne
+20017af4:	8014      	strhne	r4, [r2, #0]
+20017af6:	f013 0f30 	tst.w	r3, #48	@ 0x30
+20017afa:	bf18      	it	ne
+20017afc:	f830 401e 	ldrhne.w	r4, [r0, lr, lsl #1]
+20017b00:	f3c3 0c81 	ubfx	ip, r3, #2, #2
+20017b04:	bf18      	it	ne
+20017b06:	8054      	strhne	r4, [r2, #2]
+20017b08:	f013 0f0c 	tst.w	r3, #12
+20017b0c:	bf1c      	itt	ne
+20017b0e:	f830 401c 	ldrhne.w	r4, [r0, ip, lsl #1]
+20017b12:	8094      	strhne	r4, [r2, #4]
+20017b14:	f013 0303 	ands.w	r3, r3, #3
+20017b18:	bf1c      	itt	ne
+20017b1a:	f830 3013 	ldrhne.w	r3, [r0, r3, lsl #1]
+20017b1e:	80d3      	strhne	r3, [r2, #6]
+20017b20:	42a9      	cmp	r1, r5
+20017b22:	d1dd      	bne.n	20017ae0 <pico9918_splash_render+0x38>
+20017b24:	bd30      	pop	{r4, r5, pc}
+20017b26:	f8df c030 	ldr.w	ip, [pc, #48]	@ 20017b58 <pico9918_splash_render+0xb0>
+20017b2a:	f89c c000 	ldrb.w	ip, [ip]
+20017b2e:	f1bc 0f00 	cmp.w	ip, #0
+20017b32:	d0c2      	beq.n	20017aba <pico9918_splash_render+0x12>
+20017b34:	29f0      	cmp	r1, #240	@ 0xf0
+20017b36:	d9c0      	bls.n	20017aba <pico9918_splash_render+0x12>
+20017b38:	3401      	adds	r4, #1
+20017b3a:	602c      	str	r4, [r5, #0]
+20017b3c:	e7bd      	b.n	20017aba <pico9918_splash_render+0x12>
+20017b3e:	9903      	ldr	r1, [sp, #12]
+20017b40:	4288      	cmp	r0, r1
+20017b42:	d8ef      	bhi.n	20017b24 <pico9918_splash_render+0x7c>
+20017b44:	4901      	ldr	r1, [pc, #4]	@ (20017b4c <pico9918_splash_render+0xa4>)
+20017b46:	680c      	ldr	r4, [r1, #0]
+20017b48:	e7b7      	b.n	20017aba <pico9918_splash_render+0x12>
+20017b4a:	bf00      	nop
+20017b4c:	20026234 	.word	0x20026234
+20017b50:	2002b090 	.word	0x2002b090
+20017b54:	2002b2a4 	.word	0x2002b2a4
+20017b58:	2002c0ff 	.word	0x2002c0ff

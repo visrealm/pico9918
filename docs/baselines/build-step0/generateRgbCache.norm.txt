@@ -1,0 +1,289 @@
+20000390 <generateRgbCache>:
+movs	r3, #0
+push	{r4, r5, r6, lr}
+ldr	r4, [pc, #532]	@ (200005ac <generateRgbCache+0x21c>)
+sub	sp, #32
+ldr	r0, [r4, #0]
+strb	r3, [r0, #16]
+bl	2000b714 <vrEmuTms9918DisplayMode>
+ldr	r1, [r4, #0]
+ldr	r3, [pc, #524]	@ (200005b0 <generateRgbCache+0x220>)
+cmp	r0, #4
+beq.n	2000043e <generateRgbCache+0xae>
+ldr	r0, [pc, #520]	@ (200005b4 <generateRgbCache+0x224>)
+adds	r3, r1, r3
+adds	r4, r1, r0
+movs	r1, #240	@ 0xf0
+ldr	r2, [pc, #516]	@ (200005b8 <generateRgbCache+0x228>)
+ldrh	r5, [r3, #0]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+ldrh	r5, [r3, #2]
+str	r0, [r2, #0]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+ldrh	r5, [r3, #4]
+str	r0, [r2, #4]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+ldrh	r5, [r3, #6]
+str	r0, [r2, #8]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+ldrh	r5, [r3, #8]
+str	r0, [r2, #12]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+ldrh	r5, [r3, #10]
+str	r0, [r2, #16]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+ldrh	r5, [r3, #12]
+str	r0, [r2, #20]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+ldrh	r5, [r3, #14]
+str	r0, [r2, #24]
+bics	r5, r1
+lsrs	r0, r5, #12
+lsls	r0, r0, #4
+orrs	r0, r5
+lsls	r5, r0, #16
+adds	r0, r5, r0
+adds	r3, #16
+str	r0, [r2, #28]
+adds	r2, #32
+cmp	r4, r3
+bne.n	200003b2 <generateRgbCache+0x22>
+add	sp, #32
+pop	{r4, r5, r6, pc}
+ldrh	r2, [r1, r3]
+movs	r3, #240	@ 0xf0
+mov	r4, sp
+bics	r2, r3
+lsrs	r0, r2, #12
+lsls	r0, r0, #4
+orrs	r2, r0
+lsls	r5, r2, #16
+ldr	r0, [pc, #360]	@ (200005b8 <generateRgbCache+0x228>)
+strh	r2, [r4, #0]
+adds	r2, r5, r2
+str	r2, [r0, #0]
+ldr	r2, [pc, #356]	@ (200005bc <generateRgbCache+0x22c>)
+movs	r6, #15
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #2]
+adds	r2, r5, r2
+str	r2, [r0, #4]
+ldr	r2, [pc, #336]	@ (200005c0 <generateRgbCache+0x230>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #4]
+adds	r2, r5, r2
+str	r2, [r0, #8]
+ldr	r2, [pc, #320]	@ (200005c4 <generateRgbCache+0x234>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #6]
+adds	r2, r5, r2
+str	r2, [r0, #12]
+ldr	r2, [pc, #304]	@ (200005c8 <generateRgbCache+0x238>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #8]
+adds	r2, r5, r2
+str	r2, [r0, #16]
+ldr	r2, [pc, #288]	@ (200005cc <generateRgbCache+0x23c>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #10]
+adds	r2, r5, r2
+str	r2, [r0, #20]
+ldr	r2, [pc, #272]	@ (200005d0 <generateRgbCache+0x240>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #12]
+adds	r2, r5, r2
+str	r2, [r0, #24]
+ldr	r2, [pc, #256]	@ (200005d4 <generateRgbCache+0x244>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #14]
+adds	r2, r5, r2
+str	r2, [r0, #28]
+ldr	r2, [pc, #240]	@ (200005d8 <generateRgbCache+0x248>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #16]
+adds	r2, r5, r2
+str	r2, [r0, #32]
+ldr	r2, [pc, #224]	@ (200005dc <generateRgbCache+0x24c>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #18]
+adds	r2, r5, r2
+str	r2, [r0, #36]	@ 0x24
+ldr	r2, [pc, #208]	@ (200005e0 <generateRgbCache+0x250>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #20]
+adds	r2, r5, r2
+str	r2, [r0, #40]	@ 0x28
+ldr	r2, [pc, #192]	@ (200005e4 <generateRgbCache+0x254>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #22]
+adds	r2, r5, r2
+str	r2, [r0, #44]	@ 0x2c
+ldr	r2, [pc, #176]	@ (200005e8 <generateRgbCache+0x258>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #24]
+adds	r2, r5, r2
+str	r2, [r0, #48]	@ 0x30
+ldr	r2, [pc, #160]	@ (200005ec <generateRgbCache+0x25c>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #26]
+adds	r2, r5, r2
+str	r2, [r0, #52]	@ 0x34
+ldr	r2, [pc, #144]	@ (200005f0 <generateRgbCache+0x260>)
+ldrh	r2, [r1, r2]
+bics	r2, r3
+lsrs	r5, r2, #12
+lsls	r5, r5, #4
+orrs	r2, r5
+lsls	r5, r2, #16
+strh	r2, [r4, #28]
+adds	r2, r5, r2
+str	r2, [r0, #56]	@ 0x38
+ldr	r2, [pc, #128]	@ (200005f4 <generateRgbCache+0x264>)
+movs	r5, #128	@ 0x80
+ldrh	r2, [r1, r2]
+lsls	r5, r5, #1
+bics	r2, r3
+movs	r3, r2
+lsrs	r2, r2, #12
+lsls	r2, r2, #4
+orrs	r3, r2
+lsls	r2, r3, #16
+strh	r3, [r4, #30]
+adds	r3, r2, r3
+movs	r2, #16
+str	r3, [r0, #60]	@ 0x3c
+adds	r0, #64	@ 0x40
+movs	r3, r6
+ands	r3, r2
+asrs	r1, r2, #4
+lsls	r3, r3, #1
+ldrh	r3, [r4, r3]
+lsls	r1, r1, #1
+ldrh	r1, [r4, r1]
+lsls	r3, r3, #16
+orrs	r3, r1
+adds	r2, #1
+stmia	r0!, {r3}
+cmp	r2, r5
+bne.n	2000058e <generateRgbCache+0x1fe>
+b.n	2000043a <generateRgbCache+0xaa>
+nop			@ (mov r8, r8)
+200005ac:	2000c7e4 	.word	0x2000c7e4
+200005b0:	0000502c 	.word	0x0000502c
+200005b4:	000050ac 	.word	0x000050ac
+200005b8:	20025b68 	.word	0x20025b68
+200005bc:	0000502e 	.word	0x0000502e
+200005c0:	00005030 	.word	0x00005030
+200005c4:	00005032 	.word	0x00005032
+200005c8:	00005034 	.word	0x00005034
+200005cc:	00005036 	.word	0x00005036
+200005d0:	00005038 	.word	0x00005038
+200005d4:	0000503a 	.word	0x0000503a
+200005d8:	0000503c 	.word	0x0000503c
+200005dc:	0000503e 	.word	0x0000503e
+200005e0:	00005040 	.word	0x00005040
+200005e4:	00005042 	.word	0x00005042
+200005e8:	00005044 	.word	0x00005044
+200005ec:	00005046 	.word	0x00005046
+200005f0:	00005048 	.word	0x00005048
+200005f4:	0000504a 	.word	0x0000504a

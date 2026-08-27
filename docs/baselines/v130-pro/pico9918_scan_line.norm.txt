@@ -1,0 +1,157 @@
+<ADDR> <pico9918_scan_line>:
+ldr	r3, [pc, #380]	@ (<ADDR> <pico9918_scan_line+OFF>)
+push	{r4, r5, r6, lr}
+ldrb	r3, [r3, #0]
+mov	r6, r0
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_scan_line+OFF>
+ldr	r3, [pc, #372]	@ (<ADDR> <pico9918_scan_line+OFF>)
+ldrb	r1, [r3, #0]
+ldrb	r2, [r3, #1]
+lsls	r0, r1, #30
+bmi.n	<ADDR> <pico9918_scan_line+OFF>
+lsls	r1, r1, #29
+bmi.n	<ADDR> <pico9918_scan_line+OFF>
+ldr	r0, [pc, #360]	@ (<ADDR> <pico9918_scan_line+OFF>)
+ldr	r4, [pc, #364]	@ (<ADDR> <pico9918_scan_line+OFF>)
+ubfx	r1, r2, #3, #2
+ldrb	r0, [r0, r1]
+ldrb	r1, [r4, #0]
+cmp	r1, r0
+beq.n	<ADDR> <pico9918_scan_line+OFF>
+movs	r1, #1
+add.w	r5, r3, #40960	@ 0xa000
+strb	r0, [r4, #0]
+strb.w	r1, [r5, #52]	@ 0x34
+ldrb	r1, [r3, #7]
+cmp	r0, #4
+and.w	r1, r1, #15
+beq.w	<ADDR> <pico9918_scan_line+OFF>
+mov.w	lr, #64	@ 0x40
+ldrb	r3, [r3, #24]
+lsls	r3, r3, #4
+and.w	r3, r3, #48	@ 0x30
+orrs	r3, r1
+mov.w	r1, #<ADDR>	@ 0xADDR
+mul.w	r3, r1, r3
+movs	r1, #0
+ldr	r5, [pc, #304]	@ (<ADDR> <pico9918_scan_line+OFF>)
+ldr	r0, [pc, #308]	@ (<ADDR> <pico9918_scan_line+OFF>)
+str	r3, [r5, #0]
+ldr.w	ip, [pc, #328]	@ <ADDR> <pico9918_scan_line+OFF>
+ldr	r3, [pc, #304]	@ (<ADDR> <pico9918_scan_line+OFF>)
+str.w	lr, [r0, #136]	@ 0x88
+str.w	ip, [r0, #172]	@ 0xac
+str.w	ip, [r3]
+ldr	r3, [pc, #292]	@ (<ADDR> <pico9918_scan_line+OFF>)
+lsls	r5, r2, #25
+strb	r1, [r3, #0]
+bpl.n	<ADDR> <pico9918_scan_line+OFF>
+ldr	r3, [pc, #288]	@ (<ADDR> <pico9918_scan_line+OFF>)
+movs	r2, #136	@ 0x88
+str	r3, [r0, #108]	@ 0x6c
+ldr	r0, [pc, #288]	@ (<ADDR> <pico9918_scan_line+OFF>)
+bl	<ADDR> <memset>
+movs	r1, #0
+mov.w	r2, #1342177280	@ 0xADDR
+ldr	r5, [pc, #280]	@ (<ADDR> <pico9918_scan_line+OFF>)
+strb.w	r1, [r5, #54]	@ 0x36
+ldr.w	r3, [r2, #336]	@ 0x150
+lsls	r0, r3, #5
+bmi.n	<ADDR> <pico9918_scan_line+OFF>
+ldrb	r3, [r4, #0]
+cmp	r3, #4
+bhi.n	<ADDR> <pico9918_scan_line+OFF>
+tbb	[pc, r3]
+.short	0x4444
+.short	0x4448
+<ADDR>:	48          	.byte	0x48
+<ADDR>:	00          	.byte	0x00
+ldr	r4, [pc, #220]	@ (<ADDR> <pico9918_scan_line+OFF>)
+ldrb	r1, [r4, #0]
+cmp	r1, #4
+beq.n	<ADDR> <pico9918_scan_line+OFF>
+movs	r0, #4
+mov.w	ip, #1
+ldrb	r1, [r3, #7]
+add.w	r5, r3, #40960	@ 0xa000
+and.w	r1, r1, #15
+strb.w	ip, [r5, #52]	@ 0x34
+strb	r0, [r4, #0]
+ldrb.w	r0, [r5, #47]	@ 0x2f
+cmp	r0, #0
+bne.n	<ADDR> <pico9918_scan_line+OFF>
+add.w	r3, r1, r1, lsl #4
+mov.w	lr, #64	@ 0x40
+mov.w	r1, #<ADDR>	@ 0xADDR
+mul.w	r3, r1, r3
+b.n	<ADDR> <pico9918_scan_line+OFF>
+bl	<ADDR> <text_scan_line.constprop.0>
+ldrb.w	r3, [r5, #47]	@ 0x2f
+cmp	r3, #0
+bne.n	<ADDR> <pico9918_scan_line+OFF>
+movs	r0, #0
+mov.w	r2, #1342177280	@ 0xADDR
+ldr.w	r3, [r2, #400]	@ 0x190
+lsls	r1, r3, #5
+bmi.n	<ADDR> <pico9918_scan_line+OFF>
+mov.w	r2, #1342177280	@ 0xADDR
+ldr.w	r3, [r2, #464]	@ 0x1d0
+lsls	r3, r3, #5
+bmi.n	<ADDR> <pico9918_scan_line+OFF>
+pop	{r4, r5, r6, pc}
+ldr	r4, [pc, #124]	@ (<ADDR> <pico9918_scan_line+OFF>)
+ldrb	r1, [r4, #0]
+cmp	r1, #1
+beq.n	<ADDR> <pico9918_scan_line+OFF>
+movs	r0, #1
+ldrb	r1, [r3, #7]
+add.w	r5, r3, #40960	@ 0xa000
+and.w	r1, r1, #15
+strb.w	r0, [r5, #52]	@ 0x34
+strb	r0, [r4, #0]
+b.n	<ADDR> <pico9918_scan_line+OFF>
+bl	<ADDR> <__initLookups_veneer>
+b.n	<ADDR> <pico9918_scan_line+OFF>
+mov	r0, r6
+bl	<ADDR> <graphics_i_scan_line.constprop.0>
+b.n	<ADDR> <pico9918_scan_line+OFF>
+ldrb.w	r3, [r5, #47]	@ 0x2f
+mov	r0, r6
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_scan_line+OFF>
+bl	<ADDR> <graphics_i_scan_line.constprop.0>
+b.n	<ADDR> <pico9918_scan_line+OFF>
+ldrb	r1, [r3, #7]
+add.w	r5, r3, #40960	@ 0xa000
+and.w	r1, r1, #15
+b.n	<ADDR> <pico9918_scan_line+OFF>
+ldrb	r3, [r3, #24]
+mov.w	lr, #128	@ 0x80
+lsls	r3, r3, #4
+and.w	r3, r3, #48	@ 0x30
+orrs	r3, r1
+mov.w	r1, #<ADDR>	@ 0xADDR
+mul.w	r3, r1, r3
+b.n	<ADDR> <pico9918_scan_line+OFF>
+ldrb	r1, [r3, #7]
+and.w	r1, r1, #15
+b.n	<ADDR> <pico9918_scan_line+OFF>
+ldr	r5, [pc, #52]	@ (<ADDR> <pico9918_scan_line+OFF>)
+b.n	<ADDR> <pico9918_scan_line+OFF>
+mov	r0, r6
+bl	<ADDR> <pico9918_output_sprites.constprop.0>
+b.n	<ADDR> <pico9918_scan_line+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

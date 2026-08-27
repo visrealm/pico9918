@@ -1,0 +1,34 @@
+# Derived from the existing PICO9918 sources, not a stock preset: 2-space indent,
+# Allman braces, `Type* name`, and the column-aligned #define and assignment
+# blocks the codebase already uses. Tables laid out to be read by column are
+# fenced with `// clang-format off` rather than accommodated here.
+Language: Cpp
+BasedOnStyle: LLVM
+
+IndentWidth: 2
+ContinuationIndentWidth: 2
+UseTab: Never
+ColumnLimit: 110
+
+BreakBeforeBraces: Allman
+PointerAlignment: Left
+DerivePointerAlignment: false
+SpaceAfterCStyleCast: false
+
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
+
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignEscapedNewlines: DontAlign
+AlignTrailingComments: true
+
+IndentCaseLabels: false
+SortIncludes: Never
+ReflowComments: false
+MaxEmptyLinesToKeep: 2
+InsertNewlineAtEOF: true

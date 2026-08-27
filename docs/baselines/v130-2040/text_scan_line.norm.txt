@@ -1,0 +1,581 @@
+<ADDR> <text_scan_line.constprop.0>:
+push	{r4, r5, r6, r7, lr}
+mov	r6, r9
+mov	lr, fp
+mov	r7, sl
+mov	r5, r8
+push	{r5, r6, r7, lr}
+ldr	r3, [pc, #824]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+sub	sp, #60	@ 0x3c
+ldrb	r2, [r3, #0]
+str	r3, [sp, #44]	@ 0x2c
+ldr	r4, [pc, #820]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldr	r3, [pc, #824]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+str	r0, [sp, #16]
+mov	r9, r2
+ldrb	r3, [r4, r3]
+cmp	r2, #4
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+cmp	r3, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r2, #240	@ 0xf0
+lsls	r2, r2, #6
+mov	fp, r2
+movs	r2, #40	@ 0x28
+str	r2, [sp, #20]
+movs	r2, #0
+mov	r8, r2
+ldr	r2, [pc, #792]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r1, [r4, r2]
+ldr	r2, [sp, #16]
+movs	r0, r2
+cmp	r1, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+adds	r1, r1, r2
+ldr	r2, [pc, #784]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r0, [r4, r2]
+movs	r2, #64	@ 0x40
+ands	r2, r0
+negs	r0, r2
+adcs	r2, r0
+movs	r0, #47	@ 0x2f
+negs	r2, r2
+bics	r2, r0
+movs	r0, #192	@ 0xc0
+lsls	r0, r0, #7
+ldrb	r0, [r4, r0]
+adds	r2, #240	@ 0xf0
+lsls	r0, r0, #28
+lsrs	r0, r0, #31
+lsls	r2, r0
+cmp	r1, r2
+blt.n	<ADDR> <text_scan_line.constprop.0+OFF>
+subs	r1, r1, r2
+uxth	r0, r1
+mov	r5, fp
+ldr	r2, [sp, #20]
+lsrs	r1, r0, #3
+muls	r1, r2
+ldr	r2, [pc, #740]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r2, [r4, r2]
+lsls	r2, r2, #10
+ands	r2, r5
+adds	r2, r1, r2
+uxth	r2, r2
+str	r2, [sp, #24]
+movs	r2, #7
+mov	r5, r9
+ands	r2, r0
+ldr	r0, [pc, #724]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r0, [r4, r0]
+cmp	r5, #1
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+lsls	r0, r0, #6
+mov	sl, r0
+mov	r0, r8
+cmp	r0, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+add	r1, sl
+lsls	r1, r1, #18
+lsrs	r1, r1, #18
+mov	sl, r1
+movs	r0, #7
+ldr	r1, [pc, #696]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r1, [r4, r1]
+ands	r1, r0
+lsls	r1, r1, #11
+adds	r1, r1, r2
+ldr	r2, [pc, #692]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+adds	r1, r4, r1
+ldrb	r2, [r4, r2]
+str	r2, [sp, #28]
+cmp	r3, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r7, #171	@ 0xab
+ldr	r3, [pc, #680]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+lsls	r7, r7, #1
+ldrb	r3, [r4, r3]
+lsls	r3, r3, #1
+muls	r7, r3
+lsrs	r7, r7, #11
+lsls	r2, r7, #1
+adds	r2, r2, r7
+lsls	r2, r2, #1
+subs	r2, r3, r2
+str	r3, [sp, #36]	@ 0x24
+lsrs	r3, r2, #1
+mov	ip, r3
+uxth	r3, r7
+str	r3, [sp, #32]
+mov	r3, ip
+uxtb	r3, r3
+str	r3, [sp, #40]	@ 0x28
+uxth	r3, r7
+cmp	r7, ip
+bcc.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+mov	r2, ip
+adds	r3, #80	@ 0x50
+subs	r3, r3, r2
+uxth	r3, r3
+str	r3, [sp, #48]	@ 0x30
+movs	r3, #84	@ 0x54
+str	r3, [sp, #52]	@ 0x34
+movs	r5, #160	@ 0xa0
+movs	r2, #200	@ 0xc8
+movs	r0, #128	@ 0x80
+lsls	r5, r5, #23
+lsls	r2, r2, #1
+lsls	r0, r0, #17
+ldr	r3, [r5, r2]
+movs	r6, r3
+ands	r6, r0
+tst	r3, r0
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+mov	r3, r8
+cmp	r3, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #600]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r3, [r4, r3]
+lsls	r3, r3, #27
+bmi.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #564]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r2, [r4, r3]
+ldrsb	r3, [r4, r3]
+cmp	r3, #0
+bge.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r1, #252	@ 0xfc
+ldr	r3, [pc, #580]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldr	r2, [r3, #0]
+ldr	r3, [pc, #580]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+str	r2, [r3, r1]
+subs	r1, #4
+str	r2, [r3, #4]
+str	r2, [r3, #0]
+str	r2, [r3, r1]
+add	sp, #60	@ 0x3c
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+movs	r2, #40	@ 0x28
+str	r2, [sp, #20]
+ldr	r2, [pc, #540]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r2, [r4, r2]
+lsls	r2, r2, #30
+lsrs	r2, r2, #31
+mov	r8, r2
+movs	r2, #240	@ 0xf0
+lsls	r2, r2, #6
+mov	fp, r2
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r7, #0
+str	r3, [sp, #36]	@ 0x24
+str	r3, [sp, #48]	@ 0x30
+str	r3, [sp, #32]
+movs	r3, #80	@ 0x50
+str	r3, [sp, #52]	@ 0x34
+movs	r3, #0
+mov	ip, r3
+str	r3, [sp, #40]	@ 0x28
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r6, #15
+ldr	r3, [sp, #28]
+ands	r6, r3
+ldr	r3, [pc, #488]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r5, [r4, r3]
+lsrs	r3, r5, #4
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r5, r3
+mov	r2, r9
+ldr	r3, [sp, #24]
+adds	r3, r4, r3
+cmp	r2, #4
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r2, [pc, #488]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+muls	r6, r2
+muls	r5, r2
+movs	r2, #15
+mov	r8, r1
+mov	ip, r2
+ldr	r4, [pc, #480]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldr	r7, [pc, #484]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+eors	r5, r6
+mov	r1, r8
+ldrb	r2, [r3, #0]
+lsls	r2, r2, #3
+ldrb	r2, [r2, r1]
+lsrs	r0, r2, #4
+lsls	r0, r0, #2
+ldr	r0, [r7, r0]
+ands	r0, r5
+eors	r0, r6
+str	r0, [r4, #0]
+mov	r0, ip
+ands	r2, r0
+lsls	r2, r2, #2
+ldr	r2, [r7, r2]
+ands	r2, r5
+eors	r2, r6
+strh	r2, [r4, #4]
+ldrb	r2, [r3, #1]
+adds	r3, #2
+lsls	r2, r2, #3
+ldrb	r0, [r2, r1]
+mov	r1, ip
+lsrs	r2, r0, #4
+ands	r0, r1
+lsls	r2, r2, #2
+lsls	r0, r0, #2
+ldr	r2, [r7, r2]
+ldr	r0, [r7, r0]
+ands	r2, r5
+ands	r0, r5
+eors	r2, r6
+eors	r0, r6
+strh	r2, [r4, #6]
+lsls	r0, r0, #16
+lsrs	r2, r2, #16
+orrs	r2, r0
+str	r2, [r4, #8]
+ldr	r2, [pc, #408]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+adds	r4, #12
+cmp	r4, r2
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+adds	r5, #126	@ 0x7e
+bics	r0, r5
+lsls	r0, r0, #6
+mov	sl, r0
+mov	r0, r8
+cmp	r0, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+add	r1, sl
+lsls	r1, r1, #18
+lsrs	r1, r1, #18
+mov	sl, r1
+movs	r0, #4
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+cmp	r3, #0
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r2, #192	@ 0xc0
+lsls	r2, r2, #6
+mov	fp, r2
+movs	r2, #80	@ 0x50
+str	r2, [sp, #20]
+movs	r2, #0
+mov	r8, r2
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r2, #80	@ 0x50
+str	r2, [sp, #20]
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r0, [pc, #352]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+lsls	r6, r6, #2
+lsls	r5, r5, #2
+ldr	r6, [r6, r0]
+ldr	r5, [r5, r0]
+ldr	r2, [sp, #40]	@ 0x28
+eors	r5, r6
+cmp	r2, #0
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r2, [sp, #32]
+cmp	r2, #79	@ 0x4f
+bls.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r2, #81	@ 0x51
+str	r2, [sp, #16]
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #24]
+mov	r2, ip
+adds	r0, r4, r3
+mov	r3, sl
+adds	r5, r4, r3
+movs	r3, #255	@ 0xff
+ands	r3, r2
+ldr	r2, [pc, #292]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+lsls	r3, r3, #2
+subs	r2, r2, r3
+ldr	r3, [sp, #36]	@ 0x24
+cmp	r3, #0
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r3, [sp, #52]	@ 0x34
+str	r2, [sp, #0]
+str	r3, [sp, #8]
+ldr	r3, [sp, #48]	@ 0x30
+movs	r2, r5
+str	r3, [sp, #4]
+movs	r3, #1
+bl	<ADDR> <text80RowScrolled>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #208]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r3, [r4, r3]
+cmp	r3, #0
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+ldr	r3, [pc, #264]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r6, [r4, r3]
+movs	r3, #171	@ 0xab
+lsls	r6, r6, #1
+lsls	r3, r3, #1
+muls	r3, r6
+lsrs	r3, r3, #11
+lsls	r1, r3, #1
+adds	r1, r1, r3
+lsls	r1, r1, #1
+subs	r1, r6, r1
+lsrs	r0, r1, #1
+cmp	r3, r0
+bcc.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+adds	r3, #80	@ 0x50
+subs	r3, r3, r0
+uxth	r3, r3
+mov	r8, r3
+movs	r3, #84	@ 0x54
+movs	r1, #255	@ 0xff
+mov	r9, r3
+ldr	r5, [pc, #204]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ands	r1, r0
+lsls	r1, r1, #2
+subs	r5, r5, r1
+ldr	r1, [pc, #216]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ldrb	r1, [r4, r1]
+cmp	r1, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r0, #64	@ 0x40
+ands	r2, r0
+negs	r0, r2
+adcs	r2, r0
+movs	r0, #47	@ 0x2f
+negs	r2, r2
+bics	r2, r0
+movs	r0, #192	@ 0xc0
+lsls	r0, r0, #7
+ldrb	r0, [r4, r0]
+ldr	r3, [sp, #16]
+lsls	r0, r0, #28
+adds	r2, #240	@ 0xf0
+lsrs	r0, r0, #31
+adds	r1, r1, r3
+lsls	r2, r0
+cmp	r1, r2
+blt.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+uxth	r3, r1
+str	r3, [sp, #16]
+ldr	r3, [sp, #16]
+ldr	r1, [sp, #20]
+movs	r7, #7
+lsrs	r2, r3, #3
+muls	r2, r1
+ldr	r1, [pc, #160]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+ands	r3, r7
+ldrb	r0, [r4, r1]
+mov	r1, fp
+mov	ip, r3
+ldr	r3, [sp, #44]	@ 0x2c
+lsls	r0, r0, #10
+ands	r0, r1
+ldrb	r7, [r3, #0]
+ldr	r1, [pc, #144]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+adds	r0, r2, r0
+ldrb	r1, [r4, r1]
+uxth	r0, r0
+cmp	r7, #1
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r7, #7
+lsls	r1, r1, #6
+adds	r2, r2, r1
+lsls	r2, r2, #18
+lsrs	r2, r2, #18
+ldr	r1, [pc, #64]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+adds	r0, r4, r0
+ldrb	r1, [r4, r1]
+adds	r2, r4, r2
+ands	r1, r7
+lsls	r1, r1, #11
+add	r1, ip
+adds	r1, r4, r1
+cmp	r6, #0
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+mov	r3, r9
+str	r3, [sp, #8]
+mov	r3, r8
+str	r5, [sp, #0]
+str	r3, [sp, #4]
+movs	r3, #0
+bl	<ADDR> <text80RowScrolled>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldr	r2, [sp, #32]
+cmp	r2, #79	@ 0x4f
+bls.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r2, #79	@ 0x4f
+mov	sl, r2
+adds	r2, #1
+mov	fp, r2
+str	r2, [sp, #16]
+movs	r0, #255	@ 0xff
+mov	r2, ip
+mov	ip, sl
+ands	r2, r0
+ldr	r0, [pc, #252]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+subs	r0, r0, r2
+adds	r2, r3, r7
+adds	r4, r2, #1
+add	ip, r4
+mov	r8, ip
+ldr	r7, [pc, #244]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+mov	ip, r3
+str	r0, [sp, #20]
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+adds	r4, #1
+ldrb	r2, [r2, #0]
+lsls	r2, r2, #3
+ldrb	r2, [r2, r1]
+lsls	r2, r2, #2
+ldr	r2, [r7, r2]
+ands	r2, r5
+eors	r2, r6
+strb	r2, [r0, #0]
+lsrs	r3, r2, #8
+lsrs	r2, r2, #16
+strb	r2, [r0, #2]
+strb	r3, [r0, #1]
+movs	r2, r4
+adds	r0, #3
+cmp	r4, r8
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+mov	r4, fp
+ldr	r2, [sp, #16]
+mov	r3, ip
+mov	r9, r7
+cmp	r4, r2
+bcc.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+mov	r7, sl
+ldr	r0, [sp, #20]
+lsls	r2, r7, #1
+adds	r2, r2, r7
+adds	r0, #3
+adds	r0, r0, r2
+ldr	r2, [sp, #16]
+mov	ip, r9
+adds	r2, r3, r2
+subs	r2, r2, r4
+movs	r7, r2
+mov	r4, ip
+ldrb	r2, [r3, #0]
+adds	r3, #1
+lsls	r2, r2, #3
+ldrb	r2, [r2, r1]
+lsls	r2, r2, #2
+ldr	r2, [r4, r2]
+ands	r2, r5
+eors	r2, r6
+strb	r2, [r0, #0]
+lsrs	r4, r2, #8
+lsrs	r2, r2, #16
+strb	r4, [r0, #1]
+strb	r2, [r0, #2]
+adds	r0, #3
+cmp	r3, r7
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+str	r2, [sp, #0]
+movs	r3, #1
+movs	r2, r5
+bl	<ADDR> <text80Row.constprop.0>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+mov	r8, r3
+movs	r3, #80	@ 0x50
+ldr	r5, [pc, #112]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+mov	r9, r3
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r3, #0
+str	r5, [sp, #0]
+bl	<ADDR> <text80Row.constprop.0>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+cmp	r7, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r2, #80	@ 0x50
+str	r2, [sp, #16]
+movs	r0, #80	@ 0x50
+subs	r2, r0, r7
+subs	r0, #1
+mov	fp, r2
+subs	r2, r0, r7
+mov	sl, r2
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r2, #80	@ 0x50
+mov	sl, r2
+adds	r2, #1
+mov	fp, r2
+str	r2, [sp, #16]
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+subs	r1, r1, r2
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r7, #127	@ 0x7f
+bics	r1, r7
+lsls	r1, r1, #6
+adds	r2, r2, r1
+lsls	r2, r2, #18
+lsrs	r2, r2, #18
+subs	r7, #123	@ 0x7b
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+subs	r3, r3, r0
+uxth	r3, r3
+mov	r8, r3
+cmp	r0, #0
+beq.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r3, #84	@ 0x54
+ldr	r5, [pc, #28]	@ (<ADDR> <text_scan_line.constprop.0+OFF>)
+lsls	r1, r1, #1
+mov	r9, r3
+subs	r5, r5, r1
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+mov	r2, ip
+subs	r3, r3, r2
+uxth	r3, r3
+str	r3, [sp, #48]	@ 0x30
+cmp	r2, #0
+bne.n	<ADDR> <text_scan_line.constprop.0+OFF>
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+movs	r3, #84	@ 0x54
+str	r3, [sp, #52]	@ 0x34
+b.n	<ADDR> <text_scan_line.constprop.0+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>

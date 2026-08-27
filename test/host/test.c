@@ -1,4 +1,7 @@
-/*
+/**
+ * \file
+ * \brief a second Pico driving the TMS9918A bus, to prove the host interface
+ *
  * Project: pico9918
  *
  * Copyright (c) 2024 Troy Schrapel
@@ -6,7 +9,6 @@
  * This code is licensed under the MIT license
  *
  * https://github.com/visrealm/pico9918
- *
  */
 
  /*
@@ -32,7 +34,7 @@
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
-#include "clocks.pio.h"
+#include "hostclocks.pio.h"
 
 #include "breakout.h"
 
@@ -486,13 +488,13 @@ int main(void)
 {
   set_sys_clock_khz(252000, false);
 
-  uint clocksPioOffset = pio_add_program(pio0, &clock_program);
+  uint clocksPioOffset = pio_add_program(pio0, &hostclock_program);
 
   uint gromClkSm = pio_claim_unused_sm(pio0, true);
   uint cpuClkSm = pio_claim_unused_sm(pio0, true);
 
-  clock_program_init(pio0, gromClkSm, clocksPioOffset, GPIO_GROMCL);
-  clock_program_init(pio0, cpuClkSm, clocksPioOffset, GPIO_CPUCL);
+  hostclock_program_init(pio0, gromClkSm, clocksPioOffset, GPIO_GROMCL);
+  hostclock_program_init(pio0, cpuClkSm, clocksPioOffset, GPIO_CPUCL);
 
   float clockDiv = (float)clock_get_hz(clk_sys) / (TMS_CRYSTAL_FREQ_HZ * 10.0f);
 

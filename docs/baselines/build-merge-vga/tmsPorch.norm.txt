@@ -1,0 +1,4 @@
+<ADDR> <tmsPorch>:
+push	{r4, lr}
+bl	<ADDR> <vrEmuTmsFramePorch>
+pop	{r4, pc}

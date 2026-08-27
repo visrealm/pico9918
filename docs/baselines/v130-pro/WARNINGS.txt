@@ -1,0 +1,1 @@
+WARN: symbol renderSprites not found (inlined or renamed?)

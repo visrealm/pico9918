@@ -1,0 +1,378 @@
+20019d18 <dmaIrqHandler>:
+20019d18:	22a0      	movs	r2, #160	@ 0xa0
+20019d1a:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+20019d1c:	49b6      	ldr	r1, [pc, #728]	@ (20019ff8 <dmaIrqHandler+0x2e0>)
+20019d1e:	4bb7      	ldr	r3, [pc, #732]	@ (20019ffc <dmaIrqHandler+0x2e4>)
+20019d20:	05d2      	lsls	r2, r2, #23
+20019d22:	58d0      	ldr	r0, [r2, r3]
+20019d24:	6809      	ldr	r1, [r1, #0]
+20019d26:	4201      	tst	r1, r0
+20019d28:	d03d      	beq.n	20019da6 <dmaIrqHandler+0x8e>
+20019d2a:	50d1      	str	r1, [r2, r3]
+20019d2c:	2244      	movs	r2, #68	@ 0x44
+20019d2e:	48b4      	ldr	r0, [pc, #720]	@ (2001a000 <dmaIrqHandler+0x2e8>)
+20019d30:	4db4      	ldr	r5, [pc, #720]	@ (2001a004 <dmaIrqHandler+0x2ec>)
+20019d32:	6803      	ldr	r3, [r0, #0]
+20019d34:	5caa      	ldrb	r2, [r5, r2]
+20019d36:	3301      	adds	r3, #1
+20019d38:	2a00      	cmp	r2, #0
+20019d3a:	d100      	bne.n	20019d3e <dmaIrqHandler+0x26>
+20019d3c:	e0a9      	b.n	20019e92 <dmaIrqHandler+0x17a>
+20019d3e:	4cb2      	ldr	r4, [pc, #712]	@ (2001a008 <dmaIrqHandler+0x2f0>)
+20019d40:	6003      	str	r3, [r0, #0]
+20019d42:	6821      	ldr	r1, [r4, #0]
+20019d44:	00ca      	lsls	r2, r1, #3
+20019d46:	1a52      	subs	r2, r2, r1
+20019d48:	0092      	lsls	r2, r2, #2
+20019d4a:	18ae      	adds	r6, r5, r2
+20019d4c:	3664      	adds	r6, #100	@ 0x64
+20019d4e:	8836      	ldrh	r6, [r6, #0]
+20019d50:	429e      	cmp	r6, r3
+20019d52:	dc00      	bgt.n	20019d56 <dmaIrqHandler+0x3e>
+20019d54:	e0b4      	b.n	20019ec0 <dmaIrqHandler+0x1a8>
+20019d56:	324a      	adds	r2, #74	@ 0x4a
+20019d58:	18aa      	adds	r2, r5, r2
+20019d5a:	7815      	ldrb	r5, [r2, #0]
+20019d5c:	429d      	cmp	r5, r3
+20019d5e:	dd15      	ble.n	20019d8c <dmaIrqHandler+0x74>
+20019d60:	18d2      	adds	r2, r2, r3
+20019d62:	7853      	ldrb	r3, [r2, #1]
+20019d64:	49a9      	ldr	r1, [pc, #676]	@ (2001a00c <dmaIrqHandler+0x2f4>)
+20019d66:	009b      	lsls	r3, r3, #2
+20019d68:	585a      	ldr	r2, [r3, r1]
+20019d6a:	23a0      	movs	r3, #160	@ 0xa0
+20019d6c:	21a0      	movs	r1, #160	@ 0xa0
+20019d6e:	05db      	lsls	r3, r3, #23
+20019d70:	63da      	str	r2, [r3, #60]	@ 0x3c
+20019d72:	4ba7      	ldr	r3, [pc, #668]	@ (2001a010 <dmaIrqHandler+0x2f8>)
+20019d74:	4aa1      	ldr	r2, [pc, #644]	@ (20019ffc <dmaIrqHandler+0x2e4>)
+20019d76:	05c9      	lsls	r1, r1, #23
+20019d78:	681b      	ldr	r3, [r3, #0]
+20019d7a:	5888      	ldr	r0, [r1, r2]
+20019d7c:	4203      	tst	r3, r0
+20019d7e:	d11a      	bne.n	20019db6 <dmaIrqHandler+0x9e>
+20019d80:	4ba4      	ldr	r3, [pc, #656]	@ (2001a014 <dmaIrqHandler+0x2fc>)
+20019d82:	781b      	ldrb	r3, [r3, #0]
+20019d84:	2b00      	cmp	r3, #0
+20019d86:	d000      	beq.n	20019d8a <dmaIrqHandler+0x72>
+20019d88:	e095      	b.n	20019eb6 <dmaIrqHandler+0x19e>
+20019d8a:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+20019d8c:	7a50      	ldrb	r0, [r2, #9]
+20019d8e:	1940      	adds	r0, r0, r5
+20019d90:	4298      	cmp	r0, r3
+20019d92:	dc00      	bgt.n	20019d96 <dmaIrqHandler+0x7e>
+20019d94:	e0d8      	b.n	20019f48 <dmaIrqHandler+0x230>
+20019d96:	25a0      	movs	r5, #160	@ 0xa0
+20019d98:	4a9f      	ldr	r2, [pc, #636]	@ (2001a018 <dmaIrqHandler+0x300>)
+20019d9a:	05ed      	lsls	r5, r5, #23
+20019d9c:	3302      	adds	r3, #2
+20019d9e:	63ea      	str	r2, [r5, #60]	@ 0x3c
+20019da0:	4283      	cmp	r3, r0
+20019da2:	d100      	bne.n	20019da6 <dmaIrqHandler+0x8e>
+20019da4:	e0f0      	b.n	20019f88 <dmaIrqHandler+0x270>
+20019da6:	4b9a      	ldr	r3, [pc, #616]	@ (2001a010 <dmaIrqHandler+0x2f8>)
+20019da8:	681b      	ldr	r3, [r3, #0]
+20019daa:	21a0      	movs	r1, #160	@ 0xa0
+20019dac:	4a93      	ldr	r2, [pc, #588]	@ (20019ffc <dmaIrqHandler+0x2e4>)
+20019dae:	05c9      	lsls	r1, r1, #23
+20019db0:	5888      	ldr	r0, [r1, r2]
+20019db2:	4203      	tst	r3, r0
+20019db4:	d0e4      	beq.n	20019d80 <dmaIrqHandler+0x68>
+20019db6:	508b      	str	r3, [r1, r2]
+20019db8:	4b98      	ldr	r3, [pc, #608]	@ (2001a01c <dmaIrqHandler+0x304>)
+20019dba:	4d92      	ldr	r5, [pc, #584]	@ (2001a004 <dmaIrqHandler+0x2ec>)
+20019dbc:	6819      	ldr	r1, [r3, #0]
+20019dbe:	3101      	adds	r1, #1
+20019dc0:	6019      	str	r1, [r3, #0]
+20019dc2:	2348      	movs	r3, #72	@ 0x48
+20019dc4:	5ceb      	ldrb	r3, [r5, r3]
+20019dc6:	000e      	movs	r6, r1
+20019dc8:	2b02      	cmp	r3, #2
+20019dca:	d077      	beq.n	20019ebc <dmaIrqHandler+0x1a4>
+20019dcc:	2201      	movs	r2, #1
+20019dce:	3b01      	subs	r3, #1
+20019dd0:	400b      	ands	r3, r1
+20019dd2:	001f      	movs	r7, r3
+20019dd4:	0013      	movs	r3, r2
+20019dd6:	4892      	ldr	r0, [pc, #584]	@ (2001a020 <dmaIrqHandler+0x308>)
+20019dd8:	4033      	ands	r3, r6
+20019dda:	4c92      	ldr	r4, [pc, #584]	@ (2001a024 <dmaIrqHandler+0x30c>)
+20019ddc:	425b      	negs	r3, r3
+20019dde:	4003      	ands	r3, r0
+20019de0:	191c      	adds	r4, r3, r4
+20019de2:	2394      	movs	r3, #148	@ 0x94
+20019de4:	5ceb      	ldrb	r3, [r5, r3]
+20019de6:	2b00      	cmp	r3, #0
+20019de8:	d03b      	beq.n	20019e62 <dmaIrqHandler+0x14a>
+20019dea:	2f00      	cmp	r7, #0
+20019dec:	d100      	bne.n	20019df0 <dmaIrqHandler+0xd8>
+20019dee:	e08e      	b.n	20019f0e <dmaIrqHandler+0x1f6>
+20019df0:	6823      	ldr	r3, [r4, #0]
+20019df2:	400a      	ands	r2, r1
+20019df4:	085b      	lsrs	r3, r3, #1
+20019df6:	6023      	str	r3, [r4, #0]
+20019df8:	6863      	ldr	r3, [r4, #4]
+20019dfa:	2101      	movs	r1, #1
+20019dfc:	085b      	lsrs	r3, r3, #1
+20019dfe:	6063      	str	r3, [r4, #4]
+20019e00:	68a3      	ldr	r3, [r4, #8]
+20019e02:	4889      	ldr	r0, [pc, #548]	@ (2001a028 <dmaIrqHandler+0x310>)
+20019e04:	085b      	lsrs	r3, r3, #1
+20019e06:	60a3      	str	r3, [r4, #8]
+20019e08:	68e3      	ldr	r3, [r4, #12]
+20019e0a:	3a01      	subs	r2, #1
+20019e0c:	085b      	lsrs	r3, r3, #1
+20019e0e:	60e3      	str	r3, [r4, #12]
+20019e10:	6923      	ldr	r3, [r4, #16]
+20019e12:	085b      	lsrs	r3, r3, #1
+20019e14:	6123      	str	r3, [r4, #16]
+20019e16:	4b85      	ldr	r3, [pc, #532]	@ (2001a02c <dmaIrqHandler+0x314>)
+20019e18:	63dc      	str	r4, [r3, #60]	@ 0x3c
+20019e1a:	4b85      	ldr	r3, [pc, #532]	@ (2001a030 <dmaIrqHandler+0x318>)
+20019e1c:	f7fd f886 	bl	20016f2c <pio_sm_set_pindirs_with_mask>
+20019e20:	2394      	movs	r3, #148	@ 0x94
+20019e22:	5ceb      	ldrb	r3, [r5, r3]
+20019e24:	2b00      	cmp	r3, #0
+20019e26:	d00b      	beq.n	20019e40 <dmaIrqHandler+0x128>
+20019e28:	88ab      	ldrh	r3, [r5, #4]
+20019e2a:	0858      	lsrs	r0, r3, #1
+20019e2c:	2b0b      	cmp	r3, #11
+20019e2e:	d907      	bls.n	20019e40 <dmaIrqHandler+0x128>
+20019e30:	2105      	movs	r1, #5
+20019e32:	3414      	adds	r4, #20
+20019e34:	6822      	ldr	r2, [r4, #0]
+20019e36:	3101      	adds	r1, #1
+20019e38:	0852      	lsrs	r2, r2, #1
+20019e3a:	c404      	stmia	r4!, {r2}
+20019e3c:	4288      	cmp	r0, r1
+20019e3e:	dcf9      	bgt.n	20019e34 <dmaIrqHandler+0x11c>
+20019e40:	2398      	movs	r3, #152	@ 0x98
+20019e42:	58eb      	ldr	r3, [r5, r3]
+20019e44:	42b3      	cmp	r3, r6
+20019e46:	d19b      	bne.n	20019d80 <dmaIrqHandler+0x68>
+20019e48:	2348      	movs	r3, #72	@ 0x48
+20019e4a:	5ceb      	ldrb	r3, [r5, r3]
+20019e4c:	3b01      	subs	r3, #1
+20019e4e:	429f      	cmp	r7, r3
+20019e50:	d196      	bne.n	20019d80 <dmaIrqHandler+0x68>
+20019e52:	2080      	movs	r0, #128	@ 0x80
+20019e54:	05c0      	lsls	r0, r0, #23
+20019e56:	2200      	movs	r2, #0
+20019e58:	2300      	movs	r3, #0
+20019e5a:	4330      	orrs	r0, r6
+20019e5c:	f7fc ffdc 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019e60:	e78e      	b.n	20019d80 <dmaIrqHandler+0x68>
+20019e62:	4b72      	ldr	r3, [pc, #456]	@ (2001a02c <dmaIrqHandler+0x314>)
+20019e64:	2101      	movs	r1, #1
+20019e66:	63dc      	str	r4, [r3, #60]	@ 0x3c
+20019e68:	486f      	ldr	r0, [pc, #444]	@ (2001a028 <dmaIrqHandler+0x310>)
+20019e6a:	4b71      	ldr	r3, [pc, #452]	@ (2001a030 <dmaIrqHandler+0x318>)
+20019e6c:	3a02      	subs	r2, #2
+20019e6e:	f7fd f85d 	bl	20016f2c <pio_sm_set_pindirs_with_mask>
+20019e72:	2f00      	cmp	r7, #0
+20019e74:	d1d4      	bne.n	20019e20 <dmaIrqHandler+0x108>
+20019e76:	8deb      	ldrh	r3, [r5, #46]	@ 0x2e
+20019e78:	1c74      	adds	r4, r6, #1
+20019e7a:	42a3      	cmp	r3, r4
+20019e7c:	d854      	bhi.n	20019f28 <dmaIrqHandler+0x210>
+20019e7e:	3b01      	subs	r3, #1
+20019e80:	42a3      	cmp	r3, r4
+20019e82:	d1dd      	bne.n	20019e40 <dmaIrqHandler+0x128>
+20019e84:	2080      	movs	r0, #128	@ 0x80
+20019e86:	2200      	movs	r2, #0
+20019e88:	2300      	movs	r3, #0
+20019e8a:	0600      	lsls	r0, r0, #24
+20019e8c:	f7fc ffc4 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019e90:	e7d6      	b.n	20019e40 <dmaIrqHandler+0x128>
+20019e92:	6003      	str	r3, [r0, #0]
+20019e94:	8c29      	ldrh	r1, [r5, #32]
+20019e96:	4299      	cmp	r1, r3
+20019e98:	dc03      	bgt.n	20019ea2 <dmaIrqHandler+0x18a>
+20019e9a:	4b60      	ldr	r3, [pc, #384]	@ (2001a01c <dmaIrqHandler+0x304>)
+20019e9c:	6002      	str	r2, [r0, #0]
+20019e9e:	601a      	str	r2, [r3, #0]
+20019ea0:	2300      	movs	r3, #0
+20019ea2:	8baa      	ldrh	r2, [r5, #28]
+20019ea4:	429a      	cmp	r2, r3
+20019ea6:	dd19      	ble.n	20019edc <dmaIrqHandler+0x1c4>
+20019ea8:	4b62      	ldr	r3, [pc, #392]	@ (2001a034 <dmaIrqHandler+0x31c>)
+20019eaa:	22a0      	movs	r2, #160	@ 0xa0
+20019eac:	05d2      	lsls	r2, r2, #23
+20019eae:	63d3      	str	r3, [r2, #60]	@ 0x3c
+20019eb0:	4b57      	ldr	r3, [pc, #348]	@ (2001a010 <dmaIrqHandler+0x2f8>)
+20019eb2:	681b      	ldr	r3, [r3, #0]
+20019eb4:	e779      	b.n	20019daa <dmaIrqHandler+0x92>
+20019eb6:	f008 fb09 	bl	200224cc <pico9918_gpu_rearm_palette_guard>
+20019eba:	e766      	b.n	20019d8a <dmaIrqHandler+0x72>
+20019ebc:	084e      	lsrs	r6, r1, #1
+20019ebe:	e785      	b.n	20019dcc <dmaIrqHandler+0xb4>
+20019ec0:	2300      	movs	r3, #0
+20019ec2:	4a56      	ldr	r2, [pc, #344]	@ (2001a01c <dmaIrqHandler+0x304>)
+20019ec4:	6003      	str	r3, [r0, #0]
+20019ec6:	6013      	str	r3, [r2, #0]
+20019ec8:	3301      	adds	r3, #1
+20019eca:	4059      	eors	r1, r3
+20019ecc:	00ca      	lsls	r2, r1, #3
+20019ece:	1a52      	subs	r2, r2, r1
+20019ed0:	0092      	lsls	r2, r2, #2
+20019ed2:	324a      	adds	r2, #74	@ 0x4a
+20019ed4:	2300      	movs	r3, #0
+20019ed6:	6021      	str	r1, [r4, #0]
+20019ed8:	18aa      	adds	r2, r5, r2
+20019eda:	e73e      	b.n	20019d5a <dmaIrqHandler+0x42>
+20019edc:	8be8      	ldrh	r0, [r5, #30]
+20019ede:	1882      	adds	r2, r0, r2
+20019ee0:	429a      	cmp	r2, r3
+20019ee2:	dd2b      	ble.n	20019f3c <dmaIrqHandler+0x224>
+20019ee4:	20a0      	movs	r0, #160	@ 0xa0
+20019ee6:	494c      	ldr	r1, [pc, #304]	@ (2001a018 <dmaIrqHandler+0x300>)
+20019ee8:	05c0      	lsls	r0, r0, #23
+20019eea:	3302      	adds	r3, #2
+20019eec:	63c1      	str	r1, [r0, #60]	@ 0x3c
+20019eee:	429a      	cmp	r2, r3
+20019ef0:	d000      	beq.n	20019ef4 <dmaIrqHandler+0x1dc>
+20019ef2:	e758      	b.n	20019da6 <dmaIrqHandler+0x8e>
+20019ef4:	2200      	movs	r2, #0
+20019ef6:	2300      	movs	r3, #0
+20019ef8:	2000      	movs	r0, #0
+20019efa:	f7fc ff8d 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019efe:	2300      	movs	r3, #0
+20019f00:	2200      	movs	r2, #0
+20019f02:	2001      	movs	r0, #1
+20019f04:	f7fc ff88 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019f08:	4b41      	ldr	r3, [pc, #260]	@ (2001a010 <dmaIrqHandler+0x2f8>)
+20019f0a:	681b      	ldr	r3, [r3, #0]
+20019f0c:	e74d      	b.n	20019daa <dmaIrqHandler+0x92>
+20019f0e:	4b47      	ldr	r3, [pc, #284]	@ (2001a02c <dmaIrqHandler+0x314>)
+20019f10:	400a      	ands	r2, r1
+20019f12:	63dc      	str	r4, [r3, #60]	@ 0x3c
+20019f14:	2101      	movs	r1, #1
+20019f16:	4b46      	ldr	r3, [pc, #280]	@ (2001a030 <dmaIrqHandler+0x318>)
+20019f18:	4843      	ldr	r0, [pc, #268]	@ (2001a028 <dmaIrqHandler+0x310>)
+20019f1a:	3a01      	subs	r2, #1
+20019f1c:	f7fd f806 	bl	20016f2c <pio_sm_set_pindirs_with_mask>
+20019f20:	8deb      	ldrh	r3, [r5, #46]	@ 0x2e
+20019f22:	1c74      	adds	r4, r6, #1
+20019f24:	42a3      	cmp	r3, r4
+20019f26:	d9aa      	bls.n	20019e7e <dmaIrqHandler+0x166>
+20019f28:	4b37      	ldr	r3, [pc, #220]	@ (2001a008 <dmaIrqHandler+0x2f0>)
+20019f2a:	2200      	movs	r2, #0
+20019f2c:	6818      	ldr	r0, [r3, #0]
+20019f2e:	2300      	movs	r3, #0
+20019f30:	0300      	lsls	r0, r0, #12
+20019f32:	4320      	orrs	r0, r4
+20019f34:	f7fc ff70 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019f38:	8deb      	ldrh	r3, [r5, #46]	@ 0x2e
+20019f3a:	e7a0      	b.n	20019e7e <dmaIrqHandler+0x166>
+20019f3c:	8b6a      	ldrh	r2, [r5, #26]
+20019f3e:	1a89      	subs	r1, r1, r2
+20019f40:	4299      	cmp	r1, r3
+20019f42:	dd18      	ble.n	20019f76 <dmaIrqHandler+0x25e>
+20019f44:	4b3c      	ldr	r3, [pc, #240]	@ (2001a038 <dmaIrqHandler+0x320>)
+20019f46:	e7b0      	b.n	20019eaa <dmaIrqHandler+0x192>
+20019f48:	8951      	ldrh	r1, [r2, #10]
+20019f4a:	1809      	adds	r1, r1, r0
+20019f4c:	4299      	cmp	r1, r3
+20019f4e:	dcf9      	bgt.n	20019f44 <dmaIrqHandler+0x22c>
+20019f50:	1a5c      	subs	r4, r3, r1
+20019f52:	1912      	adds	r2, r2, r4
+20019f54:	7b52      	ldrb	r2, [r2, #13]
+20019f56:	482d      	ldr	r0, [pc, #180]	@ (2001a00c <dmaIrqHandler+0x2f4>)
+20019f58:	0092      	lsls	r2, r2, #2
+20019f5a:	5810      	ldr	r0, [r2, r0]
+20019f5c:	22a0      	movs	r2, #160	@ 0xa0
+20019f5e:	05d2      	lsls	r2, r2, #23
+20019f60:	63d0      	str	r0, [r2, #60]	@ 0x3c
+20019f62:	4299      	cmp	r1, r3
+20019f64:	d000      	beq.n	20019f68 <dmaIrqHandler+0x250>
+20019f66:	e71e      	b.n	20019da6 <dmaIrqHandler+0x8e>
+20019f68:	2080      	movs	r0, #128	@ 0x80
+20019f6a:	2200      	movs	r2, #0
+20019f6c:	2300      	movs	r3, #0
+20019f6e:	0580      	lsls	r0, r0, #22
+20019f70:	f7fc ff52 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019f74:	e717      	b.n	20019da6 <dmaIrqHandler+0x8e>
+20019f76:	20a0      	movs	r0, #160	@ 0xa0
+20019f78:	4a27      	ldr	r2, [pc, #156]	@ (2001a018 <dmaIrqHandler+0x300>)
+20019f7a:	05c0      	lsls	r0, r0, #23
+20019f7c:	3102      	adds	r1, #2
+20019f7e:	63c2      	str	r2, [r0, #60]	@ 0x3c
+20019f80:	4299      	cmp	r1, r3
+20019f82:	d000      	beq.n	20019f86 <dmaIrqHandler+0x26e>
+20019f84:	e70f      	b.n	20019da6 <dmaIrqHandler+0x8e>
+20019f86:	e7ef      	b.n	20019f68 <dmaIrqHandler+0x250>
+20019f88:	2200      	movs	r2, #0
+20019f8a:	2300      	movs	r3, #0
+20019f8c:	0308      	lsls	r0, r1, #12
+20019f8e:	f7fc ff43 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019f92:	2301      	movs	r3, #1
+20019f94:	6820      	ldr	r0, [r4, #0]
+20019f96:	2200      	movs	r2, #0
+20019f98:	0300      	lsls	r0, r0, #12
+20019f9a:	4318      	orrs	r0, r3
+20019f9c:	2300      	movs	r3, #0
+20019f9e:	f7fc ff3b 	bl	20016e18 <multicore_fifo_push_timeout_us>
+20019fa2:	2202      	movs	r2, #2
+20019fa4:	4b25      	ldr	r3, [pc, #148]	@ (2001a03c <dmaIrqHandler+0x324>)
+20019fa6:	50ea      	str	r2, [r5, r3]
+20019fa8:	2280      	movs	r2, #128	@ 0x80
+20019faa:	0452      	lsls	r2, r2, #17
+20019fac:	6ceb      	ldr	r3, [r5, #76]	@ 0x4c
+20019fae:	0019      	movs	r1, r3
+20019fb0:	4011      	ands	r1, r2
+20019fb2:	4213      	tst	r3, r2
+20019fb4:	d1fa      	bne.n	20019fac <dmaIrqHandler+0x294>
+20019fb6:	4b16      	ldr	r3, [pc, #88]	@ (2001a010 <dmaIrqHandler+0x2f8>)
+20019fb8:	2402      	movs	r4, #2
+20019fba:	681b      	ldr	r3, [r3, #0]
+20019fbc:	4a0f      	ldr	r2, [pc, #60]	@ (20019ffc <dmaIrqHandler+0x2e4>)
+20019fbe:	50ab      	str	r3, [r5, r2]
+20019fc0:	2580      	movs	r5, #128	@ 0x80
+20019fc2:	4a19      	ldr	r2, [pc, #100]	@ (2001a028 <dmaIrqHandler+0x310>)
+20019fc4:	062d      	lsls	r5, r5, #24
+20019fc6:	6810      	ldr	r0, [r2, #0]
+20019fc8:	43a0      	bics	r0, r4
+20019fca:	6010      	str	r0, [r2, #0]
+20019fcc:	481c      	ldr	r0, [pc, #112]	@ (2001a040 <dmaIrqHandler+0x328>)
+20019fce:	6005      	str	r5, [r0, #0]
+20019fd0:	6005      	str	r5, [r0, #0]
+20019fd2:	2520      	movs	r5, #32
+20019fd4:	481b      	ldr	r0, [pc, #108]	@ (2001a044 <dmaIrqHandler+0x32c>)
+20019fd6:	6005      	str	r5, [r0, #0]
+20019fd8:	481b      	ldr	r0, [pc, #108]	@ (2001a048 <dmaIrqHandler+0x330>)
+20019fda:	3d01      	subs	r5, #1
+20019fdc:	6800      	ldr	r0, [r0, #0]
+20019fde:	4028      	ands	r0, r5
+20019fe0:	35d1      	adds	r5, #209	@ 0xd1
+20019fe2:	5150      	str	r0, [r2, r5]
+20019fe4:	6810      	ldr	r0, [r2, #0]
+20019fe6:	4320      	orrs	r0, r4
+20019fe8:	6010      	str	r0, [r2, #0]
+20019fea:	4a0c      	ldr	r2, [pc, #48]	@ (2001a01c <dmaIrqHandler+0x304>)
+20019fec:	6011      	str	r1, [r2, #0]
+20019fee:	4a0d      	ldr	r2, [pc, #52]	@ (2001a024 <dmaIrqHandler+0x30c>)
+20019ff0:	490e      	ldr	r1, [pc, #56]	@ (2001a02c <dmaIrqHandler+0x314>)
+20019ff2:	63ca      	str	r2, [r1, #60]	@ 0x3c
+20019ff4:	e6d9      	b.n	20019daa <dmaIrqHandler+0x92>
+20019ff6:	46c0      	nop			@ (mov r8, r8)
+20019ff8:	200292cc 	.word	0x200292cc
+20019ffc:	0000040c 	.word	0x0000040c
+2001a000:	200231f4 	.word	0x200231f4
+2001a004:	20001100 	.word	0x20001100
+2001a008:	20028a04 	.word	0x20028a04
+2001a00c:	200288a8 	.word	0x200288a8
+2001a010:	200292c0 	.word	0x200292c0
+2001a014:	200292dc 	.word	0x200292dc
+2001a018:	20028870 	.word	0x20028870
+2001a01c:	200231f0 	.word	0x200231f0
+2001a020:	00000504 	.word	0x00000504
+2001a024:	20041000 	.word	0x20041000
+2001a028:	50200000 	.word	0x50200000
+2001a02c:	50000040 	.word	0x50000040
+2001a030:	00002220 	.word	0x00002220
+2001a034:	20028880 	.word	0x20028880
+2001a038:	20028820 	.word	0x20028820
+2001a03c:	00000444 	.word	0x00000444
+2001a040:	502010e8 	.word	0x502010e8
+2001a044:	50202000 	.word	0x50202000
+2001a048:	200292c4 	.word	0x200292c4

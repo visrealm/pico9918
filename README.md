@@ -2,13 +2,13 @@
 
 A drop-in replacement for a classic TMS9918A VDP powered by the Raspberry Pi Pico RP2040 (and now RP2350) microcontroller.
 
-<p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="400px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Top" width="406px"></a></p>
+<p align="left"><a href="img/pico9918_v1_2_top_sm.jpg"><img src="img/pico9918_v1_2_top_sm.jpg" alt="PICO9918 v1.2 Top" width="400px"></a> <a href="img/pico9918_v1_2_bottom_sm.jpg"><img src="img/pico9918_v1_2_bottom_sm.jpg" alt="PICO9918 v1.2 Bottom" width="406px"></a></p>
 
 The PICO9918 PRO can replace all classic VDP models (TMS9918, TMS9918A, TMS9928A, TMS9929A, TMS9118, TMS9128, TMS9129), providing a crisp VGA, HDMI or SCART RGB signal from your retrocomputer.
 
 The PICO9918 has been tested on over 30 classic models of TI-99, Coleco, MSX, NABU, Memotech, Sega and many more. See the [full list below](#supported-devices).
 
-The TMS9918A emulation is handled by my [vrEmuTms9918 library](https://github.com/visrealm/vrEmuTms9918) which is included as a submodule here
+The TMS9918A emulation is handled by my [pico9918-core library](https://github.com/visrealm/pico9918-core), vendored here in `core/`
 
 ## Contents
 
@@ -95,7 +95,7 @@ If you have tested the PICO9918 on any other device, please let me know and I'll
 
 So far, there aren't any. 
 
-# Digital A/V (HDMI) Dongle [NEW]
+## Digital A/V (HDMI) Dongle [NEW]
 
 The new Digital A/V dongle provides video and audio direct to any HDMI compatible display. The new dongle is fully compatible with all previous FFC-equipped PICO9918 boards (v1.2, v1.3 and PRO v2.0) and are available to purchase either with a new PICO9918 PRO or separately.
 
@@ -103,7 +103,7 @@ The new Digital A/V dongle provides video and audio direct to any HDMI compatibl
 
 📖 For full details, see the [Digital AV Dongle](https://github.com/visrealm/pico9918/wiki/Digital-AV-Dongle) wiki page. See [Hardware Setup](https://github.com/visrealm/pico9918/wiki/Hardware-Setup#ffc-connector) for FFC cable connection instructions.
 
-# F18A compatibility
+## F18A compatibility
 
 The PICO9918 also includes F18A compatibility in firmware v1.0.0+. The video below was captured directly from the PICO9918 VGA output running various F18A demos on a TI-99/4A.
 
@@ -127,7 +127,7 @@ There are three main variants of the hardware.
 
 ### PRO v2.x (v2.0)
 
-This is the latest version, poewered by the more powerful RP2350. This hardware upgrade will allow for additional VRAM and display modes in the future, including V9938 support.
+This is the latest version, powered by the more powerful RP2350. This hardware upgrade will allow for additional VRAM and display modes in the future, including V9938 support.
 
 <p align="left"><a href="img/pico9918pro_800_1.jpg"><img src="img/pico9918pro_800_1.jpg" alt="PICO9918 PRO v2.0" width="720px"></a></p>
 
@@ -157,7 +157,7 @@ Schematics and Gerbers are available in [/pcb](pcb)
 
 If you're not interested in building the firmware yourself, you'll find the latest firmware in the [Releases](https://github.com/visrealm/pico9918/releases).
 
-To install, just hold the 'BOOT' button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive which should have the volume label RPI-RP2. The Pico will restart (and disconnect) automatically.
+To install, just hold the 'BOOT' button while plugging the Pico into a PC, then drag the pico9918.uf2 file on to the new USB drive, whose volume label is RPI-RP2 on the PICO9918 and RP2350 on the PICO9918 PRO. The Pico will restart (and disconnect) automatically.
 
 📖 For detailed information on firmware installation, output modes, and updates, see the [Firmware](https://github.com/visrealm/pico9918/wiki/Firmware) wiki page.
 
@@ -191,6 +191,10 @@ If you don't have a device supported by the native configurator, the [Web-based 
 
 For detailed documentation covering hardware setup, firmware, the configurator, supported devices, F18A compatibility and more, visit the **[PICO9918 Wiki](https://github.com/visrealm/pico9918/wiki)**.
 
+For working on the firmware itself, see **[DEBUGGING.md](DEBUGGING.md)** - the live test harness
+that drives the board over a debug probe and reads back exactly what the renderer produced, the
+benchmark ROM, and how to measure performance without measuring the instrument.
+
 ## Building
 
 ### Quick start
@@ -199,20 +203,24 @@ Build both firmware and configurator ROMs:
 ```bash
 # Automatic SDK download (recommended)
 mkdir build && cd build
-cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1
-cmake --build .
+cmake .. -DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1 -DPICO9918_BUILD_COMBINED=ON
+cmake --build . --target combined
+cmake --build . --target build_configurators
 ```
 
-Output in `build/dist/`: firmware `.uf2` file and configurator ROMs for all retro platforms.
+Output in `build/dist/`: the combined firmware `.uf2` and configurator ROMs for all retro platforms.
+
+For firmware alone, drop `-DPICO9918_BUILD_COMBINED=ON` and build the `firmware`
+target instead; `PICO_BOARD` defaults to `pico9918pro` (RP2350).
 
 Build settings can be overridden with `-D` flags or an optional, git-ignored `pico9918_config.cmake` in the project root - copy [`pico9918_config.cmake.template`](pico9918_config.cmake.template) to `pico9918_config.cmake` and edit it to get started. See [BUILDING.md](BUILDING.md).
 
 ### Platform-Specific Setup Required
 
 Each platform requires specific toolchain installation:
-- **Windows**: ARM GNU Toolchain 13.2.1-1.1, Python with pillow
-- **Linux**: `build-essential cmake python3 python3-pip git gcc-arm-none-eabi`  
-- **macOS**: Homebrew + ARM GNU Toolchain 13.2.1-1.1, may need `--break-system-packages`
+- **Windows**: ARM GNU Toolchain 15.2.Rel1, Python with pillow
+- **Linux**: `build-essential cmake python3 python3-pip git` plus ARM GNU Toolchain 15.2.Rel1
+- **macOS**: Homebrew + ARM GNU Toolchain 15.2.Rel1, may need `--break-system-packages`
 
 All platforms use **Raspberry Pi Pico SDK 2.1.1** specifically (newer versions may cause issues).
 

@@ -44,6 +44,16 @@
 # Enable the GPU frame counter.
 #set(PICO9918_GPU_FRAME_COUNTER OFF)
 
+# 80-column text at 8bpp, which is what ECM, tile palette select and the bitmap
+# layer need in T80. Costs a 512-byte line and twice the palette expansion, so it
+# defaults ON for the RP2350 board and OFF for the RP2040.
+#set(PICO9918_TEXT80_8BPP ON)
+
+# Keep boot-only code and data resident in flash (XIP) rather than copying it to
+# RAM at startup, which buys back SRAM. Anything reached after the GPU starts
+# must not live there - see src/xip.h.
+#set(PICO9918_COLD_IN_FLASH ON)
+
 # Build a combined PICO9918 (RP2040) + PICO9918 PRO (RP2350) UF2. Normally driven
 # by the builder/configure script (-DPICO9918_BUILD_COMBINED=ON); you can force it
 # here too.
@@ -65,12 +75,24 @@
 
 
 # -----------------------------------------------------------------------------
+# Test builds  (never ship one of these)
+# -----------------------------------------------------------------------------
+
+# Live test capture: copies each rendered scanline into a buffer that a debug
+# probe reads over SWD, so a test can assert on the exact pixels the renderer
+# produced. It costs a sizeable .bss window and about a microsecond a line while
+# a capture is armed - so no timing reading taken from such a build is valid.
+# See DEBUGGING.md and test/live/.
+#set(PICO9918_LIVE_TEST OFF)
+
+
+# -----------------------------------------------------------------------------
 # Version / artifact naming
 # -----------------------------------------------------------------------------
 
 # Version numbers (used in the artifact filename and reported by the firmware).
 #set(PICO9918_MAJOR_VER 1)
-#set(PICO9918_MINOR_VER 2)
+#set(PICO9918_MINOR_VER 3)
 #set(PICO9918_PATCH_VER 0)
 
 # Artifact suffix (e.g. "a1", "alpha1", "rc2", "beta-2"). When non-empty this

@@ -1,4 +1,7 @@
-/*
+/**
+ * \file
+ * \brief the timing tables for the known VGA and RGBs display modes
+ *
  * Project: pico9918 - vga
  *
  * Copyright (c) 2024 Troy Schrapel
@@ -6,20 +9,18 @@
  * This code is licensed under the MIT license
  *
  * https://github.com/visrealm/pico9918
- *
  */
 
 #include "vga-modes.h"
+#include "../xip.h"
 
 #include <string.h>
 
 void vgaUpdateTotalPixels(VgaSyncParams* params);
 
-/*
- * Base timing parameters for all modes (progressive and interlaced)
- * References: http://tinyvga.com/vga-timing
- */
-typedef struct {
+/** \brief base timing for every mode, progressive and interlaced */
+typedef struct
+{
   uint32_t pixelClockKHz;
   VgaSyncParams hSyncParams;
   VgaSyncParams vSyncParams;
@@ -27,27 +28,27 @@ typedef struct {
 } VgaModeBase;
 
 
-/*
- * Interlaced extension parameters (PAL/NTSC only)
- */
-typedef struct {
+/** \brief the extra field timing an interlaced mode needs (PAL/NTSC only) */
+typedef struct
+{
   uint8_t interlacedFieldOrder;
   uint8_t shortPulsePixels;
   VgaFieldParams fields[VGA_MAX_FIELDS];
 } VgaModeInterlaced;
 
-#define VGA_MODE_COUNT (RGBS_NTSC_720_480i_60HZ + 1)
+#define VGA_MODE_COUNT        (RGBS_NTSC_720_480i_60HZ + 1)
 #define INTERLACED_MODE_COUNT (RGBS_NTSC_720_480i_60HZ - RGBS_PAL_720_576i_50HZ + 1)
 #define FIRST_INTERLACED_MODE RGBS_PAL_720_576i_50HZ
 
-// References:
-// http://tinyvga.com/vga-timing/640x480@60Hz
-// http://tinyvga.com/vga-timing/640x400@70Hz
-// http://tinyvga.com/vga-timing/800x600@60Hz
-// http://tinyvga.com/vga-timing/1024x768@60Hz
-// http://tinyvga.com/vga-timing/1280x1024@60Hz
-
-static const VgaModeBase vgaModeBase[VGA_MODE_COUNT] = {
+// clang-format off
+/** \brief base timing for each mode, indexed by VgaMode
+ *  \see http://tinyvga.com/vga-timing/640x480@60Hz
+ *  \see http://tinyvga.com/vga-timing/640x400@70Hz
+ *  \see http://tinyvga.com/vga-timing/800x600@60Hz
+ *  \see http://tinyvga.com/vga-timing/1024x768@60Hz
+ *  \see http://tinyvga.com/vga-timing/1280x1024@60Hz
+ */
+static const VgaModeBase __cold_in_flash("vgamodes") vgaModeBase[VGA_MODE_COUNT] = {
   [VGA_640_480_60HZ] = {
     .pixelClockKHz = 25175,
     .hSyncParams = {
@@ -186,16 +187,13 @@ static const VgaModeBase vgaModeBase[VGA_MODE_COUNT] = {
     .frameRateHz = 60.0f
   },
 };
+// clang-format on
 
-/*
- * Interlaced mode extensions
- * Indexed by (mode - FIRST_INTERLACED_MODE)
- *
- * All DMA transfers are 4 words (one full line = 2 half-lines).
- * EQ (short sync) pulse: ~2us
- * LS (long sync) pulse: halfLine - EQ (derived automatically)
+// clang-format off
+/** \brief interlaced field structure, indexed by (mode - FIRST_INTERLACED_MODE)
+ *  \note  the LS (long sync) pulse is derived as half-line minus the EQ pulse
  */
-static const VgaModeInterlaced vgaModeInterlaced[INTERLACED_MODE_COUNT] = {
+static const VgaModeInterlaced __cold_in_flash("vgamodes") vgaModeInterlaced[INTERLACED_MODE_COUNT] = {
   [RGBS_PAL_720_576i_50HZ - FIRST_INTERLACED_MODE] = {
     // PAL: field 0 is lower raster position
     .interlacedFieldOrder = 1,
@@ -269,30 +267,28 @@ static const VgaModeInterlaced vgaModeInterlaced[INTERLACED_MODE_COUNT] = {
     }
   },
 };
+// clang-format on
 
-/*
- * populate VgaParams for known vga modes
- */
+/** \brief populate VgaParams for a known vga mode */
 VgaParams vgaGetParams(VgaMode mode)
 {
-  VgaParams params = { 0 };
+  VgaParams params = {0};
 
-  if (mode >= VGA_MODE_COUNT)
-    return params;
+  if (mode >= VGA_MODE_COUNT) return params;
 
   const VgaModeBase* base = &vgaModeBase[mode];
-  params.pixelClockKHz = base->pixelClockKHz;
-  params.hSyncParams   = base->hSyncParams;
-  params.vSyncParams   = base->vSyncParams;
-  params.frameRateHz   = base->frameRateHz;
+  params.pixelClockKHz    = base->pixelClockKHz;
+  params.hSyncParams      = base->hSyncParams;
+  params.vSyncParams      = base->vSyncParams;
+  params.frameRateHz      = base->frameRateHz;
 
   if (mode >= FIRST_INTERLACED_MODE)
   {
     const VgaModeInterlaced* ilc = &vgaModeInterlaced[mode - FIRST_INTERLACED_MODE];
-    params.interlaced          = true;
-    params.numFields           = 2;
-    params.interlacedFieldOrder = ilc->interlacedFieldOrder;
-    params.shortPulsePixels    = ilc->shortPulsePixels;
+    params.interlaced            = true;
+    params.numFields             = 2;
+    params.interlacedFieldOrder  = ilc->interlacedFieldOrder;
+    params.shortPulsePixels      = ilc->shortPulsePixels;
     memcpy(params.fields, ilc->fields, sizeof(ilc->fields));
   }
 
@@ -302,7 +298,7 @@ VgaParams vgaGetParams(VgaMode mode)
     vgaUpdateTotalPixels(&params.vSyncParams);
 
     float scanlineTimeSeconds = 1.0f / (params.pixelClockKHz * 1000.0f) * params.hSyncParams.totalPixels;
-    float frameTimeSeconds = scanlineTimeSeconds * params.vSyncParams.totalPixels;
+    float frameTimeSeconds    = scanlineTimeSeconds * params.vSyncParams.totalPixels;
 
     params.hSyncParams.freqHz = 1.0f / scanlineTimeSeconds;
     params.vSyncParams.freqHz = 1.0f / frameTimeSeconds;
@@ -313,42 +309,33 @@ VgaParams vgaGetParams(VgaMode mode)
   return params;
 }
 
-/*
- * set the scale/multiplier of virtual pixel size
- */
+/** \brief set both pixel scales */
 bool setVgaParamsScale(VgaParams* params, int pixelScale)
 {
-  return setVgaParamsScaleX(params, pixelScale) &&
-    setVgaParamsScaleY(params, pixelScale);
+  return setVgaParamsScaleX(params, pixelScale) && setVgaParamsScaleY(params, pixelScale);
 }
 
-bool setVgaParamsScaleXY(VgaParams* params, int pixelScaleX, int pixelScaleY)
-{
-  return setVgaParamsScaleX(params, pixelScaleX) &&
-    setVgaParamsScaleY(params, pixelScaleY);
-}
-
+/** \brief set the horizontal pixel scale */
 bool setVgaParamsScaleX(VgaParams* params, int pixelScale)
 {
   if (!params || pixelScale < 1) return false;
 
-  params->hPixelScale = pixelScale;
+  params->hPixelScale    = pixelScale;
   params->hVirtualPixels = (params->hSyncParams.displayPixels / params->hPixelScale);
   return true;
 }
 
+/** \brief set the vertical pixel scale */
 bool setVgaParamsScaleY(VgaParams* params, int pixelScale)
 {
   if (!params || pixelScale < 1) return false;
 
-  params->vPixelScale = pixelScale;
+  params->vPixelScale    = pixelScale;
   params->vVirtualPixels = (params->vSyncParams.displayPixels / params->vPixelScale);
   return true;
 }
 
-/*
- * update total number of pixels
- */
+/** \brief sum the display, porch and sync counts into totalPixels */
 void vgaUpdateTotalPixels(VgaSyncParams* params)
 {
   if (params)

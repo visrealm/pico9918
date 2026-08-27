@@ -1,0 +1,80 @@
+200002d4 <tmsEndOfFrame>:
+200002d4:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+200002d6:	4c26      	ldr	r4, [pc, #152]	@ (20000370 <tmsEndOfFrame+0x9c>)
+200002d8:	4a26      	ldr	r2, [pc, #152]	@ (20000374 <tmsEndOfFrame+0xa0>)
+200002da:	6823      	ldr	r3, [r4, #0]
+200002dc:	4e26      	ldr	r6, [pc, #152]	@ (20000378 <tmsEndOfFrame+0xa4>)
+200002de:	3301      	adds	r3, #1
+200002e0:	6023      	str	r3, [r4, #0]
+200002e2:	7813      	ldrb	r3, [r2, #0]
+200002e4:	6830      	ldr	r0, [r6, #0]
+200002e6:	2b00      	cmp	r3, #0
+200002e8:	d108      	bne.n	200002fc <tmsEndOfFrame+0x28>
+200002ea:	4b24      	ldr	r3, [pc, #144]	@ (2000037c <tmsEndOfFrame+0xa8>)
+200002ec:	5cc1      	ldrb	r1, [r0, r3]
+200002ee:	2340      	movs	r3, #64	@ 0x40
+200002f0:	400b      	ands	r3, r1
+200002f2:	0659      	lsls	r1, r3, #25
+200002f4:	0fc9      	lsrs	r1, r1, #31
+200002f6:	7011      	strb	r1, [r2, #0]
+200002f8:	2b00      	cmp	r3, #0
+200002fa:	d12a      	bne.n	20000352 <tmsEndOfFrame+0x7e>
+200002fc:	4b20      	ldr	r3, [pc, #128]	@ (20000380 <tmsEndOfFrame+0xac>)
+200002fe:	5cc3      	ldrb	r3, [r0, r3]
+20000300:	2b00      	cmp	r3, #0
+20000302:	d122      	bne.n	2000034a <tmsEndOfFrame+0x76>
+20000304:	4b1f      	ldr	r3, [pc, #124]	@ (20000384 <tmsEndOfFrame+0xb0>)
+20000306:	781b      	ldrb	r3, [r3, #0]
+20000308:	2b00      	cmp	r3, #0
+2000030a:	d018      	beq.n	2000033e <tmsEndOfFrame+0x6a>
+2000030c:	2408      	movs	r4, #8
+2000030e:	6833      	ldr	r3, [r6, #0]
+20000310:	4f1d      	ldr	r7, [pc, #116]	@ (20000388 <tmsEndOfFrame+0xb4>)
+20000312:	5ddd      	ldrb	r5, [r3, r7]
+20000314:	f004 f84e 	bl	200043b4 <vgaCurrentParams>
+20000318:	4025      	ands	r5, r4
+2000031a:	426b      	negs	r3, r5
+2000031c:	415d      	adcs	r5, r3
+2000031e:	6833      	ldr	r3, [r6, #0]
+20000320:	3501      	adds	r5, #1
+20000322:	6405      	str	r5, [r0, #64]	@ 0x40
+20000324:	5ddb      	ldrb	r3, [r3, r7]
+20000326:	401c      	ands	r4, r3
+20000328:	4263      	negs	r3, r4
+2000032a:	415c      	adcs	r4, r3
+2000032c:	23ef      	movs	r3, #239	@ 0xef
+2000032e:	4264      	negs	r4, r4
+20000330:	439c      	bics	r4, r3
+20000332:	f004 f83f 	bl	200043b4 <vgaCurrentParams>
+20000336:	34e1      	adds	r4, #225	@ 0xe1
+20000338:	34ff      	adds	r4, #255	@ 0xff
+2000033a:	6484      	str	r4, [r0, #72]	@ 0x48
+2000033c:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+2000033e:	f7ff ff75 	bl	2000022c <eofInterrupt>
+20000342:	2080      	movs	r0, #128	@ 0x80
+20000344:	f7ff fef6 	bl	20000134 <updateInterrupts>
+20000348:	e7e0      	b.n	2000030c <tmsEndOfFrame+0x38>
+2000034a:	6820      	ldr	r0, [r4, #0]
+2000034c:	f001 f9d0 	bl	200016f0 <updateDiagnostics>
+20000350:	e7d8      	b.n	20000304 <tmsEndOfFrame+0x30>
+20000352:	f002 f88b 	bl	2000246c <allowSplashHide>
+20000356:	2396      	movs	r3, #150	@ 0x96
+20000358:	6822      	ldr	r2, [r4, #0]
+2000035a:	6830      	ldr	r0, [r6, #0]
+2000035c:	009b      	lsls	r3, r3, #2
+2000035e:	429a      	cmp	r2, r3
+20000360:	ddcc      	ble.n	200002fc <tmsEndOfFrame+0x28>
+20000362:	4b0a      	ldr	r3, [pc, #40]	@ (2000038c <tmsEndOfFrame+0xb8>)
+20000364:	469c      	mov	ip, r3
+20000366:	4460      	add	r0, ip
+20000368:	f000 fcf2 	bl	20000d50 <readConfig>
+2000036c:	6830      	ldr	r0, [r6, #0]
+2000036e:	e7c5      	b.n	200002fc <tmsEndOfFrame+0x28>
+20000370:	2002636c 	.word	0x2002636c
+20000374:	200274dd 	.word	0x200274dd
+20000378:	2000c7e4 	.word	0x2000c7e4
+2000037c:	0000602d 	.word	0x0000602d
+20000380:	00010060 	.word	0x00010060
+20000384:	200274d7 	.word	0x200274d7
+20000388:	0000602c 	.word	0x0000602c
+2000038c:	00010050 	.word	0x00010050

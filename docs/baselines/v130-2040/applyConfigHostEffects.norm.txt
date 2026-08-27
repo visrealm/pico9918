@@ -1,0 +1,14 @@
+<ADDR> <applyConfigHostEffects>:
+push	{r4, lr}
+ldr	r3, [pc, #20]	@ (<ADDR> <applyConfigHostEffects+OFF>)
+ldr	r2, [r3, #0]
+ldr	r3, [pc, #20]	@ (<ADDR> <applyConfigHostEffects+OFF>)
+ldrb	r4, [r2, r3]
+bl	<ADDR> <vgaCurrentParams>
+subs	r3, r4, #1
+sbcs	r4, r3
+movs	r3, #148	@ 0x94
+strb	r4, [r0, r3]
+pop	{r4, pc}
+	.word	<ADDR>
+	.word	<ADDR>

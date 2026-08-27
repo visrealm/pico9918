@@ -1,0 +1,204 @@
+20019064 <volatileHack>:
+20019064:	2200      	movs	r2, #0
+20019066:	4b89      	ldr	r3, [pc, #548]	@ (2001928c <volatileHack+0x228>)
+20019068:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+2001906c:	f8d3 9000 	ldr.w	r9, [r3]
+20019070:	b089      	sub	sp, #36	@ 0x24
+20019072:	f509 3380 	add.w	r3, r9, #65536	@ 0x10000
+20019076:	8d19      	ldrh	r1, [r3, #40]	@ 0x28
+20019078:	f883 2030 	strb.w	r2, [r3, #48]	@ 0x30
+2001907c:	07c8      	lsls	r0, r1, #31
+2001907e:	f509 43c0 	add.w	r3, r9, #24576	@ 0x6000
+20019082:	9301      	str	r3, [sp, #4]
+20019084:	f509 4a30 	add.w	sl, r9, #45056	@ 0xb000
+20019088:	f100 80c8 	bmi.w	2001921c <volatileHack+0x1b8>
+2001908c:	3338      	adds	r3, #56	@ 0x38
+2001908e:	f8df b208 	ldr.w	fp, [pc, #520]	@ 20019298 <volatileHack+0x234>
+20019092:	9302      	str	r3, [sp, #8]
+20019094:	9100      	str	r1, [sp, #0]
+20019096:	2501      	movs	r5, #1
+20019098:	9e01      	ldr	r6, [sp, #4]
+2001909a:	f89a 4002 	ldrb.w	r4, [sl, #2]
+2001909e:	f886 5038 	strb.w	r5, [r6, #56]	@ 0x38
+200190a2:	2505      	movs	r5, #5
+200190a4:	f064 047f 	orn	r4, r4, #127	@ 0x7f
+200190a8:	f88a 4002 	strb.w	r4, [sl, #2]
+200190ac:	4c78      	ldr	r4, [pc, #480]	@ (20019290 <volatileHack+0x22c>)
+200190ae:	9b02      	ldr	r3, [sp, #8]
+200190b0:	f64f 72fe 	movw	r2, #65534	@ 0xfffe
+200190b4:	9900      	ldr	r1, [sp, #0]
+200190b6:	4648      	mov	r0, r9
+200190b8:	f8c4 5094 	str.w	r5, [r4, #148]	@ 0x94
+200190bc:	f00d fdd0 	bl	20026c60 <run9900>
+200190c0:	2300      	movs	r3, #0
+200190c2:	f896 2038 	ldrb.w	r2, [r6, #56]	@ 0x38
+200190c6:	9000      	str	r0, [sp, #0]
+200190c8:	07d2      	lsls	r2, r2, #31
+200190ca:	f8c4 3094 	str.w	r3, [r4, #148]	@ 0x94
+200190ce:	d504      	bpl.n	200190da <volatileHack+0x76>
+200190d0:	f509 3280 	add.w	r2, r9, #65536	@ 0x10000
+200190d4:	f882 3030 	strb.w	r3, [r2, #48]	@ 0x30
+200190d8:	8510      	strh	r0, [r2, #40]	@ 0x28
+200190da:	f8db 3000 	ldr.w	r3, [fp]
+200190de:	2b00      	cmp	r3, #0
+200190e0:	f000 809c 	beq.w	2001921c <volatileHack+0x1b8>
+200190e4:	2000      	movs	r0, #0
+200190e6:	f509 4200 	add.w	r2, r9, #32768	@ 0x8000
+200190ea:	7a13      	ldrb	r3, [r2, #8]
+200190ec:	f8cb 0000 	str.w	r0, [fp]
+200190f0:	bb13      	cbnz	r3, 20019138 <volatileHack+0xd4>
+200190f2:	4968      	ldr	r1, [pc, #416]	@ (20019294 <volatileHack+0x230>)
+200190f4:	780b      	ldrb	r3, [r1, #0]
+200190f6:	2b00      	cmp	r3, #0
+200190f8:	d1cd      	bne.n	20019096 <volatileHack+0x32>
+200190fa:	2301      	movs	r3, #1
+200190fc:	f509 3980 	add.w	r9, r9, #65536	@ 0x10000
+20019100:	f889 3034 	strb.w	r3, [r9, #52]	@ 0x34
+20019104:	f3ef 8210 	mrs	r2, PRIMASK
+20019108:	b672      	cpsid	i
+2001910a:	700b      	strb	r3, [r1, #0]
+2001910c:	4960      	ldr	r1, [pc, #384]	@ (20019290 <volatileHack+0x22c>)
+2001910e:	f8c1 3098 	str.w	r3, [r1, #152]	@ 0x98
+20019112:	f8d1 30a0 	ldr.w	r3, [r1, #160]	@ 0xa0
+20019116:	f023 0301 	bic.w	r3, r3, #1
+2001911a:	f8c1 30a0 	str.w	r3, [r1, #160]	@ 0xa0
+2001911e:	f382 8810 	msr	PRIMASK, r2
+20019122:	4b5a      	ldr	r3, [pc, #360]	@ (2001928c <volatileHack+0x228>)
+20019124:	f8d3 9000 	ldr.w	r9, [r3]
+20019128:	f509 43c0 	add.w	r3, r9, #24576	@ 0x6000
+2001912c:	9301      	str	r3, [sp, #4]
+2001912e:	3338      	adds	r3, #56	@ 0x38
+20019130:	9302      	str	r3, [sp, #8]
+20019132:	f509 4a30 	add.w	sl, r9, #45056	@ 0xb000
+20019136:	e7ae      	b.n	20019096 <volatileHack+0x32>
+20019138:	79d3      	ldrb	r3, [r2, #7]
+2001913a:	7957      	ldrb	r7, [r2, #5]
+2001913c:	f013 0f02 	tst.w	r3, #2
+20019140:	bf0c      	ite	eq
+20019142:	f04f 0e01 	moveq.w	lr, #1
+20019146:	f04f 3eff 	movne.w	lr, #4294967295
+2001914a:	f013 0f01 	tst.w	r3, #1
+2001914e:	bf0c      	ite	eq
+20019150:	46f0      	moveq	r8, lr
+20019152:	4680      	movne	r8, r0
+20019154:	2f00      	cmp	r7, #0
+20019156:	d053      	beq.n	20019200 <volatileHack+0x19c>
+20019158:	7910      	ldrb	r0, [r2, #4]
+2001915a:	2800      	cmp	r0, #0
+2001915c:	d050      	beq.n	20019200 <volatileHack+0x19c>
+2001915e:	8816      	ldrh	r6, [r2, #0]
+20019160:	8855      	ldrh	r5, [r2, #2]
+20019162:	7993      	ldrb	r3, [r2, #6]
+20019164:	ba76      	rev16	r6, r6
+20019166:	ba6d      	rev16	r5, r5
+20019168:	1a1b      	subs	r3, r3, r0
+2001916a:	f1b8 0f01 	cmp.w	r8, #1
+2001916e:	fb0e f403 	mul.w	r4, lr, r3
+20019172:	fa19 f686 	uxtah	r6, r9, r6
+20019176:	fa19 f585 	uxtah	r5, r9, r5
+2001917a:	d15c      	bne.n	20019236 <volatileHack+0x1d2>
+2001917c:	f1be 0101 	subs.w	r1, lr, #1
+20019180:	bf18      	it	ne
+20019182:	2101      	movne	r1, #1
+20019184:	2900      	cmp	r1, #0
+20019186:	d156      	bne.n	20019236 <volatileHack+0x1d2>
+20019188:	f000 08fc 	and.w	r8, r0, #252	@ 0xfc
+2001918c:	468c      	mov	ip, r1
+2001918e:	f108 0102 	add.w	r1, r8, #2
+20019192:	e9cd 1903 	strd	r1, r9, [sp, #12]
+20019196:	e9cd 2a05 	strd	r2, sl, [sp, #20]
+2001919a:	f100 3eff 	add.w	lr, r0, #4294967295
+2001919e:	f108 0a01 	add.w	sl, r8, #1
+200191a2:	f1be 0f05 	cmp.w	lr, #5
+200191a6:	d92e      	bls.n	20019206 <volatileHack+0x1a2>
+200191a8:	1e69      	subs	r1, r5, #1
+200191aa:	1b89      	subs	r1, r1, r6
+200191ac:	2902      	cmp	r1, #2
+200191ae:	462a      	mov	r2, r5
+200191b0:	4633      	mov	r3, r6
+200191b2:	d928      	bls.n	20019206 <volatileHack+0x1a2>
+200191b4:	eb06 0908 	add.w	r9, r6, r8
+200191b8:	f853 1b04 	ldr.w	r1, [r3], #4
+200191bc:	454b      	cmp	r3, r9
+200191be:	f842 1b04 	str.w	r1, [r2], #4
+200191c2:	d1f9      	bne.n	200191b8 <volatileHack+0x154>
+200191c4:	4540      	cmp	r0, r8
+200191c6:	d00d      	beq.n	200191e4 <volatileHack+0x180>
+200191c8:	781a      	ldrb	r2, [r3, #0]
+200191ca:	4550      	cmp	r0, sl
+200191cc:	f805 2008 	strb.w	r2, [r5, r8]
+200191d0:	eb05 0208 	add.w	r2, r5, r8
+200191d4:	d906      	bls.n	200191e4 <volatileHack+0x180>
+200191d6:	7859      	ldrb	r1, [r3, #1]
+200191d8:	7051      	strb	r1, [r2, #1]
+200191da:	9903      	ldr	r1, [sp, #12]
+200191dc:	4288      	cmp	r0, r1
+200191de:	d901      	bls.n	200191e4 <volatileHack+0x180>
+200191e0:	789b      	ldrb	r3, [r3, #2]
+200191e2:	7093      	strb	r3, [r2, #2]
+200191e4:	3501      	adds	r5, #1
+200191e6:	3601      	adds	r6, #1
+200191e8:	f10c 0c01 	add.w	ip, ip, #1
+200191ec:	4475      	add	r5, lr
+200191ee:	4476      	add	r6, lr
+200191f0:	4567      	cmp	r7, ip
+200191f2:	4426      	add	r6, r4
+200191f4:	4425      	add	r5, r4
+200191f6:	d1d4      	bne.n	200191a2 <volatileHack+0x13e>
+200191f8:	e9dd 9204 	ldrd	r9, r2, [sp, #16]
+200191fc:	f8dd a018 	ldr.w	sl, [sp, #24]
+20019200:	2300      	movs	r3, #0
+20019202:	8113      	strh	r3, [r2, #8]
+20019204:	e747      	b.n	20019096 <volatileHack+0x32>
+20019206:	462b      	mov	r3, r5
+20019208:	1e72      	subs	r2, r6, #1
+2001920a:	eb05 0900 	add.w	r9, r5, r0
+2001920e:	f812 1f01 	ldrb.w	r1, [r2, #1]!
+20019212:	f803 1b01 	strb.w	r1, [r3], #1
+20019216:	4599      	cmp	r9, r3
+20019218:	d1f9      	bne.n	2001920e <volatileHack+0x1aa>
+2001921a:	e7e3      	b.n	200191e4 <volatileHack+0x180>
+2001921c:	2200      	movs	r2, #0
+2001921e:	f89a 3002 	ldrb.w	r3, [sl, #2]
+20019222:	f003 037f 	and.w	r3, r3, #127	@ 0x7f
+20019226:	f88a 3002 	strb.w	r3, [sl, #2]
+2001922a:	9b01      	ldr	r3, [sp, #4]
+2001922c:	f883 2038 	strb.w	r2, [r3, #56]	@ 0x38
+20019230:	b009      	add	sp, #36	@ 0x24
+20019232:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+20019236:	f04f 0c00 	mov.w	ip, #0
+2001923a:	fb08 f303 	mul.w	r3, r8, r3
+2001923e:	9303      	str	r3, [sp, #12]
+20019240:	1e43      	subs	r3, r0, #1
+20019242:	fb0e f103 	mul.w	r1, lr, r3
+20019246:	e9cd 2a06 	strd	r2, sl, [sp, #24]
+2001924a:	fb08 fa03 	mul.w	sl, r8, r3
+2001924e:	e9cd 1904 	strd	r1, r9, [sp, #16]
+20019252:	4629      	mov	r1, r5
+20019254:	4632      	mov	r2, r6
+20019256:	2300      	movs	r3, #0
+20019258:	f892 9000 	ldrb.w	r9, [r2]
+2001925c:	3301      	adds	r3, #1
+2001925e:	4298      	cmp	r0, r3
+20019260:	f881 9000 	strb.w	r9, [r1]
+20019264:	4442      	add	r2, r8
+20019266:	4471      	add	r1, lr
+20019268:	d1f6      	bne.n	20019258 <volatileHack+0x1f4>
+2001926a:	9b04      	ldr	r3, [sp, #16]
+2001926c:	4475      	add	r5, lr
+2001926e:	441d      	add	r5, r3
+20019270:	4446      	add	r6, r8
+20019272:	9b03      	ldr	r3, [sp, #12]
+20019274:	f10c 0c01 	add.w	ip, ip, #1
+20019278:	4456      	add	r6, sl
+2001927a:	4567      	cmp	r7, ip
+2001927c:	441e      	add	r6, r3
+2001927e:	4425      	add	r5, r4
+20019280:	d1e7      	bne.n	20019252 <volatileHack+0x1ee>
+20019282:	e9dd 9205 	ldrd	r9, r2, [sp, #20]
+20019286:	f8dd a01c 	ldr.w	sl, [sp, #28]
+2001928a:	e7b9      	b.n	20019200 <volatileHack+0x19c>
+2001928c:	20025f10 	.word	0x20025f10
+20019290:	e000ed00 	.word	0xe000ed00
+20019294:	2002c104 	.word	0x2002c104
+20019298:	2002b844 	.word	0x2002b844

@@ -1,0 +1,27 @@
+20015a5c <tmsEndOfFrame>:
+20015a5c:	b510      	push	{r4, lr}
+20015a5e:	b086      	sub	sp, #24
+20015a60:	f001 f9dc 	bl	20016e1c <vgaCurrentParams>
+20015a64:	4604      	mov	r4, r0
+20015a66:	8b00      	ldrh	r0, [r0, #24]
+20015a68:	f894 1044 	ldrb.w	r1, [r4, #68]	@ 0x44
+20015a6c:	f894 2048 	ldrb.w	r2, [r4, #72]	@ 0x48
+20015a70:	8de3      	ldrh	r3, [r4, #46]	@ 0x2e
+20015a72:	f88d 1008 	strb.w	r1, [sp, #8]
+20015a76:	f88d 2009 	strb.w	r2, [sp, #9]
+20015a7a:	f8ad 300a 	strh.w	r3, [sp, #10]
+20015a7e:	9001      	str	r0, [sp, #4]
+20015a80:	f000 fd02 	bl	20016488 <coreTemperatureC>
+20015a84:	6c22      	ldr	r2, [r4, #64]	@ 0x40
+20015a86:	4601      	mov	r1, r0
+20015a88:	ab01      	add	r3, sp, #4
+20015a8a:	a803      	add	r0, sp, #12
+20015a8c:	f001 ff28 	bl	200178e0 <pico9918_frame_end>
+20015a90:	f89d 2009 	ldrb.w	r2, [sp, #9]
+20015a94:	f8bd 300a 	ldrh.w	r3, [sp, #10]
+20015a98:	9805      	ldr	r0, [sp, #20]
+20015a9a:	f884 2048 	strb.w	r2, [r4, #72]	@ 0x48
+20015a9e:	85e3      	strh	r3, [r4, #46]	@ 0x2e
+20015aa0:	f001 f9c0 	bl	20016e24 <vgaSetTriggerScanline>
+20015aa4:	b006      	add	sp, #24
+20015aa6:	bd10      	pop	{r4, pc}

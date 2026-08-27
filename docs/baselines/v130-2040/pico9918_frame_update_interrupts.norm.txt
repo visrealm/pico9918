@@ -1,0 +1,115 @@
+<ADDR> <pico9918_frame_update_interrupts>:
+push	{r4, r5, lr}
+mov	lr, r8
+movs	r4, r0
+push	{lr}
+movs	r1, #0
+movs	r0, #9
+bl	<ADDR> <irq_set_enabled>
+movs	r1, #0
+movs	r0, #10
+bl	<ADDR> <irq_set_enabled>
+dmb	sy
+ldr	r3, [pc, #192]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+ldr	r2, [pc, #196]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+ldr	r3, [r3, #0]
+ldrb	r0, [r3, r2]
+ldrsb	r2, [r3, r2]
+cmp	r2, #0
+blt.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+lsls	r2, r0, #25
+bmi.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+movs	r2, #31
+bics	r0, r2
+orrs	r0, r4
+ldr	r2, [pc, #172]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+movs	r1, #255	@ 0xff
+strb	r0, [r3, r2]
+movs	r2, #176	@ 0xb0
+lsls	r2, r2, #8
+strb	r0, [r3, r2]
+ldr	r2, [pc, #164]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+ldrb	r2, [r2, #0]
+lsls	r2, r2, #8
+orrs	r2, r1
+ldr	r1, [pc, #160]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+ldrb	r1, [r3, r1]
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+ldr	r1, [pc, #156]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+ldrb	r1, [r3, r1]
+movs	r4, r1
+movs	r1, #15
+ands	r1, r4
+lsls	r4, r1, #24
+orrs	r4, r2
+movs	r2, #176	@ 0xb0
+adds	r1, r3, r1
+lsls	r2, r2, #8
+ldrb	r2, [r1, r2]
+lsls	r2, r2, #16
+orrs	r2, r4
+ldr	r1, [pc, #136]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+str	r2, [r1, #20]
+ldr	r1, [pc, #136]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+ldrb	r2, [r3, r1]
+mov	ip, r2
+ldr	r2, [pc, #132]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #26
+bpl.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+lsls	r0, r0, #24
+bmi.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+mov	r2, ip
+cmp	r2, #0
+beq.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+movs	r1, #0
+ldr	r2, [pc, #108]	@ (<ADDR> <pico9918_frame_update_interrupts+OFF>)
+strb	r1, [r3, r2]
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #20]
+dmb	sy
+movs	r1, #1
+movs	r0, #9
+bl	<ADDR> <irq_set_enabled>
+movs	r1, #1
+movs	r0, #10
+bl	<ADDR> <irq_set_enabled>
+pop	{r5}
+mov	r8, r5
+pop	{r4, r5, pc}
+movs	r2, #31
+movs	r1, r4
+bics	r1, r2
+orrs	r0, r1
+b.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+lsls	r1, r0, #16
+orrs	r2, r1
+b.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+movs	r2, #32
+ands	r2, r4
+orrs	r0, r2
+b.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+mov	r2, ip
+cmp	r2, #0
+bne.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+adds	r2, #1
+strb	r2, [r3, r1]
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+lsls	r2, r2, #15
+str	r2, [r3, #24]
+b.n	<ADDR> <pico9918_frame_update_interrupts+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

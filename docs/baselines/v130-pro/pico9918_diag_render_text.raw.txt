@@ -1,0 +1,65 @@
+20018ab0 <pico9918_diag_render_text>:
+20018ab0:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+20018ab4:	1ac3      	subs	r3, r0, r3
+20018ab6:	2b05      	cmp	r3, #5
+20018ab8:	f8bd 7024 	ldrh.w	r7, [sp, #36]	@ 0x24
+20018abc:	f8dd 9028 	ldr.w	r9, [sp, #40]	@ 0x28
+20018ac0:	d850      	bhi.n	20018b64 <pico9918_diag_render_text+0xb4>
+20018ac2:	460c      	mov	r4, r1
+20018ac4:	7809      	ldrb	r1, [r1, #0]
+20018ac6:	eb09 0642 	add.w	r6, r9, r2, lsl #1
+20018aca:	2900      	cmp	r1, #0
+20018acc:	d045      	beq.n	20018b5a <pico9918_diag_render_text+0xaa>
+20018ace:	eb03 0343 	add.w	r3, r3, r3, lsl #1
+20018ad2:	015d      	lsls	r5, r3, #5
+20018ad4:	eb07 4007 	add.w	r0, r7, r7, lsl #16
+20018ad8:	f8df b098 	ldr.w	fp, [pc, #152]	@ 20018b74 <pico9918_diag_render_text+0xc4>
+20018adc:	4f23      	ldr	r7, [pc, #140]	@ (20018b6c <pico9918_diag_render_text+0xbc>)
+20018ade:	4a24      	ldr	r2, [pc, #144]	@ (20018b70 <pico9918_diag_render_text+0xc0>)
+20018ae0:	f8cd 9028 	str.w	r9, [sp, #40]	@ 0x28
+20018ae4:	3401      	adds	r4, #1
+20018ae6:	f106 030c 	add.w	r3, r6, #12
+20018aea:	f1a5 0920 	sub.w	r9, r5, #32
+20018aee:	4449      	add	r1, r9
+20018af0:	f81b c001 	ldrb.w	ip, [fp, r1]
+20018af4:	e953 8603 	ldrd	r8, r6, [r3, #-12]
+20018af8:	ea4f 110c 	mov.w	r1, ip, lsl #4
+20018afc:	587d      	ldr	r5, [r7, r1]
+20018afe:	469a      	mov	sl, r3
+20018b00:	43e9      	mvns	r1, r5
+20018b02:	ea01 0198 	and.w	r1, r1, r8, lsr #2
+20018b06:	ea00 0e05 	and.w	lr, r0, r5
+20018b0a:	4011      	ands	r1, r2
+20018b0c:	f853 5c04 	ldr.w	r5, [r3, #-4]
+20018b10:	ea41 010e 	orr.w	r1, r1, lr
+20018b14:	f843 1c0c 	str.w	r1, [r3, #-12]
+20018b18:	eb07 1c0c 	add.w	ip, r7, ip, lsl #4
+20018b1c:	f8dc e004 	ldr.w	lr, [ip, #4]
+20018b20:	330c      	adds	r3, #12
+20018b22:	ea6f 010e 	mvn.w	r1, lr
+20018b26:	ea01 0196 	and.w	r1, r1, r6, lsr #2
+20018b2a:	ea00 0e0e 	and.w	lr, r0, lr
+20018b2e:	4011      	ands	r1, r2
+20018b30:	ea41 010e 	orr.w	r1, r1, lr
+20018b34:	f843 1c14 	str.w	r1, [r3, #-20]
+20018b38:	f8dc 6008 	ldr.w	r6, [ip, #8]
+20018b3c:	43f1      	mvns	r1, r6
+20018b3e:	ea01 0195 	and.w	r1, r1, r5, lsr #2
+20018b42:	4006      	ands	r6, r0
+20018b44:	4011      	ands	r1, r2
+20018b46:	4331      	orrs	r1, r6
+20018b48:	f843 1c10 	str.w	r1, [r3, #-16]
+20018b4c:	f814 1b01 	ldrb.w	r1, [r4], #1
+20018b50:	2900      	cmp	r1, #0
+20018b52:	d1cc      	bne.n	20018aee <pico9918_diag_render_text+0x3e>
+20018b54:	4656      	mov	r6, sl
+20018b56:	f8dd 9028 	ldr.w	r9, [sp, #40]	@ 0x28
+20018b5a:	eba6 0209 	sub.w	r2, r6, r9
+20018b5e:	1050      	asrs	r0, r2, #1
+20018b60:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+20018b64:	4610      	mov	r0, r2
+20018b66:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+20018b6a:	bf00      	nop
+20018b6c:	2002b85c 	.word	0x2002b85c
+20018b70:	03330333 	.word	0x03330333
+20018b74:	2002b2ac 	.word	0x2002b2ac

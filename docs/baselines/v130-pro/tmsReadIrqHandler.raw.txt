@@ -1,0 +1,88 @@
+20019bb8 <tmsReadIrqHandler>:
+20019bb8:	4a3b      	ldr	r2, [pc, #236]	@ (20019ca8 <tmsReadIrqHandler+0xf0>)
+20019bba:	4b3c      	ldr	r3, [pc, #240]	@ (20019cac <tmsReadIrqHandler+0xf4>)
+20019bbc:	6812      	ldr	r2, [r2, #0]
+20019bbe:	6a5b      	ldr	r3, [r3, #36]	@ 0x24
+20019bc0:	f502 3180 	add.w	r1, r2, #65536	@ 0x10000
+20019bc4:	f013 0001 	ands.w	r0, r3, #1
+20019bc8:	b510      	push	{r4, lr}
+20019bca:	f891 c02f 	ldrb.w	ip, [r1, #47]	@ 0x2f
+20019bce:	d125      	bne.n	20019c1c <tmsReadIrqHandler+0x64>
+20019bd0:	f881 002a 	strb.w	r0, [r1, #42]	@ 0x2a
+20019bd4:	f502 40c0 	add.w	r0, r2, #24576	@ 0x6000
+20019bd8:	6a4b      	ldr	r3, [r1, #36]	@ 0x24
+20019bda:	f990 0030 	ldrsb.w	r0, [r0, #48]	@ 0x30
+20019bde:	4418      	add	r0, r3
+20019be0:	f3c3 030d 	ubfx	r3, r3, #0, #14
+20019be4:	5cd3      	ldrb	r3, [r2, r3]
+20019be6:	6248      	str	r0, [r1, #36]	@ 0x24
+20019be8:	f881 302c 	strb.w	r3, [r1, #44]	@ 0x2c
+20019bec:	4930      	ldr	r1, [pc, #192]	@ (20019cb0 <tmsReadIrqHandler+0xf8>)
+20019bee:	700b      	strb	r3, [r1, #0]
+20019bf0:	021b      	lsls	r3, r3, #8
+20019bf2:	f043 03ff 	orr.w	r3, r3, #255	@ 0xff
+20019bf6:	f1bc 0f00 	cmp.w	ip, #0
+20019bfa:	d027      	beq.n	20019c4c <tmsReadIrqHandler+0x94>
+20019bfc:	f502 41c0 	add.w	r1, r2, #24576	@ 0x6000
+20019c00:	7bc9      	ldrb	r1, [r1, #15]
+20019c02:	f001 010f 	and.w	r1, r1, #15
+20019c06:	440a      	add	r2, r1
+20019c08:	f502 4230 	add.w	r2, r2, #45056	@ 0xb000
+20019c0c:	7812      	ldrb	r2, [r2, #0]
+20019c0e:	0609      	lsls	r1, r1, #24
+20019c10:	ea41 4102 	orr.w	r1, r1, r2, lsl #16
+20019c14:	4a25      	ldr	r2, [pc, #148]	@ (20019cac <tmsReadIrqHandler+0xf4>)
+20019c16:	430b      	orrs	r3, r1
+20019c18:	6153      	str	r3, [r2, #20]
+20019c1a:	bd10      	pop	{r4, pc}
+20019c1c:	2000      	movs	r0, #0
+20019c1e:	ea4f 4e53 	mov.w	lr, r3, lsr #17
+20019c22:	f881 002a 	strb.w	r0, [r1, #42]	@ 0x2a
+20019c26:	f1bc 0f00 	cmp.w	ip, #0
+20019c2a:	d017      	beq.n	20019c5c <tmsReadIrqHandler+0xa4>
+20019c2c:	0e58      	lsrs	r0, r3, #25
+20019c2e:	d019      	beq.n	20019c64 <tmsReadIrqHandler+0xac>
+20019c30:	4b1f      	ldr	r3, [pc, #124]	@ (20019cb0 <tmsReadIrqHandler+0xf8>)
+20019c32:	2801      	cmp	r0, #1
+20019c34:	781b      	ldrb	r3, [r3, #0]
+20019c36:	d1db      	bne.n	20019bf0 <tmsReadIrqHandler+0x38>
+20019c38:	f01e 0f01 	tst.w	lr, #1
+20019c3c:	d0d8      	beq.n	20019bf0 <tmsReadIrqHandler+0x38>
+20019c3e:	f502 4030 	add.w	r0, r2, #45056	@ 0xb000
+20019c42:	7841      	ldrb	r1, [r0, #1]
+20019c44:	f021 0101 	bic.w	r1, r1, #1
+20019c48:	7041      	strb	r1, [r0, #1]
+20019c4a:	e7d1      	b.n	20019bf0 <tmsReadIrqHandler+0x38>
+20019c4c:	f502 4230 	add.w	r2, r2, #45056	@ 0xb000
+20019c50:	7812      	ldrb	r2, [r2, #0]
+20019c52:	ea43 4302 	orr.w	r3, r3, r2, lsl #16
+20019c56:	4a15      	ldr	r2, [pc, #84]	@ (20019cac <tmsReadIrqHandler+0xf4>)
+20019c58:	6153      	str	r3, [r2, #20]
+20019c5a:	bd10      	pop	{r4, pc}
+20019c5c:	f891 0035 	ldrb.w	r0, [r1, #53]	@ 0x35
+20019c60:	2801      	cmp	r0, #1
+20019c62:	d0e3      	beq.n	20019c2c <tmsReadIrqHandler+0x74>
+20019c64:	f891 05ed 	ldrb.w	r0, [r1, #1517]	@ 0x5ed
+20019c68:	f02e 031f 	bic.w	r3, lr, #31
+20019c6c:	f01e 0f40 	tst.w	lr, #64	@ 0x40
+20019c70:	fa4f fe83 	sxtb.w	lr, r3
+20019c74:	ea20 000e 	bic.w	r0, r0, lr
+20019c78:	f040 031f 	orr.w	r3, r0, #31
+20019c7c:	bf18      	it	ne
+20019c7e:	4618      	movne	r0, r3
+20019c80:	4b0b      	ldr	r3, [pc, #44]	@ (20019cb0 <tmsReadIrqHandler+0xf8>)
+20019c82:	f502 4430 	add.w	r4, r2, #45056	@ 0xb000
+20019c86:	f1be 0f00 	cmp.w	lr, #0
+20019c8a:	7020      	strb	r0, [r4, #0]
+20019c8c:	781b      	ldrb	r3, [r3, #0]
+20019c8e:	f881 05ed 	strb.w	r0, [r1, #1517]	@ 0x5ed
+20019c92:	daad      	bge.n	20019bf0 <tmsReadIrqHandler+0x38>
+20019c94:	f04f 0400 	mov.w	r4, #0
+20019c98:	2016      	movs	r0, #22
+20019c9a:	f04f 0e01 	mov.w	lr, #1
+20019c9e:	f881 45ec 	strb.w	r4, [r1, #1516]	@ 0x5ec
+20019ca2:	ec4e 0040 	mcrr	0, 4, r0, lr, cr0
+20019ca6:	e7a3      	b.n	20019bf0 <tmsReadIrqHandler+0x38>
+20019ca8:	20025f10 	.word	0x20025f10
+20019cac:	50300000 	.word	0x50300000
+20019cb0:	2002c102 	.word	0x2002c102

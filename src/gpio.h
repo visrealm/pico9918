@@ -1,4 +1,7 @@
-/*
+/**
+ * \file
+ * \brief host bus GPIO assignments and pin masks
+ *
  * Project: pico9918
  *
  * Copyright (c) 2024 Troy Schrapel
@@ -11,57 +14,36 @@
 
 #pragma once
 
- /*
-  * Pin mapping
-  *
-  * Pico Pin  | GPIO (v0.3) | GPIO (v0.4+) | Name      | TMS9918A Pin
-  * ----------+-------------+--------------+-----------+-------------
-  *     19    |     14      |     14       |  CD7      |  24
-  *     20    |     15      |     15       |  CD6      |  23
-  *     21    |     16      |     16       |  CD5      |  22
-  *     22    |     17      |     17       |  CD4      |  21
-  *     24    |     18      |     18       |  CD3      |  20
-  *     25    |     19      |     19       |  CD2      |  19
-  *     26    |     20      |     20       |  CD1      |  18
-  *     27    |     21      |     21       |  CD0      |  17
-  *     29    |     22      |     22       |  /INT     |  16
-  *     30    |     RUN     |     23       |  RST      |  34
-  *     31    |     26      |     26       |  /CSR     |  15
-  *     32    |     27      |     27       |  /CSW     |  14
-  *     34    |     28      |     28       |  MODE     |  13
-  *     --    |     --      |     29       |  MODE 1   |  --
-  *     35    |     29      |     25       |  GROMCLK  |  37
-  *     37    |     23      |     24       |  CPUCLK   |  38
-  *
-  *
-  * Note: Due to GROMCLK and CPUCLK using GPIO23 and GPIO29
-  *       a genuine Raspberry Pi Pico can't be used.
-  *       v0.3 of the PCB is designed for the DWEII?
-  *       RP2040 USB-C module which exposes these additional
-  *       GPIOs. A future pico9918 revision (v0.4+) will do without
-  *       an external RP2040 board and use the RP2040 directly.
-  * 
-  * Note: Hardware v0.3 has different GPIO mappings for GROMCL and CPUCL
-  *       Hardware v0.3 doesn't have a soft reset GPIO either
-  * 
-  * Purchase links for v0.3 Pi Pico module:
-  *       https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
-  *       https://www.aliexpress.com/item/1005007066733934.html
-  */
+/* MCU GPIO -> signal -> TMS9918A pin; the MCU side is the _L net on the schematic
+ *   signal   v0.4+  v0.3   v0.3 module pin  TMS9918A pin
+ *   CD7-CD0  14-21  14-21  19-22, 24-27     24-17 (CD0 is the MSB)
+ *   /INT     22     22     29               16
+ *   RST      23     RUN    30               34
+ *   CPUCLK   24     23     37               38
+ *   GROMCLK  25     29     35               37
+ *   /CSR     26     26     31               15
+ *   /CSW     27     27     32               14
+ *   MODE     28     28     34               13
+ *   MODE1    29     -      -                -
+ *
+ * GROMCLK and CPUCLK need GPIO23 and GPIO29, which a genuine Raspberry Pi Pico
+ * does not bring out, so v0.3 takes the DWEII RP2040 USB-C module instead. It
+ * also has no soft reset GPIO, taking host reset on RUN.
+ *   https://www.amazon.com/RP2040-Board-Type-C-Raspberry-Micropython/dp/B0CG9BY48X
+ *   https://www.aliexpress.com/item/1005007066733934.html
+ */
 
- #pragma once
+#include "tms9918.pio.h"
 
- #include "tms9918.pio.h"
-
-// Base pin defaults below may be overridden at build time via the CMake config
-// file (pico9918_config.cmake) which passes -DPICO9918_GPIO_* defines.
+// Base pins, overridable at build time with -DPICO9918_GPIO_* from pico9918_config.cmake
 #ifndef PICO9918_GPIO_CD7
 #define PICO9918_GPIO_CD7 14
 #endif
-#define GPIO_CD7 PICO9918_GPIO_CD7
+#define GPIO_CD7 PICO9918_GPIO_CD7 ///< data bus base; CD7 to CD0 run upwards from here
 
-#define GPIO_CSR tmsRead_CSR_PIN  // defined in tms9918.pio.h
-#define GPIO_CSW tmsWrite_CSW_PIN // defined in tms9918.pio.h
+// /CSR and /CSW are fixed at 26 and 27 by tms9918.pio, so they are not overridable
+#define GPIO_CSR tmsRead_CSR_PIN
+#define GPIO_CSW tmsWrite_CSW_PIN
 
 #ifndef PICO9918_GPIO_MODE
 #define PICO9918_GPIO_MODE 28
@@ -71,7 +53,7 @@
 #ifndef PICO9918_GPIO_MODE1
 #define PICO9918_GPIO_MODE1 29
 #endif
-#define GPIO_MODE1 PICO9918_GPIO_MODE1
+#define GPIO_MODE1 PICO9918_GPIO_MODE1 ///< V9938 second mode line, no TMS9918A pin
 
 #ifndef PICO9918_GPIO_INT
 #define PICO9918_GPIO_INT 22
@@ -81,9 +63,9 @@
 #ifndef PICO9918_GPIO_RESET
 #define PICO9918_GPIO_RESET 23
 #endif
-#define GPIO_RESET PICO9918_GPIO_RESET
+#define GPIO_RESET PICO9918_GPIO_RESET ///< host reset in; not present on v0.3
 
-// default mappings (v0.4+)
+// clock outputs, v0.4+ mapping
 #ifndef PICO9918_GPIO_GROMCL
 #define PICO9918_GPIO_GROMCL 25
 #endif
@@ -94,7 +76,7 @@
 #endif
 #define GPIO_CPUCL PICO9918_GPIO_CPUCL
 
-// v0.3-specific pins mappings
+// clock outputs, v0.3 mapping
 #ifndef PICO9918_GPIO_GROMCL_V03
 #define PICO9918_GPIO_GROMCL_V03 29
 #endif
@@ -105,12 +87,11 @@
 #endif
 #define GPIO_CPUCL_V03 PICO9918_GPIO_CPUCL_V03
 
-// gpio masks
-#define GPIO_CD_MASK (0xff << GPIO_CD7)
-#define GPIO_CSR_MASK (0x01 << GPIO_CSR)
-#define GPIO_CSW_MASK (0x01 << GPIO_CSW)
-#define GPIO_MODE_MASK (0x01 << GPIO_MODE)
+// pin masks for the gpio_*_masked / gpio_*_all_bits calls
+#define GPIO_CD_MASK    (0xff << GPIO_CD7)
+#define GPIO_CSR_MASK   (0x01 << GPIO_CSR)
+#define GPIO_CSW_MASK   (0x01 << GPIO_CSW)
+#define GPIO_MODE_MASK  (0x01 << GPIO_MODE)
 #define GPIO_MODE1_MASK (0x01 << GPIO_MODE1)
-#define GPIO_INT_MASK (0x01 << GPIO_INT)
+#define GPIO_INT_MASK   (0x01 << GPIO_INT)
 #define GPIO_RESET_MASK (0x01 << GPIO_RESET)
-

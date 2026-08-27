@@ -1,0 +1,160 @@
+<ADDR> <compositeTile2OnlyBuffer.constprop.0>:
+movs	r3, #132	@ 0x84
+push	{r4, r5, r6, lr}
+ldr	r5, [pc, #304]	@ (<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>)
+lsls	r3, r3, #2
+adds	r0, r5, r0
+movs	r4, #0
+ldr	r1, [pc, #300]	@ (<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>)
+ldr	r6, [pc, #304]	@ (<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>)
+adds	r5, r5, r3
+b.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+adds	r4, #4
+adds	r0, #32
+adds	r1, #32
+cmp	r4, #32
+bne.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+b.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldr	r2, [r6, r4]
+ldr	r3, [r5, r4]
+bics	r3, r2
+beq.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #0]
+strb	r2, [r1, #0]
+lsls	r2, r3, #1
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #1]
+strb	r2, [r1, #1]
+lsls	r2, r3, #2
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #2]
+strb	r2, [r1, #2]
+lsls	r2, r3, #3
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #3]
+strb	r2, [r1, #3]
+lsls	r2, r3, #4
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #4]
+strb	r2, [r1, #4]
+lsls	r2, r3, #5
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #5]
+strb	r2, [r1, #5]
+lsls	r2, r3, #6
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #6]
+strb	r2, [r1, #6]
+lsls	r2, r3, #7
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #7]
+strb	r2, [r1, #7]
+lsls	r2, r3, #8
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #8]
+strb	r2, [r1, #8]
+lsls	r2, r3, #9
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #9]
+strb	r2, [r1, #9]
+lsls	r2, r3, #10
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #10]
+strb	r2, [r1, #10]
+lsls	r2, r3, #11
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #11]
+strb	r2, [r1, #11]
+lsls	r2, r3, #12
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #12]
+strb	r2, [r1, #12]
+lsls	r2, r3, #13
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #13]
+strb	r2, [r1, #13]
+lsls	r2, r3, #14
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #14]
+strb	r2, [r1, #14]
+lsls	r2, r3, #15
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #15]
+strb	r2, [r1, #15]
+lsls	r2, r3, #16
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #16]
+strb	r2, [r1, #16]
+lsls	r2, r3, #17
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #17]
+strb	r2, [r1, #17]
+lsls	r2, r3, #18
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #18]
+strb	r2, [r1, #18]
+lsls	r2, r3, #19
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #19]
+strb	r2, [r1, #19]
+lsls	r2, r3, #20
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #20]
+strb	r2, [r1, #20]
+lsls	r2, r3, #21
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #21]
+strb	r2, [r1, #21]
+lsls	r2, r3, #22
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #22]
+strb	r2, [r1, #22]
+lsls	r2, r3, #23
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #23]
+strb	r2, [r1, #23]
+lsls	r2, r3, #24
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #24]
+strb	r2, [r1, #24]
+lsls	r2, r3, #25
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #25]
+strb	r2, [r1, #25]
+lsls	r2, r3, #26
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #26]
+strb	r2, [r1, #26]
+lsls	r2, r3, #27
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #27]
+strb	r2, [r1, #27]
+lsls	r2, r3, #28
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #28]
+strb	r2, [r1, #28]
+lsls	r2, r3, #29
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #29]
+strb	r2, [r1, #29]
+lsls	r2, r3, #30
+bpl.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r2, [r0, #30]
+strb	r2, [r1, #30]
+lsls	r3, r3, #31
+bmi.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+b.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+ldrb	r3, [r0, #31]
+adds	r4, #4
+strb	r3, [r1, #31]
+adds	r0, #32
+adds	r1, #32
+cmp	r4, #32
+beq.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+b.n	<ADDR> <compositeTile2OnlyBuffer.constprop.0+OFF>
+pop	{r4, r5, r6, pc}
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

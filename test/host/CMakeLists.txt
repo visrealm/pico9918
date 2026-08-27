@@ -5,7 +5,7 @@ add_executable(${PROGRAM})
 # generate image array source files from png images
 visrealm_generate_bindata_source(${PROGRAM} breakout res/BREAKOUT.* )
 
-pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/clocks.pio)
+pico_generate_pio_header(${PROGRAM} ${CMAKE_CURRENT_LIST_DIR}/hostclocks.pio)
 
 target_sources(${PROGRAM} PRIVATE test.c font.c)
 

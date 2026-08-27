@@ -1,0 +1,4 @@
+<ADDR> <tmsEndOfScanline>:
+push	{r4, lr}
+bl	<ADDR> <vrEmuTmsFrameEndOfScanline>
+pop	{r4, pc}

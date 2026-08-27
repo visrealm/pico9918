@@ -1,0 +1,107 @@
+20000134 <updateInterrupts>:
+20000134:	b570      	push	{r4, r5, r6, lr}
+20000136:	2100      	movs	r1, #0
+20000138:	0005      	movs	r5, r0
+2000013a:	2009      	movs	r0, #9
+2000013c:	f002 fb4a 	bl	200027d4 <irq_set_enabled>
+20000140:	2100      	movs	r1, #0
+20000142:	200a      	movs	r0, #10
+20000144:	f002 fb46 	bl	200027d4 <irq_set_enabled>
+20000148:	f3bf 8f5f 	dmb	sy
+2000014c:	492d      	ldr	r1, [pc, #180]	@ (20000204 <updateInterrupts+0xd0>)
+2000014e:	4b2e      	ldr	r3, [pc, #184]	@ (20000208 <updateInterrupts+0xd4>)
+20000150:	680c      	ldr	r4, [r1, #0]
+20000152:	492e      	ldr	r1, [pc, #184]	@ (2000020c <updateInterrupts+0xd8>)
+20000154:	781a      	ldrb	r2, [r3, #0]
+20000156:	5c60      	ldrb	r0, [r4, r1]
+20000158:	2120      	movs	r1, #32
+2000015a:	4001      	ands	r1, r0
+2000015c:	2000      	movs	r0, #0
+2000015e:	5618      	ldrsb	r0, [r3, r0]
+20000160:	2800      	cmp	r0, #0
+20000162:	da25      	bge.n	200001b0 <updateInterrupts+0x7c>
+20000164:	4b2a      	ldr	r3, [pc, #168]	@ (20000210 <updateInterrupts+0xdc>)
+20000166:	781a      	ldrb	r2, [r3, #0]
+20000168:	2900      	cmp	r1, #0
+2000016a:	d113      	bne.n	20000194 <updateInterrupts+0x60>
+2000016c:	2a00      	cmp	r2, #0
+2000016e:	d006      	beq.n	2000017e <updateInterrupts+0x4a>
+20000170:	2200      	movs	r2, #0
+20000172:	701a      	strb	r2, [r3, #0]
+20000174:	23d0      	movs	r3, #208	@ 0xd0
+20000176:	2280      	movs	r2, #128	@ 0x80
+20000178:	061b      	lsls	r3, r3, #24
+2000017a:	03d2      	lsls	r2, r2, #15
+2000017c:	615a      	str	r2, [r3, #20]
+2000017e:	f3bf 8f5f 	dmb	sy
+20000182:	2101      	movs	r1, #1
+20000184:	2009      	movs	r0, #9
+20000186:	f002 fb25 	bl	200027d4 <irq_set_enabled>
+2000018a:	2101      	movs	r1, #1
+2000018c:	200a      	movs	r0, #10
+2000018e:	f002 fb21 	bl	200027d4 <irq_set_enabled>
+20000192:	bd70      	pop	{r4, r5, r6, pc}
+20000194:	491f      	ldr	r1, [pc, #124]	@ (20000214 <updateInterrupts+0xe0>)
+20000196:	5c61      	ldrb	r1, [r4, r1]
+20000198:	297f      	cmp	r1, #127	@ 0x7f
+2000019a:	d9e7      	bls.n	2000016c <updateInterrupts+0x38>
+2000019c:	2a00      	cmp	r2, #0
+2000019e:	d1ee      	bne.n	2000017e <updateInterrupts+0x4a>
+200001a0:	3201      	adds	r2, #1
+200001a2:	701a      	strb	r2, [r3, #0]
+200001a4:	23d0      	movs	r3, #208	@ 0xd0
+200001a6:	2280      	movs	r2, #128	@ 0x80
+200001a8:	061b      	lsls	r3, r3, #24
+200001aa:	03d2      	lsls	r2, r2, #15
+200001ac:	619a      	str	r2, [r3, #24]
+200001ae:	e7e6      	b.n	2000017e <updateInterrupts+0x4a>
+200001b0:	201f      	movs	r0, #31
+200001b2:	4382      	bics	r2, r0
+200001b4:	0028      	movs	r0, r5
+200001b6:	4310      	orrs	r0, r2
+200001b8:	22ff      	movs	r2, #255	@ 0xff
+200001ba:	7018      	strb	r0, [r3, #0]
+200001bc:	4b15      	ldr	r3, [pc, #84]	@ (20000214 <updateInterrupts+0xe0>)
+200001be:	54e0      	strb	r0, [r4, r3]
+200001c0:	4b15      	ldr	r3, [pc, #84]	@ (20000218 <updateInterrupts+0xe4>)
+200001c2:	781b      	ldrb	r3, [r3, #0]
+200001c4:	021b      	lsls	r3, r3, #8
+200001c6:	4313      	orrs	r3, r2
+200001c8:	7ae2      	ldrb	r2, [r4, #11]
+200001ca:	2a00      	cmp	r2, #0
+200001cc:	d016      	beq.n	200001fc <updateInterrupts+0xc8>
+200001ce:	4a13      	ldr	r2, [pc, #76]	@ (2000021c <updateInterrupts+0xe8>)
+200001d0:	5ca5      	ldrb	r5, [r4, r2]
+200001d2:	220f      	movs	r2, #15
+200001d4:	402a      	ands	r2, r5
+200001d6:	0615      	lsls	r5, r2, #24
+200001d8:	431d      	orrs	r5, r3
+200001da:	4b0e      	ldr	r3, [pc, #56]	@ (20000214 <updateInterrupts+0xe0>)
+200001dc:	18a2      	adds	r2, r4, r2
+200001de:	469c      	mov	ip, r3
+200001e0:	4462      	add	r2, ip
+200001e2:	7813      	ldrb	r3, [r2, #0]
+200001e4:	041b      	lsls	r3, r3, #16
+200001e6:	432b      	orrs	r3, r5
+200001e8:	4a0d      	ldr	r2, [pc, #52]	@ (20000220 <updateInterrupts+0xec>)
+200001ea:	6153      	str	r3, [r2, #20]
+200001ec:	4b08      	ldr	r3, [pc, #32]	@ (20000210 <updateInterrupts+0xdc>)
+200001ee:	2900      	cmp	r1, #0
+200001f0:	d0be      	beq.n	20000170 <updateInterrupts+0x3c>
+200001f2:	b240      	sxtb	r0, r0
+200001f4:	2201      	movs	r2, #1
+200001f6:	2800      	cmp	r0, #0
+200001f8:	daba      	bge.n	20000170 <updateInterrupts+0x3c>
+200001fa:	e7d2      	b.n	200001a2 <updateInterrupts+0x6e>
+200001fc:	0402      	lsls	r2, r0, #16
+200001fe:	4313      	orrs	r3, r2
+20000200:	e7f2      	b.n	200001e8 <updateInterrupts+0xb4>
+20000202:	46c0      	nop			@ (mov r8, r8)
+20000204:	2000c7e4 	.word	0x2000c7e4
+20000208:	2000c374 	.word	0x2000c374
+2000020c:	0000602d 	.word	0x0000602d
+20000210:	200274d6 	.word	0x200274d6
+20000214:	0000b02c 	.word	0x0000b02c
+20000218:	200274da 	.word	0x200274da
+2000021c:	0000603b 	.word	0x0000603b
+20000220:	50300000 	.word	0x50300000

@@ -1,0 +1,49 @@
+20015d1c <reloadStoredConfig>:
+20015d1c:	b530      	push	{r4, r5, lr}
+20015d1e:	4b1f      	ldr	r3, [pc, #124]	@ (20015d9c <reloadStoredConfig+0x80>)
+20015d20:	b083      	sub	sp, #12
+20015d22:	681c      	ldr	r4, [r3, #0]
+20015d24:	f44f 7280 	mov.w	r2, #256	@ 0x100
+20015d28:	f504 3480 	add.w	r4, r4, #65536	@ 0x10000
+20015d2c:	491c      	ldr	r1, [pc, #112]	@ (20015da0 <reloadStoredConfig+0x84>)
+20015d2e:	f104 0050 	add.w	r0, r4, #80	@ 0x50
+20015d32:	f003 fd1b 	bl	2001976c <memcpy>
+20015d36:	f894 1050 	ldrb.w	r1, [r4, #80]	@ 0x50
+20015d3a:	f04f 0c00 	mov.w	ip, #0
+20015d3e:	f1a1 0102 	sub.w	r1, r1, #2
+20015d42:	fab1 f181 	clz	r1, r1
+20015d46:	f10d 0307 	add.w	r3, sp, #7
+20015d4a:	f44f 5298 	mov.w	r2, #4864	@ 0x1300
+20015d4e:	0949      	lsrs	r1, r1, #5
+20015d50:	f88d c007 	strb.w	ip, [sp, #7]
+20015d54:	f001 fb3c 	bl	200173d0 <pico9918_config_validate>
+20015d58:	f89d 3007 	ldrb.w	r3, [sp, #7]
+20015d5c:	b14b      	cbz	r3, 20015d72 <reloadStoredConfig+0x56>
+20015d5e:	2102      	movs	r1, #2
+20015d60:	4a10      	ldr	r2, [pc, #64]	@ (20015da4 <reloadStoredConfig+0x88>)
+20015d62:	f884 1050 	strb.w	r1, [r4, #80]	@ 0x50
+20015d66:	7813      	ldrb	r3, [r2, #0]
+20015d68:	b18b      	cbz	r3, 20015d8e <reloadStoredConfig+0x72>
+20015d6a:	4b0f      	ldr	r3, [pc, #60]	@ (20015da8 <reloadStoredConfig+0x8c>)
+20015d6c:	781b      	ldrb	r3, [r3, #0]
+20015d6e:	f884 3051 	strb.w	r3, [r4, #81]	@ 0x51
+20015d72:	b130      	cbz	r0, 20015d82 <reloadStoredConfig+0x66>
+20015d74:	f04f 0213 	mov.w	r2, #19
+20015d78:	2301      	movs	r3, #1
+20015d7a:	f8a4 2052 	strh.w	r2, [r4, #82]	@ 0x52
+20015d7e:	f884 314c 	strb.w	r3, [r4, #332]	@ 0x14c
+20015d82:	f240 1301 	movw	r3, #257	@ 0x101
+20015d86:	f8a4 3150 	strh.w	r3, [r4, #336]	@ 0x150
+20015d8a:	b003      	add	sp, #12
+20015d8c:	bd30      	pop	{r4, r5, pc}
+20015d8e:	2320      	movs	r3, #32
+20015d90:	2101      	movs	r1, #1
+20015d92:	4d05      	ldr	r5, [pc, #20]	@ (20015da8 <reloadStoredConfig+0x8c>)
+20015d94:	7011      	strb	r1, [r2, #0]
+20015d96:	702b      	strb	r3, [r5, #0]
+20015d98:	e7e9      	b.n	20015d6e <reloadStoredConfig+0x52>
+20015d9a:	bf00      	nop
+20015d9c:	20025f10 	.word	0x20025f10
+20015da0:	101ff000 	.word	0x101ff000
+20015da4:	2002c100 	.word	0x2002c100
+20015da8:	20026220 	.word	0x20026220

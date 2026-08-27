@@ -1,0 +1,180 @@
+<ADDR> <tmsWriteIrqHandler>:
+ldr	r3, [pc, #336]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+movs	r1, #128	@ 0x80
+ldr	r2, [r3, #32]
+push	{r4, r5, r6, lr}
+movs	r5, r2
+ldr	r4, [pc, #332]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+lsls	r1, r1, #23
+ldr	r3, [r4, #0]
+uxtb	r0, r2
+ands	r5, r1
+tst	r2, r1
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb	r1, [r3, #6]
+cmp	r1, #0
+bne.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r2, #1
+strb	r0, [r3, #7]
+ldrb	r0, [r3, #8]
+strb	r2, [r3, #6]
+ldr	r2, [pc, #308]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldr	r1, [pc, #308]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldrb	r2, [r3, r2]
+ldrb	r4, [r3, r1]
+lsls	r2, r2, #26
+bpl.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldr	r2, [pc, #304]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldrb	r2, [r3, r2]
+cmp	r2, #127	@ 0x7f
+bls.n	<ADDR> <tmsWriteIrqHandler+OFF>
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+cmp	r4, #0
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r1, #0
+ldr	r2, [pc, #284]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+strb	r1, [r3, r2]
+movs	r2, #208	@ 0xd0
+movs	r1, #128	@ 0x80
+lsls	r2, r2, #24
+lsls	r1, r1, #15
+str	r1, [r2, #20]
+ldr	r2, [pc, #276]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+strb	r0, [r2, #0]
+movs	r2, #255	@ 0xff
+lsls	r0, r0, #8
+orrs	r0, r2
+ldrb	r2, [r3, #11]
+cmp	r2, #0
+bne.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldr	r2, [pc, #256]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldrb	r3, [r3, r2]
+lsls	r3, r3, #16
+orrs	r3, r0
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldr	r2, [pc, #256]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldrsb	r1, [r3, r2]
+ldrb	r4, [r3, r2]
+cmp	r1, #0
+blt.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldr	r1, [r3, #0]
+strb	r5, [r3, #6]
+lsls	r2, r1, #18
+lsrs	r2, r2, #18
+adds	r2, r3, r2
+adds	r2, #44	@ 0x2c
+strb	r0, [r3, #8]
+strb	r0, [r2, #0]
+ldr	r2, [pc, #232]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldrsb	r2, [r3, r2]
+adds	r2, r2, r1
+str	r2, [r3, #0]
+ldr	r2, [pc, #216]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+strb	r0, [r2, #0]
+movs	r2, #255	@ 0xff
+lsls	r0, r0, #8
+orrs	r0, r2
+ldrb	r2, [r3, #11]
+cmp	r2, #0
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldr	r2, [pc, #212]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ldrb	r1, [r3, r2]
+movs	r2, #15
+ands	r2, r1
+lsls	r1, r2, #24
+adds	r2, r3, r2
+ldr	r3, [pc, #184]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+orrs	r1, r0
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #16
+orrs	r3, r1
+ldr	r2, [pc, #160]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+str	r3, [r2, #20]
+pop	{r4, r5, r6, pc}
+movs	r1, #64	@ 0x40
+ands	r1, r0
+lsls	r5, r2, #24
+bmi.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r0, #252	@ 0xfc
+lsls	r2, r2, #8
+lsls	r0, r0, #6
+ands	r2, r0
+ldrb	r0, [r3, #7]
+orrs	r2, r0
+str	r2, [r3, #0]
+cmp	r1, #0
+bne.n	<ADDR> <tmsWriteIrqHandler+OFF>
+adds	r1, r3, r2
+adds	r1, #44	@ 0x2c
+ldrb	r0, [r1, #0]
+ldr	r1, [pc, #148]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+strb	r0, [r3, #8]
+ldrsb	r1, [r3, r1]
+adds	r2, r1, r2
+str	r2, [r3, #0]
+movs	r2, #0
+strb	r2, [r3, #6]
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb	r1, [r3, #14]
+cmp	r1, #0
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r1, #63	@ 0x3f
+strb	r5, [r3, #14]
+ldr	r5, [pc, #132]	@ (<ADDR> <tmsWriteIrqHandler+OFF>)
+ands	r1, r4
+adds	r1, r1, r5
+ldrb	r5, [r3, #15]
+lsls	r1, r1, #1
+lsls	r0, r0, #8
+adds	r1, r3, r1
+orrs	r0, r5
+strh	r0, [r1, #4]
+movs	r1, #1
+strb	r1, [r3, #16]
+lsls	r1, r4, #25
+bpl.n	<ADDR> <tmsWriteIrqHandler+OFF>
+adds	r4, #1
+strb	r4, [r3, r2]
+ldrb	r0, [r3, #8]
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+cmp	r1, #0
+beq.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb	r0, [r3, #8]
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r2, #15
+ands	r2, r0
+strb	r2, [r3, #15]
+movs	r2, #1
+ldrb	r0, [r3, #8]
+strb	r2, [r3, #14]
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+cmp	r4, #0
+bne.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r2, #1
+strb	r2, [r3, r1]
+movs	r2, #208	@ 0xd0
+movs	r1, #128	@ 0x80
+lsls	r2, r2, #24
+lsls	r1, r1, #15
+str	r1, [r2, #24]
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+movs	r1, #127	@ 0x7f
+ands	r1, r4
+strb	r1, [r3, r2]
+ldrb	r0, [r3, #8]
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+ldrb	r1, [r3, #7]
+bl	<ADDR> <vrEmuTms9918WriteRegValue>
+ldr	r3, [r4, #0]
+ldrb	r0, [r3, #8]
+b.n	<ADDR> <tmsWriteIrqHandler+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

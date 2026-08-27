@@ -1,0 +1,72 @@
+<ADDR> <pico9918_frame_end_of_scanline>:
+push	{r4, r5, r6, r7, lr}
+mov	lr, r8
+push	{lr}
+ldr	r3, [pc, #120]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldr	r2, [pc, #120]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldr	r3, [r3, #0]
+ldrb	r1, [r3, r2]
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_frame_end_of_scanline+OFF>
+pop	{r7}
+mov	r8, r7
+pop	{r4, r5, r6, r7, pc}
+ldr	r1, [pc, #108]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldr	r5, [pc, #112]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldrb	r1, [r3, r1]
+lsrs	r4, r1, #7
+ldr	r1, [pc, #108]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldr	r0, [r1, #0]
+movs	r1, #15
+ands	r0, r1
+ldr	r1, [pc, #104]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+mov	ip, r1
+ldrb	r1, [r5, r0]
+mov	r6, ip
+strb	r4, [r5, r0]
+subs	r1, r4, r1
+movs	r4, #2
+ldr	r6, [r6, #0]
+movs	r0, #1
+adds	r1, r1, r6
+mov	r6, ip
+mov	ip, r4
+mov	r4, ip
+str	r1, [r6, #0]
+ldr	r1, [pc, #80]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+strb	r0, [r3, r2]
+ldrb	r2, [r3, r1]
+orrs	r2, r4
+strb	r2, [r3, r1]
+ldr	r2, [pc, #76]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #26
+bmi.n	<ADDR> <pico9918_frame_end_of_scanline+OFF>
+ldr	r2, [pc, #72]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldrb	r1, [r3, r2]
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_frame_end_of_scanline+OFF>
+movs	r0, #128	@ 0x80
+bl	<ADDR> <pico9918_frame_update_interrupts>
+b.n	<ADDR> <pico9918_frame_end_of_scanline+OFF>
+ldr	r2, [pc, #60]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+strb	r0, [r3, r2]
+ldr	r2, [pc, #52]	@ (<ADDR> <pico9918_frame_end_of_scanline+OFF>)
+ldrb	r1, [r3, r2]
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_frame_end_of_scanline+OFF>
+movs	r1, #0
+strb	r1, [r3, r2]
+bl	<ADDR> <pico9918_config_apply>
+bl	<ADDR> <pico9918_diag_config_updated>
+b.n	<ADDR> <pico9918_frame_end_of_scanline+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

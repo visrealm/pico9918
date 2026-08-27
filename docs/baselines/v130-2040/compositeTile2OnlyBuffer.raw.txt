@@ -1,0 +1,160 @@
+2001a900 <compositeTile2OnlyBuffer.constprop.0>:
+2001a900:	2384      	movs	r3, #132	@ 0x84
+2001a902:	b570      	push	{r4, r5, r6, lr}
+2001a904:	4d4c      	ldr	r5, [pc, #304]	@ (2001aa38 <compositeTile2OnlyBuffer.constprop.0+0x138>)
+2001a906:	009b      	lsls	r3, r3, #2
+2001a908:	1828      	adds	r0, r5, r0
+2001a90a:	2400      	movs	r4, #0
+2001a90c:	494b      	ldr	r1, [pc, #300]	@ (2001aa3c <compositeTile2OnlyBuffer.constprop.0+0x13c>)
+2001a90e:	4e4c      	ldr	r6, [pc, #304]	@ (2001aa40 <compositeTile2OnlyBuffer.constprop.0+0x140>)
+2001a910:	18ed      	adds	r5, r5, r3
+2001a912:	e005      	b.n	2001a920 <compositeTile2OnlyBuffer.constprop.0+0x20>
+2001a914:	3404      	adds	r4, #4
+2001a916:	3020      	adds	r0, #32
+2001a918:	3120      	adds	r1, #32
+2001a91a:	2c20      	cmp	r4, #32
+2001a91c:	d100      	bne.n	2001a920 <compositeTile2OnlyBuffer.constprop.0+0x20>
+2001a91e:	e089      	b.n	2001aa34 <compositeTile2OnlyBuffer.constprop.0+0x134>
+2001a920:	5932      	ldr	r2, [r6, r4]
+2001a922:	592b      	ldr	r3, [r5, r4]
+2001a924:	4393      	bics	r3, r2
+2001a926:	d0f5      	beq.n	2001a914 <compositeTile2OnlyBuffer.constprop.0+0x14>
+2001a928:	d501      	bpl.n	2001a92e <compositeTile2OnlyBuffer.constprop.0+0x2e>
+2001a92a:	7802      	ldrb	r2, [r0, #0]
+2001a92c:	700a      	strb	r2, [r1, #0]
+2001a92e:	005a      	lsls	r2, r3, #1
+2001a930:	d501      	bpl.n	2001a936 <compositeTile2OnlyBuffer.constprop.0+0x36>
+2001a932:	7842      	ldrb	r2, [r0, #1]
+2001a934:	704a      	strb	r2, [r1, #1]
+2001a936:	009a      	lsls	r2, r3, #2
+2001a938:	d501      	bpl.n	2001a93e <compositeTile2OnlyBuffer.constprop.0+0x3e>
+2001a93a:	7882      	ldrb	r2, [r0, #2]
+2001a93c:	708a      	strb	r2, [r1, #2]
+2001a93e:	00da      	lsls	r2, r3, #3
+2001a940:	d501      	bpl.n	2001a946 <compositeTile2OnlyBuffer.constprop.0+0x46>
+2001a942:	78c2      	ldrb	r2, [r0, #3]
+2001a944:	70ca      	strb	r2, [r1, #3]
+2001a946:	011a      	lsls	r2, r3, #4
+2001a948:	d501      	bpl.n	2001a94e <compositeTile2OnlyBuffer.constprop.0+0x4e>
+2001a94a:	7902      	ldrb	r2, [r0, #4]
+2001a94c:	710a      	strb	r2, [r1, #4]
+2001a94e:	015a      	lsls	r2, r3, #5
+2001a950:	d501      	bpl.n	2001a956 <compositeTile2OnlyBuffer.constprop.0+0x56>
+2001a952:	7942      	ldrb	r2, [r0, #5]
+2001a954:	714a      	strb	r2, [r1, #5]
+2001a956:	019a      	lsls	r2, r3, #6
+2001a958:	d501      	bpl.n	2001a95e <compositeTile2OnlyBuffer.constprop.0+0x5e>
+2001a95a:	7982      	ldrb	r2, [r0, #6]
+2001a95c:	718a      	strb	r2, [r1, #6]
+2001a95e:	01da      	lsls	r2, r3, #7
+2001a960:	d501      	bpl.n	2001a966 <compositeTile2OnlyBuffer.constprop.0+0x66>
+2001a962:	79c2      	ldrb	r2, [r0, #7]
+2001a964:	71ca      	strb	r2, [r1, #7]
+2001a966:	021a      	lsls	r2, r3, #8
+2001a968:	d501      	bpl.n	2001a96e <compositeTile2OnlyBuffer.constprop.0+0x6e>
+2001a96a:	7a02      	ldrb	r2, [r0, #8]
+2001a96c:	720a      	strb	r2, [r1, #8]
+2001a96e:	025a      	lsls	r2, r3, #9
+2001a970:	d501      	bpl.n	2001a976 <compositeTile2OnlyBuffer.constprop.0+0x76>
+2001a972:	7a42      	ldrb	r2, [r0, #9]
+2001a974:	724a      	strb	r2, [r1, #9]
+2001a976:	029a      	lsls	r2, r3, #10
+2001a978:	d501      	bpl.n	2001a97e <compositeTile2OnlyBuffer.constprop.0+0x7e>
+2001a97a:	7a82      	ldrb	r2, [r0, #10]
+2001a97c:	728a      	strb	r2, [r1, #10]
+2001a97e:	02da      	lsls	r2, r3, #11
+2001a980:	d501      	bpl.n	2001a986 <compositeTile2OnlyBuffer.constprop.0+0x86>
+2001a982:	7ac2      	ldrb	r2, [r0, #11]
+2001a984:	72ca      	strb	r2, [r1, #11]
+2001a986:	031a      	lsls	r2, r3, #12
+2001a988:	d501      	bpl.n	2001a98e <compositeTile2OnlyBuffer.constprop.0+0x8e>
+2001a98a:	7b02      	ldrb	r2, [r0, #12]
+2001a98c:	730a      	strb	r2, [r1, #12]
+2001a98e:	035a      	lsls	r2, r3, #13
+2001a990:	d501      	bpl.n	2001a996 <compositeTile2OnlyBuffer.constprop.0+0x96>
+2001a992:	7b42      	ldrb	r2, [r0, #13]
+2001a994:	734a      	strb	r2, [r1, #13]
+2001a996:	039a      	lsls	r2, r3, #14
+2001a998:	d501      	bpl.n	2001a99e <compositeTile2OnlyBuffer.constprop.0+0x9e>
+2001a99a:	7b82      	ldrb	r2, [r0, #14]
+2001a99c:	738a      	strb	r2, [r1, #14]
+2001a99e:	03da      	lsls	r2, r3, #15
+2001a9a0:	d501      	bpl.n	2001a9a6 <compositeTile2OnlyBuffer.constprop.0+0xa6>
+2001a9a2:	7bc2      	ldrb	r2, [r0, #15]
+2001a9a4:	73ca      	strb	r2, [r1, #15]
+2001a9a6:	041a      	lsls	r2, r3, #16
+2001a9a8:	d501      	bpl.n	2001a9ae <compositeTile2OnlyBuffer.constprop.0+0xae>
+2001a9aa:	7c02      	ldrb	r2, [r0, #16]
+2001a9ac:	740a      	strb	r2, [r1, #16]
+2001a9ae:	045a      	lsls	r2, r3, #17
+2001a9b0:	d501      	bpl.n	2001a9b6 <compositeTile2OnlyBuffer.constprop.0+0xb6>
+2001a9b2:	7c42      	ldrb	r2, [r0, #17]
+2001a9b4:	744a      	strb	r2, [r1, #17]
+2001a9b6:	049a      	lsls	r2, r3, #18
+2001a9b8:	d501      	bpl.n	2001a9be <compositeTile2OnlyBuffer.constprop.0+0xbe>
+2001a9ba:	7c82      	ldrb	r2, [r0, #18]
+2001a9bc:	748a      	strb	r2, [r1, #18]
+2001a9be:	04da      	lsls	r2, r3, #19
+2001a9c0:	d501      	bpl.n	2001a9c6 <compositeTile2OnlyBuffer.constprop.0+0xc6>
+2001a9c2:	7cc2      	ldrb	r2, [r0, #19]
+2001a9c4:	74ca      	strb	r2, [r1, #19]
+2001a9c6:	051a      	lsls	r2, r3, #20
+2001a9c8:	d501      	bpl.n	2001a9ce <compositeTile2OnlyBuffer.constprop.0+0xce>
+2001a9ca:	7d02      	ldrb	r2, [r0, #20]
+2001a9cc:	750a      	strb	r2, [r1, #20]
+2001a9ce:	055a      	lsls	r2, r3, #21
+2001a9d0:	d501      	bpl.n	2001a9d6 <compositeTile2OnlyBuffer.constprop.0+0xd6>
+2001a9d2:	7d42      	ldrb	r2, [r0, #21]
+2001a9d4:	754a      	strb	r2, [r1, #21]
+2001a9d6:	059a      	lsls	r2, r3, #22
+2001a9d8:	d501      	bpl.n	2001a9de <compositeTile2OnlyBuffer.constprop.0+0xde>
+2001a9da:	7d82      	ldrb	r2, [r0, #22]
+2001a9dc:	758a      	strb	r2, [r1, #22]
+2001a9de:	05da      	lsls	r2, r3, #23
+2001a9e0:	d501      	bpl.n	2001a9e6 <compositeTile2OnlyBuffer.constprop.0+0xe6>
+2001a9e2:	7dc2      	ldrb	r2, [r0, #23]
+2001a9e4:	75ca      	strb	r2, [r1, #23]
+2001a9e6:	061a      	lsls	r2, r3, #24
+2001a9e8:	d501      	bpl.n	2001a9ee <compositeTile2OnlyBuffer.constprop.0+0xee>
+2001a9ea:	7e02      	ldrb	r2, [r0, #24]
+2001a9ec:	760a      	strb	r2, [r1, #24]
+2001a9ee:	065a      	lsls	r2, r3, #25
+2001a9f0:	d501      	bpl.n	2001a9f6 <compositeTile2OnlyBuffer.constprop.0+0xf6>
+2001a9f2:	7e42      	ldrb	r2, [r0, #25]
+2001a9f4:	764a      	strb	r2, [r1, #25]
+2001a9f6:	069a      	lsls	r2, r3, #26
+2001a9f8:	d501      	bpl.n	2001a9fe <compositeTile2OnlyBuffer.constprop.0+0xfe>
+2001a9fa:	7e82      	ldrb	r2, [r0, #26]
+2001a9fc:	768a      	strb	r2, [r1, #26]
+2001a9fe:	06da      	lsls	r2, r3, #27
+2001aa00:	d501      	bpl.n	2001aa06 <compositeTile2OnlyBuffer.constprop.0+0x106>
+2001aa02:	7ec2      	ldrb	r2, [r0, #27]
+2001aa04:	76ca      	strb	r2, [r1, #27]
+2001aa06:	071a      	lsls	r2, r3, #28
+2001aa08:	d501      	bpl.n	2001aa0e <compositeTile2OnlyBuffer.constprop.0+0x10e>
+2001aa0a:	7f02      	ldrb	r2, [r0, #28]
+2001aa0c:	770a      	strb	r2, [r1, #28]
+2001aa0e:	075a      	lsls	r2, r3, #29
+2001aa10:	d501      	bpl.n	2001aa16 <compositeTile2OnlyBuffer.constprop.0+0x116>
+2001aa12:	7f42      	ldrb	r2, [r0, #29]
+2001aa14:	774a      	strb	r2, [r1, #29]
+2001aa16:	079a      	lsls	r2, r3, #30
+2001aa18:	d501      	bpl.n	2001aa1e <compositeTile2OnlyBuffer.constprop.0+0x11e>
+2001aa1a:	7f82      	ldrb	r2, [r0, #30]
+2001aa1c:	778a      	strb	r2, [r1, #30]
+2001aa1e:	07db      	lsls	r3, r3, #31
+2001aa20:	d400      	bmi.n	2001aa24 <compositeTile2OnlyBuffer.constprop.0+0x124>
+2001aa22:	e777      	b.n	2001a914 <compositeTile2OnlyBuffer.constprop.0+0x14>
+2001aa24:	7fc3      	ldrb	r3, [r0, #31]
+2001aa26:	3404      	adds	r4, #4
+2001aa28:	77cb      	strb	r3, [r1, #31]
+2001aa2a:	3020      	adds	r0, #32
+2001aa2c:	3120      	adds	r1, #32
+2001aa2e:	2c20      	cmp	r4, #32
+2001aa30:	d000      	beq.n	2001aa34 <compositeTile2OnlyBuffer.constprop.0+0x134>
+2001aa32:	e775      	b.n	2001a920 <compositeTile2OnlyBuffer.constprop.0+0x20>
+2001aa34:	bd70      	pop	{r4, r5, r6, pc}
+2001aa36:	46c0      	nop			@ (mov r8, r8)
+2001aa38:	20015354 	.word	0x20015354
+2001aa3c:	2004064c 	.word	0x2004064c
+2001aa40:	20040628 	.word	0x20040628

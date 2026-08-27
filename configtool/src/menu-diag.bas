@@ -54,7 +54,7 @@ diagMenu: PROCEDURE
     SET_MENU(MENU_ID_MAIN)
 
     g_diagDirty = FALSE
-    FOR I = CONF_DIAG_REGISTERS TO CONF_DIAG_ADDRESS
+    FOR I = PICO9918_CONF_DIAG_REGISTERS TO PICO9918_CONF_DIAG_ADDRESS
         IF savedConfigValues(I) <> tempConfigValues(I) THEN g_diagDirty = TRUE
     NEXT I
 

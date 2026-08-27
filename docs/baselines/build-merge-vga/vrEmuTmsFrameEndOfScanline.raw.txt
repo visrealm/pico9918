@@ -1,0 +1,71 @@
+20003b80 <vrEmuTmsFrameEndOfScanline>:
+20003b80:	b5f0      	push	{r4, r5, r6, r7, lr}
+20003b82:	46c6      	mov	lr, r8
+20003b84:	b500      	push	{lr}
+20003b86:	4b1e      	ldr	r3, [pc, #120]	@ (20003c00 <vrEmuTmsFrameEndOfScanline+0x80>)
+20003b88:	4a1e      	ldr	r2, [pc, #120]	@ (20003c04 <vrEmuTmsFrameEndOfScanline+0x84>)
+20003b8a:	681b      	ldr	r3, [r3, #0]
+20003b8c:	5c99      	ldrb	r1, [r3, r2]
+20003b8e:	2900      	cmp	r1, #0
+20003b90:	d002      	beq.n	20003b98 <vrEmuTmsFrameEndOfScanline+0x18>
+20003b92:	bc80      	pop	{r7}
+20003b94:	46b8      	mov	r8, r7
+20003b96:	bdf0      	pop	{r4, r5, r6, r7, pc}
+20003b98:	491b      	ldr	r1, [pc, #108]	@ (20003c08 <vrEmuTmsFrameEndOfScanline+0x88>)
+20003b9a:	4d1c      	ldr	r5, [pc, #112]	@ (20003c0c <vrEmuTmsFrameEndOfScanline+0x8c>)
+20003b9c:	5c59      	ldrb	r1, [r3, r1]
+20003b9e:	09cc      	lsrs	r4, r1, #7
+20003ba0:	491b      	ldr	r1, [pc, #108]	@ (20003c10 <vrEmuTmsFrameEndOfScanline+0x90>)
+20003ba2:	6808      	ldr	r0, [r1, #0]
+20003ba4:	210f      	movs	r1, #15
+20003ba6:	4008      	ands	r0, r1
+20003ba8:	491a      	ldr	r1, [pc, #104]	@ (20003c14 <vrEmuTmsFrameEndOfScanline+0x94>)
+20003baa:	468c      	mov	ip, r1
+20003bac:	5c29      	ldrb	r1, [r5, r0]
+20003bae:	4666      	mov	r6, ip
+20003bb0:	542c      	strb	r4, [r5, r0]
+20003bb2:	1a61      	subs	r1, r4, r1
+20003bb4:	2402      	movs	r4, #2
+20003bb6:	6836      	ldr	r6, [r6, #0]
+20003bb8:	2001      	movs	r0, #1
+20003bba:	1989      	adds	r1, r1, r6
+20003bbc:	4666      	mov	r6, ip
+20003bbe:	46a4      	mov	ip, r4
+20003bc0:	4664      	mov	r4, ip
+20003bc2:	6031      	str	r1, [r6, #0]
+20003bc4:	4914      	ldr	r1, [pc, #80]	@ (20003c18 <vrEmuTmsFrameEndOfScanline+0x98>)
+20003bc6:	5498      	strb	r0, [r3, r2]
+20003bc8:	5c5a      	ldrb	r2, [r3, r1]
+20003bca:	4322      	orrs	r2, r4
+20003bcc:	545a      	strb	r2, [r3, r1]
+20003bce:	4a13      	ldr	r2, [pc, #76]	@ (20003c1c <vrEmuTmsFrameEndOfScanline+0x9c>)
+20003bd0:	5c9a      	ldrb	r2, [r3, r2]
+20003bd2:	0692      	lsls	r2, r2, #26
+20003bd4:	d407      	bmi.n	20003be6 <vrEmuTmsFrameEndOfScanline+0x66>
+20003bd6:	4a12      	ldr	r2, [pc, #72]	@ (20003c20 <vrEmuTmsFrameEndOfScanline+0xa0>)
+20003bd8:	5c99      	ldrb	r1, [r3, r2]
+20003bda:	2900      	cmp	r1, #0
+20003bdc:	d108      	bne.n	20003bf0 <vrEmuTmsFrameEndOfScanline+0x70>
+20003bde:	2080      	movs	r0, #128	@ 0x80
+20003be0:	f7ff ff40 	bl	20003a64 <vrEmuTmsFrameUpdateInterrupts>
+20003be4:	e7d5      	b.n	20003b92 <vrEmuTmsFrameEndOfScanline+0x12>
+20003be6:	4a0e      	ldr	r2, [pc, #56]	@ (20003c20 <vrEmuTmsFrameEndOfScanline+0xa0>)
+20003be8:	7318      	strb	r0, [r3, #12]
+20003bea:	5c99      	ldrb	r1, [r3, r2]
+20003bec:	2900      	cmp	r1, #0
+20003bee:	d0f6      	beq.n	20003bde <vrEmuTmsFrameEndOfScanline+0x5e>
+20003bf0:	2100      	movs	r1, #0
+20003bf2:	5499      	strb	r1, [r3, r2]
+20003bf4:	f7ff fdea 	bl	200037cc <vrEmuTmsConfigApply>
+20003bf8:	f001 fbba 	bl	20005370 <vrEmuTmsDiagConfigUpdated>
+20003bfc:	e7ef      	b.n	20003bde <vrEmuTmsFrameEndOfScanline+0x5e>
+20003bfe:	46c0      	nop			@ (mov r8, r8)
+20003c00:	2000d534 	.word	0x2000d534
+20003c04:	00010153 	.word	0x00010153
+20003c08:	00010152 	.word	0x00010152
+20003c0c:	20028638 	.word	0x20028638
+20003c10:	2002864c 	.word	0x2002864c
+20003c14:	20028648 	.word	0x20028648
+20003c18:	0000b02d 	.word	0x0000b02d
+20003c1c:	0000605e 	.word	0x0000605e
+20003c20:	00010150 	.word	0x00010150

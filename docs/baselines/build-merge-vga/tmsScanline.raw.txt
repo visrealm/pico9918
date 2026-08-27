@@ -1,0 +1,89 @@
+200061fc <tmsScanline>:
+200061fc:	b570      	push	{r4, r5, r6, lr}
+200061fe:	6acb      	ldr	r3, [r1, #44]	@ 0x2c
+20006200:	b086      	sub	sp, #24
+20006202:	000e      	movs	r6, r1
+20006204:	9304      	str	r3, [sp, #16]
+20006206:	2344      	movs	r3, #68	@ 0x44
+20006208:	5af3      	ldrh	r3, [r6, r3]
+2000620a:	0004      	movs	r4, r0
+2000620c:	a904      	add	r1, sp, #16
+2000620e:	0015      	movs	r5, r2
+20006210:	808b      	strh	r3, [r1, #4]
+20006212:	f006 f945 	bl	2000c4a0 <vrEmuTmsFrameScanline>
+20006216:	0524      	lsls	r4, r4, #20
+20006218:	0d24      	lsrs	r4, r4, #20
+2000621a:	2800      	cmp	r0, #0
+2000621c:	d115      	bne.n	2000624a <tmsScanline+0x4e>
+2000621e:	4b23      	ldr	r3, [pc, #140]	@ (200062ac <tmsScanline+0xb0>)
+20006220:	681a      	ldr	r2, [r3, #0]
+20006222:	4b23      	ldr	r3, [pc, #140]	@ (200062b0 <tmsScanline+0xb4>)
+20006224:	5cd3      	ldrb	r3, [r2, r3]
+20006226:	2b00      	cmp	r3, #0
+20006228:	d00d      	beq.n	20006246 <tmsScanline+0x4a>
+2000622a:	21a0      	movs	r1, #160	@ 0xa0
+2000622c:	2280      	movs	r2, #128	@ 0x80
+2000622e:	2090      	movs	r0, #144	@ 0x90
+20006230:	8df6      	ldrh	r6, [r6, #46]	@ 0x2e
+20006232:	05c9      	lsls	r1, r1, #23
+20006234:	0452      	lsls	r2, r2, #17
+20006236:	580b      	ldr	r3, [r1, r0]
+20006238:	4213      	tst	r3, r2
+2000623a:	d1fc      	bne.n	20006236 <tmsScanline+0x3a>
+2000623c:	002a      	movs	r2, r5
+2000623e:	0031      	movs	r1, r6
+20006240:	0020      	movs	r0, r4
+20006242:	f7ff f8cd 	bl	200053e0 <vrEmuTmsDiagRender>
+20006246:	b006      	add	sp, #24
+20006248:	bd70      	pop	{r4, r5, r6, pc}
+2000624a:	f7fa fb89 	bl	20000960 <pendingDisplayBanner>
+2000624e:	2801      	cmp	r0, #1
+20006250:	d016      	beq.n	20006280 <tmsScanline+0x84>
+20006252:	2802      	cmp	r0, #2
+20006254:	d1e3      	bne.n	2000621e <tmsScanline+0x22>
+20006256:	2280      	movs	r2, #128	@ 0x80
+20006258:	2190      	movs	r1, #144	@ 0x90
+2000625a:	0452      	lsls	r2, r2, #17
+2000625c:	23a0      	movs	r3, #160	@ 0xa0
+2000625e:	05db      	lsls	r3, r3, #23
+20006260:	585b      	ldr	r3, [r3, r1]
+20006262:	0018      	movs	r0, r3
+20006264:	4010      	ands	r0, r2
+20006266:	4213      	tst	r3, r2
+20006268:	d1f8      	bne.n	2000625c <tmsScanline+0x60>
+2000626a:	4b12      	ldr	r3, [pc, #72]	@ (200062b4 <tmsScanline+0xb8>)
+2000626c:	9001      	str	r0, [sp, #4]
+2000626e:	9300      	str	r3, [sp, #0]
+20006270:	22c6      	movs	r2, #198	@ 0xc6
+20006272:	2308      	movs	r3, #8
+20006274:	0020      	movs	r0, r4
+20006276:	4910      	ldr	r1, [pc, #64]	@ (200062b8 <tmsScanline+0xbc>)
+20006278:	9502      	str	r5, [sp, #8]
+2000627a:	f7fe ffdb 	bl	20005234 <vrEmuTmsDiagRenderText>
+2000627e:	e7ce      	b.n	2000621e <tmsScanline+0x22>
+20006280:	2280      	movs	r2, #128	@ 0x80
+20006282:	2190      	movs	r1, #144	@ 0x90
+20006284:	0452      	lsls	r2, r2, #17
+20006286:	23a0      	movs	r3, #160	@ 0xa0
+20006288:	05db      	lsls	r3, r3, #23
+2000628a:	585b      	ldr	r3, [r3, r1]
+2000628c:	0018      	movs	r0, r3
+2000628e:	4010      	ands	r0, r2
+20006290:	4213      	tst	r3, r2
+20006292:	d1f8      	bne.n	20006286 <tmsScanline+0x8a>
+20006294:	4b07      	ldr	r3, [pc, #28]	@ (200062b4 <tmsScanline+0xb8>)
+20006296:	9001      	str	r0, [sp, #4]
+20006298:	9300      	str	r3, [sp, #0]
+2000629a:	22d2      	movs	r2, #210	@ 0xd2
+2000629c:	2308      	movs	r3, #8
+2000629e:	0020      	movs	r0, r4
+200062a0:	4906      	ldr	r1, [pc, #24]	@ (200062bc <tmsScanline+0xc0>)
+200062a2:	9502      	str	r5, [sp, #8]
+200062a4:	f7fe ffc6 	bl	20005234 <vrEmuTmsDiagRenderText>
+200062a8:	e7b9      	b.n	2000621e <tmsScanline+0x22>
+200062aa:	46c0      	nop			@ (mov r8, r8)
+200062ac:	2000d534 	.word	0x2000d534
+200062b0:	00010060 	.word	0x00010060
+200062b4:	00000fff 	.word	0x00000fff
+200062b8:	2000c7b4 	.word	0x2000c7b4
+200062bc:	2000c78c 	.word	0x2000c78c

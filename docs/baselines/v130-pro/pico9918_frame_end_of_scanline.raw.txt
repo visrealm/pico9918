@@ -1,0 +1,49 @@
+20017844 <pico9918_frame_end_of_scanline>:
+20017844:	4b22      	ldr	r3, [pc, #136]	@ (200178d0 <pico9918_frame_end_of_scanline+0x8c>)
+20017846:	681b      	ldr	r3, [r3, #0]
+20017848:	f503 3280 	add.w	r2, r3, #65536	@ 0x10000
+2001784c:	f892 15ee 	ldrb.w	r1, [r2, #1518]	@ 0x5ee
+20017850:	b101      	cbz	r1, 20017854 <pico9918_frame_end_of_scanline+0x10>
+20017852:	4770      	bx	lr
+20017854:	b510      	push	{r4, lr}
+20017856:	461c      	mov	r4, r3
+20017858:	491e      	ldr	r1, [pc, #120]	@ (200178d4 <pico9918_frame_end_of_scanline+0x90>)
+2001785a:	4b1f      	ldr	r3, [pc, #124]	@ (200178d8 <pico9918_frame_end_of_scanline+0x94>)
+2001785c:	6808      	ldr	r0, [r1, #0]
+2001785e:	f892 c5ed 	ldrb.w	ip, [r2, #1517]	@ 0x5ed
+20017862:	f000 000f 	and.w	r0, r0, #15
+20017866:	5c19      	ldrb	r1, [r3, r0]
+20017868:	f8df e070 	ldr.w	lr, [pc, #112]	@ 200178dc <pico9918_frame_end_of_scanline+0x98>
+2001786c:	ebc1 11dc 	rsb	r1, r1, ip, lsr #7
+20017870:	ea4f 1cdc 	mov.w	ip, ip, lsr #7
+20017874:	f803 c000 	strb.w	ip, [r3, r0]
+20017878:	f504 43c0 	add.w	r3, r4, #24576	@ 0x6000
+2001787c:	f893 c032 	ldrb.w	ip, [r3, #50]	@ 0x32
+20017880:	f8de 3000 	ldr.w	r3, [lr]
+20017884:	f504 4030 	add.w	r0, r4, #45056	@ 0xb000
+20017888:	440b      	add	r3, r1
+2001788a:	f8ce 3000 	str.w	r3, [lr]
+2001788e:	7843      	ldrb	r3, [r0, #1]
+20017890:	f01c 0f20 	tst.w	ip, #32
+20017894:	f043 0302 	orr.w	r3, r3, #2
+20017898:	7043      	strb	r3, [r0, #1]
+2001789a:	f04f 0301 	mov.w	r3, #1
+2001789e:	f882 35ee 	strb.w	r3, [r2, #1518]	@ 0x5ee
+200178a2:	bf18      	it	ne
+200178a4:	f882 3030 	strbne.w	r3, [r2, #48]	@ 0x30
+200178a8:	f892 3150 	ldrb.w	r3, [r2, #336]	@ 0x150
+200178ac:	b923      	cbnz	r3, 200178b8 <pico9918_frame_end_of_scanline+0x74>
+200178ae:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+200178b2:	2080      	movs	r0, #128	@ 0x80
+200178b4:	f7ff bf4c 	b.w	20017750 <pico9918_frame_update_interrupts>
+200178b8:	2300      	movs	r3, #0
+200178ba:	f882 3150 	strb.w	r3, [r2, #336]	@ 0x150
+200178be:	f7ff fe39 	bl	20017534 <pico9918_config_apply>
+200178c2:	f001 f973 	bl	20018bac <pico9918_diag_config_updated>
+200178c6:	e8bd 4010 	ldmia.w	sp!, {r4, lr}
+200178ca:	2080      	movs	r0, #128	@ 0x80
+200178cc:	f7ff bf40 	b.w	20017750 <pico9918_frame_update_interrupts>
+200178d0:	20025f10 	.word	0x20025f10
+200178d4:	2002bce4 	.word	0x2002bce4
+200178d8:	2002b848 	.word	0x2002b848
+200178dc:	2002bce0 	.word	0x2002bce0

@@ -10,7 +10,7 @@ Or access it online at: `https://visrealm.github.io/pico9918/config/`
 
 ## What This Tool Does
 
-The PICO9918 stores its configuration in the top 4KB of flash memory. When you update the firmware, this configuration area is preserved. However, if the configuration becomes corrupted or incompatible, this tool allows you to generate a small UF2 file (512 bytes) to reset or update just the configuration without reflashing the entire firmware.
+The PICO9918 stores its configuration in the top 4KB of flash memory. When you update the firmware, this configuration area is preserved. However, if the configuration becomes corrupted or incompatible, this tool allows you to generate a small UF2 file to reset or update just the configuration without reflashing the entire firmware.
 
 ## Features
 
@@ -32,7 +32,7 @@ The PICO9918 stores its configuration in the top 4KB of flash memory. When you u
 ## Installing the Configuration
 
 1. Hold the BOOTSEL button on your PICO9918 while powering it on
-2. The device will appear as a USB drive named "RPI-RP2"
+2. The device will appear as a USB drive named "RPI-RP2" (PICO9918) or "RP2350" (PICO9918 PRO)
 3. Drag and drop the generated `.uf2` file onto the drive
 4. The device will automatically reboot with the new configuration
 
@@ -82,21 +82,11 @@ For the pico9918 repository: `https://visrealm.github.io/pico9918/`
 
 ## Technical Details
 
-- **File Size**: Generated UF2 files are exactly 512 bytes (one UF2 block)
+- **File Size**: Generated UF2 files are 2048 bytes - four 512-byte blocks, a config and a pending block for each of the RP2040 and RP2350 family IDs
 - **Target Address**: `0x101FF000` (top 4KB of 2MB flash)
 - **Format**: Standard UF2 format with RP2040/RP2350 family ID
 - **Compatibility**: Works in all modern browsers (Chrome, Firefox, Safari, Edge)
 - **Dependencies**: None - fully self-contained single HTML file
-
-## Comparison with Python Tool
-
-This web tool generates identical UF2 files to the Python command-line tool (`configtool/tools/config_uf2.py`). Both tools:
-- Use the same configuration structure (256 bytes)
-- Target the same flash address
-- Apply the same validation requirements
-- Generate byte-identical output for the same settings
-
-The web tool offers a more user-friendly interface, while the Python tool is better for automation and scripting.
 
 ## Troubleshooting
 
@@ -136,4 +126,3 @@ Copyright (c) 2024 Troy Schrapel
 - [PICO9918 GitHub Repository](https://github.com/visrealm/pico9918)
 - [Firmware Releases](https://github.com/visrealm/pico9918/releases)
 - [AtariAge Forum Discussion](https://atariage.com/forums/topic/323020-pico9918-drop-in-replacement-for-tms9918a)
-- [Python Configuration Tool](../../configtool/tools/config_uf2.py)

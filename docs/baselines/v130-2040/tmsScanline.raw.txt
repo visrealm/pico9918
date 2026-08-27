@@ -1,0 +1,83 @@
+20019740 <tmsScanline>:
+20019740:	b570      	push	{r4, r5, r6, lr}
+20019742:	6acb      	ldr	r3, [r1, #44]	@ 0x2c
+20019744:	b084      	sub	sp, #16
+20019746:	000d      	movs	r5, r1
+20019748:	9302      	str	r3, [sp, #8]
+2001974a:	2344      	movs	r3, #68	@ 0x44
+2001974c:	5aeb      	ldrh	r3, [r5, r3]
+2001974e:	a902      	add	r1, sp, #8
+20019750:	0004      	movs	r4, r0
+20019752:	0016      	movs	r6, r2
+20019754:	808b      	strh	r3, [r1, #4]
+20019756:	f008 fcf3 	bl	20022140 <pico9918_frame_scanline>
+2001975a:	2800      	cmp	r0, #0
+2001975c:	d101      	bne.n	20019762 <tmsScanline+0x22>
+2001975e:	b004      	add	sp, #16
+20019760:	bd70      	pop	{r4, r5, r6, pc}
+20019762:	0524      	lsls	r4, r4, #20
+20019764:	0d24      	lsrs	r4, r4, #20
+20019766:	f7fc f9c9 	bl	20015afc <pendingDisplayBanner>
+2001976a:	2801      	cmp	r0, #1
+2001976c:	d015      	beq.n	2001979a <tmsScanline+0x5a>
+2001976e:	2802      	cmp	r0, #2
+20019770:	d025      	beq.n	200197be <tmsScanline+0x7e>
+20019772:	4b1c      	ldr	r3, [pc, #112]	@ (200197e4 <tmsScanline+0xa4>)
+20019774:	681a      	ldr	r2, [r3, #0]
+20019776:	4b1c      	ldr	r3, [pc, #112]	@ (200197e8 <tmsScanline+0xa8>)
+20019778:	5cd3      	ldrb	r3, [r2, r3]
+2001977a:	2b00      	cmp	r3, #0
+2001977c:	d0ef      	beq.n	2001975e <tmsScanline+0x1e>
+2001977e:	20a0      	movs	r0, #160	@ 0xa0
+20019780:	2280      	movs	r2, #128	@ 0x80
+20019782:	2190      	movs	r1, #144	@ 0x90
+20019784:	05c0      	lsls	r0, r0, #23
+20019786:	0452      	lsls	r2, r2, #17
+20019788:	5843      	ldr	r3, [r0, r1]
+2001978a:	4213      	tst	r3, r2
+2001978c:	d1fc      	bne.n	20019788 <tmsScanline+0x48>
+2001978e:	0032      	movs	r2, r6
+20019790:	0020      	movs	r0, r4
+20019792:	8de9      	ldrh	r1, [r5, #46]	@ 0x2e
+20019794:	f7ff fb4c 	bl	20018e30 <pico9918_diag_render>
+20019798:	e7e1      	b.n	2001975e <tmsScanline+0x1e>
+2001979a:	20a0      	movs	r0, #160	@ 0xa0
+2001979c:	2280      	movs	r2, #128	@ 0x80
+2001979e:	2190      	movs	r1, #144	@ 0x90
+200197a0:	05c0      	lsls	r0, r0, #23
+200197a2:	0452      	lsls	r2, r2, #17
+200197a4:	5843      	ldr	r3, [r0, r1]
+200197a6:	4213      	tst	r3, r2
+200197a8:	d1fc      	bne.n	200197a4 <tmsScanline+0x64>
+200197aa:	4b10      	ldr	r3, [pc, #64]	@ (200197ec <tmsScanline+0xac>)
+200197ac:	22d2      	movs	r2, #210	@ 0xd2
+200197ae:	9300      	str	r3, [sp, #0]
+200197b0:	0020      	movs	r0, r4
+200197b2:	2308      	movs	r3, #8
+200197b4:	490e      	ldr	r1, [pc, #56]	@ (200197f0 <tmsScanline+0xb0>)
+200197b6:	9601      	str	r6, [sp, #4]
+200197b8:	f7ff fa94 	bl	20018ce4 <pico9918_diag_render_text>
+200197bc:	e7d9      	b.n	20019772 <tmsScanline+0x32>
+200197be:	20a0      	movs	r0, #160	@ 0xa0
+200197c0:	2280      	movs	r2, #128	@ 0x80
+200197c2:	2190      	movs	r1, #144	@ 0x90
+200197c4:	05c0      	lsls	r0, r0, #23
+200197c6:	0452      	lsls	r2, r2, #17
+200197c8:	5843      	ldr	r3, [r0, r1]
+200197ca:	4213      	tst	r3, r2
+200197cc:	d1fc      	bne.n	200197c8 <tmsScanline+0x88>
+200197ce:	4b07      	ldr	r3, [pc, #28]	@ (200197ec <tmsScanline+0xac>)
+200197d0:	22c6      	movs	r2, #198	@ 0xc6
+200197d2:	9300      	str	r3, [sp, #0]
+200197d4:	0020      	movs	r0, r4
+200197d6:	2308      	movs	r3, #8
+200197d8:	4906      	ldr	r1, [pc, #24]	@ (200197f4 <tmsScanline+0xb4>)
+200197da:	9601      	str	r6, [sp, #4]
+200197dc:	f7ff fa82 	bl	20018ce4 <pico9918_diag_render_text>
+200197e0:	e7c7      	b.n	20019772 <tmsScanline+0x32>
+200197e2:	46c0      	nop			@ (mov r8, r8)
+200197e4:	20022eb0 	.word	0x20022eb0
+200197e8:	00010060 	.word	0x00010060
+200197ec:	00000fff 	.word	0x00000fff
+200197f0:	20022548 	.word	0x20022548
+200197f4:	20022570 	.word	0x20022570

@@ -1,0 +1,335 @@
+*
+* Reverse-engineered listing of a 634-byte TI-99/4A memory image.
+*
+* The program is Tursi's. This listing is a reverse-engineered reading of it,
+* kept as provenance and documentation for the test fixture mandel.bin.
+*
+* Two programs in one blob:
+*   >A000..>A055  (86 bytes)  host TMS9900 loader, runs on the 99/4A CPU
+*   >A056..>A279  (548 bytes) payload, uploaded to VRAM >1B02 and run by
+*                             the F18A's on-board GPU
+*
+* The host copies the payload into VRAM, unlocks the F18A, points the GPU
+* program counter at it and then does nothing further.  Every pixel is drawn
+* by the GPU.  The image is the Mandelbrot set over x -2.0..+0.5,
+* y +1.25..-1.25, 14 iterations, Q13 fixed point, in Graphics II bitmap mode.
+*
+* Register/behaviour facts checked against the F18A v1.9 VHDL:
+*   f18a_cpu.vhd  VR57 unlock ("000111xx" twice), VR54/55 GPU PC, VR55 triggers
+*   f18a_gpu.vhd  GPU >6xxx = VDP register file, IDLE halts the GPU
+*
+       AORG >A000
+*
+* ---------------------------------------------------------------------------
+* Host loader.  Requires 32K memory expansion; this is not a cartridge image
+* (no >AA header, and it is linked to run at >A000, not cartridge space >6000).
+* ---------------------------------------------------------------------------
+VDPWD  EQU  >8C00                 VDP data port
+VDPWA  EQU  >8C02                 VDP address/register port
+*
+LOADER LWPI >8300                 workspace in scratchpad
+       LI   R0,>025B              VRAM write address >1B02  (>5B = >40 | >1B)
+       MOVB R0,@VDPWA               LSB first
+       SWPB R0
+       MOVB R0,@VDPWA               then MSB with the write bit
+*
+       LI   R0,PAYLD              copy the GPU program into VRAM
+       LI   R1,>0224                548 bytes
+CPYLP  MOVB *R0+,@VDPWD
+       DEC  R1
+       JNE  CPYLP
+*
+       LI   R0,>B91C              VR57 = >1C  (F18A unlock, needs two writes)
+       BL   @WREG
+       BL   @WREG
+       LI   R0,>B61B              VR54 = >1B  GPU PC MSB
+       BL   @WREG
+       LI   R0,>B702              VR55 = >02  GPU PC LSB - this starts the GPU
+       BL   @WREG
+*
+HANG   LIMI 2                     idle forever; the GPU owns the screen now
+       LIMI 0
+       JMP  HANG
+*
+* R0 = >8n<value>, n = register number.  Sends value then register select.
+WREG   SWPB R0
+       MOVB R0,@VDPWA             data byte
+       SWPB R0
+       MOVB R0,@VDPWA             >80 | register
+       RT
+*
+* ---------------------------------------------------------------------------
+* Payload.  Assembled for >1B02 in VRAM, so the addresses below are GPU
+* addresses, not host addresses.  Host image offset = GPU address + >8F54.
+*
+* GPU address space (f18a_gpu.vhd):
+*   >0000-3FFF VRAM   >4000-47FF GRAM   >5000-507F PRAM
+*   >6000-603F VDP registers      >7000 scanline (read-only)
+* ---------------------------------------------------------------------------
+PAYLD  EQU  $                     >A056
+       AORG >1B02
+*
+* VRAM layout chosen by VREGS below:
+*   >0000-17FF pattern table     >1800-1AFF name table
+*   >1B00      sprite attributes >1B02-1D25 this program
+*   >1E20-1E2B variables         >2000-37FF colour table
+*
+GPU    LI   R0,>1100             pixel accumulator: fg=1 bg=1 bits=0
+       MOV  R0,@ACCUM
+       LI   R1,VREGS
+       BL   @SETREG              program VR0-VR7, kill the sprite list
+       BL   @CLRTAB              clear pattern and colour tables
+       BL   @SETCON              load the fixed-point constants
+       BL   @MANDEL              draw
+       IDLE                      halt the GPU
+*
+* Build the Graphics II name table (0,1,2..255 three times) and zero the
+* 6144-byte pattern and colour tables.
+CLRTAB MOV  R11,R3
+       LI   R0,>1800
+       LI   R2,3
+NT1    CLR  R1
+NT2    MOVB R1,*R0+
+       AI   R1,>0100
+       JNE  NT2
+       DEC  R2
+       JNE  NT1
+       CLR  R0                   pattern table >0000-17FF
+       LI   R1,>0C00
+PAT    CLR  *R0+
+       DEC  R1
+       JNE  PAT
+       LI   R0,>2000             colour table >2000-37FF
+       LI   R1,>0C00
+COL    CLR  *R0+
+       DEC  R1
+       JNE  COL
+       B    *R3
+*
+* Fixed-point constants, Q13 (1.0 = >2000).
+SETCON LI   R12,>C000            cr origin  = -2.0
+       LI   R13,>2800            ci origin  = +1.25
+       LI   R14,>5000            width      =  2.5  (>>8 later -> dx)
+       LI   R15,>B000            -height    = -2.5  (/192 later -> dy)
+       RT
+*
+* VR0 >02  M3 set -> Graphics II
+* VR1 >E2  16K, display on, interrupts on, 16x16 sprites
+* VR2 >06  name table   >1800
+* VR3 >FF  colour table >2000, full mask
+* VR4 >03  pattern table >0000, full mask
+* VR5 >36  sprite attributes >1B00
+* VR6 >03  sprite patterns  >1800
+* VR7 >00  backdrop transparent -> black
+VREGS  DATA >02E2,>06FF,>0336,>0300
+       DATA >5B00,>0000          unused padding, not copied
+*
+* Copy bytes to the VDP register file until a zero byte is moved.  VR7 = >00
+* terminates, so exactly VR0-VR7 are written.
+SETREG LI   R3,>6000
+SR1    MOVB *R1+,*R3+
+       JNE  SR1
+       LI   R1,>D000
+       MOVB R1,@>1B00            >D0 terminates the sprite list
+       RT
+*
+SIGN   DATA >8000                sign-bit mask; the >00 low byte is also used
+*                                as a zero source by PLOT
+*
+* SQR - r0 = (r0*r0) >> 13, i.e. square in Q13.  Returns >FFFF if the result
+* would not fit, which the caller treats as an escape.
+SQR    ABS  R0
+       MPY  R0,R0                r0:r1 = product
+       MOV  R0,R2
+       ANDI R2,>F000
+       JNE  SQROV
+       SRL  R1,13
+       SLA  R0,3
+       SOC  R1,R0
+       RT
+SQROV  SETO R0
+       RT
+*
+* ---------------------------------------------------------------------------
+* MANDEL - the renderer.  256x192 pixels, max 14 iterations.
+*   r6 = zr   r7 = zi   r8 = iterations left
+*   r9 = x    r10 = y   r12 = cr   r13 = ci   r14 = dx   r15 = dy
+* ---------------------------------------------------------------------------
+MANDEL MOV  R11,@SAVR11
+       MOV  R12,@SAVR12
+       MOV  R13,@SAVR13
+       MOV  R14,@SAVR14
+       MOV  R15,@SAVR15
+       SRA  R14,8                dx = 2.5 / 256
+       CLR  R3                   dy = -(2.5 / 192), by signed divide
+       MOV  R15,R1
+       JGT  DIVID
+       JEQ  DIVID
+       ABS  R1
+       SETO R3
+DIVID  CLR  R0
+       LI   R2,>00C0             192 rows
+       DIV  R2,R0
+       MOV  R0,R15
+       MOV  R3,R3
+       JEQ  ROWSET
+       NEG  R15
+ROWSET CLR  R10                  y = 0
+ROW    MOV  @SAVR12,R12          cr = -2.0 at the start of every row
+       CLR  R9                   x = 0
+COLUMN CLR  R6                   zr = 0
+       CLR  R7                   zi = 0
+       LI   R8,>000E             14 iterations
+*
+ITER   MOV  R6,R0
+       BL   @SQR                 r4 = zr^2
+       CI   R0,>FFFF
+       JEQ  PIXEL                overflow -> escaped
+       MOV  R0,R4
+       MOV  R7,R0
+       BL   @SQR                 r5 = zi^2
+       CI   R0,>FFFF
+       JEQ  PIXEL
+       MOV  R0,R5
+       SRL  R0,5                 (zr^2 + zi^2) >> 5, keeps the sum in 16 bits
+       MOV  R4,R1
+       SRL  R1,5
+       A    R1,R0
+       CI   R0,>0400             >= 4.0 ?
+       JHE  PIXEL
+       DEC  R8
+       JEQ  PIXEL                out of iterations -> inside the set
+*
+       MOV  R4,R0                zr' = zr^2 - zi^2 + cr
+       S    R5,R0
+       A    R12,R0
+*
+       CLR  R5                   zi' = 2*zr*zi + ci, sign tracked in r5
+       MOV  R6,R1
+       COC  @SIGN,R1
+       JNE  POSI
+       INV  R5
+       ABS  R1
+POSI   MOV  R7,R2
+       COC  @SIGN,R2
+       JNE  MULT
+       INV  R5
+       ABS  R2
+MULT   MPY  R2,R1
+       SRL  R2,13
+       SLA  R1,3
+       SOC  R2,R1
+       SLA  R1,1                 x2
+       MOV  R5,R5
+       JEQ  ADDCI
+       NEG  R1
+ADDCI  A    R13,R1
+       MOV  R1,R7
+       MOV  R0,R6
+       JMP  ITER
+*
+PIXEL  BL   @PLOT
+       A    R14,R12              cr += dx
+       INC  R9
+       CI   R9,>0100             256 columns
+       JNE  COLUMN
+       A    R15,R13              ci += dy
+       INC  R10
+       CI   R10,>00C0            192 rows
+       JNE  ROW
+       MOV  @SAVR11,R11
+       MOV  @SAVR12,R12
+       MOV  @SAVR13,R13
+       MOV  @SAVR14,R14
+       MOV  @SAVR15,R15
+       RT
+*
+BITTAB BYTE >80,>40,>20,>10,>08,>04,>02,>01
+*
+* ---------------------------------------------------------------------------
+* PLOT - accumulate one pixel, and flush every 8th.
+*
+* Graphics II gives only two colours per 8-pixel group, so ACCUM carries the
+* whole group:  high byte = colour byte (fg<<4 | bg), low byte = pattern bits.
+* Colour index = iterations left + 1, so a fast escape is bright (14, grey)
+* and a slow one is dark.  Points inside the set must be colour 0.
+* ---------------------------------------------------------------------------
+PLOT   MOV  R8,R8
+       JEQ  INSIDE               r8 = 0 -> inside the set
+       INC  R8
+       SLA  R8,12                colour index into bits 15-12
+       MOV  @ACCUM,R3
+       MOV  R3,R0
+       ANDI R0,>F000
+       CI   R0,>1000             fg still the >1 sentinel ?
+       JEQ  USEFG
+       C    R0,R8                fg already this colour ?
+       JEQ  USEFG
+       MOV  R3,R0
+       ANDI R0,>0F00
+       JEQ  USEFG                bg locked to 0 by INSIDE ?
+       SRL  R8,4                 otherwise put this colour in bg
+       ANDI R3,>F0FF
+       SOCB R8,R3
+       JMP  STORE                and leave the pixel bit clear
+*
+USEFG  ANDI R3,>0FFF             claim fg for this colour
+       SOCB R8,R3
+       MOV  R9,R2                and set this pixel's bit
+       ANDI R2,>0007
+       MOVB @BITTAB(R2),R2
+       SWPB R2
+       MOVB @SIGN+1,R2           zero the high byte
+       SOC  R2,R3
+       JMP  STORE
+*
+* Inside the set: force bg to 0 (transparent -> black backdrop).  Any pixels
+* already placed in this group are promoted to fg so they keep a colour.
+INSIDE MOV  @ACCUM,R3
+       MOV  R3,R0
+       ANDI R0,>0F00
+       JEQ  STORE                bg already 0, nothing to do
+       ANDI R3,>00FF             clear both nibbles
+       SLA  R0,4
+       SOCB R0,R3                fg = old bg
+       MOV  R9,R1
+       ANDI R1,>0007
+       JEQ  STORE
+       LI   R2,>0080
+FILL   SOC  R2,R3                set bits for pixels 0..(x&7)-1
+       SRL  R2,1
+       DEC  R1
+       JNE  FILL
+*
+* Flush on the last pixel of the group.  Graphics II address is
+* ((y & >F8) << 5) | (x & >F8) | (y & 7).
+STORE  MOV  R9,R0
+       ANDI R0,>0007
+       CI   R0,>0007
+       JNE  KEEP
+       SWPB R3
+       MOV  R10,R0
+       SLA  R0,5
+       SOC  R10,R0
+       ANDI R0,>FF07
+       MOV  R9,R2
+       ANDI R2,>0007
+       A    R9,R0
+       S    R2,R0
+       MOV  R11,R2               redundant: nothing below touches r11
+       MOVB R3,*R0               pattern byte
+       AI   R0,>2000
+       SWPB R3
+       MOVB R3,*R0               colour byte
+       LI   R3,>1100             reset the accumulator
+       MOV  R2,R11
+KEEP   MOV  R3,@ACCUM
+       RT
+*
+SAVR12 BSS  2                    >1E20
+SAVR13 BSS  2                    >1E22
+SAVR14 BSS  2                    >1E24
+SAVR15 BSS  2                    >1E26
+SAVR11 BSS  2                    >1E28
+ACCUM  BSS  2                    >1E2A
+       END

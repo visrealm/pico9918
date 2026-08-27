@@ -1,0 +1,11 @@
+# Commits that only move whitespace. Skip them when tracing a line's history:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# (GitHub picks this file up on its own.)
+
+# Adopt clang-format across the firmware and the submodule
+8d061d35ae85b7913c59dfa603dee9a39720d783
+
+# Widen the column limit to 120 and reformat
+62d346fc96cffdbcbbbec52686cc651760a1dac4

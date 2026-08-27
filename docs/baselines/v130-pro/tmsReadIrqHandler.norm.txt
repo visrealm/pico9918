@@ -1,0 +1,88 @@
+<ADDR> <tmsReadIrqHandler>:
+ldr	r2, [pc, #236]	@ (<ADDR> <tmsReadIrqHandler+OFF>)
+ldr	r3, [pc, #240]	@ (<ADDR> <tmsReadIrqHandler+OFF>)
+ldr	r2, [r2, #0]
+ldr	r3, [r3, #36]	@ 0x24
+add.w	r1, r2, #65536	@ 0x10000
+ands.w	r0, r3, #1
+push	{r4, lr}
+ldrb.w	ip, [r1, #47]	@ 0x2f
+bne.n	<ADDR> <tmsReadIrqHandler+OFF>
+strb.w	r0, [r1, #42]	@ 0x2a
+add.w	r0, r2, #24576	@ 0x6000
+ldr	r3, [r1, #36]	@ 0x24
+ldrsb.w	r0, [r0, #48]	@ 0x30
+add	r0, r3
+ubfx	r3, r3, #0, #14
+ldrb	r3, [r2, r3]
+str	r0, [r1, #36]	@ 0x24
+strb.w	r3, [r1, #44]	@ 0x2c
+ldr	r1, [pc, #192]	@ (<ADDR> <tmsReadIrqHandler+OFF>)
+strb	r3, [r1, #0]
+lsls	r3, r3, #8
+orr.w	r3, r3, #255	@ 0xff
+cmp.w	ip, #0
+beq.n	<ADDR> <tmsReadIrqHandler+OFF>
+add.w	r1, r2, #24576	@ 0x6000
+ldrb	r1, [r1, #15]
+and.w	r1, r1, #15
+add	r2, r1
+add.w	r2, r2, #45056	@ 0xb000
+ldrb	r2, [r2, #0]
+lsls	r1, r1, #24
+orr.w	r1, r1, r2, lsl #16
+ldr	r2, [pc, #148]	@ (<ADDR> <tmsReadIrqHandler+OFF>)
+orrs	r3, r1
+str	r3, [r2, #20]
+pop	{r4, pc}
+movs	r0, #0
+mov.w	lr, r3, lsr #17
+strb.w	r0, [r1, #42]	@ 0x2a
+cmp.w	ip, #0
+beq.n	<ADDR> <tmsReadIrqHandler+OFF>
+lsrs	r0, r3, #25
+beq.n	<ADDR> <tmsReadIrqHandler+OFF>
+ldr	r3, [pc, #124]	@ (<ADDR> <tmsReadIrqHandler+OFF>)
+cmp	r0, #1
+ldrb	r3, [r3, #0]
+bne.n	<ADDR> <tmsReadIrqHandler+OFF>
+tst.w	lr, #1
+beq.n	<ADDR> <tmsReadIrqHandler+OFF>
+add.w	r0, r2, #45056	@ 0xb000
+ldrb	r1, [r0, #1]
+bic.w	r1, r1, #1
+strb	r1, [r0, #1]
+b.n	<ADDR> <tmsReadIrqHandler+OFF>
+add.w	r2, r2, #45056	@ 0xb000
+ldrb	r2, [r2, #0]
+orr.w	r3, r3, r2, lsl #16
+ldr	r2, [pc, #84]	@ (<ADDR> <tmsReadIrqHandler+OFF>)
+str	r3, [r2, #20]
+pop	{r4, pc}
+ldrb.w	r0, [r1, #53]	@ 0x35
+cmp	r0, #1
+beq.n	<ADDR> <tmsReadIrqHandler+OFF>
+ldrb.w	r0, [r1, #1517]	@ 0x5ed
+bic.w	r3, lr, #31
+tst.w	lr, #64	@ 0x40
+sxtb.w	lr, r3
+bic.w	r0, r0, lr
+orr.w	r3, r0, #31
+it	ne
+movne	r0, r3
+ldr	r3, [pc, #44]	@ (<ADDR> <tmsReadIrqHandler+OFF>)
+add.w	r4, r2, #45056	@ 0xb000
+cmp.w	lr, #0
+strb	r0, [r4, #0]
+ldrb	r3, [r3, #0]
+strb.w	r0, [r1, #1517]	@ 0x5ed
+bge.n	<ADDR> <tmsReadIrqHandler+OFF>
+mov.w	r4, #0
+movs	r0, #22
+mov.w	lr, #1
+strb.w	r4, [r1, #1516]	@ 0x5ec
+mcrr	0, 4, r0, lr, cr0
+b.n	<ADDR> <tmsReadIrqHandler+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

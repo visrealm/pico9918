@@ -1,0 +1,83 @@
+<ADDR> <tmsScanline>:
+push	{r4, r5, r6, lr}
+ldr	r3, [r1, #44]	@ 0x2c
+sub	sp, #16
+movs	r5, r1
+str	r3, [sp, #8]
+movs	r3, #68	@ 0x44
+ldrh	r3, [r5, r3]
+add	r1, sp, #8
+movs	r4, r0
+movs	r6, r2
+strh	r3, [r1, #4]
+bl	<ADDR> <pico9918_frame_scanline>
+cmp	r0, #0
+bne.n	<ADDR> <tmsScanline+OFF>
+add	sp, #16
+pop	{r4, r5, r6, pc}
+lsls	r4, r4, #20
+lsrs	r4, r4, #20
+bl	<ADDR> <pendingDisplayBanner>
+cmp	r0, #1
+beq.n	<ADDR> <tmsScanline+OFF>
+cmp	r0, #2
+beq.n	<ADDR> <tmsScanline+OFF>
+ldr	r3, [pc, #112]	@ (<ADDR> <tmsScanline+OFF>)
+ldr	r2, [r3, #0]
+ldr	r3, [pc, #112]	@ (<ADDR> <tmsScanline+OFF>)
+ldrb	r3, [r2, r3]
+cmp	r3, #0
+beq.n	<ADDR> <tmsScanline+OFF>
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+tst	r3, r2
+bne.n	<ADDR> <tmsScanline+OFF>
+movs	r2, r6
+movs	r0, r4
+ldrh	r1, [r5, #46]	@ 0x2e
+bl	<ADDR> <pico9918_diag_render>
+b.n	<ADDR> <tmsScanline+OFF>
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+tst	r3, r2
+bne.n	<ADDR> <tmsScanline+OFF>
+ldr	r3, [pc, #64]	@ (<ADDR> <tmsScanline+OFF>)
+movs	r2, #210	@ 0xd2
+str	r3, [sp, #0]
+movs	r0, r4
+movs	r3, #8
+ldr	r1, [pc, #56]	@ (<ADDR> <tmsScanline+OFF>)
+str	r6, [sp, #4]
+bl	<ADDR> <pico9918_diag_render_text>
+b.n	<ADDR> <tmsScanline+OFF>
+movs	r0, #160	@ 0xa0
+movs	r2, #128	@ 0x80
+movs	r1, #144	@ 0x90
+lsls	r0, r0, #23
+lsls	r2, r2, #17
+ldr	r3, [r0, r1]
+tst	r3, r2
+bne.n	<ADDR> <tmsScanline+OFF>
+ldr	r3, [pc, #28]	@ (<ADDR> <tmsScanline+OFF>)
+movs	r2, #198	@ 0xc6
+str	r3, [sp, #0]
+movs	r0, r4
+movs	r3, #8
+ldr	r1, [pc, #24]	@ (<ADDR> <tmsScanline+OFF>)
+str	r6, [sp, #4]
+bl	<ADDR> <pico9918_diag_render_text>
+b.n	<ADDR> <tmsScanline+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

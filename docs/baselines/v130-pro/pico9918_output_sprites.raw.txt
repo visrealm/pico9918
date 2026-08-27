@@ -1,0 +1,2598 @@
+20022200 <pico9918_output_sprites.constprop.0>:
+20022200:	4b86      	ldr	r3, [pc, #536]	@ (2002241c <pico9918_output_sprites.constprop.0+0x21c>)
+20022202:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+20022206:	f503 4220 	add.w	r2, r3, #40960	@ 0xa000
+2002220a:	f892 202f 	ldrb.w	r2, [r2, #47]	@ 0x2f
+2002220e:	f893 5031 	ldrb.w	r5, [r3, #49]	@ 0x31
+20022212:	7819      	ldrb	r1, [r3, #0]
+20022214:	fb02 f405 	mul.w	r4, r2, r5
+20022218:	f893 e001 	ldrb.w	lr, [r3, #1]
+2002221c:	f011 0f08 	tst.w	r1, #8
+20022220:	b09d      	sub	sp, #116	@ 0x74
+20022222:	f00e 0101 	and.w	r1, lr, #1
+20022226:	9104      	str	r1, [sp, #16]
+20022228:	f893 6033 	ldrb.w	r6, [r3, #51]	@ 0x33
+2002222c:	ea4f 0150 	mov.w	r1, r0, lsr #1
+20022230:	bf18      	it	ne
+20022232:	4608      	movne	r0, r1
+20022234:	f014 0140 	ands.w	r1, r4, #64	@ 0x40
+20022238:	bf0c      	ite	eq
+2002223a:	f04f 08e0 	moveq.w	r8, #224	@ 0xe0
+2002223e:	f04f 08f0 	movne.w	r8, #240	@ 0xf0
+20022242:	2e00      	cmp	r6, #0
+20022244:	f001 8026 	beq.w	20023294 <pico9918_output_sprites.constprop.0+0x1094>
+20022248:	2e20      	cmp	r6, #32
+2002224a:	bf28      	it	cs
+2002224c:	2620      	movcs	r6, #32
+2002224e:	46b4      	mov	ip, r6
+20022250:	795e      	ldrb	r6, [r3, #5]
+20022252:	f3c5 05c0 	ubfx	r5, r5, #3, #1
+20022256:	f085 0501 	eor.w	r5, r5, #1
+2002225a:	01f6      	lsls	r6, r6, #7
+2002225c:	eba8 0805 	sub.w	r8, r8, r5
+20022260:	1b40      	subs	r0, r0, r5
+20022262:	f406 567e 	and.w	r6, r6, #16256	@ 0x3f80
+20022266:	f5a3 45c0 	sub.w	r5, r3, #24576	@ 0x6000
+2002226a:	442e      	add	r6, r5
+2002226c:	2900      	cmp	r1, #0
+2002226e:	f001 801f 	beq.w	200232b0 <pico9918_output_sprites.constprop.0+0x10b0>
+20022272:	2a00      	cmp	r2, #0
+20022274:	f040 817f 	bne.w	20022576 <pico9918_output_sprites.constprop.0+0x376>
+20022278:	4617      	mov	r7, r2
+2002227a:	4611      	mov	r1, r2
+2002227c:	4693      	mov	fp, r2
+2002227e:	f8df 91a8 	ldr.w	r9, [pc, #424]	@ 20022428 <pico9918_output_sprites.constprop.0+0x228>
+20022282:	f8df a1a0 	ldr.w	sl, [pc, #416]	@ 20022424 <pico9918_output_sprites.constprop.0+0x224>
+20022286:	f816 5027 	ldrb.w	r5, [r6, r7, lsl #2]
+2002228a:	2dd0      	cmp	r5, #208	@ 0xd0
+2002228c:	d003      	beq.n	20022296 <pico9918_output_sprites.constprop.0+0x96>
+2002228e:	45a8      	cmp	r8, r5
+20022290:	bfb8      	it	lt
+20022292:	f5a5 7580 	sublt.w	r5, r5, #256	@ 0x100
+20022296:	1b45      	subs	r5, r0, r5
+20022298:	2d1f      	cmp	r5, #31
+2002229a:	d808      	bhi.n	200222ae <pico9918_output_sprites.constprop.0+0xae>
+2002229c:	f856 2027 	ldr.w	r2, [r6, r7, lsl #2]
+200222a0:	f80a 7001 	strb.w	r7, [sl, r1]
+200222a4:	f849 2021 	str.w	r2, [r9, r1, lsl #2]
+200222a8:	f809 5021 	strb.w	r5, [r9, r1, lsl #2]
+200222ac:	3101      	adds	r1, #1
+200222ae:	3701      	adds	r7, #1
+200222b0:	45bc      	cmp	ip, r7
+200222b2:	d8e8      	bhi.n	20022286 <pico9918_output_sprites.constprop.0+0x86>
+200222b4:	465a      	mov	r2, fp
+200222b6:	485a      	ldr	r0, [pc, #360]	@ (20022420 <pico9918_output_sprites.constprop.0+0x220>)
+200222b8:	f00e 0502 	and.w	r5, lr, #2
+200222bc:	7800      	ldrb	r0, [r0, #0]
+200222be:	9016      	str	r0, [sp, #88]	@ 0x58
+200222c0:	9e04      	ldr	r6, [sp, #16]
+200222c2:	4250      	negs	r0, r2
+200222c4:	2e00      	cmp	r6, #0
+200222c6:	f000 80b5 	beq.w	20022434 <pico9918_output_sprites.constprop.0+0x234>
+200222ca:	2d00      	cmp	r5, #0
+200222cc:	f000 821a 	beq.w	20022704 <pico9918_output_sprites.constprop.0+0x504>
+200222d0:	9608      	str	r6, [sp, #32]
+200222d2:	2610      	movs	r6, #16
+200222d4:	9601      	str	r6, [sp, #4]
+200222d6:	26fc      	movs	r6, #252	@ 0xfc
+200222d8:	2520      	movs	r5, #32
+200222da:	9607      	str	r6, [sp, #28]
+200222dc:	f004 0603 	and.w	r6, r4, #3
+200222e0:	2e03      	cmp	r6, #3
+200222e2:	950a      	str	r5, [sp, #40]	@ 0x28
+200222e4:	9509      	str	r5, [sp, #36]	@ 0x24
+200222e6:	9606      	str	r6, [sp, #24]
+200222e8:	f000 821a 	beq.w	20022720 <pico9918_output_sprites.constprop.0+0x520>
+200222ec:	7e1d      	ldrb	r5, [r3, #24]
+200222ee:	2e01      	cmp	r6, #1
+200222f0:	ea05 0500 	and.w	r5, r5, r0
+200222f4:	f040 8238 	bne.w	20022768 <pico9918_output_sprites.constprop.0+0x568>
+200222f8:	f005 0520 	and.w	r5, r5, #32
+200222fc:	9517      	str	r5, [sp, #92]	@ 0x5c
+200222fe:	250f      	movs	r5, #15
+20022300:	9612      	str	r6, [sp, #72]	@ 0x48
+20022302:	9510      	str	r5, [sp, #64]	@ 0x40
+20022304:	2900      	cmp	r1, #0
+20022306:	f000 87bd 	beq.w	20023284 <pico9918_output_sprites.constprop.0+0x1084>
+2002230a:	f060 0070 	orn	r0, r0, #112	@ 0x70
+2002230e:	f04f 0b1f 	mov.w	fp, #31
+20022312:	9003      	str	r0, [sp, #12]
+20022314:	f004 0002 	and.w	r0, r4, #2
+20022318:	2400      	movs	r4, #0
+2002231a:	900c      	str	r0, [sp, #48]	@ 0x30
+2002231c:	4841      	ldr	r0, [pc, #260]	@ (20022424 <pico9918_output_sprites.constprop.0+0x224>)
+2002231e:	f8cd b008 	str.w	fp, [sp, #8]
+20022322:	4401      	add	r1, r0
+20022324:	f44f 6000 	mov.w	r0, #2048	@ 0x800
+20022328:	46a3      	mov	fp, r4
+2002232a:	9105      	str	r1, [sp, #20]
+2002232c:	f893 1032 	ldrb.w	r1, [r3, #50]	@ 0x32
+20022330:	f8df a0f0 	ldr.w	sl, [pc, #240]	@ 20022424 <pico9918_output_sprites.constprop.0+0x224>
+20022334:	fb02 f101 	mul.w	r1, r2, r1
+20022338:	f001 0208 	and.w	r2, r1, #8
+2002233c:	9215      	str	r2, [sp, #84]	@ 0x54
+2002233e:	799a      	ldrb	r2, [r3, #6]
+20022340:	4939      	ldr	r1, [pc, #228]	@ (20022428 <pico9918_output_sprites.constprop.0+0x228>)
+20022342:	02d2      	lsls	r2, r2, #11
+20022344:	f402 5260 	and.w	r2, r2, #14336	@ 0x3800
+20022348:	920b      	str	r2, [sp, #44]	@ 0x2c
+2002234a:	7f5a      	ldrb	r2, [r3, #29]
+2002234c:	7f9b      	ldrb	r3, [r3, #30]
+2002234e:	0992      	lsrs	r2, r2, #6
+20022350:	930e      	str	r3, [sp, #56]	@ 0x38
+20022352:	fa40 f302 	asr.w	r3, r0, r2
+20022356:	9413      	str	r4, [sp, #76]	@ 0x4c
+20022358:	930d      	str	r3, [sp, #52]	@ 0x34
+2002235a:	9411      	str	r4, [sp, #68]	@ 0x44
+2002235c:	78cb      	ldrb	r3, [r1, #3]
+2002235e:	9a03      	ldr	r2, [sp, #12]
+20022360:	7808      	ldrb	r0, [r1, #0]
+20022362:	4013      	ands	r3, r2
+20022364:	f013 0510 	ands.w	r5, r3, #16
+20022368:	ea4f 0060 	mov.w	r0, r0, asr #1
+2002236c:	f040 83f5 	bne.w	20022b5a <pico9918_output_sprites.constprop.0+0x95a>
+20022370:	e9dd 9709 	ldrd	r9, r7, [sp, #36]	@ 0x24
+20022374:	e9dd 2e07 	ldrd	r2, lr, [sp, #28]
+20022378:	9e01      	ldr	r6, [sp, #4]
+2002237a:	9500      	str	r5, [sp, #0]
+2002237c:	42b0      	cmp	r0, r6
+2002237e:	f280 8217 	bge.w	200227b0 <pico9918_output_sprites.constprop.0+0x5b0>
+20022382:	f10b 0b01 	add.w	fp, fp, #1
+20022386:	f1bb 0f04 	cmp.w	fp, #4
+2002238a:	f240 82f6 	bls.w	2002297a <pico9918_output_sprites.constprop.0+0x77a>
+2002238e:	9c02      	ldr	r4, [sp, #8]
+20022390:	0665      	lsls	r5, r4, #25
+20022392:	f100 82ee 	bmi.w	20022972 <pico9918_output_sprites.constprop.0+0x772>
+20022396:	9d15      	ldr	r5, [sp, #84]	@ 0x54
+20022398:	2d00      	cmp	r5, #0
+2002239a:	f000 82e0 	beq.w	2002295e <pico9918_output_sprites.constprop.0+0x75e>
+2002239e:	9d0e      	ldr	r5, [sp, #56]	@ 0x38
+200223a0:	455d      	cmp	r5, fp
+200223a2:	f080 82ea 	bcs.w	2002297a <pico9918_output_sprites.constprop.0+0x77a>
+200223a6:	f89a 3000 	ldrb.w	r3, [sl]
+200223aa:	f024 021f 	bic.w	r2, r4, #31
+200223ae:	4313      	orrs	r3, r2
+200223b0:	f043 0340 	orr.w	r3, r3, #64	@ 0x40
+200223b4:	fa5f fb83 	uxtb.w	fp, r3
+200223b8:	4b1c      	ldr	r3, [pc, #112]	@ (2002242c <pico9918_output_sprites.constprop.0+0x22c>)
+200223ba:	9a13      	ldr	r2, [sp, #76]	@ 0x4c
+200223bc:	f883 2036 	strb.w	r2, [r3, #54]	@ 0x36
+200223c0:	9b11      	ldr	r3, [sp, #68]	@ 0x44
+200223c2:	2b00      	cmp	r3, #0
+200223c4:	f000 80d3 	beq.w	2002256e <pico9918_output_sprites.constprop.0+0x36e>
+200223c8:	4b19      	ldr	r3, [pc, #100]	@ (20022430 <pico9918_output_sprites.constprop.0+0x230>)
+200223ca:	6a58      	ldr	r0, [r3, #36]	@ 0x24
+200223cc:	e9d3 2112 	ldrd	r2, r1, [r3, #72]	@ 0x48
+200223d0:	4042      	eors	r2, r0
+200223d2:	6a98      	ldr	r0, [r3, #40]	@ 0x28
+200223d4:	649a      	str	r2, [r3, #72]	@ 0x48
+200223d6:	4041      	eors	r1, r0
+200223d8:	6d1a      	ldr	r2, [r3, #80]	@ 0x50
+200223da:	6ad8      	ldr	r0, [r3, #44]	@ 0x2c
+200223dc:	64d9      	str	r1, [r3, #76]	@ 0x4c
+200223de:	4042      	eors	r2, r0
+200223e0:	6d59      	ldr	r1, [r3, #84]	@ 0x54
+200223e2:	6b18      	ldr	r0, [r3, #48]	@ 0x30
+200223e4:	651a      	str	r2, [r3, #80]	@ 0x50
+200223e6:	4041      	eors	r1, r0
+200223e8:	6d9a      	ldr	r2, [r3, #88]	@ 0x58
+200223ea:	6b58      	ldr	r0, [r3, #52]	@ 0x34
+200223ec:	6559      	str	r1, [r3, #84]	@ 0x54
+200223ee:	4042      	eors	r2, r0
+200223f0:	6dd9      	ldr	r1, [r3, #92]	@ 0x5c
+200223f2:	6b98      	ldr	r0, [r3, #56]	@ 0x38
+200223f4:	659a      	str	r2, [r3, #88]	@ 0x58
+200223f6:	4041      	eors	r1, r0
+200223f8:	6e1a      	ldr	r2, [r3, #96]	@ 0x60
+200223fa:	6bd8      	ldr	r0, [r3, #60]	@ 0x3c
+200223fc:	65d9      	str	r1, [r3, #92]	@ 0x5c
+200223fe:	4042      	eors	r2, r0
+20022400:	6e59      	ldr	r1, [r3, #100]	@ 0x64
+20022402:	6c18      	ldr	r0, [r3, #64]	@ 0x40
+20022404:	661a      	str	r2, [r3, #96]	@ 0x60
+20022406:	4041      	eors	r1, r0
+20022408:	4658      	mov	r0, fp
+2002240a:	6c5a      	ldr	r2, [r3, #68]	@ 0x44
+2002240c:	6659      	str	r1, [r3, #100]	@ 0x64
+2002240e:	6e99      	ldr	r1, [r3, #104]	@ 0x68
+20022410:	404a      	eors	r2, r1
+20022412:	669a      	str	r2, [r3, #104]	@ 0x68
+20022414:	b01d      	add	sp, #116	@ 0x74
+20022416:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+2002241a:	bf00      	nop
+2002241c:	2000b300 	.word	0x2000b300
+20022420:	2002c107 	.word	0x2002c107
+20022424:	20080000 	.word	0x20080000
+20022428:	20080020 	.word	0x20080020
+2002242c:	20015300 	.word	0x20015300
+20022430:	200805e0 	.word	0x200805e0
+20022434:	2d00      	cmp	r5, #0
+20022436:	f000 8185 	beq.w	20022744 <pico9918_output_sprites.constprop.0+0x544>
+2002243a:	25fc      	movs	r5, #252	@ 0xfc
+2002243c:	f04f 0801 	mov.w	r8, #1
+20022440:	f004 0603 	and.w	r6, r4, #3
+20022444:	2e03      	cmp	r6, #3
+20022446:	f04f 0710 	mov.w	r7, #16
+2002244a:	e9cd 5806 	strd	r5, r8, [sp, #24]
+2002244e:	9605      	str	r6, [sp, #20]
+20022450:	f000 8183 	beq.w	2002275a <pico9918_output_sprites.constprop.0+0x55a>
+20022454:	7e1d      	ldrb	r5, [r3, #24]
+20022456:	2e01      	cmp	r6, #1
+20022458:	ea05 0500 	and.w	r5, r5, r0
+2002245c:	f040 818e 	bne.w	2002277c <pico9918_output_sprites.constprop.0+0x57c>
+20022460:	f005 0520 	and.w	r5, r5, #32
+20022464:	9512      	str	r5, [sp, #72]	@ 0x48
+20022466:	250f      	movs	r5, #15
+20022468:	960e      	str	r6, [sp, #56]	@ 0x38
+2002246a:	950c      	str	r5, [sp, #48]	@ 0x30
+2002246c:	2900      	cmp	r1, #0
+2002246e:	f000 8709 	beq.w	20023284 <pico9918_output_sprites.constprop.0+0x1084>
+20022472:	f060 0070 	orn	r0, r0, #112	@ 0x70
+20022476:	f04f 0b1f 	mov.w	fp, #31
+2002247a:	9002      	str	r0, [sp, #8]
+2002247c:	f004 0002 	and.w	r0, r4, #2
+20022480:	2400      	movs	r4, #0
+20022482:	900a      	str	r0, [sp, #40]	@ 0x28
+20022484:	48aa      	ldr	r0, [pc, #680]	@ (20022730 <pico9918_output_sprites.constprop.0+0x530>)
+20022486:	f8cd b004 	str.w	fp, [sp, #4]
+2002248a:	4401      	add	r1, r0
+2002248c:	9103      	str	r1, [sp, #12]
+2002248e:	f44f 6100 	mov.w	r1, #2048	@ 0x800
+20022492:	46a2      	mov	sl, r4
+20022494:	46bb      	mov	fp, r7
+20022496:	4605      	mov	r5, r0
+20022498:	f893 0032 	ldrb.w	r0, [r3, #50]	@ 0x32
+2002249c:	940f      	str	r4, [sp, #60]	@ 0x3c
+2002249e:	fb02 f000 	mul.w	r0, r2, r0
+200224a2:	f000 0208 	and.w	r2, r0, #8
+200224a6:	9211      	str	r2, [sp, #68]	@ 0x44
+200224a8:	799a      	ldrb	r2, [r3, #6]
+200224aa:	940d      	str	r4, [sp, #52]	@ 0x34
+200224ac:	02d2      	lsls	r2, r2, #11
+200224ae:	f402 5260 	and.w	r2, r2, #14336	@ 0x3800
+200224b2:	9208      	str	r2, [sp, #32]
+200224b4:	7f5a      	ldrb	r2, [r3, #29]
+200224b6:	7f9b      	ldrb	r3, [r3, #30]
+200224b8:	0992      	lsrs	r2, r2, #6
+200224ba:	930b      	str	r3, [sp, #44]	@ 0x2c
+200224bc:	fa41 f302 	asr.w	r3, r1, r2
+200224c0:	499c      	ldr	r1, [pc, #624]	@ (20022734 <pico9918_output_sprites.constprop.0+0x534>)
+200224c2:	9309      	str	r3, [sp, #36]	@ 0x24
+200224c4:	78cb      	ldrb	r3, [r1, #3]
+200224c6:	9a02      	ldr	r2, [sp, #8]
+200224c8:	7808      	ldrb	r0, [r1, #0]
+200224ca:	4013      	ands	r3, r2
+200224cc:	f013 0e10 	ands.w	lr, r3, #16
+200224d0:	f040 8350 	bne.w	20022b74 <pico9918_output_sprites.constprop.0+0x974>
+200224d4:	e9dd 2906 	ldrd	r2, r9, [sp, #24]
+200224d8:	46dc      	mov	ip, fp
+200224da:	f8cd b000 	str.w	fp, [sp]
+200224de:	4560      	cmp	r0, ip
+200224e0:	f280 8159 	bge.w	20022796 <pico9918_output_sprites.constprop.0+0x596>
+200224e4:	f10a 0a01 	add.w	sl, sl, #1
+200224e8:	f1ba 0f04 	cmp.w	sl, #4
+200224ec:	f240 8176 	bls.w	200227dc <pico9918_output_sprites.constprop.0+0x5dc>
+200224f0:	9c01      	ldr	r4, [sp, #4]
+200224f2:	0667      	lsls	r7, r4, #25
+200224f4:	f100 816f 	bmi.w	200227d6 <pico9918_output_sprites.constprop.0+0x5d6>
+200224f8:	9e11      	ldr	r6, [sp, #68]	@ 0x44
+200224fa:	2e00      	cmp	r6, #0
+200224fc:	f000 8163 	beq.w	200227c6 <pico9918_output_sprites.constprop.0+0x5c6>
+20022500:	9e0b      	ldr	r6, [sp, #44]	@ 0x2c
+20022502:	4556      	cmp	r6, sl
+20022504:	f080 816a 	bcs.w	200227dc <pico9918_output_sprites.constprop.0+0x5dc>
+20022508:	782b      	ldrb	r3, [r5, #0]
+2002250a:	f024 021f 	bic.w	r2, r4, #31
+2002250e:	4313      	orrs	r3, r2
+20022510:	f043 0340 	orr.w	r3, r3, #64	@ 0x40
+20022514:	fa5f fb83 	uxtb.w	fp, r3
+20022518:	4b87      	ldr	r3, [pc, #540]	@ (20022738 <pico9918_output_sprites.constprop.0+0x538>)
+2002251a:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+2002251c:	f883 2036 	strb.w	r2, [r3, #54]	@ 0x36
+20022520:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+20022522:	b323      	cbz	r3, 2002256e <pico9918_output_sprites.constprop.0+0x36e>
+20022524:	4b85      	ldr	r3, [pc, #532]	@ (2002273c <pico9918_output_sprites.constprop.0+0x53c>)
+20022526:	6a58      	ldr	r0, [r3, #36]	@ 0x24
+20022528:	e9d3 2112 	ldrd	r2, r1, [r3, #72]	@ 0x48
+2002252c:	4042      	eors	r2, r0
+2002252e:	6a98      	ldr	r0, [r3, #40]	@ 0x28
+20022530:	649a      	str	r2, [r3, #72]	@ 0x48
+20022532:	4041      	eors	r1, r0
+20022534:	6d1a      	ldr	r2, [r3, #80]	@ 0x50
+20022536:	6ad8      	ldr	r0, [r3, #44]	@ 0x2c
+20022538:	64d9      	str	r1, [r3, #76]	@ 0x4c
+2002253a:	4042      	eors	r2, r0
+2002253c:	6d59      	ldr	r1, [r3, #84]	@ 0x54
+2002253e:	6b18      	ldr	r0, [r3, #48]	@ 0x30
+20022540:	651a      	str	r2, [r3, #80]	@ 0x50
+20022542:	4041      	eors	r1, r0
+20022544:	6d9a      	ldr	r2, [r3, #88]	@ 0x58
+20022546:	6b58      	ldr	r0, [r3, #52]	@ 0x34
+20022548:	6559      	str	r1, [r3, #84]	@ 0x54
+2002254a:	4042      	eors	r2, r0
+2002254c:	6dd9      	ldr	r1, [r3, #92]	@ 0x5c
+2002254e:	6b98      	ldr	r0, [r3, #56]	@ 0x38
+20022550:	659a      	str	r2, [r3, #88]	@ 0x58
+20022552:	4041      	eors	r1, r0
+20022554:	6e1a      	ldr	r2, [r3, #96]	@ 0x60
+20022556:	6bd8      	ldr	r0, [r3, #60]	@ 0x3c
+20022558:	65d9      	str	r1, [r3, #92]	@ 0x5c
+2002255a:	4042      	eors	r2, r0
+2002255c:	6e59      	ldr	r1, [r3, #100]	@ 0x64
+2002255e:	6c18      	ldr	r0, [r3, #64]	@ 0x40
+20022560:	661a      	str	r2, [r3, #96]	@ 0x60
+20022562:	4041      	eors	r1, r0
+20022564:	6e9a      	ldr	r2, [r3, #104]	@ 0x68
+20022566:	6659      	str	r1, [r3, #100]	@ 0x64
+20022568:	6c59      	ldr	r1, [r3, #68]	@ 0x44
+2002256a:	404a      	eors	r2, r1
+2002256c:	669a      	str	r2, [r3, #104]	@ 0x68
+2002256e:	4658      	mov	r0, fp
+20022570:	b01d      	add	sp, #116	@ 0x74
+20022572:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+20022576:	2100      	movs	r1, #0
+20022578:	4693      	mov	fp, r2
+2002257a:	460f      	mov	r7, r1
+2002257c:	f8df 91b4 	ldr.w	r9, [pc, #436]	@ 20022734 <pico9918_output_sprites.constprop.0+0x534>
+20022580:	f8df a1ac 	ldr.w	sl, [pc, #428]	@ 20022730 <pico9918_output_sprites.constprop.0+0x530>
+20022584:	f816 5027 	ldrb.w	r5, [r6, r7, lsl #2]
+20022588:	2dd0      	cmp	r5, #208	@ 0xd0
+2002258a:	d003      	beq.n	20022594 <pico9918_output_sprites.constprop.0+0x394>
+2002258c:	45a8      	cmp	r8, r5
+2002258e:	bfb8      	it	lt
+20022590:	f5a5 7580 	sublt.w	r5, r5, #256	@ 0x100
+20022594:	1b45      	subs	r5, r0, r5
+20022596:	2d1f      	cmp	r5, #31
+20022598:	d809      	bhi.n	200225ae <pico9918_output_sprites.constprop.0+0x3ae>
+2002259a:	f856 2027 	ldr.w	r2, [r6, r7, lsl #2]
+2002259e:	b132      	cbz	r2, 200225ae <pico9918_output_sprites.constprop.0+0x3ae>
+200225a0:	f849 2021 	str.w	r2, [r9, r1, lsl #2]
+200225a4:	f80a 7001 	strb.w	r7, [sl, r1]
+200225a8:	f809 5021 	strb.w	r5, [r9, r1, lsl #2]
+200225ac:	3101      	adds	r1, #1
+200225ae:	3701      	adds	r7, #1
+200225b0:	45bc      	cmp	ip, r7
+200225b2:	d8e7      	bhi.n	20022584 <pico9918_output_sprites.constprop.0+0x384>
+200225b4:	4862      	ldr	r0, [pc, #392]	@ (20022740 <pico9918_output_sprites.constprop.0+0x540>)
+200225b6:	465a      	mov	r2, fp
+200225b8:	7800      	ldrb	r0, [r0, #0]
+200225ba:	f00e 0502 	and.w	r5, lr, #2
+200225be:	2804      	cmp	r0, #4
+200225c0:	9016      	str	r0, [sp, #88]	@ 0x58
+200225c2:	f47f ae7d 	bne.w	200222c0 <pico9918_output_sprites.constprop.0+0xc0>
+200225c6:	9a04      	ldr	r2, [sp, #16]
+200225c8:	2a00      	cmp	r2, #0
+200225ca:	f000 85e4 	beq.w	20023196 <pico9918_output_sprites.constprop.0+0xf96>
+200225ce:	2d00      	cmp	r5, #0
+200225d0:	f040 8696 	bne.w	20023300 <pico9918_output_sprites.constprop.0+0x1100>
+200225d4:	2008      	movs	r0, #8
+200225d6:	2210      	movs	r2, #16
+200225d8:	9002      	str	r0, [sp, #8]
+200225da:	20ff      	movs	r0, #255	@ 0xff
+200225dc:	9507      	str	r5, [sp, #28]
+200225de:	9209      	str	r2, [sp, #36]	@ 0x24
+200225e0:	9006      	str	r0, [sp, #24]
+200225e2:	9208      	str	r2, [sp, #32]
+200225e4:	f004 0003 	and.w	r0, r4, #3
+200225e8:	2803      	cmp	r0, #3
+200225ea:	9005      	str	r0, [sp, #20]
+200225ec:	f001 838c 	beq.w	20023d08 <pico9918_output_sprites.constprop.0+0x1b08>
+200225f0:	2801      	cmp	r0, #1
+200225f2:	7e1a      	ldrb	r2, [r3, #24]
+200225f4:	f041 83df 	bne.w	20023db6 <pico9918_output_sprites.constprop.0+0x1bb6>
+200225f8:	f002 0220 	and.w	r2, r2, #32
+200225fc:	9213      	str	r2, [sp, #76]	@ 0x4c
+200225fe:	220f      	movs	r2, #15
+20022600:	9010      	str	r0, [sp, #64]	@ 0x40
+20022602:	920e      	str	r2, [sp, #56]	@ 0x38
+20022604:	2900      	cmp	r1, #0
+20022606:	f000 863d 	beq.w	20023284 <pico9918_output_sprites.constprop.0+0x1084>
+2002260a:	f004 0202 	and.w	r2, r4, #2
+2002260e:	920b      	str	r2, [sp, #44]	@ 0x2c
+20022610:	4a47      	ldr	r2, [pc, #284]	@ (20022730 <pico9918_output_sprites.constprop.0+0x530>)
+20022612:	2000      	movs	r0, #0
+20022614:	188a      	adds	r2, r1, r2
+20022616:	f44f 6100 	mov.w	r1, #2048	@ 0x800
+2002261a:	f04f 091f 	mov.w	r9, #31
+2002261e:	9203      	str	r2, [sp, #12]
+20022620:	799a      	ldrb	r2, [r3, #6]
+20022622:	4683      	mov	fp, r0
+20022624:	02d2      	lsls	r2, r2, #11
+20022626:	f402 5260 	and.w	r2, r2, #14336	@ 0x3800
+2002262a:	920a      	str	r2, [sp, #40]	@ 0x28
+2002262c:	7f5a      	ldrb	r2, [r3, #29]
+2002262e:	9011      	str	r0, [sp, #68]	@ 0x44
+20022630:	0992      	lsrs	r2, r2, #6
+20022632:	fa41 f202 	asr.w	r2, r1, r2
+20022636:	920d      	str	r2, [sp, #52]	@ 0x34
+20022638:	f893 2032 	ldrb.w	r2, [r3, #50]	@ 0x32
+2002263c:	7f9b      	ldrb	r3, [r3, #30]
+2002263e:	900f      	str	r0, [sp, #60]	@ 0x3c
+20022640:	930c      	str	r3, [sp, #48]	@ 0x30
+20022642:	f8df a0ec 	ldr.w	sl, [pc, #236]	@ 20022730 <pico9918_output_sprites.constprop.0+0x530>
+20022646:	f002 0308 	and.w	r3, r2, #8
+2002264a:	483a      	ldr	r0, [pc, #232]	@ (20022734 <pico9918_output_sprites.constprop.0+0x534>)
+2002264c:	9312      	str	r3, [sp, #72]	@ 0x48
+2002264e:	78c3      	ldrb	r3, [r0, #3]
+20022650:	7804      	ldrb	r4, [r0, #0]
+20022652:	f013 0510 	ands.w	r5, r3, #16
+20022656:	ea4f 0464 	mov.w	r4, r4, asr #1
+2002265a:	f041 8072 	bne.w	20023742 <pico9918_output_sprites.constprop.0+0x1542>
+2002265e:	e9dd 1608 	ldrd	r1, r6, [sp, #32]
+20022662:	e9dd 8e06 	ldrd	r8, lr, [sp, #24]
+20022666:	9a02      	ldr	r2, [sp, #8]
+20022668:	9501      	str	r5, [sp, #4]
+2002266a:	9100      	str	r1, [sp, #0]
+2002266c:	4294      	cmp	r4, r2
+2002266e:	f280 8661 	bge.w	20023334 <pico9918_output_sprites.constprop.0+0x1134>
+20022672:	f10b 0b01 	add.w	fp, fp, #1
+20022676:	f1bb 0f04 	cmp.w	fp, #4
+2002267a:	f240 8758 	bls.w	2002352e <pico9918_output_sprites.constprop.0+0x132e>
+2002267e:	f019 0f40 	tst.w	r9, #64	@ 0x40
+20022682:	f040 8750 	bne.w	20023526 <pico9918_output_sprites.constprop.0+0x1326>
+20022686:	9912      	ldr	r1, [sp, #72]	@ 0x48
+20022688:	2900      	cmp	r1, #0
+2002268a:	f000 8742 	beq.w	20023512 <pico9918_output_sprites.constprop.0+0x1312>
+2002268e:	990c      	ldr	r1, [sp, #48]	@ 0x30
+20022690:	4559      	cmp	r1, fp
+20022692:	f080 874c 	bcs.w	2002352e <pico9918_output_sprites.constprop.0+0x132e>
+20022696:	f89a 3000 	ldrb.w	r3, [sl]
+2002269a:	f029 021f 	bic.w	r2, r9, #31
+2002269e:	4313      	orrs	r3, r2
+200226a0:	f043 0340 	orr.w	r3, r3, #64	@ 0x40
+200226a4:	fa5f fb83 	uxtb.w	fp, r3
+200226a8:	4b23      	ldr	r3, [pc, #140]	@ (20022738 <pico9918_output_sprites.constprop.0+0x538>)
+200226aa:	9a11      	ldr	r2, [sp, #68]	@ 0x44
+200226ac:	f883 2036 	strb.w	r2, [r3, #54]	@ 0x36
+200226b0:	9b0f      	ldr	r3, [sp, #60]	@ 0x3c
+200226b2:	2b00      	cmp	r3, #0
+200226b4:	f43f af5b 	beq.w	2002256e <pico9918_output_sprites.constprop.0+0x36e>
+200226b8:	4b20      	ldr	r3, [pc, #128]	@ (2002273c <pico9918_output_sprites.constprop.0+0x53c>)
+200226ba:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+200226bc:	e9d3 0112 	ldrd	r0, r1, [r3, #72]	@ 0x48
+200226c0:	4042      	eors	r2, r0
+200226c2:	6a98      	ldr	r0, [r3, #40]	@ 0x28
+200226c4:	6b1e      	ldr	r6, [r3, #48]	@ 0x30
+200226c6:	4041      	eors	r1, r0
+200226c8:	64d9      	str	r1, [r3, #76]	@ 0x4c
+200226ca:	e9d3 1514 	ldrd	r1, r5, [r3, #80]	@ 0x50
+200226ce:	4075      	eors	r5, r6
+200226d0:	649a      	str	r2, [r3, #72]	@ 0x48
+200226d2:	655d      	str	r5, [r3, #84]	@ 0x54
+200226d4:	6ada      	ldr	r2, [r3, #44]	@ 0x2c
+200226d6:	6b9d      	ldr	r5, [r3, #56]	@ 0x38
+200226d8:	404a      	eors	r2, r1
+200226da:	e9d3 1416 	ldrd	r1, r4, [r3, #88]	@ 0x58
+200226de:	406c      	eors	r4, r5
+200226e0:	651a      	str	r2, [r3, #80]	@ 0x50
+200226e2:	65dc      	str	r4, [r3, #92]	@ 0x5c
+200226e4:	6b5a      	ldr	r2, [r3, #52]	@ 0x34
+200226e6:	6bdc      	ldr	r4, [r3, #60]	@ 0x3c
+200226e8:	404a      	eors	r2, r1
+200226ea:	e9d3 1018 	ldrd	r1, r0, [r3, #96]	@ 0x60
+200226ee:	4061      	eors	r1, r4
+200226f0:	659a      	str	r2, [r3, #88]	@ 0x58
+200226f2:	6619      	str	r1, [r3, #96]	@ 0x60
+200226f4:	6e9a      	ldr	r2, [r3, #104]	@ 0x68
+200226f6:	6c59      	ldr	r1, [r3, #68]	@ 0x44
+200226f8:	404a      	eors	r2, r1
+200226fa:	669a      	str	r2, [r3, #104]	@ 0x68
+200226fc:	6c1a      	ldr	r2, [r3, #64]	@ 0x40
+200226fe:	4042      	eors	r2, r0
+20022700:	665a      	str	r2, [r3, #100]	@ 0x64
+20022702:	e734      	b.n	2002256e <pico9918_output_sprites.constprop.0+0x36e>
+20022704:	2608      	movs	r6, #8
+20022706:	9601      	str	r6, [sp, #4]
+20022708:	26ff      	movs	r6, #255	@ 0xff
+2002270a:	9508      	str	r5, [sp, #32]
+2002270c:	2510      	movs	r5, #16
+2002270e:	9607      	str	r6, [sp, #28]
+20022710:	f004 0603 	and.w	r6, r4, #3
+20022714:	2e03      	cmp	r6, #3
+20022716:	950a      	str	r5, [sp, #40]	@ 0x28
+20022718:	9509      	str	r5, [sp, #36]	@ 0x24
+2002271a:	9606      	str	r6, [sp, #24]
+2002271c:	f47f ade6 	bne.w	200222ec <pico9918_output_sprites.constprop.0+0xec>
+20022720:	250e      	movs	r5, #14
+20022722:	9510      	str	r5, [sp, #64]	@ 0x40
+20022724:	2502      	movs	r5, #2
+20022726:	9512      	str	r5, [sp, #72]	@ 0x48
+20022728:	2500      	movs	r5, #0
+2002272a:	9517      	str	r5, [sp, #92]	@ 0x5c
+2002272c:	e5ea      	b.n	20022304 <pico9918_output_sprites.constprop.0+0x104>
+2002272e:	bf00      	nop
+20022730:	20080000 	.word	0x20080000
+20022734:	20080020 	.word	0x20080020
+20022738:	20015300 	.word	0x20015300
+2002273c:	200805e0 	.word	0x200805e0
+20022740:	2002c107 	.word	0x2002c107
+20022744:	9507      	str	r5, [sp, #28]
+20022746:	25ff      	movs	r5, #255	@ 0xff
+20022748:	f004 0603 	and.w	r6, r4, #3
+2002274c:	2e03      	cmp	r6, #3
+2002274e:	f04f 0708 	mov.w	r7, #8
+20022752:	9506      	str	r5, [sp, #24]
+20022754:	9605      	str	r6, [sp, #20]
+20022756:	f47f ae7d 	bne.w	20022454 <pico9918_output_sprites.constprop.0+0x254>
+2002275a:	250e      	movs	r5, #14
+2002275c:	950c      	str	r5, [sp, #48]	@ 0x30
+2002275e:	2502      	movs	r5, #2
+20022760:	950e      	str	r5, [sp, #56]	@ 0x38
+20022762:	2500      	movs	r5, #0
+20022764:	9512      	str	r5, [sp, #72]	@ 0x48
+20022766:	e681      	b.n	2002246c <pico9918_output_sprites.constprop.0+0x26c>
+20022768:	2e00      	cmp	r6, #0
+2002276a:	f041 8286 	bne.w	20023c7a <pico9918_output_sprites.constprop.0+0x1a7a>
+2002276e:	f005 0530 	and.w	r5, r5, #48	@ 0x30
+20022772:	9517      	str	r5, [sp, #92]	@ 0x5c
+20022774:	250f      	movs	r5, #15
+20022776:	9612      	str	r6, [sp, #72]	@ 0x48
+20022778:	9510      	str	r5, [sp, #64]	@ 0x40
+2002277a:	e5c3      	b.n	20022304 <pico9918_output_sprites.constprop.0+0x104>
+2002277c:	2e00      	cmp	r6, #0
+2002277e:	f041 8278 	bne.w	20023c72 <pico9918_output_sprites.constprop.0+0x1a72>
+20022782:	f005 0530 	and.w	r5, r5, #48	@ 0x30
+20022786:	9512      	str	r5, [sp, #72]	@ 0x48
+20022788:	250f      	movs	r5, #15
+2002278a:	960e      	str	r6, [sp, #56]	@ 0x38
+2002278c:	950c      	str	r5, [sp, #48]	@ 0x30
+2002278e:	e66d      	b.n	2002246c <pico9918_output_sprites.constprop.0+0x26c>
+20022790:	9900      	ldr	r1, [sp, #0]
+20022792:	2301      	movs	r3, #1
+20022794:	930f      	str	r3, [sp, #60]	@ 0x3c
+20022796:	9b03      	ldr	r3, [sp, #12]
+20022798:	3501      	adds	r5, #1
+2002279a:	42ab      	cmp	r3, r5
+2002279c:	f101 0104 	add.w	r1, r1, #4
+200227a0:	f47f ae90 	bne.w	200224c4 <pico9918_output_sprites.constprop.0+0x2c4>
+200227a4:	f8dd b004 	ldr.w	fp, [sp, #4]
+200227a8:	e6b6      	b.n	20022518 <pico9918_output_sprites.constprop.0+0x318>
+200227aa:	4649      	mov	r1, r9
+200227ac:	9b04      	ldr	r3, [sp, #16]
+200227ae:	9313      	str	r3, [sp, #76]	@ 0x4c
+200227b0:	9b05      	ldr	r3, [sp, #20]
+200227b2:	f10a 0a01 	add.w	sl, sl, #1
+200227b6:	459a      	cmp	sl, r3
+200227b8:	f101 0104 	add.w	r1, r1, #4
+200227bc:	f47f adce 	bne.w	2002235c <pico9918_output_sprites.constprop.0+0x15c>
+200227c0:	f8dd b008 	ldr.w	fp, [sp, #8]
+200227c4:	e5f8      	b.n	200223b8 <pico9918_output_sprites.constprop.0+0x1b8>
+200227c6:	782f      	ldrb	r7, [r5, #0]
+200227c8:	f024 041f 	bic.w	r4, r4, #31
+200227cc:	433c      	orrs	r4, r7
+200227ce:	f044 0440 	orr.w	r4, r4, #64	@ 0x40
+200227d2:	b2e4      	uxtb	r4, r4
+200227d4:	9401      	str	r4, [sp, #4]
+200227d6:	9c0b      	ldr	r4, [sp, #44]	@ 0x2c
+200227d8:	4554      	cmp	r4, sl
+200227da:	d3e3      	bcc.n	200227a4 <pico9918_output_sprites.constprop.0+0x5a4>
+200227dc:	061e      	lsls	r6, r3, #24
+200227de:	784c      	ldrb	r4, [r1, #1]
+200227e0:	f100 81dd 	bmi.w	20022b9e <pico9918_output_sprites.constprop.0+0x99e>
+200227e4:	4266      	negs	r6, r4
+200227e6:	9604      	str	r6, [sp, #16]
+200227e8:	2600      	movs	r6, #0
+200227ea:	ebac 0800 	sub.w	r8, ip, r0
+200227ee:	f013 0f20 	tst.w	r3, #32
+200227f2:	f108 38ff 	add.w	r8, r8, #4294967295
+200227f6:	bf18      	it	ne
+200227f8:	4640      	movne	r0, r8
+200227fa:	f891 8002 	ldrb.w	r8, [r1, #2]
+200227fe:	e9cd 6618 	strd	r6, r6, [sp, #96]	@ 0x60
+20022802:	961a      	str	r6, [sp, #104]	@ 0x68
+20022804:	9e08      	ldr	r6, [sp, #32]
+20022806:	ea02 0208 	and.w	r2, r2, r8
+2002280a:	eb06 02c2 	add.w	r2, r6, r2, lsl #3
+2002280e:	4402      	add	r2, r0
+20022810:	0658      	lsls	r0, r3, #25
+20022812:	b292      	uxth	r2, r2
+20022814:	f100 81f3 	bmi.w	20022bfe <pico9918_output_sprites.constprop.0+0x9fe>
+20022818:	f1b9 0f00 	cmp.w	r9, #0
+2002281c:	f040 832b 	bne.w	20022e76 <pico9918_output_sprites.constprop.0+0xc76>
+20022820:	4ea8      	ldr	r6, [pc, #672]	@ (20022ac4 <pico9918_output_sprites.constprop.0+0x8c4>)
+20022822:	9f0a      	ldr	r7, [sp, #40]	@ 0x28
+20022824:	5cb0      	ldrb	r0, [r6, r2]
+20022826:	0600      	lsls	r0, r0, #24
+20022828:	9018      	str	r0, [sp, #96]	@ 0x60
+2002282a:	b187      	cbz	r7, 2002284e <pico9918_output_sprites.constprop.0+0x64e>
+2002282c:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+2002282e:	eb02 0807 	add.w	r8, r2, r7
+20022832:	f816 2008 	ldrb.w	r2, [r6, r8]
+20022836:	0612      	lsls	r2, r2, #24
+20022838:	9219      	str	r2, [sp, #100]	@ 0x64
+2002283a:	4310      	orrs	r0, r2
+2002283c:	9a05      	ldr	r2, [sp, #20]
+2002283e:	2a03      	cmp	r2, #3
+20022840:	d105      	bne.n	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022842:	eb07 0208 	add.w	r2, r7, r8
+20022846:	5cb2      	ldrb	r2, [r6, r2]
+20022848:	0612      	lsls	r2, r2, #24
+2002284a:	921a      	str	r2, [sp, #104]	@ 0x68
+2002284c:	4310      	orrs	r0, r2
+2002284e:	f1be 0f00 	cmp.w	lr, #0
+20022852:	f040 81fb 	bne.w	20022c4c <pico9918_output_sprites.constprop.0+0xa4c>
+20022856:	2800      	cmp	r0, #0
+20022858:	d09d      	beq.n	20022796 <pico9918_output_sprites.constprop.0+0x596>
+2002285a:	2c00      	cmp	r4, #0
+2002285c:	f2c0 81fa 	blt.w	20022c54 <pico9918_output_sprites.constprop.0+0xa54>
+20022860:	f5c4 7280 	rsb	r2, r4, #256	@ 0x100
+20022864:	f004 071f 	and.w	r7, r4, #31
+20022868:	4562      	cmp	r2, ip
+2002286a:	f1c7 0e20 	rsb	lr, r7, #32
+2002286e:	f2c0 836e 	blt.w	20022f4e <pico9918_output_sprites.constprop.0+0xd4e>
+20022872:	ea4f 1c54 	mov.w	ip, r4, lsr #5
+20022876:	fa20 f907 	lsr.w	r9, r0, r7
+2002287a:	9a0c      	ldr	r2, [sp, #48]	@ 0x30
+2002287c:	4e92      	ldr	r6, [pc, #584]	@ (20022ac8 <pico9918_output_sprites.constprop.0+0x8c8>)
+2002287e:	4013      	ands	r3, r2
+20022880:	9a0e      	ldr	r2, [sp, #56]	@ 0x38
+20022882:	f10c 0812 	add.w	r8, ip, #18
+20022886:	4093      	lsls	r3, r2
+20022888:	f856 2028 	ldr.w	r2, [r6, r8, lsl #2]
+2002288c:	9304      	str	r3, [sp, #16]
+2002288e:	ea29 0302 	bic.w	r3, r9, r2
+20022892:	ea42 0209 	orr.w	r2, r2, r9
+20022896:	f846 2028 	str.w	r2, [r6, r8, lsl #2]
+2002289a:	fa03 f207 	lsl.w	r2, r3, r7
+2002289e:	9b00      	ldr	r3, [sp, #0]
+200228a0:	4573      	cmp	r3, lr
+200228a2:	d912      	bls.n	200228ca <pico9918_output_sprites.constprop.0+0x6ca>
+200228a4:	f10c 0913 	add.w	r9, ip, #19
+200228a8:	f856 3029 	ldr.w	r3, [r6, r9, lsl #2]
+200228ac:	fa00 f80e 	lsl.w	r8, r0, lr
+200228b0:	ea28 0603 	bic.w	r6, r8, r3
+200228b4:	9610      	str	r6, [sp, #64]	@ 0x40
+200228b6:	4e84      	ldr	r6, [pc, #528]	@ (20022ac8 <pico9918_output_sprites.constprop.0+0x8c8>)
+200228b8:	ea43 0808 	orr.w	r8, r3, r8
+200228bc:	f846 8029 	str.w	r8, [r6, r9, lsl #2]
+200228c0:	9e10      	ldr	r6, [sp, #64]	@ 0x40
+200228c2:	fa26 f90e 	lsr.w	r9, r6, lr
+200228c6:	ea42 0209 	orr.w	r2, r2, r9
+200228ca:	9e01      	ldr	r6, [sp, #4]
+200228cc:	9b05      	ldr	r3, [sp, #20]
+200228ce:	f046 0820 	orr.w	r8, r6, #32
+200228d2:	fa5f f888 	uxtb.w	r8, r8
+200228d6:	4282      	cmp	r2, r0
+200228d8:	bf18      	it	ne
+200228da:	4646      	movne	r6, r8
+200228dc:	9601      	str	r6, [sp, #4]
+200228de:	2b00      	cmp	r3, #0
+200228e0:	f000 8213 	beq.w	20022d0a <pico9918_output_sprites.constprop.0+0xb0a>
+200228e4:	9804      	ldr	r0, [sp, #16]
+200228e6:	9b12      	ldr	r3, [sp, #72]	@ 0x48
+200228e8:	f004 0c03 	and.w	ip, r4, #3
+200228ec:	4303      	orrs	r3, r0
+200228ee:	fa32 f20c 	lsrs.w	r2, r2, ip
+200228f2:	f04f 3001 	mov.w	r0, #16843009	@ 0x1010101
+200228f6:	b2db      	uxtb	r3, r3
+200228f8:	fb00 f303 	mul.w	r3, r0, r3
+200228fc:	f43f af49 	beq.w	20022792 <pico9918_output_sprites.constprop.0+0x592>
+20022900:	9f05      	ldr	r7, [sp, #20]
+20022902:	9e19      	ldr	r6, [sp, #100]	@ 0x64
+20022904:	9818      	ldr	r0, [sp, #96]	@ 0x60
+20022906:	2f02      	cmp	r7, #2
+20022908:	ea4f 04a4 	mov.w	r4, r4, asr #2
+2002290c:	fa26 f60c 	lsr.w	r6, r6, ip
+20022910:	fa20 f00c 	lsr.w	r0, r0, ip
+20022914:	f000 8336 	beq.w	20022f84 <pico9918_output_sprites.constprop.0+0xd84>
+20022918:	2f03      	cmp	r7, #3
+2002291a:	f000 83f4 	beq.w	20023106 <pico9918_output_sprites.constprop.0+0xf06>
+2002291e:	4e6b      	ldr	r6, [pc, #428]	@ (20022acc <pico9918_output_sprites.constprop.0+0x8cc>)
+20022920:	f8df e1b0 	ldr.w	lr, [pc, #432]	@ 20022ad4 <pico9918_output_sprites.constprop.0+0x8d4>
+20022924:	f8df 81b0 	ldr.w	r8, [pc, #432]	@ 20022ad8 <pico9918_output_sprites.constprop.0+0x8d8>
+20022928:	eb06 0684 	add.w	r6, r6, r4, lsl #2
+2002292c:	0f14      	lsrs	r4, r2, #28
+2002292e:	2c0f      	cmp	r4, #15
+20022930:	d00a      	beq.n	20022948 <pico9918_output_sprites.constprop.0+0x748>
+20022932:	2c00      	cmp	r4, #0
+20022934:	f040 81ba 	bne.w	20022cac <pico9918_output_sprites.constprop.0+0xaac>
+20022938:	0112      	lsls	r2, r2, #4
+2002293a:	0f14      	lsrs	r4, r2, #28
+2002293c:	2c0f      	cmp	r4, #15
+2002293e:	ea4f 1000 	mov.w	r0, r0, lsl #4
+20022942:	f106 0604 	add.w	r6, r6, #4
+20022946:	d1f4      	bne.n	20022932 <pico9918_output_sprites.constprop.0+0x732>
+20022948:	0f04      	lsrs	r4, r0, #28
+2002294a:	f85e 4024 	ldr.w	r4, [lr, r4, lsl #2]
+2002294e:	431c      	orrs	r4, r3
+20022950:	6034      	str	r4, [r6, #0]
+20022952:	0112      	lsls	r2, r2, #4
+20022954:	f43f af1d 	beq.w	20022792 <pico9918_output_sprites.constprop.0+0x592>
+20022958:	0100      	lsls	r0, r0, #4
+2002295a:	3604      	adds	r6, #4
+2002295c:	e7e6      	b.n	2002292c <pico9918_output_sprites.constprop.0+0x72c>
+2002295e:	f89a c000 	ldrb.w	ip, [sl]
+20022962:	f024 041f 	bic.w	r4, r4, #31
+20022966:	ea44 040c 	orr.w	r4, r4, ip
+2002296a:	f044 0440 	orr.w	r4, r4, #64	@ 0x40
+2002296e:	b2e4      	uxtb	r4, r4
+20022970:	9402      	str	r4, [sp, #8]
+20022972:	9c0e      	ldr	r4, [sp, #56]	@ 0x38
+20022974:	455c      	cmp	r4, fp
+20022976:	f4ff af23 	bcc.w	200227c0 <pico9918_output_sprites.constprop.0+0x5c0>
+2002297a:	061d      	lsls	r5, r3, #24
+2002297c:	784c      	ldrb	r4, [r1, #1]
+2002297e:	f100 8107 	bmi.w	20022b90 <pico9918_output_sprites.constprop.0+0x990>
+20022982:	f1c4 0c00 	rsb	ip, r4, #0
+20022986:	1a36      	subs	r6, r6, r0
+20022988:	3e01      	subs	r6, #1
+2002298a:	f013 0f20 	tst.w	r3, #32
+2002298e:	bf18      	it	ne
+20022990:	4630      	movne	r0, r6
+20022992:	2600      	movs	r6, #0
+20022994:	e9cd 6618 	strd	r6, r6, [sp, #96]	@ 0x60
+20022998:	961a      	str	r6, [sp, #104]	@ 0x68
+2002299a:	788e      	ldrb	r6, [r1, #2]
+2002299c:	4032      	ands	r2, r6
+2002299e:	9e0b      	ldr	r6, [sp, #44]	@ 0x2c
+200229a0:	eb06 02c2 	add.w	r2, r6, r2, lsl #3
+200229a4:	4402      	add	r2, r0
+200229a6:	0658      	lsls	r0, r3, #25
+200229a8:	b292      	uxth	r2, r2
+200229aa:	f100 8103 	bmi.w	20022bb4 <pico9918_output_sprites.constprop.0+0x9b4>
+200229ae:	f1be 0f00 	cmp.w	lr, #0
+200229b2:	f040 8233 	bne.w	20022e1c <pico9918_output_sprites.constprop.0+0xc1c>
+200229b6:	4e43      	ldr	r6, [pc, #268]	@ (20022ac4 <pico9918_output_sprites.constprop.0+0x8c4>)
+200229b8:	9d0c      	ldr	r5, [sp, #48]	@ 0x30
+200229ba:	5cb0      	ldrb	r0, [r6, r2]
+200229bc:	0600      	lsls	r0, r0, #24
+200229be:	9018      	str	r0, [sp, #96]	@ 0x60
+200229c0:	b175      	cbz	r5, 200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+200229c2:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+200229c4:	442a      	add	r2, r5
+200229c6:	5cb6      	ldrb	r6, [r6, r2]
+200229c8:	0636      	lsls	r6, r6, #24
+200229ca:	9619      	str	r6, [sp, #100]	@ 0x64
+200229cc:	4330      	orrs	r0, r6
+200229ce:	9e06      	ldr	r6, [sp, #24]
+200229d0:	2e03      	cmp	r6, #3
+200229d2:	d105      	bne.n	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+200229d4:	4e3b      	ldr	r6, [pc, #236]	@ (20022ac4 <pico9918_output_sprites.constprop.0+0x8c4>)
+200229d6:	442a      	add	r2, r5
+200229d8:	5cb2      	ldrb	r2, [r6, r2]
+200229da:	0612      	lsls	r2, r2, #24
+200229dc:	921a      	str	r2, [sp, #104]	@ 0x68
+200229de:	4310      	orrs	r0, r2
+200229e0:	9a00      	ldr	r2, [sp, #0]
+200229e2:	2a00      	cmp	r2, #0
+200229e4:	f040 80e3 	bne.w	20022bae <pico9918_output_sprites.constprop.0+0x9ae>
+200229e8:	2800      	cmp	r0, #0
+200229ea:	f43f aee1 	beq.w	200227b0 <pico9918_output_sprites.constprop.0+0x5b0>
+200229ee:	0e02      	lsrs	r2, r0, #24
+200229f0:	f3c0 4007 	ubfx	r0, r0, #16, #8
+200229f4:	4d36      	ldr	r5, [pc, #216]	@ (20022ad0 <pico9918_output_sprites.constprop.0+0x8d0>)
+200229f6:	2c00      	cmp	r4, #0
+200229f8:	f835 2012 	ldrh.w	r2, [r5, r2, lsl #1]
+200229fc:	f835 5010 	ldrh.w	r5, [r5, r0, lsl #1]
+20022a00:	ea45 4502 	orr.w	r5, r5, r2, lsl #16
+20022a04:	f2c0 81ac 	blt.w	20022d60 <pico9918_output_sprites.constprop.0+0xb60>
+20022a08:	f5c4 7280 	rsb	r2, r4, #256	@ 0x100
+20022a0c:	f004 061f 	and.w	r6, r4, #31
+20022a10:	42ba      	cmp	r2, r7
+20022a12:	940f      	str	r4, [sp, #60]	@ 0x3c
+20022a14:	f1c6 0c20 	rsb	ip, r6, #32
+20022a18:	f2c0 82a7 	blt.w	20022f6a <pico9918_output_sprites.constprop.0+0xd6a>
+20022a1c:	0967      	lsrs	r7, r4, #5
+20022a1e:	fa25 f806 	lsr.w	r8, r5, r6
+20022a22:	9a10      	ldr	r2, [sp, #64]	@ 0x40
+20022a24:	f107 0e12 	add.w	lr, r7, #18
+20022a28:	4013      	ands	r3, r2
+20022a2a:	9a12      	ldr	r2, [sp, #72]	@ 0x48
+20022a2c:	45e1      	cmp	r9, ip
+20022a2e:	fa03 f302 	lsl.w	r3, r3, r2
+20022a32:	4a25      	ldr	r2, [pc, #148]	@ (20022ac8 <pico9918_output_sprites.constprop.0+0x8c8>)
+20022a34:	9300      	str	r3, [sp, #0]
+20022a36:	4613      	mov	r3, r2
+20022a38:	f852 202e 	ldr.w	r2, [r2, lr, lsl #2]
+20022a3c:	ea28 0002 	bic.w	r0, r8, r2
+20022a40:	ea42 0208 	orr.w	r2, r2, r8
+20022a44:	f843 202e 	str.w	r2, [r3, lr, lsl #2]
+20022a48:	fa00 f206 	lsl.w	r2, r0, r6
+20022a4c:	d912      	bls.n	20022a74 <pico9918_output_sprites.constprop.0+0x874>
+20022a4e:	f107 0813 	add.w	r8, r7, #19
+20022a52:	f853 0028 	ldr.w	r0, [r3, r8, lsl #2]
+20022a56:	fa05 fe0c 	lsl.w	lr, r5, ip
+20022a5a:	ea2e 0300 	bic.w	r3, lr, r0
+20022a5e:	9314      	str	r3, [sp, #80]	@ 0x50
+20022a60:	4b19      	ldr	r3, [pc, #100]	@ (20022ac8 <pico9918_output_sprites.constprop.0+0x8c8>)
+20022a62:	ea40 0e0e 	orr.w	lr, r0, lr
+20022a66:	f843 e028 	str.w	lr, [r3, r8, lsl #2]
+20022a6a:	9b14      	ldr	r3, [sp, #80]	@ 0x50
+20022a6c:	fa23 f80c 	lsr.w	r8, r3, ip
+20022a70:	ea42 0208 	orr.w	r2, r2, r8
+20022a74:	9802      	ldr	r0, [sp, #8]
+20022a76:	9b06      	ldr	r3, [sp, #24]
+20022a78:	f040 0e20 	orr.w	lr, r0, #32
+20022a7c:	fa5f fe8e 	uxtb.w	lr, lr
+20022a80:	42aa      	cmp	r2, r5
+20022a82:	bf18      	it	ne
+20022a84:	4670      	movne	r0, lr
+20022a86:	9002      	str	r0, [sp, #8]
+20022a88:	2b00      	cmp	r3, #0
+20022a8a:	f000 811c 	beq.w	20022cc6 <pico9918_output_sprites.constprop.0+0xac6>
+20022a8e:	9b17      	ldr	r3, [sp, #92]	@ 0x5c
+20022a90:	9800      	ldr	r0, [sp, #0]
+20022a92:	ea40 0c03 	orr.w	ip, r0, r3
+20022a96:	fa5f f08c 	uxtb.w	r0, ip
+20022a9a:	f04f 3301 	mov.w	r3, #16843009	@ 0x1010101
+20022a9e:	fb03 f000 	mul.w	r0, r3, r0
+20022aa2:	4684      	mov	ip, r0
+20022aa4:	2a00      	cmp	r2, #0
+20022aa6:	f43f ae81 	beq.w	200227ac <pico9918_output_sprites.constprop.0+0x5ac>
+20022aaa:	e9dd 4518 	ldrd	r4, r5, [sp, #96]	@ 0x60
+20022aae:	4b07      	ldr	r3, [pc, #28]	@ (20022acc <pico9918_output_sprites.constprop.0+0x8cc>)
+20022ab0:	980f      	ldr	r0, [sp, #60]	@ 0x3c
+20022ab2:	4418      	add	r0, r3
+20022ab4:	9b06      	ldr	r3, [sp, #24]
+20022ab6:	2b02      	cmp	r3, #2
+20022ab8:	f000 829d 	beq.w	20022ff6 <pico9918_output_sprites.constprop.0+0xdf6>
+20022abc:	469e      	mov	lr, r3
+20022abe:	4689      	mov	r9, r1
+20022ac0:	9b1a      	ldr	r3, [sp, #104]	@ 0x68
+20022ac2:	e011      	b.n	20022ae8 <pico9918_output_sprites.constprop.0+0x8e8>
+20022ac4:	20005300 	.word	0x20005300
+20022ac8:	200805e0 	.word	0x200805e0
+20022acc:	2008064c 	.word	0x2008064c
+20022ad0:	200803e0 	.word	0x200803e0
+20022ad4:	200012a0 	.word	0x200012a0
+20022ad8:	200800a0 	.word	0x200800a0
+20022adc:	011b      	lsls	r3, r3, #4
+20022ade:	012d      	lsls	r5, r5, #4
+20022ae0:	0124      	lsls	r4, r4, #4
+20022ae2:	2a00      	cmp	r2, #0
+20022ae4:	f43f ae61 	beq.w	200227aa <pico9918_output_sprites.constprop.0+0x5aa>
+20022ae8:	0e17      	lsrs	r7, r2, #24
+20022aea:	4616      	mov	r6, r2
+20022aec:	3008      	adds	r0, #8
+20022aee:	0212      	lsls	r2, r2, #8
+20022af0:	2f00      	cmp	r7, #0
+20022af2:	d0f3      	beq.n	20022adc <pico9918_output_sprites.constprop.0+0x8dc>
+20022af4:	f1be 0f03 	cmp.w	lr, #3
+20022af8:	f000 812b 	beq.w	20022d52 <pico9918_output_sprites.constprop.0+0xb52>
+20022afc:	2700      	movs	r7, #0
+20022afe:	49a5      	ldr	r1, [pc, #660]	@ (20022d94 <pico9918_output_sprites.constprop.0+0xb94>)
+20022b00:	ea47 7714 	orr.w	r7, r7, r4, lsr #28
+20022b04:	f851 7027 	ldr.w	r7, [r1, r7, lsl #2]
+20022b08:	2e00      	cmp	r6, #0
+20022b0a:	ea4c 0707 	orr.w	r7, ip, r7
+20022b0e:	da01      	bge.n	20022b14 <pico9918_output_sprites.constprop.0+0x914>
+20022b10:	f800 7c08 	strb.w	r7, [r0, #-8]
+20022b14:	0071      	lsls	r1, r6, #1
+20022b16:	d501      	bpl.n	20022b1c <pico9918_output_sprites.constprop.0+0x91c>
+20022b18:	f800 7c07 	strb.w	r7, [r0, #-7]
+20022b1c:	00b1      	lsls	r1, r6, #2
+20022b1e:	ea4f 2817 	mov.w	r8, r7, lsr #8
+20022b22:	d501      	bpl.n	20022b28 <pico9918_output_sprites.constprop.0+0x928>
+20022b24:	f800 8c06 	strb.w	r8, [r0, #-6]
+20022b28:	00f1      	lsls	r1, r6, #3
+20022b2a:	d501      	bpl.n	20022b30 <pico9918_output_sprites.constprop.0+0x930>
+20022b2c:	f800 8c05 	strb.w	r8, [r0, #-5]
+20022b30:	0131      	lsls	r1, r6, #4
+20022b32:	ea4f 4817 	mov.w	r8, r7, lsr #16
+20022b36:	d501      	bpl.n	20022b3c <pico9918_output_sprites.constprop.0+0x93c>
+20022b38:	f800 8c04 	strb.w	r8, [r0, #-4]
+20022b3c:	0171      	lsls	r1, r6, #5
+20022b3e:	d501      	bpl.n	20022b44 <pico9918_output_sprites.constprop.0+0x944>
+20022b40:	f800 8c03 	strb.w	r8, [r0, #-3]
+20022b44:	01b1      	lsls	r1, r6, #6
+20022b46:	ea4f 6717 	mov.w	r7, r7, lsr #24
+20022b4a:	d501      	bpl.n	20022b50 <pico9918_output_sprites.constprop.0+0x950>
+20022b4c:	f800 7c02 	strb.w	r7, [r0, #-2]
+20022b50:	01f1      	lsls	r1, r6, #7
+20022b52:	d5c3      	bpl.n	20022adc <pico9918_output_sprites.constprop.0+0x8dc>
+20022b54:	f800 7c01 	strb.w	r7, [r0, #-1]
+20022b58:	e7c0      	b.n	20022adc <pico9918_output_sprites.constprop.0+0x8dc>
+20022b5a:	9a01      	ldr	r2, [sp, #4]
+20022b5c:	2a10      	cmp	r2, #16
+20022b5e:	f000 809c 	beq.w	20022c9a <pico9918_output_sprites.constprop.0+0xa9a>
+20022b62:	2200      	movs	r2, #0
+20022b64:	2720      	movs	r7, #32
+20022b66:	9200      	str	r2, [sp, #0]
+20022b68:	2610      	movs	r6, #16
+20022b6a:	22fc      	movs	r2, #252	@ 0xfc
+20022b6c:	46b9      	mov	r9, r7
+20022b6e:	f8dd e010 	ldr.w	lr, [sp, #16]
+20022b72:	e403      	b.n	2002237c <pico9918_output_sprites.constprop.0+0x17c>
+20022b74:	f1bb 0f10 	cmp.w	fp, #16
+20022b78:	f000 8087 	beq.w	20022c8a <pico9918_output_sprites.constprop.0+0xa8a>
+20022b7c:	f04f 0c10 	mov.w	ip, #16
+20022b80:	f04f 0e00 	mov.w	lr, #0
+20022b84:	22fc      	movs	r2, #252	@ 0xfc
+20022b86:	f04f 0901 	mov.w	r9, #1
+20022b8a:	f8cd c000 	str.w	ip, [sp]
+20022b8e:	e4a6      	b.n	200224de <pico9918_output_sprites.constprop.0+0x2de>
+20022b90:	f1c4 0c20 	rsb	ip, r4, #32
+20022b94:	45bc      	cmp	ip, r7
+20022b96:	f73f ae0b 	bgt.w	200227b0 <pico9918_output_sprites.constprop.0+0x5b0>
+20022b9a:	3c20      	subs	r4, #32
+20022b9c:	e6f3      	b.n	20022986 <pico9918_output_sprites.constprop.0+0x786>
+20022b9e:	f1c4 0620 	rsb	r6, r4, #32
+20022ba2:	4566      	cmp	r6, ip
+20022ba4:	9604      	str	r6, [sp, #16]
+20022ba6:	f73f adf6 	bgt.w	20022796 <pico9918_output_sprites.constprop.0+0x596>
+20022baa:	3c20      	subs	r4, #32
+20022bac:	e61c      	b.n	200227e8 <pico9918_output_sprites.constprop.0+0x5e8>
+20022bae:	20ff      	movs	r0, #255	@ 0xff
+20022bb0:	4602      	mov	r2, r0
+20022bb2:	e71f      	b.n	200229f4 <pico9918_output_sprites.constprop.0+0x7f4>
+20022bb4:	f1be 0f00 	cmp.w	lr, #0
+20022bb8:	f040 818d 	bne.w	20022ed6 <pico9918_output_sprites.constprop.0+0xcd6>
+20022bbc:	4d76      	ldr	r5, [pc, #472]	@ (20022d98 <pico9918_output_sprites.constprop.0+0xb98>)
+20022bbe:	f8df e1dc 	ldr.w	lr, [pc, #476]	@ 20022d9c <pico9918_output_sprites.constprop.0+0xb9c>
+20022bc2:	5ca8      	ldrb	r0, [r5, r2]
+20022bc4:	9e0c      	ldr	r6, [sp, #48]	@ 0x30
+20022bc6:	f81e 0000 	ldrb.w	r0, [lr, r0]
+20022bca:	0600      	lsls	r0, r0, #24
+20022bcc:	9018      	str	r0, [sp, #96]	@ 0x60
+20022bce:	2e00      	cmp	r6, #0
+20022bd0:	f43f af06 	beq.w	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022bd4:	9e0d      	ldr	r6, [sp, #52]	@ 0x34
+20022bd6:	4432      	add	r2, r6
+20022bd8:	5cae      	ldrb	r6, [r5, r2]
+20022bda:	f81e 6006 	ldrb.w	r6, [lr, r6]
+20022bde:	0636      	lsls	r6, r6, #24
+20022be0:	9619      	str	r6, [sp, #100]	@ 0x64
+20022be2:	4330      	orrs	r0, r6
+20022be4:	9e06      	ldr	r6, [sp, #24]
+20022be6:	2e03      	cmp	r6, #3
+20022be8:	f47f aefa 	bne.w	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022bec:	9e0d      	ldr	r6, [sp, #52]	@ 0x34
+20022bee:	4432      	add	r2, r6
+20022bf0:	5caa      	ldrb	r2, [r5, r2]
+20022bf2:	f81e 2002 	ldrb.w	r2, [lr, r2]
+20022bf6:	0612      	lsls	r2, r2, #24
+20022bf8:	921a      	str	r2, [sp, #104]	@ 0x68
+20022bfa:	4310      	orrs	r0, r2
+20022bfc:	e6f0      	b.n	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022bfe:	f1b9 0f00 	cmp.w	r9, #0
+20022c02:	f040 80d1 	bne.w	20022da8 <pico9918_output_sprites.constprop.0+0xba8>
+20022c06:	4e64      	ldr	r6, [pc, #400]	@ (20022d98 <pico9918_output_sprites.constprop.0+0xb98>)
+20022c08:	4f64      	ldr	r7, [pc, #400]	@ (20022d9c <pico9918_output_sprites.constprop.0+0xb9c>)
+20022c0a:	5cb0      	ldrb	r0, [r6, r2]
+20022c0c:	9e0a      	ldr	r6, [sp, #40]	@ 0x28
+20022c0e:	5c38      	ldrb	r0, [r7, r0]
+20022c10:	0600      	lsls	r0, r0, #24
+20022c12:	9018      	str	r0, [sp, #96]	@ 0x60
+20022c14:	2e00      	cmp	r6, #0
+20022c16:	f43f ae1a 	beq.w	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022c1a:	9e09      	ldr	r6, [sp, #36]	@ 0x24
+20022c1c:	eb02 0806 	add.w	r8, r2, r6
+20022c20:	4e5d      	ldr	r6, [pc, #372]	@ (20022d98 <pico9918_output_sprites.constprop.0+0xb98>)
+20022c22:	f816 2008 	ldrb.w	r2, [r6, r8]
+20022c26:	5cba      	ldrb	r2, [r7, r2]
+20022c28:	0612      	lsls	r2, r2, #24
+20022c2a:	9219      	str	r2, [sp, #100]	@ 0x64
+20022c2c:	4310      	orrs	r0, r2
+20022c2e:	9a05      	ldr	r2, [sp, #20]
+20022c30:	2a03      	cmp	r2, #3
+20022c32:	f47f ae0c 	bne.w	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022c36:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+20022c38:	4442      	add	r2, r8
+20022c3a:	5cb2      	ldrb	r2, [r6, r2]
+20022c3c:	5cba      	ldrb	r2, [r7, r2]
+20022c3e:	0612      	lsls	r2, r2, #24
+20022c40:	921a      	str	r2, [sp, #104]	@ 0x68
+20022c42:	4310      	orrs	r0, r2
+20022c44:	f1be 0f00 	cmp.w	lr, #0
+20022c48:	f43f ae05 	beq.w	20022856 <pico9918_output_sprites.constprop.0+0x656>
+20022c4c:	2c00      	cmp	r4, #0
+20022c4e:	4854      	ldr	r0, [pc, #336]	@ (20022da0 <pico9918_output_sprites.constprop.0+0xba0>)
+20022c50:	f6bf ae06 	bge.w	20022860 <pico9918_output_sprites.constprop.0+0x660>
+20022c54:	9e04      	ldr	r6, [sp, #16]
+20022c56:	9a1a      	ldr	r2, [sp, #104]	@ 0x68
+20022c58:	40b0      	lsls	r0, r6
+20022c5a:	fa02 f206 	lsl.w	r2, r2, r6
+20022c5e:	921a      	str	r2, [sp, #104]	@ 0x68
+20022c60:	9a19      	ldr	r2, [sp, #100]	@ 0x64
+20022c62:	fa02 f206 	lsl.w	r2, r2, r6
+20022c66:	9219      	str	r2, [sp, #100]	@ 0x64
+20022c68:	9a18      	ldr	r2, [sp, #96]	@ 0x60
+20022c6a:	fa02 f206 	lsl.w	r2, r2, r6
+20022c6e:	9218      	str	r2, [sp, #96]	@ 0x60
+20022c70:	f43f ad91 	beq.w	20022796 <pico9918_output_sprites.constprop.0+0x596>
+20022c74:	2700      	movs	r7, #0
+20022c76:	9a00      	ldr	r2, [sp, #0]
+20022c78:	4681      	mov	r9, r0
+20022c7a:	4414      	add	r4, r2
+20022c7c:	b2e2      	uxtb	r2, r4
+20022c7e:	f04f 0e20 	mov.w	lr, #32
+20022c82:	46bc      	mov	ip, r7
+20022c84:	463c      	mov	r4, r7
+20022c86:	9200      	str	r2, [sp, #0]
+20022c88:	e5f7      	b.n	2002287a <pico9918_output_sprites.constprop.0+0x67a>
+20022c8a:	46dc      	mov	ip, fp
+20022c8c:	e9dd 2906 	ldrd	r2, r9, [sp, #24]
+20022c90:	f04f 0e01 	mov.w	lr, #1
+20022c94:	f8cd b000 	str.w	fp, [sp]
+20022c98:	e421      	b.n	200224de <pico9918_output_sprites.constprop.0+0x2de>
+20022c9a:	2720      	movs	r7, #32
+20022c9c:	4616      	mov	r6, r2
+20022c9e:	9a04      	ldr	r2, [sp, #16]
+20022ca0:	46b9      	mov	r9, r7
+20022ca2:	9200      	str	r2, [sp, #0]
+20022ca4:	e9dd 2e07 	ldrd	r2, lr, [sp, #28]
+20022ca8:	f7ff bb68 	b.w	2002237c <pico9918_output_sprites.constprop.0+0x17c>
+20022cac:	f858 c024 	ldr.w	ip, [r8, r4, lsl #2]
+20022cb0:	0f04      	lsrs	r4, r0, #28
+20022cb2:	f85e 4024 	ldr.w	r4, [lr, r4, lsl #2]
+20022cb6:	6837      	ldr	r7, [r6, #0]
+20022cb8:	431c      	orrs	r4, r3
+20022cba:	407c      	eors	r4, r7
+20022cbc:	ea04 040c 	and.w	r4, r4, ip
+20022cc0:	407c      	eors	r4, r7
+20022cc2:	6034      	str	r4, [r6, #0]
+20022cc4:	e645      	b.n	20022952 <pico9918_output_sprites.constprop.0+0x752>
+20022cc6:	9b00      	ldr	r3, [sp, #0]
+20022cc8:	2b00      	cmp	r3, #0
+20022cca:	f040 81ff 	bne.w	200230cc <pico9918_output_sprites.constprop.0+0xecc>
+20022cce:	4c35      	ldr	r4, [pc, #212]	@ (20022da4 <pico9918_output_sprites.constprop.0+0xba4>)
+20022cd0:	fa22 f606 	lsr.w	r6, r2, r6
+20022cd4:	eb04 0087 	add.w	r0, r4, r7, lsl #2
+20022cd8:	6a43      	ldr	r3, [r0, #36]	@ 0x24
+20022cda:	45e1      	cmp	r9, ip
+20022cdc:	ea43 0306 	orr.w	r3, r3, r6
+20022ce0:	6243      	str	r3, [r0, #36]	@ 0x24
+20022ce2:	d907      	bls.n	20022cf4 <pico9918_output_sprites.constprop.0+0xaf4>
+20022ce4:	3709      	adds	r7, #9
+20022ce6:	eb04 0787 	add.w	r7, r4, r7, lsl #2
+20022cea:	687b      	ldr	r3, [r7, #4]
+20022cec:	fa02 f20c 	lsl.w	r2, r2, ip
+20022cf0:	4313      	orrs	r3, r2
+20022cf2:	607b      	str	r3, [r7, #4]
+20022cf4:	9b11      	ldr	r3, [sp, #68]	@ 0x44
+20022cf6:	f10a 0a01 	add.w	sl, sl, #1
+20022cfa:	3301      	adds	r3, #1
+20022cfc:	9311      	str	r3, [sp, #68]	@ 0x44
+20022cfe:	9b05      	ldr	r3, [sp, #20]
+20022d00:	3104      	adds	r1, #4
+20022d02:	459a      	cmp	sl, r3
+20022d04:	f47f ab2a 	bne.w	2002235c <pico9918_output_sprites.constprop.0+0x15c>
+20022d08:	e55a      	b.n	200227c0 <pico9918_output_sprites.constprop.0+0x5c0>
+20022d0a:	9b04      	ldr	r3, [sp, #16]
+20022d0c:	2b00      	cmp	r3, #0
+20022d0e:	f040 81b5 	bne.w	2002307c <pico9918_output_sprites.constprop.0+0xe7c>
+20022d12:	4c24      	ldr	r4, [pc, #144]	@ (20022da4 <pico9918_output_sprites.constprop.0+0xba4>)
+20022d14:	fa22 f707 	lsr.w	r7, r2, r7
+20022d18:	eb04 008c 	add.w	r0, r4, ip, lsl #2
+20022d1c:	6a43      	ldr	r3, [r0, #36]	@ 0x24
+20022d1e:	433b      	orrs	r3, r7
+20022d20:	6243      	str	r3, [r0, #36]	@ 0x24
+20022d22:	9b00      	ldr	r3, [sp, #0]
+20022d24:	4573      	cmp	r3, lr
+20022d26:	d90a      	bls.n	20022d3e <pico9918_output_sprites.constprop.0+0xb3e>
+20022d28:	f10c 0c09 	add.w	ip, ip, #9
+20022d2c:	eb04 0c8c 	add.w	ip, r4, ip, lsl #2
+20022d30:	f8dc 3004 	ldr.w	r3, [ip, #4]
+20022d34:	fa02 f20e 	lsl.w	r2, r2, lr
+20022d38:	4313      	orrs	r3, r2
+20022d3a:	f8cc 3004 	str.w	r3, [ip, #4]
+20022d3e:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+20022d40:	3501      	adds	r5, #1
+20022d42:	3301      	adds	r3, #1
+20022d44:	930d      	str	r3, [sp, #52]	@ 0x34
+20022d46:	9b03      	ldr	r3, [sp, #12]
+20022d48:	3104      	adds	r1, #4
+20022d4a:	42ab      	cmp	r3, r5
+20022d4c:	f47f abba 	bne.w	200224c4 <pico9918_output_sprites.constprop.0+0x2c4>
+20022d50:	e528      	b.n	200227a4 <pico9918_output_sprites.constprop.0+0x5a4>
+20022d52:	ea4f 7813 	mov.w	r8, r3, lsr #28
+20022d56:	0f2f      	lsrs	r7, r5, #28
+20022d58:	ea47 1708 	orr.w	r7, r7, r8, lsl #4
+20022d5c:	013f      	lsls	r7, r7, #4
+20022d5e:	e6ce      	b.n	20022afe <pico9918_output_sprites.constprop.0+0x8fe>
+20022d60:	9a18      	ldr	r2, [sp, #96]	@ 0x60
+20022d62:	ea4f 076c 	mov.w	r7, ip, asr #1
+20022d66:	e9dd 0619 	ldrd	r0, r6, [sp, #100]	@ 0x64
+20022d6a:	40ba      	lsls	r2, r7
+20022d6c:	40be      	lsls	r6, r7
+20022d6e:	40b8      	lsls	r0, r7
+20022d70:	fa15 f50c 	lsls.w	r5, r5, ip
+20022d74:	e9cd 2018 	strd	r2, r0, [sp, #96]	@ 0x60
+20022d78:	961a      	str	r6, [sp, #104]	@ 0x68
+20022d7a:	f43f ad19 	beq.w	200227b0 <pico9918_output_sprites.constprop.0+0x5b0>
+20022d7e:	2600      	movs	r6, #0
+20022d80:	444c      	add	r4, r9
+20022d82:	fa5f f984 	uxtb.w	r9, r4
+20022d86:	46a8      	mov	r8, r5
+20022d88:	f04f 0c20 	mov.w	ip, #32
+20022d8c:	4637      	mov	r7, r6
+20022d8e:	4634      	mov	r4, r6
+20022d90:	960f      	str	r6, [sp, #60]	@ 0x3c
+20022d92:	e646      	b.n	20022a22 <pico9918_output_sprites.constprop.0+0x822>
+20022d94:	200012a0 	.word	0x200012a0
+20022d98:	20005300 	.word	0x20005300
+20022d9c:	200802e0 	.word	0x200802e0
+20022da0:	ffff0000 	.word	0xffff0000
+20022da4:	200805e0 	.word	0x200805e0
+20022da8:	4fc3      	ldr	r7, [pc, #780]	@ (200230b8 <pico9918_output_sprites.constprop.0+0xeb8>)
+20022daa:	4ec4      	ldr	r6, [pc, #784]	@ (200230bc <pico9918_output_sprites.constprop.0+0xebc>)
+20022dac:	5cb8      	ldrb	r0, [r7, r2]
+20022dae:	3f10      	subs	r7, #16
+20022db0:	f817 8002 	ldrb.w	r8, [r7, r2]
+20022db4:	5c30      	ldrb	r0, [r6, r0]
+20022db6:	f816 8008 	ldrb.w	r8, [r6, r8]
+20022dba:	0600      	lsls	r0, r0, #24
+20022dbc:	9f0a      	ldr	r7, [sp, #40]	@ 0x28
+20022dbe:	ea40 4008 	orr.w	r0, r0, r8, lsl #16
+20022dc2:	9018      	str	r0, [sp, #96]	@ 0x60
+20022dc4:	2f00      	cmp	r7, #0
+20022dc6:	f43f ad42 	beq.w	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022dca:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+20022dcc:	443a      	add	r2, r7
+20022dce:	4fba      	ldr	r7, [pc, #744]	@ (200230b8 <pico9918_output_sprites.constprop.0+0xeb8>)
+20022dd0:	f817 8002 	ldrb.w	r8, [r7, r2]
+20022dd4:	3f10      	subs	r7, #16
+20022dd6:	f817 9002 	ldrb.w	r9, [r7, r2]
+20022dda:	f816 8008 	ldrb.w	r8, [r6, r8]
+20022dde:	f816 9009 	ldrb.w	r9, [r6, r9]
+20022de2:	9f05      	ldr	r7, [sp, #20]
+20022de4:	ea4f 6808 	mov.w	r8, r8, lsl #24
+20022de8:	ea48 4809 	orr.w	r8, r8, r9, lsl #16
+20022dec:	2f03      	cmp	r7, #3
+20022dee:	f8cd 8064 	str.w	r8, [sp, #100]	@ 0x64
+20022df2:	ea40 0008 	orr.w	r0, r0, r8
+20022df6:	f47f ad2a 	bne.w	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022dfa:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+20022dfc:	443a      	add	r2, r7
+20022dfe:	4fae      	ldr	r7, [pc, #696]	@ (200230b8 <pico9918_output_sprites.constprop.0+0xeb8>)
+20022e00:	f817 8002 	ldrb.w	r8, [r7, r2]
+20022e04:	3f10      	subs	r7, #16
+20022e06:	5cba      	ldrb	r2, [r7, r2]
+20022e08:	f816 8008 	ldrb.w	r8, [r6, r8]
+20022e0c:	5cb2      	ldrb	r2, [r6, r2]
+20022e0e:	ea4f 6808 	mov.w	r8, r8, lsl #24
+20022e12:	ea48 4202 	orr.w	r2, r8, r2, lsl #16
+20022e16:	921a      	str	r2, [sp, #104]	@ 0x68
+20022e18:	4310      	orrs	r0, r2
+20022e1a:	e518      	b.n	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022e1c:	f8df e298 	ldr.w	lr, [pc, #664]	@ 200230b8 <pico9918_output_sprites.constprop.0+0xeb8>
+20022e20:	f1ae 0010 	sub.w	r0, lr, #16
+20022e24:	5c86      	ldrb	r6, [r0, r2]
+20022e26:	4605      	mov	r5, r0
+20022e28:	f81e 0002 	ldrb.w	r0, [lr, r2]
+20022e2c:	0400      	lsls	r0, r0, #16
+20022e2e:	ea40 6006 	orr.w	r0, r0, r6, lsl #24
+20022e32:	9e0c      	ldr	r6, [sp, #48]	@ 0x30
+20022e34:	9018      	str	r0, [sp, #96]	@ 0x60
+20022e36:	2e00      	cmp	r6, #0
+20022e38:	f43f add2 	beq.w	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022e3c:	9e0d      	ldr	r6, [sp, #52]	@ 0x34
+20022e3e:	4432      	add	r2, r6
+20022e40:	f81e 6002 	ldrb.w	r6, [lr, r2]
+20022e44:	f815 8002 	ldrb.w	r8, [r5, r2]
+20022e48:	9d06      	ldr	r5, [sp, #24]
+20022e4a:	0436      	lsls	r6, r6, #16
+20022e4c:	ea46 6608 	orr.w	r6, r6, r8, lsl #24
+20022e50:	2d03      	cmp	r5, #3
+20022e52:	9619      	str	r6, [sp, #100]	@ 0x64
+20022e54:	ea40 0006 	orr.w	r0, r0, r6
+20022e58:	f47f adc2 	bne.w	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022e5c:	9e0d      	ldr	r6, [sp, #52]	@ 0x34
+20022e5e:	f1ae 0510 	sub.w	r5, lr, #16
+20022e62:	4432      	add	r2, r6
+20022e64:	f81e 6002 	ldrb.w	r6, [lr, r2]
+20022e68:	5caa      	ldrb	r2, [r5, r2]
+20022e6a:	0436      	lsls	r6, r6, #16
+20022e6c:	ea46 6602 	orr.w	r6, r6, r2, lsl #24
+20022e70:	961a      	str	r6, [sp, #104]	@ 0x68
+20022e72:	4330      	orrs	r0, r6
+20022e74:	e5b4      	b.n	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022e76:	4e90      	ldr	r6, [pc, #576]	@ (200230b8 <pico9918_output_sprites.constprop.0+0xeb8>)
+20022e78:	f1a6 0710 	sub.w	r7, r6, #16
+20022e7c:	5cb0      	ldrb	r0, [r6, r2]
+20022e7e:	f817 8002 	ldrb.w	r8, [r7, r2]
+20022e82:	0400      	lsls	r0, r0, #16
+20022e84:	9f0a      	ldr	r7, [sp, #40]	@ 0x28
+20022e86:	ea40 6008 	orr.w	r0, r0, r8, lsl #24
+20022e8a:	9018      	str	r0, [sp, #96]	@ 0x60
+20022e8c:	2f00      	cmp	r7, #0
+20022e8e:	f43f acde 	beq.w	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022e92:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+20022e94:	443a      	add	r2, r7
+20022e96:	f816 8002 	ldrb.w	r8, [r6, r2]
+20022e9a:	f1a6 0710 	sub.w	r7, r6, #16
+20022e9e:	f817 9002 	ldrb.w	r9, [r7, r2]
+20022ea2:	9f05      	ldr	r7, [sp, #20]
+20022ea4:	ea4f 4808 	mov.w	r8, r8, lsl #16
+20022ea8:	ea48 6809 	orr.w	r8, r8, r9, lsl #24
+20022eac:	2f03      	cmp	r7, #3
+20022eae:	f8cd 8064 	str.w	r8, [sp, #100]	@ 0x64
+20022eb2:	ea40 0008 	orr.w	r0, r0, r8
+20022eb6:	f47f acca 	bne.w	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022eba:	9f09      	ldr	r7, [sp, #36]	@ 0x24
+20022ebc:	443a      	add	r2, r7
+20022ebe:	f816 8002 	ldrb.w	r8, [r6, r2]
+20022ec2:	f1a6 0710 	sub.w	r7, r6, #16
+20022ec6:	5cba      	ldrb	r2, [r7, r2]
+20022ec8:	ea4f 4808 	mov.w	r8, r8, lsl #16
+20022ecc:	ea48 6202 	orr.w	r2, r8, r2, lsl #24
+20022ed0:	921a      	str	r2, [sp, #104]	@ 0x68
+20022ed2:	4310      	orrs	r0, r2
+20022ed4:	e4bb      	b.n	2002284e <pico9918_output_sprites.constprop.0+0x64e>
+20022ed6:	f8df 81e0 	ldr.w	r8, [pc, #480]	@ 200230b8 <pico9918_output_sprites.constprop.0+0xeb8>
+20022eda:	4e78      	ldr	r6, [pc, #480]	@ (200230bc <pico9918_output_sprites.constprop.0+0xebc>)
+20022edc:	f818 0002 	ldrb.w	r0, [r8, r2]
+20022ee0:	f1a8 0510 	sub.w	r5, r8, #16
+20022ee4:	f815 e002 	ldrb.w	lr, [r5, r2]
+20022ee8:	5c30      	ldrb	r0, [r6, r0]
+20022eea:	f816 e00e 	ldrb.w	lr, [r6, lr]
+20022eee:	0600      	lsls	r0, r0, #24
+20022ef0:	9e0c      	ldr	r6, [sp, #48]	@ 0x30
+20022ef2:	ea40 400e 	orr.w	r0, r0, lr, lsl #16
+20022ef6:	9018      	str	r0, [sp, #96]	@ 0x60
+20022ef8:	2e00      	cmp	r6, #0
+20022efa:	f43f ad71 	beq.w	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022efe:	9e0d      	ldr	r6, [sp, #52]	@ 0x34
+20022f00:	4432      	add	r2, r6
+20022f02:	f818 e002 	ldrb.w	lr, [r8, r2]
+20022f06:	960f      	str	r6, [sp, #60]	@ 0x3c
+20022f08:	4e6c      	ldr	r6, [pc, #432]	@ (200230bc <pico9918_output_sprites.constprop.0+0xebc>)
+20022f0a:	5cad      	ldrb	r5, [r5, r2]
+20022f0c:	f816 e00e 	ldrb.w	lr, [r6, lr]
+20022f10:	5d75      	ldrb	r5, [r6, r5]
+20022f12:	ea4f 6e0e 	mov.w	lr, lr, lsl #24
+20022f16:	ea4e 4e05 	orr.w	lr, lr, r5, lsl #16
+20022f1a:	9d06      	ldr	r5, [sp, #24]
+20022f1c:	f8cd e064 	str.w	lr, [sp, #100]	@ 0x64
+20022f20:	2d03      	cmp	r5, #3
+20022f22:	ea40 000e 	orr.w	r0, r0, lr
+20022f26:	f47f ad5b 	bne.w	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022f2a:	9e0f      	ldr	r6, [sp, #60]	@ 0x3c
+20022f2c:	f1a8 0510 	sub.w	r5, r8, #16
+20022f30:	4432      	add	r2, r6
+20022f32:	f818 e002 	ldrb.w	lr, [r8, r2]
+20022f36:	5caa      	ldrb	r2, [r5, r2]
+20022f38:	4d60      	ldr	r5, [pc, #384]	@ (200230bc <pico9918_output_sprites.constprop.0+0xebc>)
+20022f3a:	f815 e00e 	ldrb.w	lr, [r5, lr]
+20022f3e:	5caa      	ldrb	r2, [r5, r2]
+20022f40:	ea4f 6e0e 	mov.w	lr, lr, lsl #24
+20022f44:	ea4e 4202 	orr.w	r2, lr, r2, lsl #16
+20022f48:	921a      	str	r2, [sp, #104]	@ 0x68
+20022f4a:	4310      	orrs	r0, r2
+20022f4c:	e548      	b.n	200229e0 <pico9918_output_sprites.constprop.0+0x7e0>
+20022f4e:	2601      	movs	r6, #1
+20022f50:	b2d2      	uxtb	r2, r2
+20022f52:	9200      	str	r2, [sp, #0]
+20022f54:	f1a4 02e0 	sub.w	r2, r4, #224	@ 0xe0
+20022f58:	fa06 f202 	lsl.w	r2, r6, r2
+20022f5c:	4252      	negs	r2, r2
+20022f5e:	4010      	ands	r0, r2
+20022f60:	f04f 0c07 	mov.w	ip, #7
+20022f64:	fa20 f907 	lsr.w	r9, r0, r7
+20022f68:	e487      	b.n	2002287a <pico9918_output_sprites.constprop.0+0x67a>
+20022f6a:	fa5f f982 	uxtb.w	r9, r2
+20022f6e:	f04f 32ff 	mov.w	r2, #4294967295
+20022f72:	f1a4 0ee0 	sub.w	lr, r4, #224	@ 0xe0
+20022f76:	fa02 f20e 	lsl.w	r2, r2, lr
+20022f7a:	4015      	ands	r5, r2
+20022f7c:	2707      	movs	r7, #7
+20022f7e:	fa25 f806 	lsr.w	r8, r5, r6
+20022f82:	e54e      	b.n	20022a22 <pico9918_output_sprites.constprop.0+0x822>
+20022f84:	4f4e      	ldr	r7, [pc, #312]	@ (200230c0 <pico9918_output_sprites.constprop.0+0xec0>)
+20022f86:	f8df e13c 	ldr.w	lr, [pc, #316]	@ 200230c4 <pico9918_output_sprites.constprop.0+0xec4>
+20022f8a:	f8df 913c 	ldr.w	r9, [pc, #316]	@ 200230c8 <pico9918_output_sprites.constprop.0+0xec8>
+20022f8e:	eb07 0784 	add.w	r7, r7, r4, lsl #2
+20022f92:	0f14      	lsrs	r4, r2, #28
+20022f94:	2c0f      	cmp	r4, #15
+20022f96:	d00a      	beq.n	20022fae <pico9918_output_sprites.constprop.0+0xdae>
+20022f98:	b9cc      	cbnz	r4, 20022fce <pico9918_output_sprites.constprop.0+0xdce>
+20022f9a:	0112      	lsls	r2, r2, #4
+20022f9c:	0f14      	lsrs	r4, r2, #28
+20022f9e:	2c0f      	cmp	r4, #15
+20022fa0:	ea4f 1606 	mov.w	r6, r6, lsl #4
+20022fa4:	ea4f 1000 	mov.w	r0, r0, lsl #4
+20022fa8:	f107 0704 	add.w	r7, r7, #4
+20022fac:	d1f4      	bne.n	20022f98 <pico9918_output_sprites.constprop.0+0xd98>
+20022fae:	ea4f 7c16 	mov.w	ip, r6, lsr #28
+20022fb2:	0f04      	lsrs	r4, r0, #28
+20022fb4:	ea44 140c 	orr.w	r4, r4, ip, lsl #4
+20022fb8:	f85e 4024 	ldr.w	r4, [lr, r4, lsl #2]
+20022fbc:	431c      	orrs	r4, r3
+20022fbe:	603c      	str	r4, [r7, #0]
+20022fc0:	0112      	lsls	r2, r2, #4
+20022fc2:	f43f abe6 	beq.w	20022792 <pico9918_output_sprites.constprop.0+0x592>
+20022fc6:	0136      	lsls	r6, r6, #4
+20022fc8:	0100      	lsls	r0, r0, #4
+20022fca:	3704      	adds	r7, #4
+20022fcc:	e7e1      	b.n	20022f92 <pico9918_output_sprites.constprop.0+0xd92>
+20022fce:	f859 8024 	ldr.w	r8, [r9, r4, lsl #2]
+20022fd2:	ea4f 7c16 	mov.w	ip, r6, lsr #28
+20022fd6:	0f04      	lsrs	r4, r0, #28
+20022fd8:	ea44 140c 	orr.w	r4, r4, ip, lsl #4
+20022fdc:	f85e 4024 	ldr.w	r4, [lr, r4, lsl #2]
+20022fe0:	f8d7 c000 	ldr.w	ip, [r7]
+20022fe4:	431c      	orrs	r4, r3
+20022fe6:	ea84 040c 	eor.w	r4, r4, ip
+20022fea:	ea04 0408 	and.w	r4, r4, r8
+20022fee:	ea84 040c 	eor.w	r4, r4, ip
+20022ff2:	603c      	str	r4, [r7, #0]
+20022ff4:	e7e4      	b.n	20022fc0 <pico9918_output_sprites.constprop.0+0xdc0>
+20022ff6:	4f33      	ldr	r7, [pc, #204]	@ (200230c4 <pico9918_output_sprites.constprop.0+0xec4>)
+20022ff8:	e004      	b.n	20023004 <pico9918_output_sprites.constprop.0+0xe04>
+20022ffa:	012d      	lsls	r5, r5, #4
+20022ffc:	0124      	lsls	r4, r4, #4
+20022ffe:	2a00      	cmp	r2, #0
+20023000:	f43f abd4 	beq.w	200227ac <pico9918_output_sprites.constprop.0+0x5ac>
+20023004:	0e16      	lsrs	r6, r2, #24
+20023006:	4613      	mov	r3, r2
+20023008:	3008      	adds	r0, #8
+2002300a:	0212      	lsls	r2, r2, #8
+2002300c:	2e00      	cmp	r6, #0
+2002300e:	d0f4      	beq.n	20022ffa <pico9918_output_sprites.constprop.0+0xdfa>
+20023010:	ea4f 7e15 	mov.w	lr, r5, lsr #28
+20023014:	0f26      	lsrs	r6, r4, #28
+20023016:	ea46 160e 	orr.w	r6, r6, lr, lsl #4
+2002301a:	f857 6026 	ldr.w	r6, [r7, r6, lsl #2]
+2002301e:	2b00      	cmp	r3, #0
+20023020:	ea4c 0606 	orr.w	r6, ip, r6
+20023024:	bfb8      	it	lt
+20023026:	f800 6c08 	strblt.w	r6, [r0, #-8]
+2002302a:	f013 4f80 	tst.w	r3, #1073741824	@ 0x40000000
+2002302e:	ea4f 2e16 	mov.w	lr, r6, lsr #8
+20023032:	bf18      	it	ne
+20023034:	f800 6c07 	strbne.w	r6, [r0, #-7]
+20023038:	f013 5f00 	tst.w	r3, #536870912	@ 0x20000000
+2002303c:	bf18      	it	ne
+2002303e:	f800 ec06 	strbne.w	lr, [r0, #-6]
+20023042:	f013 5f80 	tst.w	r3, #268435456	@ 0x10000000
+20023046:	bf18      	it	ne
+20023048:	f800 ec05 	strbne.w	lr, [r0, #-5]
+2002304c:	ea4f 4e16 	mov.w	lr, r6, lsr #16
+20023050:	f013 6f00 	tst.w	r3, #134217728	@ 0x8000000
+20023054:	bf18      	it	ne
+20023056:	f800 ec04 	strbne.w	lr, [r0, #-4]
+2002305a:	f013 6f80 	tst.w	r3, #67108864	@ 0x4000000
+2002305e:	ea4f 6616 	mov.w	r6, r6, lsr #24
+20023062:	bf18      	it	ne
+20023064:	f800 ec03 	strbne.w	lr, [r0, #-3]
+20023068:	f013 7f00 	tst.w	r3, #33554432	@ 0x2000000
+2002306c:	bf18      	it	ne
+2002306e:	f800 6c02 	strbne.w	r6, [r0, #-2]
+20023072:	01db      	lsls	r3, r3, #7
+20023074:	bf48      	it	mi
+20023076:	f800 6c01 	strbmi.w	r6, [r0, #-1]
+2002307a:	e7be      	b.n	20022ffa <pico9918_output_sprites.constprop.0+0xdfa>
+2002307c:	4618      	mov	r0, r3
+2002307e:	9b12      	ldr	r3, [sp, #72]	@ 0x48
+20023080:	9e16      	ldr	r6, [sp, #88]	@ 0x58
+20023082:	4303      	orrs	r3, r0
+20023084:	b2db      	uxtb	r3, r3
+20023086:	ea43 1003 	orr.w	r0, r3, r3, lsl #4
+2002308a:	b2c0      	uxtb	r0, r0
+2002308c:	2e04      	cmp	r6, #4
+2002308e:	bf08      	it	eq
+20023090:	4603      	moveq	r3, r0
+20023092:	2a00      	cmp	r2, #0
+20023094:	f43f ab7d 	beq.w	20022792 <pico9918_output_sprites.constprop.0+0x592>
+20023098:	4809      	ldr	r0, [pc, #36]	@ (200230c0 <pico9918_output_sprites.constprop.0+0xec0>)
+2002309a:	4404      	add	r4, r0
+2002309c:	2a00      	cmp	r2, #0
+2002309e:	db04      	blt.n	200230aa <pico9918_output_sprites.constprop.0+0xeaa>
+200230a0:	0052      	lsls	r2, r2, #1
+200230a2:	2a00      	cmp	r2, #0
+200230a4:	f104 0401 	add.w	r4, r4, #1
+200230a8:	dafa      	bge.n	200230a0 <pico9918_output_sprites.constprop.0+0xea0>
+200230aa:	0052      	lsls	r2, r2, #1
+200230ac:	7023      	strb	r3, [r4, #0]
+200230ae:	f43f ab70 	beq.w	20022792 <pico9918_output_sprites.constprop.0+0x592>
+200230b2:	3401      	adds	r4, #1
+200230b4:	e7f2      	b.n	2002309c <pico9918_output_sprites.constprop.0+0xe9c>
+200230b6:	bf00      	nop
+200230b8:	20005310 	.word	0x20005310
+200230bc:	200802e0 	.word	0x200802e0
+200230c0:	2008064c 	.word	0x2008064c
+200230c4:	200012a0 	.word	0x200012a0
+200230c8:	200800a0 	.word	0x200800a0
+200230cc:	4618      	mov	r0, r3
+200230ce:	9b17      	ldr	r3, [sp, #92]	@ 0x5c
+200230d0:	9d16      	ldr	r5, [sp, #88]	@ 0x58
+200230d2:	4303      	orrs	r3, r0
+200230d4:	b2db      	uxtb	r3, r3
+200230d6:	ea43 1003 	orr.w	r0, r3, r3, lsl #4
+200230da:	b2c0      	uxtb	r0, r0
+200230dc:	2d04      	cmp	r5, #4
+200230de:	bf08      	it	eq
+200230e0:	4603      	moveq	r3, r0
+200230e2:	2a00      	cmp	r2, #0
+200230e4:	f43f ab62 	beq.w	200227ac <pico9918_output_sprites.constprop.0+0x5ac>
+200230e8:	4898      	ldr	r0, [pc, #608]	@ (2002334c <pico9918_output_sprites.constprop.0+0x114c>)
+200230ea:	4404      	add	r4, r0
+200230ec:	2a00      	cmp	r2, #0
+200230ee:	db04      	blt.n	200230fa <pico9918_output_sprites.constprop.0+0xefa>
+200230f0:	0052      	lsls	r2, r2, #1
+200230f2:	2a00      	cmp	r2, #0
+200230f4:	f104 0401 	add.w	r4, r4, #1
+200230f8:	dafa      	bge.n	200230f0 <pico9918_output_sprites.constprop.0+0xef0>
+200230fa:	0052      	lsls	r2, r2, #1
+200230fc:	7023      	strb	r3, [r4, #0]
+200230fe:	f43f ab55 	beq.w	200227ac <pico9918_output_sprites.constprop.0+0x5ac>
+20023102:	3401      	adds	r4, #1
+20023104:	e7f2      	b.n	200230ec <pico9918_output_sprites.constprop.0+0xeec>
+20023106:	9f1a      	ldr	r7, [sp, #104]	@ 0x68
+20023108:	f8df e258 	ldr.w	lr, [pc, #600]	@ 20023364 <pico9918_output_sprites.constprop.0+0x1164>
+2002310c:	fa27 fc0c 	lsr.w	ip, r7, ip
+20023110:	4f8e      	ldr	r7, [pc, #568]	@ (2002334c <pico9918_output_sprites.constprop.0+0x114c>)
+20023112:	9100      	str	r1, [sp, #0]
+20023114:	eb07 0484 	add.w	r4, r7, r4, lsl #2
+20023118:	0f17      	lsrs	r7, r2, #28
+2002311a:	2f0f      	cmp	r7, #15
+2002311c:	d00c      	beq.n	20023138 <pico9918_output_sprites.constprop.0+0xf38>
+2002311e:	bb0f      	cbnz	r7, 20023164 <pico9918_output_sprites.constprop.0+0xf64>
+20023120:	0112      	lsls	r2, r2, #4
+20023122:	0f17      	lsrs	r7, r2, #28
+20023124:	2f0f      	cmp	r7, #15
+20023126:	ea4f 1c0c 	mov.w	ip, ip, lsl #4
+2002312a:	ea4f 1606 	mov.w	r6, r6, lsl #4
+2002312e:	ea4f 1000 	mov.w	r0, r0, lsl #4
+20023132:	f104 0404 	add.w	r4, r4, #4
+20023136:	d1f2      	bne.n	2002311e <pico9918_output_sprites.constprop.0+0xf1e>
+20023138:	ea4f 771c 	mov.w	r7, ip, lsr #28
+2002313c:	ea4f 7816 	mov.w	r8, r6, lsr #28
+20023140:	ea48 1807 	orr.w	r8, r8, r7, lsl #4
+20023144:	0f07      	lsrs	r7, r0, #28
+20023146:	ea47 1708 	orr.w	r7, r7, r8, lsl #4
+2002314a:	f85e 7027 	ldr.w	r7, [lr, r7, lsl #2]
+2002314e:	431f      	orrs	r7, r3
+20023150:	6027      	str	r7, [r4, #0]
+20023152:	0112      	lsls	r2, r2, #4
+20023154:	f43f ab1c 	beq.w	20022790 <pico9918_output_sprites.constprop.0+0x590>
+20023158:	ea4f 1c0c 	mov.w	ip, ip, lsl #4
+2002315c:	0136      	lsls	r6, r6, #4
+2002315e:	0100      	lsls	r0, r0, #4
+20023160:	3404      	adds	r4, #4
+20023162:	e7d9      	b.n	20023118 <pico9918_output_sprites.constprop.0+0xf18>
+20023164:	497a      	ldr	r1, [pc, #488]	@ (20023350 <pico9918_output_sprites.constprop.0+0x1150>)
+20023166:	ea4f 7816 	mov.w	r8, r6, lsr #28
+2002316a:	f851 9027 	ldr.w	r9, [r1, r7, lsl #2]
+2002316e:	ea4f 771c 	mov.w	r7, ip, lsr #28
+20023172:	ea48 1807 	orr.w	r8, r8, r7, lsl #4
+20023176:	0f07      	lsrs	r7, r0, #28
+20023178:	ea47 1708 	orr.w	r7, r7, r8, lsl #4
+2002317c:	f85e 7027 	ldr.w	r7, [lr, r7, lsl #2]
+20023180:	f8d4 8000 	ldr.w	r8, [r4]
+20023184:	431f      	orrs	r7, r3
+20023186:	ea87 0708 	eor.w	r7, r7, r8
+2002318a:	ea07 0709 	and.w	r7, r7, r9
+2002318e:	ea87 0708 	eor.w	r7, r7, r8
+20023192:	6027      	str	r7, [r4, #0]
+20023194:	e7dd      	b.n	20023152 <pico9918_output_sprites.constprop.0+0xf52>
+20023196:	2d00      	cmp	r5, #0
+20023198:	f040 80ac 	bne.w	200232f4 <pico9918_output_sprites.constprop.0+0x10f4>
+2002319c:	22ff      	movs	r2, #255	@ 0xff
+2002319e:	9506      	str	r5, [sp, #24]
+200231a0:	2508      	movs	r5, #8
+200231a2:	9205      	str	r2, [sp, #20]
+200231a4:	f004 0003 	and.w	r0, r4, #3
+200231a8:	2803      	cmp	r0, #3
+200231aa:	9004      	str	r0, [sp, #16]
+200231ac:	f000 85a4 	beq.w	20023cf8 <pico9918_output_sprites.constprop.0+0x1af8>
+200231b0:	2801      	cmp	r0, #1
+200231b2:	7e1a      	ldrb	r2, [r3, #24]
+200231b4:	f040 8608 	bne.w	20023dc8 <pico9918_output_sprites.constprop.0+0x1bc8>
+200231b8:	f002 0220 	and.w	r2, r2, #32
+200231bc:	9212      	str	r2, [sp, #72]	@ 0x48
+200231be:	220f      	movs	r2, #15
+200231c0:	900e      	str	r0, [sp, #56]	@ 0x38
+200231c2:	920c      	str	r2, [sp, #48]	@ 0x30
+200231c4:	2900      	cmp	r1, #0
+200231c6:	d05d      	beq.n	20023284 <pico9918_output_sprites.constprop.0+0x1084>
+200231c8:	2000      	movs	r0, #0
+200231ca:	f04f 0b1f 	mov.w	fp, #31
+200231ce:	f004 0202 	and.w	r2, r4, #2
+200231d2:	9208      	str	r2, [sp, #32]
+200231d4:	4a5f      	ldr	r2, [pc, #380]	@ (20023354 <pico9918_output_sprites.constprop.0+0x1154>)
+200231d6:	f8cd b004 	str.w	fp, [sp, #4]
+200231da:	188a      	adds	r2, r1, r2
+200231dc:	f44f 6100 	mov.w	r1, #2048	@ 0x800
+200231e0:	4682      	mov	sl, r0
+200231e2:	46ab      	mov	fp, r5
+200231e4:	9202      	str	r2, [sp, #8]
+200231e6:	799a      	ldrb	r2, [r3, #6]
+200231e8:	f8df 9168 	ldr.w	r9, [pc, #360]	@ 20023354 <pico9918_output_sprites.constprop.0+0x1154>
+200231ec:	02d2      	lsls	r2, r2, #11
+200231ee:	f402 5260 	and.w	r2, r2, #14336	@ 0x3800
+200231f2:	9207      	str	r2, [sp, #28]
+200231f4:	7f5a      	ldrb	r2, [r3, #29]
+200231f6:	f8df 8170 	ldr.w	r8, [pc, #368]	@ 20023368 <pico9918_output_sprites.constprop.0+0x1168>
+200231fa:	0992      	lsrs	r2, r2, #6
+200231fc:	fa41 f202 	asr.w	r2, r1, r2
+20023200:	9209      	str	r2, [sp, #36]	@ 0x24
+20023202:	f893 2032 	ldrb.w	r2, [r3, #50]	@ 0x32
+20023206:	7f9b      	ldrb	r3, [r3, #30]
+20023208:	900f      	str	r0, [sp, #60]	@ 0x3c
+2002320a:	930a      	str	r3, [sp, #40]	@ 0x28
+2002320c:	f002 0308 	and.w	r3, r2, #8
+20023210:	900d      	str	r0, [sp, #52]	@ 0x34
+20023212:	9311      	str	r3, [sp, #68]	@ 0x44
+20023214:	f898 2003 	ldrb.w	r2, [r8, #3]
+20023218:	f898 1000 	ldrb.w	r1, [r8]
+2002321c:	f012 0710 	ands.w	r7, r2, #16
+20023220:	f040 8285 	bne.w	2002372e <pico9918_output_sprites.constprop.0+0x152e>
+20023224:	e9dd 3e05 	ldrd	r3, lr, [sp, #20]
+20023228:	465e      	mov	r6, fp
+2002322a:	f8cd b000 	str.w	fp, [sp]
+2002322e:	42b1      	cmp	r1, r6
+20023230:	da72      	bge.n	20023318 <pico9918_output_sprites.constprop.0+0x1118>
+20023232:	f10a 0a01 	add.w	sl, sl, #1
+20023236:	f1ba 0f04 	cmp.w	sl, #4
+2002323a:	f240 80a3 	bls.w	20023384 <pico9918_output_sprites.constprop.0+0x1184>
+2002323e:	9801      	ldr	r0, [sp, #4]
+20023240:	0645      	lsls	r5, r0, #25
+20023242:	f100 809c 	bmi.w	2002337e <pico9918_output_sprites.constprop.0+0x117e>
+20023246:	9c11      	ldr	r4, [sp, #68]	@ 0x44
+20023248:	2c00      	cmp	r4, #0
+2002324a:	f000 808f 	beq.w	2002336c <pico9918_output_sprites.constprop.0+0x116c>
+2002324e:	9c0a      	ldr	r4, [sp, #40]	@ 0x28
+20023250:	4554      	cmp	r4, sl
+20023252:	f080 8097 	bcs.w	20023384 <pico9918_output_sprites.constprop.0+0x1184>
+20023256:	f899 3000 	ldrb.w	r3, [r9]
+2002325a:	f020 021f 	bic.w	r2, r0, #31
+2002325e:	4313      	orrs	r3, r2
+20023260:	f043 0340 	orr.w	r3, r3, #64	@ 0x40
+20023264:	fa5f fb83 	uxtb.w	fp, r3
+20023268:	4b3b      	ldr	r3, [pc, #236]	@ (20023358 <pico9918_output_sprites.constprop.0+0x1158>)
+2002326a:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+2002326c:	f883 2036 	strb.w	r2, [r3, #54]	@ 0x36
+20023270:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+20023272:	2b00      	cmp	r3, #0
+20023274:	f43f a97b 	beq.w	2002256e <pico9918_output_sprites.constprop.0+0x36e>
+20023278:	4b38      	ldr	r3, [pc, #224]	@ (2002335c <pico9918_output_sprites.constprop.0+0x115c>)
+2002327a:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+2002327c:	e9d3 0112 	ldrd	r0, r1, [r3, #72]	@ 0x48
+20023280:	f7ff b954 	b.w	2002252c <pico9918_output_sprites.constprop.0+0x32c>
+20023284:	2300      	movs	r3, #0
+20023286:	4a34      	ldr	r2, [pc, #208]	@ (20023358 <pico9918_output_sprites.constprop.0+0x1158>)
+20023288:	f04f 0b1f 	mov.w	fp, #31
+2002328c:	f882 3036 	strb.w	r3, [r2, #54]	@ 0x36
+20023290:	f7ff b96d 	b.w	2002256e <pico9918_output_sprites.constprop.0+0x36e>
+20023294:	4631      	mov	r1, r6
+20023296:	4832      	ldr	r0, [pc, #200]	@ (20023360 <pico9918_output_sprites.constprop.0+0x1160>)
+20023298:	f00e 0502 	and.w	r5, lr, #2
+2002329c:	7800      	ldrb	r0, [r0, #0]
+2002329e:	2804      	cmp	r0, #4
+200232a0:	9016      	str	r0, [sp, #88]	@ 0x58
+200232a2:	f47f a80d 	bne.w	200222c0 <pico9918_output_sprites.constprop.0+0xc0>
+200232a6:	2a00      	cmp	r2, #0
+200232a8:	f43f a80a 	beq.w	200222c0 <pico9918_output_sprites.constprop.0+0xc0>
+200232ac:	f7ff b98b 	b.w	200225c6 <pico9918_output_sprites.constprop.0+0x3c6>
+200232b0:	460f      	mov	r7, r1
+200232b2:	f8df a0b4 	ldr.w	sl, [pc, #180]	@ 20023368 <pico9918_output_sprites.constprop.0+0x1168>
+200232b6:	f8df b09c 	ldr.w	fp, [pc, #156]	@ 20023354 <pico9918_output_sprites.constprop.0+0x1154>
+200232ba:	e016      	b.n	200232ea <pico9918_output_sprites.constprop.0+0x10ea>
+200232bc:	45a8      	cmp	r8, r5
+200232be:	bfb8      	it	lt
+200232c0:	f5a5 7580 	sublt.w	r5, r5, #256	@ 0x100
+200232c4:	1b45      	subs	r5, r0, r5
+200232c6:	2d1f      	cmp	r5, #31
+200232c8:	d80c      	bhi.n	200232e4 <pico9918_output_sprites.constprop.0+0x10e4>
+200232ca:	f856 9027 	ldr.w	r9, [r6, r7, lsl #2]
+200232ce:	f1b9 0f00 	cmp.w	r9, #0
+200232d2:	d100      	bne.n	200232d6 <pico9918_output_sprites.constprop.0+0x10d6>
+200232d4:	b932      	cbnz	r2, 200232e4 <pico9918_output_sprites.constprop.0+0x10e4>
+200232d6:	f84a 9021 	str.w	r9, [sl, r1, lsl #2]
+200232da:	f80b 7001 	strb.w	r7, [fp, r1]
+200232de:	f80a 5021 	strb.w	r5, [sl, r1, lsl #2]
+200232e2:	3101      	adds	r1, #1
+200232e4:	3701      	adds	r7, #1
+200232e6:	45bc      	cmp	ip, r7
+200232e8:	d9d5      	bls.n	20023296 <pico9918_output_sprites.constprop.0+0x1096>
+200232ea:	f816 5027 	ldrb.w	r5, [r6, r7, lsl #2]
+200232ee:	2dd0      	cmp	r5, #208	@ 0xd0
+200232f0:	d1e4      	bne.n	200232bc <pico9918_output_sprites.constprop.0+0x10bc>
+200232f2:	e7d0      	b.n	20023296 <pico9918_output_sprites.constprop.0+0x1096>
+200232f4:	22fc      	movs	r2, #252	@ 0xfc
+200232f6:	2701      	movs	r7, #1
+200232f8:	2510      	movs	r5, #16
+200232fa:	e9cd 2705 	strd	r2, r7, [sp, #20]
+200232fe:	e751      	b.n	200231a4 <pico9918_output_sprites.constprop.0+0xfa4>
+20023300:	9207      	str	r2, [sp, #28]
+20023302:	2210      	movs	r2, #16
+20023304:	2020      	movs	r0, #32
+20023306:	9202      	str	r2, [sp, #8]
+20023308:	22fc      	movs	r2, #252	@ 0xfc
+2002330a:	9009      	str	r0, [sp, #36]	@ 0x24
+2002330c:	9206      	str	r2, [sp, #24]
+2002330e:	9008      	str	r0, [sp, #32]
+20023310:	f7ff b968 	b.w	200225e4 <pico9918_output_sprites.constprop.0+0x3e4>
+20023314:	2301      	movs	r3, #1
+20023316:	930f      	str	r3, [sp, #60]	@ 0x3c
+20023318:	9b02      	ldr	r3, [sp, #8]
+2002331a:	f109 0901 	add.w	r9, r9, #1
+2002331e:	4599      	cmp	r9, r3
+20023320:	f108 0804 	add.w	r8, r8, #4
+20023324:	f47f af76 	bne.w	20023214 <pico9918_output_sprites.constprop.0+0x1014>
+20023328:	f8dd b004 	ldr.w	fp, [sp, #4]
+2002332c:	e79c      	b.n	20023268 <pico9918_output_sprites.constprop.0+0x1068>
+2002332e:	9800      	ldr	r0, [sp, #0]
+20023330:	9b04      	ldr	r3, [sp, #16]
+20023332:	9311      	str	r3, [sp, #68]	@ 0x44
+20023334:	9b03      	ldr	r3, [sp, #12]
+20023336:	f10a 0a01 	add.w	sl, sl, #1
+2002333a:	459a      	cmp	sl, r3
+2002333c:	f100 0004 	add.w	r0, r0, #4
+20023340:	f47f a985 	bne.w	2002264e <pico9918_output_sprites.constprop.0+0x44e>
+20023344:	46cb      	mov	fp, r9
+20023346:	f7ff b9af 	b.w	200226a8 <pico9918_output_sprites.constprop.0+0x4a8>
+2002334a:	bf00      	nop
+2002334c:	2008064c 	.word	0x2008064c
+20023350:	200800a0 	.word	0x200800a0
+20023354:	20080000 	.word	0x20080000
+20023358:	20015300 	.word	0x20015300
+2002335c:	200805e0 	.word	0x200805e0
+20023360:	2002c107 	.word	0x2002c107
+20023364:	200012a0 	.word	0x200012a0
+20023368:	20080020 	.word	0x20080020
+2002336c:	f899 5000 	ldrb.w	r5, [r9]
+20023370:	f020 001f 	bic.w	r0, r0, #31
+20023374:	4328      	orrs	r0, r5
+20023376:	f040 0040 	orr.w	r0, r0, #64	@ 0x40
+2002337a:	b2c0      	uxtb	r0, r0
+2002337c:	9001      	str	r0, [sp, #4]
+2002337e:	980a      	ldr	r0, [sp, #40]	@ 0x28
+20023380:	4550      	cmp	r0, sl
+20023382:	d3d1      	bcc.n	20023328 <pico9918_output_sprites.constprop.0+0x1128>
+20023384:	0614      	lsls	r4, r2, #24
+20023386:	f898 0001 	ldrb.w	r0, [r8, #1]
+2002338a:	f100 81e8 	bmi.w	2002375e <pico9918_output_sprites.constprop.0+0x155e>
+2002338e:	4244      	negs	r4, r0
+20023390:	9403      	str	r4, [sp, #12]
+20023392:	2400      	movs	r4, #0
+20023394:	eba6 0c01 	sub.w	ip, r6, r1
+20023398:	f012 0f20 	tst.w	r2, #32
+2002339c:	f10c 3cff 	add.w	ip, ip, #4294967295
+200233a0:	bf18      	it	ne
+200233a2:	4661      	movne	r1, ip
+200233a4:	f898 c002 	ldrb.w	ip, [r8, #2]
+200233a8:	e9cd 4418 	strd	r4, r4, [sp, #96]	@ 0x60
+200233ac:	941a      	str	r4, [sp, #104]	@ 0x68
+200233ae:	9c07      	ldr	r4, [sp, #28]
+200233b0:	ea03 030c 	and.w	r3, r3, ip
+200233b4:	eb04 03c3 	add.w	r3, r4, r3, lsl #3
+200233b8:	440b      	add	r3, r1
+200233ba:	0651      	lsls	r1, r2, #25
+200233bc:	b29b      	uxth	r3, r3
+200233be:	f100 81dd 	bmi.w	2002377c <pico9918_output_sprites.constprop.0+0x157c>
+200233c2:	f1be 0f00 	cmp.w	lr, #0
+200233c6:	f040 82ac 	bne.w	20023922 <pico9918_output_sprites.constprop.0+0x1722>
+200233ca:	4cab      	ldr	r4, [pc, #684]	@ (20023678 <pico9918_output_sprites.constprop.0+0x1478>)
+200233cc:	9d08      	ldr	r5, [sp, #32]
+200233ce:	5ce1      	ldrb	r1, [r4, r3]
+200233d0:	0609      	lsls	r1, r1, #24
+200233d2:	9118      	str	r1, [sp, #96]	@ 0x60
+200233d4:	b185      	cbz	r5, 200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+200233d6:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+200233d8:	eb03 0c05 	add.w	ip, r3, r5
+200233dc:	f814 300c 	ldrb.w	r3, [r4, ip]
+200233e0:	061b      	lsls	r3, r3, #24
+200233e2:	9319      	str	r3, [sp, #100]	@ 0x64
+200233e4:	4319      	orrs	r1, r3
+200233e6:	9b04      	ldr	r3, [sp, #16]
+200233e8:	2b03      	cmp	r3, #3
+200233ea:	d105      	bne.n	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+200233ec:	eb0c 0305 	add.w	r3, ip, r5
+200233f0:	5ce3      	ldrb	r3, [r4, r3]
+200233f2:	061b      	lsls	r3, r3, #24
+200233f4:	931a      	str	r3, [sp, #104]	@ 0x68
+200233f6:	4319      	orrs	r1, r3
+200233f8:	2f00      	cmp	r7, #0
+200233fa:	f040 81e5 	bne.w	200237c8 <pico9918_output_sprites.constprop.0+0x15c8>
+200233fe:	2900      	cmp	r1, #0
+20023400:	d08a      	beq.n	20023318 <pico9918_output_sprites.constprop.0+0x1118>
+20023402:	2800      	cmp	r0, #0
+20023404:	f2c0 8255 	blt.w	200238b2 <pico9918_output_sprites.constprop.0+0x16b2>
+20023408:	f5c0 7380 	rsb	r3, r0, #256	@ 0x100
+2002340c:	f000 051f 	and.w	r5, r0, #31
+20023410:	42b3      	cmp	r3, r6
+20023412:	900b      	str	r0, [sp, #44]	@ 0x2c
+20023414:	f1c5 0720 	rsb	r7, r5, #32
+20023418:	f2c0 8365 	blt.w	20023ae6 <pico9918_output_sprites.constprop.0+0x18e6>
+2002341c:	0946      	lsrs	r6, r0, #5
+2002341e:	fa21 fe05 	lsr.w	lr, r1, r5
+20023422:	9b0c      	ldr	r3, [sp, #48]	@ 0x30
+20023424:	4c95      	ldr	r4, [pc, #596]	@ (2002367c <pico9918_output_sprites.constprop.0+0x147c>)
+20023426:	401a      	ands	r2, r3
+20023428:	9b0e      	ldr	r3, [sp, #56]	@ 0x38
+2002342a:	f106 0c12 	add.w	ip, r6, #18
+2002342e:	fa02 f303 	lsl.w	r3, r2, r3
+20023432:	9303      	str	r3, [sp, #12]
+20023434:	f854 302c 	ldr.w	r3, [r4, ip, lsl #2]
+20023438:	ea2e 0203 	bic.w	r2, lr, r3
+2002343c:	ea43 030e 	orr.w	r3, r3, lr
+20023440:	f844 302c 	str.w	r3, [r4, ip, lsl #2]
+20023444:	fa02 f305 	lsl.w	r3, r2, r5
+20023448:	9a00      	ldr	r2, [sp, #0]
+2002344a:	42ba      	cmp	r2, r7
+2002344c:	d912      	bls.n	20023474 <pico9918_output_sprites.constprop.0+0x1274>
+2002344e:	f106 0e13 	add.w	lr, r6, #19
+20023452:	f854 202e 	ldr.w	r2, [r4, lr, lsl #2]
+20023456:	fa01 fc07 	lsl.w	ip, r1, r7
+2002345a:	ea2c 0402 	bic.w	r4, ip, r2
+2002345e:	9410      	str	r4, [sp, #64]	@ 0x40
+20023460:	4c86      	ldr	r4, [pc, #536]	@ (2002367c <pico9918_output_sprites.constprop.0+0x147c>)
+20023462:	ea42 0c0c 	orr.w	ip, r2, ip
+20023466:	f844 c02e 	str.w	ip, [r4, lr, lsl #2]
+2002346a:	9c10      	ldr	r4, [sp, #64]	@ 0x40
+2002346c:	fa24 fe07 	lsr.w	lr, r4, r7
+20023470:	ea43 030e 	orr.w	r3, r3, lr
+20023474:	9c01      	ldr	r4, [sp, #4]
+20023476:	9a04      	ldr	r2, [sp, #16]
+20023478:	f044 0c20 	orr.w	ip, r4, #32
+2002347c:	fa5f fc8c 	uxtb.w	ip, ip
+20023480:	428b      	cmp	r3, r1
+20023482:	bf18      	it	ne
+20023484:	4664      	movne	r4, ip
+20023486:	9401      	str	r4, [sp, #4]
+20023488:	2a00      	cmp	r2, #0
+2002348a:	f000 81f2 	beq.w	20023872 <pico9918_output_sprites.constprop.0+0x1672>
+2002348e:	9903      	ldr	r1, [sp, #12]
+20023490:	9a12      	ldr	r2, [sp, #72]	@ 0x48
+20023492:	430a      	orrs	r2, r1
+20023494:	b2d1      	uxtb	r1, r2
+20023496:	f04f 3201 	mov.w	r2, #16843009	@ 0x1010101
+2002349a:	fb02 f101 	mul.w	r1, r2, r1
+2002349e:	468e      	mov	lr, r1
+200234a0:	2b00      	cmp	r3, #0
+200234a2:	f43f af37 	beq.w	20023314 <pico9918_output_sprites.constprop.0+0x1114>
+200234a6:	e9dd 2118 	ldrd	r2, r1, [sp, #96]	@ 0x60
+200234aa:	9804      	ldr	r0, [sp, #16]
+200234ac:	2802      	cmp	r0, #2
+200234ae:	f000 8349 	beq.w	20023b44 <pico9918_output_sprites.constprop.0+0x1944>
+200234b2:	2803      	cmp	r0, #3
+200234b4:	f000 8430 	beq.w	20023d18 <pico9918_output_sprites.constprop.0+0x1b18>
+200234b8:	4971      	ldr	r1, [pc, #452]	@ (20023680 <pico9918_output_sprites.constprop.0+0x1480>)
+200234ba:	980b      	ldr	r0, [sp, #44]	@ 0x2c
+200234bc:	f8df c1c8 	ldr.w	ip, [pc, #456]	@ 20023688 <pico9918_output_sprites.constprop.0+0x1488>
+200234c0:	eb01 0140 	add.w	r1, r1, r0, lsl #1
+200234c4:	e002      	b.n	200234cc <pico9918_output_sprites.constprop.0+0x12cc>
+200234c6:	0112      	lsls	r2, r2, #4
+200234c8:	011b      	lsls	r3, r3, #4
+200234ca:	3108      	adds	r1, #8
+200234cc:	0f1c      	lsrs	r4, r3, #28
+200234ce:	d104      	bne.n	200234da <pico9918_output_sprites.constprop.0+0x12da>
+200234d0:	0112      	lsls	r2, r2, #4
+200234d2:	011b      	lsls	r3, r3, #4
+200234d4:	3108      	adds	r1, #8
+200234d6:	0f1c      	lsrs	r4, r3, #28
+200234d8:	d0f5      	beq.n	200234c6 <pico9918_output_sprites.constprop.0+0x12c6>
+200234da:	0f10      	lsrs	r0, r2, #28
+200234dc:	f85c 0020 	ldr.w	r0, [ip, r0, lsl #2]
+200234e0:	0726      	lsls	r6, r4, #28
+200234e2:	ea4e 0000 	orr.w	r0, lr, r0
+200234e6:	f100 831d 	bmi.w	20023b24 <pico9918_output_sprites.constprop.0+0x1924>
+200234ea:	0765      	lsls	r5, r4, #29
+200234ec:	f100 8320 	bmi.w	20023b30 <pico9918_output_sprites.constprop.0+0x1930>
+200234f0:	07a7      	lsls	r7, r4, #30
+200234f2:	f140 8312 	bpl.w	20023b1a <pico9918_output_sprites.constprop.0+0x191a>
+200234f6:	f3c0 4507 	ubfx	r5, r0, #16, #8
+200234fa:	eb05 2505 	add.w	r5, r5, r5, lsl #8
+200234fe:	808d      	strh	r5, [r1, #4]
+20023500:	07e7      	lsls	r7, r4, #31
+20023502:	f100 830a 	bmi.w	20023b1a <pico9918_output_sprites.constprop.0+0x191a>
+20023506:	011b      	lsls	r3, r3, #4
+20023508:	f43f af04 	beq.w	20023314 <pico9918_output_sprites.constprop.0+0x1114>
+2002350c:	0112      	lsls	r2, r2, #4
+2002350e:	3108      	adds	r1, #8
+20023510:	e7e1      	b.n	200234d6 <pico9918_output_sprites.constprop.0+0x12d6>
+20023512:	f89a c000 	ldrb.w	ip, [sl]
+20023516:	f029 011f 	bic.w	r1, r9, #31
+2002351a:	ea41 010c 	orr.w	r1, r1, ip
+2002351e:	f041 0140 	orr.w	r1, r1, #64	@ 0x40
+20023522:	fa5f f981 	uxtb.w	r9, r1
+20023526:	990c      	ldr	r1, [sp, #48]	@ 0x30
+20023528:	4559      	cmp	r1, fp
+2002352a:	f4ff af0b 	bcc.w	20023344 <pico9918_output_sprites.constprop.0+0x1144>
+2002352e:	061d      	lsls	r5, r3, #24
+20023530:	7841      	ldrb	r1, [r0, #1]
+20023532:	f100 811c 	bmi.w	2002376e <pico9918_output_sprites.constprop.0+0x156e>
+20023536:	f1c1 0c00 	rsb	ip, r1, #0
+2002353a:	1b12      	subs	r2, r2, r4
+2002353c:	3a01      	subs	r2, #1
+2002353e:	f013 0f20 	tst.w	r3, #32
+20023542:	bf18      	it	ne
+20023544:	4614      	movne	r4, r2
+20023546:	2200      	movs	r2, #0
+20023548:	e9cd 2218 	strd	r2, r2, [sp, #96]	@ 0x60
+2002354c:	921a      	str	r2, [sp, #104]	@ 0x68
+2002354e:	7882      	ldrb	r2, [r0, #2]
+20023550:	9f0a      	ldr	r7, [sp, #40]	@ 0x28
+20023552:	ea08 0202 	and.w	r2, r8, r2
+20023556:	eb07 02c2 	add.w	r2, r7, r2, lsl #3
+2002355a:	4422      	add	r2, r4
+2002355c:	065c      	lsls	r4, r3, #25
+2002355e:	b292      	uxth	r2, r2
+20023560:	f100 8134 	bmi.w	200237cc <pico9918_output_sprites.constprop.0+0x15cc>
+20023564:	f1be 0f00 	cmp.w	lr, #0
+20023568:	f040 8218 	bne.w	2002399c <pico9918_output_sprites.constprop.0+0x179c>
+2002356c:	4f42      	ldr	r7, [pc, #264]	@ (20023678 <pico9918_output_sprites.constprop.0+0x1478>)
+2002356e:	9d0b      	ldr	r5, [sp, #44]	@ 0x2c
+20023570:	5cbc      	ldrb	r4, [r7, r2]
+20023572:	0624      	lsls	r4, r4, #24
+20023574:	9418      	str	r4, [sp, #96]	@ 0x60
+20023576:	b185      	cbz	r5, 2002359a <pico9918_output_sprites.constprop.0+0x139a>
+20023578:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+2002357a:	eb02 0e05 	add.w	lr, r2, r5
+2002357e:	f817 200e 	ldrb.w	r2, [r7, lr]
+20023582:	0612      	lsls	r2, r2, #24
+20023584:	9219      	str	r2, [sp, #100]	@ 0x64
+20023586:	4314      	orrs	r4, r2
+20023588:	9a05      	ldr	r2, [sp, #20]
+2002358a:	2a03      	cmp	r2, #3
+2002358c:	d105      	bne.n	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+2002358e:	eb0e 0205 	add.w	r2, lr, r5
+20023592:	5cba      	ldrb	r2, [r7, r2]
+20023594:	0612      	lsls	r2, r2, #24
+20023596:	921a      	str	r2, [sp, #104]	@ 0x68
+20023598:	4314      	orrs	r4, r2
+2002359a:	9a01      	ldr	r2, [sp, #4]
+2002359c:	2a00      	cmp	r2, #0
+2002359e:	f040 813c 	bne.w	2002381a <pico9918_output_sprites.constprop.0+0x161a>
+200235a2:	2c00      	cmp	r4, #0
+200235a4:	f43f aec6 	beq.w	20023334 <pico9918_output_sprites.constprop.0+0x1134>
+200235a8:	0e22      	lsrs	r2, r4, #24
+200235aa:	f3c4 4407 	ubfx	r4, r4, #16, #8
+200235ae:	4d35      	ldr	r5, [pc, #212]	@ (20023684 <pico9918_output_sprites.constprop.0+0x1484>)
+200235b0:	2900      	cmp	r1, #0
+200235b2:	f835 2012 	ldrh.w	r2, [r5, r2, lsl #1]
+200235b6:	f835 4014 	ldrh.w	r4, [r5, r4, lsl #1]
+200235ba:	ea44 4402 	orr.w	r4, r4, r2, lsl #16
+200235be:	f2c0 8193 	blt.w	200238e8 <pico9918_output_sprites.constprop.0+0x16e8>
+200235c2:	f5c1 7280 	rsb	r2, r1, #256	@ 0x100
+200235c6:	f001 051f 	and.w	r5, r1, #31
+200235ca:	42b2      	cmp	r2, r6
+200235cc:	f1c5 0c20 	rsb	ip, r5, #32
+200235d0:	f2c0 8296 	blt.w	20023b00 <pico9918_output_sprites.constprop.0+0x1900>
+200235d4:	094e      	lsrs	r6, r1, #5
+200235d6:	fa24 f805 	lsr.w	r8, r4, r5
+200235da:	9a0e      	ldr	r2, [sp, #56]	@ 0x38
+200235dc:	f106 0e12 	add.w	lr, r6, #18
+200235e0:	4013      	ands	r3, r2
+200235e2:	9a10      	ldr	r2, [sp, #64]	@ 0x40
+200235e4:	4093      	lsls	r3, r2
+200235e6:	9301      	str	r3, [sp, #4]
+200235e8:	4b24      	ldr	r3, [pc, #144]	@ (2002367c <pico9918_output_sprites.constprop.0+0x147c>)
+200235ea:	f853 302e 	ldr.w	r3, [r3, lr, lsl #2]
+200235ee:	ea28 0703 	bic.w	r7, r8, r3
+200235f2:	463a      	mov	r2, r7
+200235f4:	4f21      	ldr	r7, [pc, #132]	@ (2002367c <pico9918_output_sprites.constprop.0+0x147c>)
+200235f6:	ea43 0308 	orr.w	r3, r3, r8
+200235fa:	f847 302e 	str.w	r3, [r7, lr, lsl #2]
+200235fe:	fa02 f305 	lsl.w	r3, r2, r5
+20023602:	9a00      	ldr	r2, [sp, #0]
+20023604:	4562      	cmp	r2, ip
+20023606:	d910      	bls.n	2002362a <pico9918_output_sprites.constprop.0+0x142a>
+20023608:	f106 0813 	add.w	r8, r6, #19
+2002360c:	f857 7028 	ldr.w	r7, [r7, r8, lsl #2]
+20023610:	fa04 fe0c 	lsl.w	lr, r4, ip
+20023614:	ea2e 0207 	bic.w	r2, lr, r7
+20023618:	ea47 0e0e 	orr.w	lr, r7, lr
+2002361c:	4f17      	ldr	r7, [pc, #92]	@ (2002367c <pico9918_output_sprites.constprop.0+0x147c>)
+2002361e:	f847 e028 	str.w	lr, [r7, r8, lsl #2]
+20023622:	fa22 f80c 	lsr.w	r8, r2, ip
+20023626:	ea43 0308 	orr.w	r3, r3, r8
+2002362a:	f049 0e20 	orr.w	lr, r9, #32
+2002362e:	fa5f fe8e 	uxtb.w	lr, lr
+20023632:	42a3      	cmp	r3, r4
+20023634:	bf18      	it	ne
+20023636:	46f1      	movne	r9, lr
+20023638:	9c05      	ldr	r4, [sp, #20]
+2002363a:	2c00      	cmp	r4, #0
+2002363c:	f000 80ff 	beq.w	2002383e <pico9918_output_sprites.constprop.0+0x163e>
+20023640:	9a13      	ldr	r2, [sp, #76]	@ 0x4c
+20023642:	9c01      	ldr	r4, [sp, #4]
+20023644:	ea44 0c02 	orr.w	ip, r4, r2
+20023648:	fa5f f48c 	uxtb.w	r4, ip
+2002364c:	f04f 3201 	mov.w	r2, #16843009	@ 0x1010101
+20023650:	fb02 f404 	mul.w	r4, r2, r4
+20023654:	46a4      	mov	ip, r4
+20023656:	2b00      	cmp	r3, #0
+20023658:	f43f ae6a 	beq.w	20023330 <pico9918_output_sprites.constprop.0+0x1130>
+2002365c:	9d05      	ldr	r5, [sp, #20]
+2002365e:	b20a      	sxth	r2, r1
+20023660:	4907      	ldr	r1, [pc, #28]	@ (20023680 <pico9918_output_sprites.constprop.0+0x1480>)
+20023662:	2d02      	cmp	r5, #2
+20023664:	eb01 0242 	add.w	r2, r1, r2, lsl #1
+20023668:	e9dd 1418 	ldrd	r1, r4, [sp, #96]	@ 0x60
+2002366c:	f000 82ad 	beq.w	20023bca <pico9918_output_sprites.constprop.0+0x19ca>
+20023670:	9f1a      	ldr	r7, [sp, #104]	@ 0x68
+20023672:	9000      	str	r0, [sp, #0]
+20023674:	e010      	b.n	20023698 <pico9918_output_sprites.constprop.0+0x1498>
+20023676:	bf00      	nop
+20023678:	20005300 	.word	0x20005300
+2002367c:	200805e0 	.word	0x200805e0
+20023680:	2008064c 	.word	0x2008064c
+20023684:	200803e0 	.word	0x200803e0
+20023688:	200012a0 	.word	0x200012a0
+2002368c:	013f      	lsls	r7, r7, #4
+2002368e:	0124      	lsls	r4, r4, #4
+20023690:	0109      	lsls	r1, r1, #4
+20023692:	2b00      	cmp	r3, #0
+20023694:	f43f ae4b 	beq.w	2002332e <pico9918_output_sprites.constprop.0+0x112e>
+20023698:	0e1e      	lsrs	r6, r3, #24
+2002369a:	461d      	mov	r5, r3
+2002369c:	3210      	adds	r2, #16
+2002369e:	021b      	lsls	r3, r3, #8
+200236a0:	2e00      	cmp	r6, #0
+200236a2:	d0f3      	beq.n	2002368c <pico9918_output_sprites.constprop.0+0x148c>
+200236a4:	9e05      	ldr	r6, [sp, #20]
+200236a6:	2e03      	cmp	r6, #3
+200236a8:	f000 80fc 	beq.w	200238a4 <pico9918_output_sprites.constprop.0+0x16a4>
+200236ac:	2600      	movs	r6, #0
+200236ae:	48b5      	ldr	r0, [pc, #724]	@ (20023984 <pico9918_output_sprites.constprop.0+0x1784>)
+200236b0:	ea46 7611 	orr.w	r6, r6, r1, lsr #28
+200236b4:	f850 6026 	ldr.w	r6, [r0, r6, lsl #2]
+200236b8:	2d00      	cmp	r5, #0
+200236ba:	ea4c 0606 	orr.w	r6, ip, r6
+200236be:	fa5f fe86 	uxtb.w	lr, r6
+200236c2:	da03      	bge.n	200236cc <pico9918_output_sprites.constprop.0+0x14cc>
+200236c4:	eb0e 280e 	add.w	r8, lr, lr, lsl #8
+200236c8:	f822 8c10 	strh.w	r8, [r2, #-16]
+200236cc:	0068      	lsls	r0, r5, #1
+200236ce:	d503      	bpl.n	200236d8 <pico9918_output_sprites.constprop.0+0x14d8>
+200236d0:	eb0e 2e0e 	add.w	lr, lr, lr, lsl #8
+200236d4:	f822 ec0e 	strh.w	lr, [r2, #-14]
+200236d8:	00a8      	lsls	r0, r5, #2
+200236da:	f3c6 2e07 	ubfx	lr, r6, #8, #8
+200236de:	d503      	bpl.n	200236e8 <pico9918_output_sprites.constprop.0+0x14e8>
+200236e0:	eb0e 280e 	add.w	r8, lr, lr, lsl #8
+200236e4:	f822 8c0c 	strh.w	r8, [r2, #-12]
+200236e8:	00e8      	lsls	r0, r5, #3
+200236ea:	d503      	bpl.n	200236f4 <pico9918_output_sprites.constprop.0+0x14f4>
+200236ec:	eb0e 2e0e 	add.w	lr, lr, lr, lsl #8
+200236f0:	f822 ec0a 	strh.w	lr, [r2, #-10]
+200236f4:	0128      	lsls	r0, r5, #4
+200236f6:	f3c6 4e07 	ubfx	lr, r6, #16, #8
+200236fa:	d503      	bpl.n	20023704 <pico9918_output_sprites.constprop.0+0x1504>
+200236fc:	eb0e 280e 	add.w	r8, lr, lr, lsl #8
+20023700:	f822 8c08 	strh.w	r8, [r2, #-8]
+20023704:	0168      	lsls	r0, r5, #5
+20023706:	d503      	bpl.n	20023710 <pico9918_output_sprites.constprop.0+0x1510>
+20023708:	eb0e 2e0e 	add.w	lr, lr, lr, lsl #8
+2002370c:	f822 ec06 	strh.w	lr, [r2, #-6]
+20023710:	01a8      	lsls	r0, r5, #6
+20023712:	ea4f 6616 	mov.w	r6, r6, lsr #24
+20023716:	d503      	bpl.n	20023720 <pico9918_output_sprites.constprop.0+0x1520>
+20023718:	eb06 2e06 	add.w	lr, r6, r6, lsl #8
+2002371c:	f822 ec04 	strh.w	lr, [r2, #-4]
+20023720:	01e8      	lsls	r0, r5, #7
+20023722:	d5b3      	bpl.n	2002368c <pico9918_output_sprites.constprop.0+0x148c>
+20023724:	eb06 2606 	add.w	r6, r6, r6, lsl #8
+20023728:	f822 6c02 	strh.w	r6, [r2, #-2]
+2002372c:	e7ae      	b.n	2002368c <pico9918_output_sprites.constprop.0+0x148c>
+2002372e:	f1bb 0f10 	cmp.w	fp, #16
+20023732:	d07d      	beq.n	20023830 <pico9918_output_sprites.constprop.0+0x1630>
+20023734:	2610      	movs	r6, #16
+20023736:	2700      	movs	r7, #0
+20023738:	23fc      	movs	r3, #252	@ 0xfc
+2002373a:	f04f 0e01 	mov.w	lr, #1
+2002373e:	9600      	str	r6, [sp, #0]
+20023740:	e575      	b.n	2002322e <pico9918_output_sprites.constprop.0+0x102e>
+20023742:	9a02      	ldr	r2, [sp, #8]
+20023744:	2620      	movs	r6, #32
+20023746:	2a10      	cmp	r2, #16
+20023748:	d06a      	beq.n	20023820 <pico9918_output_sprites.constprop.0+0x1620>
+2002374a:	2100      	movs	r1, #0
+2002374c:	2210      	movs	r2, #16
+2002374e:	f04f 08fc 	mov.w	r8, #252	@ 0xfc
+20023752:	f8dd e010 	ldr.w	lr, [sp, #16]
+20023756:	9101      	str	r1, [sp, #4]
+20023758:	9600      	str	r6, [sp, #0]
+2002375a:	f7fe bf87 	b.w	2002266c <pico9918_output_sprites.constprop.0+0x46c>
+2002375e:	f1c0 0420 	rsb	r4, r0, #32
+20023762:	42b4      	cmp	r4, r6
+20023764:	9403      	str	r4, [sp, #12]
+20023766:	f73f add7 	bgt.w	20023318 <pico9918_output_sprites.constprop.0+0x1118>
+2002376a:	3820      	subs	r0, #32
+2002376c:	e611      	b.n	20023392 <pico9918_output_sprites.constprop.0+0x1192>
+2002376e:	f1c1 0c20 	rsb	ip, r1, #32
+20023772:	45b4      	cmp	ip, r6
+20023774:	f73f adde 	bgt.w	20023334 <pico9918_output_sprites.constprop.0+0x1134>
+20023778:	3920      	subs	r1, #32
+2002377a:	e6de      	b.n	2002353a <pico9918_output_sprites.constprop.0+0x133a>
+2002377c:	f1be 0f00 	cmp.w	lr, #0
+20023780:	f040 813a 	bne.w	200239f8 <pico9918_output_sprites.constprop.0+0x17f8>
+20023784:	4c80      	ldr	r4, [pc, #512]	@ (20023988 <pico9918_output_sprites.constprop.0+0x1788>)
+20023786:	4d81      	ldr	r5, [pc, #516]	@ (2002398c <pico9918_output_sprites.constprop.0+0x178c>)
+20023788:	5ce1      	ldrb	r1, [r4, r3]
+2002378a:	9c08      	ldr	r4, [sp, #32]
+2002378c:	5c69      	ldrb	r1, [r5, r1]
+2002378e:	0609      	lsls	r1, r1, #24
+20023790:	9118      	str	r1, [sp, #96]	@ 0x60
+20023792:	2c00      	cmp	r4, #0
+20023794:	f43f ae30 	beq.w	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+20023798:	9c09      	ldr	r4, [sp, #36]	@ 0x24
+2002379a:	eb03 0c04 	add.w	ip, r3, r4
+2002379e:	4c7a      	ldr	r4, [pc, #488]	@ (20023988 <pico9918_output_sprites.constprop.0+0x1788>)
+200237a0:	f814 300c 	ldrb.w	r3, [r4, ip]
+200237a4:	5ceb      	ldrb	r3, [r5, r3]
+200237a6:	061b      	lsls	r3, r3, #24
+200237a8:	9319      	str	r3, [sp, #100]	@ 0x64
+200237aa:	4319      	orrs	r1, r3
+200237ac:	9b04      	ldr	r3, [sp, #16]
+200237ae:	2b03      	cmp	r3, #3
+200237b0:	f47f ae22 	bne.w	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+200237b4:	9b09      	ldr	r3, [sp, #36]	@ 0x24
+200237b6:	4463      	add	r3, ip
+200237b8:	5ce3      	ldrb	r3, [r4, r3]
+200237ba:	5ceb      	ldrb	r3, [r5, r3]
+200237bc:	061b      	lsls	r3, r3, #24
+200237be:	931a      	str	r3, [sp, #104]	@ 0x68
+200237c0:	4319      	orrs	r1, r3
+200237c2:	2f00      	cmp	r7, #0
+200237c4:	f43f ae1b 	beq.w	200233fe <pico9918_output_sprites.constprop.0+0x11fe>
+200237c8:	4971      	ldr	r1, [pc, #452]	@ (20023990 <pico9918_output_sprites.constprop.0+0x1790>)
+200237ca:	e61a      	b.n	20023402 <pico9918_output_sprites.constprop.0+0x1202>
+200237cc:	f1be 0f00 	cmp.w	lr, #0
+200237d0:	f040 814c 	bne.w	20023a6c <pico9918_output_sprites.constprop.0+0x186c>
+200237d4:	4f6c      	ldr	r7, [pc, #432]	@ (20023988 <pico9918_output_sprites.constprop.0+0x1788>)
+200237d6:	f8df e1b4 	ldr.w	lr, [pc, #436]	@ 2002398c <pico9918_output_sprites.constprop.0+0x178c>
+200237da:	5cbc      	ldrb	r4, [r7, r2]
+200237dc:	9d0b      	ldr	r5, [sp, #44]	@ 0x2c
+200237de:	f81e 4004 	ldrb.w	r4, [lr, r4]
+200237e2:	0624      	lsls	r4, r4, #24
+200237e4:	9418      	str	r4, [sp, #96]	@ 0x60
+200237e6:	2d00      	cmp	r5, #0
+200237e8:	f43f aed7 	beq.w	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+200237ec:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+200237ee:	eb02 0805 	add.w	r8, r2, r5
+200237f2:	f817 2008 	ldrb.w	r2, [r7, r8]
+200237f6:	f81e 2002 	ldrb.w	r2, [lr, r2]
+200237fa:	0612      	lsls	r2, r2, #24
+200237fc:	9219      	str	r2, [sp, #100]	@ 0x64
+200237fe:	4314      	orrs	r4, r2
+20023800:	9a05      	ldr	r2, [sp, #20]
+20023802:	2a03      	cmp	r2, #3
+20023804:	f47f aec9 	bne.w	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+20023808:	eb08 0205 	add.w	r2, r8, r5
+2002380c:	5cba      	ldrb	r2, [r7, r2]
+2002380e:	f81e 2002 	ldrb.w	r2, [lr, r2]
+20023812:	0612      	lsls	r2, r2, #24
+20023814:	921a      	str	r2, [sp, #104]	@ 0x68
+20023816:	4314      	orrs	r4, r2
+20023818:	e6bf      	b.n	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+2002381a:	24ff      	movs	r4, #255	@ 0xff
+2002381c:	4622      	mov	r2, r4
+2002381e:	e6c6      	b.n	200235ae <pico9918_output_sprites.constprop.0+0x13ae>
+20023820:	9a04      	ldr	r2, [sp, #16]
+20023822:	9600      	str	r6, [sp, #0]
+20023824:	9201      	str	r2, [sp, #4]
+20023826:	e9dd 8e06 	ldrd	r8, lr, [sp, #24]
+2002382a:	9a02      	ldr	r2, [sp, #8]
+2002382c:	f7fe bf1e 	b.w	2002266c <pico9918_output_sprites.constprop.0+0x46c>
+20023830:	465e      	mov	r6, fp
+20023832:	e9dd 3e05 	ldrd	r3, lr, [sp, #20]
+20023836:	2701      	movs	r7, #1
+20023838:	f8cd b000 	str.w	fp, [sp]
+2002383c:	e4f7      	b.n	2002322e <pico9918_output_sprites.constprop.0+0x102e>
+2002383e:	9a01      	ldr	r2, [sp, #4]
+20023840:	2a00      	cmp	r2, #0
+20023842:	f040 821e 	bne.w	20023c82 <pico9918_output_sprites.constprop.0+0x1a82>
+20023846:	4c53      	ldr	r4, [pc, #332]	@ (20023994 <pico9918_output_sprites.constprop.0+0x1794>)
+20023848:	fa23 f505 	lsr.w	r5, r3, r5
+2002384c:	eb04 0186 	add.w	r1, r4, r6, lsl #2
+20023850:	6a4a      	ldr	r2, [r1, #36]	@ 0x24
+20023852:	432a      	orrs	r2, r5
+20023854:	624a      	str	r2, [r1, #36]	@ 0x24
+20023856:	9a00      	ldr	r2, [sp, #0]
+20023858:	4562      	cmp	r2, ip
+2002385a:	d906      	bls.n	2002386a <pico9918_output_sprites.constprop.0+0x166a>
+2002385c:	eb04 0186 	add.w	r1, r4, r6, lsl #2
+20023860:	6a8a      	ldr	r2, [r1, #40]	@ 0x28
+20023862:	fa03 f30c 	lsl.w	r3, r3, ip
+20023866:	431a      	orrs	r2, r3
+20023868:	628a      	str	r2, [r1, #40]	@ 0x28
+2002386a:	9b0f      	ldr	r3, [sp, #60]	@ 0x3c
+2002386c:	3301      	adds	r3, #1
+2002386e:	930f      	str	r3, [sp, #60]	@ 0x3c
+20023870:	e560      	b.n	20023334 <pico9918_output_sprites.constprop.0+0x1134>
+20023872:	9a03      	ldr	r2, [sp, #12]
+20023874:	2a00      	cmp	r2, #0
+20023876:	f040 821d 	bne.w	20023cb4 <pico9918_output_sprites.constprop.0+0x1ab4>
+2002387a:	4846      	ldr	r0, [pc, #280]	@ (20023994 <pico9918_output_sprites.constprop.0+0x1794>)
+2002387c:	fa23 f505 	lsr.w	r5, r3, r5
+20023880:	eb00 0186 	add.w	r1, r0, r6, lsl #2
+20023884:	6a4a      	ldr	r2, [r1, #36]	@ 0x24
+20023886:	432a      	orrs	r2, r5
+20023888:	624a      	str	r2, [r1, #36]	@ 0x24
+2002388a:	9a00      	ldr	r2, [sp, #0]
+2002388c:	42ba      	cmp	r2, r7
+2002388e:	d905      	bls.n	2002389c <pico9918_output_sprites.constprop.0+0x169c>
+20023890:	eb00 0186 	add.w	r1, r0, r6, lsl #2
+20023894:	6a8a      	ldr	r2, [r1, #40]	@ 0x28
+20023896:	40bb      	lsls	r3, r7
+20023898:	431a      	orrs	r2, r3
+2002389a:	628a      	str	r2, [r1, #40]	@ 0x28
+2002389c:	9b0d      	ldr	r3, [sp, #52]	@ 0x34
+2002389e:	3301      	adds	r3, #1
+200238a0:	930d      	str	r3, [sp, #52]	@ 0x34
+200238a2:	e539      	b.n	20023318 <pico9918_output_sprites.constprop.0+0x1118>
+200238a4:	ea4f 7e17 	mov.w	lr, r7, lsr #28
+200238a8:	0f26      	lsrs	r6, r4, #28
+200238aa:	ea46 160e 	orr.w	r6, r6, lr, lsl #4
+200238ae:	0136      	lsls	r6, r6, #4
+200238b0:	e6fd      	b.n	200236ae <pico9918_output_sprites.constprop.0+0x14ae>
+200238b2:	9c03      	ldr	r4, [sp, #12]
+200238b4:	9b1a      	ldr	r3, [sp, #104]	@ 0x68
+200238b6:	40a1      	lsls	r1, r4
+200238b8:	fa03 f304 	lsl.w	r3, r3, r4
+200238bc:	931a      	str	r3, [sp, #104]	@ 0x68
+200238be:	9b19      	ldr	r3, [sp, #100]	@ 0x64
+200238c0:	fa03 f304 	lsl.w	r3, r3, r4
+200238c4:	9319      	str	r3, [sp, #100]	@ 0x64
+200238c6:	9b18      	ldr	r3, [sp, #96]	@ 0x60
+200238c8:	fa03 f304 	lsl.w	r3, r3, r4
+200238cc:	9318      	str	r3, [sp, #96]	@ 0x60
+200238ce:	f43f ad23 	beq.w	20023318 <pico9918_output_sprites.constprop.0+0x1118>
+200238d2:	2500      	movs	r5, #0
+200238d4:	9b00      	ldr	r3, [sp, #0]
+200238d6:	468e      	mov	lr, r1
+200238d8:	4418      	add	r0, r3
+200238da:	b2c3      	uxtb	r3, r0
+200238dc:	2720      	movs	r7, #32
+200238de:	462e      	mov	r6, r5
+200238e0:	4628      	mov	r0, r5
+200238e2:	9300      	str	r3, [sp, #0]
+200238e4:	950b      	str	r5, [sp, #44]	@ 0x2c
+200238e6:	e59c      	b.n	20023422 <pico9918_output_sprites.constprop.0+0x1222>
+200238e8:	9a18      	ldr	r2, [sp, #96]	@ 0x60
+200238ea:	ea4f 0e6c 	mov.w	lr, ip, asr #1
+200238ee:	e9dd 5619 	ldrd	r5, r6, [sp, #100]	@ 0x64
+200238f2:	fa02 f20e 	lsl.w	r2, r2, lr
+200238f6:	fa06 f60e 	lsl.w	r6, r6, lr
+200238fa:	fa05 f50e 	lsl.w	r5, r5, lr
+200238fe:	fa14 f40c 	lsls.w	r4, r4, ip
+20023902:	e9cd 2518 	strd	r2, r5, [sp, #96]	@ 0x60
+20023906:	961a      	str	r6, [sp, #104]	@ 0x68
+20023908:	f43f ad14 	beq.w	20023334 <pico9918_output_sprites.constprop.0+0x1134>
+2002390c:	2500      	movs	r5, #0
+2002390e:	9a00      	ldr	r2, [sp, #0]
+20023910:	46a0      	mov	r8, r4
+20023912:	4411      	add	r1, r2
+20023914:	b2ca      	uxtb	r2, r1
+20023916:	f04f 0c20 	mov.w	ip, #32
+2002391a:	462e      	mov	r6, r5
+2002391c:	4629      	mov	r1, r5
+2002391e:	9200      	str	r2, [sp, #0]
+20023920:	e65b      	b.n	200235da <pico9918_output_sprites.constprop.0+0x13da>
+20023922:	4c1d      	ldr	r4, [pc, #116]	@ (20023998 <pico9918_output_sprites.constprop.0+0x1798>)
+20023924:	f1a4 0510 	sub.w	r5, r4, #16
+20023928:	5ce1      	ldrb	r1, [r4, r3]
+2002392a:	f815 c003 	ldrb.w	ip, [r5, r3]
+2002392e:	0409      	lsls	r1, r1, #16
+20023930:	9d08      	ldr	r5, [sp, #32]
+20023932:	ea41 610c 	orr.w	r1, r1, ip, lsl #24
+20023936:	9118      	str	r1, [sp, #96]	@ 0x60
+20023938:	2d00      	cmp	r5, #0
+2002393a:	f43f ad5d 	beq.w	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+2002393e:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20023940:	442b      	add	r3, r5
+20023942:	f814 c003 	ldrb.w	ip, [r4, r3]
+20023946:	f1a4 0510 	sub.w	r5, r4, #16
+2002394a:	f815 e003 	ldrb.w	lr, [r5, r3]
+2002394e:	9d04      	ldr	r5, [sp, #16]
+20023950:	ea4f 4c0c 	mov.w	ip, ip, lsl #16
+20023954:	ea4c 6c0e 	orr.w	ip, ip, lr, lsl #24
+20023958:	2d03      	cmp	r5, #3
+2002395a:	f8cd c064 	str.w	ip, [sp, #100]	@ 0x64
+2002395e:	ea41 010c 	orr.w	r1, r1, ip
+20023962:	f47f ad49 	bne.w	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+20023966:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20023968:	442b      	add	r3, r5
+2002396a:	f814 c003 	ldrb.w	ip, [r4, r3]
+2002396e:	f1a4 0510 	sub.w	r5, r4, #16
+20023972:	5ceb      	ldrb	r3, [r5, r3]
+20023974:	ea4f 4c0c 	mov.w	ip, ip, lsl #16
+20023978:	ea4c 6303 	orr.w	r3, ip, r3, lsl #24
+2002397c:	931a      	str	r3, [sp, #104]	@ 0x68
+2002397e:	4319      	orrs	r1, r3
+20023980:	e53a      	b.n	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+20023982:	bf00      	nop
+20023984:	200012a0 	.word	0x200012a0
+20023988:	20005300 	.word	0x20005300
+2002398c:	200802e0 	.word	0x200802e0
+20023990:	ffff0000 	.word	0xffff0000
+20023994:	200805e0 	.word	0x200805e0
+20023998:	20005310 	.word	0x20005310
+2002399c:	f8df 8348 	ldr.w	r8, [pc, #840]	@ 20023ce8 <pico9918_output_sprites.constprop.0+0x1ae8>
+200239a0:	9d0b      	ldr	r5, [sp, #44]	@ 0x2c
+200239a2:	f818 4002 	ldrb.w	r4, [r8, r2]
+200239a6:	f1a8 0710 	sub.w	r7, r8, #16
+200239aa:	f817 e002 	ldrb.w	lr, [r7, r2]
+200239ae:	0424      	lsls	r4, r4, #16
+200239b0:	ea44 640e 	orr.w	r4, r4, lr, lsl #24
+200239b4:	9418      	str	r4, [sp, #96]	@ 0x60
+200239b6:	2d00      	cmp	r5, #0
+200239b8:	f43f adef 	beq.w	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+200239bc:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+200239be:	442a      	add	r2, r5
+200239c0:	f818 e002 	ldrb.w	lr, [r8, r2]
+200239c4:	5cbf      	ldrb	r7, [r7, r2]
+200239c6:	ea4f 4e0e 	mov.w	lr, lr, lsl #16
+200239ca:	ea4e 6e07 	orr.w	lr, lr, r7, lsl #24
+200239ce:	9f05      	ldr	r7, [sp, #20]
+200239d0:	f8cd e064 	str.w	lr, [sp, #100]	@ 0x64
+200239d4:	2f03      	cmp	r7, #3
+200239d6:	ea44 040e 	orr.w	r4, r4, lr
+200239da:	f47f adde 	bne.w	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+200239de:	442a      	add	r2, r5
+200239e0:	f818 e002 	ldrb.w	lr, [r8, r2]
+200239e4:	f1a8 0710 	sub.w	r7, r8, #16
+200239e8:	5cba      	ldrb	r2, [r7, r2]
+200239ea:	ea4f 4e0e 	mov.w	lr, lr, lsl #16
+200239ee:	ea4e 6202 	orr.w	r2, lr, r2, lsl #24
+200239f2:	921a      	str	r2, [sp, #104]	@ 0x68
+200239f4:	4314      	orrs	r4, r2
+200239f6:	e5d0      	b.n	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+200239f8:	4dbb      	ldr	r5, [pc, #748]	@ (20023ce8 <pico9918_output_sprites.constprop.0+0x1ae8>)
+200239fa:	4cbc      	ldr	r4, [pc, #752]	@ (20023cec <pico9918_output_sprites.constprop.0+0x1aec>)
+200239fc:	5ce9      	ldrb	r1, [r5, r3]
+200239fe:	3d10      	subs	r5, #16
+20023a00:	f815 c003 	ldrb.w	ip, [r5, r3]
+20023a04:	5c61      	ldrb	r1, [r4, r1]
+20023a06:	f814 c00c 	ldrb.w	ip, [r4, ip]
+20023a0a:	0609      	lsls	r1, r1, #24
+20023a0c:	9d08      	ldr	r5, [sp, #32]
+20023a0e:	ea41 410c 	orr.w	r1, r1, ip, lsl #16
+20023a12:	9118      	str	r1, [sp, #96]	@ 0x60
+20023a14:	2d00      	cmp	r5, #0
+20023a16:	f43f acef 	beq.w	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+20023a1a:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20023a1c:	442b      	add	r3, r5
+20023a1e:	4db2      	ldr	r5, [pc, #712]	@ (20023ce8 <pico9918_output_sprites.constprop.0+0x1ae8>)
+20023a20:	f815 c003 	ldrb.w	ip, [r5, r3]
+20023a24:	3d10      	subs	r5, #16
+20023a26:	f815 e003 	ldrb.w	lr, [r5, r3]
+20023a2a:	f814 c00c 	ldrb.w	ip, [r4, ip]
+20023a2e:	f814 e00e 	ldrb.w	lr, [r4, lr]
+20023a32:	9d04      	ldr	r5, [sp, #16]
+20023a34:	ea4f 6c0c 	mov.w	ip, ip, lsl #24
+20023a38:	ea4c 4c0e 	orr.w	ip, ip, lr, lsl #16
+20023a3c:	2d03      	cmp	r5, #3
+20023a3e:	f8cd c064 	str.w	ip, [sp, #100]	@ 0x64
+20023a42:	ea41 010c 	orr.w	r1, r1, ip
+20023a46:	f47f acd7 	bne.w	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+20023a4a:	9d09      	ldr	r5, [sp, #36]	@ 0x24
+20023a4c:	442b      	add	r3, r5
+20023a4e:	4da6      	ldr	r5, [pc, #664]	@ (20023ce8 <pico9918_output_sprites.constprop.0+0x1ae8>)
+20023a50:	f815 c003 	ldrb.w	ip, [r5, r3]
+20023a54:	3d10      	subs	r5, #16
+20023a56:	5ceb      	ldrb	r3, [r5, r3]
+20023a58:	f814 c00c 	ldrb.w	ip, [r4, ip]
+20023a5c:	5ce3      	ldrb	r3, [r4, r3]
+20023a5e:	ea4f 6c0c 	mov.w	ip, ip, lsl #24
+20023a62:	ea4c 4303 	orr.w	r3, ip, r3, lsl #16
+20023a66:	931a      	str	r3, [sp, #104]	@ 0x68
+20023a68:	4319      	orrs	r1, r3
+20023a6a:	e4c5      	b.n	200233f8 <pico9918_output_sprites.constprop.0+0x11f8>
+20023a6c:	4f9e      	ldr	r7, [pc, #632]	@ (20023ce8 <pico9918_output_sprites.constprop.0+0x1ae8>)
+20023a6e:	f8df e27c 	ldr.w	lr, [pc, #636]	@ 20023cec <pico9918_output_sprites.constprop.0+0x1aec>
+20023a72:	f1a7 0510 	sub.w	r5, r7, #16
+20023a76:	5cbc      	ldrb	r4, [r7, r2]
+20023a78:	f815 8002 	ldrb.w	r8, [r5, r2]
+20023a7c:	f81e 4004 	ldrb.w	r4, [lr, r4]
+20023a80:	f81e 8008 	ldrb.w	r8, [lr, r8]
+20023a84:	0624      	lsls	r4, r4, #24
+20023a86:	9d0b      	ldr	r5, [sp, #44]	@ 0x2c
+20023a88:	ea44 4408 	orr.w	r4, r4, r8, lsl #16
+20023a8c:	9418      	str	r4, [sp, #96]	@ 0x60
+20023a8e:	2d00      	cmp	r5, #0
+20023a90:	f43f ad83 	beq.w	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+20023a94:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+20023a96:	442a      	add	r2, r5
+20023a98:	f817 8002 	ldrb.w	r8, [r7, r2]
+20023a9c:	f1a7 0510 	sub.w	r5, r7, #16
+20023aa0:	5cad      	ldrb	r5, [r5, r2]
+20023aa2:	f81e 8008 	ldrb.w	r8, [lr, r8]
+20023aa6:	f81e 5005 	ldrb.w	r5, [lr, r5]
+20023aaa:	ea4f 6808 	mov.w	r8, r8, lsl #24
+20023aae:	ea48 4805 	orr.w	r8, r8, r5, lsl #16
+20023ab2:	9d05      	ldr	r5, [sp, #20]
+20023ab4:	f8cd 8064 	str.w	r8, [sp, #100]	@ 0x64
+20023ab8:	2d03      	cmp	r5, #3
+20023aba:	ea44 0408 	orr.w	r4, r4, r8
+20023abe:	f47f ad6c 	bne.w	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+20023ac2:	9d0d      	ldr	r5, [sp, #52]	@ 0x34
+20023ac4:	442a      	add	r2, r5
+20023ac6:	f817 8002 	ldrb.w	r8, [r7, r2]
+20023aca:	f1a7 0510 	sub.w	r5, r7, #16
+20023ace:	5caa      	ldrb	r2, [r5, r2]
+20023ad0:	f81e 8008 	ldrb.w	r8, [lr, r8]
+20023ad4:	f81e 2002 	ldrb.w	r2, [lr, r2]
+20023ad8:	ea4f 6808 	mov.w	r8, r8, lsl #24
+20023adc:	ea48 4202 	orr.w	r2, r8, r2, lsl #16
+20023ae0:	921a      	str	r2, [sp, #104]	@ 0x68
+20023ae2:	4314      	orrs	r4, r2
+20023ae4:	e559      	b.n	2002359a <pico9918_output_sprites.constprop.0+0x139a>
+20023ae6:	2401      	movs	r4, #1
+20023ae8:	b2db      	uxtb	r3, r3
+20023aea:	9300      	str	r3, [sp, #0]
+20023aec:	f1a0 03e0 	sub.w	r3, r0, #224	@ 0xe0
+20023af0:	fa04 f303 	lsl.w	r3, r4, r3
+20023af4:	425b      	negs	r3, r3
+20023af6:	4019      	ands	r1, r3
+20023af8:	2607      	movs	r6, #7
+20023afa:	fa21 fe05 	lsr.w	lr, r1, r5
+20023afe:	e490      	b.n	20023422 <pico9918_output_sprites.constprop.0+0x1222>
+20023b00:	b2d2      	uxtb	r2, r2
+20023b02:	9200      	str	r2, [sp, #0]
+20023b04:	f04f 32ff 	mov.w	r2, #4294967295
+20023b08:	f1a1 0ee0 	sub.w	lr, r1, #224	@ 0xe0
+20023b0c:	fa02 f20e 	lsl.w	r2, r2, lr
+20023b10:	4014      	ands	r4, r2
+20023b12:	2607      	movs	r6, #7
+20023b14:	fa24 f805 	lsr.w	r8, r4, r5
+20023b18:	e55f      	b.n	200235da <pico9918_output_sprites.constprop.0+0x13da>
+20023b1a:	0e00      	lsrs	r0, r0, #24
+20023b1c:	eb00 2000 	add.w	r0, r0, r0, lsl #8
+20023b20:	80c8      	strh	r0, [r1, #6]
+20023b22:	e4f0      	b.n	20023506 <pico9918_output_sprites.constprop.0+0x1306>
+20023b24:	b2c5      	uxtb	r5, r0
+20023b26:	eb05 2505 	add.w	r5, r5, r5, lsl #8
+20023b2a:	0766      	lsls	r6, r4, #29
+20023b2c:	800d      	strh	r5, [r1, #0]
+20023b2e:	d505      	bpl.n	20023b3c <pico9918_output_sprites.constprop.0+0x193c>
+20023b30:	f3c0 2507 	ubfx	r5, r0, #8, #8
+20023b34:	f400 467f 	and.w	r6, r0, #65280	@ 0xff00
+20023b38:	4435      	add	r5, r6
+20023b3a:	804d      	strh	r5, [r1, #2]
+20023b3c:	07a5      	lsls	r5, r4, #30
+20023b3e:	f57f acdf 	bpl.w	20023500 <pico9918_output_sprites.constprop.0+0x1300>
+20023b42:	e4d8      	b.n	200234f6 <pico9918_output_sprites.constprop.0+0x12f6>
+20023b44:	486a      	ldr	r0, [pc, #424]	@ (20023cf0 <pico9918_output_sprites.constprop.0+0x1af0>)
+20023b46:	9c0b      	ldr	r4, [sp, #44]	@ 0x2c
+20023b48:	f8df c1a8 	ldr.w	ip, [pc, #424]	@ 20023cf4 <pico9918_output_sprites.constprop.0+0x1af4>
+20023b4c:	eb00 0044 	add.w	r0, r0, r4, lsl #1
+20023b50:	e003      	b.n	20023b5a <pico9918_output_sprites.constprop.0+0x195a>
+20023b52:	0109      	lsls	r1, r1, #4
+20023b54:	0112      	lsls	r2, r2, #4
+20023b56:	011b      	lsls	r3, r3, #4
+20023b58:	3008      	adds	r0, #8
+20023b5a:	0f1d      	lsrs	r5, r3, #28
+20023b5c:	d105      	bne.n	20023b6a <pico9918_output_sprites.constprop.0+0x196a>
+20023b5e:	0109      	lsls	r1, r1, #4
+20023b60:	0112      	lsls	r2, r2, #4
+20023b62:	011b      	lsls	r3, r3, #4
+20023b64:	3008      	adds	r0, #8
+20023b66:	0f1d      	lsrs	r5, r3, #28
+20023b68:	d0f3      	beq.n	20023b52 <pico9918_output_sprites.constprop.0+0x1952>
+20023b6a:	0f0e      	lsrs	r6, r1, #28
+20023b6c:	0f14      	lsrs	r4, r2, #28
+20023b6e:	ea44 1406 	orr.w	r4, r4, r6, lsl #4
+20023b72:	f85c 4024 	ldr.w	r4, [ip, r4, lsl #2]
+20023b76:	072e      	lsls	r6, r5, #28
+20023b78:	ea4e 0404 	orr.w	r4, lr, r4
+20023b7c:	d411      	bmi.n	20023ba2 <pico9918_output_sprites.constprop.0+0x19a2>
+20023b7e:	076f      	lsls	r7, r5, #29
+20023b80:	d415      	bmi.n	20023bae <pico9918_output_sprites.constprop.0+0x19ae>
+20023b82:	07ae      	lsls	r6, r5, #30
+20023b84:	d51c      	bpl.n	20023bc0 <pico9918_output_sprites.constprop.0+0x19c0>
+20023b86:	f3c4 4607 	ubfx	r6, r4, #16, #8
+20023b8a:	eb06 2606 	add.w	r6, r6, r6, lsl #8
+20023b8e:	8086      	strh	r6, [r0, #4]
+20023b90:	07ed      	lsls	r5, r5, #31
+20023b92:	d415      	bmi.n	20023bc0 <pico9918_output_sprites.constprop.0+0x19c0>
+20023b94:	011b      	lsls	r3, r3, #4
+20023b96:	f43f abbd 	beq.w	20023314 <pico9918_output_sprites.constprop.0+0x1114>
+20023b9a:	0109      	lsls	r1, r1, #4
+20023b9c:	0112      	lsls	r2, r2, #4
+20023b9e:	3008      	adds	r0, #8
+20023ba0:	e7e1      	b.n	20023b66 <pico9918_output_sprites.constprop.0+0x1966>
+20023ba2:	b2e6      	uxtb	r6, r4
+20023ba4:	eb06 2606 	add.w	r6, r6, r6, lsl #8
+20023ba8:	076f      	lsls	r7, r5, #29
+20023baa:	8006      	strh	r6, [r0, #0]
+20023bac:	d505      	bpl.n	20023bba <pico9918_output_sprites.constprop.0+0x19ba>
+20023bae:	f3c4 2607 	ubfx	r6, r4, #8, #8
+20023bb2:	f404 477f 	and.w	r7, r4, #65280	@ 0xff00
+20023bb6:	443e      	add	r6, r7
+20023bb8:	8046      	strh	r6, [r0, #2]
+20023bba:	07ae      	lsls	r6, r5, #30
+20023bbc:	d5e8      	bpl.n	20023b90 <pico9918_output_sprites.constprop.0+0x1990>
+20023bbe:	e7e2      	b.n	20023b86 <pico9918_output_sprites.constprop.0+0x1986>
+20023bc0:	0e24      	lsrs	r4, r4, #24
+20023bc2:	eb04 2404 	add.w	r4, r4, r4, lsl #8
+20023bc6:	80c4      	strh	r4, [r0, #6]
+20023bc8:	e7e4      	b.n	20023b94 <pico9918_output_sprites.constprop.0+0x1994>
+20023bca:	f8df 8128 	ldr.w	r8, [pc, #296]	@ 20023cf4 <pico9918_output_sprites.constprop.0+0x1af4>
+20023bce:	e004      	b.n	20023bda <pico9918_output_sprites.constprop.0+0x19da>
+20023bd0:	0124      	lsls	r4, r4, #4
+20023bd2:	0109      	lsls	r1, r1, #4
+20023bd4:	2b00      	cmp	r3, #0
+20023bd6:	f43f abab 	beq.w	20023330 <pico9918_output_sprites.constprop.0+0x1130>
+20023bda:	0e1e      	lsrs	r6, r3, #24
+20023bdc:	461d      	mov	r5, r3
+20023bde:	3210      	adds	r2, #16
+20023be0:	021b      	lsls	r3, r3, #8
+20023be2:	2e00      	cmp	r6, #0
+20023be4:	d0f4      	beq.n	20023bd0 <pico9918_output_sprites.constprop.0+0x19d0>
+20023be6:	0f27      	lsrs	r7, r4, #28
+20023be8:	0f0e      	lsrs	r6, r1, #28
+20023bea:	ea46 1607 	orr.w	r6, r6, r7, lsl #4
+20023bee:	f858 6026 	ldr.w	r6, [r8, r6, lsl #2]
+20023bf2:	2d00      	cmp	r5, #0
+20023bf4:	ea4c 0606 	orr.w	r6, ip, r6
+20023bf8:	b2f7      	uxtb	r7, r6
+20023bfa:	bfbc      	itt	lt
+20023bfc:	eb07 2e07 	addlt.w	lr, r7, r7, lsl #8
+20023c00:	f822 ec10 	strhlt.w	lr, [r2, #-16]
+20023c04:	f015 4f80 	tst.w	r5, #1073741824	@ 0x40000000
+20023c08:	bf1c      	itt	ne
+20023c0a:	eb07 2707 	addne.w	r7, r7, r7, lsl #8
+20023c0e:	f822 7c0e 	strhne.w	r7, [r2, #-14]
+20023c12:	f3c6 2707 	ubfx	r7, r6, #8, #8
+20023c16:	f015 5f00 	tst.w	r5, #536870912	@ 0x20000000
+20023c1a:	bf1c      	itt	ne
+20023c1c:	eb07 2e07 	addne.w	lr, r7, r7, lsl #8
+20023c20:	f822 ec0c 	strhne.w	lr, [r2, #-12]
+20023c24:	f015 5f80 	tst.w	r5, #268435456	@ 0x10000000
+20023c28:	bf1c      	itt	ne
+20023c2a:	eb07 2707 	addne.w	r7, r7, r7, lsl #8
+20023c2e:	f822 7c0a 	strhne.w	r7, [r2, #-10]
+20023c32:	f3c6 4707 	ubfx	r7, r6, #16, #8
+20023c36:	f015 6f00 	tst.w	r5, #134217728	@ 0x8000000
+20023c3a:	bf1c      	itt	ne
+20023c3c:	eb07 2e07 	addne.w	lr, r7, r7, lsl #8
+20023c40:	f822 ec08 	strhne.w	lr, [r2, #-8]
+20023c44:	f015 6f80 	tst.w	r5, #67108864	@ 0x4000000
+20023c48:	bf18      	it	ne
+20023c4a:	eb07 2707 	addne.w	r7, r7, r7, lsl #8
+20023c4e:	ea4f 6616 	mov.w	r6, r6, lsr #24
+20023c52:	bf18      	it	ne
+20023c54:	f822 7c06 	strhne.w	r7, [r2, #-6]
+20023c58:	01af      	lsls	r7, r5, #6
+20023c5a:	bf44      	itt	mi
+20023c5c:	eb06 2706 	addmi.w	r7, r6, r6, lsl #8
+20023c60:	f822 7c04 	strhmi.w	r7, [r2, #-4]
+20023c64:	01ed      	lsls	r5, r5, #7
+20023c66:	bf44      	itt	mi
+20023c68:	eb06 2606 	addmi.w	r6, r6, r6, lsl #8
+20023c6c:	f822 6c02 	strhmi.w	r6, [r2, #-2]
+20023c70:	e7ae      	b.n	20023bd0 <pico9918_output_sprites.constprop.0+0x19d0>
+20023c72:	250f      	movs	r5, #15
+20023c74:	950c      	str	r5, [sp, #48]	@ 0x30
+20023c76:	f7fe bd72 	b.w	2002275e <pico9918_output_sprites.constprop.0+0x55e>
+20023c7a:	250f      	movs	r5, #15
+20023c7c:	9510      	str	r5, [sp, #64]	@ 0x40
+20023c7e:	f7fe bd51 	b.w	20022724 <pico9918_output_sprites.constprop.0+0x524>
+20023c82:	2b00      	cmp	r3, #0
+20023c84:	f43f ab54 	beq.w	20023330 <pico9918_output_sprites.constprop.0+0x1130>
+20023c88:	4614      	mov	r4, r2
+20023c8a:	9a13      	ldr	r2, [sp, #76]	@ 0x4c
+20023c8c:	4322      	orrs	r2, r4
+20023c8e:	4c18      	ldr	r4, [pc, #96]	@ (20023cf0 <pico9918_output_sprites.constprop.0+0x1af0>)
+20023c90:	b2d2      	uxtb	r2, r2
+20023c92:	eb02 2202 	add.w	r2, r2, r2, lsl #8
+20023c96:	eb04 0441 	add.w	r4, r4, r1, lsl #1
+20023c9a:	2b00      	cmp	r3, #0
+20023c9c:	db04      	blt.n	20023ca8 <pico9918_output_sprites.constprop.0+0x1aa8>
+20023c9e:	005b      	lsls	r3, r3, #1
+20023ca0:	2b00      	cmp	r3, #0
+20023ca2:	f104 0402 	add.w	r4, r4, #2
+20023ca6:	dafa      	bge.n	20023c9e <pico9918_output_sprites.constprop.0+0x1a9e>
+20023ca8:	005b      	lsls	r3, r3, #1
+20023caa:	8022      	strh	r2, [r4, #0]
+20023cac:	f43f ab40 	beq.w	20023330 <pico9918_output_sprites.constprop.0+0x1130>
+20023cb0:	3402      	adds	r4, #2
+20023cb2:	e7f2      	b.n	20023c9a <pico9918_output_sprites.constprop.0+0x1a9a>
+20023cb4:	2b00      	cmp	r3, #0
+20023cb6:	f43f ab2d 	beq.w	20023314 <pico9918_output_sprites.constprop.0+0x1114>
+20023cba:	4611      	mov	r1, r2
+20023cbc:	9a12      	ldr	r2, [sp, #72]	@ 0x48
+20023cbe:	430a      	orrs	r2, r1
+20023cc0:	490b      	ldr	r1, [pc, #44]	@ (20023cf0 <pico9918_output_sprites.constprop.0+0x1af0>)
+20023cc2:	b2d2      	uxtb	r2, r2
+20023cc4:	eb02 2202 	add.w	r2, r2, r2, lsl #8
+20023cc8:	eb01 0140 	add.w	r1, r1, r0, lsl #1
+20023ccc:	2b00      	cmp	r3, #0
+20023cce:	db04      	blt.n	20023cda <pico9918_output_sprites.constprop.0+0x1ada>
+20023cd0:	005b      	lsls	r3, r3, #1
+20023cd2:	2b00      	cmp	r3, #0
+20023cd4:	f101 0102 	add.w	r1, r1, #2
+20023cd8:	dafa      	bge.n	20023cd0 <pico9918_output_sprites.constprop.0+0x1ad0>
+20023cda:	005b      	lsls	r3, r3, #1
+20023cdc:	800a      	strh	r2, [r1, #0]
+20023cde:	f43f ab19 	beq.w	20023314 <pico9918_output_sprites.constprop.0+0x1114>
+20023ce2:	3102      	adds	r1, #2
+20023ce4:	e7f2      	b.n	20023ccc <pico9918_output_sprites.constprop.0+0x1acc>
+20023ce6:	bf00      	nop
+20023ce8:	20005310 	.word	0x20005310
+20023cec:	200802e0 	.word	0x200802e0
+20023cf0:	2008064c 	.word	0x2008064c
+20023cf4:	200012a0 	.word	0x200012a0
+20023cf8:	220e      	movs	r2, #14
+20023cfa:	920c      	str	r2, [sp, #48]	@ 0x30
+20023cfc:	2202      	movs	r2, #2
+20023cfe:	920e      	str	r2, [sp, #56]	@ 0x38
+20023d00:	2200      	movs	r2, #0
+20023d02:	9212      	str	r2, [sp, #72]	@ 0x48
+20023d04:	f7ff ba5e 	b.w	200231c4 <pico9918_output_sprites.constprop.0+0xfc4>
+20023d08:	220e      	movs	r2, #14
+20023d0a:	920e      	str	r2, [sp, #56]	@ 0x38
+20023d0c:	2202      	movs	r2, #2
+20023d0e:	9210      	str	r2, [sp, #64]	@ 0x40
+20023d10:	2200      	movs	r2, #0
+20023d12:	9213      	str	r2, [sp, #76]	@ 0x4c
+20023d14:	f7fe bc76 	b.w	20022604 <pico9918_output_sprites.constprop.0+0x404>
+20023d18:	9c0b      	ldr	r4, [sp, #44]	@ 0x2c
+20023d1a:	4833      	ldr	r0, [pc, #204]	@ (20023de8 <pico9918_output_sprites.constprop.0+0x1be8>)
+20023d1c:	f8df c0cc 	ldr.w	ip, [pc, #204]	@ 20023dec <pico9918_output_sprites.constprop.0+0x1bec>
+20023d20:	eb00 0044 	add.w	r0, r0, r4, lsl #1
+20023d24:	9c1a      	ldr	r4, [sp, #104]	@ 0x68
+20023d26:	0f1d      	lsrs	r5, r3, #28
+20023d28:	d10a      	bne.n	20023d40 <pico9918_output_sprites.constprop.0+0x1b40>
+20023d2a:	011b      	lsls	r3, r3, #4
+20023d2c:	0f1d      	lsrs	r5, r3, #28
+20023d2e:	ea4f 1404 	mov.w	r4, r4, lsl #4
+20023d32:	ea4f 1101 	mov.w	r1, r1, lsl #4
+20023d36:	ea4f 1202 	mov.w	r2, r2, lsl #4
+20023d3a:	f100 0008 	add.w	r0, r0, #8
+20023d3e:	d0f4      	beq.n	20023d2a <pico9918_output_sprites.constprop.0+0x1b2a>
+20023d40:	0f26      	lsrs	r6, r4, #28
+20023d42:	0f0f      	lsrs	r7, r1, #28
+20023d44:	ea47 1706 	orr.w	r7, r7, r6, lsl #4
+20023d48:	0f16      	lsrs	r6, r2, #28
+20023d4a:	ea46 1607 	orr.w	r6, r6, r7, lsl #4
+20023d4e:	f85c 7026 	ldr.w	r7, [ip, r6, lsl #2]
+20023d52:	ea4e 0607 	orr.w	r6, lr, r7
+20023d56:	072f      	lsls	r7, r5, #28
+20023d58:	9600      	str	r6, [sp, #0]
+20023d5a:	d522      	bpl.n	20023da2 <pico9918_output_sprites.constprop.0+0x1ba2>
+20023d5c:	f89d 6000 	ldrb.w	r6, [sp]
+20023d60:	eb06 2606 	add.w	r6, r6, r6, lsl #8
+20023d64:	8006      	strh	r6, [r0, #0]
+20023d66:	076e      	lsls	r6, r5, #29
+20023d68:	d509      	bpl.n	20023d7e <pico9918_output_sprites.constprop.0+0x1b7e>
+20023d6a:	9e00      	ldr	r6, [sp, #0]
+20023d6c:	f3c6 2707 	ubfx	r7, r6, #8, #8
+20023d70:	f406 467f 	and.w	r6, r6, #65280	@ 0xff00
+20023d74:	9603      	str	r6, [sp, #12]
+20023d76:	463e      	mov	r6, r7
+20023d78:	9f03      	ldr	r7, [sp, #12]
+20023d7a:	443e      	add	r6, r7
+20023d7c:	8046      	strh	r6, [r0, #2]
+20023d7e:	07ae      	lsls	r6, r5, #30
+20023d80:	d505      	bpl.n	20023d8e <pico9918_output_sprites.constprop.0+0x1b8e>
+20023d82:	9e00      	ldr	r6, [sp, #0]
+20023d84:	f3c6 4607 	ubfx	r6, r6, #16, #8
+20023d88:	eb06 2606 	add.w	r6, r6, r6, lsl #8
+20023d8c:	8086      	strh	r6, [r0, #4]
+20023d8e:	07ef      	lsls	r7, r5, #31
+20023d90:	d40b      	bmi.n	20023daa <pico9918_output_sprites.constprop.0+0x1baa>
+20023d92:	011b      	lsls	r3, r3, #4
+20023d94:	f43f aabe 	beq.w	20023314 <pico9918_output_sprites.constprop.0+0x1114>
+20023d98:	0124      	lsls	r4, r4, #4
+20023d9a:	0109      	lsls	r1, r1, #4
+20023d9c:	0112      	lsls	r2, r2, #4
+20023d9e:	3008      	adds	r0, #8
+20023da0:	e7c1      	b.n	20023d26 <pico9918_output_sprites.constprop.0+0x1b26>
+20023da2:	076e      	lsls	r6, r5, #29
+20023da4:	d4e1      	bmi.n	20023d6a <pico9918_output_sprites.constprop.0+0x1b6a>
+20023da6:	07af      	lsls	r7, r5, #30
+20023da8:	d4eb      	bmi.n	20023d82 <pico9918_output_sprites.constprop.0+0x1b82>
+20023daa:	9d00      	ldr	r5, [sp, #0]
+20023dac:	0e2d      	lsrs	r5, r5, #24
+20023dae:	eb05 2505 	add.w	r5, r5, r5, lsl #8
+20023db2:	80c5      	strh	r5, [r0, #6]
+20023db4:	e7ed      	b.n	20023d92 <pico9918_output_sprites.constprop.0+0x1b92>
+20023db6:	b980      	cbnz	r0, 20023dda <pico9918_output_sprites.constprop.0+0x1bda>
+20023db8:	f002 0230 	and.w	r2, r2, #48	@ 0x30
+20023dbc:	9213      	str	r2, [sp, #76]	@ 0x4c
+20023dbe:	220f      	movs	r2, #15
+20023dc0:	9010      	str	r0, [sp, #64]	@ 0x40
+20023dc2:	920e      	str	r2, [sp, #56]	@ 0x38
+20023dc4:	f7fe bc1e 	b.w	20022604 <pico9918_output_sprites.constprop.0+0x404>
+20023dc8:	b950      	cbnz	r0, 20023de0 <pico9918_output_sprites.constprop.0+0x1be0>
+20023dca:	f002 0230 	and.w	r2, r2, #48	@ 0x30
+20023dce:	9212      	str	r2, [sp, #72]	@ 0x48
+20023dd0:	220f      	movs	r2, #15
+20023dd2:	900e      	str	r0, [sp, #56]	@ 0x38
+20023dd4:	920c      	str	r2, [sp, #48]	@ 0x30
+20023dd6:	f7ff b9f5 	b.w	200231c4 <pico9918_output_sprites.constprop.0+0xfc4>
+20023dda:	220f      	movs	r2, #15
+20023ddc:	920e      	str	r2, [sp, #56]	@ 0x38
+20023dde:	e795      	b.n	20023d0c <pico9918_output_sprites.constprop.0+0x1b0c>
+20023de0:	220f      	movs	r2, #15
+20023de2:	920c      	str	r2, [sp, #48]	@ 0x30
+20023de4:	e78a      	b.n	20023cfc <pico9918_output_sprites.constprop.0+0x1afc>
+20023de6:	bf00      	nop
+20023de8:	2008064c 	.word	0x2008064c
+20023dec:	200012a0 	.word	0x200012a0

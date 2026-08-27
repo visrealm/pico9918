@@ -1,0 +1,2263 @@
+<ADDR> <vrEmuTms9918OutputSprites>:
+push	{r4, r5, r6, r7, lr}
+mov	lr, fp
+mov	r7, sl
+mov	r6, r9
+mov	r5, r8
+push	{r5, r6, r7, lr}
+ldr	r3, [pc, #508]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldr	r2, [pc, #512]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	fp, r3
+ldr	r3, [r3, #0]
+sub	sp, #140	@ 0x8c
+ldrb	r1, [r3, r2]
+movs	r2, #1
+ands	r2, r1
+str	r2, [sp, #40]	@ 0x28
+ldr	r2, [r3, #40]	@ 0x28
+ldrh	r0, [r3, #32]
+str	r2, [sp, #80]	@ 0x50
+ldr	r2, [pc, #492]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r0, [sp, #4]
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #28
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r2, r0, #1
+str	r2, [sp, #4]
+movs	r2, #2
+ands	r2, r1
+ldr	r1, [sp, #40]	@ 0x28
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r2, #16
+str	r2, [sp, #64]	@ 0x40
+movs	r2, #0
+str	r2, [sp, #40]	@ 0x28
+adds	r2, #8
+str	r2, [sp, #48]	@ 0x30
+adds	r2, #247	@ 0xf7
+str	r2, [sp, #52]	@ 0x34
+ldrb	r1, [r3, #11]
+ldr	r2, [pc, #448]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r1, [sp, #92]	@ 0x5c
+ldrb	r2, [r3, r2]
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r2, #25
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #0
+movs	r0, #3
+str	r1, [sp, #92]	@ 0x5c
+adds	r1, #224	@ 0xe0
+str	r1, [sp, #60]	@ 0x3c
+ands	r0, r2
+cmp	r0, #3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [pc, #416]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r1, [r3, r1]
+cmp	r0, #1
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r0, #31
+ands	r0, r1
+movs	r1, #1
+str	r1, [sp, #104]	@ 0x68
+adds	r1, #14
+str	r1, [sp, #108]	@ 0x6c
+subs	r1, #14
+str	r0, [sp, #112]	@ 0x70
+str	r1, [sp, #32]
+ldr	r1, [pc, #388]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r0, [r3, r1]
+cmp	r0, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r4, #224	@ 0xe0
+ldr	r1, [pc, #380]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+lsls	r4, r4, #6
+ldrb	r1, [r3, r1]
+lsls	r1, r1, #11
+ands	r1, r4
+movs	r4, #128	@ 0x80
+str	r1, [sp, #88]	@ 0x58
+ldr	r1, [pc, #368]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+lsls	r4, r4, #4
+ldrb	r1, [r3, r1]
+str	r0, [sp, #24]
+lsrs	r1, r1, #6
+asrs	r4, r1
+str	r4, [sp, #96]	@ 0x60
+cmp	r0, #32
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #32
+str	r1, [sp, #24]
+movs	r1, #1
+lsls	r2, r2, #28
+lsrs	r2, r2, #31
+eors	r2, r1
+ldr	r1, [pc, #344]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r2, [sp, #36]	@ 0x24
+movs	r7, r3
+ldrb	r3, [r3, r1]
+movs	r1, #254	@ 0xfe
+movs	r2, #31
+lsls	r3, r3, #7
+lsls	r1, r1, #6
+ands	r3, r1
+adds	r7, #44	@ 0x2c
+adds	r4, r7, r3
+movs	r3, #0
+str	r2, [sp, #12]
+movs	r2, #0
+mov	sl, fp
+mov	fp, r3
+str	r2, [sp, #8]
+ldr	r2, [pc, #312]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r3, [sp, #100]	@ 0x64
+str	r2, [sp, #84]	@ 0x54
+ldr	r2, [pc, #312]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r2, [sp, #56]	@ 0x38
+ldr	r2, [pc, #312]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r2, [sp, #116]	@ 0x74
+ldr	r3, [r4, #0]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, sl
+ldr	r3, [r3, #0]
+ldrb	r3, [r3, #11]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldrb	r3, [r4, #0]
+cmp	r3, #208	@ 0xd0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #36]	@ 0x24
+adds	r3, r3, r2
+ldr	r2, [sp, #60]	@ 0x3c
+cmp	r3, r2
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #4]
+subs	r3, #1
+subs	r3, #255	@ 0xff
+subs	r3, r2, r3
+mov	r2, sl
+ldr	r2, [r2, #0]
+ldrb	r7, [r4, #3]
+str	r2, [sp, #0]
+ldrb	r1, [r2, #11]
+asrs	r3, r3, #1
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r0, #0
+movs	r2, #112	@ 0x70
+str	r0, [sp, #28]
+ldr	r0, [sp, #64]	@ 0x40
+ldr	r5, [sp, #40]	@ 0x28
+bics	r7, r2
+str	r0, [sp, #16]
+ldr	r2, [sp, #48]	@ 0x30
+ldr	r0, [sp, #52]	@ 0x34
+str	r5, [sp, #20]
+cmp	r3, r2
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r6, [sp, #8]
+adds	r6, #1
+str	r6, [sp, #8]
+cmp	r6, #4
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #0]
+ldr	r6, [pc, #204]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r6, [r5, r6]
+ldr	r5, [sp, #12]
+lsls	r5, r5, #25
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [pc, #192]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldr	r5, [sp, #0]
+ldrb	r1, [r5, r1]
+lsls	r1, r1, #28
+bmi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [sp, #8]
+cmp	r1, r6
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #31
+ldr	r5, [sp, #12]
+mov	r2, fp
+bics	r5, r3
+movs	r3, r5
+orrs	r3, r2
+movs	r2, #64	@ 0x40
+orrs	r3, r2
+uxtb	r3, r3
+str	r3, [sp, #12]
+ldr	r3, [sp, #100]	@ 0x64
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [pc, #132]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldr	r2, [pc, #148]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+movs	r1, r3
+orrs	r1, r2
+lsls	r1, r1, #29
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [r2, #0]
+ldr	r0, [r3, #0]
+ldr	r4, [r2, #4]
+eors	r0, r1
+ldr	r1, [r3, #4]
+str	r0, [r3, #0]
+eors	r1, r4
+ldr	r0, [r3, #8]
+str	r1, [r3, #4]
+ldr	r1, [r2, #8]
+ldr	r4, [r2, #12]
+eors	r0, r1
+ldr	r1, [r3, #12]
+str	r0, [r3, #8]
+eors	r1, r4
+ldr	r0, [r3, #16]
+str	r1, [r3, #12]
+ldr	r1, [r2, #16]
+ldr	r4, [r2, #20]
+eors	r0, r1
+ldr	r1, [r3, #20]
+str	r0, [r3, #16]
+eors	r1, r4
+ldr	r0, [r3, #24]
+str	r1, [r3, #20]
+ldr	r1, [r2, #24]
+ldr	r2, [r2, #28]
+eors	r0, r1
+ldr	r1, [r3, #28]
+str	r0, [r3, #24]
+eors	r2, r1
+str	r2, [r3, #28]
+ldr	r0, [sp, #12]
+add	sp, #140	@ 0x8c
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+str	r2, [sp, #48]	@ 0x30
+movs	r2, #8
+str	r2, [sp, #36]	@ 0x24
+adds	r2, #247	@ 0xf7
+str	r2, [sp, #44]	@ 0x2c
+ldrb	r1, [r3, #11]
+ldr	r2, [pc, #632]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r1, [sp, #72]	@ 0x48
+ldrb	r2, [r3, r2]
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r2, #25
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #0
+str	r1, [sp, #72]	@ 0x48
+adds	r1, #224	@ 0xe0
+str	r1, [sp, #56]	@ 0x38
+movs	r1, #3
+ands	r1, r2
+cmp	r1, #3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [pc, #600]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r0, [r3, r0]
+cmp	r1, #1
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #48	@ 0x30
+ands	r1, r0
+str	r1, [sp, #96]	@ 0x60
+movs	r1, #0
+str	r1, [sp, #76]	@ 0x4c
+adds	r1, #15
+str	r1, [sp, #88]	@ 0x58
+movs	r1, #0
+str	r1, [sp, #28]
+ldr	r1, [pc, #564]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r0, [r3, r1]
+cmp	r0, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r4, #224	@ 0xe0
+ldr	r1, [pc, #556]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+lsls	r4, r4, #6
+ldrb	r1, [r3, r1]
+lsls	r1, r1, #11
+ands	r1, r4
+movs	r4, #128	@ 0x80
+str	r1, [sp, #68]	@ 0x44
+ldr	r1, [pc, #544]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+lsls	r4, r4, #4
+ldrb	r1, [r3, r1]
+str	r0, [sp, #16]
+lsrs	r1, r1, #6
+asrs	r4, r1
+str	r4, [sp, #64]	@ 0x40
+cmp	r0, #32
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #32
+str	r1, [sp, #16]
+movs	r1, #1
+lsls	r2, r2, #28
+lsrs	r2, r2, #31
+eors	r2, r1
+ldr	r1, [pc, #520]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r2, [sp, #32]
+movs	r6, r3
+ldrb	r3, [r3, r1]
+movs	r1, #254	@ 0xfe
+lsls	r3, r3, #7
+lsls	r1, r1, #6
+ands	r3, r1
+adds	r6, #44	@ 0x2c
+adds	r4, r6, r3
+movs	r3, #0
+mov	sl, r3
+str	r3, [sp, #84]	@ 0x54
+adds	r3, #31
+str	r3, [sp, #12]
+movs	r3, #0
+str	r3, [sp, #0]
+ldr	r3, [pc, #488]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [pc, #488]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r3, [sp, #108]	@ 0x6c
+ldr	r3, [pc, #488]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r3, [sp, #104]	@ 0x68
+ldr	r3, [r4, #0]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, fp
+ldr	r3, [r3, #0]
+ldrb	r3, [r3, #11]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldrb	r3, [r4, #0]
+cmp	r3, #208	@ 0xd0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #32]
+adds	r3, r3, r2
+ldr	r2, [sp, #56]	@ 0x38
+cmp	r3, r2
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #4]
+subs	r3, #1
+subs	r3, #255	@ 0xff
+subs	r3, r2, r3
+mov	r2, fp
+ldr	r5, [r2, #0]
+ldrb	r7, [r4, #3]
+ldrb	r2, [r5, #11]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #112	@ 0x70
+bics	r7, r1
+movs	r1, #0
+ldr	r0, [sp, #36]	@ 0x24
+ldr	r6, [sp, #48]	@ 0x30
+mov	r8, r0
+str	r1, [sp, #24]
+ldr	r1, [sp, #44]	@ 0x2c
+str	r6, [sp, #20]
+str	r0, [sp, #8]
+cmp	r3, r8
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #0]
+adds	r0, #1
+str	r0, [sp, #0]
+cmp	r0, #4
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [pc, #392]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldr	r6, [sp, #12]
+ldrb	r0, [r5, r0]
+lsls	r6, r6, #25
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [pc, #376]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r2, [r5, r2]
+lsls	r2, r2, #28
+bmi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #0]
+cmp	r2, r0
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #31
+ldr	r6, [sp, #12]
+mov	r2, sl
+bics	r6, r3
+movs	r3, r6
+orrs	r3, r2
+movs	r2, #64	@ 0x40
+orrs	r3, r2
+uxtb	r3, r3
+str	r3, [sp, #12]
+ldr	r3, [sp, #84]	@ 0x54
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [pc, #316]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldr	r2, [pc, #332]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+movs	r1, r3
+orrs	r1, r2
+lsls	r1, r1, #29
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [r3, #0]
+ldr	r0, [r2, #0]
+ldr	r4, [r3, #4]
+eors	r0, r1
+ldr	r1, [r2, #4]
+str	r0, [r3, #0]
+eors	r1, r4
+ldr	r0, [r2, #8]
+str	r1, [r3, #4]
+ldr	r1, [r3, #8]
+ldr	r4, [r3, #12]
+eors	r0, r1
+ldr	r1, [r2, #12]
+str	r0, [r3, #8]
+eors	r1, r4
+ldr	r0, [r2, #16]
+str	r1, [r3, #12]
+ldr	r1, [r3, #16]
+ldr	r4, [r3, #20]
+eors	r0, r1
+ldr	r1, [r2, #20]
+str	r0, [r3, #16]
+eors	r1, r4
+ldr	r0, [r3, #24]
+str	r1, [r3, #20]
+ldr	r1, [r2, #24]
+ldr	r2, [r2, #28]
+eors	r1, r0
+ldr	r0, [r3, #28]
+str	r1, [r3, #24]
+eors	r2, r0
+str	r2, [r3, #28]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r2, #1
+str	r2, [sp, #48]	@ 0x30
+adds	r2, #15
+str	r2, [sp, #36]	@ 0x24
+adds	r2, #236	@ 0xec
+str	r2, [sp, #44]	@ 0x2c
+ldrb	r1, [r3, #11]
+ldr	r2, [pc, #196]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r1, [sp, #72]	@ 0x48
+ldrb	r2, [r3, r2]
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+str	r1, [sp, #76]	@ 0x4c
+movs	r1, #15
+str	r1, [sp, #88]	@ 0x58
+movs	r1, #0
+str	r1, [sp, #28]
+adds	r1, #224	@ 0xe0
+str	r1, [sp, #56]	@ 0x38
+movs	r1, #0
+str	r1, [sp, #96]	@ 0x60
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r2, #32
+str	r2, [sp, #64]	@ 0x40
+subs	r2, #16
+str	r2, [sp, #48]	@ 0x30
+adds	r2, #236	@ 0xec
+str	r2, [sp, #52]	@ 0x34
+ldrb	r1, [r3, #11]
+ldr	r2, [pc, #148]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r1, [sp, #92]	@ 0x5c
+ldrb	r2, [r3, r2]
+cmp	r1, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+str	r1, [sp, #104]	@ 0x68
+movs	r1, #15
+str	r1, [sp, #108]	@ 0x6c
+movs	r1, #0
+str	r1, [sp, #32]
+adds	r1, #224	@ 0xe0
+str	r1, [sp, #60]	@ 0x3c
+movs	r1, #0
+str	r1, [sp, #112]	@ 0x70
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #240	@ 0xf0
+str	r1, [sp, #56]	@ 0x38
+movs	r1, #3
+ands	r1, r2
+cmp	r1, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #14
+str	r1, [sp, #88]	@ 0x58
+subs	r1, #11
+str	r1, [sp, #28]
+movs	r1, #2
+str	r1, [sp, #76]	@ 0x4c
+movs	r1, #0
+str	r1, [sp, #96]	@ 0x60
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #240	@ 0xf0
+movs	r0, #3
+str	r1, [sp, #60]	@ 0x3c
+ands	r0, r2
+cmp	r0, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #14
+str	r1, [sp, #108]	@ 0x6c
+subs	r1, #11
+str	r1, [sp, #32]
+movs	r1, #2
+str	r1, [sp, #104]	@ 0x68
+movs	r1, #0
+str	r1, [sp, #112]	@ 0x70
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, r9
+movs	r3, #1
+add	sl, r3
+ldr	r3, [sp, #16]
+adds	r4, #4
+cmp	r3, sl
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #92]	@ 0x5c
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+adds	r3, #208	@ 0xd0
+ldr	r2, [sp, #4]
+subs	r3, r2, r3
+bmi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #1
+add	fp, r3
+ldr	r3, [sp, #24]
+adds	r4, #4
+cmp	r3, fp
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r1, #31
+ldr	r5, [sp, #12]
+bics	r5, r1
+movs	r1, r5
+mov	r5, fp
+orrs	r1, r5
+movs	r5, #64	@ 0x40
+mov	ip, r5
+mov	r5, ip
+orrs	r1, r5
+uxtb	r1, r1
+str	r1, [sp, #12]
+ldr	r1, [sp, #8]
+cmp	r1, r6
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldrb	r1, [r4, #1]
+mov	r8, r1
+sxtb	r1, r7
+cmp	r1, #0
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r1, r8
+negs	r1, r1
+str	r1, [sp, #44]	@ 0x2c
+lsls	r1, r7, #26
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+subs	r3, r2, r3
+subs	r3, #1
+ldrb	r6, [r4, #2]
+ldr	r2, [sp, #88]	@ 0x58
+ands	r6, r0
+lsls	r6, r6, #3
+adds	r6, r6, r2
+adds	r6, r6, r3
+add	r3, sp, #124	@ 0x7c
+movs	r0, r3
+movs	r2, #12
+movs	r1, #0
+mov	r9, r3
+uxth	r6, r6
+bl	<ADDR> <__wrap_memset>
+lsls	r3, r7, #25
+bmi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #20]
+ldr	r2, [pc, #856]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #0]
+ldr	r5, [sp, #32]
+adds	r3, r0, r6
+movs	r1, r3
+adds	r3, #60	@ 0x3c
+adds	r1, #44	@ 0x2c
+ldrb	r1, [r1, #0]
+ldrb	r3, [r3, #0]
+ldrb	r1, [r2, r1]
+ldrb	r3, [r2, r3]
+lsls	r1, r1, #16
+lsls	r3, r3, #24
+orrs	r3, r1
+str	r3, [sp, #124]	@ 0x7c
+cmp	r5, #1
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [sp, #96]	@ 0x60
+mov	ip, r1
+add	r6, ip
+adds	r1, r0, r6
+movs	r0, r1
+adds	r1, #60	@ 0x3c
+adds	r0, #44	@ 0x2c
+ldrb	r0, [r0, #0]
+ldrb	r1, [r1, #0]
+ldrb	r0, [r2, r0]
+ldrb	r1, [r2, r1]
+lsls	r0, r0, #16
+lsls	r1, r1, #24
+orrs	r1, r0
+str	r1, [sp, #128]	@ 0x80
+orrs	r3, r1
+cmp	r5, #3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #0]
+add	r6, ip
+adds	r1, r0, r6
+movs	r0, r1
+adds	r1, #60	@ 0x3c
+adds	r0, #44	@ 0x2c
+ldrb	r0, [r0, #0]
+ldrb	r1, [r1, #0]
+ldrb	r0, [r2, r0]
+ldrb	r1, [r2, r1]
+lsls	r2, r0, #16
+lsls	r1, r1, #24
+orrs	r2, r1
+str	r2, [sp, #132]	@ 0x84
+orrs	r3, r2
+ldr	r2, [sp, #28]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r2, r3, #24
+lsls	r3, r3, #8
+lsrs	r3, r3, #24
+ldr	r0, [sp, #84]	@ 0x54
+lsls	r2, r2, #1
+ldrh	r1, [r0, r2]
+lsls	r3, r3, #1
+ldrh	r3, [r0, r3]
+lsls	r1, r1, #16
+orrs	r1, r3
+mov	r3, r8
+cmp	r3, #0
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r2, r8
+movs	r3, #128	@ 0x80
+movs	r0, #31
+movs	r6, #32
+lsls	r3, r3, #1
+ands	r0, r2
+subs	r3, r3, r2
+subs	r2, r6, r0
+str	r2, [sp, #28]
+ldr	r2, [sp, #16]
+cmp	r3, r2
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r8
+lsrs	r3, r3, #5
+str	r3, [sp, #68]	@ 0x44
+movs	r3, r1
+lsrs	r3, r0
+mov	ip, r3
+ldr	r2, [sp, #108]	@ 0x6c
+ldr	r3, [sp, #104]	@ 0x68
+ands	r2, r7
+lsls	r2, r3
+mov	r5, ip
+str	r2, [sp, #72]	@ 0x48
+ldr	r2, [sp, #68]	@ 0x44
+ldr	r6, [sp, #56]	@ 0x38
+lsls	r3, r2, #2
+str	r3, [sp, #44]	@ 0x2c
+ldr	r3, [r6, r3]
+ldr	r7, [sp, #44]	@ 0x2c
+bics	r5, r3
+str	r5, [sp, #76]	@ 0x4c
+mov	r5, ip
+orrs	r3, r5
+str	r3, [r6, r7]
+ldr	r5, [sp, #16]
+ldr	r3, [sp, #76]	@ 0x4c
+ldr	r7, [sp, #28]
+lsls	r3, r0
+cmp	r5, r7
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r2, #1
+lsls	r2, r2, #2
+ldr	r5, [r6, r2]
+movs	r6, r1
+lsls	r6, r7
+movs	r7, r5
+mov	ip, r6
+orrs	r5, r6
+movs	r6, r2
+str	r5, [sp, #76]	@ 0x4c
+ldr	r2, [sp, #76]	@ 0x4c
+ldr	r5, [sp, #56]	@ 0x38
+str	r2, [r6, r5]
+mov	r2, ip
+ldr	r5, [sp, #28]
+bics	r2, r7
+lsrs	r2, r5
+orrs	r3, r2
+cmp	r1, r3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #32
+ldr	r2, [sp, #12]
+orrs	r2, r1
+str	r2, [sp, #12]
+ldr	r2, [sp, #32]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #72]	@ 0x48
+cmp	r5, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #1
+ldr	r2, [sp, #0]
+strb	r1, [r2, #18]
+ldr	r1, [pc, #556]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldr	r2, [sp, #112]	@ 0x70
+ldrb	r1, [r1, #0]
+orrs	r5, r2
+movs	r2, r5
+cmp	r1, #4
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [sp, #80]	@ 0x50
+add	r1, r8
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r3, #0
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r3, r3, #1
+adds	r1, #1
+cmp	r3, #0
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r2, [r1, #0]
+lsls	r3, r3, #1
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r1, #1
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r2, #31
+ldr	r6, [sp, #12]
+bics	r6, r2
+movs	r2, r6
+mov	r6, sl
+orrs	r2, r6
+movs	r6, #64	@ 0x40
+orrs	r2, r6
+uxtb	r2, r2
+str	r2, [sp, #12]
+ldr	r2, [sp, #0]
+cmp	r2, r0
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldrb	r2, [r4, #1]
+mov	r9, r2
+sxtb	r2, r7
+cmp	r2, #0
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r2, r9
+negs	r2, r2
+str	r2, [sp, #40]	@ 0x28
+lsls	r2, r7, #26
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r2, r8
+subs	r3, r2, r3
+subs	r3, #1
+ldrb	r6, [r4, #2]
+ldr	r2, [sp, #68]	@ 0x44
+ands	r6, r1
+lsls	r6, r6, #3
+adds	r6, r6, r2
+adds	r6, r6, r3
+add	r3, sp, #124	@ 0x7c
+movs	r0, r3
+movs	r2, #12
+movs	r1, #0
+str	r3, [sp, #60]	@ 0x3c
+uxth	r6, r6
+bl	<ADDR> <__wrap_memset>
+lsls	r3, r7, #25
+bmi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #20]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r2, r5, r6
+movs	r1, r2
+adds	r2, #60	@ 0x3c
+adds	r1, #44	@ 0x2c
+ldr	r3, [pc, #396]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r1, [r1, #0]
+ldrb	r2, [r2, #0]
+ldrb	r0, [r3, r1]
+ldrb	r1, [r3, r2]
+lsls	r0, r0, #16
+lsls	r1, r1, #24
+ldr	r2, [sp, #28]
+orrs	r1, r0
+str	r1, [sp, #124]	@ 0x7c
+cmp	r2, #1
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #64]	@ 0x40
+mov	ip, r0
+add	r6, ip
+adds	r2, r5, r6
+movs	r0, r2
+adds	r2, #60	@ 0x3c
+adds	r0, #44	@ 0x2c
+ldrb	r0, [r0, #0]
+ldrb	r2, [r2, #0]
+ldrb	r0, [r3, r0]
+ldrb	r2, [r3, r2]
+lsls	r0, r0, #16
+lsls	r2, r2, #24
+orrs	r2, r0
+str	r2, [sp, #128]	@ 0x80
+orrs	r1, r2
+ldr	r2, [sp, #28]
+cmp	r2, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+add	r6, ip
+adds	r2, r5, r6
+movs	r0, r2
+adds	r2, #60	@ 0x3c
+adds	r0, #44	@ 0x2c
+ldrb	r0, [r0, #0]
+ldrb	r2, [r2, #0]
+ldrb	r0, [r3, r0]
+ldrb	r2, [r3, r2]
+lsls	r3, r0, #16
+lsls	r2, r2, #24
+orrs	r3, r2
+ldr	r2, [sp, #24]
+str	r3, [sp, #132]	@ 0x84
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+cmp	r3, #0
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [pc, #296]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r2, r9
+movs	r3, #128	@ 0x80
+movs	r0, #31
+movs	r6, #32
+ands	r0, r2
+lsls	r3, r3, #1
+subs	r3, r3, r2
+subs	r2, r6, r0
+str	r0, [sp, #24]
+str	r2, [sp, #20]
+cmp	r3, r8
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+lsrs	r3, r3, #5
+mov	r8, r3
+movs	r3, r1
+lsrs	r3, r0
+mov	ip, r3
+ldr	r2, [sp, #88]	@ 0x58
+ldr	r3, [sp, #76]	@ 0x4c
+ands	r2, r7
+lsls	r2, r3
+mov	r3, r8
+str	r2, [sp, #40]	@ 0x28
+mov	r2, ip
+ldr	r7, [sp, #52]	@ 0x34
+lsls	r3, r3, #2
+movs	r6, r3
+str	r3, [sp, #92]	@ 0x5c
+ldr	r3, [r7, r3]
+bics	r2, r3
+movs	r0, r2
+mov	r2, ip
+orrs	r3, r2
+str	r3, [r7, r6]
+movs	r3, r0
+ldr	r2, [sp, #24]
+ldr	r0, [sp, #20]
+lsls	r3, r2
+ldr	r2, [sp, #8]
+cmp	r2, r0
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r6, #1
+add	r6, r8
+lsls	r6, r6, #2
+ldr	r2, [r7, r6]
+movs	r7, r1
+lsls	r7, r0
+movs	r0, r2
+mov	ip, r7
+orrs	r2, r7
+movs	r7, r6
+str	r2, [sp, #100]	@ 0x64
+ldr	r6, [sp, #100]	@ 0x64
+ldr	r2, [sp, #52]	@ 0x34
+str	r6, [r7, r2]
+mov	r6, ip
+bics	r6, r0
+movs	r2, r6
+ldr	r6, [sp, #20]
+lsrs	r2, r6
+orrs	r3, r2
+cmp	r1, r3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #32
+ldr	r2, [sp, #12]
+orrs	r2, r1
+str	r2, [sp, #12]
+ldr	r2, [sp, #28]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #1
+mov	r2, r9
+strb	r1, [r5, #18]
+movs	r5, #3
+ands	r5, r2
+lsrs	r3, r5
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #96]	@ 0x60
+ldr	r1, [sp, #40]	@ 0x28
+ldr	r6, [sp, #28]
+orrs	r1, r2
+uxtb	r2, r1
+ldr	r1, [sp, #104]	@ 0x68
+lsls	r2, r2, #2
+ldr	r2, [r2, r1]
+ldr	r1, [sp, #124]	@ 0x7c
+mov	ip, r2
+ldr	r2, [sp, #60]	@ 0x3c
+lsrs	r1, r5
+ldr	r0, [r2, #4]
+mov	r2, r9
+lsrs	r0, r5
+asrs	r2, r2, #2
+cmp	r6, #2
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r6, #3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #80]	@ 0x50
+lsls	r2, r2, #2
+adds	r2, r0, r2
+ldr	r0, [pc, #84]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r5, ip
+movs	r6, r0
+ldr	r0, [pc, #84]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r9, r4
+mov	ip, r0
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r0, r3, #28
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r0, r3, #28
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r4, r1, #28
+lsls	r4, r4, #2
+ldr	r4, [r6, r4]
+ldr	r7, [r2, #0]
+orrs	r4, r5
+eors	r4, r7
+mov	r8, r4
+mov	r4, ip
+lsls	r0, r0, #2
+ldr	r0, [r4, r0]
+mov	r4, r8
+ands	r0, r4
+eors	r0, r7
+str	r0, [r2, #0]
+lsls	r3, r3, #4
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r1, #4
+adds	r2, #4
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldr	r1, [pc, #824]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldr	r2, [sp, #60]	@ 0x3c
+ldr	r0, [sp, #40]	@ 0x28
+ldr	r3, [r2, #8]
+lsls	r3, r0
+str	r3, [r2, #8]
+ldr	r2, [sp, #60]	@ 0x3c
+ldr	r0, [sp, #40]	@ 0x28
+ldr	r3, [r2, #4]
+lsls	r3, r0
+str	r3, [r2, #4]
+ldr	r3, [sp, #124]	@ 0x7c
+ldr	r2, [sp, #40]	@ 0x28
+lsls	r3, r2
+lsls	r1, r2
+str	r3, [sp, #124]	@ 0x7c
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #8]
+mov	ip, r1
+add	r3, r9
+uxtb	r3, r3
+str	r3, [sp, #8]
+movs	r3, #32
+str	r3, [sp, #20]
+movs	r3, #0
+mov	r8, r3
+mov	r9, r3
+str	r3, [sp, #24]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #72]	@ 0x48
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #32]
+adds	r3, #208	@ 0xd0
+ldr	r2, [sp, #4]
+subs	r3, r2, r3
+bpl.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r2, fp
+ldr	r5, [r2, #0]
+ldrb	r7, [r4, #3]
+ldrb	r2, [r5, #11]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r7, #27
+bmi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [sp, #36]	@ 0x24
+cmp	r1, #16
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #0
+movs	r0, #16
+str	r1, [sp, #24]
+adds	r1, #16
+mov	r8, r1
+str	r2, [sp, #20]
+adds	r1, #236	@ 0xec
+str	r0, [sp, #8]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r2, r7, #27
+bmi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #40]	@ 0x28
+ldr	r0, [sp, #64]	@ 0x40
+str	r5, [sp, #20]
+movs	r5, #0
+str	r0, [sp, #16]
+ldr	r2, [sp, #48]	@ 0x30
+ldr	r0, [sp, #52]	@ 0x34
+str	r5, [sp, #28]
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r5, r8
+movs	r1, #32
+subs	r1, r1, r5
+ldr	r5, [sp, #16]
+str	r1, [sp, #44]	@ 0x2c
+cmp	r1, r5
+ble.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #32
+negs	r1, r1
+add	r8, r1
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r2, #32
+mov	r0, r9
+subs	r2, r2, r0
+str	r2, [sp, #40]	@ 0x28
+cmp	r2, r8
+ble.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r2, #32
+negs	r2, r2
+add	r9, r2
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #48]	@ 0x30
+cmp	r2, #16
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r0, #0
+str	r0, [sp, #28]
+adds	r0, #32
+str	r0, [sp, #16]
+movs	r2, #16
+str	r1, [sp, #20]
+adds	r0, #220	@ 0xdc
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #255	@ 0xff
+movs	r2, #255	@ 0xff
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #20]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #0]
+adds	r2, r0, r6
+movs	r3, r2
+adds	r2, #44	@ 0x2c
+adds	r3, #60	@ 0x3c
+ldrb	r3, [r3, #0]
+ldrb	r2, [r2, #0]
+lsls	r3, r3, #16
+lsls	r2, r2, #24
+orrs	r3, r2
+ldr	r2, [sp, #32]
+str	r3, [sp, #124]	@ 0x7c
+cmp	r2, #1
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #96]	@ 0x60
+adds	r6, r6, r5
+adds	r0, r0, r6
+movs	r1, r0
+adds	r0, #44	@ 0x2c
+adds	r1, #60	@ 0x3c
+ldrb	r1, [r1, #0]
+ldrb	r0, [r0, #0]
+lsls	r1, r1, #16
+lsls	r0, r0, #24
+orrs	r1, r0
+str	r1, [sp, #128]	@ 0x80
+orrs	r3, r1
+cmp	r2, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #0]
+adds	r2, r6, r5
+adds	r2, r0, r2
+movs	r1, r2
+adds	r2, #44	@ 0x2c
+adds	r1, #60	@ 0x3c
+ldrb	r1, [r1, #0]
+ldrb	r2, [r2, #0]
+lsls	r1, r1, #16
+lsls	r2, r2, #24
+orrs	r2, r1
+str	r2, [sp, #132]	@ 0x84
+orrs	r3, r2
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #20]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r3, r5, r6
+movs	r2, r3
+adds	r3, #44	@ 0x2c
+adds	r2, #60	@ 0x3c
+ldrb	r1, [r2, #0]
+ldrb	r3, [r3, #0]
+lsls	r1, r1, #16
+lsls	r3, r3, #24
+orrs	r1, r3
+ldr	r3, [sp, #28]
+str	r1, [sp, #124]	@ 0x7c
+cmp	r3, #1
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+adds	r6, r6, r3
+adds	r0, r5, r6
+movs	r2, r0
+adds	r0, #44	@ 0x2c
+adds	r2, #60	@ 0x3c
+ldrb	r2, [r2, #0]
+ldrb	r0, [r0, #0]
+lsls	r2, r2, #16
+lsls	r0, r0, #24
+ldr	r3, [sp, #28]
+orrs	r2, r0
+str	r2, [sp, #128]	@ 0x80
+orrs	r1, r2
+cmp	r3, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+adds	r3, r6, r3
+adds	r3, r5, r3
+movs	r2, r3
+adds	r3, #44	@ 0x2c
+adds	r2, #60	@ 0x3c
+ldrb	r2, [r2, #0]
+ldrb	r3, [r3, #0]
+lsls	r2, r2, #16
+lsls	r3, r3, #24
+orrs	r3, r2
+ldr	r2, [sp, #24]
+str	r3, [sp, #132]	@ 0x84
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+orrs	r1, r3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+cmp	r3, #0
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #1
+ldr	r2, [sp, #0]
+strb	r1, [r2, #18]
+ldr	r2, [sp, #112]	@ 0x70
+ldr	r1, [sp, #72]	@ 0x48
+orrs	r1, r2
+uxtb	r2, r1
+ldr	r1, [sp, #116]	@ 0x74
+lsls	r2, r2, #2
+ldr	r2, [r2, r1]
+ldr	r1, [sp, #124]	@ 0x7c
+mov	ip, r2
+mov	r2, r9
+ldr	r7, [r2, #8]
+ldr	r5, [r2, #4]
+ldr	r2, [sp, #20]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r6, [sp, #80]	@ 0x50
+ldr	r2, [sp, #32]
+add	r6, r8
+cmp	r2, #2
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [pc, #328]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r4, [sp, #16]
+str	r2, [sp, #0]
+movs	r2, #16
+mov	r8, r2
+lsrs	r2, r3, #24
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #32]
+cmp	r0, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r0, #0
+mov	r9, r0
+mov	r4, r9
+lsrs	r0, r1, #28
+orrs	r0, r4
+ldr	r4, [sp, #0]
+lsls	r0, r0, #2
+ldr	r0, [r4, r0]
+mov	r4, ip
+orrs	r0, r4
+movs	r4, #128	@ 0x80
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #0]
+movs	r4, #64	@ 0x40
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #1]
+lsrs	r4, r0, #8
+mov	r9, r4
+movs	r4, #32
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, r9
+strb	r4, [r6, #2]
+mov	r4, r8
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, r9
+strb	r4, [r6, #3]
+lsrs	r4, r0, #16
+mov	r9, r4
+movs	r4, #8
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, r9
+strb	r4, [r6, #4]
+movs	r4, #4
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, r9
+strb	r4, [r6, #5]
+movs	r4, #2
+lsrs	r0, r0, #24
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #6]
+movs	r4, #1
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #7]
+lsls	r3, r3, #8
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r7, r7, #4
+lsls	r5, r5, #4
+lsls	r1, r1, #4
+adds	r6, #8
+lsrs	r2, r3, #24
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r7, r7, #4
+lsls	r5, r5, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #8
+adds	r6, #8
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #40]	@ 0x28
+cmp	r0, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, #1
+strb	r1, [r5, #18]
+ldr	r1, [sp, #108]	@ 0x6c
+ldr	r2, [sp, #96]	@ 0x60
+ldrb	r1, [r1, #0]
+orrs	r0, r2
+movs	r2, r0
+cmp	r1, #4
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [sp, #80]	@ 0x50
+add	r1, r9
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r3, #0
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r3, r3, #1
+adds	r1, #1
+cmp	r3, #0
+bge.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r2, [r1, #0]
+lsls	r3, r3, #1
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r1, #1
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r0, r7, #28
+lsls	r0, r0, #8
+movs	r4, r0
+lsrs	r0, r5, #28
+lsls	r0, r0, #4
+orrs	r4, r0
+mov	r9, r4
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #44]	@ 0x2c
+asrs	r2, r3, #1
+ldr	r3, [sp, #32]
+cmp	r3, #2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r3, #3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+ldr	r3, [r3, #8]
+mov	r0, r9
+lsls	r3, r2
+str	r3, [r0, #8]
+mov	r3, r9
+ldr	r3, [r3, #4]
+mov	r0, r9
+lsls	r3, r2
+str	r3, [r0, #4]
+ldr	r3, [sp, #124]	@ 0x7c
+lsls	r3, r2
+str	r3, [sp, #124]	@ 0x7c
+ldr	r3, [sp, #44]	@ 0x2c
+lsls	r1, r3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #16]
+mov	ip, r1
+add	r3, r8
+uxtb	r3, r3
+str	r3, [sp, #16]
+movs	r3, #32
+str	r3, [sp, #28]
+movs	r3, #0
+movs	r0, #0
+mov	r8, r3
+str	r3, [sp, #68]	@ 0x44
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #24]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+cmp	r3, #0
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+adds	r3, r5, r6
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+ldr	r2, [pc, #788]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+ldrb	r1, [r2, r3]
+ldr	r3, [sp, #28]
+lsls	r1, r1, #24
+str	r1, [sp, #124]	@ 0x7c
+cmp	r3, #1
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+adds	r6, r6, r3
+adds	r6, r5, r6
+movs	r3, r6
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #24
+str	r3, [sp, #128]	@ 0x80
+orrs	r1, r3
+ldr	r3, [sp, #28]
+cmp	r3, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+adds	r6, r6, r3
+adds	r6, #44	@ 0x2c
+ldrb	r3, [r6, #0]
+ldrb	r3, [r2, r3]
+ldr	r2, [sp, #24]
+lsls	r3, r3, #24
+str	r3, [sp, #132]	@ 0x84
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #0]
+ldr	r1, [sp, #32]
+adds	r3, r5, r6
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+lsls	r3, r3, #24
+str	r3, [sp, #124]	@ 0x7c
+cmp	r1, #1
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #96]	@ 0x60
+adds	r6, r6, r0
+adds	r6, r5, r6
+movs	r2, r6
+adds	r2, #44	@ 0x2c
+ldrb	r2, [r2, #0]
+lsls	r2, r2, #24
+str	r2, [sp, #128]	@ 0x80
+orrs	r3, r2
+cmp	r1, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r6, r6, r0
+adds	r6, #44	@ 0x2c
+ldrb	r2, [r6, #0]
+lsls	r2, r2, #24
+str	r2, [sp, #132]	@ 0x84
+orrs	r3, r2
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [sp, #0]
+ldr	r0, [sp, #32]
+adds	r3, r1, r6
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+ldrb	r3, [r2, r3]
+lsls	r3, r3, #24
+str	r3, [sp, #124]	@ 0x7c
+cmp	r0, #1
+bhi.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #96]	@ 0x60
+adds	r6, r6, r5
+adds	r6, r1, r6
+movs	r1, r6
+adds	r1, #44	@ 0x2c
+ldrb	r1, [r1, #0]
+ldrb	r1, [r2, r1]
+lsls	r1, r1, #24
+str	r1, [sp, #128]	@ 0x80
+orrs	r3, r1
+cmp	r0, #3
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r6, r6, r5
+adds	r6, #44	@ 0x2c
+ldrb	r1, [r6, #0]
+ldrb	r2, [r2, r1]
+lsls	r2, r2, #24
+str	r2, [sp, #132]	@ 0x84
+orrs	r3, r2
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r3, r5, r6
+adds	r3, #44	@ 0x2c
+ldrb	r1, [r3, #0]
+ldr	r3, [sp, #28]
+lsls	r1, r1, #24
+str	r1, [sp, #124]	@ 0x7c
+cmp	r3, #1
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+adds	r6, r6, r3
+adds	r6, r5, r6
+movs	r3, r6
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+lsls	r3, r3, #24
+str	r3, [sp, #128]	@ 0x80
+orrs	r1, r3
+ldr	r3, [sp, #28]
+cmp	r3, #3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+ldr	r2, [sp, #24]
+adds	r6, r6, r3
+adds	r6, #44	@ 0x2c
+ldrb	r3, [r6, #0]
+lsls	r3, r3, #24
+str	r3, [sp, #132]	@ 0x84
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+uxtb	r3, r3
+mov	r2, r8
+str	r3, [sp, #16]
+movs	r3, #1
+subs	r2, #224	@ 0xe0
+lsls	r3, r2
+negs	r3, r3
+ands	r1, r3
+movs	r3, r1
+lsrs	r3, r0
+mov	ip, r3
+movs	r3, #7
+str	r3, [sp, #68]	@ 0x44
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+uxtb	r3, r3
+mov	r2, r9
+str	r3, [sp, #8]
+movs	r3, #1
+subs	r2, #224	@ 0xe0
+lsls	r3, r2
+negs	r3, r3
+ands	r1, r3
+movs	r3, r1
+ldr	r2, [sp, #24]
+lsrs	r3, r2
+mov	ip, r3
+movs	r3, #7
+mov	r8, r3
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r3, [sp, #24]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r1, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+cmp	r3, #0
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r6, #3
+mov	r2, r8
+ands	r6, r2
+lsrs	r3, r6
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #84]	@ 0x54
+lsrs	r5, r5, #24
+lsrs	r1, r1, #24
+lsls	r5, r5, #1
+lsls	r1, r1, #1
+ldrh	r0, [r2, r5]
+ldrh	r1, [r2, r1]
+mov	r2, r8
+ldr	r5, [sp, #32]
+lsls	r0, r0, #16
+lsls	r1, r1, #16
+lsrs	r0, r6
+lsrs	r1, r6
+asrs	r2, r2, #2
+cmp	r5, #2
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+cmp	r5, #3
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #80]	@ 0x50
+lsls	r2, r2, #2
+ldr	r5, [pc, #400]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+adds	r2, r0, r2
+ldr	r0, [pc, #400]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r9, ip
+movs	r7, r5
+mov	ip, r0
+str	r4, [sp, #0]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r0, r3, #28
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r0, r3, #28
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r4, r1, #28
+lsls	r4, r4, #2
+movs	r5, r4
+mov	r4, ip
+ldr	r4, [r4, r5]
+mov	r5, r9
+ldr	r6, [r2, #0]
+lsls	r0, r0, #2
+ldr	r0, [r7, r0]
+orrs	r4, r5
+eors	r4, r6
+ands	r0, r4
+eors	r0, r6
+str	r0, [r2, #0]
+lsls	r3, r3, #4
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r1, #4
+adds	r2, #4
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #48]	@ 0x30
+ldr	r1, [sp, #44]	@ 0x2c
+str	r0, [sp, #20]
+movs	r0, #16
+str	r2, [sp, #24]
+mov	r8, r0
+str	r0, [sp, #8]
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r5, #32
+ldr	r2, [sp, #40]	@ 0x28
+ldr	r0, [sp, #52]	@ 0x34
+str	r2, [sp, #20]
+str	r1, [sp, #28]
+movs	r2, #16
+str	r5, [sp, #16]
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #100]	@ 0x64
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [pc, #288]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+movs	r1, r3
+lsrs	r1, r0
+movs	r0, r1
+ldr	r1, [sp, #44]	@ 0x2c
+ldr	r1, [r2, r1]
+orrs	r1, r0
+ldr	r0, [sp, #44]	@ 0x2c
+str	r1, [r2, r0]
+ldr	r1, [sp, #16]
+ldr	r0, [sp, #28]
+cmp	r1, r0
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r3, r0
+ldr	r1, [sp, #68]	@ 0x44
+adds	r1, #1
+lsls	r1, r1, #2
+ldr	r0, [r2, r1]
+orrs	r3, r0
+str	r3, [r2, r1]
+ldr	r3, [sp, #100]	@ 0x64
+adds	r4, #4
+adds	r3, #1
+str	r3, [sp, #100]	@ 0x64
+movs	r3, #1
+add	fp, r3
+ldr	r3, [sp, #24]
+cmp	r3, fp
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [sp, #84]	@ 0x54
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [pc, #212]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+movs	r1, r3
+ldr	r0, [sp, #24]
+ldr	r5, [sp, #92]	@ 0x5c
+lsrs	r1, r0
+movs	r0, r1
+ldr	r1, [r2, r5]
+orrs	r1, r0
+str	r1, [r2, r5]
+ldr	r0, [sp, #20]
+ldr	r1, [sp, #8]
+cmp	r1, r0
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r1, r8
+lsls	r3, r0
+adds	r1, #1
+lsls	r1, r1, #2
+ldr	r0, [r2, r1]
+orrs	r3, r0
+str	r3, [r2, r1]
+ldr	r3, [sp, #84]	@ 0x54
+adds	r4, #4
+adds	r3, #1
+str	r3, [sp, #84]	@ 0x54
+movs	r3, #1
+add	sl, r3
+ldr	r3, [sp, #16]
+cmp	r3, sl
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #1
+ldr	r4, [sp, #16]
+add	fp, r3
+ldr	r3, [sp, #24]
+adds	r4, #4
+cmp	r3, fp
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+cmp	r3, #0
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [pc, #120]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #80]	@ 0x50
+lsls	r2, r2, #2
+adds	r2, r5, r2
+ldr	r5, [pc, #104]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r9, r4
+mov	r8, r5
+ldr	r5, [pc, #92]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r5, [sp, #20]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r0, r0, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r6, r3, #28
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r0, r0, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r6, r3, #28
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r5, r0, #28
+lsrs	r4, r1, #28
+lsls	r5, r5, #4
+orrs	r5, r4
+mov	r4, r8
+lsls	r5, r5, #2
+ldr	r5, [r4, r5]
+mov	r4, ip
+orrs	r5, r4
+ldr	r4, [sp, #20]
+ldr	r7, [r2, #0]
+lsls	r6, r6, #2
+ldr	r4, [r4, r6]
+eors	r5, r7
+ands	r4, r5
+eors	r4, r7
+str	r4, [r2, #0]
+lsls	r3, r3, #4
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r0, r0, #4
+lsls	r1, r1, #4
+adds	r2, #4
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r3, r9
+cmp	r3, #0
+blt.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [pc, #16]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldr	r6, [sp, #60]	@ 0x3c
+mov	r9, r4
+ldr	r6, [r6, #8]
+lsls	r2, r2, #2
+lsrs	r6, r5
+movs	r4, r6
+ldr	r5, [sp, #80]	@ 0x50
+str	r0, [sp, #8]
+adds	r2, r5, r2
+ldr	r5, [pc, #740]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r8, r5
+ldr	r5, [pc, #740]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r5, [sp, #20]
+lsrs	r5, r3, #28
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #8]
+lsrs	r7, r4, #28
+lsrs	r6, r0, #28
+lsls	r7, r7, #8
+lsls	r6, r6, #4
+orrs	r6, r7
+lsrs	r0, r1, #28
+orrs	r6, r0
+mov	r0, r8
+lsls	r6, r6, #2
+ldr	r6, [r0, r6]
+mov	r0, ip
+orrs	r6, r0
+ldr	r0, [sp, #20]
+ldr	r7, [r2, #0]
+lsls	r5, r5, #2
+ldr	r5, [r0, r5]
+eors	r6, r7
+ands	r5, r6
+eors	r5, r7
+str	r5, [r2, #0]
+lsls	r3, r3, #4
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #8]
+lsls	r4, r4, #4
+lsls	r0, r0, #4
+str	r0, [sp, #8]
+lsls	r1, r1, #4
+adds	r2, #4
+lsrs	r5, r3, #28
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #8]
+lsls	r4, r4, #4
+lsls	r0, r0, #4
+str	r0, [sp, #8]
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #1
+ldr	r4, [sp, #0]
+add	fp, r3
+ldr	r3, [sp, #24]
+adds	r4, #4
+cmp	r3, fp
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r1, #31
+ands	r1, r0
+str	r1, [sp, #96]	@ 0x60
+movs	r1, #1
+str	r1, [sp, #76]	@ 0x4c
+adds	r1, #14
+str	r1, [sp, #88]	@ 0x58
+subs	r1, #14
+str	r1, [sp, #28]
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r2, [pc, #600]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r7, ip
+str	r2, [sp, #0]
+movs	r2, #4
+mov	r8, r2
+subs	r2, #2
+mov	r9, r2
+str	r4, [sp, #16]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r5, r5, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #8
+adds	r6, #8
+lsrs	r2, r3, #24
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r5, r5, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #8
+adds	r6, #8
+lsrs	r2, r3, #24
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r0, r5, #28
+lsrs	r4, r1, #28
+lsls	r0, r0, #4
+orrs	r0, r4
+ldr	r4, [sp, #0]
+lsls	r0, r0, #2
+ldr	r0, [r4, r0]
+movs	r4, #128	@ 0x80
+orrs	r0, r7
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #0]
+movs	r4, #64	@ 0x40
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #1]
+lsrs	r4, r0, #8
+mov	ip, r4
+movs	r4, #32
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, ip
+strb	r4, [r6, #2]
+movs	r4, #16
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, ip
+strb	r4, [r6, #3]
+lsrs	r4, r0, #16
+mov	ip, r4
+movs	r4, #8
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, ip
+strb	r4, [r6, #4]
+mov	r4, r8
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+mov	r4, ip
+strb	r4, [r6, #5]
+mov	r4, r9
+lsrs	r0, r0, #24
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #6]
+movs	r4, #1
+tst	r4, r2
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+strb	r0, [r6, #7]
+lsls	r3, r3, #8
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r5, r5, #4
+lsls	r1, r1, #4
+adds	r6, #8
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #80]	@ 0x50
+lsls	r2, r2, #2
+adds	r2, r5, r2
+ldr	r5, [pc, #440]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r9, r4
+str	r5, [sp, #0]
+ldr	r5, [pc, #440]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r8, r5
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r0, r0, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r6, r3, #28
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r0, r0, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+lsrs	r6, r3, #28
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r5, r0, #28
+lsrs	r4, r1, #28
+lsls	r5, r5, #4
+orrs	r5, r4
+ldr	r4, [sp, #0]
+lsls	r5, r5, #2
+ldr	r5, [r4, r5]
+mov	r4, ip
+orrs	r5, r4
+mov	r4, r8
+ldr	r7, [r2, #0]
+lsls	r6, r6, #2
+ldr	r4, [r4, r6]
+eors	r5, r7
+ands	r4, r5
+eors	r4, r7
+str	r4, [r2, #0]
+lsls	r3, r3, #4
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r0, r0, #4
+lsls	r1, r1, #4
+adds	r2, #4
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #1
+mov	r4, r9
+add	fp, r3
+ldr	r3, [sp, #24]
+adds	r4, #4
+cmp	r3, fp
+bls.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r5, #4
+orrs	r2, r1
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r1, r0, #4
+orrs	r2, r1
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, r2
+ldr	r2, [pc, #328]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r1, [r2, #0]
+str	r1, [r2, #4]
+str	r1, [r2, #8]
+str	r1, [r2, #12]
+str	r1, [r2, #16]
+str	r1, [r2, #20]
+str	r1, [r2, #24]
+str	r1, [r2, #28]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r1, r2
+ldr	r2, [pc, #308]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r1, [r2, #0]
+str	r1, [r2, #4]
+str	r1, [r2, #8]
+str	r1, [r2, #12]
+str	r1, [r2, #16]
+str	r1, [r2, #20]
+str	r1, [r2, #24]
+str	r1, [r2, #28]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r5, [sp, #84]	@ 0x54
+lsrs	r7, r7, #24
+lsls	r7, r7, #1
+ldrh	r5, [r5, r7]
+lsls	r2, r2, #2
+lsls	r5, r5, #16
+lsrs	r5, r6
+mov	r9, r5
+ldr	r5, [sp, #80]	@ 0x50
+adds	r2, r5, r2
+ldr	r5, [pc, #260]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+str	r5, [sp, #0]
+ldr	r5, [pc, #260]	@ (<ADDR> <vrEmuTms9918OutputSprites+OFF>)
+mov	r8, r5
+movs	r5, r4
+movs	r4, r0
+mov	r0, r9
+mov	r9, r5
+str	r0, [sp, #16]
+ldr	r0, [sp, #16]
+lsrs	r5, r3, #28
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsrs	r7, r0, #28
+lsrs	r6, r4, #28
+lsls	r7, r7, #8
+lsls	r6, r6, #4
+orrs	r6, r7
+lsrs	r0, r1, #28
+orrs	r6, r0
+ldr	r0, [sp, #0]
+lsls	r6, r6, #2
+ldr	r6, [r0, r6]
+mov	r0, ip
+orrs	r6, r0
+mov	r0, r8
+ldr	r7, [r2, #0]
+lsls	r5, r5, #2
+ldr	r5, [r0, r5]
+eors	r6, r7
+ands	r5, r6
+eors	r5, r7
+str	r5, [r2, #0]
+lsls	r3, r3, #4
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r0, [sp, #16]
+lsls	r4, r4, #4
+lsls	r0, r0, #4
+str	r0, [sp, #16]
+ldr	r0, [sp, #16]
+lsls	r1, r1, #4
+adds	r2, #4
+lsrs	r5, r3, #28
+bne.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+lsls	r0, r0, #4
+str	r0, [sp, #16]
+lsls	r4, r4, #4
+lsls	r1, r1, #4
+lsls	r3, r3, #4
+adds	r2, #4
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [r3, #4]
+ldr	r0, [r2, #4]
+ldr	r7, [r2, #8]
+eors	r0, r1
+ldr	r1, [r3, #8]
+ldr	r6, [r2, #12]
+eors	r7, r1
+ldr	r1, [r3, #12]
+ldr	r5, [r2, #16]
+eors	r6, r1
+ldr	r1, [r3, #16]
+ldr	r4, [r2, #20]
+eors	r5, r1
+ldr	r1, [r3, #20]
+mov	ip, r0
+eors	r4, r1
+ldr	r0, [r2, #24]
+ldr	r1, [r3, #24]
+eors	r0, r1
+mov	r9, r0
+ldr	r1, [r3, #28]
+ldr	r0, [r2, #28]
+ldr	r2, [r2, #0]
+eors	r1, r0
+ldr	r0, [r3, #0]
+str	r7, [r3, #8]
+eors	r2, r0
+str	r2, [r3, #0]
+mov	r2, ip
+str	r2, [r3, #4]
+mov	r2, r9
+str	r6, [r3, #12]
+str	r5, [r3, #16]
+str	r4, [r3, #20]
+str	r2, [r3, #24]
+str	r1, [r3, #28]
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+ldr	r1, [r2, #4]
+ldr	r0, [r3, #4]
+ldr	r7, [r3, #8]
+eors	r0, r1
+ldr	r1, [r2, #8]
+ldr	r6, [r3, #12]
+eors	r7, r1
+ldr	r1, [r2, #12]
+ldr	r5, [r3, #16]
+eors	r6, r1
+ldr	r1, [r2, #16]
+ldr	r4, [r3, #20]
+eors	r5, r1
+ldr	r1, [r2, #20]
+mov	ip, r0
+eors	r4, r1
+ldr	r0, [r3, #24]
+ldr	r1, [r2, #24]
+b.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r3, #31
+str	r3, [sp, #12]
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+movs	r4, #15
+str	r0, [sp, #32]
+str	r4, [sp, #108]	@ 0x6c
+cmp	r0, #0
+beq.n	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+adds	r0, #48	@ 0x30
+ands	r1, r0
+str	r1, [sp, #112]	@ 0x70
+movs	r1, #0
+str	r1, [sp, #104]	@ 0x68
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+str	r1, [sp, #28]
+movs	r1, #15
+str	r1, [sp, #88]	@ 0x58
+bl	<ADDR> <vrEmuTms9918OutputSprites+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

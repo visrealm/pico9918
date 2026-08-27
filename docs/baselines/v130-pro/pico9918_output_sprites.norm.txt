@@ -1,0 +1,2598 @@
+<ADDR> <pico9918_output_sprites.constprop.0>:
+ldr	r3, [pc, #536]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+add.w	r2, r3, #40960	@ 0xa000
+ldrb.w	r2, [r2, #47]	@ 0x2f
+ldrb.w	r5, [r3, #49]	@ 0x31
+ldrb	r1, [r3, #0]
+mul.w	r4, r2, r5
+ldrb.w	lr, [r3, #1]
+tst.w	r1, #8
+sub	sp, #116	@ 0x74
+and.w	r1, lr, #1
+str	r1, [sp, #16]
+ldrb.w	r6, [r3, #51]	@ 0x33
+mov.w	r1, r0, lsr #1
+it	ne
+movne	r0, r1
+ands.w	r1, r4, #64	@ 0x40
+ite	eq
+moveq.w	r8, #224	@ 0xe0
+movne.w	r8, #240	@ 0xf0
+cmp	r6, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r6, #32
+it	cs
+movcs	r6, #32
+mov	ip, r6
+ldrb	r6, [r3, #5]
+ubfx	r5, r5, #3, #1
+eor.w	r5, r5, #1
+lsls	r6, r6, #7
+sub.w	r8, r8, r5
+subs	r0, r0, r5
+and.w	r6, r6, #16256	@ 0x3f80
+sub.w	r5, r3, #24576	@ 0x6000
+add	r6, r5
+cmp	r1, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r2, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r7, r2
+mov	r1, r2
+mov	fp, r2
+ldr.w	r9, [pc, #424]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	sl, [pc, #416]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	r5, [r6, r7, lsl #2]
+cmp	r5, #208	@ 0xd0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r8, r5
+it	lt
+sublt.w	r5, r5, #256	@ 0x100
+subs	r5, r0, r5
+cmp	r5, #31
+bhi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r2, [r6, r7, lsl #2]
+strb.w	r7, [sl, r1]
+str.w	r2, [r9, r1, lsl #2]
+strb.w	r5, [r9, r1, lsl #2]
+adds	r1, #1
+adds	r7, #1
+cmp	ip, r7
+bhi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r2, fp
+ldr	r0, [pc, #360]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+and.w	r5, lr, #2
+ldrb	r0, [r0, #0]
+str	r0, [sp, #88]	@ 0x58
+ldr	r6, [sp, #16]
+negs	r0, r2
+cmp	r6, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+str	r6, [sp, #32]
+movs	r6, #16
+str	r6, [sp, #4]
+movs	r6, #252	@ 0xfc
+movs	r5, #32
+str	r6, [sp, #28]
+and.w	r6, r4, #3
+cmp	r6, #3
+str	r5, [sp, #40]	@ 0x28
+str	r5, [sp, #36]	@ 0x24
+str	r6, [sp, #24]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb	r5, [r3, #24]
+cmp	r6, #1
+and.w	r5, r5, r0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r5, r5, #32
+str	r5, [sp, #92]	@ 0x5c
+movs	r5, #15
+str	r6, [sp, #72]	@ 0x48
+str	r5, [sp, #64]	@ 0x40
+cmp	r1, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+orn	r0, r0, #112	@ 0x70
+mov.w	fp, #31
+str	r0, [sp, #12]
+and.w	r0, r4, #2
+movs	r4, #0
+str	r0, [sp, #48]	@ 0x30
+ldr	r0, [pc, #260]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str.w	fp, [sp, #8]
+add	r1, r0
+mov.w	r0, #2048	@ 0x800
+mov	fp, r4
+str	r1, [sp, #20]
+ldrb.w	r1, [r3, #50]	@ 0x32
+ldr.w	sl, [pc, #240]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mul.w	r1, r2, r1
+and.w	r2, r1, #8
+str	r2, [sp, #84]	@ 0x54
+ldrb	r2, [r3, #6]
+ldr	r1, [pc, #228]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+lsls	r2, r2, #11
+and.w	r2, r2, #14336	@ 0x3800
+str	r2, [sp, #44]	@ 0x2c
+ldrb	r2, [r3, #29]
+ldrb	r3, [r3, #30]
+lsrs	r2, r2, #6
+str	r3, [sp, #56]	@ 0x38
+asr.w	r3, r0, r2
+str	r4, [sp, #76]	@ 0x4c
+str	r3, [sp, #52]	@ 0x34
+str	r4, [sp, #68]	@ 0x44
+ldrb	r3, [r1, #3]
+ldr	r2, [sp, #12]
+ldrb	r0, [r1, #0]
+ands	r3, r2
+ands.w	r5, r3, #16
+mov.w	r0, r0, asr #1
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrd	r9, r7, [sp, #36]	@ 0x24
+ldrd	r2, lr, [sp, #28]
+ldr	r6, [sp, #4]
+str	r5, [sp, #0]
+cmp	r0, r6
+bge.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	fp, fp, #1
+cmp.w	fp, #4
+bls.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [sp, #8]
+lsls	r5, r4, #25
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #84]	@ 0x54
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #56]	@ 0x38
+cmp	r5, fp
+bcs.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	r3, [sl]
+bic.w	r2, r4, #31
+orrs	r3, r2
+orr.w	r3, r3, #64	@ 0x40
+uxtb.w	fp, r3
+ldr	r3, [pc, #112]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r2, [sp, #76]	@ 0x4c
+strb.w	r2, [r3, #54]	@ 0x36
+ldr	r3, [sp, #68]	@ 0x44
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [pc, #100]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r0, [r3, #36]	@ 0x24
+ldrd	r2, r1, [r3, #72]	@ 0x48
+eors	r2, r0
+ldr	r0, [r3, #40]	@ 0x28
+str	r2, [r3, #72]	@ 0x48
+eors	r1, r0
+ldr	r2, [r3, #80]	@ 0x50
+ldr	r0, [r3, #44]	@ 0x2c
+str	r1, [r3, #76]	@ 0x4c
+eors	r2, r0
+ldr	r1, [r3, #84]	@ 0x54
+ldr	r0, [r3, #48]	@ 0x30
+str	r2, [r3, #80]	@ 0x50
+eors	r1, r0
+ldr	r2, [r3, #88]	@ 0x58
+ldr	r0, [r3, #52]	@ 0x34
+str	r1, [r3, #84]	@ 0x54
+eors	r2, r0
+ldr	r1, [r3, #92]	@ 0x5c
+ldr	r0, [r3, #56]	@ 0x38
+str	r2, [r3, #88]	@ 0x58
+eors	r1, r0
+ldr	r2, [r3, #96]	@ 0x60
+ldr	r0, [r3, #60]	@ 0x3c
+str	r1, [r3, #92]	@ 0x5c
+eors	r2, r0
+ldr	r1, [r3, #100]	@ 0x64
+ldr	r0, [r3, #64]	@ 0x40
+str	r2, [r3, #96]	@ 0x60
+eors	r1, r0
+mov	r0, fp
+ldr	r2, [r3, #68]	@ 0x44
+str	r1, [r3, #100]	@ 0x64
+ldr	r1, [r3, #104]	@ 0x68
+eors	r2, r1
+str	r2, [r3, #104]	@ 0x68
+add	sp, #116	@ 0x74
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r5, #252	@ 0xfc
+mov.w	r8, #1
+and.w	r6, r4, #3
+cmp	r6, #3
+mov.w	r7, #16
+strd	r5, r8, [sp, #24]
+str	r6, [sp, #20]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb	r5, [r3, #24]
+cmp	r6, #1
+and.w	r5, r5, r0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r5, r5, #32
+str	r5, [sp, #72]	@ 0x48
+movs	r5, #15
+str	r6, [sp, #56]	@ 0x38
+str	r5, [sp, #48]	@ 0x30
+cmp	r1, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+orn	r0, r0, #112	@ 0x70
+mov.w	fp, #31
+str	r0, [sp, #8]
+and.w	r0, r4, #2
+movs	r4, #0
+str	r0, [sp, #40]	@ 0x28
+ldr	r0, [pc, #680]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str.w	fp, [sp, #4]
+add	r1, r0
+str	r1, [sp, #12]
+mov.w	r1, #2048	@ 0x800
+mov	sl, r4
+mov	fp, r7
+mov	r5, r0
+ldrb.w	r0, [r3, #50]	@ 0x32
+str	r4, [sp, #60]	@ 0x3c
+mul.w	r0, r2, r0
+and.w	r2, r0, #8
+str	r2, [sp, #68]	@ 0x44
+ldrb	r2, [r3, #6]
+str	r4, [sp, #52]	@ 0x34
+lsls	r2, r2, #11
+and.w	r2, r2, #14336	@ 0x3800
+str	r2, [sp, #32]
+ldrb	r2, [r3, #29]
+ldrb	r3, [r3, #30]
+lsrs	r2, r2, #6
+str	r3, [sp, #44]	@ 0x2c
+asr.w	r3, r1, r2
+ldr	r1, [pc, #624]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str	r3, [sp, #36]	@ 0x24
+ldrb	r3, [r1, #3]
+ldr	r2, [sp, #8]
+ldrb	r0, [r1, #0]
+ands	r3, r2
+ands.w	lr, r3, #16
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrd	r2, r9, [sp, #24]
+mov	ip, fp
+str.w	fp, [sp]
+cmp	r0, ip
+bge.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	sl, sl, #1
+cmp.w	sl, #4
+bls.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [sp, #4]
+lsls	r7, r4, #25
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #68]	@ 0x44
+cmp	r6, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #44]	@ 0x2c
+cmp	r6, sl
+bcs.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb	r3, [r5, #0]
+bic.w	r2, r4, #31
+orrs	r3, r2
+orr.w	r3, r3, #64	@ 0x40
+uxtb.w	fp, r3
+ldr	r3, [pc, #540]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r2, [sp, #60]	@ 0x3c
+strb.w	r2, [r3, #54]	@ 0x36
+ldr	r3, [sp, #52]	@ 0x34
+cbz	r3, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [pc, #532]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r0, [r3, #36]	@ 0x24
+ldrd	r2, r1, [r3, #72]	@ 0x48
+eors	r2, r0
+ldr	r0, [r3, #40]	@ 0x28
+str	r2, [r3, #72]	@ 0x48
+eors	r1, r0
+ldr	r2, [r3, #80]	@ 0x50
+ldr	r0, [r3, #44]	@ 0x2c
+str	r1, [r3, #76]	@ 0x4c
+eors	r2, r0
+ldr	r1, [r3, #84]	@ 0x54
+ldr	r0, [r3, #48]	@ 0x30
+str	r2, [r3, #80]	@ 0x50
+eors	r1, r0
+ldr	r2, [r3, #88]	@ 0x58
+ldr	r0, [r3, #52]	@ 0x34
+str	r1, [r3, #84]	@ 0x54
+eors	r2, r0
+ldr	r1, [r3, #92]	@ 0x5c
+ldr	r0, [r3, #56]	@ 0x38
+str	r2, [r3, #88]	@ 0x58
+eors	r1, r0
+ldr	r2, [r3, #96]	@ 0x60
+ldr	r0, [r3, #60]	@ 0x3c
+str	r1, [r3, #92]	@ 0x5c
+eors	r2, r0
+ldr	r1, [r3, #100]	@ 0x64
+ldr	r0, [r3, #64]	@ 0x40
+str	r2, [r3, #96]	@ 0x60
+eors	r1, r0
+ldr	r2, [r3, #104]	@ 0x68
+str	r1, [r3, #100]	@ 0x64
+ldr	r1, [r3, #68]	@ 0x44
+eors	r2, r1
+str	r2, [r3, #104]	@ 0x68
+mov	r0, fp
+add	sp, #116	@ 0x74
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+movs	r1, #0
+mov	fp, r2
+mov	r7, r1
+ldr.w	r9, [pc, #436]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	sl, [pc, #428]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	r5, [r6, r7, lsl #2]
+cmp	r5, #208	@ 0xd0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r8, r5
+it	lt
+sublt.w	r5, r5, #256	@ 0x100
+subs	r5, r0, r5
+cmp	r5, #31
+bhi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r2, [r6, r7, lsl #2]
+cbz	r2, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+str.w	r2, [r9, r1, lsl #2]
+strb.w	r7, [sl, r1]
+strb.w	r5, [r9, r1, lsl #2]
+adds	r1, #1
+adds	r7, #1
+cmp	ip, r7
+bhi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [pc, #392]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+mov	r2, fp
+ldrb	r0, [r0, #0]
+and.w	r5, lr, #2
+cmp	r0, #4
+str	r0, [sp, #88]	@ 0x58
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #16]
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r5, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r0, #8
+movs	r2, #16
+str	r0, [sp, #8]
+movs	r0, #255	@ 0xff
+str	r5, [sp, #28]
+str	r2, [sp, #36]	@ 0x24
+str	r0, [sp, #24]
+str	r2, [sp, #32]
+and.w	r0, r4, #3
+cmp	r0, #3
+str	r0, [sp, #20]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r0, #1
+ldrb	r2, [r3, #24]
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r2, r2, #32
+str	r2, [sp, #76]	@ 0x4c
+movs	r2, #15
+str	r0, [sp, #64]	@ 0x40
+str	r2, [sp, #56]	@ 0x38
+cmp	r1, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r2, r4, #2
+str	r2, [sp, #44]	@ 0x2c
+ldr	r2, [pc, #284]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+movs	r0, #0
+adds	r2, r1, r2
+mov.w	r1, #2048	@ 0x800
+mov.w	r9, #31
+str	r2, [sp, #12]
+ldrb	r2, [r3, #6]
+mov	fp, r0
+lsls	r2, r2, #11
+and.w	r2, r2, #14336	@ 0x3800
+str	r2, [sp, #40]	@ 0x28
+ldrb	r2, [r3, #29]
+str	r0, [sp, #68]	@ 0x44
+lsrs	r2, r2, #6
+asr.w	r2, r1, r2
+str	r2, [sp, #52]	@ 0x34
+ldrb.w	r2, [r3, #50]	@ 0x32
+ldrb	r3, [r3, #30]
+str	r0, [sp, #60]	@ 0x3c
+str	r3, [sp, #48]	@ 0x30
+ldr.w	sl, [pc, #236]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r3, r2, #8
+ldr	r0, [pc, #232]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str	r3, [sp, #72]	@ 0x48
+ldrb	r3, [r0, #3]
+ldrb	r4, [r0, #0]
+ands.w	r5, r3, #16
+mov.w	r4, r4, asr #1
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrd	r1, r6, [sp, #32]
+ldrd	r8, lr, [sp, #24]
+ldr	r2, [sp, #8]
+str	r5, [sp, #4]
+str	r1, [sp, #0]
+cmp	r4, r2
+bge.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	fp, fp, #1
+cmp.w	fp, #4
+bls.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+tst.w	r9, #64	@ 0x40
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r1, [sp, #72]	@ 0x48
+cmp	r1, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r1, [sp, #48]	@ 0x30
+cmp	r1, fp
+bcs.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	r3, [sl]
+bic.w	r2, r9, #31
+orrs	r3, r2
+orr.w	r3, r3, #64	@ 0x40
+uxtb.w	fp, r3
+ldr	r3, [pc, #140]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r2, [sp, #68]	@ 0x44
+strb.w	r2, [r3, #54]	@ 0x36
+ldr	r3, [sp, #60]	@ 0x3c
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [pc, #128]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r2, [r3, #36]	@ 0x24
+ldrd	r0, r1, [r3, #72]	@ 0x48
+eors	r2, r0
+ldr	r0, [r3, #40]	@ 0x28
+ldr	r6, [r3, #48]	@ 0x30
+eors	r1, r0
+str	r1, [r3, #76]	@ 0x4c
+ldrd	r1, r5, [r3, #80]	@ 0x50
+eors	r5, r6
+str	r2, [r3, #72]	@ 0x48
+str	r5, [r3, #84]	@ 0x54
+ldr	r2, [r3, #44]	@ 0x2c
+ldr	r5, [r3, #56]	@ 0x38
+eors	r2, r1
+ldrd	r1, r4, [r3, #88]	@ 0x58
+eors	r4, r5
+str	r2, [r3, #80]	@ 0x50
+str	r4, [r3, #92]	@ 0x5c
+ldr	r2, [r3, #52]	@ 0x34
+ldr	r4, [r3, #60]	@ 0x3c
+eors	r2, r1
+ldrd	r1, r0, [r3, #96]	@ 0x60
+eors	r1, r4
+str	r2, [r3, #88]	@ 0x58
+str	r1, [r3, #96]	@ 0x60
+ldr	r2, [r3, #104]	@ 0x68
+ldr	r1, [r3, #68]	@ 0x44
+eors	r2, r1
+str	r2, [r3, #104]	@ 0x68
+ldr	r2, [r3, #64]	@ 0x40
+eors	r2, r0
+str	r2, [r3, #100]	@ 0x64
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r6, #8
+str	r6, [sp, #4]
+movs	r6, #255	@ 0xff
+str	r5, [sp, #32]
+movs	r5, #16
+str	r6, [sp, #28]
+and.w	r6, r4, #3
+cmp	r6, #3
+str	r5, [sp, #40]	@ 0x28
+str	r5, [sp, #36]	@ 0x24
+str	r6, [sp, #24]
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r5, #14
+str	r5, [sp, #64]	@ 0x40
+movs	r5, #2
+str	r5, [sp, #72]	@ 0x48
+movs	r5, #0
+str	r5, [sp, #92]	@ 0x5c
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+str	r5, [sp, #28]
+movs	r5, #255	@ 0xff
+and.w	r6, r4, #3
+cmp	r6, #3
+mov.w	r7, #8
+str	r5, [sp, #24]
+str	r6, [sp, #20]
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r5, #14
+str	r5, [sp, #48]	@ 0x30
+movs	r5, #2
+str	r5, [sp, #56]	@ 0x38
+movs	r5, #0
+str	r5, [sp, #72]	@ 0x48
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r6, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r5, r5, #48	@ 0x30
+str	r5, [sp, #92]	@ 0x5c
+movs	r5, #15
+str	r6, [sp, #72]	@ 0x48
+str	r5, [sp, #64]	@ 0x40
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r6, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r5, r5, #48	@ 0x30
+str	r5, [sp, #72]	@ 0x48
+movs	r5, #15
+str	r6, [sp, #56]	@ 0x38
+str	r5, [sp, #48]	@ 0x30
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r1, [sp, #0]
+movs	r3, #1
+str	r3, [sp, #60]	@ 0x3c
+ldr	r3, [sp, #12]
+adds	r5, #1
+cmp	r3, r5
+add.w	r1, r1, #4
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	fp, [sp, #4]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r1, r9
+ldr	r3, [sp, #16]
+str	r3, [sp, #76]	@ 0x4c
+ldr	r3, [sp, #20]
+add.w	sl, sl, #1
+cmp	sl, r3
+add.w	r1, r1, #4
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	fp, [sp, #8]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb	r7, [r5, #0]
+bic.w	r4, r4, #31
+orrs	r4, r7
+orr.w	r4, r4, #64	@ 0x40
+uxtb	r4, r4
+str	r4, [sp, #4]
+ldr	r4, [sp, #44]	@ 0x2c
+cmp	r4, sl
+bcc.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r6, r3, #24
+ldrb	r4, [r1, #1]
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+negs	r6, r4
+str	r6, [sp, #16]
+movs	r6, #0
+sub.w	r8, ip, r0
+tst.w	r3, #32
+add.w	r8, r8, #4294967295
+it	ne
+movne	r0, r8
+ldrb.w	r8, [r1, #2]
+strd	r6, r6, [sp, #96]	@ 0x60
+str	r6, [sp, #104]	@ 0x68
+ldr	r6, [sp, #32]
+and.w	r2, r2, r8
+add.w	r2, r6, r2, lsl #3
+add	r2, r0
+lsls	r0, r3, #25
+uxth	r2, r2
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	r9, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [pc, #672]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r7, [sp, #40]	@ 0x28
+ldrb	r0, [r6, r2]
+lsls	r0, r0, #24
+str	r0, [sp, #96]	@ 0x60
+cbz	r7, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #36]	@ 0x24
+add.w	r8, r2, r7
+ldrb.w	r2, [r6, r8]
+lsls	r2, r2, #24
+str	r2, [sp, #100]	@ 0x64
+orrs	r0, r2
+ldr	r2, [sp, #20]
+cmp	r2, #3
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r2, r7, r8
+ldrb	r2, [r6, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r0, r2
+cmp.w	lr, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r0, #0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r4, #0
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	r2, r4, #256	@ 0x100
+and.w	r7, r4, #31
+cmp	r2, ip
+rsb	lr, r7, #32
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	ip, r4, lsr #5
+lsr.w	r9, r0, r7
+ldr	r2, [sp, #48]	@ 0x30
+ldr	r6, [pc, #584]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ands	r3, r2
+ldr	r2, [sp, #56]	@ 0x38
+add.w	r8, ip, #18
+lsls	r3, r2
+ldr.w	r2, [r6, r8, lsl #2]
+str	r3, [sp, #16]
+bic.w	r3, r9, r2
+orr.w	r2, r2, r9
+str.w	r2, [r6, r8, lsl #2]
+lsl.w	r2, r3, r7
+ldr	r3, [sp, #0]
+cmp	r3, lr
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r9, ip, #19
+ldr.w	r3, [r6, r9, lsl #2]
+lsl.w	r8, r0, lr
+bic.w	r6, r8, r3
+str	r6, [sp, #64]	@ 0x40
+ldr	r6, [pc, #528]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+orr.w	r8, r3, r8
+str.w	r8, [r6, r9, lsl #2]
+ldr	r6, [sp, #64]	@ 0x40
+lsr.w	r9, r6, lr
+orr.w	r2, r2, r9
+ldr	r6, [sp, #4]
+ldr	r3, [sp, #20]
+orr.w	r8, r6, #32
+uxtb.w	r8, r8
+cmp	r2, r0
+it	ne
+movne	r6, r8
+str	r6, [sp, #4]
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [sp, #16]
+ldr	r3, [sp, #72]	@ 0x48
+and.w	ip, r4, #3
+orrs	r3, r0
+lsrs.w	r2, r2, ip
+mov.w	r0, #<ADDR>	@ 0xADDR
+uxtb	r3, r3
+mul.w	r3, r0, r3
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #20]
+ldr	r6, [sp, #100]	@ 0x64
+ldr	r0, [sp, #96]	@ 0x60
+cmp	r7, #2
+mov.w	r4, r4, asr #2
+lsr.w	r6, r6, ip
+lsr.w	r0, r0, ip
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r7, #3
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [pc, #428]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr.w	lr, [pc, #432]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r8, [pc, #432]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r6, r6, r4, lsl #2
+lsrs	r4, r2, #28
+cmp	r4, #15
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r4, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #4
+lsrs	r4, r2, #28
+cmp	r4, #15
+mov.w	r0, r0, lsl #4
+add.w	r6, r6, #4
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r4, r0, #28
+ldr.w	r4, [lr, r4, lsl #2]
+orrs	r4, r3
+str	r4, [r6, #0]
+lsls	r2, r2, #4
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r0, r0, #4
+adds	r6, #4
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	ip, [sl]
+bic.w	r4, r4, #31
+orr.w	r4, r4, ip
+orr.w	r4, r4, #64	@ 0x40
+uxtb	r4, r4
+str	r4, [sp, #8]
+ldr	r4, [sp, #56]	@ 0x38
+cmp	r4, fp
+bcc.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r5, r3, #24
+ldrb	r4, [r1, #1]
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	ip, r4, #0
+subs	r6, r6, r0
+subs	r6, #1
+tst.w	r3, #32
+it	ne
+movne	r0, r6
+movs	r6, #0
+strd	r6, r6, [sp, #96]	@ 0x60
+str	r6, [sp, #104]	@ 0x68
+ldrb	r6, [r1, #2]
+ands	r2, r6
+ldr	r6, [sp, #44]	@ 0x2c
+add.w	r2, r6, r2, lsl #3
+add	r2, r0
+lsls	r0, r3, #25
+uxth	r2, r2
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	lr, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [pc, #268]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r5, [sp, #48]	@ 0x30
+ldrb	r0, [r6, r2]
+lsls	r0, r0, #24
+str	r0, [sp, #96]	@ 0x60
+cbz	r5, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #52]	@ 0x34
+add	r2, r5
+ldrb	r6, [r6, r2]
+lsls	r6, r6, #24
+str	r6, [sp, #100]	@ 0x64
+orrs	r0, r6
+ldr	r6, [sp, #24]
+cmp	r6, #3
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [pc, #236]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+add	r2, r5
+ldrb	r2, [r6, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r0, r2
+ldr	r2, [sp, #0]
+cmp	r2, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r0, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r2, r0, #24
+ubfx	r0, r0, #16, #8
+ldr	r5, [pc, #216]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+cmp	r4, #0
+ldrh.w	r2, [r5, r2, lsl #1]
+ldrh.w	r5, [r5, r0, lsl #1]
+orr.w	r5, r5, r2, lsl #16
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	r2, r4, #256	@ 0x100
+and.w	r6, r4, #31
+cmp	r2, r7
+str	r4, [sp, #60]	@ 0x3c
+rsb	ip, r6, #32
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r7, r4, #5
+lsr.w	r8, r5, r6
+ldr	r2, [sp, #64]	@ 0x40
+add.w	lr, r7, #18
+ands	r3, r2
+ldr	r2, [sp, #72]	@ 0x48
+cmp	r9, ip
+lsl.w	r3, r3, r2
+ldr	r2, [pc, #148]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str	r3, [sp, #0]
+mov	r3, r2
+ldr.w	r2, [r2, lr, lsl #2]
+bic.w	r0, r8, r2
+orr.w	r2, r2, r8
+str.w	r2, [r3, lr, lsl #2]
+lsl.w	r2, r0, r6
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r8, r7, #19
+ldr.w	r0, [r3, r8, lsl #2]
+lsl.w	lr, r5, ip
+bic.w	r3, lr, r0
+str	r3, [sp, #80]	@ 0x50
+ldr	r3, [pc, #100]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+orr.w	lr, r0, lr
+str.w	lr, [r3, r8, lsl #2]
+ldr	r3, [sp, #80]	@ 0x50
+lsr.w	r8, r3, ip
+orr.w	r2, r2, r8
+ldr	r0, [sp, #8]
+ldr	r3, [sp, #24]
+orr.w	lr, r0, #32
+uxtb.w	lr, lr
+cmp	r2, r5
+it	ne
+movne	r0, lr
+str	r0, [sp, #8]
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [sp, #92]	@ 0x5c
+ldr	r0, [sp, #0]
+orr.w	ip, r0, r3
+uxtb.w	r0, ip
+mov.w	r3, #<ADDR>	@ 0xADDR
+mul.w	r0, r3, r0
+mov	ip, r0
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrd	r4, r5, [sp, #96]	@ 0x60
+ldr	r3, [pc, #28]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r0, [sp, #60]	@ 0x3c
+add	r0, r3
+ldr	r3, [sp, #24]
+cmp	r3, #2
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	lr, r3
+mov	r9, r1
+ldr	r3, [sp, #104]	@ 0x68
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+lsls	r3, r3, #4
+lsls	r5, r5, #4
+lsls	r4, r4, #4
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r7, r2, #24
+mov	r6, r2
+adds	r0, #8
+lsls	r2, r2, #8
+cmp	r7, #0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	lr, #3
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r7, #0
+ldr	r1, [pc, #660]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+orr.w	r7, r7, r4, lsr #28
+ldr.w	r7, [r1, r7, lsl #2]
+cmp	r6, #0
+orr.w	r7, ip, r7
+bge.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r7, [r0, #-8]
+lsls	r1, r6, #1
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r7, [r0, #-7]
+lsls	r1, r6, #2
+mov.w	r8, r7, lsr #8
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r8, [r0, #-6]
+lsls	r1, r6, #3
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r8, [r0, #-5]
+lsls	r1, r6, #4
+mov.w	r8, r7, lsr #16
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r8, [r0, #-4]
+lsls	r1, r6, #5
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r8, [r0, #-3]
+lsls	r1, r6, #6
+mov.w	r7, r7, lsr #24
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r7, [r0, #-2]
+lsls	r1, r6, #7
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+strb.w	r7, [r0, #-1]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #4]
+cmp	r2, #16
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r2, #0
+movs	r7, #32
+str	r2, [sp, #0]
+movs	r6, #16
+movs	r2, #252	@ 0xfc
+mov	r9, r7
+ldr.w	lr, [sp, #16]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	fp, #16
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	ip, #16
+mov.w	lr, #0
+movs	r2, #252	@ 0xfc
+mov.w	r9, #1
+str.w	ip, [sp]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	ip, r4, #32
+cmp	ip, r7
+bgt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+subs	r4, #32
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	r6, r4, #32
+cmp	r6, ip
+str	r6, [sp, #16]
+bgt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+subs	r4, #32
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r0, #255	@ 0xff
+mov	r2, r0
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	lr, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [pc, #472]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr.w	lr, [pc, #476]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb	r0, [r5, r2]
+ldr	r6, [sp, #48]	@ 0x30
+ldrb.w	r0, [lr, r0]
+lsls	r0, r0, #24
+str	r0, [sp, #96]	@ 0x60
+cmp	r6, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #52]	@ 0x34
+add	r2, r6
+ldrb	r6, [r5, r2]
+ldrb.w	r6, [lr, r6]
+lsls	r6, r6, #24
+str	r6, [sp, #100]	@ 0x64
+orrs	r0, r6
+ldr	r6, [sp, #24]
+cmp	r6, #3
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #52]	@ 0x34
+add	r2, r6
+ldrb	r2, [r5, r2]
+ldrb.w	r2, [lr, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r0, r2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	r9, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [pc, #400]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r7, [pc, #400]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb	r0, [r6, r2]
+ldr	r6, [sp, #40]	@ 0x28
+ldrb	r0, [r7, r0]
+lsls	r0, r0, #24
+str	r0, [sp, #96]	@ 0x60
+cmp	r6, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #36]	@ 0x24
+add.w	r8, r2, r6
+ldr	r6, [pc, #372]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	r2, [r6, r8]
+ldrb	r2, [r7, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #100]	@ 0x64
+orrs	r0, r2
+ldr	r2, [sp, #20]
+cmp	r2, #3
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #36]	@ 0x24
+add	r2, r8
+ldrb	r2, [r6, r2]
+ldrb	r2, [r7, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r0, r2
+cmp.w	lr, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r4, #0
+ldr	r0, [pc, #336]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+bge.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #16]
+ldr	r2, [sp, #104]	@ 0x68
+lsls	r0, r6
+lsl.w	r2, r2, r6
+str	r2, [sp, #104]	@ 0x68
+ldr	r2, [sp, #100]	@ 0x64
+lsl.w	r2, r2, r6
+str	r2, [sp, #100]	@ 0x64
+ldr	r2, [sp, #96]	@ 0x60
+lsl.w	r2, r2, r6
+str	r2, [sp, #96]	@ 0x60
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r7, #0
+ldr	r2, [sp, #0]
+mov	r9, r0
+add	r4, r2
+uxtb	r2, r4
+mov.w	lr, #32
+mov	ip, r7
+mov	r4, r7
+str	r2, [sp, #0]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	ip, fp
+ldrd	r2, r9, [sp, #24]
+mov.w	lr, #1
+str.w	fp, [sp]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r7, #32
+mov	r6, r2
+ldr	r2, [sp, #16]
+mov	r9, r7
+str	r2, [sp, #0]
+ldrd	r2, lr, [sp, #28]
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	ip, [r8, r4, lsl #2]
+lsrs	r4, r0, #28
+ldr.w	r4, [lr, r4, lsl #2]
+ldr	r7, [r6, #0]
+orrs	r4, r3
+eors	r4, r7
+and.w	r4, r4, ip
+eors	r4, r7
+str	r4, [r6, #0]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [sp, #0]
+cmp	r3, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [pc, #212]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+lsr.w	r6, r2, r6
+add.w	r0, r4, r7, lsl #2
+ldr	r3, [r0, #36]	@ 0x24
+cmp	r9, ip
+orr.w	r3, r3, r6
+str	r3, [r0, #36]	@ 0x24
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+adds	r7, #9
+add.w	r7, r4, r7, lsl #2
+ldr	r3, [r7, #4]
+lsl.w	r2, r2, ip
+orrs	r3, r2
+str	r3, [r7, #4]
+ldr	r3, [sp, #68]	@ 0x44
+add.w	sl, sl, #1
+adds	r3, #1
+str	r3, [sp, #68]	@ 0x44
+ldr	r3, [sp, #20]
+adds	r1, #4
+cmp	sl, r3
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [sp, #16]
+cmp	r3, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [pc, #144]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+lsr.w	r7, r2, r7
+add.w	r0, r4, ip, lsl #2
+ldr	r3, [r0, #36]	@ 0x24
+orrs	r3, r7
+str	r3, [r0, #36]	@ 0x24
+ldr	r3, [sp, #0]
+cmp	r3, lr
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	ip, ip, #9
+add.w	ip, r4, ip, lsl #2
+ldr.w	r3, [ip, #4]
+lsl.w	r2, r2, lr
+orrs	r3, r2
+str.w	r3, [ip, #4]
+ldr	r3, [sp, #52]	@ 0x34
+adds	r5, #1
+adds	r3, #1
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [sp, #12]
+adds	r1, #4
+cmp	r3, r5
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	r8, r3, lsr #28
+lsrs	r7, r5, #28
+orr.w	r7, r7, r8, lsl #4
+lsls	r7, r7, #4
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #96]	@ 0x60
+mov.w	r7, ip, asr #1
+ldrd	r0, r6, [sp, #100]	@ 0x64
+lsls	r2, r7
+lsls	r6, r7
+lsls	r0, r7
+lsls.w	r5, r5, ip
+strd	r2, r0, [sp, #96]	@ 0x60
+str	r6, [sp, #104]	@ 0x68
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r6, #0
+add	r4, r9
+uxtb.w	r9, r4
+mov	r8, r5
+mov.w	ip, #32
+mov	r7, r6
+mov	r4, r6
+str	r6, [sp, #60]	@ 0x3c
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldr	r7, [pc, #780]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r6, [pc, #784]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb	r0, [r7, r2]
+subs	r7, #16
+ldrb.w	r8, [r7, r2]
+ldrb	r0, [r6, r0]
+ldrb.w	r8, [r6, r8]
+lsls	r0, r0, #24
+ldr	r7, [sp, #40]	@ 0x28
+orr.w	r0, r0, r8, lsl #16
+str	r0, [sp, #96]	@ 0x60
+cmp	r7, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #36]	@ 0x24
+add	r2, r7
+ldr	r7, [pc, #744]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	r8, [r7, r2]
+subs	r7, #16
+ldrb.w	r9, [r7, r2]
+ldrb.w	r8, [r6, r8]
+ldrb.w	r9, [r6, r9]
+ldr	r7, [sp, #20]
+mov.w	r8, r8, lsl #24
+orr.w	r8, r8, r9, lsl #16
+cmp	r7, #3
+str.w	r8, [sp, #100]	@ 0x64
+orr.w	r0, r0, r8
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #36]	@ 0x24
+add	r2, r7
+ldr	r7, [pc, #696]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	r8, [r7, r2]
+subs	r7, #16
+ldrb	r2, [r7, r2]
+ldrb.w	r8, [r6, r8]
+ldrb	r2, [r6, r2]
+mov.w	r8, r8, lsl #24
+orr.w	r2, r8, r2, lsl #16
+str	r2, [sp, #104]	@ 0x68
+orrs	r0, r2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	lr, [pc, #664]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+sub.w	r0, lr, #16
+ldrb	r6, [r0, r2]
+mov	r5, r0
+ldrb.w	r0, [lr, r2]
+lsls	r0, r0, #16
+orr.w	r0, r0, r6, lsl #24
+ldr	r6, [sp, #48]	@ 0x30
+str	r0, [sp, #96]	@ 0x60
+cmp	r6, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #52]	@ 0x34
+add	r2, r6
+ldrb.w	r6, [lr, r2]
+ldrb.w	r8, [r5, r2]
+ldr	r5, [sp, #24]
+lsls	r6, r6, #16
+orr.w	r6, r6, r8, lsl #24
+cmp	r5, #3
+str	r6, [sp, #100]	@ 0x64
+orr.w	r0, r0, r6
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #52]	@ 0x34
+sub.w	r5, lr, #16
+add	r2, r6
+ldrb.w	r6, [lr, r2]
+ldrb	r2, [r5, r2]
+lsls	r6, r6, #16
+orr.w	r6, r6, r2, lsl #24
+str	r6, [sp, #104]	@ 0x68
+orrs	r0, r6
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [pc, #576]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+sub.w	r7, r6, #16
+ldrb	r0, [r6, r2]
+ldrb.w	r8, [r7, r2]
+lsls	r0, r0, #16
+ldr	r7, [sp, #40]	@ 0x28
+orr.w	r0, r0, r8, lsl #24
+str	r0, [sp, #96]	@ 0x60
+cmp	r7, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #36]	@ 0x24
+add	r2, r7
+ldrb.w	r8, [r6, r2]
+sub.w	r7, r6, #16
+ldrb.w	r9, [r7, r2]
+ldr	r7, [sp, #20]
+mov.w	r8, r8, lsl #16
+orr.w	r8, r8, r9, lsl #24
+cmp	r7, #3
+str.w	r8, [sp, #100]	@ 0x64
+orr.w	r0, r0, r8
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #36]	@ 0x24
+add	r2, r7
+ldrb.w	r8, [r6, r2]
+sub.w	r7, r6, #16
+ldrb	r2, [r7, r2]
+mov.w	r8, r8, lsl #16
+orr.w	r2, r8, r2, lsl #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r0, r2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r8, [pc, #480]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [pc, #480]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	r0, [r8, r2]
+sub.w	r5, r8, #16
+ldrb.w	lr, [r5, r2]
+ldrb	r0, [r6, r0]
+ldrb.w	lr, [r6, lr]
+lsls	r0, r0, #24
+ldr	r6, [sp, #48]	@ 0x30
+orr.w	r0, r0, lr, lsl #16
+str	r0, [sp, #96]	@ 0x60
+cmp	r6, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #52]	@ 0x34
+add	r2, r6
+ldrb.w	lr, [r8, r2]
+str	r6, [sp, #60]	@ 0x3c
+ldr	r6, [pc, #432]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb	r5, [r5, r2]
+ldrb.w	lr, [r6, lr]
+ldrb	r5, [r6, r5]
+mov.w	lr, lr, lsl #24
+orr.w	lr, lr, r5, lsl #16
+ldr	r5, [sp, #24]
+str.w	lr, [sp, #100]	@ 0x64
+cmp	r5, #3
+orr.w	r0, r0, lr
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #60]	@ 0x3c
+sub.w	r5, r8, #16
+add	r2, r6
+ldrb.w	lr, [r8, r2]
+ldrb	r2, [r5, r2]
+ldr	r5, [pc, #384]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	lr, [r5, lr]
+ldrb	r2, [r5, r2]
+mov.w	lr, lr, lsl #24
+orr.w	r2, lr, r2, lsl #16
+str	r2, [sp, #104]	@ 0x68
+orrs	r0, r2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r6, #1
+uxtb	r2, r2
+str	r2, [sp, #0]
+sub.w	r2, r4, #224	@ 0xe0
+lsl.w	r2, r6, r2
+negs	r2, r2
+ands	r0, r2
+mov.w	ip, #7
+lsr.w	r9, r0, r7
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+uxtb.w	r9, r2
+mov.w	r2, #4294967295
+sub.w	lr, r4, #224	@ 0xe0
+lsl.w	r2, r2, lr
+ands	r5, r2
+movs	r7, #7
+lsr.w	r8, r5, r6
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [pc, #312]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr.w	lr, [pc, #316]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r9, [pc, #316]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r7, r7, r4, lsl #2
+lsrs	r4, r2, #28
+cmp	r4, #15
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cbnz	r4, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #4
+lsrs	r4, r2, #28
+cmp	r4, #15
+mov.w	r6, r6, lsl #4
+mov.w	r0, r0, lsl #4
+add.w	r7, r7, #4
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	ip, r6, lsr #28
+lsrs	r4, r0, #28
+orr.w	r4, r4, ip, lsl #4
+ldr.w	r4, [lr, r4, lsl #2]
+orrs	r4, r3
+str	r4, [r7, #0]
+lsls	r2, r2, #4
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r6, r6, #4
+lsls	r0, r0, #4
+adds	r7, #4
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r8, [r9, r4, lsl #2]
+mov.w	ip, r6, lsr #28
+lsrs	r4, r0, #28
+orr.w	r4, r4, ip, lsl #4
+ldr.w	r4, [lr, r4, lsl #2]
+ldr.w	ip, [r7]
+orrs	r4, r3
+eor.w	r4, r4, ip
+and.w	r4, r4, r8
+eor.w	r4, r4, ip
+str	r4, [r7, #0]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [pc, #204]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r5, r5, #4
+lsls	r4, r4, #4
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r6, r2, #24
+mov	r3, r2
+adds	r0, #8
+lsls	r2, r2, #8
+cmp	r6, #0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	lr, r5, lsr #28
+lsrs	r6, r4, #28
+orr.w	r6, r6, lr, lsl #4
+ldr.w	r6, [r7, r6, lsl #2]
+cmp	r3, #0
+orr.w	r6, ip, r6
+it	lt
+strblt.w	r6, [r0, #-8]
+tst.w	r3, #1073741824	@ 0xADDR
+mov.w	lr, r6, lsr #8
+it	ne
+strbne.w	r6, [r0, #-7]
+tst.w	r3, #536870912	@ 0xADDR
+it	ne
+strbne.w	lr, [r0, #-6]
+tst.w	r3, #268435456	@ 0xADDR
+it	ne
+strbne.w	lr, [r0, #-5]
+mov.w	lr, r6, lsr #16
+tst.w	r3, #134217728	@ 0xADDR
+it	ne
+strbne.w	lr, [r0, #-4]
+tst.w	r3, #<ADDR>	@ 0xADDR
+mov.w	r6, r6, lsr #24
+it	ne
+strbne.w	lr, [r0, #-3]
+tst.w	r3, #<ADDR>	@ 0xADDR
+it	ne
+strbne.w	r6, [r0, #-2]
+lsls	r3, r3, #7
+it	mi
+strbmi.w	r6, [r0, #-1]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r0, r3
+ldr	r3, [sp, #72]	@ 0x48
+ldr	r6, [sp, #88]	@ 0x58
+orrs	r3, r0
+uxtb	r3, r3
+orr.w	r0, r3, r3, lsl #4
+uxtb	r0, r0
+cmp	r6, #4
+it	eq
+moveq	r3, r0
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [pc, #36]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+add	r4, r0
+cmp	r2, #0
+blt.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #1
+cmp	r2, #0
+add.w	r4, r4, #1
+bge.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #1
+strb	r3, [r4, #0]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+adds	r4, #1
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+mov	r0, r3
+ldr	r3, [sp, #92]	@ 0x5c
+ldr	r5, [sp, #88]	@ 0x58
+orrs	r3, r0
+uxtb	r3, r3
+orr.w	r0, r3, r3, lsl #4
+uxtb	r0, r0
+cmp	r5, #4
+it	eq
+moveq	r3, r0
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [pc, #608]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+add	r4, r0
+cmp	r2, #0
+blt.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #1
+cmp	r2, #0
+add.w	r4, r4, #1
+bge.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #1
+strb	r3, [r4, #0]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+adds	r4, #1
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #104]	@ 0x68
+ldr.w	lr, [pc, #600]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsr.w	ip, r7, ip
+ldr	r7, [pc, #568]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str	r1, [sp, #0]
+add.w	r4, r7, r4, lsl #2
+lsrs	r7, r2, #28
+cmp	r7, #15
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cbnz	r7, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #4
+lsrs	r7, r2, #28
+cmp	r7, #15
+mov.w	ip, ip, lsl #4
+mov.w	r6, r6, lsl #4
+mov.w	r0, r0, lsl #4
+add.w	r4, r4, #4
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	r7, ip, lsr #28
+mov.w	r8, r6, lsr #28
+orr.w	r8, r8, r7, lsl #4
+lsrs	r7, r0, #28
+orr.w	r7, r7, r8, lsl #4
+ldr.w	r7, [lr, r7, lsl #2]
+orrs	r7, r3
+str	r7, [r4, #0]
+lsls	r2, r2, #4
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	ip, ip, lsl #4
+lsls	r6, r6, #4
+lsls	r0, r0, #4
+adds	r4, #4
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r1, [pc, #488]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+mov.w	r8, r6, lsr #28
+ldr.w	r9, [r1, r7, lsl #2]
+mov.w	r7, ip, lsr #28
+orr.w	r8, r8, r7, lsl #4
+lsrs	r7, r0, #28
+orr.w	r7, r7, r8, lsl #4
+ldr.w	r7, [lr, r7, lsl #2]
+ldr.w	r8, [r4]
+orrs	r7, r3
+eor.w	r7, r7, r8
+and.w	r7, r7, r9
+eor.w	r7, r7, r8
+str	r7, [r4, #0]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r5, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r2, #255	@ 0xff
+str	r5, [sp, #24]
+movs	r5, #8
+str	r2, [sp, #20]
+and.w	r0, r4, #3
+cmp	r0, #3
+str	r0, [sp, #16]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r0, #1
+ldrb	r2, [r3, #24]
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r2, r2, #32
+str	r2, [sp, #72]	@ 0x48
+movs	r2, #15
+str	r0, [sp, #56]	@ 0x38
+str	r2, [sp, #48]	@ 0x30
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r0, #0
+mov.w	fp, #31
+and.w	r2, r4, #2
+str	r2, [sp, #32]
+ldr	r2, [pc, #380]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str.w	fp, [sp, #4]
+adds	r2, r1, r2
+mov.w	r1, #2048	@ 0x800
+mov	sl, r0
+mov	fp, r5
+str	r2, [sp, #8]
+ldrb	r2, [r3, #6]
+ldr.w	r9, [pc, #360]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #11
+and.w	r2, r2, #14336	@ 0x3800
+str	r2, [sp, #28]
+ldrb	r2, [r3, #29]
+ldr.w	r8, [pc, #368]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r2, r2, #6
+asr.w	r2, r1, r2
+str	r2, [sp, #36]	@ 0x24
+ldrb.w	r2, [r3, #50]	@ 0x32
+ldrb	r3, [r3, #30]
+str	r0, [sp, #60]	@ 0x3c
+str	r3, [sp, #40]	@ 0x28
+and.w	r3, r2, #8
+str	r0, [sp, #52]	@ 0x34
+str	r3, [sp, #68]	@ 0x44
+ldrb.w	r2, [r8, #3]
+ldrb.w	r1, [r8]
+ands.w	r7, r2, #16
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrd	r3, lr, [sp, #20]
+mov	r6, fp
+str.w	fp, [sp]
+cmp	r1, r6
+bge.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	sl, sl, #1
+cmp.w	sl, #4
+bls.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [sp, #4]
+lsls	r5, r0, #25
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [sp, #68]	@ 0x44
+cmp	r4, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [sp, #40]	@ 0x28
+cmp	r4, sl
+bcs.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	r3, [r9]
+bic.w	r2, r0, #31
+orrs	r3, r2
+orr.w	r3, r3, #64	@ 0x40
+uxtb.w	fp, r3
+ldr	r3, [pc, #236]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r2, [sp, #60]	@ 0x3c
+strb.w	r2, [r3, #54]	@ 0x36
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [pc, #224]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r2, [r3, #36]	@ 0x24
+ldrd	r0, r1, [r3, #72]	@ 0x48
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r3, #0
+ldr	r2, [pc, #208]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+mov.w	fp, #31
+strb.w	r3, [r2, #54]	@ 0x36
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r1, r6
+ldr	r0, [pc, #200]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+and.w	r5, lr, #2
+ldrb	r0, [r0, #0]
+cmp	r0, #4
+str	r0, [sp, #88]	@ 0x58
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r7, r1
+ldr.w	sl, [pc, #180]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	fp, [pc, #156]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r8, r5
+it	lt
+sublt.w	r5, r5, #256	@ 0x100
+subs	r5, r0, r5
+cmp	r5, #31
+bhi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r9, [r6, r7, lsl #2]
+cmp.w	r9, #0
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cbnz	r2, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+str.w	r9, [sl, r1, lsl #2]
+strb.w	r7, [fp, r1]
+strb.w	r5, [sl, r1, lsl #2]
+adds	r1, #1
+adds	r7, #1
+cmp	ip, r7
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	r5, [r6, r7, lsl #2]
+cmp	r5, #208	@ 0xd0
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r2, #252	@ 0xfc
+movs	r7, #1
+movs	r5, #16
+strd	r2, r7, [sp, #20]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+str	r2, [sp, #28]
+movs	r2, #16
+movs	r0, #32
+str	r2, [sp, #8]
+movs	r2, #252	@ 0xfc
+str	r0, [sp, #36]	@ 0x24
+str	r2, [sp, #24]
+str	r0, [sp, #32]
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r3, #1
+str	r3, [sp, #60]	@ 0x3c
+ldr	r3, [sp, #8]
+add.w	r9, r9, #1
+cmp	r9, r3
+add.w	r8, r8, #4
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	fp, [sp, #4]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [sp, #0]
+ldr	r3, [sp, #16]
+str	r3, [sp, #68]	@ 0x44
+ldr	r3, [sp, #12]
+add.w	sl, sl, #1
+cmp	sl, r3
+add.w	r0, r0, #4
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	fp, r9
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldrb.w	r5, [r9]
+bic.w	r0, r0, #31
+orrs	r0, r5
+orr.w	r0, r0, #64	@ 0x40
+uxtb	r0, r0
+str	r0, [sp, #4]
+ldr	r0, [sp, #40]	@ 0x28
+cmp	r0, sl
+bcc.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r4, r2, #24
+ldrb.w	r0, [r8, #1]
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+negs	r4, r0
+str	r4, [sp, #12]
+movs	r4, #0
+sub.w	ip, r6, r1
+tst.w	r2, #32
+add.w	ip, ip, #4294967295
+it	ne
+movne	r1, ip
+ldrb.w	ip, [r8, #2]
+strd	r4, r4, [sp, #96]	@ 0x60
+str	r4, [sp, #104]	@ 0x68
+ldr	r4, [sp, #28]
+and.w	r3, r3, ip
+add.w	r3, r4, r3, lsl #3
+add	r3, r1
+lsls	r1, r2, #25
+uxth	r3, r3
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	lr, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [pc, #684]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r5, [sp, #32]
+ldrb	r1, [r4, r3]
+lsls	r1, r1, #24
+str	r1, [sp, #96]	@ 0x60
+cbz	r5, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #36]	@ 0x24
+add.w	ip, r3, r5
+ldrb.w	r3, [r4, ip]
+lsls	r3, r3, #24
+str	r3, [sp, #100]	@ 0x64
+orrs	r1, r3
+ldr	r3, [sp, #16]
+cmp	r3, #3
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r3, ip, r5
+ldrb	r3, [r4, r3]
+lsls	r3, r3, #24
+str	r3, [sp, #104]	@ 0x68
+orrs	r1, r3
+cmp	r7, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r0, #0
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	r3, r0, #256	@ 0x100
+and.w	r5, r0, #31
+cmp	r3, r6
+str	r0, [sp, #44]	@ 0x2c
+rsb	r7, r5, #32
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r6, r0, #5
+lsr.w	lr, r1, r5
+ldr	r3, [sp, #48]	@ 0x30
+ldr	r4, [pc, #596]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ands	r2, r3
+ldr	r3, [sp, #56]	@ 0x38
+add.w	ip, r6, #18
+lsl.w	r3, r2, r3
+str	r3, [sp, #12]
+ldr.w	r3, [r4, ip, lsl #2]
+bic.w	r2, lr, r3
+orr.w	r3, r3, lr
+str.w	r3, [r4, ip, lsl #2]
+lsl.w	r3, r2, r5
+ldr	r2, [sp, #0]
+cmp	r2, r7
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	lr, r6, #19
+ldr.w	r2, [r4, lr, lsl #2]
+lsl.w	ip, r1, r7
+bic.w	r4, ip, r2
+str	r4, [sp, #64]	@ 0x40
+ldr	r4, [pc, #536]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+orr.w	ip, r2, ip
+str.w	ip, [r4, lr, lsl #2]
+ldr	r4, [sp, #64]	@ 0x40
+lsr.w	lr, r4, r7
+orr.w	r3, r3, lr
+ldr	r4, [sp, #4]
+ldr	r2, [sp, #16]
+orr.w	ip, r4, #32
+uxtb.w	ip, ip
+cmp	r3, r1
+it	ne
+movne	r4, ip
+str	r4, [sp, #4]
+cmp	r2, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r1, [sp, #12]
+ldr	r2, [sp, #72]	@ 0x48
+orrs	r2, r1
+uxtb	r1, r2
+mov.w	r2, #<ADDR>	@ 0xADDR
+mul.w	r1, r2, r1
+mov	lr, r1
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrd	r2, r1, [sp, #96]	@ 0x60
+ldr	r0, [sp, #16]
+cmp	r0, #2
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r0, #3
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r1, [pc, #452]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r0, [sp, #44]	@ 0x2c
+ldr.w	ip, [pc, #456]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r1, r1, r0, lsl #1
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #4
+lsls	r3, r3, #4
+adds	r1, #8
+lsrs	r4, r3, #28
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #4
+lsls	r3, r3, #4
+adds	r1, #8
+lsrs	r4, r3, #28
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r0, r2, #28
+ldr.w	r0, [ip, r0, lsl #2]
+lsls	r6, r4, #28
+orr.w	r0, lr, r0
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r5, r4, #29
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r7, r4, #30
+bpl.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ubfx	r5, r0, #16, #8
+add.w	r5, r5, r5, lsl #8
+strh	r5, [r1, #4]
+lsls	r7, r4, #31
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #4
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r2, r2, #4
+adds	r1, #8
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	ip, [sl]
+bic.w	r1, r9, #31
+orr.w	r1, r1, ip
+orr.w	r1, r1, #64	@ 0x40
+uxtb.w	r9, r1
+ldr	r1, [sp, #48]	@ 0x30
+cmp	r1, fp
+bcc.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r5, r3, #24
+ldrb	r1, [r0, #1]
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	ip, r1, #0
+subs	r2, r2, r4
+subs	r2, #1
+tst.w	r3, #32
+it	ne
+movne	r4, r2
+movs	r2, #0
+strd	r2, r2, [sp, #96]	@ 0x60
+str	r2, [sp, #104]	@ 0x68
+ldrb	r2, [r0, #2]
+ldr	r7, [sp, #40]	@ 0x28
+and.w	r2, r8, r2
+add.w	r2, r7, r2, lsl #3
+add	r2, r4
+lsls	r4, r3, #25
+uxth	r2, r2
+bmi.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	lr, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [pc, #264]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r5, [sp, #44]	@ 0x2c
+ldrb	r4, [r7, r2]
+lsls	r4, r4, #24
+str	r4, [sp, #96]	@ 0x60
+cbz	r5, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #52]	@ 0x34
+add.w	lr, r2, r5
+ldrb.w	r2, [r7, lr]
+lsls	r2, r2, #24
+str	r2, [sp, #100]	@ 0x64
+orrs	r4, r2
+ldr	r2, [sp, #20]
+cmp	r2, #3
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r2, lr, r5
+ldrb	r2, [r7, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r4, r2
+ldr	r2, [sp, #4]
+cmp	r2, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r4, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r2, r4, #24
+ubfx	r4, r4, #16, #8
+ldr	r5, [pc, #212]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+cmp	r1, #0
+ldrh.w	r2, [r5, r2, lsl #1]
+ldrh.w	r4, [r5, r4, lsl #1]
+orr.w	r4, r4, r2, lsl #16
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	r2, r1, #256	@ 0x100
+and.w	r5, r1, #31
+cmp	r2, r6
+rsb	ip, r5, #32
+blt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r6, r1, #5
+lsr.w	r8, r4, r5
+ldr	r2, [sp, #56]	@ 0x38
+add.w	lr, r6, #18
+ands	r3, r2
+ldr	r2, [sp, #64]	@ 0x40
+lsls	r3, r2
+str	r3, [sp, #4]
+ldr	r3, [pc, #144]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr.w	r3, [r3, lr, lsl #2]
+bic.w	r7, r8, r3
+mov	r2, r7
+ldr	r7, [pc, #132]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+orr.w	r3, r3, r8
+str.w	r3, [r7, lr, lsl #2]
+lsl.w	r3, r2, r5
+ldr	r2, [sp, #0]
+cmp	r2, ip
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r8, r6, #19
+ldr.w	r7, [r7, r8, lsl #2]
+lsl.w	lr, r4, ip
+bic.w	r2, lr, r7
+orr.w	lr, r7, lr
+ldr	r7, [pc, #92]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+str.w	lr, [r7, r8, lsl #2]
+lsr.w	r8, r2, ip
+orr.w	r3, r3, r8
+orr.w	lr, r9, #32
+uxtb.w	lr, lr
+cmp	r3, r4
+it	ne
+movne	r9, lr
+ldr	r4, [sp, #20]
+cmp	r4, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #76]	@ 0x4c
+ldr	r4, [sp, #4]
+orr.w	ip, r4, r2
+uxtb.w	r4, ip
+mov.w	r2, #<ADDR>	@ 0xADDR
+mul.w	r4, r2, r4
+mov	ip, r4
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #20]
+sxth	r2, r1
+ldr	r1, [pc, #28]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+cmp	r5, #2
+add.w	r2, r1, r2, lsl #1
+ldrd	r1, r4, [sp, #96]	@ 0x60
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [sp, #104]	@ 0x68
+str	r0, [sp, #0]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+lsls	r7, r7, #4
+lsls	r4, r4, #4
+lsls	r1, r1, #4
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r6, r3, #24
+mov	r5, r3
+adds	r2, #16
+lsls	r3, r3, #8
+cmp	r6, #0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #20]
+cmp	r6, #3
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r6, #0
+ldr	r0, [pc, #724]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+orr.w	r6, r6, r1, lsr #28
+ldr.w	r6, [r0, r6, lsl #2]
+cmp	r5, #0
+orr.w	r6, ip, r6
+uxtb.w	lr, r6
+bge.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r8, lr, lr, lsl #8
+strh.w	r8, [r2, #-16]
+lsls	r0, r5, #1
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	lr, lr, lr, lsl #8
+strh.w	lr, [r2, #-14]
+lsls	r0, r5, #2
+ubfx	lr, r6, #8, #8
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r8, lr, lr, lsl #8
+strh.w	r8, [r2, #-12]
+lsls	r0, r5, #3
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	lr, lr, lr, lsl #8
+strh.w	lr, [r2, #-10]
+lsls	r0, r5, #4
+ubfx	lr, r6, #16, #8
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r8, lr, lr, lsl #8
+strh.w	r8, [r2, #-8]
+lsls	r0, r5, #5
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	lr, lr, lr, lsl #8
+strh.w	lr, [r2, #-6]
+lsls	r0, r5, #6
+mov.w	r6, r6, lsr #24
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	lr, r6, r6, lsl #8
+strh.w	lr, [r2, #-4]
+lsls	r0, r5, #7
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r6, r6, r6, lsl #8
+strh.w	r6, [r2, #-2]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	fp, #16
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r6, #16
+movs	r7, #0
+movs	r3, #252	@ 0xfc
+mov.w	lr, #1
+str	r6, [sp, #0]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #8]
+movs	r6, #32
+cmp	r2, #16
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r1, #0
+movs	r2, #16
+mov.w	r8, #252	@ 0xfc
+ldr.w	lr, [sp, #16]
+str	r1, [sp, #4]
+str	r6, [sp, #0]
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	r4, r0, #32
+cmp	r4, r6
+str	r4, [sp, #12]
+bgt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+subs	r0, #32
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+rsb	ip, r1, #32
+cmp	ip, r6
+bgt.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+subs	r1, #32
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	lr, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [pc, #512]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r5, [pc, #516]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb	r1, [r4, r3]
+ldr	r4, [sp, #32]
+ldrb	r1, [r5, r1]
+lsls	r1, r1, #24
+str	r1, [sp, #96]	@ 0x60
+cmp	r4, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [sp, #36]	@ 0x24
+add.w	ip, r3, r4
+ldr	r4, [pc, #488]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	r3, [r4, ip]
+ldrb	r3, [r5, r3]
+lsls	r3, r3, #24
+str	r3, [sp, #100]	@ 0x64
+orrs	r1, r3
+ldr	r3, [sp, #16]
+cmp	r3, #3
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+add	r3, ip
+ldrb	r3, [r4, r3]
+ldrb	r3, [r5, r3]
+lsls	r3, r3, #24
+str	r3, [sp, #104]	@ 0x68
+orrs	r1, r3
+cmp	r7, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r1, [pc, #452]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp.w	lr, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [pc, #432]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr.w	lr, [pc, #436]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb	r4, [r7, r2]
+ldr	r5, [sp, #44]	@ 0x2c
+ldrb.w	r4, [lr, r4]
+lsls	r4, r4, #24
+str	r4, [sp, #96]	@ 0x60
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #52]	@ 0x34
+add.w	r8, r2, r5
+ldrb.w	r2, [r7, r8]
+ldrb.w	r2, [lr, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #100]	@ 0x64
+orrs	r4, r2
+ldr	r2, [sp, #20]
+cmp	r2, #3
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r2, r8, r5
+ldrb	r2, [r7, r2]
+ldrb.w	r2, [lr, r2]
+lsls	r2, r2, #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r4, r2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r4, #255	@ 0xff
+mov	r2, r4
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #16]
+str	r6, [sp, #0]
+str	r2, [sp, #4]
+ldrd	r8, lr, [sp, #24]
+ldr	r2, [sp, #8]
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r6, fp
+ldrd	r3, lr, [sp, #20]
+movs	r7, #1
+str.w	fp, [sp]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #4]
+cmp	r2, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [pc, #332]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+lsr.w	r5, r3, r5
+add.w	r1, r4, r6, lsl #2
+ldr	r2, [r1, #36]	@ 0x24
+orrs	r2, r5
+str	r2, [r1, #36]	@ 0x24
+ldr	r2, [sp, #0]
+cmp	r2, ip
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r1, r4, r6, lsl #2
+ldr	r2, [r1, #40]	@ 0x28
+lsl.w	r3, r3, ip
+orrs	r2, r3
+str	r2, [r1, #40]	@ 0x28
+ldr	r3, [sp, #60]	@ 0x3c
+adds	r3, #1
+str	r3, [sp, #60]	@ 0x3c
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #12]
+cmp	r2, #0
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [pc, #280]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+lsr.w	r5, r3, r5
+add.w	r1, r0, r6, lsl #2
+ldr	r2, [r1, #36]	@ 0x24
+orrs	r2, r5
+str	r2, [r1, #36]	@ 0x24
+ldr	r2, [sp, #0]
+cmp	r2, r7
+bls.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r1, r0, r6, lsl #2
+ldr	r2, [r1, #40]	@ 0x28
+lsls	r3, r7
+orrs	r2, r3
+str	r2, [r1, #40]	@ 0x28
+ldr	r3, [sp, #52]	@ 0x34
+adds	r3, #1
+str	r3, [sp, #52]	@ 0x34
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov.w	lr, r7, lsr #28
+lsrs	r6, r4, #28
+orr.w	r6, r6, lr, lsl #4
+lsls	r6, r6, #4
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [sp, #12]
+ldr	r3, [sp, #104]	@ 0x68
+lsls	r1, r4
+lsl.w	r3, r3, r4
+str	r3, [sp, #104]	@ 0x68
+ldr	r3, [sp, #100]	@ 0x64
+lsl.w	r3, r3, r4
+str	r3, [sp, #100]	@ 0x64
+ldr	r3, [sp, #96]	@ 0x60
+lsl.w	r3, r3, r4
+str	r3, [sp, #96]	@ 0x60
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r5, #0
+ldr	r3, [sp, #0]
+mov	lr, r1
+add	r0, r3
+uxtb	r3, r0
+movs	r7, #32
+mov	r6, r5
+mov	r0, r5
+str	r3, [sp, #0]
+str	r5, [sp, #44]	@ 0x2c
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r2, [sp, #96]	@ 0x60
+mov.w	lr, ip, asr #1
+ldrd	r5, r6, [sp, #100]	@ 0x64
+lsl.w	r2, r2, lr
+lsl.w	r6, r6, lr
+lsl.w	r5, r5, lr
+lsls.w	r4, r4, ip
+strd	r2, r5, [sp, #96]	@ 0x60
+str	r6, [sp, #104]	@ 0x68
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r5, #0
+ldr	r2, [sp, #0]
+mov	r8, r4
+add	r1, r2
+uxtb	r2, r1
+mov.w	ip, #32
+mov	r6, r5
+mov	r1, r5
+str	r2, [sp, #0]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [pc, #116]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+sub.w	r5, r4, #16
+ldrb	r1, [r4, r3]
+ldrb.w	ip, [r5, r3]
+lsls	r1, r1, #16
+ldr	r5, [sp, #32]
+orr.w	r1, r1, ip, lsl #24
+str	r1, [sp, #96]	@ 0x60
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #36]	@ 0x24
+add	r3, r5
+ldrb.w	ip, [r4, r3]
+sub.w	r5, r4, #16
+ldrb.w	lr, [r5, r3]
+ldr	r5, [sp, #16]
+mov.w	ip, ip, lsl #16
+orr.w	ip, ip, lr, lsl #24
+cmp	r5, #3
+str.w	ip, [sp, #100]	@ 0x64
+orr.w	r1, r1, ip
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #36]	@ 0x24
+add	r3, r5
+ldrb.w	ip, [r4, r3]
+sub.w	r5, r4, #16
+ldrb	r3, [r5, r3]
+mov.w	ip, ip, lsl #16
+orr.w	r3, ip, r3, lsl #24
+str	r3, [sp, #104]	@ 0x68
+orrs	r1, r3
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldr.w	r8, [pc, #840]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #44]	@ 0x2c
+ldrb.w	r4, [r8, r2]
+sub.w	r7, r8, #16
+ldrb.w	lr, [r7, r2]
+lsls	r4, r4, #16
+orr.w	r4, r4, lr, lsl #24
+str	r4, [sp, #96]	@ 0x60
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #52]	@ 0x34
+add	r2, r5
+ldrb.w	lr, [r8, r2]
+ldrb	r7, [r7, r2]
+mov.w	lr, lr, lsl #16
+orr.w	lr, lr, r7, lsl #24
+ldr	r7, [sp, #20]
+str.w	lr, [sp, #100]	@ 0x64
+cmp	r7, #3
+orr.w	r4, r4, lr
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add	r2, r5
+ldrb.w	lr, [r8, r2]
+sub.w	r7, r8, #16
+ldrb	r2, [r7, r2]
+mov.w	lr, lr, lsl #16
+orr.w	r2, lr, r2, lsl #24
+str	r2, [sp, #104]	@ 0x68
+orrs	r4, r2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [pc, #748]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r4, [pc, #752]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb	r1, [r5, r3]
+subs	r5, #16
+ldrb.w	ip, [r5, r3]
+ldrb	r1, [r4, r1]
+ldrb.w	ip, [r4, ip]
+lsls	r1, r1, #24
+ldr	r5, [sp, #32]
+orr.w	r1, r1, ip, lsl #16
+str	r1, [sp, #96]	@ 0x60
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #36]	@ 0x24
+add	r3, r5
+ldr	r5, [pc, #712]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	ip, [r5, r3]
+subs	r5, #16
+ldrb.w	lr, [r5, r3]
+ldrb.w	ip, [r4, ip]
+ldrb.w	lr, [r4, lr]
+ldr	r5, [sp, #16]
+mov.w	ip, ip, lsl #24
+orr.w	ip, ip, lr, lsl #16
+cmp	r5, #3
+str.w	ip, [sp, #100]	@ 0x64
+orr.w	r1, r1, ip
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #36]	@ 0x24
+add	r3, r5
+ldr	r5, [pc, #664]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldrb.w	ip, [r5, r3]
+subs	r5, #16
+ldrb	r3, [r5, r3]
+ldrb.w	ip, [r4, ip]
+ldrb	r3, [r4, r3]
+mov.w	ip, ip, lsl #24
+orr.w	r3, ip, r3, lsl #16
+str	r3, [sp, #104]	@ 0x68
+orrs	r1, r3
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r7, [pc, #632]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr.w	lr, [pc, #636]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+sub.w	r5, r7, #16
+ldrb	r4, [r7, r2]
+ldrb.w	r8, [r5, r2]
+ldrb.w	r4, [lr, r4]
+ldrb.w	r8, [lr, r8]
+lsls	r4, r4, #24
+ldr	r5, [sp, #44]	@ 0x2c
+orr.w	r4, r4, r8, lsl #16
+str	r4, [sp, #96]	@ 0x60
+cmp	r5, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #52]	@ 0x34
+add	r2, r5
+ldrb.w	r8, [r7, r2]
+sub.w	r5, r7, #16
+ldrb	r5, [r5, r2]
+ldrb.w	r8, [lr, r8]
+ldrb.w	r5, [lr, r5]
+mov.w	r8, r8, lsl #24
+orr.w	r8, r8, r5, lsl #16
+ldr	r5, [sp, #20]
+str.w	r8, [sp, #100]	@ 0x64
+cmp	r5, #3
+orr.w	r4, r4, r8
+bne.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #52]	@ 0x34
+add	r2, r5
+ldrb.w	r8, [r7, r2]
+sub.w	r5, r7, #16
+ldrb	r2, [r5, r2]
+ldrb.w	r8, [lr, r8]
+ldrb.w	r2, [lr, r2]
+mov.w	r8, r8, lsl #24
+orr.w	r2, r8, r2, lsl #16
+str	r2, [sp, #104]	@ 0x68
+orrs	r4, r2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r4, #1
+uxtb	r3, r3
+str	r3, [sp, #0]
+sub.w	r3, r0, #224	@ 0xe0
+lsl.w	r3, r4, r3
+negs	r3, r3
+ands	r1, r3
+movs	r6, #7
+lsr.w	lr, r1, r5
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+uxtb	r2, r2
+str	r2, [sp, #0]
+mov.w	r2, #4294967295
+sub.w	lr, r1, #224	@ 0xe0
+lsl.w	r2, r2, lr
+ands	r4, r2
+movs	r6, #7
+lsr.w	r8, r4, r5
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r0, r0, #24
+add.w	r0, r0, r0, lsl #8
+strh	r0, [r1, #6]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+uxtb	r5, r0
+add.w	r5, r5, r5, lsl #8
+lsls	r6, r4, #29
+strh	r5, [r1, #0]
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ubfx	r5, r0, #8, #8
+and.w	r6, r0, #65280	@ 0xff00
+add	r5, r6
+strh	r5, [r1, #2]
+lsls	r5, r4, #30
+bpl.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r0, [pc, #424]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr	r4, [sp, #44]	@ 0x2c
+ldr.w	ip, [pc, #424]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r0, r0, r4, lsl #1
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r1, r1, #4
+lsls	r2, r2, #4
+lsls	r3, r3, #4
+adds	r0, #8
+lsrs	r5, r3, #28
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r1, r1, #4
+lsls	r2, r2, #4
+lsls	r3, r3, #4
+adds	r0, #8
+lsrs	r5, r3, #28
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r6, r1, #28
+lsrs	r4, r2, #28
+orr.w	r4, r4, r6, lsl #4
+ldr.w	r4, [ip, r4, lsl #2]
+lsls	r6, r5, #28
+orr.w	r4, lr, r4
+bmi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r7, r5, #29
+bmi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r6, r5, #30
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ubfx	r6, r4, #16, #8
+add.w	r6, r6, r6, lsl #8
+strh	r6, [r0, #4]
+lsls	r5, r5, #31
+bmi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #4
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r1, r1, #4
+lsls	r2, r2, #4
+adds	r0, #8
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+uxtb	r6, r4
+add.w	r6, r6, r6, lsl #8
+lsls	r7, r5, #29
+strh	r6, [r0, #0]
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ubfx	r6, r4, #8, #8
+and.w	r7, r4, #65280	@ 0xff00
+add	r6, r7
+strh	r6, [r0, #2]
+lsls	r6, r5, #30
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r4, r4, #24
+add.w	r4, r4, r4, lsl #8
+strh	r4, [r0, #6]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr.w	r8, [pc, #296]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r4, r4, #4
+lsls	r1, r1, #4
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r6, r3, #24
+mov	r5, r3
+adds	r2, #16
+lsls	r3, r3, #8
+cmp	r6, #0
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r7, r4, #28
+lsrs	r6, r1, #28
+orr.w	r6, r6, r7, lsl #4
+ldr.w	r6, [r8, r6, lsl #2]
+cmp	r5, #0
+orr.w	r6, ip, r6
+uxtb	r7, r6
+itt	lt
+addlt.w	lr, r7, r7, lsl #8
+strhlt.w	lr, [r2, #-16]
+tst.w	r5, #1073741824	@ 0xADDR
+itt	ne
+addne.w	r7, r7, r7, lsl #8
+strhne.w	r7, [r2, #-14]
+ubfx	r7, r6, #8, #8
+tst.w	r5, #536870912	@ 0xADDR
+itt	ne
+addne.w	lr, r7, r7, lsl #8
+strhne.w	lr, [r2, #-12]
+tst.w	r5, #268435456	@ 0xADDR
+itt	ne
+addne.w	r7, r7, r7, lsl #8
+strhne.w	r7, [r2, #-10]
+ubfx	r7, r6, #16, #8
+tst.w	r5, #134217728	@ 0xADDR
+itt	ne
+addne.w	lr, r7, r7, lsl #8
+strhne.w	lr, [r2, #-8]
+tst.w	r5, #<ADDR>	@ 0xADDR
+it	ne
+addne.w	r7, r7, r7, lsl #8
+mov.w	r6, r6, lsr #24
+it	ne
+strhne.w	r7, [r2, #-6]
+lsls	r7, r5, #6
+itt	mi
+addmi.w	r7, r6, r6, lsl #8
+strhmi.w	r7, [r2, #-4]
+lsls	r5, r5, #7
+itt	mi
+addmi.w	r6, r6, r6, lsl #8
+strhmi.w	r6, [r2, #-2]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r5, #15
+str	r5, [sp, #48]	@ 0x30
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r5, #15
+str	r5, [sp, #64]	@ 0x40
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r4, r2
+ldr	r2, [sp, #76]	@ 0x4c
+orrs	r2, r4
+ldr	r4, [pc, #96]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+uxtb	r2, r2
+add.w	r2, r2, r2, lsl #8
+add.w	r4, r4, r1, lsl #1
+cmp	r3, #0
+blt.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #1
+cmp	r3, #0
+add.w	r4, r4, #2
+bge.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #1
+strh	r2, [r4, #0]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+adds	r4, #2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+mov	r1, r2
+ldr	r2, [sp, #72]	@ 0x48
+orrs	r2, r1
+ldr	r1, [pc, #44]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+uxtb	r2, r2
+add.w	r2, r2, r2, lsl #8
+add.w	r1, r1, r0, lsl #1
+cmp	r3, #0
+blt.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #1
+cmp	r3, #0
+add.w	r1, r1, #2
+bge.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #1
+strh	r2, [r1, #0]
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+adds	r1, #2
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r2, #14
+str	r2, [sp, #48]	@ 0x30
+movs	r2, #2
+str	r2, [sp, #56]	@ 0x38
+movs	r2, #0
+str	r2, [sp, #72]	@ 0x48
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r2, #14
+str	r2, [sp, #56]	@ 0x38
+movs	r2, #2
+str	r2, [sp, #64]	@ 0x40
+movs	r2, #0
+str	r2, [sp, #76]	@ 0x4c
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r4, [sp, #44]	@ 0x2c
+ldr	r0, [pc, #204]	@ (<ADDR> <pico9918_output_sprites.constprop.0+OFF>)
+ldr.w	ip, [pc, #204]	@ <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+add.w	r0, r0, r4, lsl #1
+ldr	r4, [sp, #104]	@ 0x68
+lsrs	r5, r3, #28
+bne.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #4
+lsrs	r5, r3, #28
+mov.w	r4, r4, lsl #4
+mov.w	r1, r1, lsl #4
+mov.w	r2, r2, lsl #4
+add.w	r0, r0, #8
+beq.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsrs	r6, r4, #28
+lsrs	r7, r1, #28
+orr.w	r7, r7, r6, lsl #4
+lsrs	r6, r2, #28
+orr.w	r6, r6, r7, lsl #4
+ldr.w	r7, [ip, r6, lsl #2]
+orr.w	r6, lr, r7
+lsls	r7, r5, #28
+str	r6, [sp, #0]
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldrb.w	r6, [sp]
+add.w	r6, r6, r6, lsl #8
+strh	r6, [r0, #0]
+lsls	r6, r5, #29
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #0]
+ubfx	r7, r6, #8, #8
+and.w	r6, r6, #65280	@ 0xff00
+str	r6, [sp, #12]
+mov	r6, r7
+ldr	r7, [sp, #12]
+add	r6, r7
+strh	r6, [r0, #2]
+lsls	r6, r5, #30
+bpl.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r6, [sp, #0]
+ubfx	r6, r6, #16, #8
+add.w	r6, r6, r6, lsl #8
+strh	r6, [r0, #4]
+lsls	r7, r5, #31
+bmi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r3, r3, #4
+beq.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r4, r4, #4
+lsls	r1, r1, #4
+lsls	r2, r2, #4
+adds	r0, #8
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r6, r5, #29
+bmi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+lsls	r7, r5, #30
+bmi.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+ldr	r5, [sp, #0]
+lsrs	r5, r5, #24
+add.w	r5, r5, r5, lsl #8
+strh	r5, [r0, #6]
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cbnz	r0, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r2, r2, #48	@ 0x30
+str	r2, [sp, #76]	@ 0x4c
+movs	r2, #15
+str	r0, [sp, #64]	@ 0x40
+str	r2, [sp, #56]	@ 0x38
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+cbnz	r0, <ADDR> <pico9918_output_sprites.constprop.0+OFF>
+and.w	r2, r2, #48	@ 0x30
+str	r2, [sp, #72]	@ 0x48
+movs	r2, #15
+str	r0, [sp, #56]	@ 0x38
+str	r2, [sp, #48]	@ 0x30
+b.w	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r2, #15
+str	r2, [sp, #56]	@ 0x38
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+movs	r2, #15
+str	r2, [sp, #48]	@ 0x30
+b.n	<ADDR> <pico9918_output_sprites.constprop.0+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>

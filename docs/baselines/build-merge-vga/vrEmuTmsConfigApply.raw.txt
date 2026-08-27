@@ -1,0 +1,266 @@
+200037cc <vrEmuTmsConfigApply>:
+200037cc:	4b66      	ldr	r3, [pc, #408]	@ (20003968 <vrEmuTmsConfigApply+0x19c>)
+200037ce:	b510      	push	{r4, lr}
+200037d0:	681b      	ldr	r3, [r3, #0]
+200037d2:	2b00      	cmp	r3, #0
+200037d4:	d000      	beq.n	200037d8 <vrEmuTmsConfigApply+0xc>
+200037d6:	4798      	blx	r3
+200037d8:	4b64      	ldr	r3, [pc, #400]	@ (2000396c <vrEmuTmsConfigApply+0x1a0>)
+200037da:	4a65      	ldr	r2, [pc, #404]	@ (20003970 <vrEmuTmsConfigApply+0x1a4>)
+200037dc:	6818      	ldr	r0, [r3, #0]
+200037de:	4b65      	ldr	r3, [pc, #404]	@ (20003974 <vrEmuTmsConfigApply+0x1a8>)
+200037e0:	5c82      	ldrb	r2, [r0, r2]
+200037e2:	5cc3      	ldrb	r3, [r0, r3]
+200037e4:	2a00      	cmp	r2, #0
+200037e6:	d100      	bne.n	200037ea <vrEmuTmsConfigApply+0x1e>
+200037e8:	e0b1      	b.n	2000394e <vrEmuTmsConfigApply+0x182>
+200037ea:	2204      	movs	r2, #4
+200037ec:	4313      	orrs	r3, r2
+200037ee:	4a61      	ldr	r2, [pc, #388]	@ (20003974 <vrEmuTmsConfigApply+0x1a8>)
+200037f0:	5483      	strb	r3, [r0, r2]
+200037f2:	4b61      	ldr	r3, [pc, #388]	@ (20003978 <vrEmuTmsConfigApply+0x1ac>)
+200037f4:	5cc2      	ldrb	r2, [r0, r3]
+200037f6:	2301      	movs	r3, #1
+200037f8:	3202      	adds	r2, #2
+200037fa:	4093      	lsls	r3, r2
+200037fc:	4a5f      	ldr	r2, [pc, #380]	@ (2000397c <vrEmuTmsConfigApply+0x1b0>)
+200037fe:	5483      	strb	r3, [r0, r2]
+20003800:	4b5f      	ldr	r3, [pc, #380]	@ (20003980 <vrEmuTmsConfigApply+0x1b4>)
+20003802:	5cc2      	ldrb	r2, [r0, r3]
+20003804:	4b5f      	ldr	r3, [pc, #380]	@ (20003984 <vrEmuTmsConfigApply+0x1b8>)
+20003806:	0212      	lsls	r2, r2, #8
+20003808:	5cc3      	ldrb	r3, [r0, r3]
+2000380a:	4313      	orrs	r3, r2
+2000380c:	4a5e      	ldr	r2, [pc, #376]	@ (20003988 <vrEmuTmsConfigApply+0x1bc>)
+2000380e:	ba5b      	rev16	r3, r3
+20003810:	5283      	strh	r3, [r0, r2]
+20003812:	4b5e      	ldr	r3, [pc, #376]	@ (2000398c <vrEmuTmsConfigApply+0x1c0>)
+20003814:	5cc2      	ldrb	r2, [r0, r3]
+20003816:	4b5e      	ldr	r3, [pc, #376]	@ (20003990 <vrEmuTmsConfigApply+0x1c4>)
+20003818:	0212      	lsls	r2, r2, #8
+2000381a:	5cc3      	ldrb	r3, [r0, r3]
+2000381c:	4313      	orrs	r3, r2
+2000381e:	4a5d      	ldr	r2, [pc, #372]	@ (20003994 <vrEmuTmsConfigApply+0x1c8>)
+20003820:	ba5b      	rev16	r3, r3
+20003822:	5283      	strh	r3, [r0, r2]
+20003824:	4b5c      	ldr	r3, [pc, #368]	@ (20003998 <vrEmuTmsConfigApply+0x1cc>)
+20003826:	5cc2      	ldrb	r2, [r0, r3]
+20003828:	4b5c      	ldr	r3, [pc, #368]	@ (2000399c <vrEmuTmsConfigApply+0x1d0>)
+2000382a:	0212      	lsls	r2, r2, #8
+2000382c:	5cc3      	ldrb	r3, [r0, r3]
+2000382e:	4313      	orrs	r3, r2
+20003830:	4a5b      	ldr	r2, [pc, #364]	@ (200039a0 <vrEmuTmsConfigApply+0x1d4>)
+20003832:	ba5b      	rev16	r3, r3
+20003834:	5283      	strh	r3, [r0, r2]
+20003836:	4b5b      	ldr	r3, [pc, #364]	@ (200039a4 <vrEmuTmsConfigApply+0x1d8>)
+20003838:	5cc2      	ldrb	r2, [r0, r3]
+2000383a:	4b5b      	ldr	r3, [pc, #364]	@ (200039a8 <vrEmuTmsConfigApply+0x1dc>)
+2000383c:	0212      	lsls	r2, r2, #8
+2000383e:	5cc3      	ldrb	r3, [r0, r3]
+20003840:	4313      	orrs	r3, r2
+20003842:	4a5a      	ldr	r2, [pc, #360]	@ (200039ac <vrEmuTmsConfigApply+0x1e0>)
+20003844:	ba5b      	rev16	r3, r3
+20003846:	5283      	strh	r3, [r0, r2]
+20003848:	4b59      	ldr	r3, [pc, #356]	@ (200039b0 <vrEmuTmsConfigApply+0x1e4>)
+2000384a:	5cc2      	ldrb	r2, [r0, r3]
+2000384c:	4b59      	ldr	r3, [pc, #356]	@ (200039b4 <vrEmuTmsConfigApply+0x1e8>)
+2000384e:	0212      	lsls	r2, r2, #8
+20003850:	5cc3      	ldrb	r3, [r0, r3]
+20003852:	4313      	orrs	r3, r2
+20003854:	4a58      	ldr	r2, [pc, #352]	@ (200039b8 <vrEmuTmsConfigApply+0x1ec>)
+20003856:	ba5b      	rev16	r3, r3
+20003858:	5283      	strh	r3, [r0, r2]
+2000385a:	4b58      	ldr	r3, [pc, #352]	@ (200039bc <vrEmuTmsConfigApply+0x1f0>)
+2000385c:	5cc2      	ldrb	r2, [r0, r3]
+2000385e:	4b58      	ldr	r3, [pc, #352]	@ (200039c0 <vrEmuTmsConfigApply+0x1f4>)
+20003860:	0212      	lsls	r2, r2, #8
+20003862:	5cc3      	ldrb	r3, [r0, r3]
+20003864:	4313      	orrs	r3, r2
+20003866:	4a57      	ldr	r2, [pc, #348]	@ (200039c4 <vrEmuTmsConfigApply+0x1f8>)
+20003868:	ba5b      	rev16	r3, r3
+2000386a:	5283      	strh	r3, [r0, r2]
+2000386c:	4b56      	ldr	r3, [pc, #344]	@ (200039c8 <vrEmuTmsConfigApply+0x1fc>)
+2000386e:	5cc2      	ldrb	r2, [r0, r3]
+20003870:	4b56      	ldr	r3, [pc, #344]	@ (200039cc <vrEmuTmsConfigApply+0x200>)
+20003872:	0212      	lsls	r2, r2, #8
+20003874:	5cc3      	ldrb	r3, [r0, r3]
+20003876:	4313      	orrs	r3, r2
+20003878:	4a55      	ldr	r2, [pc, #340]	@ (200039d0 <vrEmuTmsConfigApply+0x204>)
+2000387a:	ba5b      	rev16	r3, r3
+2000387c:	5283      	strh	r3, [r0, r2]
+2000387e:	4b55      	ldr	r3, [pc, #340]	@ (200039d4 <vrEmuTmsConfigApply+0x208>)
+20003880:	5cc2      	ldrb	r2, [r0, r3]
+20003882:	4b55      	ldr	r3, [pc, #340]	@ (200039d8 <vrEmuTmsConfigApply+0x20c>)
+20003884:	0212      	lsls	r2, r2, #8
+20003886:	5cc3      	ldrb	r3, [r0, r3]
+20003888:	4313      	orrs	r3, r2
+2000388a:	4a54      	ldr	r2, [pc, #336]	@ (200039dc <vrEmuTmsConfigApply+0x210>)
+2000388c:	ba5b      	rev16	r3, r3
+2000388e:	5283      	strh	r3, [r0, r2]
+20003890:	4b53      	ldr	r3, [pc, #332]	@ (200039e0 <vrEmuTmsConfigApply+0x214>)
+20003892:	5cc2      	ldrb	r2, [r0, r3]
+20003894:	4b53      	ldr	r3, [pc, #332]	@ (200039e4 <vrEmuTmsConfigApply+0x218>)
+20003896:	0212      	lsls	r2, r2, #8
+20003898:	5cc3      	ldrb	r3, [r0, r3]
+2000389a:	4313      	orrs	r3, r2
+2000389c:	4a52      	ldr	r2, [pc, #328]	@ (200039e8 <vrEmuTmsConfigApply+0x21c>)
+2000389e:	ba5b      	rev16	r3, r3
+200038a0:	5283      	strh	r3, [r0, r2]
+200038a2:	4b52      	ldr	r3, [pc, #328]	@ (200039ec <vrEmuTmsConfigApply+0x220>)
+200038a4:	5cc2      	ldrb	r2, [r0, r3]
+200038a6:	4b52      	ldr	r3, [pc, #328]	@ (200039f0 <vrEmuTmsConfigApply+0x224>)
+200038a8:	0212      	lsls	r2, r2, #8
+200038aa:	5cc3      	ldrb	r3, [r0, r3]
+200038ac:	4313      	orrs	r3, r2
+200038ae:	4a51      	ldr	r2, [pc, #324]	@ (200039f4 <vrEmuTmsConfigApply+0x228>)
+200038b0:	ba5b      	rev16	r3, r3
+200038b2:	5283      	strh	r3, [r0, r2]
+200038b4:	4b50      	ldr	r3, [pc, #320]	@ (200039f8 <vrEmuTmsConfigApply+0x22c>)
+200038b6:	5cc2      	ldrb	r2, [r0, r3]
+200038b8:	4b50      	ldr	r3, [pc, #320]	@ (200039fc <vrEmuTmsConfigApply+0x230>)
+200038ba:	0212      	lsls	r2, r2, #8
+200038bc:	5cc3      	ldrb	r3, [r0, r3]
+200038be:	4313      	orrs	r3, r2
+200038c0:	4a4f      	ldr	r2, [pc, #316]	@ (20003a00 <vrEmuTmsConfigApply+0x234>)
+200038c2:	ba5b      	rev16	r3, r3
+200038c4:	5283      	strh	r3, [r0, r2]
+200038c6:	4b4f      	ldr	r3, [pc, #316]	@ (20003a04 <vrEmuTmsConfigApply+0x238>)
+200038c8:	5cc2      	ldrb	r2, [r0, r3]
+200038ca:	4b4f      	ldr	r3, [pc, #316]	@ (20003a08 <vrEmuTmsConfigApply+0x23c>)
+200038cc:	0212      	lsls	r2, r2, #8
+200038ce:	5cc3      	ldrb	r3, [r0, r3]
+200038d0:	4313      	orrs	r3, r2
+200038d2:	4a4e      	ldr	r2, [pc, #312]	@ (20003a0c <vrEmuTmsConfigApply+0x240>)
+200038d4:	ba5b      	rev16	r3, r3
+200038d6:	5283      	strh	r3, [r0, r2]
+200038d8:	4b4d      	ldr	r3, [pc, #308]	@ (20003a10 <vrEmuTmsConfigApply+0x244>)
+200038da:	5cc2      	ldrb	r2, [r0, r3]
+200038dc:	4b4d      	ldr	r3, [pc, #308]	@ (20003a14 <vrEmuTmsConfigApply+0x248>)
+200038de:	0212      	lsls	r2, r2, #8
+200038e0:	5cc3      	ldrb	r3, [r0, r3]
+200038e2:	4313      	orrs	r3, r2
+200038e4:	4a4c      	ldr	r2, [pc, #304]	@ (20003a18 <vrEmuTmsConfigApply+0x24c>)
+200038e6:	ba5b      	rev16	r3, r3
+200038e8:	5283      	strh	r3, [r0, r2]
+200038ea:	4b4c      	ldr	r3, [pc, #304]	@ (20003a1c <vrEmuTmsConfigApply+0x250>)
+200038ec:	5cc2      	ldrb	r2, [r0, r3]
+200038ee:	4b4c      	ldr	r3, [pc, #304]	@ (20003a20 <vrEmuTmsConfigApply+0x254>)
+200038f0:	0212      	lsls	r2, r2, #8
+200038f2:	5cc3      	ldrb	r3, [r0, r3]
+200038f4:	4313      	orrs	r3, r2
+200038f6:	4a4b      	ldr	r2, [pc, #300]	@ (20003a24 <vrEmuTmsConfigApply+0x258>)
+200038f8:	ba5b      	rev16	r3, r3
+200038fa:	5283      	strh	r3, [r0, r2]
+200038fc:	4b4a      	ldr	r3, [pc, #296]	@ (20003a28 <vrEmuTmsConfigApply+0x25c>)
+200038fe:	5cc2      	ldrb	r2, [r0, r3]
+20003900:	4b4a      	ldr	r3, [pc, #296]	@ (20003a2c <vrEmuTmsConfigApply+0x260>)
+20003902:	0212      	lsls	r2, r2, #8
+20003904:	5cc3      	ldrb	r3, [r0, r3]
+20003906:	4313      	orrs	r3, r2
+20003908:	4a49      	ldr	r2, [pc, #292]	@ (20003a30 <vrEmuTmsConfigApply+0x264>)
+2000390a:	ba5b      	rev16	r3, r3
+2000390c:	5283      	strh	r3, [r0, r2]
+2000390e:	4b49      	ldr	r3, [pc, #292]	@ (20003a34 <vrEmuTmsConfigApply+0x268>)
+20003910:	5cc2      	ldrb	r2, [r0, r3]
+20003912:	4b49      	ldr	r3, [pc, #292]	@ (20003a38 <vrEmuTmsConfigApply+0x26c>)
+20003914:	0212      	lsls	r2, r2, #8
+20003916:	5cc3      	ldrb	r3, [r0, r3]
+20003918:	4313      	orrs	r3, r2
+2000391a:	4a48      	ldr	r2, [pc, #288]	@ (20003a3c <vrEmuTmsConfigApply+0x270>)
+2000391c:	ba5b      	rev16	r3, r3
+2000391e:	5283      	strh	r3, [r0, r2]
+20003920:	4b47      	ldr	r3, [pc, #284]	@ (20003a40 <vrEmuTmsConfigApply+0x274>)
+20003922:	5cc2      	ldrb	r2, [r0, r3]
+20003924:	2301      	movs	r3, #1
+20003926:	2a00      	cmp	r2, #0
+20003928:	d103      	bne.n	20003932 <vrEmuTmsConfigApply+0x166>
+2000392a:	4a46      	ldr	r2, [pc, #280]	@ (20003a44 <vrEmuTmsConfigApply+0x278>)
+2000392c:	5c82      	ldrb	r2, [r0, r2]
+2000392e:	2a00      	cmp	r2, #0
+20003930:	d010      	beq.n	20003954 <vrEmuTmsConfigApply+0x188>
+20003932:	4a45      	ldr	r2, [pc, #276]	@ (20003a48 <vrEmuTmsConfigApply+0x27c>)
+20003934:	5483      	strb	r3, [r0, r2]
+20003936:	4b45      	ldr	r3, [pc, #276]	@ (20003a4c <vrEmuTmsConfigApply+0x280>)
+20003938:	5cc3      	ldrb	r3, [r0, r3]
+2000393a:	3b01      	subs	r3, #1
+2000393c:	425a      	negs	r2, r3
+2000393e:	4153      	adcs	r3, r2
+20003940:	7c42      	ldrb	r2, [r0, #17]
+20003942:	429a      	cmp	r2, r3
+20003944:	d002      	beq.n	2000394c <vrEmuTmsConfigApply+0x180>
+20003946:	7443      	strb	r3, [r0, #17]
+20003948:	f7ff fe62 	bl	20003610 <vrEmuTmsUpdateActiveOps>
+2000394c:	bd10      	pop	{r4, pc}
+2000394e:	2204      	movs	r2, #4
+20003950:	4393      	bics	r3, r2
+20003952:	e74c      	b.n	200037ee <vrEmuTmsConfigApply+0x22>
+20003954:	4a3e      	ldr	r2, [pc, #248]	@ (20003a50 <vrEmuTmsConfigApply+0x284>)
+20003956:	5c82      	ldrb	r2, [r0, r2]
+20003958:	2a00      	cmp	r2, #0
+2000395a:	d1ea      	bne.n	20003932 <vrEmuTmsConfigApply+0x166>
+2000395c:	4b3d      	ldr	r3, [pc, #244]	@ (20003a54 <vrEmuTmsConfigApply+0x288>)
+2000395e:	5cc3      	ldrb	r3, [r0, r3]
+20003960:	1e5a      	subs	r2, r3, #1
+20003962:	4193      	sbcs	r3, r2
+20003964:	e7e5      	b.n	20003932 <vrEmuTmsConfigApply+0x166>
+20003966:	46c0      	nop			@ (mov r8, r8)
+20003968:	20027438 	.word	0x20027438
+2000396c:	2000d534 	.word	0x2000d534
+20003970:	00010058 	.word	0x00010058
+20003974:	0000605e 	.word	0x0000605e
+20003978:	00010059 	.word	0x00010059
+2000397c:	0000604a 	.word	0x0000604a
+20003980:	000100d0 	.word	0x000100d0
+20003984:	000100d1 	.word	0x000100d1
+20003988:	0000502c 	.word	0x0000502c
+2000398c:	000100d2 	.word	0x000100d2
+20003990:	000100d3 	.word	0x000100d3
+20003994:	0000502e 	.word	0x0000502e
+20003998:	000100d4 	.word	0x000100d4
+2000399c:	000100d5 	.word	0x000100d5
+200039a0:	00005030 	.word	0x00005030
+200039a4:	000100d6 	.word	0x000100d6
+200039a8:	000100d7 	.word	0x000100d7
+200039ac:	00005032 	.word	0x00005032
+200039b0:	000100d8 	.word	0x000100d8
+200039b4:	000100d9 	.word	0x000100d9
+200039b8:	00005034 	.word	0x00005034
+200039bc:	000100da 	.word	0x000100da
+200039c0:	000100db 	.word	0x000100db
+200039c4:	00005036 	.word	0x00005036
+200039c8:	000100dc 	.word	0x000100dc
+200039cc:	000100dd 	.word	0x000100dd
+200039d0:	00005038 	.word	0x00005038
+200039d4:	000100de 	.word	0x000100de
+200039d8:	000100df 	.word	0x000100df
+200039dc:	0000503a 	.word	0x0000503a
+200039e0:	000100e0 	.word	0x000100e0
+200039e4:	000100e1 	.word	0x000100e1
+200039e8:	0000503c 	.word	0x0000503c
+200039ec:	000100e2 	.word	0x000100e2
+200039f0:	000100e3 	.word	0x000100e3
+200039f4:	0000503e 	.word	0x0000503e
+200039f8:	000100e4 	.word	0x000100e4
+200039fc:	000100e5 	.word	0x000100e5
+20003a00:	00005040 	.word	0x00005040
+20003a04:	000100e6 	.word	0x000100e6
+20003a08:	000100e7 	.word	0x000100e7
+20003a0c:	00005042 	.word	0x00005042
+20003a10:	000100e8 	.word	0x000100e8
+20003a14:	000100e9 	.word	0x000100e9
+20003a18:	00005044 	.word	0x00005044
+20003a1c:	000100ea 	.word	0x000100ea
+20003a20:	000100eb 	.word	0x000100eb
+20003a24:	00005046 	.word	0x00005046
+20003a28:	000100ec 	.word	0x000100ec
+20003a2c:	000100ed 	.word	0x000100ed
+20003a30:	00005048 	.word	0x00005048
+20003a34:	000100ee 	.word	0x000100ee
+20003a38:	000100ef 	.word	0x000100ef
+20003a3c:	0000504a 	.word	0x0000504a
+20003a40:	00010064 	.word	0x00010064
+20003a44:	00010063 	.word	0x00010063
+20003a48:	00010060 	.word	0x00010060
+20003a4c:	0001005f 	.word	0x0001005f
+20003a50:	00010062 	.word	0x00010062
+20003a54:	00010061 	.word	0x00010061

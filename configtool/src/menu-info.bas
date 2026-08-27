@@ -36,7 +36,7 @@ deviceInfoMenu: PROCEDURE
 
     VDP_STATUS_REG = 12  ' config
 
-    VDP_REG(58) = CONF_PICO_MODEL
+    VDP_REG(58) = PICO9918_CONF_PICO_MODEL
     optValue = VDP_STATUS
     #addr = XY(21, g_menuTopRow + 0)
     PRINT AT #addr, "RP2"
@@ -47,7 +47,7 @@ deviceInfoMenu: PROCEDURE
     END IF
 
     PRINT AT #addr + 31, " "
-    VDP_REG(58) = CONF_HW_VERSION
+    VDP_REG(58) = PICO9918_CONF_HW_VERSION
     optValue = VDP_STATUS
     tmpMajor = optValue / 16
     tmpMinor = optValue AND $0f
@@ -55,15 +55,15 @@ deviceInfoMenu: PROCEDURE
     PRINT "v", tmpMajor, "."
     IF hwMinor = 0 THEN PRINT "x" ELSE PRINT hwMinor
 
-    VDP_REG(58) = CONF_SW_VERSION
+    VDP_REG(58) = PICO9918_CONF_SW_VERSION
     optValue = VDP_STATUS
     tmpMajor = optValue / 16
     tmpMinor = optValue AND $0f
-    VDP_REG(58) = CONF_SW_PATCH_VERSION
+    VDP_REG(58) = PICO9918_CONF_SW_PATCH_VERSION
     tmpPatch = VDP_STATUS
     PRINT AT #addr + 64, "v", tmpMajor, ".", tmpMinor, ".", tmpPatch
 
-    VDP_REG(58) = CONF_DISP_DRIVER
+    VDP_REG(58) = PICO9918_CONF_DISP_DRIVER
     optValue = VDP_STATUS
     #addr = #addr + 96
     IF optValue = 1 THEN

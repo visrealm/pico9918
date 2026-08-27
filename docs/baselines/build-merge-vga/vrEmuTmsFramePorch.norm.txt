@@ -1,0 +1,15 @@
+<ADDR> <vrEmuTmsFramePorch>:
+ldr	r3, [pc, #16]	@ (<ADDR> <vrEmuTmsFramePorch+OFF>)
+ldr	r2, [pc, #20]	@ (<ADDR> <vrEmuTmsFramePorch+OFF>)
+ldr	r3, [r3, #0]
+ldr	r1, [pc, #20]	@ (<ADDR> <vrEmuTmsFramePorch+OFF>)
+strh	r1, [r3, r2]
+ldr	r2, [pc, #20]	@ (<ADDR> <vrEmuTmsFramePorch+OFF>)
+subs	r1, #1
+subs	r1, #255	@ 0xff
+strb	r1, [r3, r2]
+bx	lr
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

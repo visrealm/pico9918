@@ -1,0 +1,16 @@
+<ADDR> <pico9918_frame_porch>:
+movs	r2, #224	@ 0xe0
+ldr	r3, [pc, #20]	@ (<ADDR> <pico9918_frame_porch+OFF>)
+ldr	r1, [pc, #20]	@ (<ADDR> <pico9918_frame_porch+OFF>)
+ldr	r3, [r3, #0]
+lsls	r2, r2, #7
+strh	r1, [r3, r2]
+ldr	r2, [pc, #16]	@ (<ADDR> <pico9918_frame_porch+OFF>)
+subs	r1, #1
+subs	r1, #255	@ 0xff
+strb	r1, [r3, r2]
+bx	lr
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

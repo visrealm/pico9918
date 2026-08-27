@@ -2,7 +2,8 @@ CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
-Claude.md
+CLAUDE.md
+.claude/
 Testing
 Makefile
 cmake_install.cmake
@@ -15,3 +16,21 @@ testapps/**
 configtool/build/**
 configtool/CLAUDE.md
 pico9918_config.cmake
+__pycache__/
+test/live/shots/
+test/live/perf-*.json
+test/live/shots-*/
+# reports are generated from the records beside them, so only the records are kept
+test/live/reports/
+test/live/history/history-data.json
+test/live/history/history-report.html
+# docs tooling working files (pdf -> markdown conversion)
+docs/node_modules/
+docs/pdf_input/
+docs/pdf_output/
+docs/package.json
+docs/package-lock.json
+
+# Generated API documentation. CI builds it and publishes it; it is never
+# committed, so a regeneration cannot show up as a thousand-file diff.
+/doc/

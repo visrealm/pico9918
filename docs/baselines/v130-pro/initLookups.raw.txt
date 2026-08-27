@@ -1,0 +1,53 @@
+10001658 <initLookups>:
+10001658:	4a1d      	ldr	r2, [pc, #116]	@ (100016d0 <initLookups+0x78>)
+1000165a:	b508      	push	{r3, lr}
+1000165c:	7813      	ldrb	r3, [r2, #0]
+1000165e:	b103      	cbz	r3, 10001662 <initLookups+0xa>
+10001660:	bd08      	pop	{r3, pc}
+10001662:	20e4      	movs	r0, #228	@ 0xe4
+10001664:	f000 f96c 	bl	10001940 <__dma_claim_mask_veneer>
+10001668:	f7ff ff66 	bl	10001538 <ecmLookupInit>
+1000166c:	f7ff ff9c 	bl	100015a8 <doubledBitsInit>
+10001670:	f7ff ffca 	bl	10001608 <reversedBitsInit>
+10001674:	f7ff ffe0 	bl	10001638 <ecm0PaletteInit>
+10001678:	4b16      	ldr	r3, [pc, #88]	@ (100016d4 <initLookups+0x7c>)
+1000167a:	4a17      	ldr	r2, [pc, #92]	@ (100016d8 <initLookups+0x80>)
+1000167c:	f04f 0e1b 	mov.w	lr, #27
+10001680:	f8c3 2090 	str.w	r2, [r3, #144]	@ 0x90
+10001684:	4a15      	ldr	r2, [pc, #84]	@ (100016dc <initLookups+0x84>)
+10001686:	f04f 40a0 	mov.w	r0, #1342177280	@ 0x50000000
+1000168a:	f8c3 2080 	str.w	r2, [r3, #128]	@ 0x80
+1000168e:	2240      	movs	r2, #64	@ 0x40
+10001690:	f04f 0c01 	mov.w	ip, #1
+10001694:	f8c3 2088 	str.w	r2, [r3, #136]	@ 0x88
+10001698:	4a11      	ldr	r2, [pc, #68]	@ (100016e0 <initLookups+0x88>)
+1000169a:	4912      	ldr	r1, [pc, #72]	@ (100016e4 <initLookups+0x8c>)
+1000169c:	651a      	str	r2, [r3, #80]	@ 0x50
+1000169e:	4a12      	ldr	r2, [pc, #72]	@ (100016e8 <initLookups+0x90>)
+100016a0:	641a      	str	r2, [r3, #64]	@ 0x40
+100016a2:	f8c3 e048 	str.w	lr, [r3, #72]	@ 0x48
+100016a6:	f8df e04c 	ldr.w	lr, [pc, #76]	@ 100016f4 <initLookups+0x9c>
+100016aa:	4a09      	ldr	r2, [pc, #36]	@ (100016d0 <initLookups+0x78>)
+100016ac:	f8c0 e090 	str.w	lr, [r0, #144]	@ 0x90
+100016b0:	f8df e044 	ldr.w	lr, [pc, #68]	@ 100016f8 <initLookups+0xa0>
+100016b4:	f8c0 e080 	str.w	lr, [r0, #128]	@ 0x80
+100016b8:	480c      	ldr	r0, [pc, #48]	@ (100016ec <initLookups+0x94>)
+100016ba:	f8df e040 	ldr.w	lr, [pc, #64]	@ 100016fc <initLookups+0xa4>
+100016be:	6001      	str	r1, [r0, #0]
+100016c0:	480b      	ldr	r0, [pc, #44]	@ (100016f0 <initLookups+0x98>)
+100016c2:	f8c0 e000 	str.w	lr, [r0]
+100016c6:	f8c3 10d0 	str.w	r1, [r3, #208]	@ 0xd0
+100016ca:	f882 c000 	strb.w	ip, [r2]
+100016ce:	bd08      	pop	{r3, pc}
+100016d0:	2002c101 	.word	0x2002c101
+100016d4:	50000100 	.word	0x50000100
+100016d8:	007ec049 	.word	0x007ec049
+100016dc:	20081a08 	.word	0x20081a08
+100016e0:	007ea049 	.word	0x007ea049
+100016e4:	007ee053 	.word	0x007ee053
+100016e8:	20025e88 	.word	0x20025e88
+100016ec:	2002bcd8 	.word	0x2002bcd8
+100016f0:	2002bcdc 	.word	0x2002bcdc
+100016f4:	007e4049 	.word	0x007e4049
+100016f8:	20081a0c 	.word	0x20081a0c
+100016fc:	007ee05b 	.word	0x007ee05b

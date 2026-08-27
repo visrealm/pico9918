@@ -1,0 +1,338 @@
+2002508c <pico9918_frame_scanline>:
+2002508c:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+20025090:	880b      	ldrh	r3, [r1, #0]
+20025092:	b08b      	sub	sp, #44	@ 0x2c
+20025094:	4689      	mov	r9, r1
+20025096:	4617      	mov	r7, r2
+20025098:	9302      	str	r3, [sp, #8]
+2002509a:	4682      	mov	sl, r0
+2002509c:	f3c0 050b 	ubfx	r5, r0, #0, #12
+200250a0:	f7ff ffd8 	bl	20025054 <pico9918_line_bytes>
+200250a4:	4606      	mov	r6, r0
+200250a6:	f7ff ffcf 	bl	20025048 <pico9918_display_mode>
+200250aa:	2804      	cmp	r0, #4
+200250ac:	f04f 0007 	mov.w	r0, #7
+200250b0:	f000 8192 	beq.w	200253d8 <pico9918_frame_scanline+0x34c>
+200250b4:	f7ff feca 	bl	20024e4c <pico9918_reg_value>
+200250b8:	f8df 8310 	ldr.w	r8, [pc, #784]	@ 200253cc <pico9918_frame_scanline+0x340>
+200250bc:	f000 000f 	and.w	r0, r0, #15
+200250c0:	f8d8 3000 	ldr.w	r3, [r8]
+200250c4:	f503 43c0 	add.w	r3, r3, #24576	@ 0x6000
+200250c8:	7e1b      	ldrb	r3, [r3, #24]
+200250ca:	011b      	lsls	r3, r3, #4
+200250cc:	f003 0330 	and.w	r3, r3, #48	@ 0x30
+200250d0:	4303      	orrs	r3, r0
+200250d2:	4cb9      	ldr	r4, [pc, #740]	@ (200253b8 <pico9918_frame_scanline+0x32c>)
+200250d4:	f854 2023 	ldr.w	r2, [r4, r3, lsl #2]
+200250d8:	4bb8      	ldr	r3, [pc, #736]	@ (200253bc <pico9918_frame_scanline+0x330>)
+200250da:	601a      	str	r2, [r3, #0]
+200250dc:	b92d      	cbnz	r5, 200250ea <pico9918_frame_scanline+0x5e>
+200250de:	f8d8 3000 	ldr.w	r3, [r8]
+200250e2:	f503 3380 	add.w	r3, r3, #65536	@ 0x10000
+200250e6:	f883 55ee 	strb.w	r5, [r3, #1518]	@ 0x5ee
+200250ea:	f04f 43a0 	mov.w	r3, #1342177280	@ 0x50000000
+200250ee:	f8d3 2090 	ldr.w	r2, [r3, #144]	@ 0x90
+200250f2:	0150      	lsls	r0, r2, #5
+200250f4:	d4fb      	bmi.n	200250ee <pico9918_frame_scanline+0x62>
+200250f6:	f8df b2d8 	ldr.w	fp, [pc, #728]	@ 200253d0 <pico9918_frame_scanline+0x344>
+200250fa:	f8df c2d8 	ldr.w	ip, [pc, #728]	@ 200253d4 <pico9918_frame_scanline+0x348>
+200250fe:	f8db 0000 	ldr.w	r0, [fp]
+20025102:	f8dc 2000 	ldr.w	r2, [ip]
+20025106:	4285      	cmp	r5, r0
+20025108:	eb00 0e02 	add.w	lr, r0, r2
+2002510c:	f8d8 2000 	ldr.w	r2, [r8]
+20025110:	f0c0 8143 	bcc.w	2002539a <pico9918_frame_scanline+0x30e>
+20025114:	4575      	cmp	r5, lr
+20025116:	f080 80cd 	bcs.w	200252b4 <pico9918_frame_scanline+0x228>
+2002511a:	9902      	ldr	r1, [sp, #8]
+2002511c:	1a28      	subs	r0, r5, r0
+2002511e:	f5b1 7300 	subs.w	r3, r1, #512	@ 0x200
+20025122:	bf48      	it	mi
+20025124:	f46f 7cfe 	mvnmi.w	ip, #508	@ 0x1fc
+20025128:	b285      	uxth	r5, r0
+2002512a:	f04f 0000 	mov.w	r0, #0
+2002512e:	bf48      	it	mi
+20025130:	eb01 030c 	addmi.w	r3, r1, ip
+20025134:	109b      	asrs	r3, r3, #2
+20025136:	9303      	str	r3, [sp, #12]
+20025138:	f04f 43a0 	mov.w	r3, #1342177280	@ 0x50000000
+2002513c:	49a0      	ldr	r1, [pc, #640]	@ (200253c0 <pico9918_frame_scanline+0x334>)
+2002513e:	6a89      	ldr	r1, [r1, #40]	@ 0x28
+20025140:	9502      	str	r5, [sp, #8]
+20025142:	9107      	str	r1, [sp, #28]
+20025144:	f502 41e0 	add.w	r1, r2, #28672	@ 0x7000
+20025148:	7048      	strb	r0, [r1, #1]
+2002514a:	9802      	ldr	r0, [sp, #8]
+2002514c:	700d      	strb	r5, [r1, #0]
+2002514e:	f502 4530 	add.w	r5, r2, #45056	@ 0xb000
+20025152:	70e8      	strb	r0, [r5, #3]
+20025154:	9803      	ldr	r0, [sp, #12]
+20025156:	f8c3 0088 	str.w	r0, [r3, #136]	@ 0x88
+2002515a:	f8c3 70ac 	str.w	r7, [r3, #172]	@ 0xac
+2002515e:	f502 3380 	add.w	r3, r2, #65536	@ 0x10000
+20025162:	9306      	str	r3, [sp, #24]
+20025164:	f893 3034 	ldrb.w	r3, [r3, #52]	@ 0x34
+20025168:	2b00      	cmp	r3, #0
+2002516a:	f040 810f 	bne.w	2002538c <pico9918_frame_scanline+0x300>
+2002516e:	f995 3002 	ldrsb.w	r3, [r5, #2]
+20025172:	2b00      	cmp	r3, #0
+20025174:	f2c0 810a 	blt.w	2002538c <pico9918_frame_scanline+0x300>
+20025178:	f899 3004 	ldrb.w	r3, [r9, #4]
+2002517c:	f502 42c0 	add.w	r2, r2, #24576	@ 0x6000
+20025180:	b11b      	cbz	r3, 2002518a <pico9918_frame_scanline+0xfe>
+20025182:	7813      	ldrb	r3, [r2, #0]
+20025184:	0718      	lsls	r0, r3, #28
+20025186:	f100 813d 	bmi.w	20025404 <pico9918_frame_scanline+0x378>
+2002518a:	9802      	ldr	r0, [sp, #8]
+2002518c:	f8df a230 	ldr.w	sl, [pc, #560]	@ 200253c0 <pico9918_frame_scanline+0x334>
+20025190:	e9cd 2104 	strd	r2, r1, [sp, #16]
+20025194:	f8da 3028 	ldr.w	r3, [sl, #40]	@ 0x28
+20025198:	9309      	str	r3, [sp, #36]	@ 0x24
+2002519a:	f7ff fd7f 	bl	20024c9c <pico9918_scan_line>
+2002519e:	f8da 3028 	ldr.w	r3, [sl, #40]	@ 0x28
+200251a2:	4682      	mov	sl, r0
+200251a4:	9308      	str	r3, [sp, #32]
+200251a6:	f7ff ff6b 	bl	20025080 <pico9918_line_source>
+200251aa:	9905      	ldr	r1, [sp, #20]
+200251ac:	4603      	mov	r3, r0
+200251ae:	7808      	ldrb	r0, [r1, #0]
+200251b0:	7869      	ldrb	r1, [r5, #1]
+200251b2:	9a04      	ldr	r2, [sp, #16]
+200251b4:	f001 01fc 	and.w	r1, r1, #252	@ 0xfc
+200251b8:	7069      	strb	r1, [r5, #1]
+200251ba:	b120      	cbz	r0, 200251c6 <pico9918_frame_scanline+0x13a>
+200251bc:	f892 c013 	ldrb.w	ip, [r2, #19]
+200251c0:	4584      	cmp	ip, r0
+200251c2:	f000 8129 	beq.w	20025418 <pico9918_frame_scanline+0x38c>
+200251c6:	f892 2032 	ldrb.w	r2, [r2, #50]	@ 0x32
+200251ca:	0651      	lsls	r1, r2, #25
+200251cc:	d503      	bpl.n	200251d6 <pico9918_frame_scanline+0x14a>
+200251ce:	2201      	movs	r2, #1
+200251d0:	9906      	ldr	r1, [sp, #24]
+200251d2:	f881 2030 	strb.w	r2, [r1, #48]	@ 0x30
+200251d6:	4650      	mov	r0, sl
+200251d8:	9304      	str	r3, [sp, #16]
+200251da:	f7f2 fab9 	bl	20017750 <pico9918_frame_update_interrupts>
+200251de:	f04f 41a0 	mov.w	r1, #1342177280	@ 0x50000000
+200251e2:	9b04      	ldr	r3, [sp, #16]
+200251e4:	f8d1 2090 	ldr.w	r2, [r1, #144]	@ 0x90
+200251e8:	0152      	lsls	r2, r2, #5
+200251ea:	d4fb      	bmi.n	200251e4 <pico9918_frame_scanline+0x158>
+200251ec:	2501      	movs	r5, #1
+200251ee:	f8d8 1000 	ldr.w	r1, [r8]
+200251f2:	9a03      	ldr	r2, [sp, #12]
+200251f4:	f501 4ce0 	add.w	ip, r1, #28672	@ 0x7000
+200251f8:	f5b6 7f80 	cmp.w	r6, #256	@ 0x100
+200251fc:	ea4f 0082 	mov.w	r0, r2, lsl #2
+20025200:	f88c 5001 	strb.w	r5, [ip, #1]
+20025204:	eb07 0282 	add.w	r2, r7, r2, lsl #2
+20025208:	f000 810e 	beq.w	20025428 <pico9918_frame_scanline+0x39c>
+2002520c:	199d      	adds	r5, r3, r6
+2002520e:	42ab      	cmp	r3, r5
+20025210:	d23b      	bcs.n	2002528a <pico9918_frame_scanline+0x1fe>
+20025212:	3e01      	subs	r6, #1
+20025214:	f103 0510 	add.w	r5, r3, #16
+20025218:	f026 0607 	bic.w	r6, r6, #7
+2002521c:	3210      	adds	r2, #16
+2002521e:	442e      	add	r6, r5
+20025220:	3308      	adds	r3, #8
+20025222:	f813 5c08 	ldrb.w	r5, [r3, #-8]
+20025226:	f813 cc07 	ldrb.w	ip, [r3, #-7]
+2002522a:	f834 5025 	ldrh.w	r5, [r4, r5, lsl #2]
+2002522e:	f854 c02c 	ldr.w	ip, [r4, ip, lsl #2]
+20025232:	3308      	adds	r3, #8
+20025234:	ea45 450c 	orr.w	r5, r5, ip, lsl #16
+20025238:	f842 5c10 	str.w	r5, [r2, #-16]
+2002523c:	f813 5c0e 	ldrb.w	r5, [r3, #-14]
+20025240:	f813 cc0d 	ldrb.w	ip, [r3, #-13]
+20025244:	f834 5025 	ldrh.w	r5, [r4, r5, lsl #2]
+20025248:	f854 c02c 	ldr.w	ip, [r4, ip, lsl #2]
+2002524c:	3210      	adds	r2, #16
+2002524e:	ea45 450c 	orr.w	r5, r5, ip, lsl #16
+20025252:	f842 5c1c 	str.w	r5, [r2, #-28]
+20025256:	f813 5c0c 	ldrb.w	r5, [r3, #-12]
+2002525a:	f813 cc0b 	ldrb.w	ip, [r3, #-11]
+2002525e:	f834 5025 	ldrh.w	r5, [r4, r5, lsl #2]
+20025262:	f854 c02c 	ldr.w	ip, [r4, ip, lsl #2]
+20025266:	ea45 450c 	orr.w	r5, r5, ip, lsl #16
+2002526a:	f842 5c18 	str.w	r5, [r2, #-24]
+2002526e:	f813 5c0a 	ldrb.w	r5, [r3, #-10]
+20025272:	f813 cc09 	ldrb.w	ip, [r3, #-9]
+20025276:	f834 5025 	ldrh.w	r5, [r4, r5, lsl #2]
+2002527a:	f854 c02c 	ldr.w	ip, [r4, ip, lsl #2]
+2002527e:	42b3      	cmp	r3, r6
+20025280:	ea45 450c 	orr.w	r5, r5, ip, lsl #16
+20025284:	f842 5c14 	str.w	r5, [r2, #-20]
+20025288:	d1cb      	bne.n	20025222 <pico9918_frame_scanline+0x196>
+2002528a:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2002528e:	f500 6080 	add.w	r0, r0, #1024	@ 0x400
+20025292:	4438      	add	r0, r7
+20025294:	f501 3180 	add.w	r1, r1, #65536	@ 0x10000
+20025298:	f8c2 00ac 	str.w	r0, [r2, #172]	@ 0xac
+2002529c:	f891 3060 	ldrb.w	r3, [r1, #96]	@ 0x60
+200252a0:	2b00      	cmp	r3, #0
+200252a2:	d153      	bne.n	2002534c <pico9918_frame_scanline+0x2c0>
+200252a4:	f891 3062 	ldrb.w	r3, [r1, #98]	@ 0x62
+200252a8:	2b00      	cmp	r3, #0
+200252aa:	d165      	bne.n	20025378 <pico9918_frame_scanline+0x2ec>
+200252ac:	2000      	movs	r0, #0
+200252ae:	b00b      	add	sp, #44	@ 0x2c
+200252b0:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+200252b4:	2401      	movs	r4, #1
+200252b6:	f8b9 1000 	ldrh.w	r1, [r9]
+200252ba:	40e1      	lsrs	r1, r4
+200252bc:	f8c3 1088 	str.w	r1, [r3, #136]	@ 0x88
+200252c0:	f502 41e0 	add.w	r1, r2, #28672	@ 0x7000
+200252c4:	f8c3 70ac 	str.w	r7, [r3, #172]	@ 0xac
+200252c8:	704c      	strb	r4, [r1, #1]
+200252ca:	1a2b      	subs	r3, r5, r0
+200252cc:	700b      	strb	r3, [r1, #0]
+200252ce:	f502 4130 	add.w	r1, r2, #45056	@ 0xb000
+200252d2:	70cb      	strb	r3, [r1, #3]
+200252d4:	4b3b      	ldr	r3, [pc, #236]	@ (200253c4 <pico9918_frame_scanline+0x338>)
+200252d6:	4c3c      	ldr	r4, [pc, #240]	@ (200253c8 <pico9918_frame_scanline+0x33c>)
+200252d8:	781b      	ldrb	r3, [r3, #0]
+200252da:	b1ab      	cbz	r3, 20025308 <pico9918_frame_scanline+0x27c>
+200252dc:	6823      	ldr	r3, [r4, #0]
+200252de:	f5b3 7f16 	cmp.w	r3, #600	@ 0x258
+200252e2:	db11      	blt.n	20025308 <pico9918_frame_scanline+0x27c>
+200252e4:	3801      	subs	r0, #1
+200252e6:	4285      	cmp	r5, r0
+200252e8:	d02b      	beq.n	20025342 <pico9918_frame_scanline+0x2b6>
+200252ea:	f502 43c0 	add.w	r3, r2, #24576	@ 0x6000
+200252ee:	f893 3032 	ldrb.w	r3, [r3, #50]	@ 0x32
+200252f2:	065b      	lsls	r3, r3, #25
+200252f4:	d504      	bpl.n	20025300 <pico9918_frame_scanline+0x274>
+200252f6:	2301      	movs	r3, #1
+200252f8:	f502 3280 	add.w	r2, r2, #65536	@ 0x10000
+200252fc:	f882 3030 	strb.w	r3, [r2, #48]	@ 0x30
+20025300:	2001      	movs	r0, #1
+20025302:	b00b      	add	sp, #44	@ 0x2c
+20025304:	e8bd 8ff0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+20025308:	f04f 42a0 	mov.w	r2, #1342177280	@ 0x50000000
+2002530c:	f8d2 3090 	ldr.w	r3, [r2, #144]	@ 0x90
+20025310:	0159      	lsls	r1, r3, #5
+20025312:	d4fb      	bmi.n	2002530c <pico9918_frame_scanline+0x280>
+20025314:	9701      	str	r7, [sp, #4]
+20025316:	f8b9 3002 	ldrh.w	r3, [r9, #2]
+2002531a:	4628      	mov	r0, r5
+2002531c:	9300      	str	r3, [sp, #0]
+2002531e:	f8dc 3000 	ldr.w	r3, [ip]
+20025322:	f8db 2000 	ldr.w	r2, [fp]
+20025326:	6821      	ldr	r1, [r4, #0]
+20025328:	f7f2 fbbe 	bl	20017aa8 <pico9918_splash_render>
+2002532c:	6823      	ldr	r3, [r4, #0]
+2002532e:	f8d8 2000 	ldr.w	r2, [r8]
+20025332:	f5b3 7f61 	cmp.w	r3, #900	@ 0x384
+20025336:	dc5a      	bgt.n	200253ee <pico9918_frame_scanline+0x362>
+20025338:	f8db 0000 	ldr.w	r0, [fp]
+2002533c:	3801      	subs	r0, #1
+2002533e:	4285      	cmp	r5, r0
+20025340:	d1d3      	bne.n	200252ea <pico9918_frame_scanline+0x25e>
+20025342:	9202      	str	r2, [sp, #8]
+20025344:	f7f4 f85c 	bl	20019400 <pico9918_palette_regenerate>
+20025348:	9a02      	ldr	r2, [sp, #8]
+2002534a:	e7ce      	b.n	200252ea <pico9918_frame_scanline+0x25e>
+2002534c:	f8d2 3090 	ldr.w	r3, [r2, #144]	@ 0x90
+20025350:	015b      	lsls	r3, r3, #5
+20025352:	d4fb      	bmi.n	2002534c <pico9918_frame_scanline+0x2c0>
+20025354:	9b02      	ldr	r3, [sp, #8]
+20025356:	f8db 0000 	ldr.w	r0, [fp]
+2002535a:	f8b9 1002 	ldrh.w	r1, [r9, #2]
+2002535e:	1818      	adds	r0, r3, r0
+20025360:	463a      	mov	r2, r7
+20025362:	b280      	uxth	r0, r0
+20025364:	f7f3 fc60 	bl	20018c28 <pico9918_diag_render>
+20025368:	f8d8 1000 	ldr.w	r1, [r8]
+2002536c:	f501 3180 	add.w	r1, r1, #65536	@ 0x10000
+20025370:	f891 3062 	ldrb.w	r3, [r1, #98]	@ 0x62
+20025374:	2b00      	cmp	r3, #0
+20025376:	d099      	beq.n	200252ac <pico9918_frame_scanline+0x220>
+20025378:	e9dd 2108 	ldrd	r2, r1, [sp, #32]
+2002537c:	4b10      	ldr	r3, [pc, #64]	@ (200253c0 <pico9918_frame_scanline+0x334>)
+2002537e:	1a50      	subs	r0, r2, r1
+20025380:	6a99      	ldr	r1, [r3, #40]	@ 0x28
+20025382:	9b07      	ldr	r3, [sp, #28]
+20025384:	1ac9      	subs	r1, r1, r3
+20025386:	f7f3 fbf7 	bl	20018b78 <pico9918_diag_update_render_time>
+2002538a:	e78f      	b.n	200252ac <pico9918_frame_scanline+0x220>
+2002538c:	e9cd 2104 	strd	r2, r1, [sp, #16]
+20025390:	f7f4 f836 	bl	20019400 <pico9918_palette_regenerate>
+20025394:	e9dd 2104 	ldrd	r2, r1, [sp, #16]
+20025398:	e6ee      	b.n	20025178 <pico9918_frame_scanline+0xec>
+2002539a:	2401      	movs	r4, #1
+2002539c:	f8b9 1000 	ldrh.w	r1, [r9]
+200253a0:	4575      	cmp	r5, lr
+200253a2:	fa21 f104 	lsr.w	r1, r1, r4
+200253a6:	f8c3 1088 	str.w	r1, [r3, #136]	@ 0x88
+200253aa:	f502 41e0 	add.w	r1, r2, #28672	@ 0x7000
+200253ae:	f8c3 70ac 	str.w	r7, [r3, #172]	@ 0xac
+200253b2:	704c      	strb	r4, [r1, #1]
+200253b4:	d38e      	bcc.n	200252d4 <pico9918_frame_scanline+0x248>
+200253b6:	e788      	b.n	200252ca <pico9918_frame_scanline+0x23e>
+200253b8:	2002bce8 	.word	0x2002bce8
+200253bc:	20081a0c 	.word	0x20081a0c
+200253c0:	400b0000 	.word	0x400b0000
+200253c4:	2002c105 	.word	0x2002c105
+200253c8:	2002bce4 	.word	0x2002bce4
+200253cc:	20025f10 	.word	0x20025f10
+200253d0:	2002c0e8 	.word	0x2002c0e8
+200253d4:	20026230 	.word	0x20026230
+200253d8:	f5b6 7f80 	cmp.w	r6, #256	@ 0x100
+200253dc:	f47f ae6a 	bne.w	200250b4 <pico9918_frame_scanline+0x28>
+200253e0:	f7ff fd34 	bl	20024e4c <pico9918_reg_value>
+200253e4:	f8df 80b4 	ldr.w	r8, [pc, #180]	@ 2002549c <pico9918_frame_scanline+0x410>
+200253e8:	f000 030f 	and.w	r3, r0, #15
+200253ec:	e671      	b.n	200250d2 <pico9918_frame_scanline+0x46>
+200253ee:	f04f 3401 	mov.w	r4, #16843009	@ 0x1010101
+200253f2:	2101      	movs	r1, #1
+200253f4:	f502 3380 	add.w	r3, r2, #65536	@ 0x10000
+200253f8:	f8db 0000 	ldr.w	r0, [fp]
+200253fc:	661c      	str	r4, [r3, #96]	@ 0x60
+200253fe:	f883 1064 	strb.w	r1, [r3, #100]	@ 0x64
+20025402:	e76f      	b.n	200252e4 <pico9918_frame_scanline+0x258>
+20025404:	f899 3005 	ldrb.w	r3, [r9, #5]
+20025408:	f3ca 3000 	ubfx	r0, sl, #12, #1
+2002540c:	4058      	eors	r0, r3
+2002540e:	9b02      	ldr	r3, [sp, #8]
+20025410:	eb00 0043 	add.w	r0, r0, r3, lsl #1
+20025414:	b280      	uxth	r0, r0
+20025416:	e6b9      	b.n	2002518c <pico9918_frame_scanline+0x100>
+20025418:	f041 0101 	orr.w	r1, r1, #1
+2002541c:	f06a 0a7f 	orn	sl, sl, #127	@ 0x7f
+20025420:	7069      	strb	r1, [r5, #1]
+20025422:	fa5f fa8a 	uxtb.w	sl, sl
+20025426:	e6ce      	b.n	200251c6 <pico9918_frame_scanline+0x13a>
+20025428:	f102 0520 	add.w	r5, r2, #32
+2002542c:	3308      	adds	r3, #8
+2002542e:	f502 6284 	add.w	r2, r2, #1056	@ 0x420
+20025432:	f813 6c08 	ldrb.w	r6, [r3, #-8]
+20025436:	3520      	adds	r5, #32
+20025438:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+2002543c:	3308      	adds	r3, #8
+2002543e:	f845 6c40 	str.w	r6, [r5, #-64]
+20025442:	f813 6c0f 	ldrb.w	r6, [r3, #-15]
+20025446:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+2002544a:	f845 6c3c 	str.w	r6, [r5, #-60]
+2002544e:	f813 6c0e 	ldrb.w	r6, [r3, #-14]
+20025452:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+20025456:	f845 6c38 	str.w	r6, [r5, #-56]
+2002545a:	f813 6c0d 	ldrb.w	r6, [r3, #-13]
+2002545e:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+20025462:	f845 6c34 	str.w	r6, [r5, #-52]
+20025466:	f813 6c0c 	ldrb.w	r6, [r3, #-12]
+2002546a:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+2002546e:	f845 6c30 	str.w	r6, [r5, #-48]
+20025472:	f813 6c0b 	ldrb.w	r6, [r3, #-11]
+20025476:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+2002547a:	f845 6c2c 	str.w	r6, [r5, #-44]
+2002547e:	f813 6c0a 	ldrb.w	r6, [r3, #-10]
+20025482:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+20025486:	f845 6c28 	str.w	r6, [r5, #-40]
+2002548a:	f813 6c09 	ldrb.w	r6, [r3, #-9]
+2002548e:	f854 6026 	ldr.w	r6, [r4, r6, lsl #2]
+20025492:	f845 6c24 	str.w	r6, [r5, #-36]
+20025496:	4295      	cmp	r5, r2
+20025498:	d1cb      	bne.n	20025432 <pico9918_frame_scanline+0x3a6>
+2002549a:	e6f6      	b.n	2002528a <pico9918_frame_scanline+0x1fe>
+2002549c:	20025f10 	.word	0x20025f10

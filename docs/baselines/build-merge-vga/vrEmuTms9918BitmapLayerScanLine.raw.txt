@@ -1,0 +1,699 @@
+200068bc <vrEmuTms9918BitmapLayerScanLine>:
+200068bc:	b5f0      	push	{r4, r5, r6, r7, lr}
+200068be:	4657      	mov	r7, sl
+200068c0:	464e      	mov	r6, r9
+200068c2:	4645      	mov	r5, r8
+200068c4:	46de      	mov	lr, fp
+200068c6:	2201      	movs	r2, #1
+200068c8:	b5e0      	push	{r5, r6, r7, lr}
+200068ca:	4d8d      	ldr	r5, [pc, #564]	@ (20006b00 <vrEmuTms9918BitmapLayerScanLine+0x244>)
+200068cc:	4b8d      	ldr	r3, [pc, #564]	@ (20006b04 <vrEmuTms9918BitmapLayerScanLine+0x248>)
+200068ce:	682e      	ldr	r6, [r5, #0]
+200068d0:	4692      	mov	sl, r2
+200068d2:	5cf7      	ldrb	r7, [r6, r3]
+200068d4:	56f3      	ldrsb	r3, [r6, r3]
+200068d6:	b089      	sub	sp, #36	@ 0x24
+200068d8:	2b00      	cmp	r3, #0
+200068da:	da72      	bge.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+200068dc:	4a8a      	ldr	r2, [pc, #552]	@ (20006b08 <vrEmuTms9918BitmapLayerScanLine+0x24c>)
+200068de:	8c33      	ldrh	r3, [r6, #32]
+200068e0:	5cb2      	ldrb	r2, [r6, r2]
+200068e2:	429a      	cmp	r2, r3
+200068e4:	d86d      	bhi.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+200068e6:	1a9a      	subs	r2, r3, r2
+200068e8:	4b88      	ldr	r3, [pc, #544]	@ (20006b0c <vrEmuTms9918BitmapLayerScanLine+0x250>)
+200068ea:	b292      	uxth	r2, r2
+200068ec:	5cf3      	ldrb	r3, [r6, r3]
+200068ee:	4293      	cmp	r3, r2
+200068f0:	d967      	bls.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+200068f2:	4b87      	ldr	r3, [pc, #540]	@ (20006b10 <vrEmuTms9918BitmapLayerScanLine+0x254>)
+200068f4:	6ab4      	ldr	r4, [r6, #40]	@ 0x28
+200068f6:	5cf3      	ldrb	r3, [r6, r3]
+200068f8:	2b00      	cmp	r3, #0
+200068fa:	d16a      	bne.n	200069d2 <vrEmuTms9918BitmapLayerScanLine+0x116>
+200068fc:	2340      	movs	r3, #64	@ 0x40
+200068fe:	2140      	movs	r1, #64	@ 0x40
+20006900:	4699      	mov	r9, r3
+20006902:	4698      	mov	r8, r3
+20006904:	4b83      	ldr	r3, [pc, #524]	@ (20006b14 <vrEmuTms9918BitmapLayerScanLine+0x258>)
+20006906:	434a      	muls	r2, r1
+20006908:	5cf3      	ldrb	r3, [r6, r3]
+2000690a:	019b      	lsls	r3, r3, #6
+2000690c:	189b      	adds	r3, r3, r2
+2000690e:	9302      	str	r3, [sp, #8]
+20006910:	2320      	movs	r3, #32
+20006912:	403b      	ands	r3, r7
+20006914:	001a      	movs	r2, r3
+20006916:	469b      	mov	fp, r3
+20006918:	067b      	lsls	r3, r7, #25
+2000691a:	d400      	bmi.n	2000691e <vrEmuTms9918BitmapLayerScanLine+0x62>
+2000691c:	e0eb      	b.n	20006af6 <vrEmuTms9918BitmapLayerScanLine+0x23a>
+2000691e:	2a00      	cmp	r2, #0
+20006920:	d103      	bne.n	2000692a <vrEmuTms9918BitmapLayerScanLine+0x6e>
+20006922:	4643      	mov	r3, r8
+20006924:	2b40      	cmp	r3, #64	@ 0x40
+20006926:	d100      	bne.n	2000692a <vrEmuTms9918BitmapLayerScanLine+0x6e>
+20006928:	e280      	b.n	20006e2c <vrEmuTms9918BitmapLayerScanLine+0x570>
+2000692a:	2301      	movs	r3, #1
+2000692c:	469a      	mov	sl, r3
+2000692e:	9303      	str	r3, [sp, #12]
+20006930:	22d0      	movs	r2, #208	@ 0xd0
+20006932:	4b79      	ldr	r3, [pc, #484]	@ (20006b18 <vrEmuTms9918BitmapLayerScanLine+0x25c>)
+20006934:	4694      	mov	ip, r2
+20006936:	5cf6      	ldrb	r6, [r6, r3]
+20006938:	00bb      	lsls	r3, r7, #2
+2000693a:	2280      	movs	r2, #128	@ 0x80
+2000693c:	9301      	str	r3, [sp, #4]
+2000693e:	23a0      	movs	r3, #160	@ 0xa0
+20006940:	9604      	str	r6, [sp, #16]
+20006942:	05db      	lsls	r3, r3, #23
+20006944:	0452      	lsls	r2, r2, #17
+20006946:	06ff      	lsls	r7, r7, #27
+20006948:	d548      	bpl.n	200069dc <vrEmuTms9918BitmapLayerScanLine+0x120>
+2000694a:	4661      	mov	r1, ip
+2000694c:	5858      	ldr	r0, [r3, r1]
+2000694e:	0001      	movs	r1, r0
+20006950:	4011      	ands	r1, r2
+20006952:	4210      	tst	r0, r2
+20006954:	d1f9      	bne.n	2000694a <vrEmuTms9918BitmapLayerScanLine+0x8e>
+20006956:	4643      	mov	r3, r8
+20006958:	2b00      	cmp	r3, #0
+2000695a:	d032      	beq.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+2000695c:	2030      	movs	r0, #48	@ 0x30
+2000695e:	9b01      	ldr	r3, [sp, #4]
+20006960:	4018      	ands	r0, r3
+20006962:	9b03      	ldr	r3, [sp, #12]
+20006964:	2b00      	cmp	r3, #0
+20006966:	d000      	beq.n	2000696a <vrEmuTms9918BitmapLayerScanLine+0xae>
+20006968:	e166      	b.n	20006c38 <vrEmuTms9918BitmapLayerScanLine+0x37c>
+2000696a:	465b      	mov	r3, fp
+2000696c:	2b00      	cmp	r3, #0
+2000696e:	d100      	bne.n	20006972 <vrEmuTms9918BitmapLayerScanLine+0xb6>
+20006970:	e1f9      	b.n	20006d66 <vrEmuTms9918BitmapLayerScanLine+0x4aa>
+20006972:	466b      	mov	r3, sp
+20006974:	2100      	movs	r1, #0
+20006976:	4680      	mov	r8, r0
+20006978:	891b      	ldrh	r3, [r3, #8]
+2000697a:	682a      	ldr	r2, [r5, #0]
+2000697c:	200f      	movs	r0, #15
+2000697e:	18d2      	adds	r2, r2, r3
+20006980:	322c      	adds	r2, #44	@ 0x2c
+20006982:	7812      	ldrb	r2, [r2, #0]
+20006984:	0017      	movs	r7, r2
+20006986:	0112      	lsls	r2, r2, #4
+20006988:	4387      	bics	r7, r0
+2000698a:	b2d2      	uxtb	r2, r2
+2000698c:	2f00      	cmp	r7, #0
+2000698e:	d006      	beq.n	2000699e <vrEmuTms9918BitmapLayerScanLine+0xe2>
+20006990:	4640      	mov	r0, r8
+20006992:	113f      	asrs	r7, r7, #4
+20006994:	4307      	orrs	r7, r0
+20006996:	0038      	movs	r0, r7
+20006998:	55a7      	strb	r7, [r4, r6]
+2000699a:	19a7      	adds	r7, r4, r6
+2000699c:	7078      	strb	r0, [r7, #1]
+2000699e:	2a00      	cmp	r2, #0
+200069a0:	d009      	beq.n	200069b6 <vrEmuTms9918BitmapLayerScanLine+0xfa>
+200069a2:	1cb7      	adds	r7, r6, #2
+200069a4:	b2ff      	uxtb	r7, r7
+200069a6:	46bc      	mov	ip, r7
+200069a8:	4640      	mov	r0, r8
+200069aa:	1112      	asrs	r2, r2, #4
+200069ac:	44a4      	add	ip, r4
+200069ae:	4302      	orrs	r2, r0
+200069b0:	4660      	mov	r0, ip
+200069b2:	55e2      	strb	r2, [r4, r7]
+200069b4:	7042      	strb	r2, [r0, #1]
+200069b6:	3604      	adds	r6, #4
+200069b8:	3101      	adds	r1, #1
+200069ba:	b2f6      	uxtb	r6, r6
+200069bc:	3301      	adds	r3, #1
+200069be:	4589      	cmp	r9, r1
+200069c0:	dcdb      	bgt.n	2000697a <vrEmuTms9918BitmapLayerScanLine+0xbe>
+200069c2:	4650      	mov	r0, sl
+200069c4:	b009      	add	sp, #36	@ 0x24
+200069c6:	bcf0      	pop	{r4, r5, r6, r7}
+200069c8:	46bb      	mov	fp, r7
+200069ca:	46b2      	mov	sl, r6
+200069cc:	46a9      	mov	r9, r5
+200069ce:	46a0      	mov	r8, r4
+200069d0:	bdf0      	pop	{r4, r5, r6, r7, pc}
+200069d2:	089b      	lsrs	r3, r3, #2
+200069d4:	4698      	mov	r8, r3
+200069d6:	0019      	movs	r1, r3
+200069d8:	4699      	mov	r9, r3
+200069da:	e793      	b.n	20006904 <vrEmuTms9918BitmapLayerScanLine+0x48>
+200069dc:	4661      	mov	r1, ip
+200069de:	5858      	ldr	r0, [r3, r1]
+200069e0:	0001      	movs	r1, r0
+200069e2:	4011      	ands	r1, r2
+200069e4:	4210      	tst	r0, r2
+200069e6:	d1f9      	bne.n	200069dc <vrEmuTms9918BitmapLayerScanLine+0x120>
+200069e8:	4643      	mov	r3, r8
+200069ea:	2b00      	cmp	r3, #0
+200069ec:	d0e9      	beq.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+200069ee:	203c      	movs	r0, #60	@ 0x3c
+200069f0:	9b01      	ldr	r3, [sp, #4]
+200069f2:	4018      	ands	r0, r3
+200069f4:	465b      	mov	r3, fp
+200069f6:	2b00      	cmp	r3, #0
+200069f8:	d100      	bne.n	200069fc <vrEmuTms9918BitmapLayerScanLine+0x140>
+200069fa:	e091      	b.n	20006b20 <vrEmuTms9918BitmapLayerScanLine+0x264>
+200069fc:	9b03      	ldr	r3, [sp, #12]
+200069fe:	2b00      	cmp	r3, #0
+20006a00:	d100      	bne.n	20006a04 <vrEmuTms9918BitmapLayerScanLine+0x148>
+20006a02:	e1d0      	b.n	20006da6 <vrEmuTms9918BitmapLayerScanLine+0x4ea>
+20006a04:	466b      	mov	r3, sp
+20006a06:	891b      	ldrh	r3, [r3, #8]
+20006a08:	9401      	str	r4, [sp, #4]
+20006a0a:	4698      	mov	r8, r3
+20006a0c:	2380      	movs	r3, #128	@ 0x80
+20006a0e:	061b      	lsls	r3, r3, #24
+20006a10:	469c      	mov	ip, r3
+20006a12:	2300      	movs	r3, #0
+20006a14:	9002      	str	r0, [sp, #8]
+20006a16:	4664      	mov	r4, ip
+20006a18:	0030      	movs	r0, r6
+20006a1a:	469b      	mov	fp, r3
+20006a1c:	4a3f      	ldr	r2, [pc, #252]	@ (20006b1c <vrEmuTms9918BitmapLayerScanLine+0x260>)
+20006a1e:	9606      	str	r6, [sp, #24]
+20006a20:	9205      	str	r2, [sp, #20]
+20006a22:	9503      	str	r5, [sp, #12]
+20006a24:	223f      	movs	r2, #63	@ 0x3f
+20006a26:	9b03      	ldr	r3, [sp, #12]
+20006a28:	0016      	movs	r6, r2
+20006a2a:	681b      	ldr	r3, [r3, #0]
+20006a2c:	4443      	add	r3, r8
+20006a2e:	332c      	adds	r3, #44	@ 0x2c
+20006a30:	781b      	ldrb	r3, [r3, #0]
+20006a32:	001d      	movs	r5, r3
+20006a34:	009f      	lsls	r7, r3, #2
+20006a36:	4397      	bics	r7, r2
+20006a38:	4395      	bics	r5, r2
+20006a3a:	011a      	lsls	r2, r3, #4
+20006a3c:	43b2      	bics	r2, r6
+20006a3e:	019b      	lsls	r3, r3, #6
+20006a40:	b2ff      	uxtb	r7, r7
+20006a42:	b2d2      	uxtb	r2, r2
+20006a44:	b2db      	uxtb	r3, r3
+20006a46:	2d00      	cmp	r5, #0
+20006a48:	d005      	beq.n	20006a56 <vrEmuTms9918BitmapLayerScanLine+0x19a>
+20006a4a:	9e02      	ldr	r6, [sp, #8]
+20006a4c:	11ad      	asrs	r5, r5, #6
+20006a4e:	4335      	orrs	r5, r6
+20006a50:	9e01      	ldr	r6, [sp, #4]
+20006a52:	4321      	orrs	r1, r4
+20006a54:	5435      	strb	r5, [r6, r0]
+20006a56:	2f00      	cmp	r7, #0
+20006a58:	d008      	beq.n	20006a6c <vrEmuTms9918BitmapLayerScanLine+0x1b0>
+20006a5a:	9e02      	ldr	r6, [sp, #8]
+20006a5c:	11bf      	asrs	r7, r7, #6
+20006a5e:	4337      	orrs	r7, r6
+20006a60:	1c45      	adds	r5, r0, #1
+20006a62:	9e01      	ldr	r6, [sp, #4]
+20006a64:	b2ed      	uxtb	r5, r5
+20006a66:	5577      	strb	r7, [r6, r5]
+20006a68:	0865      	lsrs	r5, r4, #1
+20006a6a:	4329      	orrs	r1, r5
+20006a6c:	2a00      	cmp	r2, #0
+20006a6e:	d008      	beq.n	20006a82 <vrEmuTms9918BitmapLayerScanLine+0x1c6>
+20006a70:	9e02      	ldr	r6, [sp, #8]
+20006a72:	1192      	asrs	r2, r2, #6
+20006a74:	4332      	orrs	r2, r6
+20006a76:	1c85      	adds	r5, r0, #2
+20006a78:	9e01      	ldr	r6, [sp, #4]
+20006a7a:	b2ed      	uxtb	r5, r5
+20006a7c:	5572      	strb	r2, [r6, r5]
+20006a7e:	08a2      	lsrs	r2, r4, #2
+20006a80:	4311      	orrs	r1, r2
+20006a82:	2b00      	cmp	r3, #0
+20006a84:	d008      	beq.n	20006a98 <vrEmuTms9918BitmapLayerScanLine+0x1dc>
+20006a86:	9d02      	ldr	r5, [sp, #8]
+20006a88:	119b      	asrs	r3, r3, #6
+20006a8a:	432b      	orrs	r3, r5
+20006a8c:	1cc2      	adds	r2, r0, #3
+20006a8e:	9d01      	ldr	r5, [sp, #4]
+20006a90:	b2d2      	uxtb	r2, r2
+20006a92:	54ab      	strb	r3, [r5, r2]
+20006a94:	08e3      	lsrs	r3, r4, #3
+20006a96:	4319      	orrs	r1, r3
+20006a98:	3004      	adds	r0, #4
+20006a9a:	b2c0      	uxtb	r0, r0
+20006a9c:	0924      	lsrs	r4, r4, #4
+20006a9e:	d11c      	bne.n	20006ada <vrEmuTms9918BitmapLayerScanLine+0x21e>
+20006aa0:	2900      	cmp	r1, #0
+20006aa2:	d01a      	beq.n	20006ada <vrEmuTms9918BitmapLayerScanLine+0x21e>
+20006aa4:	9b04      	ldr	r3, [sp, #16]
+20006aa6:	341f      	adds	r4, #31
+20006aa8:	095a      	lsrs	r2, r3, #5
+20006aaa:	4023      	ands	r3, r4
+20006aac:	000c      	movs	r4, r1
+20006aae:	40dc      	lsrs	r4, r3
+20006ab0:	9e05      	ldr	r6, [sp, #20]
+20006ab2:	0095      	lsls	r5, r2, #2
+20006ab4:	59af      	ldr	r7, [r5, r6]
+20006ab6:	433c      	orrs	r4, r7
+20006ab8:	51ac      	str	r4, [r5, r6]
+20006aba:	1e5c      	subs	r4, r3, #1
+20006abc:	2c1f      	cmp	r4, #31
+20006abe:	d808      	bhi.n	20006ad2 <vrEmuTms9918BitmapLayerScanLine+0x216>
+20006ac0:	2420      	movs	r4, #32
+20006ac2:	1ae3      	subs	r3, r4, r3
+20006ac4:	4099      	lsls	r1, r3
+20006ac6:	9c05      	ldr	r4, [sp, #20]
+20006ac8:	3201      	adds	r2, #1
+20006aca:	0092      	lsls	r2, r2, #2
+20006acc:	58a3      	ldr	r3, [r4, r2]
+20006ace:	4319      	orrs	r1, r3
+20006ad0:	50a1      	str	r1, [r4, r2]
+20006ad2:	2480      	movs	r4, #128	@ 0x80
+20006ad4:	2100      	movs	r1, #0
+20006ad6:	9004      	str	r0, [sp, #16]
+20006ad8:	0624      	lsls	r4, r4, #24
+20006ada:	2301      	movs	r3, #1
+20006adc:	449b      	add	fp, r3
+20006ade:	4643      	mov	r3, r8
+20006ae0:	3301      	adds	r3, #1
+20006ae2:	4698      	mov	r8, r3
+20006ae4:	45d9      	cmp	r9, fp
+20006ae6:	dc9d      	bgt.n	20006a24 <vrEmuTms9918BitmapLayerScanLine+0x168>
+20006ae8:	464a      	mov	r2, r9
+20006aea:	2300      	movs	r3, #0
+20006aec:	9e06      	ldr	r6, [sp, #24]
+20006aee:	2a00      	cmp	r2, #0
+20006af0:	d100      	bne.n	20006af4 <vrEmuTms9918BitmapLayerScanLine+0x238>
+20006af2:	e081      	b.n	20006bf8 <vrEmuTms9918BitmapLayerScanLine+0x33c>
+20006af4:	e07e      	b.n	20006bf4 <vrEmuTms9918BitmapLayerScanLine+0x338>
+20006af6:	2301      	movs	r3, #1
+20006af8:	469a      	mov	sl, r3
+20006afa:	2300      	movs	r3, #0
+20006afc:	9303      	str	r3, [sp, #12]
+20006afe:	e717      	b.n	20006930 <vrEmuTms9918BitmapLayerScanLine+0x74>
+20006b00:	2000d534 	.word	0x2000d534
+20006b04:	0000604b 	.word	0x0000604b
+20006b08:	0000604e 	.word	0x0000604e
+20006b0c:	00006050 	.word	0x00006050
+20006b10:	0000604f 	.word	0x0000604f
+20006b14:	0000604c 	.word	0x0000604c
+20006b18:	0000604d 	.word	0x0000604d
+20006b1c:	20040440 	.word	0x20040440
+20006b20:	466b      	mov	r3, sp
+20006b22:	891f      	ldrh	r7, [r3, #8]
+20006b24:	2300      	movs	r3, #0
+20006b26:	9505      	str	r5, [sp, #20]
+20006b28:	2580      	movs	r5, #128	@ 0x80
+20006b2a:	0032      	movs	r2, r6
+20006b2c:	46bb      	mov	fp, r7
+20006b2e:	9302      	str	r3, [sp, #8]
+20006b30:	333f      	adds	r3, #63	@ 0x3f
+20006b32:	469c      	mov	ip, r3
+20006b34:	4bc2      	ldr	r3, [pc, #776]	@ (20006e40 <vrEmuTms9918BitmapLayerScanLine+0x584>)
+20006b36:	9101      	str	r1, [sp, #4]
+20006b38:	9306      	str	r3, [sp, #24]
+20006b3a:	9607      	str	r6, [sp, #28]
+20006b3c:	062d      	lsls	r5, r5, #24
+20006b3e:	9b05      	ldr	r3, [sp, #20]
+20006b40:	4661      	mov	r1, ip
+20006b42:	681b      	ldr	r3, [r3, #0]
+20006b44:	4667      	mov	r7, ip
+20006b46:	445b      	add	r3, fp
+20006b48:	332c      	adds	r3, #44	@ 0x2c
+20006b4a:	781e      	ldrb	r6, [r3, #0]
+20006b4c:	0033      	movs	r3, r6
+20006b4e:	438b      	bics	r3, r1
+20006b50:	119b      	asrs	r3, r3, #6
+20006b52:	4303      	orrs	r3, r0
+20006b54:	54a3      	strb	r3, [r4, r2]
+20006b56:	1c53      	adds	r3, r2, #1
+20006b58:	b2d9      	uxtb	r1, r3
+20006b5a:	00b3      	lsls	r3, r6, #2
+20006b5c:	43bb      	bics	r3, r7
+20006b5e:	b2db      	uxtb	r3, r3
+20006b60:	119b      	asrs	r3, r3, #6
+20006b62:	4303      	orrs	r3, r0
+20006b64:	5463      	strb	r3, [r4, r1]
+20006b66:	1c93      	adds	r3, r2, #2
+20006b68:	b2d9      	uxtb	r1, r3
+20006b6a:	0133      	lsls	r3, r6, #4
+20006b6c:	43bb      	bics	r3, r7
+20006b6e:	b2db      	uxtb	r3, r3
+20006b70:	119b      	asrs	r3, r3, #6
+20006b72:	4303      	orrs	r3, r0
+20006b74:	5463      	strb	r3, [r4, r1]
+20006b76:	2103      	movs	r1, #3
+20006b78:	1cd3      	adds	r3, r2, #3
+20006b7a:	4031      	ands	r1, r6
+20006b7c:	b2db      	uxtb	r3, r3
+20006b7e:	4301      	orrs	r1, r0
+20006b80:	54e1      	strb	r1, [r4, r3]
+20006b82:	08a9      	lsrs	r1, r5, #2
+20006b84:	086b      	lsrs	r3, r5, #1
+20006b86:	430b      	orrs	r3, r1
+20006b88:	9e01      	ldr	r6, [sp, #4]
+20006b8a:	432b      	orrs	r3, r5
+20006b8c:	08e9      	lsrs	r1, r5, #3
+20006b8e:	430b      	orrs	r3, r1
+20006b90:	431e      	orrs	r6, r3
+20006b92:	9b03      	ldr	r3, [sp, #12]
+20006b94:	3204      	adds	r2, #4
+20006b96:	9601      	str	r6, [sp, #4]
+20006b98:	b2d2      	uxtb	r2, r2
+20006b9a:	092d      	lsrs	r5, r5, #4
+20006b9c:	2b00      	cmp	r3, #0
+20006b9e:	d018      	beq.n	20006bd2 <vrEmuTms9918BitmapLayerScanLine+0x316>
+20006ba0:	2d00      	cmp	r5, #0
+20006ba2:	d116      	bne.n	20006bd2 <vrEmuTms9918BitmapLayerScanLine+0x316>
+20006ba4:	2e00      	cmp	r6, #0
+20006ba6:	d014      	beq.n	20006bd2 <vrEmuTms9918BitmapLayerScanLine+0x316>
+20006ba8:	211f      	movs	r1, #31
+20006baa:	9b04      	ldr	r3, [sp, #16]
+20006bac:	9f06      	ldr	r7, [sp, #24]
+20006bae:	095d      	lsrs	r5, r3, #5
+20006bb0:	400b      	ands	r3, r1
+20006bb2:	0031      	movs	r1, r6
+20006bb4:	40d9      	lsrs	r1, r3
+20006bb6:	9504      	str	r5, [sp, #16]
+20006bb8:	00ad      	lsls	r5, r5, #2
+20006bba:	59ee      	ldr	r6, [r5, r7]
+20006bbc:	4331      	orrs	r1, r6
+20006bbe:	51e9      	str	r1, [r5, r7]
+20006bc0:	1e59      	subs	r1, r3, #1
+20006bc2:	291f      	cmp	r1, #31
+20006bc4:	d800      	bhi.n	20006bc8 <vrEmuTms9918BitmapLayerScanLine+0x30c>
+20006bc6:	e0c3      	b.n	20006d50 <vrEmuTms9918BitmapLayerScanLine+0x494>
+20006bc8:	2300      	movs	r3, #0
+20006bca:	2580      	movs	r5, #128	@ 0x80
+20006bcc:	9204      	str	r2, [sp, #16]
+20006bce:	9301      	str	r3, [sp, #4]
+20006bd0:	062d      	lsls	r5, r5, #24
+20006bd2:	2101      	movs	r1, #1
+20006bd4:	9b02      	ldr	r3, [sp, #8]
+20006bd6:	448b      	add	fp, r1
+20006bd8:	3301      	adds	r3, #1
+20006bda:	9302      	str	r3, [sp, #8]
+20006bdc:	4599      	cmp	r9, r3
+20006bde:	dcae      	bgt.n	20006b3e <vrEmuTms9918BitmapLayerScanLine+0x282>
+20006be0:	9b03      	ldr	r3, [sp, #12]
+20006be2:	9901      	ldr	r1, [sp, #4]
+20006be4:	9e07      	ldr	r6, [sp, #28]
+20006be6:	2b00      	cmp	r3, #0
+20006be8:	d100      	bne.n	20006bec <vrEmuTms9918BitmapLayerScanLine+0x330>
+20006bea:	e6ea      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006bec:	464a      	mov	r2, r9
+20006bee:	2300      	movs	r3, #0
+20006bf0:	2a00      	cmp	r2, #0
+20006bf2:	d001      	beq.n	20006bf8 <vrEmuTms9918BitmapLayerScanLine+0x33c>
+20006bf4:	1e53      	subs	r3, r2, #1
+20006bf6:	009b      	lsls	r3, r3, #2
+20006bf8:	3604      	adds	r6, #4
+20006bfa:	18f3      	adds	r3, r6, r3
+20006bfc:	b2db      	uxtb	r3, r3
+20006bfe:	2900      	cmp	r1, #0
+20006c00:	d100      	bne.n	20006c04 <vrEmuTms9918BitmapLayerScanLine+0x348>
+20006c02:	e6de      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006c04:	221f      	movs	r2, #31
+20006c06:	000f      	movs	r7, r1
+20006c08:	9804      	ldr	r0, [sp, #16]
+20006c0a:	4c8d      	ldr	r4, [pc, #564]	@ (20006e40 <vrEmuTms9918BitmapLayerScanLine+0x584>)
+20006c0c:	4002      	ands	r2, r0
+20006c0e:	40d7      	lsrs	r7, r2
+20006c10:	0945      	lsrs	r5, r0, #5
+20006c12:	0038      	movs	r0, r7
+20006c14:	00ae      	lsls	r6, r5, #2
+20006c16:	5937      	ldr	r7, [r6, r4]
+20006c18:	4338      	orrs	r0, r7
+20006c1a:	5130      	str	r0, [r6, r4]
+20006c1c:	2020      	movs	r0, #32
+20006c1e:	1a80      	subs	r0, r0, r2
+20006c20:	9a04      	ldr	r2, [sp, #16]
+20006c22:	1a9b      	subs	r3, r3, r2
+20006c24:	4283      	cmp	r3, r0
+20006c26:	d800      	bhi.n	20006c2a <vrEmuTms9918BitmapLayerScanLine+0x36e>
+20006c28:	e6cb      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006c2a:	4081      	lsls	r1, r0
+20006c2c:	3501      	adds	r5, #1
+20006c2e:	00ab      	lsls	r3, r5, #2
+20006c30:	591a      	ldr	r2, [r3, r4]
+20006c32:	4311      	orrs	r1, r2
+20006c34:	5119      	str	r1, [r3, r4]
+20006c36:	e6c4      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006c38:	466b      	mov	r3, sp
+20006c3a:	891b      	ldrh	r3, [r3, #8]
+20006c3c:	4a80      	ldr	r2, [pc, #512]	@ (20006e40 <vrEmuTms9918BitmapLayerScanLine+0x584>)
+20006c3e:	9302      	str	r3, [sp, #8]
+20006c40:	9b02      	ldr	r3, [sp, #8]
+20006c42:	9001      	str	r0, [sp, #4]
+20006c44:	20c0      	movs	r0, #192	@ 0xc0
+20006c46:	9205      	str	r2, [sp, #20]
+20006c48:	2700      	movs	r7, #0
+20006c4a:	0032      	movs	r2, r6
+20006c4c:	4698      	mov	r8, r3
+20006c4e:	0600      	lsls	r0, r0, #24
+20006c50:	9606      	str	r6, [sp, #24]
+20006c52:	9502      	str	r5, [sp, #8]
+20006c54:	9b02      	ldr	r3, [sp, #8]
+20006c56:	681e      	ldr	r6, [r3, #0]
+20006c58:	230f      	movs	r3, #15
+20006c5a:	4446      	add	r6, r8
+20006c5c:	362c      	adds	r6, #44	@ 0x2c
+20006c5e:	7836      	ldrb	r6, [r6, #0]
+20006c60:	0035      	movs	r5, r6
+20006c62:	439d      	bics	r5, r3
+20006c64:	465b      	mov	r3, fp
+20006c66:	0136      	lsls	r6, r6, #4
+20006c68:	b2f6      	uxtb	r6, r6
+20006c6a:	2b00      	cmp	r3, #0
+20006c6c:	d05d      	beq.n	20006d2a <vrEmuTms9918BitmapLayerScanLine+0x46e>
+20006c6e:	2d00      	cmp	r5, #0
+20006c70:	d007      	beq.n	20006c82 <vrEmuTms9918BitmapLayerScanLine+0x3c6>
+20006c72:	112b      	asrs	r3, r5, #4
+20006c74:	9d01      	ldr	r5, [sp, #4]
+20006c76:	4301      	orrs	r1, r0
+20006c78:	432b      	orrs	r3, r5
+20006c7a:	001d      	movs	r5, r3
+20006c7c:	54a3      	strb	r3, [r4, r2]
+20006c7e:	18a3      	adds	r3, r4, r2
+20006c80:	705d      	strb	r5, [r3, #1]
+20006c82:	2e00      	cmp	r6, #0
+20006c84:	d009      	beq.n	20006c9a <vrEmuTms9918BitmapLayerScanLine+0x3de>
+20006c86:	9d01      	ldr	r5, [sp, #4]
+20006c88:	1136      	asrs	r6, r6, #4
+20006c8a:	4335      	orrs	r5, r6
+20006c8c:	1c96      	adds	r6, r2, #2
+20006c8e:	b2f6      	uxtb	r6, r6
+20006c90:	55a5      	strb	r5, [r4, r6]
+20006c92:	19a6      	adds	r6, r4, r6
+20006c94:	7075      	strb	r5, [r6, #1]
+20006c96:	0886      	lsrs	r6, r0, #2
+20006c98:	4331      	orrs	r1, r6
+20006c9a:	3204      	adds	r2, #4
+20006c9c:	b2d2      	uxtb	r2, r2
+20006c9e:	0900      	lsrs	r0, r0, #4
+20006ca0:	d118      	bne.n	20006cd4 <vrEmuTms9918BitmapLayerScanLine+0x418>
+20006ca2:	2900      	cmp	r1, #0
+20006ca4:	d016      	beq.n	20006cd4 <vrEmuTms9918BitmapLayerScanLine+0x418>
+20006ca6:	251f      	movs	r5, #31
+20006ca8:	9b04      	ldr	r3, [sp, #16]
+20006caa:	0958      	lsrs	r0, r3, #5
+20006cac:	402b      	ands	r3, r5
+20006cae:	001e      	movs	r6, r3
+20006cb0:	0083      	lsls	r3, r0, #2
+20006cb2:	469c      	mov	ip, r3
+20006cb4:	000b      	movs	r3, r1
+20006cb6:	9003      	str	r0, [sp, #12]
+20006cb8:	4660      	mov	r0, ip
+20006cba:	40f3      	lsrs	r3, r6
+20006cbc:	9d05      	ldr	r5, [sp, #20]
+20006cbe:	5940      	ldr	r0, [r0, r5]
+20006cc0:	4303      	orrs	r3, r0
+20006cc2:	4660      	mov	r0, ip
+20006cc4:	5143      	str	r3, [r0, r5]
+20006cc6:	1e73      	subs	r3, r6, #1
+20006cc8:	2b1f      	cmp	r3, #31
+20006cca:	d937      	bls.n	20006d3c <vrEmuTms9918BitmapLayerScanLine+0x480>
+20006ccc:	20c0      	movs	r0, #192	@ 0xc0
+20006cce:	2100      	movs	r1, #0
+20006cd0:	9204      	str	r2, [sp, #16]
+20006cd2:	0600      	lsls	r0, r0, #24
+20006cd4:	2301      	movs	r3, #1
+20006cd6:	3701      	adds	r7, #1
+20006cd8:	4498      	add	r8, r3
+20006cda:	45b9      	cmp	r9, r7
+20006cdc:	dcba      	bgt.n	20006c54 <vrEmuTms9918BitmapLayerScanLine+0x398>
+20006cde:	9e06      	ldr	r6, [sp, #24]
+20006ce0:	2900      	cmp	r1, #0
+20006ce2:	d100      	bne.n	20006ce6 <vrEmuTms9918BitmapLayerScanLine+0x42a>
+20006ce4:	e66d      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006ce6:	231f      	movs	r3, #31
+20006ce8:	000c      	movs	r4, r1
+20006cea:	9804      	ldr	r0, [sp, #16]
+20006cec:	4003      	ands	r3, r0
+20006cee:	40dc      	lsrs	r4, r3
+20006cf0:	0942      	lsrs	r2, r0, #5
+20006cf2:	4853      	ldr	r0, [pc, #332]	@ (20006e40 <vrEmuTms9918BitmapLayerScanLine+0x584>)
+20006cf4:	0095      	lsls	r5, r2, #2
+20006cf6:	5947      	ldr	r7, [r0, r5]
+20006cf8:	433c      	orrs	r4, r7
+20006cfa:	5144      	str	r4, [r0, r5]
+20006cfc:	2420      	movs	r4, #32
+20006cfe:	1ae4      	subs	r4, r4, r3
+20006d00:	464b      	mov	r3, r9
+20006d02:	2500      	movs	r5, #0
+20006d04:	2b00      	cmp	r3, #0
+20006d06:	d001      	beq.n	20006d0c <vrEmuTms9918BitmapLayerScanLine+0x450>
+20006d08:	1e5d      	subs	r5, r3, #1
+20006d0a:	00ad      	lsls	r5, r5, #2
+20006d0c:	3604      	adds	r6, #4
+20006d0e:	1973      	adds	r3, r6, r5
+20006d10:	9d04      	ldr	r5, [sp, #16]
+20006d12:	b2db      	uxtb	r3, r3
+20006d14:	1b5b      	subs	r3, r3, r5
+20006d16:	42a3      	cmp	r3, r4
+20006d18:	d800      	bhi.n	20006d1c <vrEmuTms9918BitmapLayerScanLine+0x460>
+20006d1a:	e652      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006d1c:	40a1      	lsls	r1, r4
+20006d1e:	3201      	adds	r2, #1
+20006d20:	0092      	lsls	r2, r2, #2
+20006d22:	5883      	ldr	r3, [r0, r2]
+20006d24:	4319      	orrs	r1, r3
+20006d26:	5081      	str	r1, [r0, r2]
+20006d28:	e64b      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006d2a:	112b      	asrs	r3, r5, #4
+20006d2c:	9d01      	ldr	r5, [sp, #4]
+20006d2e:	4301      	orrs	r1, r0
+20006d30:	432b      	orrs	r3, r5
+20006d32:	001d      	movs	r5, r3
+20006d34:	54a3      	strb	r3, [r4, r2]
+20006d36:	18a3      	adds	r3, r4, r2
+20006d38:	705d      	strb	r5, [r3, #1]
+20006d3a:	e7a4      	b.n	20006c86 <vrEmuTms9918BitmapLayerScanLine+0x3ca>
+20006d3c:	2320      	movs	r3, #32
+20006d3e:	1b9e      	subs	r6, r3, r6
+20006d40:	40b1      	lsls	r1, r6
+20006d42:	9803      	ldr	r0, [sp, #12]
+20006d44:	3001      	adds	r0, #1
+20006d46:	0080      	lsls	r0, r0, #2
+20006d48:	582e      	ldr	r6, [r5, r0]
+20006d4a:	4331      	orrs	r1, r6
+20006d4c:	5029      	str	r1, [r5, r0]
+20006d4e:	e7bd      	b.n	20006ccc <vrEmuTms9918BitmapLayerScanLine+0x410>
+20006d50:	2120      	movs	r1, #32
+20006d52:	1acb      	subs	r3, r1, r3
+20006d54:	9901      	ldr	r1, [sp, #4]
+20006d56:	9d04      	ldr	r5, [sp, #16]
+20006d58:	4099      	lsls	r1, r3
+20006d5a:	3501      	adds	r5, #1
+20006d5c:	00ad      	lsls	r5, r5, #2
+20006d5e:	597b      	ldr	r3, [r7, r5]
+20006d60:	4319      	orrs	r1, r3
+20006d62:	5179      	str	r1, [r7, r5]
+20006d64:	e730      	b.n	20006bc8 <vrEmuTms9918BitmapLayerScanLine+0x30c>
+20006d66:	466b      	mov	r3, sp
+20006d68:	2700      	movs	r7, #0
+20006d6a:	46ac      	mov	ip, r5
+20006d6c:	891b      	ldrh	r3, [r3, #8]
+20006d6e:	4662      	mov	r2, ip
+20006d70:	6812      	ldr	r2, [r2, #0]
+20006d72:	250f      	movs	r5, #15
+20006d74:	18d2      	adds	r2, r2, r3
+20006d76:	322c      	adds	r2, #44	@ 0x2c
+20006d78:	7812      	ldrb	r2, [r2, #0]
+20006d7a:	3701      	adds	r7, #1
+20006d7c:	0011      	movs	r1, r2
+20006d7e:	43a9      	bics	r1, r5
+20006d80:	1109      	asrs	r1, r1, #4
+20006d82:	4301      	orrs	r1, r0
+20006d84:	19a5      	adds	r5, r4, r6
+20006d86:	55a1      	strb	r1, [r4, r6]
+20006d88:	7069      	strb	r1, [r5, #1]
+20006d8a:	210f      	movs	r1, #15
+20006d8c:	400a      	ands	r2, r1
+20006d8e:	1cb1      	adds	r1, r6, #2
+20006d90:	4302      	orrs	r2, r0
+20006d92:	b2c9      	uxtb	r1, r1
+20006d94:	5462      	strb	r2, [r4, r1]
+20006d96:	3604      	adds	r6, #4
+20006d98:	1861      	adds	r1, r4, r1
+20006d9a:	704a      	strb	r2, [r1, #1]
+20006d9c:	b2f6      	uxtb	r6, r6
+20006d9e:	3301      	adds	r3, #1
+20006da0:	45b9      	cmp	r9, r7
+20006da2:	dce4      	bgt.n	20006d6e <vrEmuTms9918BitmapLayerScanLine+0x4b2>
+20006da4:	e60d      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006da6:	213f      	movs	r1, #63	@ 0x3f
+20006da8:	466b      	mov	r3, sp
+20006daa:	4683      	mov	fp, r0
+20006dac:	468c      	mov	ip, r1
+20006dae:	2000      	movs	r0, #0
+20006db0:	46a0      	mov	r8, r4
+20006db2:	891c      	ldrh	r4, [r3, #8]
+20006db4:	9501      	str	r5, [sp, #4]
+20006db6:	9b01      	ldr	r3, [sp, #4]
+20006db8:	4662      	mov	r2, ip
+20006dba:	681b      	ldr	r3, [r3, #0]
+20006dbc:	4661      	mov	r1, ip
+20006dbe:	191b      	adds	r3, r3, r4
+20006dc0:	332c      	adds	r3, #44	@ 0x2c
+20006dc2:	781b      	ldrb	r3, [r3, #0]
+20006dc4:	4665      	mov	r5, ip
+20006dc6:	001f      	movs	r7, r3
+20006dc8:	4397      	bics	r7, r2
+20006dca:	009a      	lsls	r2, r3, #2
+20006dcc:	438a      	bics	r2, r1
+20006dce:	0119      	lsls	r1, r3, #4
+20006dd0:	43a9      	bics	r1, r5
+20006dd2:	019b      	lsls	r3, r3, #6
+20006dd4:	b2d2      	uxtb	r2, r2
+20006dd6:	b2c9      	uxtb	r1, r1
+20006dd8:	b2db      	uxtb	r3, r3
+20006dda:	2f00      	cmp	r7, #0
+20006ddc:	d004      	beq.n	20006de8 <vrEmuTms9918BitmapLayerScanLine+0x52c>
+20006dde:	465d      	mov	r5, fp
+20006de0:	11bf      	asrs	r7, r7, #6
+20006de2:	432f      	orrs	r7, r5
+20006de4:	4645      	mov	r5, r8
+20006de6:	55af      	strb	r7, [r5, r6]
+20006de8:	2a00      	cmp	r2, #0
+20006dea:	d006      	beq.n	20006dfa <vrEmuTms9918BitmapLayerScanLine+0x53e>
+20006dec:	465d      	mov	r5, fp
+20006dee:	1192      	asrs	r2, r2, #6
+20006df0:	432a      	orrs	r2, r5
+20006df2:	4645      	mov	r5, r8
+20006df4:	1c77      	adds	r7, r6, #1
+20006df6:	b2ff      	uxtb	r7, r7
+20006df8:	55ea      	strb	r2, [r5, r7]
+20006dfa:	2900      	cmp	r1, #0
+20006dfc:	d006      	beq.n	20006e0c <vrEmuTms9918BitmapLayerScanLine+0x550>
+20006dfe:	465d      	mov	r5, fp
+20006e00:	1189      	asrs	r1, r1, #6
+20006e02:	4329      	orrs	r1, r5
+20006e04:	4645      	mov	r5, r8
+20006e06:	1cb2      	adds	r2, r6, #2
+20006e08:	b2d2      	uxtb	r2, r2
+20006e0a:	54a9      	strb	r1, [r5, r2]
+20006e0c:	2b00      	cmp	r3, #0
+20006e0e:	d006      	beq.n	20006e1e <vrEmuTms9918BitmapLayerScanLine+0x562>
+20006e10:	4659      	mov	r1, fp
+20006e12:	119b      	asrs	r3, r3, #6
+20006e14:	430b      	orrs	r3, r1
+20006e16:	4641      	mov	r1, r8
+20006e18:	1cf2      	adds	r2, r6, #3
+20006e1a:	b2d2      	uxtb	r2, r2
+20006e1c:	548b      	strb	r3, [r1, r2]
+20006e1e:	3604      	adds	r6, #4
+20006e20:	3001      	adds	r0, #1
+20006e22:	b2f6      	uxtb	r6, r6
+20006e24:	3401      	adds	r4, #1
+20006e26:	4581      	cmp	r9, r0
+20006e28:	dcc5      	bgt.n	20006db6 <vrEmuTms9918BitmapLayerScanLine+0x4fa>
+20006e2a:	e5ca      	b.n	200069c2 <vrEmuTms9918BitmapLayerScanLine+0x106>
+20006e2c:	21ff      	movs	r1, #255	@ 0xff
+20006e2e:	4804      	ldr	r0, [pc, #16]	@ (20006e40 <vrEmuTms9918BitmapLayerScanLine+0x584>)
+20006e30:	3220      	adds	r2, #32
+20006e32:	f7fb fc73 	bl	2000271c <__wrap_memset>
+20006e36:	2300      	movs	r3, #0
+20006e38:	469a      	mov	sl, r3
+20006e3a:	9303      	str	r3, [sp, #12]
+20006e3c:	e578      	b.n	20006930 <vrEmuTms9918BitmapLayerScanLine+0x74>
+20006e3e:	46c0      	nop			@ (mov r8, r8)
+20006e40:	20040440 	.word	0x20040440

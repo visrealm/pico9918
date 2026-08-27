@@ -1,0 +1,319 @@
+2001cb5c <compositeTile2OnlyBuffer.constprop.0>:
+2001cb5c:	4b85      	ldr	r3, [pc, #532]	@ (2001cd74 <compositeTile2OnlyBuffer.constprop.0+0x218>)
+2001cb5e:	b570      	push	{r4, r5, r6, lr}
+2001cb60:	4418      	add	r0, r3
+2001cb62:	2900      	cmp	r1, #0
+2001cb64:	f040 80d4 	bne.w	2001cd10 <compositeTile2OnlyBuffer.constprop.0+0x1b4>
+2001cb68:	4983      	ldr	r1, [pc, #524]	@ (2001cd78 <compositeTile2OnlyBuffer.constprop.0+0x21c>)
+2001cb6a:	4a84      	ldr	r2, [pc, #528]	@ (2001cd7c <compositeTile2OnlyBuffer.constprop.0+0x220>)
+2001cb6c:	f203 4c0c 	addw	ip, r3, #1036	@ 0x40c
+2001cb70:	f500 7580 	add.w	r5, r0, #256	@ 0x100
+2001cb74:	e0bd      	b.n	2001ccf2 <compositeTile2OnlyBuffer.constprop.0+0x196>
+2001cb76:	da03      	bge.n	2001cb80 <compositeTile2OnlyBuffer.constprop.0+0x24>
+2001cb78:	f810 4c20 	ldrb.w	r4, [r0, #-32]
+2001cb7c:	f802 4c20 	strb.w	r4, [r2, #-32]
+2001cb80:	005e      	lsls	r6, r3, #1
+2001cb82:	d503      	bpl.n	2001cb8c <compositeTile2OnlyBuffer.constprop.0+0x30>
+2001cb84:	f810 4c1f 	ldrb.w	r4, [r0, #-31]
+2001cb88:	f802 4c1f 	strb.w	r4, [r2, #-31]
+2001cb8c:	009c      	lsls	r4, r3, #2
+2001cb8e:	d503      	bpl.n	2001cb98 <compositeTile2OnlyBuffer.constprop.0+0x3c>
+2001cb90:	f810 4c1e 	ldrb.w	r4, [r0, #-30]
+2001cb94:	f802 4c1e 	strb.w	r4, [r2, #-30]
+2001cb98:	00de      	lsls	r6, r3, #3
+2001cb9a:	d503      	bpl.n	2001cba4 <compositeTile2OnlyBuffer.constprop.0+0x48>
+2001cb9c:	f810 4c1d 	ldrb.w	r4, [r0, #-29]
+2001cba0:	f802 4c1d 	strb.w	r4, [r2, #-29]
+2001cba4:	011c      	lsls	r4, r3, #4
+2001cba6:	d503      	bpl.n	2001cbb0 <compositeTile2OnlyBuffer.constprop.0+0x54>
+2001cba8:	f810 4c1c 	ldrb.w	r4, [r0, #-28]
+2001cbac:	f802 4c1c 	strb.w	r4, [r2, #-28]
+2001cbb0:	015e      	lsls	r6, r3, #5
+2001cbb2:	d503      	bpl.n	2001cbbc <compositeTile2OnlyBuffer.constprop.0+0x60>
+2001cbb4:	f810 4c1b 	ldrb.w	r4, [r0, #-27]
+2001cbb8:	f802 4c1b 	strb.w	r4, [r2, #-27]
+2001cbbc:	019c      	lsls	r4, r3, #6
+2001cbbe:	d503      	bpl.n	2001cbc8 <compositeTile2OnlyBuffer.constprop.0+0x6c>
+2001cbc0:	f810 4c1a 	ldrb.w	r4, [r0, #-26]
+2001cbc4:	f802 4c1a 	strb.w	r4, [r2, #-26]
+2001cbc8:	01de      	lsls	r6, r3, #7
+2001cbca:	d503      	bpl.n	2001cbd4 <compositeTile2OnlyBuffer.constprop.0+0x78>
+2001cbcc:	f810 4c19 	ldrb.w	r4, [r0, #-25]
+2001cbd0:	f802 4c19 	strb.w	r4, [r2, #-25]
+2001cbd4:	021c      	lsls	r4, r3, #8
+2001cbd6:	d503      	bpl.n	2001cbe0 <compositeTile2OnlyBuffer.constprop.0+0x84>
+2001cbd8:	f810 4c18 	ldrb.w	r4, [r0, #-24]
+2001cbdc:	f802 4c18 	strb.w	r4, [r2, #-24]
+2001cbe0:	025e      	lsls	r6, r3, #9
+2001cbe2:	d503      	bpl.n	2001cbec <compositeTile2OnlyBuffer.constprop.0+0x90>
+2001cbe4:	f810 4c17 	ldrb.w	r4, [r0, #-23]
+2001cbe8:	f802 4c17 	strb.w	r4, [r2, #-23]
+2001cbec:	029c      	lsls	r4, r3, #10
+2001cbee:	d503      	bpl.n	2001cbf8 <compositeTile2OnlyBuffer.constprop.0+0x9c>
+2001cbf0:	f810 4c16 	ldrb.w	r4, [r0, #-22]
+2001cbf4:	f802 4c16 	strb.w	r4, [r2, #-22]
+2001cbf8:	02de      	lsls	r6, r3, #11
+2001cbfa:	d503      	bpl.n	2001cc04 <compositeTile2OnlyBuffer.constprop.0+0xa8>
+2001cbfc:	f810 4c15 	ldrb.w	r4, [r0, #-21]
+2001cc00:	f802 4c15 	strb.w	r4, [r2, #-21]
+2001cc04:	031c      	lsls	r4, r3, #12
+2001cc06:	d503      	bpl.n	2001cc10 <compositeTile2OnlyBuffer.constprop.0+0xb4>
+2001cc08:	f810 4c14 	ldrb.w	r4, [r0, #-20]
+2001cc0c:	f802 4c14 	strb.w	r4, [r2, #-20]
+2001cc10:	035e      	lsls	r6, r3, #13
+2001cc12:	d503      	bpl.n	2001cc1c <compositeTile2OnlyBuffer.constprop.0+0xc0>
+2001cc14:	f810 4c13 	ldrb.w	r4, [r0, #-19]
+2001cc18:	f802 4c13 	strb.w	r4, [r2, #-19]
+2001cc1c:	039c      	lsls	r4, r3, #14
+2001cc1e:	d503      	bpl.n	2001cc28 <compositeTile2OnlyBuffer.constprop.0+0xcc>
+2001cc20:	f810 4c12 	ldrb.w	r4, [r0, #-18]
+2001cc24:	f802 4c12 	strb.w	r4, [r2, #-18]
+2001cc28:	03de      	lsls	r6, r3, #15
+2001cc2a:	d503      	bpl.n	2001cc34 <compositeTile2OnlyBuffer.constprop.0+0xd8>
+2001cc2c:	f810 4c11 	ldrb.w	r4, [r0, #-17]
+2001cc30:	f802 4c11 	strb.w	r4, [r2, #-17]
+2001cc34:	041c      	lsls	r4, r3, #16
+2001cc36:	d503      	bpl.n	2001cc40 <compositeTile2OnlyBuffer.constprop.0+0xe4>
+2001cc38:	f810 4c10 	ldrb.w	r4, [r0, #-16]
+2001cc3c:	f802 4c10 	strb.w	r4, [r2, #-16]
+2001cc40:	045e      	lsls	r6, r3, #17
+2001cc42:	d503      	bpl.n	2001cc4c <compositeTile2OnlyBuffer.constprop.0+0xf0>
+2001cc44:	f810 4c0f 	ldrb.w	r4, [r0, #-15]
+2001cc48:	f802 4c0f 	strb.w	r4, [r2, #-15]
+2001cc4c:	049c      	lsls	r4, r3, #18
+2001cc4e:	d503      	bpl.n	2001cc58 <compositeTile2OnlyBuffer.constprop.0+0xfc>
+2001cc50:	f810 4c0e 	ldrb.w	r4, [r0, #-14]
+2001cc54:	f802 4c0e 	strb.w	r4, [r2, #-14]
+2001cc58:	04de      	lsls	r6, r3, #19
+2001cc5a:	d503      	bpl.n	2001cc64 <compositeTile2OnlyBuffer.constprop.0+0x108>
+2001cc5c:	f810 4c0d 	ldrb.w	r4, [r0, #-13]
+2001cc60:	f802 4c0d 	strb.w	r4, [r2, #-13]
+2001cc64:	051c      	lsls	r4, r3, #20
+2001cc66:	d503      	bpl.n	2001cc70 <compositeTile2OnlyBuffer.constprop.0+0x114>
+2001cc68:	f810 4c0c 	ldrb.w	r4, [r0, #-12]
+2001cc6c:	f802 4c0c 	strb.w	r4, [r2, #-12]
+2001cc70:	055e      	lsls	r6, r3, #21
+2001cc72:	d503      	bpl.n	2001cc7c <compositeTile2OnlyBuffer.constprop.0+0x120>
+2001cc74:	f810 4c0b 	ldrb.w	r4, [r0, #-11]
+2001cc78:	f802 4c0b 	strb.w	r4, [r2, #-11]
+2001cc7c:	059c      	lsls	r4, r3, #22
+2001cc7e:	d503      	bpl.n	2001cc88 <compositeTile2OnlyBuffer.constprop.0+0x12c>
+2001cc80:	f810 4c0a 	ldrb.w	r4, [r0, #-10]
+2001cc84:	f802 4c0a 	strb.w	r4, [r2, #-10]
+2001cc88:	05de      	lsls	r6, r3, #23
+2001cc8a:	d503      	bpl.n	2001cc94 <compositeTile2OnlyBuffer.constprop.0+0x138>
+2001cc8c:	f810 4c09 	ldrb.w	r4, [r0, #-9]
+2001cc90:	f802 4c09 	strb.w	r4, [r2, #-9]
+2001cc94:	061c      	lsls	r4, r3, #24
+2001cc96:	d503      	bpl.n	2001cca0 <compositeTile2OnlyBuffer.constprop.0+0x144>
+2001cc98:	f810 4c08 	ldrb.w	r4, [r0, #-8]
+2001cc9c:	f802 4c08 	strb.w	r4, [r2, #-8]
+2001cca0:	065e      	lsls	r6, r3, #25
+2001cca2:	d503      	bpl.n	2001ccac <compositeTile2OnlyBuffer.constprop.0+0x150>
+2001cca4:	f810 4c07 	ldrb.w	r4, [r0, #-7]
+2001cca8:	f802 4c07 	strb.w	r4, [r2, #-7]
+2001ccac:	069c      	lsls	r4, r3, #26
+2001ccae:	d503      	bpl.n	2001ccb8 <compositeTile2OnlyBuffer.constprop.0+0x15c>
+2001ccb0:	f810 4c06 	ldrb.w	r4, [r0, #-6]
+2001ccb4:	f802 4c06 	strb.w	r4, [r2, #-6]
+2001ccb8:	06de      	lsls	r6, r3, #27
+2001ccba:	d503      	bpl.n	2001ccc4 <compositeTile2OnlyBuffer.constprop.0+0x168>
+2001ccbc:	f810 4c05 	ldrb.w	r4, [r0, #-5]
+2001ccc0:	f802 4c05 	strb.w	r4, [r2, #-5]
+2001ccc4:	071c      	lsls	r4, r3, #28
+2001ccc6:	d503      	bpl.n	2001ccd0 <compositeTile2OnlyBuffer.constprop.0+0x174>
+2001ccc8:	f810 4c04 	ldrb.w	r4, [r0, #-4]
+2001cccc:	f802 4c04 	strb.w	r4, [r2, #-4]
+2001ccd0:	075e      	lsls	r6, r3, #29
+2001ccd2:	d503      	bpl.n	2001ccdc <compositeTile2OnlyBuffer.constprop.0+0x180>
+2001ccd4:	f810 4c03 	ldrb.w	r4, [r0, #-3]
+2001ccd8:	f802 4c03 	strb.w	r4, [r2, #-3]
+2001ccdc:	079c      	lsls	r4, r3, #30
+2001ccde:	d503      	bpl.n	2001cce8 <compositeTile2OnlyBuffer.constprop.0+0x18c>
+2001cce0:	f810 4c02 	ldrb.w	r4, [r0, #-2]
+2001cce4:	f802 4c02 	strb.w	r4, [r2, #-2]
+2001cce8:	07db      	lsls	r3, r3, #31
+2001ccea:	f100 810e 	bmi.w	2001cf0a <compositeTile2OnlyBuffer.constprop.0+0x3ae>
+2001ccee:	42a8      	cmp	r0, r5
+2001ccf0:	d00d      	beq.n	2001cd0e <compositeTile2OnlyBuffer.constprop.0+0x1b2>
+2001ccf2:	f851 4f04 	ldr.w	r4, [r1, #4]!
+2001ccf6:	f85c 3f04 	ldr.w	r3, [ip, #4]!
+2001ccfa:	3220      	adds	r2, #32
+2001ccfc:	ea23 0304 	bic.w	r3, r3, r4
+2001cd00:	2b00      	cmp	r3, #0
+2001cd02:	f100 0020 	add.w	r0, r0, #32
+2001cd06:	f47f af36 	bne.w	2001cb76 <compositeTile2OnlyBuffer.constprop.0+0x1a>
+2001cd0a:	42a8      	cmp	r0, r5
+2001cd0c:	d1f1      	bne.n	2001ccf2 <compositeTile2OnlyBuffer.constprop.0+0x196>
+2001cd0e:	bd70      	pop	{r4, r5, r6, pc}
+2001cd10:	2100      	movs	r1, #0
+2001cd12:	4a1a      	ldr	r2, [pc, #104]	@ (2001cd7c <compositeTile2OnlyBuffer.constprop.0+0x220>)
+2001cd14:	4c1a      	ldr	r4, [pc, #104]	@ (2001cd80 <compositeTile2OnlyBuffer.constprop.0+0x224>)
+2001cd16:	f8df e06c 	ldr.w	lr, [pc, #108]	@ 2001cd84 <compositeTile2OnlyBuffer.constprop.0+0x228>
+2001cd1a:	f203 4c0c 	addw	ip, r3, #1036	@ 0x40c
+2001cd1e:	084b      	lsrs	r3, r1, #1
+2001cd20:	07ce      	lsls	r6, r1, #31
+2001cd22:	f85c 5f04 	ldr.w	r5, [ip, #4]!
+2001cd26:	f854 3023 	ldr.w	r3, [r4, r3, lsl #2]
+2001cd2a:	d410      	bmi.n	2001cd4e <compositeTile2OnlyBuffer.constprop.0+0x1f2>
+2001cd2c:	f3c3 4607 	ubfx	r6, r3, #16, #8
+2001cd30:	0e1b      	lsrs	r3, r3, #24
+2001cd32:	f83e 6016 	ldrh.w	r6, [lr, r6, lsl #1]
+2001cd36:	f83e 3013 	ldrh.w	r3, [lr, r3, lsl #1]
+2001cd3a:	3220      	adds	r2, #32
+2001cd3c:	ea46 4303 	orr.w	r3, r6, r3, lsl #16
+2001cd40:	ea35 0303 	bics.w	r3, r5, r3
+2001cd44:	f100 0020 	add.w	r0, r0, #32
+2001cd48:	d11e      	bne.n	2001cd88 <compositeTile2OnlyBuffer.constprop.0+0x22c>
+2001cd4a:	3101      	adds	r1, #1
+2001cd4c:	e7e7      	b.n	2001cd1e <compositeTile2OnlyBuffer.constprop.0+0x1c2>
+2001cd4e:	f3c3 2607 	ubfx	r6, r3, #8, #8
+2001cd52:	b2db      	uxtb	r3, r3
+2001cd54:	f83e 6016 	ldrh.w	r6, [lr, r6, lsl #1]
+2001cd58:	f83e 3013 	ldrh.w	r3, [lr, r3, lsl #1]
+2001cd5c:	3220      	adds	r2, #32
+2001cd5e:	ea43 4306 	orr.w	r3, r3, r6, lsl #16
+2001cd62:	ea35 0303 	bics.w	r3, r5, r3
+2001cd66:	f100 0020 	add.w	r0, r0, #32
+2001cd6a:	d10d      	bne.n	2001cd88 <compositeTile2OnlyBuffer.constprop.0+0x22c>
+2001cd6c:	3101      	adds	r1, #1
+2001cd6e:	2910      	cmp	r1, #16
+2001cd70:	d1d5      	bne.n	2001cd1e <compositeTile2OnlyBuffer.constprop.0+0x1c2>
+2001cd72:	bd70      	pop	{r4, r5, r6, pc}
+2001cd74:	20015454 	.word	0x20015454
+2001cd78:	20080624 	.word	0x20080624
+2001cd7c:	2008064c 	.word	0x2008064c
+2001cd80:	20080628 	.word	0x20080628
+2001cd84:	200803e0 	.word	0x200803e0
+2001cd88:	2b00      	cmp	r3, #0
+2001cd8a:	bfbc      	itt	lt
+2001cd8c:	f810 5c20 	ldrblt.w	r5, [r0, #-32]
+2001cd90:	f802 5c20 	strblt.w	r5, [r2, #-32]
+2001cd94:	005e      	lsls	r6, r3, #1
+2001cd96:	bf44      	itt	mi
+2001cd98:	f810 5c1f 	ldrbmi.w	r5, [r0, #-31]
+2001cd9c:	f802 5c1f 	strbmi.w	r5, [r2, #-31]
+2001cda0:	009d      	lsls	r5, r3, #2
+2001cda2:	bf44      	itt	mi
+2001cda4:	f810 5c1e 	ldrbmi.w	r5, [r0, #-30]
+2001cda8:	f802 5c1e 	strbmi.w	r5, [r2, #-30]
+2001cdac:	00de      	lsls	r6, r3, #3
+2001cdae:	bf44      	itt	mi
+2001cdb0:	f810 5c1d 	ldrbmi.w	r5, [r0, #-29]
+2001cdb4:	f802 5c1d 	strbmi.w	r5, [r2, #-29]
+2001cdb8:	011d      	lsls	r5, r3, #4
+2001cdba:	bf44      	itt	mi
+2001cdbc:	f810 5c1c 	ldrbmi.w	r5, [r0, #-28]
+2001cdc0:	f802 5c1c 	strbmi.w	r5, [r2, #-28]
+2001cdc4:	015e      	lsls	r6, r3, #5
+2001cdc6:	bf44      	itt	mi
+2001cdc8:	f810 5c1b 	ldrbmi.w	r5, [r0, #-27]
+2001cdcc:	f802 5c1b 	strbmi.w	r5, [r2, #-27]
+2001cdd0:	019d      	lsls	r5, r3, #6
+2001cdd2:	bf44      	itt	mi
+2001cdd4:	f810 5c1a 	ldrbmi.w	r5, [r0, #-26]
+2001cdd8:	f802 5c1a 	strbmi.w	r5, [r2, #-26]
+2001cddc:	01de      	lsls	r6, r3, #7
+2001cdde:	bf44      	itt	mi
+2001cde0:	f810 5c19 	ldrbmi.w	r5, [r0, #-25]
+2001cde4:	f802 5c19 	strbmi.w	r5, [r2, #-25]
+2001cde8:	021d      	lsls	r5, r3, #8
+2001cdea:	bf44      	itt	mi
+2001cdec:	f810 5c18 	ldrbmi.w	r5, [r0, #-24]
+2001cdf0:	f802 5c18 	strbmi.w	r5, [r2, #-24]
+2001cdf4:	025e      	lsls	r6, r3, #9
+2001cdf6:	bf44      	itt	mi
+2001cdf8:	f810 5c17 	ldrbmi.w	r5, [r0, #-23]
+2001cdfc:	f802 5c17 	strbmi.w	r5, [r2, #-23]
+2001ce00:	029d      	lsls	r5, r3, #10
+2001ce02:	bf44      	itt	mi
+2001ce04:	f810 5c16 	ldrbmi.w	r5, [r0, #-22]
+2001ce08:	f802 5c16 	strbmi.w	r5, [r2, #-22]
+2001ce0c:	02de      	lsls	r6, r3, #11
+2001ce0e:	bf44      	itt	mi
+2001ce10:	f810 5c15 	ldrbmi.w	r5, [r0, #-21]
+2001ce14:	f802 5c15 	strbmi.w	r5, [r2, #-21]
+2001ce18:	031d      	lsls	r5, r3, #12
+2001ce1a:	bf44      	itt	mi
+2001ce1c:	f810 5c14 	ldrbmi.w	r5, [r0, #-20]
+2001ce20:	f802 5c14 	strbmi.w	r5, [r2, #-20]
+2001ce24:	035e      	lsls	r6, r3, #13
+2001ce26:	bf44      	itt	mi
+2001ce28:	f810 5c13 	ldrbmi.w	r5, [r0, #-19]
+2001ce2c:	f802 5c13 	strbmi.w	r5, [r2, #-19]
+2001ce30:	039d      	lsls	r5, r3, #14
+2001ce32:	bf44      	itt	mi
+2001ce34:	f810 5c12 	ldrbmi.w	r5, [r0, #-18]
+2001ce38:	f802 5c12 	strbmi.w	r5, [r2, #-18]
+2001ce3c:	03de      	lsls	r6, r3, #15
+2001ce3e:	bf44      	itt	mi
+2001ce40:	f810 5c11 	ldrbmi.w	r5, [r0, #-17]
+2001ce44:	f802 5c11 	strbmi.w	r5, [r2, #-17]
+2001ce48:	041d      	lsls	r5, r3, #16
+2001ce4a:	bf44      	itt	mi
+2001ce4c:	f810 5c10 	ldrbmi.w	r5, [r0, #-16]
+2001ce50:	f802 5c10 	strbmi.w	r5, [r2, #-16]
+2001ce54:	045e      	lsls	r6, r3, #17
+2001ce56:	bf44      	itt	mi
+2001ce58:	f810 5c0f 	ldrbmi.w	r5, [r0, #-15]
+2001ce5c:	f802 5c0f 	strbmi.w	r5, [r2, #-15]
+2001ce60:	049d      	lsls	r5, r3, #18
+2001ce62:	bf44      	itt	mi
+2001ce64:	f810 5c0e 	ldrbmi.w	r5, [r0, #-14]
+2001ce68:	f802 5c0e 	strbmi.w	r5, [r2, #-14]
+2001ce6c:	04de      	lsls	r6, r3, #19
+2001ce6e:	bf44      	itt	mi
+2001ce70:	f810 5c0d 	ldrbmi.w	r5, [r0, #-13]
+2001ce74:	f802 5c0d 	strbmi.w	r5, [r2, #-13]
+2001ce78:	051d      	lsls	r5, r3, #20
+2001ce7a:	bf44      	itt	mi
+2001ce7c:	f810 5c0c 	ldrbmi.w	r5, [r0, #-12]
+2001ce80:	f802 5c0c 	strbmi.w	r5, [r2, #-12]
+2001ce84:	055e      	lsls	r6, r3, #21
+2001ce86:	bf44      	itt	mi
+2001ce88:	f810 5c0b 	ldrbmi.w	r5, [r0, #-11]
+2001ce8c:	f802 5c0b 	strbmi.w	r5, [r2, #-11]
+2001ce90:	059d      	lsls	r5, r3, #22
+2001ce92:	bf44      	itt	mi
+2001ce94:	f810 5c0a 	ldrbmi.w	r5, [r0, #-10]
+2001ce98:	f802 5c0a 	strbmi.w	r5, [r2, #-10]
+2001ce9c:	05de      	lsls	r6, r3, #23
+2001ce9e:	bf44      	itt	mi
+2001cea0:	f810 5c09 	ldrbmi.w	r5, [r0, #-9]
+2001cea4:	f802 5c09 	strbmi.w	r5, [r2, #-9]
+2001cea8:	061d      	lsls	r5, r3, #24
+2001ceaa:	bf44      	itt	mi
+2001ceac:	f810 5c08 	ldrbmi.w	r5, [r0, #-8]
+2001ceb0:	f802 5c08 	strbmi.w	r5, [r2, #-8]
+2001ceb4:	065e      	lsls	r6, r3, #25
+2001ceb6:	bf44      	itt	mi
+2001ceb8:	f810 5c07 	ldrbmi.w	r5, [r0, #-7]
+2001cebc:	f802 5c07 	strbmi.w	r5, [r2, #-7]
+2001cec0:	069d      	lsls	r5, r3, #26
+2001cec2:	bf44      	itt	mi
+2001cec4:	f810 5c06 	ldrbmi.w	r5, [r0, #-6]
+2001cec8:	f802 5c06 	strbmi.w	r5, [r2, #-6]
+2001cecc:	06de      	lsls	r6, r3, #27
+2001cece:	bf44      	itt	mi
+2001ced0:	f810 5c05 	ldrbmi.w	r5, [r0, #-5]
+2001ced4:	f802 5c05 	strbmi.w	r5, [r2, #-5]
+2001ced8:	071d      	lsls	r5, r3, #28
+2001ceda:	bf44      	itt	mi
+2001cedc:	f810 5c04 	ldrbmi.w	r5, [r0, #-4]
+2001cee0:	f802 5c04 	strbmi.w	r5, [r2, #-4]
+2001cee4:	075e      	lsls	r6, r3, #29
+2001cee6:	bf44      	itt	mi
+2001cee8:	f810 5c03 	ldrbmi.w	r5, [r0, #-3]
+2001ceec:	f802 5c03 	strbmi.w	r5, [r2, #-3]
+2001cef0:	079d      	lsls	r5, r3, #30
+2001cef2:	bf44      	itt	mi
+2001cef4:	f810 5c02 	ldrbmi.w	r5, [r0, #-2]
+2001cef8:	f802 5c02 	strbmi.w	r5, [r2, #-2]
+2001cefc:	07db      	lsls	r3, r3, #31
+2001cefe:	bf44      	itt	mi
+2001cf00:	f810 3c01 	ldrbmi.w	r3, [r0, #-1]
+2001cf04:	f802 3c01 	strbmi.w	r3, [r2, #-1]
+2001cf08:	e730      	b.n	2001cd6c <compositeTile2OnlyBuffer.constprop.0+0x210>
+2001cf0a:	f810 3c01 	ldrb.w	r3, [r0, #-1]
+2001cf0e:	f802 3c01 	strb.w	r3, [r2, #-1]
+2001cf12:	e6ec      	b.n	2001ccee <compositeTile2OnlyBuffer.constprop.0+0x192>

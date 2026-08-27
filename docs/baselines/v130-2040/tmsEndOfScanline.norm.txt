@@ -1,0 +1,4 @@
+<ADDR> <tmsEndOfScanline>:
+push	{r4, lr}
+bl	<ADDR> <pico9918_frame_end_of_scanline>
+pop	{r4, pc}

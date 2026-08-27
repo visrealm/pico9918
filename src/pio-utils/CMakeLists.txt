@@ -12,4 +12,8 @@ target_include_directories (${LIBRARY} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${LIBRARY} PUBLIC hardware_pio pico_stdlib)
 
+target_compile_definitions(${LIBRARY} PRIVATE
+        PICO9918_COLD_IN_FLASH=$<BOOL:${PICO9918_COLD_IN_FLASH}>
+        PICO_TIME_DEFAULT_ALARM_POOL_DISABLED=1)
+
 target_compile_options(${PROJECT_NAME} PUBLIC -include pico/platform/compiler.h)

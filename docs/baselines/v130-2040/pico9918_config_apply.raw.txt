@@ -1,0 +1,275 @@
+20017518 <pico9918_config_apply>:
+20017518:	4b69      	ldr	r3, [pc, #420]	@ (200176c0 <pico9918_config_apply+0x1a8>)
+2001751a:	b510      	push	{r4, lr}
+2001751c:	681b      	ldr	r3, [r3, #0]
+2001751e:	2b00      	cmp	r3, #0
+20017520:	d000      	beq.n	20017524 <pico9918_config_apply+0xc>
+20017522:	4798      	blx	r3
+20017524:	4b67      	ldr	r3, [pc, #412]	@ (200176c4 <pico9918_config_apply+0x1ac>)
+20017526:	4a68      	ldr	r2, [pc, #416]	@ (200176c8 <pico9918_config_apply+0x1b0>)
+20017528:	681b      	ldr	r3, [r3, #0]
+2001752a:	5c99      	ldrb	r1, [r3, r2]
+2001752c:	2900      	cmp	r1, #0
+2001752e:	d100      	bne.n	20017532 <pico9918_config_apply+0x1a>
+20017530:	e0a7      	b.n	20017682 <pico9918_config_apply+0x16a>
+20017532:	2100      	movs	r1, #0
+20017534:	5499      	strb	r1, [r3, r2]
+20017536:	4965      	ldr	r1, [pc, #404]	@ (200176cc <pico9918_config_apply+0x1b4>)
+20017538:	4a65      	ldr	r2, [pc, #404]	@ (200176d0 <pico9918_config_apply+0x1b8>)
+2001753a:	5c59      	ldrb	r1, [r3, r1]
+2001753c:	5c9a      	ldrb	r2, [r3, r2]
+2001753e:	2900      	cmp	r1, #0
+20017540:	d000      	beq.n	20017544 <pico9918_config_apply+0x2c>
+20017542:	e0ba      	b.n	200176ba <pico9918_config_apply+0x1a2>
+20017544:	2104      	movs	r1, #4
+20017546:	438a      	bics	r2, r1
+20017548:	4961      	ldr	r1, [pc, #388]	@ (200176d0 <pico9918_config_apply+0x1b8>)
+2001754a:	545a      	strb	r2, [r3, r1]
+2001754c:	2101      	movs	r1, #1
+2001754e:	0008      	movs	r0, r1
+20017550:	4a60      	ldr	r2, [pc, #384]	@ (200176d4 <pico9918_config_apply+0x1bc>)
+20017552:	5c9a      	ldrb	r2, [r3, r2]
+20017554:	3202      	adds	r2, #2
+20017556:	4090      	lsls	r0, r2
+20017558:	4a5f      	ldr	r2, [pc, #380]	@ (200176d8 <pico9918_config_apply+0x1c0>)
+2001755a:	5498      	strb	r0, [r3, r2]
+2001755c:	4a5f      	ldr	r2, [pc, #380]	@ (200176dc <pico9918_config_apply+0x1c4>)
+2001755e:	5c98      	ldrb	r0, [r3, r2]
+20017560:	4a5f      	ldr	r2, [pc, #380]	@ (200176e0 <pico9918_config_apply+0x1c8>)
+20017562:	0200      	lsls	r0, r0, #8
+20017564:	5c9a      	ldrb	r2, [r3, r2]
+20017566:	4302      	orrs	r2, r0
+20017568:	20a0      	movs	r0, #160	@ 0xa0
+2001756a:	ba52      	rev16	r2, r2
+2001756c:	01c0      	lsls	r0, r0, #7
+2001756e:	521a      	strh	r2, [r3, r0]
+20017570:	4a5c      	ldr	r2, [pc, #368]	@ (200176e4 <pico9918_config_apply+0x1cc>)
+20017572:	5c98      	ldrb	r0, [r3, r2]
+20017574:	4a5c      	ldr	r2, [pc, #368]	@ (200176e8 <pico9918_config_apply+0x1d0>)
+20017576:	0200      	lsls	r0, r0, #8
+20017578:	5c9a      	ldrb	r2, [r3, r2]
+2001757a:	4302      	orrs	r2, r0
+2001757c:	485b      	ldr	r0, [pc, #364]	@ (200176ec <pico9918_config_apply+0x1d4>)
+2001757e:	ba52      	rev16	r2, r2
+20017580:	521a      	strh	r2, [r3, r0]
+20017582:	4a5b      	ldr	r2, [pc, #364]	@ (200176f0 <pico9918_config_apply+0x1d8>)
+20017584:	5c98      	ldrb	r0, [r3, r2]
+20017586:	4a5b      	ldr	r2, [pc, #364]	@ (200176f4 <pico9918_config_apply+0x1dc>)
+20017588:	0200      	lsls	r0, r0, #8
+2001758a:	5c9a      	ldrb	r2, [r3, r2]
+2001758c:	4302      	orrs	r2, r0
+2001758e:	485a      	ldr	r0, [pc, #360]	@ (200176f8 <pico9918_config_apply+0x1e0>)
+20017590:	ba52      	rev16	r2, r2
+20017592:	521a      	strh	r2, [r3, r0]
+20017594:	4a59      	ldr	r2, [pc, #356]	@ (200176fc <pico9918_config_apply+0x1e4>)
+20017596:	5c98      	ldrb	r0, [r3, r2]
+20017598:	4a59      	ldr	r2, [pc, #356]	@ (20017700 <pico9918_config_apply+0x1e8>)
+2001759a:	0200      	lsls	r0, r0, #8
+2001759c:	5c9a      	ldrb	r2, [r3, r2]
+2001759e:	4302      	orrs	r2, r0
+200175a0:	4858      	ldr	r0, [pc, #352]	@ (20017704 <pico9918_config_apply+0x1ec>)
+200175a2:	ba52      	rev16	r2, r2
+200175a4:	521a      	strh	r2, [r3, r0]
+200175a6:	4a58      	ldr	r2, [pc, #352]	@ (20017708 <pico9918_config_apply+0x1f0>)
+200175a8:	5c98      	ldrb	r0, [r3, r2]
+200175aa:	4a58      	ldr	r2, [pc, #352]	@ (2001770c <pico9918_config_apply+0x1f4>)
+200175ac:	0200      	lsls	r0, r0, #8
+200175ae:	5c9a      	ldrb	r2, [r3, r2]
+200175b0:	4302      	orrs	r2, r0
+200175b2:	4857      	ldr	r0, [pc, #348]	@ (20017710 <pico9918_config_apply+0x1f8>)
+200175b4:	ba52      	rev16	r2, r2
+200175b6:	521a      	strh	r2, [r3, r0]
+200175b8:	4a56      	ldr	r2, [pc, #344]	@ (20017714 <pico9918_config_apply+0x1fc>)
+200175ba:	5c98      	ldrb	r0, [r3, r2]
+200175bc:	4a56      	ldr	r2, [pc, #344]	@ (20017718 <pico9918_config_apply+0x200>)
+200175be:	0200      	lsls	r0, r0, #8
+200175c0:	5c9a      	ldrb	r2, [r3, r2]
+200175c2:	4302      	orrs	r2, r0
+200175c4:	4855      	ldr	r0, [pc, #340]	@ (2001771c <pico9918_config_apply+0x204>)
+200175c6:	ba52      	rev16	r2, r2
+200175c8:	521a      	strh	r2, [r3, r0]
+200175ca:	4a55      	ldr	r2, [pc, #340]	@ (20017720 <pico9918_config_apply+0x208>)
+200175cc:	5c98      	ldrb	r0, [r3, r2]
+200175ce:	4a55      	ldr	r2, [pc, #340]	@ (20017724 <pico9918_config_apply+0x20c>)
+200175d0:	0200      	lsls	r0, r0, #8
+200175d2:	5c9a      	ldrb	r2, [r3, r2]
+200175d4:	4302      	orrs	r2, r0
+200175d6:	4854      	ldr	r0, [pc, #336]	@ (20017728 <pico9918_config_apply+0x210>)
+200175d8:	ba52      	rev16	r2, r2
+200175da:	521a      	strh	r2, [r3, r0]
+200175dc:	4a53      	ldr	r2, [pc, #332]	@ (2001772c <pico9918_config_apply+0x214>)
+200175de:	5c98      	ldrb	r0, [r3, r2]
+200175e0:	4a53      	ldr	r2, [pc, #332]	@ (20017730 <pico9918_config_apply+0x218>)
+200175e2:	0200      	lsls	r0, r0, #8
+200175e4:	5c9a      	ldrb	r2, [r3, r2]
+200175e6:	4302      	orrs	r2, r0
+200175e8:	4852      	ldr	r0, [pc, #328]	@ (20017734 <pico9918_config_apply+0x21c>)
+200175ea:	ba52      	rev16	r2, r2
+200175ec:	521a      	strh	r2, [r3, r0]
+200175ee:	4a52      	ldr	r2, [pc, #328]	@ (20017738 <pico9918_config_apply+0x220>)
+200175f0:	5c98      	ldrb	r0, [r3, r2]
+200175f2:	4a52      	ldr	r2, [pc, #328]	@ (2001773c <pico9918_config_apply+0x224>)
+200175f4:	0200      	lsls	r0, r0, #8
+200175f6:	5c9a      	ldrb	r2, [r3, r2]
+200175f8:	4302      	orrs	r2, r0
+200175fa:	4851      	ldr	r0, [pc, #324]	@ (20017740 <pico9918_config_apply+0x228>)
+200175fc:	ba52      	rev16	r2, r2
+200175fe:	521a      	strh	r2, [r3, r0]
+20017600:	4a50      	ldr	r2, [pc, #320]	@ (20017744 <pico9918_config_apply+0x22c>)
+20017602:	5c98      	ldrb	r0, [r3, r2]
+20017604:	4a50      	ldr	r2, [pc, #320]	@ (20017748 <pico9918_config_apply+0x230>)
+20017606:	0200      	lsls	r0, r0, #8
+20017608:	5c9a      	ldrb	r2, [r3, r2]
+2001760a:	4302      	orrs	r2, r0
+2001760c:	484f      	ldr	r0, [pc, #316]	@ (2001774c <pico9918_config_apply+0x234>)
+2001760e:	ba52      	rev16	r2, r2
+20017610:	521a      	strh	r2, [r3, r0]
+20017612:	4a4f      	ldr	r2, [pc, #316]	@ (20017750 <pico9918_config_apply+0x238>)
+20017614:	5c98      	ldrb	r0, [r3, r2]
+20017616:	4a4f      	ldr	r2, [pc, #316]	@ (20017754 <pico9918_config_apply+0x23c>)
+20017618:	0200      	lsls	r0, r0, #8
+2001761a:	5c9a      	ldrb	r2, [r3, r2]
+2001761c:	4302      	orrs	r2, r0
+2001761e:	484e      	ldr	r0, [pc, #312]	@ (20017758 <pico9918_config_apply+0x240>)
+20017620:	ba52      	rev16	r2, r2
+20017622:	521a      	strh	r2, [r3, r0]
+20017624:	4a4d      	ldr	r2, [pc, #308]	@ (2001775c <pico9918_config_apply+0x244>)
+20017626:	5c98      	ldrb	r0, [r3, r2]
+20017628:	4a4d      	ldr	r2, [pc, #308]	@ (20017760 <pico9918_config_apply+0x248>)
+2001762a:	0200      	lsls	r0, r0, #8
+2001762c:	5c9a      	ldrb	r2, [r3, r2]
+2001762e:	4302      	orrs	r2, r0
+20017630:	484c      	ldr	r0, [pc, #304]	@ (20017764 <pico9918_config_apply+0x24c>)
+20017632:	ba52      	rev16	r2, r2
+20017634:	521a      	strh	r2, [r3, r0]
+20017636:	4a4c      	ldr	r2, [pc, #304]	@ (20017768 <pico9918_config_apply+0x250>)
+20017638:	5c98      	ldrb	r0, [r3, r2]
+2001763a:	4a4c      	ldr	r2, [pc, #304]	@ (2001776c <pico9918_config_apply+0x254>)
+2001763c:	0200      	lsls	r0, r0, #8
+2001763e:	5c9a      	ldrb	r2, [r3, r2]
+20017640:	4302      	orrs	r2, r0
+20017642:	484b      	ldr	r0, [pc, #300]	@ (20017770 <pico9918_config_apply+0x258>)
+20017644:	ba52      	rev16	r2, r2
+20017646:	521a      	strh	r2, [r3, r0]
+20017648:	4a4a      	ldr	r2, [pc, #296]	@ (20017774 <pico9918_config_apply+0x25c>)
+2001764a:	5c98      	ldrb	r0, [r3, r2]
+2001764c:	4a4a      	ldr	r2, [pc, #296]	@ (20017778 <pico9918_config_apply+0x260>)
+2001764e:	0200      	lsls	r0, r0, #8
+20017650:	5c9a      	ldrb	r2, [r3, r2]
+20017652:	4302      	orrs	r2, r0
+20017654:	4849      	ldr	r0, [pc, #292]	@ (2001777c <pico9918_config_apply+0x264>)
+20017656:	ba52      	rev16	r2, r2
+20017658:	521a      	strh	r2, [r3, r0]
+2001765a:	4a49      	ldr	r2, [pc, #292]	@ (20017780 <pico9918_config_apply+0x268>)
+2001765c:	5c98      	ldrb	r0, [r3, r2]
+2001765e:	4a49      	ldr	r2, [pc, #292]	@ (20017784 <pico9918_config_apply+0x26c>)
+20017660:	0200      	lsls	r0, r0, #8
+20017662:	5c9a      	ldrb	r2, [r3, r2]
+20017664:	4302      	orrs	r2, r0
+20017666:	4848      	ldr	r0, [pc, #288]	@ (20017788 <pico9918_config_apply+0x270>)
+20017668:	ba52      	rev16	r2, r2
+2001766a:	521a      	strh	r2, [r3, r0]
+2001766c:	4a47      	ldr	r2, [pc, #284]	@ (2001778c <pico9918_config_apply+0x274>)
+2001766e:	5c98      	ldrb	r0, [r3, r2]
+20017670:	4a47      	ldr	r2, [pc, #284]	@ (20017790 <pico9918_config_apply+0x278>)
+20017672:	0200      	lsls	r0, r0, #8
+20017674:	5c9a      	ldrb	r2, [r3, r2]
+20017676:	4302      	orrs	r2, r0
+20017678:	4846      	ldr	r0, [pc, #280]	@ (20017794 <pico9918_config_apply+0x27c>)
+2001767a:	ba52      	rev16	r2, r2
+2001767c:	521a      	strh	r2, [r3, r0]
+2001767e:	4a46      	ldr	r2, [pc, #280]	@ (20017798 <pico9918_config_apply+0x280>)
+20017680:	5499      	strb	r1, [r3, r2]
+20017682:	4a46      	ldr	r2, [pc, #280]	@ (2001779c <pico9918_config_apply+0x284>)
+20017684:	5c99      	ldrb	r1, [r3, r2]
+20017686:	2201      	movs	r2, #1
+20017688:	2900      	cmp	r1, #0
+2001768a:	d103      	bne.n	20017694 <pico9918_config_apply+0x17c>
+2001768c:	4944      	ldr	r1, [pc, #272]	@ (200177a0 <pico9918_config_apply+0x288>)
+2001768e:	5c59      	ldrb	r1, [r3, r1]
+20017690:	2900      	cmp	r1, #0
+20017692:	d009      	beq.n	200176a8 <pico9918_config_apply+0x190>
+20017694:	4943      	ldr	r1, [pc, #268]	@ (200177a4 <pico9918_config_apply+0x28c>)
+20017696:	545a      	strb	r2, [r3, r1]
+20017698:	4a43      	ldr	r2, [pc, #268]	@ (200177a8 <pico9918_config_apply+0x290>)
+2001769a:	5c9a      	ldrb	r2, [r3, r2]
+2001769c:	3a01      	subs	r2, #1
+2001769e:	4251      	negs	r1, r2
+200176a0:	414a      	adcs	r2, r1
+200176a2:	4942      	ldr	r1, [pc, #264]	@ (200177ac <pico9918_config_apply+0x294>)
+200176a4:	545a      	strb	r2, [r3, r1]
+200176a6:	bd10      	pop	{r4, pc}
+200176a8:	4941      	ldr	r1, [pc, #260]	@ (200177b0 <pico9918_config_apply+0x298>)
+200176aa:	5c59      	ldrb	r1, [r3, r1]
+200176ac:	2900      	cmp	r1, #0
+200176ae:	d1f1      	bne.n	20017694 <pico9918_config_apply+0x17c>
+200176b0:	4a40      	ldr	r2, [pc, #256]	@ (200177b4 <pico9918_config_apply+0x29c>)
+200176b2:	5c9a      	ldrb	r2, [r3, r2]
+200176b4:	1e51      	subs	r1, r2, #1
+200176b6:	418a      	sbcs	r2, r1
+200176b8:	e7ec      	b.n	20017694 <pico9918_config_apply+0x17c>
+200176ba:	2104      	movs	r1, #4
+200176bc:	430a      	orrs	r2, r1
+200176be:	e743      	b.n	20017548 <pico9918_config_apply+0x30>
+200176c0:	200289d4 	.word	0x200289d4
+200176c4:	20022eb0 	.word	0x20022eb0
+200176c8:	00010151 	.word	0x00010151
+200176cc:	00010058 	.word	0x00010058
+200176d0:	00006032 	.word	0x00006032
+200176d4:	00010059 	.word	0x00010059
+200176d8:	0000601e 	.word	0x0000601e
+200176dc:	000100d0 	.word	0x000100d0
+200176e0:	000100d1 	.word	0x000100d1
+200176e4:	000100d2 	.word	0x000100d2
+200176e8:	000100d3 	.word	0x000100d3
+200176ec:	00005002 	.word	0x00005002
+200176f0:	000100d4 	.word	0x000100d4
+200176f4:	000100d5 	.word	0x000100d5
+200176f8:	00005004 	.word	0x00005004
+200176fc:	000100d6 	.word	0x000100d6
+20017700:	000100d7 	.word	0x000100d7
+20017704:	00005006 	.word	0x00005006
+20017708:	000100d8 	.word	0x000100d8
+2001770c:	000100d9 	.word	0x000100d9
+20017710:	00005008 	.word	0x00005008
+20017714:	000100da 	.word	0x000100da
+20017718:	000100db 	.word	0x000100db
+2001771c:	0000500a 	.word	0x0000500a
+20017720:	000100dc 	.word	0x000100dc
+20017724:	000100dd 	.word	0x000100dd
+20017728:	0000500c 	.word	0x0000500c
+2001772c:	000100de 	.word	0x000100de
+20017730:	000100df 	.word	0x000100df
+20017734:	0000500e 	.word	0x0000500e
+20017738:	000100e0 	.word	0x000100e0
+2001773c:	000100e1 	.word	0x000100e1
+20017740:	00005010 	.word	0x00005010
+20017744:	000100e2 	.word	0x000100e2
+20017748:	000100e3 	.word	0x000100e3
+2001774c:	00005012 	.word	0x00005012
+20017750:	000100e4 	.word	0x000100e4
+20017754:	000100e5 	.word	0x000100e5
+20017758:	00005014 	.word	0x00005014
+2001775c:	000100e6 	.word	0x000100e6
+20017760:	000100e7 	.word	0x000100e7
+20017764:	00005016 	.word	0x00005016
+20017768:	000100e8 	.word	0x000100e8
+2001776c:	000100e9 	.word	0x000100e9
+20017770:	00005018 	.word	0x00005018
+20017774:	000100ea 	.word	0x000100ea
+20017778:	000100eb 	.word	0x000100eb
+2001777c:	0000501a 	.word	0x0000501a
+20017780:	000100ec 	.word	0x000100ec
+20017784:	000100ed 	.word	0x000100ed
+20017788:	0000501c 	.word	0x0000501c
+2001778c:	000100ee 	.word	0x000100ee
+20017790:	000100ef 	.word	0x000100ef
+20017794:	0000501e 	.word	0x0000501e
+20017798:	00010034 	.word	0x00010034
+2001779c:	00010064 	.word	0x00010064
+200177a0:	00010063 	.word	0x00010063
+200177a4:	00010060 	.word	0x00010060
+200177a8:	0001005f 	.word	0x0001005f
+200177ac:	00010035 	.word	0x00010035
+200177b0:	00010062 	.word	0x00010062
+200177b4:	00010061 	.word	0x00010061

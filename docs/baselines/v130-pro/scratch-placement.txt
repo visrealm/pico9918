@@ -1,0 +1,13 @@
+                0x00000001                        ASSERT ((__scratch_x_end__ <= __StackOneBottom), SCRATCH_X overflow: .scratch_x data has run into core 1's stack)
+                0x00000001                        ASSERT ((__scratch_y_end__ <= __StackBottom), SCRATCH_Y overflow: .scratch_y data has run into core 0's stack)
+.scratch_x      0x20080000      0x854 load address 0x1001773c
+ *(.scratch_x.*)
+ .scratch_x.lookup
+ .scratch_x.buffer
+                0x1001773c                        __scratch_x_source__ = LOADADDR (.scratch_x)
+.scratch_y      0x20081000      0xa10 load address 0x10017f90
+ *(.scratch_y.*)
+ .scratch_y.lookup
+ .scratch_y.buffer
+ .scratch_y.buffer
+                0x10017f90                        __scratch_y_source__ = LOADADDR (.scratch_y)

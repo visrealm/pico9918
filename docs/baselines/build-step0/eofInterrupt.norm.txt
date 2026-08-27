@@ -1,0 +1,68 @@
+2000022c <eofInterrupt>:
+movs	r0, #1
+push	{r4, r5, r6, lr}
+movs	r5, #2
+ldr	r3, [pc, #128]	@ (200002b4 <eofInterrupt+0x88>)
+ldr	r4, [pc, #128]	@ (200002b8 <eofInterrupt+0x8c>)
+strb	r0, [r3, #0]
+ldr	r1, [pc, #128]	@ (200002bc <eofInterrupt+0x90>)
+ldr	r3, [r4, #0]
+ldrb	r2, [r3, r1]
+orrs	r2, r5
+strb	r2, [r3, r1]
+ldr	r2, [pc, #124]	@ (200002c0 <eofInterrupt+0x94>)
+ldrb	r2, [r3, r2]
+lsls	r2, r2, #26
+bpl.n	2000024c <eofInterrupt+0x20>
+strb	r0, [r3, #12]
+bl	20002590 <coreTemperatureC>
+ldr	r5, [pc, #112]	@ (200002c4 <eofInterrupt+0x98>)
+ldr	r1, [r5, #0]
+bl	20003770 <__wrap___aeabi_fadd>
+ldr	r3, [pc, #108]	@ (200002c8 <eofInterrupt+0x9c>)
+str	r0, [r5, #0]
+ldr	r3, [r3, #0]
+lsls	r3, r3, #26
+beq.n	2000026e <eofInterrupt+0x42>
+ldr	r4, [r4, #0]
+ldr	r3, [pc, #100]	@ (200002cc <eofInterrupt+0xa0>)
+ldrb	r2, [r4, r3]
+cmp	r2, #0
+bne.n	200002a4 <eofInterrupt+0x78>
+pop	{r4, r5, r6, pc}
+movs	r1, #242	@ 0xf2
+lsls	r1, r1, #22
+bl	2000379e <__wrap___aeabi_fmul>
+str	r0, [r5, #0]
+bl	20001670 <diagSetTemperature>
+movs	r1, #129	@ 0x81
+ldr	r0, [r5, #0]
+lsls	r1, r1, #23
+bl	2000379e <__wrap___aeabi_fmul>
+movs	r1, #252	@ 0xfc
+lsls	r1, r1, #22
+bl	20003770 <__wrap___aeabi_fadd>
+bl	200038bc <__wrap___aeabi_f2uiz>
+ldr	r4, [r4, #0]
+ldr	r3, [pc, #56]	@ (200002d0 <eofInterrupt+0xa4>)
+strb	r0, [r4, r3]
+movs	r3, #0
+str	r3, [r5, #0]
+ldr	r3, [pc, #44]	@ (200002cc <eofInterrupt+0xa0>)
+ldrb	r2, [r4, r3]
+cmp	r2, #0
+beq.n	2000026c <eofInterrupt+0x40>
+movs	r2, #0
+strb	r2, [r4, r3]
+bl	20000ae8 <applyConfig>
+bl	20001cc4 <diagnosticsConfigUpdated>
+b.n	2000026c <eofInterrupt+0x40>
+nop			@ (mov r8, r8)
+200002b4:	200274d7 	.word	0x200274d7
+200002b8:	2000c7e4 	.word	0x2000c7e4
+200002bc:	0000b02d 	.word	0x0000b02d
+200002c0:	0000605e 	.word	0x0000605e
+200002c4:	20027454 	.word	0x20027454
+200002c8:	2002636c 	.word	0x2002636c
+200002cc:	00010150 	.word	0x00010150
+200002d0:	0000b039 	.word	0x0000b039

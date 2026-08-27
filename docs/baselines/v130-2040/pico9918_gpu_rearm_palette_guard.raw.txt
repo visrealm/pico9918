@@ -1,0 +1,23 @@
+200224cc <pico9918_gpu_rearm_palette_guard>:
+200224cc:	b510      	push	{r4, lr}
+200224ce:	4b08      	ldr	r3, [pc, #32]	@ (200224f0 <pico9918_gpu_rearm_palette_guard+0x24>)
+200224d0:	681a      	ldr	r2, [r3, #0]
+200224d2:	4b08      	ldr	r3, [pc, #32]	@ (200224f4 <pico9918_gpu_rearm_palette_guard+0x28>)
+200224d4:	5cd1      	ldrb	r1, [r2, r3]
+200224d6:	2900      	cmp	r1, #0
+200224d8:	d108      	bne.n	200224ec <pico9918_gpu_rearm_palette_guard+0x20>
+200224da:	4807      	ldr	r0, [pc, #28]	@ (200224f8 <pico9918_gpu_rearm_palette_guard+0x2c>)
+200224dc:	7001      	strb	r1, [r0, #0]
+200224de:	4807      	ldr	r0, [pc, #28]	@ (200224fc <pico9918_gpu_rearm_palette_guard+0x30>)
+200224e0:	3101      	adds	r1, #1
+200224e2:	6081      	str	r1, [r0, #8]
+200224e4:	6904      	ldr	r4, [r0, #16]
+200224e6:	430c      	orrs	r4, r1
+200224e8:	6104      	str	r4, [r0, #16]
+200224ea:	54d1      	strb	r1, [r2, r3]
+200224ec:	bd10      	pop	{r4, pc}
+200224ee:	46c0      	nop			@ (mov r8, r8)
+200224f0:	20022eb0 	.word	0x20022eb0
+200224f4:	00010034 	.word	0x00010034
+200224f8:	200292dc 	.word	0x200292dc
+200224fc:	e000ed90 	.word	0xe000ed90

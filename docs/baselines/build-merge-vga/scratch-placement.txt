@@ -1,0 +1,11 @@
+.scratch_x      0x20040000      0x5ac load address 0x10012aa4
+ *(.scratch_x.*)
+ .scratch_x.lookup
+ .scratch_x.buffer
+ .scratch_x.buffer
+                0x10012aa4                        __scratch_x_source__ = LOADADDR (.scratch_x)
+.scratch_y      0x20041000      0xa0c load address 0x10013050
+ *(.scratch_y.*)
+ .scratch_y.lookup
+ .scratch_y.buffer
+                0x10013050                        __scratch_y_source__ = LOADADDR (.scratch_y)

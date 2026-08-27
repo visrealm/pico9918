@@ -1,0 +1,5 @@
+tmsScanline            489 instructions
+updateInterrupts       107 instructions
+generateRgbCache       289 instructions
+tmsEndOfFrame           80 instructions
+eofInterrupt            68 instructions

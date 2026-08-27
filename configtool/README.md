@@ -51,21 +51,19 @@ make configurator_all   # Build all configurator ROMs
 ```
 
 All final artifacts will be in `build/dist/`:
-- **Firmware**: `pico9918-vga-build-v1-0-2.uf2`
-- **Configurator ROMs**: `pico9918_v1-0-2_*.rom` / `pico9918_v1-0-2_*.bin`
+- **Firmware**: `pico9918-v<version>.uf2`
+- **Configurator ROMs**: `pico9918conf-v<version>_*.rom` / `pico9918conf-v<version>_*.bin`
 
-#### Standalone Build (Legacy)
+#### Standalone Build (against an existing firmware UF2)
 ```bash
-cd configtool
 mkdir build && cd build
-cmake .. [-DBUILD_TOOLS_FROM_SOURCE=ON]
+cmake .. -DCONFIGURATOR_ONLY=ON -DPICO9918_FIRMWARE_UF2_PATH=<path-to-firmware.uf2>
 make configurator_all
 ```
 
 #### Build Individual Platforms
 ```bash
 make ti99              # TI-99/4A
-make ti99_f18a         # TI-99/4A F18A Testing  
 make coleco            # ColecoVision
 make msx_asc16         # MSX ASCII16 mapper
 make msx_konami        # MSX Konami mapper

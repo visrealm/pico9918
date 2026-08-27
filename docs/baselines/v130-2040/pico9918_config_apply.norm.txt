@@ -1,0 +1,275 @@
+<ADDR> <pico9918_config_apply>:
+ldr	r3, [pc, #420]	@ (<ADDR> <pico9918_config_apply+OFF>)
+push	{r4, lr}
+ldr	r3, [r3, #0]
+cmp	r3, #0
+beq.n	<ADDR> <pico9918_config_apply+OFF>
+blx	r3
+ldr	r3, [pc, #412]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldr	r2, [pc, #416]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldr	r3, [r3, #0]
+ldrb	r1, [r3, r2]
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_config_apply+OFF>
+b.n	<ADDR> <pico9918_config_apply+OFF>
+movs	r1, #0
+strb	r1, [r3, r2]
+ldr	r1, [pc, #404]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldr	r2, [pc, #404]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r1, [r3, r1]
+ldrb	r2, [r3, r2]
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_config_apply+OFF>
+b.n	<ADDR> <pico9918_config_apply+OFF>
+movs	r1, #4
+bics	r2, r1
+ldr	r1, [pc, #388]	@ (<ADDR> <pico9918_config_apply+OFF>)
+strb	r2, [r3, r1]
+movs	r1, #1
+movs	r0, r1
+ldr	r2, [pc, #384]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r2, [r3, r2]
+adds	r2, #2
+lsls	r0, r2
+ldr	r2, [pc, #380]	@ (<ADDR> <pico9918_config_apply+OFF>)
+strb	r0, [r3, r2]
+ldr	r2, [pc, #380]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #380]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+movs	r0, #160	@ 0xa0
+rev16	r2, r2
+lsls	r0, r0, #7
+strh	r2, [r3, r0]
+ldr	r2, [pc, #368]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #368]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #364]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #364]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #364]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #360]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #356]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #356]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #352]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #352]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #352]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #348]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #344]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #344]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #340]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #340]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #340]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #336]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #332]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #332]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #328]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #328]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #328]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #324]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #320]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #320]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #316]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #316]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #316]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #312]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #308]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #308]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #304]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #304]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #304]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #300]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #296]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #296]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #292]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #292]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #292]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #288]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #284]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r0, [r3, r2]
+ldr	r2, [pc, #284]	@ (<ADDR> <pico9918_config_apply+OFF>)
+lsls	r0, r0, #8
+ldrb	r2, [r3, r2]
+orrs	r2, r0
+ldr	r0, [pc, #280]	@ (<ADDR> <pico9918_config_apply+OFF>)
+rev16	r2, r2
+strh	r2, [r3, r0]
+ldr	r2, [pc, #280]	@ (<ADDR> <pico9918_config_apply+OFF>)
+strb	r1, [r3, r2]
+ldr	r2, [pc, #280]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r1, [r3, r2]
+movs	r2, #1
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_config_apply+OFF>
+ldr	r1, [pc, #272]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r1, [r3, r1]
+cmp	r1, #0
+beq.n	<ADDR> <pico9918_config_apply+OFF>
+ldr	r1, [pc, #268]	@ (<ADDR> <pico9918_config_apply+OFF>)
+strb	r2, [r3, r1]
+ldr	r2, [pc, #268]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r2, [r3, r2]
+subs	r2, #1
+negs	r1, r2
+adcs	r2, r1
+ldr	r1, [pc, #264]	@ (<ADDR> <pico9918_config_apply+OFF>)
+strb	r2, [r3, r1]
+pop	{r4, pc}
+ldr	r1, [pc, #260]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r1, [r3, r1]
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_config_apply+OFF>
+ldr	r2, [pc, #256]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldrb	r2, [r3, r2]
+subs	r1, r2, #1
+sbcs	r2, r1
+b.n	<ADDR> <pico9918_config_apply+OFF>
+movs	r1, #4
+orrs	r2, r1
+b.n	<ADDR> <pico9918_config_apply+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

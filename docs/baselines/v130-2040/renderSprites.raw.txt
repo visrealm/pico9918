@@ -1,0 +1,1136 @@
+2001b144 <renderSprites.constprop.0>:
+2001b144:	b5f0      	push	{r4, r5, r6, r7, lr}
+2001b146:	46de      	mov	lr, fp
+2001b148:	4657      	mov	r7, sl
+2001b14a:	464e      	mov	r6, r9
+2001b14c:	4645      	mov	r5, r8
+2001b14e:	b5e0      	push	{r5, r6, r7, lr}
+2001b150:	b0a3      	sub	sp, #140	@ 0x8c
+2001b152:	9100      	str	r1, [sp, #0]
+2001b154:	497c      	ldr	r1, [pc, #496]	@ (2001b348 <renderSprites.constprop.0+0x204>)
+2001b156:	4a7d      	ldr	r2, [pc, #500]	@ (2001b34c <renderSprites.constprop.0+0x208>)
+2001b158:	9004      	str	r0, [sp, #16]
+2001b15a:	9103      	str	r1, [sp, #12]
+2001b15c:	4b7c      	ldr	r3, [pc, #496]	@ (2001b350 <renderSprites.constprop.0+0x20c>)
+2001b15e:	5c8a      	ldrb	r2, [r1, r2]
+2001b160:	5ccb      	ldrb	r3, [r1, r3]
+2001b162:	0792      	lsls	r2, r2, #30
+2001b164:	d400      	bmi.n	2001b168 <renderSprites.constprop.0+0x24>
+2001b166:	e0cd      	b.n	2001b304 <renderSprites.constprop.0+0x1c0>
+2001b168:	2210      	movs	r2, #16
+2001b16a:	000c      	movs	r4, r1
+2001b16c:	920e      	str	r2, [sp, #56]	@ 0x38
+2001b16e:	920f      	str	r2, [sp, #60]	@ 0x3c
+2001b170:	3a0f      	subs	r2, #15
+2001b172:	920c      	str	r2, [sp, #48]	@ 0x30
+2001b174:	32fb      	adds	r2, #251	@ 0xfb
+2001b176:	920b      	str	r2, [sp, #44]	@ 0x2c
+2001b178:	9900      	ldr	r1, [sp, #0]
+2001b17a:	9a0e      	ldr	r2, [sp, #56]	@ 0x38
+2001b17c:	425b      	negs	r3, r3
+2001b17e:	408a      	lsls	r2, r1
+2001b180:	2103      	movs	r1, #3
+2001b182:	9209      	str	r2, [sp, #36]	@ 0x24
+2001b184:	b2d2      	uxtb	r2, r2
+2001b186:	920a      	str	r2, [sp, #40]	@ 0x28
+2001b188:	4a72      	ldr	r2, [pc, #456]	@ (2001b354 <renderSprites.constprop.0+0x210>)
+2001b18a:	5ca2      	ldrb	r2, [r4, r2]
+2001b18c:	401a      	ands	r2, r3
+2001b18e:	4011      	ands	r1, r2
+2001b190:	0008      	movs	r0, r1
+2001b192:	9108      	str	r1, [sp, #32]
+2001b194:	2903      	cmp	r1, #3
+2001b196:	d100      	bne.n	2001b19a <renderSprites.constprop.0+0x56>
+2001b198:	e386      	b.n	2001b8a8 <renderSprites.constprop.0+0x764>
+2001b19a:	496f      	ldr	r1, [pc, #444]	@ (2001b358 <renderSprites.constprop.0+0x214>)
+2001b19c:	5c61      	ldrb	r1, [r4, r1]
+2001b19e:	4019      	ands	r1, r3
+2001b1a0:	2801      	cmp	r0, #1
+2001b1a2:	d000      	beq.n	2001b1a6 <renderSprites.constprop.0+0x62>
+2001b1a4:	e0b7      	b.n	2001b316 <renderSprites.constprop.0+0x1d2>
+2001b1a6:	301f      	adds	r0, #31
+2001b1a8:	4008      	ands	r0, r1
+2001b1aa:	2101      	movs	r1, #1
+2001b1ac:	9119      	str	r1, [sp, #100]	@ 0x64
+2001b1ae:	310e      	adds	r1, #14
+2001b1b0:	901d      	str	r0, [sp, #116]	@ 0x74
+2001b1b2:	9118      	str	r1, [sp, #96]	@ 0x60
+2001b1b4:	9904      	ldr	r1, [sp, #16]
+2001b1b6:	2900      	cmp	r1, #0
+2001b1b8:	d101      	bne.n	2001b1be <renderSprites.constprop.0+0x7a>
+2001b1ba:	f000 fc3f 	bl	2001ba3c <renderSprites.constprop.0+0x8f8>
+2001b1be:	2171      	movs	r1, #113	@ 0x71
+2001b1c0:	20e0      	movs	r0, #224	@ 0xe0
+2001b1c2:	4249      	negs	r1, r1
+2001b1c4:	4319      	orrs	r1, r3
+2001b1c6:	9105      	str	r1, [sp, #20]
+2001b1c8:	9c03      	ldr	r4, [sp, #12]
+2001b1ca:	4964      	ldr	r1, [pc, #400]	@ (2001b35c <renderSprites.constprop.0+0x218>)
+2001b1cc:	0180      	lsls	r0, r0, #6
+2001b1ce:	5c61      	ldrb	r1, [r4, r1]
+2001b1d0:	4f63      	ldr	r7, [pc, #396]	@ (2001b360 <renderSprites.constprop.0+0x21c>)
+2001b1d2:	02c9      	lsls	r1, r1, #11
+2001b1d4:	4001      	ands	r1, r0
+2001b1d6:	2080      	movs	r0, #128	@ 0x80
+2001b1d8:	9111      	str	r1, [sp, #68]	@ 0x44
+2001b1da:	4962      	ldr	r1, [pc, #392]	@ (2001b364 <renderSprites.constprop.0+0x220>)
+2001b1dc:	0100      	lsls	r0, r0, #4
+2001b1de:	5c61      	ldrb	r1, [r4, r1]
+2001b1e0:	0989      	lsrs	r1, r1, #6
+2001b1e2:	4108      	asrs	r0, r1
+2001b1e4:	4960      	ldr	r1, [pc, #384]	@ (2001b368 <renderSprites.constprop.0+0x224>)
+2001b1e6:	9013      	str	r0, [sp, #76]	@ 0x4c
+2001b1e8:	5c61      	ldrb	r1, [r4, r1]
+2001b1ea:	9114      	str	r1, [sp, #80]	@ 0x50
+2001b1ec:	495f      	ldr	r1, [pc, #380]	@ (2001b36c <renderSprites.constprop.0+0x228>)
+2001b1ee:	5c61      	ldrb	r1, [r4, r1]
+2001b1f0:	400b      	ands	r3, r1
+2001b1f2:	2108      	movs	r1, #8
+2001b1f4:	4019      	ands	r1, r3
+2001b1f6:	2302      	movs	r3, #2
+2001b1f8:	4013      	ands	r3, r2
+2001b1fa:	9312      	str	r3, [sp, #72]	@ 0x48
+2001b1fc:	2300      	movs	r3, #0
+2001b1fe:	931b      	str	r3, [sp, #108]	@ 0x6c
+2001b200:	9317      	str	r3, [sp, #92]	@ 0x5c
+2001b202:	331f      	adds	r3, #31
+2001b204:	9306      	str	r3, [sp, #24]
+2001b206:	2300      	movs	r3, #0
+2001b208:	9a00      	ldr	r2, [sp, #0]
+2001b20a:	469a      	mov	sl, r3
+2001b20c:	469b      	mov	fp, r3
+2001b20e:	3310      	adds	r3, #16
+2001b210:	4093      	lsls	r3, r2
+2001b212:	9315      	str	r3, [sp, #84]	@ 0x54
+2001b214:	b2db      	uxtb	r3, r3
+2001b216:	9316      	str	r3, [sp, #88]	@ 0x58
+2001b218:	4653      	mov	r3, sl
+2001b21a:	911c      	str	r1, [sp, #112]	@ 0x70
+2001b21c:	9301      	str	r3, [sp, #4]
+2001b21e:	9a00      	ldr	r2, [sp, #0]
+2001b220:	783b      	ldrb	r3, [r7, #0]
+2001b222:	78fc      	ldrb	r4, [r7, #3]
+2001b224:	4113      	asrs	r3, r2
+2001b226:	9a05      	ldr	r2, [sp, #20]
+2001b228:	4014      	ands	r4, r2
+2001b22a:	2210      	movs	r2, #16
+2001b22c:	4222      	tst	r2, r4
+2001b22e:	d100      	bne.n	2001b232 <renderSprites.constprop.0+0xee>
+2001b230:	e17f      	b.n	2001b532 <renderSprites.constprop.0+0x3ee>
+2001b232:	9a0f      	ldr	r2, [sp, #60]	@ 0x3c
+2001b234:	2a10      	cmp	r2, #16
+2001b236:	d100      	bne.n	2001b23a <renderSprites.constprop.0+0xf6>
+2001b238:	e1ae      	b.n	2001b598 <renderSprites.constprop.0+0x454>
+2001b23a:	2001      	movs	r0, #1
+2001b23c:	9a15      	ldr	r2, [sp, #84]	@ 0x54
+2001b23e:	2100      	movs	r1, #0
+2001b240:	4691      	mov	r9, r2
+2001b242:	9a16      	ldr	r2, [sp, #88]	@ 0x58
+2001b244:	4680      	mov	r8, r0
+2001b246:	9202      	str	r2, [sp, #8]
+2001b248:	2210      	movs	r2, #16
+2001b24a:	468a      	mov	sl, r1
+2001b24c:	31fc      	adds	r1, #252	@ 0xfc
+2001b24e:	4293      	cmp	r3, r2
+2001b250:	db00      	blt.n	2001b254 <renderSprites.constprop.0+0x110>
+2001b252:	e071      	b.n	2001b338 <renderSprites.constprop.0+0x1f4>
+2001b254:	9e01      	ldr	r6, [sp, #4]
+2001b256:	3601      	adds	r6, #1
+2001b258:	9601      	str	r6, [sp, #4]
+2001b25a:	2e04      	cmp	r6, #4
+2001b25c:	d800      	bhi.n	2001b260 <renderSprites.constprop.0+0x11c>
+2001b25e:	e09e      	b.n	2001b39e <renderSprites.constprop.0+0x25a>
+2001b260:	9d06      	ldr	r5, [sp, #24]
+2001b262:	066d      	lsls	r5, r5, #25
+2001b264:	d500      	bpl.n	2001b268 <renderSprites.constprop.0+0x124>
+2001b266:	e095      	b.n	2001b394 <renderSprites.constprop.0+0x250>
+2001b268:	9d1c      	ldr	r5, [sp, #112]	@ 0x70
+2001b26a:	2d00      	cmp	r5, #0
+2001b26c:	d100      	bne.n	2001b270 <renderSprites.constprop.0+0x12c>
+2001b26e:	e085      	b.n	2001b37c <renderSprites.constprop.0+0x238>
+2001b270:	9d14      	ldr	r5, [sp, #80]	@ 0x50
+2001b272:	42b5      	cmp	r5, r6
+2001b274:	d300      	bcc.n	2001b278 <renderSprites.constprop.0+0x134>
+2001b276:	e092      	b.n	2001b39e <renderSprites.constprop.0+0x25a>
+2001b278:	221f      	movs	r2, #31
+2001b27a:	4659      	mov	r1, fp
+2001b27c:	9d06      	ldr	r5, [sp, #24]
+2001b27e:	4b3c      	ldr	r3, [pc, #240]	@ (2001b370 <renderSprites.constprop.0+0x22c>)
+2001b280:	4395      	bics	r5, r2
+2001b282:	2240      	movs	r2, #64	@ 0x40
+2001b284:	5c5b      	ldrb	r3, [r3, r1]
+2001b286:	432b      	orrs	r3, r5
+2001b288:	4313      	orrs	r3, r2
+2001b28a:	b2db      	uxtb	r3, r3
+2001b28c:	9306      	str	r3, [sp, #24]
+2001b28e:	4b39      	ldr	r3, [pc, #228]	@ (2001b374 <renderSprites.constprop.0+0x230>)
+2001b290:	9a03      	ldr	r2, [sp, #12]
+2001b292:	991b      	ldr	r1, [sp, #108]	@ 0x6c
+2001b294:	54d1      	strb	r1, [r2, r3]
+2001b296:	9b17      	ldr	r3, [sp, #92]	@ 0x5c
+2001b298:	2b00      	cmp	r3, #0
+2001b29a:	d02b      	beq.n	2001b2f4 <renderSprites.constprop.0+0x1b0>
+2001b29c:	4b36      	ldr	r3, [pc, #216]	@ (2001b378 <renderSprites.constprop.0+0x234>)
+2001b29e:	001a      	movs	r2, r3
+2001b2a0:	3a24      	subs	r2, #36	@ 0x24
+2001b2a2:	431a      	orrs	r2, r3
+2001b2a4:	3b48      	subs	r3, #72	@ 0x48
+2001b2a6:	0752      	lsls	r2, r2, #29
+2001b2a8:	d000      	beq.n	2001b2ac <renderSprites.constprop.0+0x168>
+2001b2aa:	e396      	b.n	2001b9da <renderSprites.constprop.0+0x896>
+2001b2ac:	6c9a      	ldr	r2, [r3, #72]	@ 0x48
+2001b2ae:	6a59      	ldr	r1, [r3, #36]	@ 0x24
+2001b2b0:	6cd8      	ldr	r0, [r3, #76]	@ 0x4c
+2001b2b2:	4051      	eors	r1, r2
+2001b2b4:	6a9a      	ldr	r2, [r3, #40]	@ 0x28
+2001b2b6:	6499      	str	r1, [r3, #72]	@ 0x48
+2001b2b8:	4042      	eors	r2, r0
+2001b2ba:	6d19      	ldr	r1, [r3, #80]	@ 0x50
+2001b2bc:	64da      	str	r2, [r3, #76]	@ 0x4c
+2001b2be:	6ada      	ldr	r2, [r3, #44]	@ 0x2c
+2001b2c0:	6b18      	ldr	r0, [r3, #48]	@ 0x30
+2001b2c2:	4051      	eors	r1, r2
+2001b2c4:	6d5a      	ldr	r2, [r3, #84]	@ 0x54
+2001b2c6:	6519      	str	r1, [r3, #80]	@ 0x50
+2001b2c8:	4042      	eors	r2, r0
+2001b2ca:	6d99      	ldr	r1, [r3, #88]	@ 0x58
+2001b2cc:	655a      	str	r2, [r3, #84]	@ 0x54
+2001b2ce:	6b5a      	ldr	r2, [r3, #52]	@ 0x34
+2001b2d0:	6b98      	ldr	r0, [r3, #56]	@ 0x38
+2001b2d2:	4051      	eors	r1, r2
+2001b2d4:	6dda      	ldr	r2, [r3, #92]	@ 0x5c
+2001b2d6:	6599      	str	r1, [r3, #88]	@ 0x58
+2001b2d8:	4042      	eors	r2, r0
+2001b2da:	6e19      	ldr	r1, [r3, #96]	@ 0x60
+2001b2dc:	65da      	str	r2, [r3, #92]	@ 0x5c
+2001b2de:	6bda      	ldr	r2, [r3, #60]	@ 0x3c
+2001b2e0:	6c18      	ldr	r0, [r3, #64]	@ 0x40
+2001b2e2:	4051      	eors	r1, r2
+2001b2e4:	6e5a      	ldr	r2, [r3, #100]	@ 0x64
+2001b2e6:	6619      	str	r1, [r3, #96]	@ 0x60
+2001b2e8:	4042      	eors	r2, r0
+2001b2ea:	6e99      	ldr	r1, [r3, #104]	@ 0x68
+2001b2ec:	665a      	str	r2, [r3, #100]	@ 0x64
+2001b2ee:	6c5a      	ldr	r2, [r3, #68]	@ 0x44
+2001b2f0:	404a      	eors	r2, r1
+2001b2f2:	669a      	str	r2, [r3, #104]	@ 0x68
+2001b2f4:	9806      	ldr	r0, [sp, #24]
+2001b2f6:	b023      	add	sp, #140	@ 0x8c
+2001b2f8:	bcf0      	pop	{r4, r5, r6, r7}
+2001b2fa:	46bb      	mov	fp, r7
+2001b2fc:	46b2      	mov	sl, r6
+2001b2fe:	46a9      	mov	r9, r5
+2001b300:	46a0      	mov	r8, r4
+2001b302:	bdf0      	pop	{r4, r5, r6, r7, pc}
+2001b304:	2208      	movs	r2, #8
+2001b306:	920e      	str	r2, [sp, #56]	@ 0x38
+2001b308:	920f      	str	r2, [sp, #60]	@ 0x3c
+2001b30a:	2200      	movs	r2, #0
+2001b30c:	920c      	str	r2, [sp, #48]	@ 0x30
+2001b30e:	32ff      	adds	r2, #255	@ 0xff
+2001b310:	000c      	movs	r4, r1
+2001b312:	920b      	str	r2, [sp, #44]	@ 0x2c
+2001b314:	e730      	b.n	2001b178 <renderSprites.constprop.0+0x34>
+2001b316:	2800      	cmp	r0, #0
+2001b318:	d000      	beq.n	2001b31c <renderSprites.constprop.0+0x1d8>
+2001b31a:	e38c      	b.n	2001ba36 <renderSprites.constprop.0+0x8f2>
+2001b31c:	3030      	adds	r0, #48	@ 0x30
+2001b31e:	4008      	ands	r0, r1
+2001b320:	2100      	movs	r1, #0
+2001b322:	9119      	str	r1, [sp, #100]	@ 0x64
+2001b324:	310f      	adds	r1, #15
+2001b326:	901d      	str	r0, [sp, #116]	@ 0x74
+2001b328:	9118      	str	r1, [sp, #96]	@ 0x60
+2001b32a:	e743      	b.n	2001b1b4 <renderSprites.constprop.0+0x70>
+2001b32c:	2020      	movs	r0, #32
+2001b32e:	1b80      	subs	r0, r0, r6
+2001b330:	9007      	str	r0, [sp, #28]
+2001b332:	4548      	cmp	r0, r9
+2001b334:	dc00      	bgt.n	2001b338 <renderSprites.constprop.0+0x1f4>
+2001b336:	e107      	b.n	2001b548 <renderSprites.constprop.0+0x404>
+2001b338:	2301      	movs	r3, #1
+2001b33a:	449b      	add	fp, r3
+2001b33c:	9b04      	ldr	r3, [sp, #16]
+2001b33e:	3704      	adds	r7, #4
+2001b340:	459b      	cmp	fp, r3
+2001b342:	d000      	beq.n	2001b346 <renderSprites.constprop.0+0x202>
+2001b344:	e76b      	b.n	2001b21e <renderSprites.constprop.0+0xda>
+2001b346:	e7a2      	b.n	2001b28e <renderSprites.constprop.0+0x14a>
+2001b348:	20005200 	.word	0x20005200
+2001b34c:	00006001 	.word	0x00006001
+2001b350:	0001002f 	.word	0x0001002f
+2001b354:	00006031 	.word	0x00006031
+2001b358:	00006018 	.word	0x00006018
+2001b35c:	00006006 	.word	0x00006006
+2001b360:	20040020 	.word	0x20040020
+2001b364:	0000601d 	.word	0x0000601d
+2001b368:	0000601e 	.word	0x0000601e
+2001b36c:	00006032 	.word	0x00006032
+2001b370:	20040000 	.word	0x20040000
+2001b374:	00010036 	.word	0x00010036
+2001b378:	20040628 	.word	0x20040628
+2001b37c:	251f      	movs	r5, #31
+2001b37e:	4658      	mov	r0, fp
+2001b380:	9e06      	ldr	r6, [sp, #24]
+2001b382:	43ae      	bics	r6, r5
+2001b384:	0035      	movs	r5, r6
+2001b386:	4ed0      	ldr	r6, [pc, #832]	@ (2001b6c8 <renderSprites.constprop.0+0x584>)
+2001b388:	5c36      	ldrb	r6, [r6, r0]
+2001b38a:	2040      	movs	r0, #64	@ 0x40
+2001b38c:	4335      	orrs	r5, r6
+2001b38e:	4305      	orrs	r5, r0
+2001b390:	b2e8      	uxtb	r0, r5
+2001b392:	9006      	str	r0, [sp, #24]
+2001b394:	9814      	ldr	r0, [sp, #80]	@ 0x50
+2001b396:	9d01      	ldr	r5, [sp, #4]
+2001b398:	42a8      	cmp	r0, r5
+2001b39a:	d200      	bcs.n	2001b39e <renderSprites.constprop.0+0x25a>
+2001b39c:	e777      	b.n	2001b28e <renderSprites.constprop.0+0x14a>
+2001b39e:	b260      	sxtb	r0, r4
+2001b3a0:	787e      	ldrb	r6, [r7, #1]
+2001b3a2:	2800      	cmp	r0, #0
+2001b3a4:	dbc2      	blt.n	2001b32c <renderSprites.constprop.0+0x1e8>
+2001b3a6:	4270      	negs	r0, r6
+2001b3a8:	9007      	str	r0, [sp, #28]
+2001b3aa:	06a0      	lsls	r0, r4, #26
+2001b3ac:	d501      	bpl.n	2001b3b2 <renderSprites.constprop.0+0x26e>
+2001b3ae:	1ad3      	subs	r3, r2, r3
+2001b3b0:	3b01      	subs	r3, #1
+2001b3b2:	78bd      	ldrb	r5, [r7, #2]
+2001b3b4:	9a11      	ldr	r2, [sp, #68]	@ 0x44
+2001b3b6:	400d      	ands	r5, r1
+2001b3b8:	00ed      	lsls	r5, r5, #3
+2001b3ba:	18ad      	adds	r5, r5, r2
+2001b3bc:	18ed      	adds	r5, r5, r3
+2001b3be:	220c      	movs	r2, #12
+2001b3c0:	2100      	movs	r1, #0
+2001b3c2:	a81f      	add	r0, sp, #124	@ 0x7c
+2001b3c4:	b2ad      	uxth	r5, r5
+2001b3c6:	f7fb fced 	bl	20016da4 <__wrap_memset>
+2001b3ca:	0663      	lsls	r3, r4, #25
+2001b3cc:	d500      	bpl.n	2001b3d0 <renderSprites.constprop.0+0x28c>
+2001b3ce:	e0bd      	b.n	2001b54c <renderSprites.constprop.0+0x408>
+2001b3d0:	4643      	mov	r3, r8
+2001b3d2:	2b00      	cmp	r3, #0
+2001b3d4:	d000      	beq.n	2001b3d8 <renderSprites.constprop.0+0x294>
+2001b3d6:	e189      	b.n	2001b6ec <renderSprites.constprop.0+0x5a8>
+2001b3d8:	9903      	ldr	r1, [sp, #12]
+2001b3da:	9b12      	ldr	r3, [sp, #72]	@ 0x48
+2001b3dc:	5d4a      	ldrb	r2, [r1, r5]
+2001b3de:	0612      	lsls	r2, r2, #24
+2001b3e0:	921f      	str	r2, [sp, #124]	@ 0x7c
+2001b3e2:	2b00      	cmp	r3, #0
+2001b3e4:	d00e      	beq.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b3e6:	9b13      	ldr	r3, [sp, #76]	@ 0x4c
+2001b3e8:	469c      	mov	ip, r3
+2001b3ea:	4465      	add	r5, ip
+2001b3ec:	5d4b      	ldrb	r3, [r1, r5]
+2001b3ee:	061b      	lsls	r3, r3, #24
+2001b3f0:	9320      	str	r3, [sp, #128]	@ 0x80
+2001b3f2:	431a      	orrs	r2, r3
+2001b3f4:	9b08      	ldr	r3, [sp, #32]
+2001b3f6:	2b03      	cmp	r3, #3
+2001b3f8:	d104      	bne.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b3fa:	4465      	add	r5, ip
+2001b3fc:	5d4b      	ldrb	r3, [r1, r5]
+2001b3fe:	061b      	lsls	r3, r3, #24
+2001b400:	9321      	str	r3, [sp, #132]	@ 0x84
+2001b402:	431a      	orrs	r2, r3
+2001b404:	4653      	mov	r3, sl
+2001b406:	2b00      	cmp	r3, #0
+2001b408:	d000      	beq.n	2001b40c <renderSprites.constprop.0+0x2c8>
+2001b40a:	e0c3      	b.n	2001b594 <renderSprites.constprop.0+0x450>
+2001b40c:	2a00      	cmp	r2, #0
+2001b40e:	d093      	beq.n	2001b338 <renderSprites.constprop.0+0x1f4>
+2001b410:	9b00      	ldr	r3, [sp, #0]
+2001b412:	2b00      	cmp	r3, #0
+2001b414:	d009      	beq.n	2001b42a <renderSprites.constprop.0+0x2e6>
+2001b416:	4bad      	ldr	r3, [pc, #692]	@ (2001b6cc <renderSprites.constprop.0+0x588>)
+2001b418:	0e11      	lsrs	r1, r2, #24
+2001b41a:	0212      	lsls	r2, r2, #8
+2001b41c:	0049      	lsls	r1, r1, #1
+2001b41e:	0e12      	lsrs	r2, r2, #24
+2001b420:	5ac9      	ldrh	r1, [r1, r3]
+2001b422:	0052      	lsls	r2, r2, #1
+2001b424:	5ad2      	ldrh	r2, [r2, r3]
+2001b426:	0409      	lsls	r1, r1, #16
+2001b428:	430a      	orrs	r2, r1
+2001b42a:	2e00      	cmp	r6, #0
+2001b42c:	da00      	bge.n	2001b430 <renderSprites.constprop.0+0x2ec>
+2001b42e:	e0ee      	b.n	2001b60e <renderSprites.constprop.0+0x4ca>
+2001b430:	211f      	movs	r1, #31
+2001b432:	2380      	movs	r3, #128	@ 0x80
+2001b434:	2020      	movs	r0, #32
+2001b436:	4031      	ands	r1, r6
+2001b438:	005b      	lsls	r3, r3, #1
+2001b43a:	1a40      	subs	r0, r0, r1
+2001b43c:	1b9b      	subs	r3, r3, r6
+2001b43e:	961a      	str	r6, [sp, #104]	@ 0x68
+2001b440:	910d      	str	r1, [sp, #52]	@ 0x34
+2001b442:	9007      	str	r0, [sp, #28]
+2001b444:	454b      	cmp	r3, r9
+2001b446:	da00      	bge.n	2001b44a <renderSprites.constprop.0+0x306>
+2001b448:	e175      	b.n	2001b736 <renderSprites.constprop.0+0x5f2>
+2001b44a:	0973      	lsrs	r3, r6, #5
+2001b44c:	469c      	mov	ip, r3
+2001b44e:	0013      	movs	r3, r2
+2001b450:	40cb      	lsrs	r3, r1
+2001b452:	4699      	mov	r9, r3
+2001b454:	9b18      	ldr	r3, [sp, #96]	@ 0x60
+2001b456:	4d9e      	ldr	r5, [pc, #632]	@ (2001b6d0 <renderSprites.constprop.0+0x58c>)
+2001b458:	401c      	ands	r4, r3
+2001b45a:	9b19      	ldr	r3, [sp, #100]	@ 0x64
+2001b45c:	409c      	lsls	r4, r3
+2001b45e:	4663      	mov	r3, ip
+2001b460:	3312      	adds	r3, #18
+2001b462:	0099      	lsls	r1, r3, #2
+2001b464:	9410      	str	r4, [sp, #64]	@ 0x40
+2001b466:	586c      	ldr	r4, [r5, r1]
+2001b468:	0023      	movs	r3, r4
+2001b46a:	464c      	mov	r4, r9
+2001b46c:	439c      	bics	r4, r3
+2001b46e:	46a2      	mov	sl, r4
+2001b470:	464c      	mov	r4, r9
+2001b472:	431c      	orrs	r4, r3
+2001b474:	4653      	mov	r3, sl
+2001b476:	506c      	str	r4, [r5, r1]
+2001b478:	990d      	ldr	r1, [sp, #52]	@ 0x34
+2001b47a:	9c02      	ldr	r4, [sp, #8]
+2001b47c:	408b      	lsls	r3, r1
+2001b47e:	9907      	ldr	r1, [sp, #28]
+2001b480:	428c      	cmp	r4, r1
+2001b482:	d912      	bls.n	2001b4aa <renderSprites.constprop.0+0x366>
+2001b484:	2413      	movs	r4, #19
+2001b486:	4464      	add	r4, ip
+2001b488:	00a4      	lsls	r4, r4, #2
+2001b48a:	0020      	movs	r0, r4
+2001b48c:	592c      	ldr	r4, [r5, r4]
+2001b48e:	46a2      	mov	sl, r4
+2001b490:	0014      	movs	r4, r2
+2001b492:	408c      	lsls	r4, r1
+2001b494:	46a0      	mov	r8, r4
+2001b496:	4654      	mov	r4, sl
+2001b498:	4641      	mov	r1, r8
+2001b49a:	430c      	orrs	r4, r1
+2001b49c:	502c      	str	r4, [r5, r0]
+2001b49e:	4651      	mov	r1, sl
+2001b4a0:	4644      	mov	r4, r8
+2001b4a2:	438c      	bics	r4, r1
+2001b4a4:	9907      	ldr	r1, [sp, #28]
+2001b4a6:	40cc      	lsrs	r4, r1
+2001b4a8:	4323      	orrs	r3, r4
+2001b4aa:	4293      	cmp	r3, r2
+2001b4ac:	d003      	beq.n	2001b4b6 <renderSprites.constprop.0+0x372>
+2001b4ae:	2220      	movs	r2, #32
+2001b4b0:	9c06      	ldr	r4, [sp, #24]
+2001b4b2:	4314      	orrs	r4, r2
+2001b4b4:	9406      	str	r4, [sp, #24]
+2001b4b6:	9a08      	ldr	r2, [sp, #32]
+2001b4b8:	2a00      	cmp	r2, #0
+2001b4ba:	d100      	bne.n	2001b4be <renderSprites.constprop.0+0x37a>
+2001b4bc:	e082      	b.n	2001b5c4 <renderSprites.constprop.0+0x480>
+2001b4be:	9a1d      	ldr	r2, [sp, #116]	@ 0x74
+2001b4c0:	9c10      	ldr	r4, [sp, #64]	@ 0x40
+2001b4c2:	4314      	orrs	r4, r2
+2001b4c4:	b2e4      	uxtb	r4, r4
+2001b4c6:	4a83      	ldr	r2, [pc, #524]	@ (2001b6d4 <renderSprites.constprop.0+0x590>)
+2001b4c8:	0021      	movs	r1, r4
+2001b4ca:	4351      	muls	r1, r2
+2001b4cc:	9a00      	ldr	r2, [sp, #0]
+2001b4ce:	468a      	mov	sl, r1
+2001b4d0:	2a00      	cmp	r2, #0
+2001b4d2:	d000      	beq.n	2001b4d6 <renderSprites.constprop.0+0x392>
+2001b4d4:	e157      	b.n	2001b786 <renderSprites.constprop.0+0x642>
+2001b4d6:	2403      	movs	r4, #3
+2001b4d8:	4034      	ands	r4, r6
+2001b4da:	40e3      	lsrs	r3, r4
+2001b4dc:	d068      	beq.n	2001b5b0 <renderSprites.constprop.0+0x46c>
+2001b4de:	9820      	ldr	r0, [sp, #128]	@ 0x80
+2001b4e0:	991f      	ldr	r1, [sp, #124]	@ 0x7c
+2001b4e2:	9d08      	ldr	r5, [sp, #32]
+2001b4e4:	40e0      	lsrs	r0, r4
+2001b4e6:	40e1      	lsrs	r1, r4
+2001b4e8:	10b2      	asrs	r2, r6, #2
+2001b4ea:	2d02      	cmp	r5, #2
+2001b4ec:	d100      	bne.n	2001b4f0 <renderSprites.constprop.0+0x3ac>
+2001b4ee:	e19e      	b.n	2001b82e <renderSprites.constprop.0+0x6ea>
+2001b4f0:	2d03      	cmp	r5, #3
+2001b4f2:	d100      	bne.n	2001b4f6 <renderSprites.constprop.0+0x3b2>
+2001b4f4:	e1df      	b.n	2001b8b6 <renderSprites.constprop.0+0x772>
+2001b4f6:	0096      	lsls	r6, r2, #2
+2001b4f8:	4a77      	ldr	r2, [pc, #476]	@ (2001b6d8 <renderSprites.constprop.0+0x594>)
+2001b4fa:	46b8      	mov	r8, r7
+2001b4fc:	4694      	mov	ip, r2
+2001b4fe:	4877      	ldr	r0, [pc, #476]	@ (2001b6dc <renderSprites.constprop.0+0x598>)
+2001b500:	4d77      	ldr	r5, [pc, #476]	@ (2001b6e0 <renderSprites.constprop.0+0x59c>)
+2001b502:	1836      	adds	r6, r6, r0
+2001b504:	0f1a      	lsrs	r2, r3, #28
+2001b506:	2a0f      	cmp	r2, #15
+2001b508:	d008      	beq.n	2001b51c <renderSprites.constprop.0+0x3d8>
+2001b50a:	2a00      	cmp	r2, #0
+2001b50c:	d000      	beq.n	2001b510 <renderSprites.constprop.0+0x3cc>
+2001b50e:	e09c      	b.n	2001b64a <renderSprites.constprop.0+0x506>
+2001b510:	011b      	lsls	r3, r3, #4
+2001b512:	0109      	lsls	r1, r1, #4
+2001b514:	3604      	adds	r6, #4
+2001b516:	0f1a      	lsrs	r2, r3, #28
+2001b518:	2a0f      	cmp	r2, #15
+2001b51a:	d1f6      	bne.n	2001b50a <renderSprites.constprop.0+0x3c6>
+2001b51c:	4650      	mov	r0, sl
+2001b51e:	0f0a      	lsrs	r2, r1, #28
+2001b520:	0092      	lsls	r2, r2, #2
+2001b522:	58aa      	ldr	r2, [r5, r2]
+2001b524:	4302      	orrs	r2, r0
+2001b526:	6032      	str	r2, [r6, #0]
+2001b528:	011b      	lsls	r3, r3, #4
+2001b52a:	d040      	beq.n	2001b5ae <renderSprites.constprop.0+0x46a>
+2001b52c:	0109      	lsls	r1, r1, #4
+2001b52e:	3604      	adds	r6, #4
+2001b530:	e7e8      	b.n	2001b504 <renderSprites.constprop.0+0x3c0>
+2001b532:	980c      	ldr	r0, [sp, #48]	@ 0x30
+2001b534:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2001b536:	4680      	mov	r8, r0
+2001b538:	2000      	movs	r0, #0
+2001b53a:	990a      	ldr	r1, [sp, #40]	@ 0x28
+2001b53c:	4691      	mov	r9, r2
+2001b53e:	9102      	str	r1, [sp, #8]
+2001b540:	4682      	mov	sl, r0
+2001b542:	9a0e      	ldr	r2, [sp, #56]	@ 0x38
+2001b544:	990b      	ldr	r1, [sp, #44]	@ 0x2c
+2001b546:	e682      	b.n	2001b24e <renderSprites.constprop.0+0x10a>
+2001b548:	3e20      	subs	r6, #32
+2001b54a:	e72e      	b.n	2001b3aa <renderSprites.constprop.0+0x266>
+2001b54c:	4643      	mov	r3, r8
+2001b54e:	2b00      	cmp	r3, #0
+2001b550:	d000      	beq.n	2001b554 <renderSprites.constprop.0+0x410>
+2001b552:	e088      	b.n	2001b666 <renderSprites.constprop.0+0x522>
+2001b554:	9803      	ldr	r0, [sp, #12]
+2001b556:	4963      	ldr	r1, [pc, #396]	@ (2001b6e4 <renderSprites.constprop.0+0x5a0>)
+2001b558:	5d43      	ldrb	r3, [r0, r5]
+2001b55a:	5cca      	ldrb	r2, [r1, r3]
+2001b55c:	9b12      	ldr	r3, [sp, #72]	@ 0x48
+2001b55e:	0612      	lsls	r2, r2, #24
+2001b560:	921f      	str	r2, [sp, #124]	@ 0x7c
+2001b562:	2b00      	cmp	r3, #0
+2001b564:	d100      	bne.n	2001b568 <renderSprites.constprop.0+0x424>
+2001b566:	e74d      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b568:	9b13      	ldr	r3, [sp, #76]	@ 0x4c
+2001b56a:	469c      	mov	ip, r3
+2001b56c:	4465      	add	r5, ip
+2001b56e:	5d43      	ldrb	r3, [r0, r5]
+2001b570:	5ccb      	ldrb	r3, [r1, r3]
+2001b572:	061b      	lsls	r3, r3, #24
+2001b574:	9320      	str	r3, [sp, #128]	@ 0x80
+2001b576:	431a      	orrs	r2, r3
+2001b578:	9b08      	ldr	r3, [sp, #32]
+2001b57a:	2b03      	cmp	r3, #3
+2001b57c:	d000      	beq.n	2001b580 <renderSprites.constprop.0+0x43c>
+2001b57e:	e741      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b580:	4465      	add	r5, ip
+2001b582:	5d43      	ldrb	r3, [r0, r5]
+2001b584:	5ccb      	ldrb	r3, [r1, r3]
+2001b586:	061b      	lsls	r3, r3, #24
+2001b588:	9321      	str	r3, [sp, #132]	@ 0x84
+2001b58a:	431a      	orrs	r2, r3
+2001b58c:	4653      	mov	r3, sl
+2001b58e:	2b00      	cmp	r3, #0
+2001b590:	d100      	bne.n	2001b594 <renderSprites.constprop.0+0x450>
+2001b592:	e73b      	b.n	2001b40c <renderSprites.constprop.0+0x2c8>
+2001b594:	4a54      	ldr	r2, [pc, #336]	@ (2001b6e8 <renderSprites.constprop.0+0x5a4>)
+2001b596:	e73b      	b.n	2001b410 <renderSprites.constprop.0+0x2cc>
+2001b598:	2001      	movs	r0, #1
+2001b59a:	9a09      	ldr	r2, [sp, #36]	@ 0x24
+2001b59c:	4682      	mov	sl, r0
+2001b59e:	4691      	mov	r9, r2
+2001b5a0:	9a0a      	ldr	r2, [sp, #40]	@ 0x28
+2001b5a2:	990b      	ldr	r1, [sp, #44]	@ 0x2c
+2001b5a4:	9202      	str	r2, [sp, #8]
+2001b5a6:	9a0c      	ldr	r2, [sp, #48]	@ 0x30
+2001b5a8:	4690      	mov	r8, r2
+2001b5aa:	2210      	movs	r2, #16
+2001b5ac:	e64f      	b.n	2001b24e <renderSprites.constprop.0+0x10a>
+2001b5ae:	4647      	mov	r7, r8
+2001b5b0:	2301      	movs	r3, #1
+2001b5b2:	931b      	str	r3, [sp, #108]	@ 0x6c
+2001b5b4:	2301      	movs	r3, #1
+2001b5b6:	449b      	add	fp, r3
+2001b5b8:	9b04      	ldr	r3, [sp, #16]
+2001b5ba:	3704      	adds	r7, #4
+2001b5bc:	459b      	cmp	fp, r3
+2001b5be:	d000      	beq.n	2001b5c2 <renderSprites.constprop.0+0x47e>
+2001b5c0:	e62d      	b.n	2001b21e <renderSprites.constprop.0+0xda>
+2001b5c2:	e664      	b.n	2001b28e <renderSprites.constprop.0+0x14a>
+2001b5c4:	9a10      	ldr	r2, [sp, #64]	@ 0x40
+2001b5c6:	2a00      	cmp	r2, #0
+2001b5c8:	d000      	beq.n	2001b5cc <renderSprites.constprop.0+0x488>
+2001b5ca:	e0c2      	b.n	2001b752 <renderSprites.constprop.0+0x60e>
+2001b5cc:	001c      	movs	r4, r3
+2001b5ce:	4662      	mov	r2, ip
+2001b5d0:	990d      	ldr	r1, [sp, #52]	@ 0x34
+2001b5d2:	3208      	adds	r2, #8
+2001b5d4:	40cc      	lsrs	r4, r1
+2001b5d6:	0092      	lsls	r2, r2, #2
+2001b5d8:	18aa      	adds	r2, r5, r2
+2001b5da:	6851      	ldr	r1, [r2, #4]
+2001b5dc:	4321      	orrs	r1, r4
+2001b5de:	6051      	str	r1, [r2, #4]
+2001b5e0:	9a02      	ldr	r2, [sp, #8]
+2001b5e2:	9907      	ldr	r1, [sp, #28]
+2001b5e4:	428a      	cmp	r2, r1
+2001b5e6:	d907      	bls.n	2001b5f8 <renderSprites.constprop.0+0x4b4>
+2001b5e8:	4662      	mov	r2, ip
+2001b5ea:	408b      	lsls	r3, r1
+2001b5ec:	3209      	adds	r2, #9
+2001b5ee:	0092      	lsls	r2, r2, #2
+2001b5f0:	18aa      	adds	r2, r5, r2
+2001b5f2:	6851      	ldr	r1, [r2, #4]
+2001b5f4:	430b      	orrs	r3, r1
+2001b5f6:	6053      	str	r3, [r2, #4]
+2001b5f8:	9b17      	ldr	r3, [sp, #92]	@ 0x5c
+2001b5fa:	3704      	adds	r7, #4
+2001b5fc:	3301      	adds	r3, #1
+2001b5fe:	9317      	str	r3, [sp, #92]	@ 0x5c
+2001b600:	2301      	movs	r3, #1
+2001b602:	449b      	add	fp, r3
+2001b604:	9b04      	ldr	r3, [sp, #16]
+2001b606:	459b      	cmp	fp, r3
+2001b608:	d000      	beq.n	2001b60c <renderSprites.constprop.0+0x4c8>
+2001b60a:	e608      	b.n	2001b21e <renderSprites.constprop.0+0xda>
+2001b60c:	e63f      	b.n	2001b28e <renderSprites.constprop.0+0x14a>
+2001b60e:	9807      	ldr	r0, [sp, #28]
+2001b610:	9b00      	ldr	r3, [sp, #0]
+2001b612:	0001      	movs	r1, r0
+2001b614:	4119      	asrs	r1, r3
+2001b616:	9b21      	ldr	r3, [sp, #132]	@ 0x84
+2001b618:	4082      	lsls	r2, r0
+2001b61a:	408b      	lsls	r3, r1
+2001b61c:	9321      	str	r3, [sp, #132]	@ 0x84
+2001b61e:	9b20      	ldr	r3, [sp, #128]	@ 0x80
+2001b620:	408b      	lsls	r3, r1
+2001b622:	9320      	str	r3, [sp, #128]	@ 0x80
+2001b624:	9b1f      	ldr	r3, [sp, #124]	@ 0x7c
+2001b626:	408b      	lsls	r3, r1
+2001b628:	931f      	str	r3, [sp, #124]	@ 0x7c
+2001b62a:	2a00      	cmp	r2, #0
+2001b62c:	d100      	bne.n	2001b630 <renderSprites.constprop.0+0x4ec>
+2001b62e:	e683      	b.n	2001b338 <renderSprites.constprop.0+0x1f4>
+2001b630:	9b02      	ldr	r3, [sp, #8]
+2001b632:	4691      	mov	r9, r2
+2001b634:	18f6      	adds	r6, r6, r3
+2001b636:	b2f3      	uxtb	r3, r6
+2001b638:	9302      	str	r3, [sp, #8]
+2001b63a:	2320      	movs	r3, #32
+2001b63c:	9307      	str	r3, [sp, #28]
+2001b63e:	2300      	movs	r3, #0
+2001b640:	2600      	movs	r6, #0
+2001b642:	469c      	mov	ip, r3
+2001b644:	930d      	str	r3, [sp, #52]	@ 0x34
+2001b646:	931a      	str	r3, [sp, #104]	@ 0x68
+2001b648:	e704      	b.n	2001b454 <renderSprites.constprop.0+0x310>
+2001b64a:	4657      	mov	r7, sl
+2001b64c:	0f0c      	lsrs	r4, r1, #28
+2001b64e:	00a4      	lsls	r4, r4, #2
+2001b650:	592c      	ldr	r4, [r5, r4]
+2001b652:	6830      	ldr	r0, [r6, #0]
+2001b654:	433c      	orrs	r4, r7
+2001b656:	4667      	mov	r7, ip
+2001b658:	0092      	lsls	r2, r2, #2
+2001b65a:	59d2      	ldr	r2, [r2, r7]
+2001b65c:	4044      	eors	r4, r0
+2001b65e:	4022      	ands	r2, r4
+2001b660:	4042      	eors	r2, r0
+2001b662:	6032      	str	r2, [r6, #0]
+2001b664:	e760      	b.n	2001b528 <renderSprites.constprop.0+0x3e4>
+2001b666:	9803      	ldr	r0, [sp, #12]
+2001b668:	4b1e      	ldr	r3, [pc, #120]	@ (2001b6e4 <renderSprites.constprop.0+0x5a0>)
+2001b66a:	5d42      	ldrb	r2, [r0, r5]
+2001b66c:	3010      	adds	r0, #16
+2001b66e:	5c99      	ldrb	r1, [r3, r2]
+2001b670:	5d42      	ldrb	r2, [r0, r5]
+2001b672:	0409      	lsls	r1, r1, #16
+2001b674:	5c9a      	ldrb	r2, [r3, r2]
+2001b676:	0612      	lsls	r2, r2, #24
+2001b678:	430a      	orrs	r2, r1
+2001b67a:	9912      	ldr	r1, [sp, #72]	@ 0x48
+2001b67c:	921f      	str	r2, [sp, #124]	@ 0x7c
+2001b67e:	2900      	cmp	r1, #0
+2001b680:	d100      	bne.n	2001b684 <renderSprites.constprop.0+0x540>
+2001b682:	e6bf      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b684:	9913      	ldr	r1, [sp, #76]	@ 0x4c
+2001b686:	186d      	adds	r5, r5, r1
+2001b688:	46a8      	mov	r8, r5
+2001b68a:	9903      	ldr	r1, [sp, #12]
+2001b68c:	5d49      	ldrb	r1, [r1, r5]
+2001b68e:	5c59      	ldrb	r1, [r3, r1]
+2001b690:	0409      	lsls	r1, r1, #16
+2001b692:	000d      	movs	r5, r1
+2001b694:	4641      	mov	r1, r8
+2001b696:	5c41      	ldrb	r1, [r0, r1]
+2001b698:	5c59      	ldrb	r1, [r3, r1]
+2001b69a:	0609      	lsls	r1, r1, #24
+2001b69c:	4329      	orrs	r1, r5
+2001b69e:	9d08      	ldr	r5, [sp, #32]
+2001b6a0:	9120      	str	r1, [sp, #128]	@ 0x80
+2001b6a2:	430a      	orrs	r2, r1
+2001b6a4:	2d03      	cmp	r5, #3
+2001b6a6:	d000      	beq.n	2001b6aa <renderSprites.constprop.0+0x566>
+2001b6a8:	e6ac      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b6aa:	4645      	mov	r5, r8
+2001b6ac:	9913      	ldr	r1, [sp, #76]	@ 0x4c
+2001b6ae:	186d      	adds	r5, r5, r1
+2001b6b0:	9903      	ldr	r1, [sp, #12]
+2001b6b2:	5d40      	ldrb	r0, [r0, r5]
+2001b6b4:	5d49      	ldrb	r1, [r1, r5]
+2001b6b6:	5c59      	ldrb	r1, [r3, r1]
+2001b6b8:	5c1b      	ldrb	r3, [r3, r0]
+2001b6ba:	0409      	lsls	r1, r1, #16
+2001b6bc:	061b      	lsls	r3, r3, #24
+2001b6be:	430b      	orrs	r3, r1
+2001b6c0:	9321      	str	r3, [sp, #132]	@ 0x84
+2001b6c2:	431a      	orrs	r2, r3
+2001b6c4:	e69e      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b6c6:	46c0      	nop			@ (mov r8, r8)
+2001b6c8:	20040000 	.word	0x20040000
+2001b6cc:	200403e0 	.word	0x200403e0
+2001b6d0:	200405e0 	.word	0x200405e0
+2001b6d4:	01010101 	.word	0x01010101
+2001b6d8:	200400a0 	.word	0x200400a0
+2001b6dc:	2004064c 	.word	0x2004064c
+2001b6e0:	200011a0 	.word	0x200011a0
+2001b6e4:	200402e0 	.word	0x200402e0
+2001b6e8:	ffff0000 	.word	0xffff0000
+2001b6ec:	9803      	ldr	r0, [sp, #12]
+2001b6ee:	0001      	movs	r1, r0
+2001b6f0:	3110      	adds	r1, #16
+2001b6f2:	5d43      	ldrb	r3, [r0, r5]
+2001b6f4:	5d4a      	ldrb	r2, [r1, r5]
+2001b6f6:	061b      	lsls	r3, r3, #24
+2001b6f8:	0412      	lsls	r2, r2, #16
+2001b6fa:	431a      	orrs	r2, r3
+2001b6fc:	9b12      	ldr	r3, [sp, #72]	@ 0x48
+2001b6fe:	921f      	str	r2, [sp, #124]	@ 0x7c
+2001b700:	2b00      	cmp	r3, #0
+2001b702:	d100      	bne.n	2001b706 <renderSprites.constprop.0+0x5c2>
+2001b704:	e67e      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b706:	9b13      	ldr	r3, [sp, #76]	@ 0x4c
+2001b708:	469c      	mov	ip, r3
+2001b70a:	4465      	add	r5, ip
+2001b70c:	5d40      	ldrb	r0, [r0, r5]
+2001b70e:	5d4b      	ldrb	r3, [r1, r5]
+2001b710:	0600      	lsls	r0, r0, #24
+2001b712:	041b      	lsls	r3, r3, #16
+2001b714:	4303      	orrs	r3, r0
+2001b716:	9320      	str	r3, [sp, #128]	@ 0x80
+2001b718:	431a      	orrs	r2, r3
+2001b71a:	9b08      	ldr	r3, [sp, #32]
+2001b71c:	2b03      	cmp	r3, #3
+2001b71e:	d000      	beq.n	2001b722 <renderSprites.constprop.0+0x5de>
+2001b720:	e670      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b722:	9803      	ldr	r0, [sp, #12]
+2001b724:	4465      	add	r5, ip
+2001b726:	5d40      	ldrb	r0, [r0, r5]
+2001b728:	5d4b      	ldrb	r3, [r1, r5]
+2001b72a:	0600      	lsls	r0, r0, #24
+2001b72c:	041b      	lsls	r3, r3, #16
+2001b72e:	4303      	orrs	r3, r0
+2001b730:	9321      	str	r3, [sp, #132]	@ 0x84
+2001b732:	431a      	orrs	r2, r3
+2001b734:	e666      	b.n	2001b404 <renderSprites.constprop.0+0x2c0>
+2001b736:	b2db      	uxtb	r3, r3
+2001b738:	0035      	movs	r5, r6
+2001b73a:	9302      	str	r3, [sp, #8]
+2001b73c:	2301      	movs	r3, #1
+2001b73e:	3de0      	subs	r5, #224	@ 0xe0
+2001b740:	40ab      	lsls	r3, r5
+2001b742:	425b      	negs	r3, r3
+2001b744:	401a      	ands	r2, r3
+2001b746:	0013      	movs	r3, r2
+2001b748:	40cb      	lsrs	r3, r1
+2001b74a:	4699      	mov	r9, r3
+2001b74c:	2307      	movs	r3, #7
+2001b74e:	469c      	mov	ip, r3
+2001b750:	e680      	b.n	2001b454 <renderSprites.constprop.0+0x310>
+2001b752:	0014      	movs	r4, r2
+2001b754:	9a1d      	ldr	r2, [sp, #116]	@ 0x74
+2001b756:	4314      	orrs	r4, r2
+2001b758:	4abb      	ldr	r2, [pc, #748]	@ (2001ba48 <renderSprites.constprop.0+0x904>)
+2001b75a:	7812      	ldrb	r2, [r2, #0]
+2001b75c:	2a04      	cmp	r2, #4
+2001b75e:	d101      	bne.n	2001b764 <renderSprites.constprop.0+0x620>
+2001b760:	0122      	lsls	r2, r4, #4
+2001b762:	4314      	orrs	r4, r2
+2001b764:	2b00      	cmp	r3, #0
+2001b766:	d100      	bne.n	2001b76a <renderSprites.constprop.0+0x626>
+2001b768:	e722      	b.n	2001b5b0 <renderSprites.constprop.0+0x46c>
+2001b76a:	4ab8      	ldr	r2, [pc, #736]	@ (2001ba4c <renderSprites.constprop.0+0x908>)
+2001b76c:	18b2      	adds	r2, r6, r2
+2001b76e:	2b00      	cmp	r3, #0
+2001b770:	db03      	blt.n	2001b77a <renderSprites.constprop.0+0x636>
+2001b772:	005b      	lsls	r3, r3, #1
+2001b774:	3201      	adds	r2, #1
+2001b776:	2b00      	cmp	r3, #0
+2001b778:	dafb      	bge.n	2001b772 <renderSprites.constprop.0+0x62e>
+2001b77a:	7014      	strb	r4, [r2, #0]
+2001b77c:	005b      	lsls	r3, r3, #1
+2001b77e:	d100      	bne.n	2001b782 <renderSprites.constprop.0+0x63e>
+2001b780:	e716      	b.n	2001b5b0 <renderSprites.constprop.0+0x46c>
+2001b782:	3201      	adds	r2, #1
+2001b784:	e7f3      	b.n	2001b76e <renderSprites.constprop.0+0x62a>
+2001b786:	2b00      	cmp	r3, #0
+2001b788:	d100      	bne.n	2001b78c <renderSprites.constprop.0+0x648>
+2001b78a:	e711      	b.n	2001b5b0 <renderSprites.constprop.0+0x46c>
+2001b78c:	991a      	ldr	r1, [sp, #104]	@ 0x68
+2001b78e:	4aaf      	ldr	r2, [pc, #700]	@ (2001ba4c <renderSprites.constprop.0+0x908>)
+2001b790:	9c08      	ldr	r4, [sp, #32]
+2001b792:	1852      	adds	r2, r2, r1
+2001b794:	9820      	ldr	r0, [sp, #128]	@ 0x80
+2001b796:	991f      	ldr	r1, [sp, #124]	@ 0x7c
+2001b798:	2c02      	cmp	r4, #2
+2001b79a:	d100      	bne.n	2001b79e <renderSprites.constprop.0+0x65a>
+2001b79c:	e0dc      	b.n	2001b958 <renderSprites.constprop.0+0x814>
+2001b79e:	4cac      	ldr	r4, [pc, #688]	@ (2001ba50 <renderSprites.constprop.0+0x90c>)
+2001b7a0:	46b8      	mov	r8, r7
+2001b7a2:	46a1      	mov	r9, r4
+2001b7a4:	9e21      	ldr	r6, [sp, #132]	@ 0x84
+2001b7a6:	e006      	b.n	2001b7b6 <renderSprites.constprop.0+0x672>
+2001b7a8:	0136      	lsls	r6, r6, #4
+2001b7aa:	0100      	lsls	r0, r0, #4
+2001b7ac:	0109      	lsls	r1, r1, #4
+2001b7ae:	3208      	adds	r2, #8
+2001b7b0:	2b00      	cmp	r3, #0
+2001b7b2:	d100      	bne.n	2001b7b6 <renderSprites.constprop.0+0x672>
+2001b7b4:	e6fb      	b.n	2001b5ae <renderSprites.constprop.0+0x46a>
+2001b7b6:	001c      	movs	r4, r3
+2001b7b8:	0e1d      	lsrs	r5, r3, #24
+2001b7ba:	021b      	lsls	r3, r3, #8
+2001b7bc:	2d00      	cmp	r5, #0
+2001b7be:	d0f3      	beq.n	2001b7a8 <renderSprites.constprop.0+0x664>
+2001b7c0:	9d08      	ldr	r5, [sp, #32]
+2001b7c2:	2d03      	cmp	r5, #3
+2001b7c4:	d02b      	beq.n	2001b81e <renderSprites.constprop.0+0x6da>
+2001b7c6:	2500      	movs	r5, #0
+2001b7c8:	46ac      	mov	ip, r5
+2001b7ca:	4667      	mov	r7, ip
+2001b7cc:	0f0d      	lsrs	r5, r1, #28
+2001b7ce:	433d      	orrs	r5, r7
+2001b7d0:	464f      	mov	r7, r9
+2001b7d2:	00ad      	lsls	r5, r5, #2
+2001b7d4:	597d      	ldr	r5, [r7, r5]
+2001b7d6:	4657      	mov	r7, sl
+2001b7d8:	433d      	orrs	r5, r7
+2001b7da:	2c00      	cmp	r4, #0
+2001b7dc:	da00      	bge.n	2001b7e0 <renderSprites.constprop.0+0x69c>
+2001b7de:	7015      	strb	r5, [r2, #0]
+2001b7e0:	0067      	lsls	r7, r4, #1
+2001b7e2:	d500      	bpl.n	2001b7e6 <renderSprites.constprop.0+0x6a2>
+2001b7e4:	7055      	strb	r5, [r2, #1]
+2001b7e6:	0a2f      	lsrs	r7, r5, #8
+2001b7e8:	46bc      	mov	ip, r7
+2001b7ea:	00a7      	lsls	r7, r4, #2
+2001b7ec:	d501      	bpl.n	2001b7f2 <renderSprites.constprop.0+0x6ae>
+2001b7ee:	4667      	mov	r7, ip
+2001b7f0:	7097      	strb	r7, [r2, #2]
+2001b7f2:	00e7      	lsls	r7, r4, #3
+2001b7f4:	d501      	bpl.n	2001b7fa <renderSprites.constprop.0+0x6b6>
+2001b7f6:	4667      	mov	r7, ip
+2001b7f8:	70d7      	strb	r7, [r2, #3]
+2001b7fa:	0c2f      	lsrs	r7, r5, #16
+2001b7fc:	46bc      	mov	ip, r7
+2001b7fe:	0127      	lsls	r7, r4, #4
+2001b800:	d501      	bpl.n	2001b806 <renderSprites.constprop.0+0x6c2>
+2001b802:	4667      	mov	r7, ip
+2001b804:	7117      	strb	r7, [r2, #4]
+2001b806:	0167      	lsls	r7, r4, #5
+2001b808:	d501      	bpl.n	2001b80e <renderSprites.constprop.0+0x6ca>
+2001b80a:	4667      	mov	r7, ip
+2001b80c:	7157      	strb	r7, [r2, #5]
+2001b80e:	0e2d      	lsrs	r5, r5, #24
+2001b810:	01a7      	lsls	r7, r4, #6
+2001b812:	d500      	bpl.n	2001b816 <renderSprites.constprop.0+0x6d2>
+2001b814:	7195      	strb	r5, [r2, #6]
+2001b816:	01e4      	lsls	r4, r4, #7
+2001b818:	d5c6      	bpl.n	2001b7a8 <renderSprites.constprop.0+0x664>
+2001b81a:	71d5      	strb	r5, [r2, #7]
+2001b81c:	e7c4      	b.n	2001b7a8 <renderSprites.constprop.0+0x664>
+2001b81e:	0f35      	lsrs	r5, r6, #28
+2001b820:	012d      	lsls	r5, r5, #4
+2001b822:	002f      	movs	r7, r5
+2001b824:	0f05      	lsrs	r5, r0, #28
+2001b826:	433d      	orrs	r5, r7
+2001b828:	012d      	lsls	r5, r5, #4
+2001b82a:	46ac      	mov	ip, r5
+2001b82c:	e7cd      	b.n	2001b7ca <renderSprites.constprop.0+0x686>
+2001b82e:	4c87      	ldr	r4, [pc, #540]	@ (2001ba4c <renderSprites.constprop.0+0x908>)
+2001b830:	0092      	lsls	r2, r2, #2
+2001b832:	1912      	adds	r2, r2, r4
+2001b834:	4c87      	ldr	r4, [pc, #540]	@ (2001ba54 <renderSprites.constprop.0+0x910>)
+2001b836:	4d86      	ldr	r5, [pc, #536]	@ (2001ba50 <renderSprites.constprop.0+0x90c>)
+2001b838:	46a1      	mov	r9, r4
+2001b83a:	9702      	str	r7, [sp, #8]
+2001b83c:	0f1c      	lsrs	r4, r3, #28
+2001b83e:	2c0f      	cmp	r4, #15
+2001b840:	d008      	beq.n	2001b854 <renderSprites.constprop.0+0x710>
+2001b842:	2c00      	cmp	r4, #0
+2001b844:	d116      	bne.n	2001b874 <renderSprites.constprop.0+0x730>
+2001b846:	011b      	lsls	r3, r3, #4
+2001b848:	0100      	lsls	r0, r0, #4
+2001b84a:	0109      	lsls	r1, r1, #4
+2001b84c:	3204      	adds	r2, #4
+2001b84e:	0f1c      	lsrs	r4, r3, #28
+2001b850:	2c0f      	cmp	r4, #15
+2001b852:	d1f6      	bne.n	2001b842 <renderSprites.constprop.0+0x6fe>
+2001b854:	0f04      	lsrs	r4, r0, #28
+2001b856:	0f0e      	lsrs	r6, r1, #28
+2001b858:	0124      	lsls	r4, r4, #4
+2001b85a:	4334      	orrs	r4, r6
+2001b85c:	4656      	mov	r6, sl
+2001b85e:	00a4      	lsls	r4, r4, #2
+2001b860:	592c      	ldr	r4, [r5, r4]
+2001b862:	011b      	lsls	r3, r3, #4
+2001b864:	4334      	orrs	r4, r6
+2001b866:	6014      	str	r4, [r2, #0]
+2001b868:	2b00      	cmp	r3, #0
+2001b86a:	d019      	beq.n	2001b8a0 <renderSprites.constprop.0+0x75c>
+2001b86c:	0100      	lsls	r0, r0, #4
+2001b86e:	0109      	lsls	r1, r1, #4
+2001b870:	3204      	adds	r2, #4
+2001b872:	e7e3      	b.n	2001b83c <renderSprites.constprop.0+0x6f8>
+2001b874:	6816      	ldr	r6, [r2, #0]
+2001b876:	0f0f      	lsrs	r7, r1, #28
+2001b878:	46b4      	mov	ip, r6
+2001b87a:	0f06      	lsrs	r6, r0, #28
+2001b87c:	0136      	lsls	r6, r6, #4
+2001b87e:	433e      	orrs	r6, r7
+2001b880:	4657      	mov	r7, sl
+2001b882:	00b6      	lsls	r6, r6, #2
+2001b884:	59ae      	ldr	r6, [r5, r6]
+2001b886:	00a4      	lsls	r4, r4, #2
+2001b888:	433e      	orrs	r6, r7
+2001b88a:	4667      	mov	r7, ip
+2001b88c:	407e      	eors	r6, r7
+2001b88e:	464f      	mov	r7, r9
+2001b890:	59e4      	ldr	r4, [r4, r7]
+2001b892:	011b      	lsls	r3, r3, #4
+2001b894:	4034      	ands	r4, r6
+2001b896:	4666      	mov	r6, ip
+2001b898:	4074      	eors	r4, r6
+2001b89a:	6014      	str	r4, [r2, #0]
+2001b89c:	2b00      	cmp	r3, #0
+2001b89e:	d1e5      	bne.n	2001b86c <renderSprites.constprop.0+0x728>
+2001b8a0:	2301      	movs	r3, #1
+2001b8a2:	9f02      	ldr	r7, [sp, #8]
+2001b8a4:	931b      	str	r3, [sp, #108]	@ 0x6c
+2001b8a6:	e685      	b.n	2001b5b4 <renderSprites.constprop.0+0x470>
+2001b8a8:	210e      	movs	r1, #14
+2001b8aa:	9118      	str	r1, [sp, #96]	@ 0x60
+2001b8ac:	2102      	movs	r1, #2
+2001b8ae:	9119      	str	r1, [sp, #100]	@ 0x64
+2001b8b0:	2100      	movs	r1, #0
+2001b8b2:	911d      	str	r1, [sp, #116]	@ 0x74
+2001b8b4:	e47e      	b.n	2001b1b4 <renderSprites.constprop.0+0x70>
+2001b8b6:	9e21      	ldr	r6, [sp, #132]	@ 0x84
+2001b8b8:	0092      	lsls	r2, r2, #2
+2001b8ba:	40e6      	lsrs	r6, r4
+2001b8bc:	4c63      	ldr	r4, [pc, #396]	@ (2001ba4c <renderSprites.constprop.0+0x908>)
+2001b8be:	4d64      	ldr	r5, [pc, #400]	@ (2001ba50 <renderSprites.constprop.0+0x90c>)
+2001b8c0:	1912      	adds	r2, r2, r4
+2001b8c2:	4c64      	ldr	r4, [pc, #400]	@ (2001ba54 <renderSprites.constprop.0+0x910>)
+2001b8c4:	970d      	str	r7, [sp, #52]	@ 0x34
+2001b8c6:	9407      	str	r4, [sp, #28]
+2001b8c8:	9502      	str	r5, [sp, #8]
+2001b8ca:	0f1c      	lsrs	r4, r3, #28
+2001b8cc:	2c0f      	cmp	r4, #15
+2001b8ce:	d009      	beq.n	2001b8e4 <renderSprites.constprop.0+0x7a0>
+2001b8d0:	2c00      	cmp	r4, #0
+2001b8d2:	d11e      	bne.n	2001b912 <renderSprites.constprop.0+0x7ce>
+2001b8d4:	011b      	lsls	r3, r3, #4
+2001b8d6:	0136      	lsls	r6, r6, #4
+2001b8d8:	0100      	lsls	r0, r0, #4
+2001b8da:	0109      	lsls	r1, r1, #4
+2001b8dc:	3204      	adds	r2, #4
+2001b8de:	0f1c      	lsrs	r4, r3, #28
+2001b8e0:	2c0f      	cmp	r4, #15
+2001b8e2:	d1f5      	bne.n	2001b8d0 <renderSprites.constprop.0+0x78c>
+2001b8e4:	0f34      	lsrs	r4, r6, #28
+2001b8e6:	0124      	lsls	r4, r4, #4
+2001b8e8:	0027      	movs	r7, r4
+2001b8ea:	0f04      	lsrs	r4, r0, #28
+2001b8ec:	433c      	orrs	r4, r7
+2001b8ee:	0124      	lsls	r4, r4, #4
+2001b8f0:	0027      	movs	r7, r4
+2001b8f2:	0f0c      	lsrs	r4, r1, #28
+2001b8f4:	433c      	orrs	r4, r7
+2001b8f6:	4657      	mov	r7, sl
+2001b8f8:	9d02      	ldr	r5, [sp, #8]
+2001b8fa:	00a4      	lsls	r4, r4, #2
+2001b8fc:	592c      	ldr	r4, [r5, r4]
+2001b8fe:	011b      	lsls	r3, r3, #4
+2001b900:	433c      	orrs	r4, r7
+2001b902:	6014      	str	r4, [r2, #0]
+2001b904:	2b00      	cmp	r3, #0
+2001b906:	d023      	beq.n	2001b950 <renderSprites.constprop.0+0x80c>
+2001b908:	0136      	lsls	r6, r6, #4
+2001b90a:	0100      	lsls	r0, r0, #4
+2001b90c:	0109      	lsls	r1, r1, #4
+2001b90e:	3204      	adds	r2, #4
+2001b910:	e7db      	b.n	2001b8ca <renderSprites.constprop.0+0x786>
+2001b912:	0f37      	lsrs	r7, r6, #28
+2001b914:	013f      	lsls	r7, r7, #4
+2001b916:	46bc      	mov	ip, r7
+2001b918:	0f07      	lsrs	r7, r0, #28
+2001b91a:	003d      	movs	r5, r7
+2001b91c:	4667      	mov	r7, ip
+2001b91e:	432f      	orrs	r7, r5
+2001b920:	013d      	lsls	r5, r7, #4
+2001b922:	002f      	movs	r7, r5
+2001b924:	6815      	ldr	r5, [r2, #0]
+2001b926:	00a4      	lsls	r4, r4, #2
+2001b928:	46ac      	mov	ip, r5
+2001b92a:	0f0d      	lsrs	r5, r1, #28
+2001b92c:	432f      	orrs	r7, r5
+2001b92e:	00bd      	lsls	r5, r7, #2
+2001b930:	9f02      	ldr	r7, [sp, #8]
+2001b932:	011b      	lsls	r3, r3, #4
+2001b934:	597d      	ldr	r5, [r7, r5]
+2001b936:	002f      	movs	r7, r5
+2001b938:	4655      	mov	r5, sl
+2001b93a:	432f      	orrs	r7, r5
+2001b93c:	4665      	mov	r5, ip
+2001b93e:	406f      	eors	r7, r5
+2001b940:	9d07      	ldr	r5, [sp, #28]
+2001b942:	5964      	ldr	r4, [r4, r5]
+2001b944:	4665      	mov	r5, ip
+2001b946:	403c      	ands	r4, r7
+2001b948:	406c      	eors	r4, r5
+2001b94a:	6014      	str	r4, [r2, #0]
+2001b94c:	2b00      	cmp	r3, #0
+2001b94e:	d1db      	bne.n	2001b908 <renderSprites.constprop.0+0x7c4>
+2001b950:	2301      	movs	r3, #1
+2001b952:	9f0d      	ldr	r7, [sp, #52]	@ 0x34
+2001b954:	931b      	str	r3, [sp, #108]	@ 0x6c
+2001b956:	e62d      	b.n	2001b5b4 <renderSprites.constprop.0+0x470>
+2001b958:	4c3d      	ldr	r4, [pc, #244]	@ (2001ba50 <renderSprites.constprop.0+0x90c>)
+2001b95a:	4656      	mov	r6, sl
+2001b95c:	46a0      	mov	r8, r4
+2001b95e:	46b9      	mov	r9, r7
+2001b960:	e004      	b.n	2001b96c <renderSprites.constprop.0+0x828>
+2001b962:	0100      	lsls	r0, r0, #4
+2001b964:	0109      	lsls	r1, r1, #4
+2001b966:	3208      	adds	r2, #8
+2001b968:	2b00      	cmp	r3, #0
+2001b96a:	d032      	beq.n	2001b9d2 <renderSprites.constprop.0+0x88e>
+2001b96c:	001c      	movs	r4, r3
+2001b96e:	0e1d      	lsrs	r5, r3, #24
+2001b970:	021b      	lsls	r3, r3, #8
+2001b972:	2d00      	cmp	r5, #0
+2001b974:	d0f5      	beq.n	2001b962 <renderSprites.constprop.0+0x81e>
+2001b976:	0f05      	lsrs	r5, r0, #28
+2001b978:	0f0f      	lsrs	r7, r1, #28
+2001b97a:	012d      	lsls	r5, r5, #4
+2001b97c:	433d      	orrs	r5, r7
+2001b97e:	4647      	mov	r7, r8
+2001b980:	00ad      	lsls	r5, r5, #2
+2001b982:	597d      	ldr	r5, [r7, r5]
+2001b984:	4335      	orrs	r5, r6
+2001b986:	2c00      	cmp	r4, #0
+2001b988:	da00      	bge.n	2001b98c <renderSprites.constprop.0+0x848>
+2001b98a:	7015      	strb	r5, [r2, #0]
+2001b98c:	0067      	lsls	r7, r4, #1
+2001b98e:	d500      	bpl.n	2001b992 <renderSprites.constprop.0+0x84e>
+2001b990:	7055      	strb	r5, [r2, #1]
+2001b992:	0a2f      	lsrs	r7, r5, #8
+2001b994:	46bc      	mov	ip, r7
+2001b996:	00a7      	lsls	r7, r4, #2
+2001b998:	d501      	bpl.n	2001b99e <renderSprites.constprop.0+0x85a>
+2001b99a:	4667      	mov	r7, ip
+2001b99c:	7097      	strb	r7, [r2, #2]
+2001b99e:	00e7      	lsls	r7, r4, #3
+2001b9a0:	d501      	bpl.n	2001b9a6 <renderSprites.constprop.0+0x862>
+2001b9a2:	4667      	mov	r7, ip
+2001b9a4:	70d7      	strb	r7, [r2, #3]
+2001b9a6:	0c2f      	lsrs	r7, r5, #16
+2001b9a8:	46bc      	mov	ip, r7
+2001b9aa:	0127      	lsls	r7, r4, #4
+2001b9ac:	d501      	bpl.n	2001b9b2 <renderSprites.constprop.0+0x86e>
+2001b9ae:	4667      	mov	r7, ip
+2001b9b0:	7117      	strb	r7, [r2, #4]
+2001b9b2:	0167      	lsls	r7, r4, #5
+2001b9b4:	d501      	bpl.n	2001b9ba <renderSprites.constprop.0+0x876>
+2001b9b6:	4667      	mov	r7, ip
+2001b9b8:	7157      	strb	r7, [r2, #5]
+2001b9ba:	0e2d      	lsrs	r5, r5, #24
+2001b9bc:	01a7      	lsls	r7, r4, #6
+2001b9be:	d500      	bpl.n	2001b9c2 <renderSprites.constprop.0+0x87e>
+2001b9c0:	7195      	strb	r5, [r2, #6]
+2001b9c2:	01e4      	lsls	r4, r4, #7
+2001b9c4:	d5cd      	bpl.n	2001b962 <renderSprites.constprop.0+0x81e>
+2001b9c6:	71d5      	strb	r5, [r2, #7]
+2001b9c8:	0100      	lsls	r0, r0, #4
+2001b9ca:	0109      	lsls	r1, r1, #4
+2001b9cc:	3208      	adds	r2, #8
+2001b9ce:	2b00      	cmp	r3, #0
+2001b9d0:	d1cc      	bne.n	2001b96c <renderSprites.constprop.0+0x828>
+2001b9d2:	2301      	movs	r3, #1
+2001b9d4:	464f      	mov	r7, r9
+2001b9d6:	931b      	str	r3, [sp, #108]	@ 0x6c
+2001b9d8:	e5ec      	b.n	2001b5b4 <renderSprites.constprop.0+0x470>
+2001b9da:	6cd9      	ldr	r1, [r3, #76]	@ 0x4c
+2001b9dc:	6a9a      	ldr	r2, [r3, #40]	@ 0x28
+2001b9de:	6d1f      	ldr	r7, [r3, #80]	@ 0x50
+2001b9e0:	4051      	eors	r1, r2
+2001b9e2:	6ada      	ldr	r2, [r3, #44]	@ 0x2c
+2001b9e4:	6b1e      	ldr	r6, [r3, #48]	@ 0x30
+2001b9e6:	4057      	eors	r7, r2
+2001b9e8:	6d5a      	ldr	r2, [r3, #84]	@ 0x54
+2001b9ea:	6b5d      	ldr	r5, [r3, #52]	@ 0x34
+2001b9ec:	4056      	eors	r6, r2
+2001b9ee:	6d9a      	ldr	r2, [r3, #88]	@ 0x58
+2001b9f0:	6ddc      	ldr	r4, [r3, #92]	@ 0x5c
+2001b9f2:	4055      	eors	r5, r2
+2001b9f4:	6b9a      	ldr	r2, [r3, #56]	@ 0x38
+2001b9f6:	6bd8      	ldr	r0, [r3, #60]	@ 0x3c
+2001b9f8:	4054      	eors	r4, r2
+2001b9fa:	6e1a      	ldr	r2, [r3, #96]	@ 0x60
+2001b9fc:	468c      	mov	ip, r1
+2001b9fe:	4050      	eors	r0, r2
+2001ba00:	6c19      	ldr	r1, [r3, #64]	@ 0x40
+2001ba02:	6e5a      	ldr	r2, [r3, #100]	@ 0x64
+2001ba04:	651f      	str	r7, [r3, #80]	@ 0x50
+2001ba06:	4051      	eors	r1, r2
+2001ba08:	468a      	mov	sl, r1
+2001ba0a:	6c5a      	ldr	r2, [r3, #68]	@ 0x44
+2001ba0c:	6e99      	ldr	r1, [r3, #104]	@ 0x68
+2001ba0e:	655e      	str	r6, [r3, #84]	@ 0x54
+2001ba10:	404a      	eors	r2, r1
+2001ba12:	6a59      	ldr	r1, [r3, #36]	@ 0x24
+2001ba14:	4693      	mov	fp, r2
+2001ba16:	4688      	mov	r8, r1
+2001ba18:	6c99      	ldr	r1, [r3, #72]	@ 0x48
+2001ba1a:	659d      	str	r5, [r3, #88]	@ 0x58
+2001ba1c:	000a      	movs	r2, r1
+2001ba1e:	4641      	mov	r1, r8
+2001ba20:	4051      	eors	r1, r2
+2001ba22:	4662      	mov	r2, ip
+2001ba24:	64da      	str	r2, [r3, #76]	@ 0x4c
+2001ba26:	4652      	mov	r2, sl
+2001ba28:	665a      	str	r2, [r3, #100]	@ 0x64
+2001ba2a:	465a      	mov	r2, fp
+2001ba2c:	6499      	str	r1, [r3, #72]	@ 0x48
+2001ba2e:	65dc      	str	r4, [r3, #92]	@ 0x5c
+2001ba30:	6618      	str	r0, [r3, #96]	@ 0x60
+2001ba32:	669a      	str	r2, [r3, #104]	@ 0x68
+2001ba34:	e45e      	b.n	2001b2f4 <renderSprites.constprop.0+0x1b0>
+2001ba36:	210f      	movs	r1, #15
+2001ba38:	9118      	str	r1, [sp, #96]	@ 0x60
+2001ba3a:	e737      	b.n	2001b8ac <renderSprites.constprop.0+0x768>
+2001ba3c:	4b06      	ldr	r3, [pc, #24]	@ (2001ba58 <renderSprites.constprop.0+0x914>)
+2001ba3e:	9a03      	ldr	r2, [sp, #12]
+2001ba40:	54d1      	strb	r1, [r2, r3]
+2001ba42:	231f      	movs	r3, #31
+2001ba44:	9306      	str	r3, [sp, #24]
+2001ba46:	e455      	b.n	2001b2f4 <renderSprites.constprop.0+0x1b0>
+2001ba48:	200292df 	.word	0x200292df
+2001ba4c:	2004064c 	.word	0x2004064c
+2001ba50:	200011a0 	.word	0x200011a0
+2001ba54:	200400a0 	.word	0x200400a0
+2001ba58:	00010036 	.word	0x00010036

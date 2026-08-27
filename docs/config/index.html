@@ -431,7 +431,7 @@
 <body>
     <div class="container">
         <header>
-            <img src="configurator_title.png" alt="PICO9918 v1.2.0 Configurator" class="title-image">
+            <img src="configurator_title.png" alt="PICO9918 v1.3.0 Configurator" class="title-image">
         </header>
 
         <!-- Target firmware banner -->
@@ -620,26 +620,26 @@
         const PENDING_STATE_CONFIRMED = 0xC0;
 
         // Configuration byte offsets (must match src/config.h)
-        const CONF_PICO_MODEL = 0;
-        const CONF_HW_VERSION = 1;
-        const CONF_SW_VERSION = 2;
-        const CONF_SW_PATCH_VERSION = 3;
-        const CONF_CLOCK_TESTED = 4;
-        const CONF_DISP_DRIVER = 5;
-        const CONF_FLASH_STATUS = 6;
-        const CONF_CRT_SCANLINES = 8;
-        const CONF_SCANLINE_SPRITES = 9;
-        const CONF_CLOCK_PRESET_ID = 10;
-        const CONF_SCART_MODE = 11;        // 0 = PAL 576i, 1 = NTSC 480i
-        const CONF_VDP_DEVICE = 12;
-        const CONF_DISP_DRIVER_PREF = 13;  // 0 = AUTO, 1 = force VGA, 2 = force SCART
-        const CONF_VGA_MODE = 14;          // 0 = 480p60 (only valid value currently)
-        const CONF_DIAG = 16;
-        const CONF_DIAG_REGISTERS = 17;
-        const CONF_DIAG_PERFORMANCE = 18;
-        const CONF_DIAG_PALETTE = 19;
-        const CONF_DIAG_ADDRESS = 20;
-        const CONF_PALETTE_IDX_0 = 128;
+        const PICO9918_CONF_PICO_MODEL = 0;
+        const PICO9918_CONF_HW_VERSION = 1;
+        const PICO9918_CONF_SW_VERSION = 2;
+        const PICO9918_CONF_SW_PATCH_VERSION = 3;
+        const PICO9918_CONF_CLOCK_TESTED = 4;
+        const PICO9918_CONF_DISP_DRIVER = 5;
+        const PICO9918_CONF_FLASH_STATUS = 6;
+        const PICO9918_CONF_CRT_SCANLINES = 8;
+        const PICO9918_CONF_SCANLINE_SPRITES = 9;
+        const PICO9918_CONF_CLOCK_PRESET_ID = 10;
+        const PICO9918_CONF_SCART_MODE = 11;        // 0 = PAL 576i, 1 = NTSC 480i
+        const PICO9918_CONF_VDP_DEVICE = 12;
+        const PICO9918_CONF_DISP_DRIVER_PREF = 13;  // 0 = AUTO, 1 = force VGA, 2 = force SCART
+        const PICO9918_CONF_VGA_MODE = 14;          // 0 = 480p60 (only valid value currently)
+        const PICO9918_CONF_DIAG = 16;
+        const PICO9918_CONF_DIAG_REGISTERS = 17;
+        const PICO9918_CONF_DIAG_PERFORMANCE = 18;
+        const PICO9918_CONF_DIAG_PALETTE = 19;
+        const PICO9918_CONF_DIAG_ADDRESS = 20;
+        const PICO9918_CONF_PALETTE_IDX_0 = 128;
 
         // ---------------------------------------------------------------------
         // TARGET FIRMWARE VERSION - the single value to bump each release.
@@ -661,7 +661,7 @@
         // regenerate configurator_title.png (the title image bakes in the
         // version text).
         const FW_MAJOR = 1;
-        const FW_MINOR = 2;
+        const FW_MINOR = 3;
         const FW_PATCH = 0;
         const FW_VERSION_STR = `${FW_MAJOR}.${FW_MINOR}.${FW_PATCH}`;
         const CONF_SW_VERSION_VALUE = ((FW_MAJOR << 4) | FW_MINOR) & 0xFF;
@@ -992,47 +992,47 @@
             const config = new Uint8Array(CONFIG_BYTES);
 
             // Set hardware fields for validation
-            config[CONF_PICO_MODEL] = picoModel;
-            config[CONF_HW_VERSION] = hwVersion;
-            // CONF_DISP_DRIVER is recomputed by the firmware on boot from
-            // CONF_DISP_DRIVER_PREF + dongle detection; we just leave it 0.
+            config[PICO9918_CONF_PICO_MODEL] = picoModel;
+            config[PICO9918_CONF_HW_VERSION] = hwVersion;
+            // PICO9918_CONF_DISP_DRIVER is recomputed by the firmware on boot from
+            // PICO9918_CONF_DISP_DRIVER_PREF + dongle detection; we just leave it 0.
 
             // Stamp the firmware version so readConfig() does not treat this as
             // an older config and reset every field to default via migration.
-            config[CONF_SW_VERSION] = CONF_SW_VERSION_VALUE;
-            config[CONF_SW_PATCH_VERSION] = CONF_SW_PATCH_VALUE;
+            config[PICO9918_CONF_SW_VERSION] = CONF_SW_VERSION_VALUE;
+            config[PICO9918_CONF_SW_PATCH_VERSION] = CONF_SW_PATCH_VALUE;
 
             // Set user-configurable options
-            config[CONF_CRT_SCANLINES] = options.scanlines ? 1 : 0;
-            config[CONF_SCANLINE_SPRITES] = options.scanlineSprites & 0x03;
-            config[CONF_CLOCK_PRESET_ID] = options.clockPreset & 0x03;
-            config[CONF_SCART_MODE] = options.scartMode & 0x01;
-            config[CONF_VDP_DEVICE] = options.vdpDevice & 0x03;
-            config[CONF_DISP_DRIVER_PREF] = options.dispDriverPref & 0x03;
-            config[CONF_VGA_MODE] = options.vgaMode & 0x01;
+            config[PICO9918_CONF_CRT_SCANLINES] = options.scanlines ? 1 : 0;
+            config[PICO9918_CONF_SCANLINE_SPRITES] = options.scanlineSprites & 0x03;
+            config[PICO9918_CONF_CLOCK_PRESET_ID] = options.clockPreset & 0x03;
+            config[PICO9918_CONF_SCART_MODE] = options.scartMode & 0x01;
+            config[PICO9918_CONF_VDP_DEVICE] = options.vdpDevice & 0x03;
+            config[PICO9918_CONF_DISP_DRIVER_PREF] = options.dispDriverPref & 0x03;
+            config[PICO9918_CONF_VGA_MODE] = options.vgaMode & 0x01;
 
             // Set diagnostic options
-            config[CONF_DIAG_REGISTERS] = options.diagRegisters ? 1 : 0;
-            config[CONF_DIAG_PERFORMANCE] = options.diagPerformance ? 1 : 0;
-            config[CONF_DIAG_PALETTE] = options.diagPalette ? 1 : 0;
-            config[CONF_DIAG_ADDRESS] = options.diagAddress ? 1 : 0;
+            config[PICO9918_CONF_DIAG_REGISTERS] = options.diagRegisters ? 1 : 0;
+            config[PICO9918_CONF_DIAG_PERFORMANCE] = options.diagPerformance ? 1 : 0;
+            config[PICO9918_CONF_DIAG_PALETTE] = options.diagPalette ? 1 : 0;
+            config[PICO9918_CONF_DIAG_ADDRESS] = options.diagAddress ? 1 : 0;
 
             // Set main DIAG flag if any diagnostic is enabled
-            config[CONF_DIAG] = (config[CONF_DIAG_REGISTERS] ||
-                                config[CONF_DIAG_PERFORMANCE] ||
-                                config[CONF_DIAG_PALETTE] ||
-                                config[CONF_DIAG_ADDRESS]) ? 1 : 0;
+            config[PICO9918_CONF_DIAG] = (config[PICO9918_CONF_DIAG_REGISTERS] ||
+                                config[PICO9918_CONF_DIAG_PERFORMANCE] ||
+                                config[PICO9918_CONF_DIAG_PALETTE] ||
+                                config[PICO9918_CONF_DIAG_ADDRESS]) ? 1 : 0;
 
             // Set palette (color 0 always black)
-            config[CONF_PALETTE_IDX_0] = 0x00;
-            config[CONF_PALETTE_IDX_0 + 1] = 0x00;
+            config[PICO9918_CONF_PALETTE_IDX_0] = 0x00;
+            config[PICO9918_CONF_PALETTE_IDX_0 + 1] = 0x00;
 
             // Colors 1-15 from custom palette
             const palette = options.customPalette || PALETTE_TMS9918A;
             for (let i = 1; i < 16; i++) {
                 const rgb = palette[i];
-                config[CONF_PALETTE_IDX_0 + (i * 2)] = (rgb >> 8) & 0xFF;
-                config[CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xFF;
+                config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2)] = (rgb >> 8) & 0xFF;
+                config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xFF;
             }
 
             return config;

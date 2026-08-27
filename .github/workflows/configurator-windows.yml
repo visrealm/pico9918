@@ -3,9 +3,26 @@ name: Configurator Windows
 on:
   push:
     branches: [ '**' ]
+    # Paths that cannot change a firmware binary, so a push touching only these builds
+    # nothing. NOT core/tools/img2carray.py, which generates the overlay assets the
+    # library compiles in. A pull request runs everything regardless.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'core/bindings/**'
+      - 'core/examples/**'
+      - 'core/test/**'
+      - 'core/tools/ci.sh'
+      - 'core/.github/**'
+      - 'test/live/**'
+      - '.github/workflows/core.yml'
   pull_request:
     branches: [ '**' ]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:

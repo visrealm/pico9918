@@ -1,0 +1,4501 @@
+{
+ "freeze": {},
+ "perf": {
+  "all": {
+   "dump-2-plane_scrolling": {
+    "line": 28.35,
+    "render": 19.3
+   },
+   "dump-Alex_Kidd_on_Miracle_Island_demo": {
+    "line": 32.97,
+    "render": 23.91
+   },
+   "dump-F18A_Karts_demo": {
+    "line": 25.64,
+    "render": 16.39
+   },
+   "dump-F18A_ZQX-ONE": {
+    "line": 37.01,
+    "render": 27.77
+   },
+   "dump-F18A_bitmap_demo": {
+    "line": 29.45,
+    "render": 20.4
+   },
+   "dump-Force_Command": {
+    "line": 27.15,
+    "render": 13.24
+   },
+   "dump-Power_Strike_demo": {
+    "line": 33.86,
+    "render": 24.63
+   },
+   "dump-Stevie_programming_editor": {
+    "line": 29.04,
+    "render": 15.15
+   },
+   "dump-TI-99_Super_Mario_Bros_demo": {
+    "line": 31.56,
+    "render": 22.31
+   },
+   "dump-WIMP8": {
+    "line": 49.26,
+    "render": 35.59
+   },
+   "dump-ck1-ti": {
+    "line": 26.82,
+    "render": 17.44
+   },
+   "dump-keen_ep1_8_1": {
+    "line": 26.88,
+    "render": 17.53
+   },
+   "dump-retroplex_v0-0-1_ti99_8": {
+    "line": 27.13,
+    "render": 18.06
+   },
+   "dump-retroplex_v0-0-1_ti99_8_vdpramfull-(3)": {
+    "line": 26.88,
+    "render": 17.83
+   },
+   "dump-stevie48": {
+    "line": 25.43,
+    "render": 13.14
+   },
+   "dump-stevie60": {
+    "line": 25.57,
+    "render": 13.11
+   },
+   "gm1-bml-fat": {
+    "line": 31.94,
+    "render": 22.89
+   },
+   "gm1-bml-full": {
+    "line": 31.19,
+    "render": 22.16
+   },
+   "gm1-bml-pri": {
+    "line": 32.08,
+    "render": 23.03
+   },
+   "gm1-bml-under": {
+    "line": 32.77,
+    "render": 23.72
+   },
+   "gm1-coarse": {
+    "line": 18.81,
+    "render": 9.43
+   },
+   "gm1-coarse-hpage": {
+    "line": 21.39,
+    "render": 12.34
+   },
+   "gm1-ecm0": {
+    "line": 18.66,
+    "render": 9.29
+   },
+   "gm1-ecm1": {
+    "line": 20.44,
+    "render": 11.07
+   },
+   "gm1-ecm2": {
+    "line": 22.06,
+    "render": 12.68
+   },
+   "gm1-ecm3": {
+    "line": 23.0,
+    "render": 13.64
+   },
+   "gm1-hscroll-3": {
+    "line": 21.38,
+    "render": 12.33
+   },
+   "gm1-hscroll-7": {
+    "line": 21.37,
+    "render": 12.32
+   },
+   "gm1-hscroll-split": {
+    "line": 32.85,
+    "render": 23.8
+   },
+   "gm1-layers-off": {
+    "line": 10.99,
+    "render": 1.96
+   },
+   "gm1-locked": {
+    "line": 14.35,
+    "render": 7.64
+   },
+   "gm1-palette": {
+    "line": 31.49,
+    "render": 22.43
+   },
+   "gm1-posattr": {
+    "line": 35.08,
+    "render": 26.05
+   },
+   "gm1-posattr-pages": {
+    "line": 21.89,
+    "render": 12.54
+   },
+   "gm1-priority": {
+    "line": 38.51,
+    "render": 29.47
+   },
+   "gm1-priority-scroll": {
+    "line": 40.18,
+    "render": 31.17
+   },
+   "gm1-scroll-both": {
+    "line": 32.51,
+    "render": 23.47
+   },
+   "gm1-scroll-cross": {
+    "line": 32.41,
+    "render": 23.38
+   },
+   "gm1-scroll-cross-back": {
+    "line": 32.23,
+    "render": 23.17
+   },
+   "gm1-sprites": {
+    "line": 31.49,
+    "render": 22.45
+   },
+   "gm1-sprites-ecm1": {
+    "line": 27.16,
+    "render": 17.9
+   },
+   "gm1-sprites-ecm2": {
+    "line": 27.73,
+    "render": 18.49
+   },
+   "gm1-sprites-ecm3": {
+    "line": 28.29,
+    "render": 19.05
+   },
+   "gm1-sprites-ecm3-mag": {
+    "line": 27.29,
+    "render": 18.05
+   },
+   "gm1-t1-off": {
+    "line": 21.52,
+    "render": 12.47
+   },
+   "gm1-t2-ecm0": {
+    "line": 29.6,
+    "render": 20.55
+   },
+   "gm1-t2-ecm1": {
+    "line": 32.71,
+    "render": 23.65
+   },
+   "gm1-t2-ecm2": {
+    "line": 35.95,
+    "render": 26.96
+   },
+   "gm1-t2-ecm3": {
+    "line": 38.52,
+    "render": 29.52
+   },
+   "gm1-t2-hscroll": {
+    "line": 32.17,
+    "render": 23.12
+   },
+   "gm1-t2-vscroll": {
+    "line": 29.64,
+    "render": 20.59
+   },
+   "gm1-t2-vscroll-page": {
+    "line": 29.71,
+    "render": 20.66
+   },
+   "gm1-vscroll": {
+    "line": 18.71,
+    "render": 9.34
+   },
+   "gm1-vscroll-page": {
+    "line": 18.71,
+    "render": 9.33
+   },
+   "gm2": {
+    "line": 18.77,
+    "render": 9.4
+   },
+   "gm2-bml-pri": {
+    "line": 22.79,
+    "render": 13.75
+   },
+   "gm2-ecm3": {
+    "line": 25.7,
+    "render": 16.32
+   },
+   "gm2-locked": {
+    "line": 13.27,
+    "render": 6.53
+   },
+   "gm2-namemask": {
+    "line": 19.32,
+    "render": 9.95
+   },
+   "gm2-nosplit": {
+    "line": 19.15,
+    "render": 9.79
+   },
+   "gm2-palette": {
+    "line": 18.78,
+    "render": 9.4
+   },
+   "gm2-posattr": {
+    "line": 18.78,
+    "render": 9.4
+   },
+   "gm2-scroll": {
+    "line": 21.58,
+    "render": 12.54
+   },
+   "gm2-sprites": {
+    "line": 21.3,
+    "render": 12.04
+   },
+   "gm2-t2": {
+    "line": 27.27,
+    "render": 18.22
+   },
+   "mcm": {
+    "line": 17.25,
+    "render": 7.87
+   },
+   "mcm-bml-pri": {
+    "line": 21.24,
+    "render": 12.18
+   },
+   "mcm-ecm3": {
+    "line": 23.69,
+    "render": 14.3
+   },
+   "mcm-locked": {
+    "line": 12.96,
+    "render": 6.21
+   },
+   "mcm-scroll": {
+    "line": 19.96,
+    "render": 10.9
+   },
+   "mcm-sprites": {
+    "line": 19.77,
+    "render": 10.49
+   },
+   "mcm-t2": {
+    "line": 23.77,
+    "render": 14.73
+   },
+   "t40": {
+    "line": 17.74,
+    "render": 8.36
+   },
+   "t40-48rows": {
+    "line": 16.33,
+    "render": 8.37
+   },
+   "t40-48rows-sprites": {
+    "line": 18.84,
+    "render": 10.98
+   },
+   "t40-60rows": {
+    "line": 20.99,
+    "render": 12.93
+   },
+   "t40-bml-pri": {
+    "line": 21.71,
+    "render": 12.67
+   },
+   "t40-bml-under": {
+    "line": 23.13,
+    "render": 14.07
+   },
+   "t40-ecm1": {
+    "line": 20.91,
+    "render": 11.52
+   },
+   "t40-ecm2": {
+    "line": 22.98,
+    "render": 13.6
+   },
+   "t40-ecm3": {
+    "line": 24.23,
+    "render": 14.86
+   },
+   "t40-ecm3-posattr": {
+    "line": 24.22,
+    "render": 14.85
+   },
+   "t40-ecm3-scroll": {
+    "line": 29.44,
+    "render": 20.4
+   },
+   "t40-ecm3-sprites": {
+    "line": 26.75,
+    "render": 17.48
+   },
+   "t40-hscroll-past-row": {
+    "line": 33.87,
+    "render": 24.8
+   },
+   "t40-hscroll-split": {
+    "line": 36.24,
+    "render": 27.22
+   },
+   "t40-locked": {
+    "line": 11.27,
+    "render": 4.54
+   },
+   "t40-palette": {
+    "line": 33.13,
+    "render": 24.07
+   },
+   "t40-posattr": {
+    "line": 18.04,
+    "render": 8.66
+   },
+   "t40-scroll": {
+    "line": 20.39,
+    "render": 11.35
+   },
+   "t40-scroll-cross": {
+    "line": 35.75,
+    "render": 26.73
+   },
+   "t40-sprites": {
+    "line": 20.25,
+    "render": 10.99
+   },
+   "t40-t2": {
+    "line": 33.13,
+    "render": 24.09
+   },
+   "t40-t2-ecm3": {
+    "line": 42.54,
+    "render": 33.51
+   },
+   "t80": {
+    "line": 26.82,
+    "render": 13.13
+   },
+   "t80-30rows": {
+    "line": 31.79,
+    "render": 18.22
+   },
+   "t80-48rows": {
+    "line": 25.94,
+    "render": 13.64
+   },
+   "t80-60rows": {
+    "line": 30.23,
+    "render": 18.01
+   },
+   "t80-bml-pri": {
+    "line": 60.25,
+    "render": 47.44
+   },
+   "t80-ecm3": {
+    "line": 41.55,
+    "render": 27.77
+   },
+   "t80-hscroll": {
+    "line": 54.63,
+    "render": 41.86
+   },
+   "t80-hscroll-past-row": {
+    "line": 49.65,
+    "render": 35.94
+   },
+   "t80-hscroll-plain": {
+    "line": 31.39,
+    "render": 18.68
+   },
+   "t80-posattr": {
+    "line": 27.37,
+    "render": 13.64
+   },
+   "t80-scroll-cross": {
+    "line": 54.2,
+    "render": 41.4
+   },
+   "t80-sprites": {
+    "line": 52.55,
+    "render": 39.14
+   },
+   "t80-t2": {
+    "line": 49.16,
+    "render": 35.39
+   },
+   "t80-t2-sparse": {
+    "line": 48.95,
+    "render": 35.18
+   },
+   "t80-tiles-off": {
+    "line": 43.47,
+    "render": 30.77
+   },
+   "t80-vscroll": {
+    "line": 49.18,
+    "render": 35.44
+   },
+   "t80-vscroll-page": {
+    "line": 27.38,
+    "render": 13.67
+   }
+  },
+  "one": {
+   "dump-2-plane_scrolling": {
+    "line": 25.61,
+    "render": 19.29
+   },
+   "dump-Alex_Kidd_on_Miracle_Island_demo": {
+    "line": 30.26,
+    "render": 23.91
+   },
+   "dump-F18A_Karts_demo": {
+    "line": 22.7,
+    "render": 16.38
+   },
+   "dump-F18A_ZQX-ONE": {
+    "line": 34.12,
+    "render": 27.78
+   },
+   "dump-F18A_bitmap_demo": {
+    "line": 26.74,
+    "render": 20.39
+   },
+   "dump-Force_Command": {
+    "line": 24.24,
+    "render": 13.25
+   },
+   "dump-Power_Strike_demo": {
+    "line": 30.97,
+    "render": 24.65
+   },
+   "dump-Stevie_programming_editor": {
+    "line": 26.11,
+    "render": 15.15
+   },
+   "dump-TI-99_Super_Mario_Bros_demo": {
+    "line": 28.67,
+    "render": 22.33
+   },
+   "dump-WIMP8": {
+    "line": 46.55,
+    "render": 35.58
+   },
+   "dump-ck1-ti": {
+    "line": 24.12,
+    "render": 17.46
+   },
+   "dump-keen_ep1_8_1": {
+    "line": 24.18,
+    "render": 17.54
+   },
+   "dump-retroplex_v0-0-1_ti99_8": {
+    "line": 24.4,
+    "render": 18.08
+   },
+   "dump-retroplex_v0-0-1_ti99_8_vdpramfull-(3)": {
+    "line": 24.16,
+    "render": 17.85
+   },
+   "dump-stevie48": {
+    "line": 24.13,
+    "render": 13.13
+   },
+   "dump-stevie60": {
+    "line": 24.07,
+    "render": 13.1
+   },
+   "gm1-bml-fat": {
+    "line": 29.22,
+    "render": 22.89
+   },
+   "gm1-bml-full": {
+    "line": 28.5,
+    "render": 22.14
+   },
+   "gm1-bml-pri": {
+    "line": 29.36,
+    "render": 23.03
+   },
+   "gm1-bml-under": {
+    "line": 30.04,
+    "render": 23.71
+   },
+   "gm1-coarse": {
+    "line": 16.09,
+    "render": 9.43
+   },
+   "gm1-coarse-hpage": {
+    "line": 18.66,
+    "render": 12.34
+   },
+   "gm1-ecm0": {
+    "line": 15.96,
+    "render": 9.29
+   },
+   "gm1-ecm1": {
+    "line": 17.75,
+    "render": 11.07
+   },
+   "gm1-ecm2": {
+    "line": 19.35,
+    "render": 12.68
+   },
+   "gm1-ecm3": {
+    "line": 20.3,
+    "render": 13.63
+   },
+   "gm1-hscroll-3": {
+    "line": 18.65,
+    "render": 12.32
+   },
+   "gm1-hscroll-7": {
+    "line": 18.65,
+    "render": 12.32
+   },
+   "gm1-hscroll-split": {
+    "line": 30.14,
+    "render": 23.8
+   },
+   "gm1-layers-off": {
+    "line": 8.29,
+    "render": 1.95
+   },
+   "gm1-locked": {
+    "line": 13.93,
+    "render": 7.64
+   },
+   "gm1-palette": {
+    "line": 28.77,
+    "render": 22.45
+   },
+   "gm1-posattr": {
+    "line": 32.36,
+    "render": 26.05
+   },
+   "gm1-posattr-pages": {
+    "line": 19.21,
+    "render": 12.56
+   },
+   "gm1-priority": {
+    "line": 35.78,
+    "render": 29.48
+   },
+   "gm1-priority-scroll": {
+    "line": 37.48,
+    "render": 31.16
+   },
+   "gm1-scroll-both": {
+    "line": 29.79,
+    "render": 23.46
+   },
+   "gm1-scroll-cross": {
+    "line": 29.7,
+    "render": 23.38
+   },
+   "gm1-scroll-cross-back": {
+    "line": 29.51,
+    "render": 23.18
+   },
+   "gm1-sprites": {
+    "line": 28.79,
+    "render": 22.43
+   },
+   "gm1-sprites-ecm1": {
+    "line": 24.46,
+    "render": 17.91
+   },
+   "gm1-sprites-ecm2": {
+    "line": 25.02,
+    "render": 18.49
+   },
+   "gm1-sprites-ecm3": {
+    "line": 25.59,
+    "render": 19.03
+   },
+   "gm1-sprites-ecm3-mag": {
+    "line": 24.6,
+    "render": 18.05
+   },
+   "gm1-t1-off": {
+    "line": 18.8,
+    "render": 12.47
+   },
+   "gm1-t2-ecm0": {
+    "line": 26.9,
+    "render": 20.55
+   },
+   "gm1-t2-ecm1": {
+    "line": 29.99,
+    "render": 23.64
+   },
+   "gm1-t2-ecm2": {
+    "line": 33.27,
+    "render": 26.94
+   },
+   "gm1-t2-ecm3": {
+    "line": 35.82,
+    "render": 29.51
+   },
+   "gm1-t2-hscroll": {
+    "line": 29.46,
+    "render": 23.12
+   },
+   "gm1-t2-vscroll": {
+    "line": 26.93,
+    "render": 20.58
+   },
+   "gm1-t2-vscroll-page": {
+    "line": 27.0,
+    "render": 20.67
+   },
+   "gm1-vscroll": {
+    "line": 15.99,
+    "render": 9.33
+   },
+   "gm1-vscroll-page": {
+    "line": 16.0,
+    "render": 9.33
+   },
+   "gm2": {
+    "line": 16.07,
+    "render": 9.4
+   },
+   "gm2-bml-pri": {
+    "line": 20.09,
+    "render": 13.75
+   },
+   "gm2-ecm3": {
+    "line": 23.0,
+    "render": 16.33
+   },
+   "gm2-locked": {
+    "line": 12.84,
+    "render": 6.53
+   },
+   "gm2-namemask": {
+    "line": 16.61,
+    "render": 9.94
+   },
+   "gm2-nosplit": {
+    "line": 16.45,
+    "render": 9.79
+   },
+   "gm2-palette": {
+    "line": 16.06,
+    "render": 9.39
+   },
+   "gm2-posattr": {
+    "line": 16.07,
+    "render": 9.4
+   },
+   "gm2-scroll": {
+    "line": 18.86,
+    "render": 12.53
+   },
+   "gm2-sprites": {
+    "line": 18.61,
+    "render": 12.04
+   },
+   "gm2-t2": {
+    "line": 24.56,
+    "render": 18.23
+   },
+   "mcm": {
+    "line": 14.54,
+    "render": 7.87
+   },
+   "mcm-bml-pri": {
+    "line": 18.53,
+    "render": 12.18
+   },
+   "mcm-ecm3": {
+    "line": 20.98,
+    "render": 14.31
+   },
+   "mcm-locked": {
+    "line": 12.52,
+    "render": 6.2
+   },
+   "mcm-scroll": {
+    "line": 17.26,
+    "render": 10.91
+   },
+   "mcm-sprites": {
+    "line": 17.05,
+    "render": 10.5
+   },
+   "mcm-t2": {
+    "line": 21.06,
+    "render": 14.74
+   },
+   "t40": {
+    "line": 15.05,
+    "render": 8.37
+   },
+   "t40-48rows": {
+    "line": 15.04,
+    "render": 8.38
+   },
+   "t40-48rows-sprites": {
+    "line": 17.54,
+    "render": 10.97
+   },
+   "t40-60rows": {
+    "line": 19.5,
+    "render": 12.94
+   },
+   "t40-bml-pri": {
+    "line": 19.01,
+    "render": 12.69
+   },
+   "t40-bml-under": {
+    "line": 20.41,
+    "render": 14.07
+   },
+   "t40-ecm1": {
+    "line": 18.18,
+    "render": 11.52
+   },
+   "t40-ecm2": {
+    "line": 20.28,
+    "render": 13.61
+   },
+   "t40-ecm3": {
+    "line": 21.52,
+    "render": 14.86
+   },
+   "t40-ecm3-posattr": {
+    "line": 21.53,
+    "render": 14.85
+   },
+   "t40-ecm3-scroll": {
+    "line": 26.74,
+    "render": 20.4
+   },
+   "t40-ecm3-sprites": {
+    "line": 24.03,
+    "render": 17.47
+   },
+   "t40-hscroll-past-row": {
+    "line": 31.17,
+    "render": 24.8
+   },
+   "t40-hscroll-split": {
+    "line": 33.57,
+    "render": 27.24
+   },
+   "t40-locked": {
+    "line": 10.84,
+    "render": 4.53
+   },
+   "t40-palette": {
+    "line": 30.42,
+    "render": 24.09
+   },
+   "t40-posattr": {
+    "line": 15.33,
+    "render": 8.66
+   },
+   "t40-scroll": {
+    "line": 17.69,
+    "render": 11.34
+   },
+   "t40-scroll-cross": {
+    "line": 33.05,
+    "render": 26.73
+   },
+   "t40-sprites": {
+    "line": 17.54,
+    "render": 10.99
+   },
+   "t40-t2": {
+    "line": 30.41,
+    "render": 24.08
+   },
+   "t40-t2-ecm3": {
+    "line": 39.84,
+    "render": 33.52
+   },
+   "t80": {
+    "line": 24.13,
+    "render": 13.13
+   },
+   "t80-30rows": {
+    "line": 28.88,
+    "render": 18.2
+   },
+   "t80-48rows": {
+    "line": 24.66,
+    "render": 13.64
+   },
+   "t80-60rows": {
+    "line": 28.77,
+    "render": 18.06
+   },
+   "t80-bml-pri": {
+    "line": 57.57,
+    "render": 47.5
+   },
+   "t80-ecm3": {
+    "line": 38.85,
+    "render": 27.78
+   },
+   "t80-hscroll": {
+    "line": 51.92,
+    "render": 41.85
+   },
+   "t80-hscroll-past-row": {
+    "line": 46.93,
+    "render": 35.9
+   },
+   "t80-hscroll-plain": {
+    "line": 28.7,
+    "render": 18.69
+   },
+   "t80-posattr": {
+    "line": 24.7,
+    "render": 13.62
+   },
+   "t80-scroll-cross": {
+    "line": 51.49,
+    "render": 41.42
+   },
+   "t80-sprites": {
+    "line": 49.79,
+    "render": 39.14
+   },
+   "t80-t2": {
+    "line": 46.43,
+    "render": 35.39
+   },
+   "t80-t2-sparse": {
+    "line": 46.24,
+    "render": 35.2
+   },
+   "t80-tiles-off": {
+    "line": 40.76,
+    "render": 30.77
+   },
+   "t80-vscroll": {
+    "line": 46.51,
+    "render": 35.45
+   },
+   "t80-vscroll-page": {
+    "line": 24.67,
+    "render": 13.66
+   }
+  }
+ },
+ "properties": {},
+ "run": {
+  "allStages": [
+   "d4",
+   "freeze",
+   "diag",
+   "perf",
+   "perf-panels",
+   "scroll",
+   "colour",
+   "ecm",
+   "t80-8bpp"
+  ],
+  "board": "pro",
+  "board_def": null,
+  "branch": "render-perf",
+  "budget_us": 63.6,
+  "clock_hz": 252000000,
+  "commit": "a312746",
+  "date": "2026-08-17T23:54:26",
+  "dirty": false,
+  "elf": "../perf-history-elfs/144-d1741b5/pico9918pro-v1-2-0-live.elf",
+  "elf_built": "2026-08-17T23:45:36",
+  "floor_us": 0.5,
+  "options": {},
+  "sdk": null,
+  "seconds": 65.7,
+  "sections": {
+   ".bss": 125972,
+   ".data": 73976,
+   ".flashcode": 4056,
+   ".flashcode_sdk": 1776,
+   ".flashtext": 504,
+   ".heap": 2048,
+   ".rodata": 896,
+   ".scratch_x": 1972,
+   ".scratch_y": 2576,
+   ".text": 13088,
+   ".uninitialized_data": 87772
+  },
+  "stages": [
+   "perf",
+   "perf-panels"
+  ],
+  "subject": "Let the harness drive a build that predates one of its instruments",
+  "submodule": "817e88f",
+  "toolchain": "gcc 15.2.1 (Arm 15.2.Rel1)",
+  "version": "1.2.0"
+ },
+ "scenes": {
+  "dump-2-plane_scrolling": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 4,
+    "sprmag": false,
+    "sprmax": 16,
+    "sprps": 3,
+    "t1": true,
+    "t1pages": "2x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "2x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "captured from real software: 2-plane_scrolling_vdpramfull .bin",
+   "overbudget": []
+  },
+  "dump-Alex_Kidd_on_Miracle_Island_demo": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 3,
+    "sprites": 2,
+    "sprmag": false,
+    "sprmax": 16,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "2x1",
+    "t2pri": true,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "captured from real software: Alex_Kidd_on_Miracle_Island_demo_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-F18A_Karts_demo": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": true,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 2,
+    "gpu": true,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 30,
+    "spr16": false,
+    "sprecm": 2,
+    "sprites": 16,
+    "sprmag": true,
+    "sprmax": 16,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": true,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "captured from real software: F18A_Karts_demo_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-F18A_ZQX-ONE": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 30,
+    "spr16": true,
+    "sprecm": 3,
+    "sprites": 20,
+    "sprmag": false,
+    "sprmax": 16,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x2",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: F18A_ZQX-ONE_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-F18A_bitmap_demo": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": true,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 16,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: F18A_bitmap_demo_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-Force_Command": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 30,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: Force_Command_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-Power_Strike_demo": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 30,
+    "spr16": true,
+    "sprecm": 3,
+    "sprites": 23,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "Y",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "captured from real software: Power_Strike_demo_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-Stevie_programming_editor": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 30,
+    "spr16": false,
+    "sprecm": 0,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 16,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: Stevie_programming_editor_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-TI-99_Super_Mario_Bros_demo": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 2,
+    "gpu": true,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 30,
+    "spr16": true,
+    "sprecm": 2,
+    "sprites": 12,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "2x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "2x1",
+    "t2pri": true,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: TI-99_Super_Mario_Bros_demo_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-WIMP8": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 4,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": true,
+    "t2ps": 0,
+    "t2scroll": "XY"
+   },
+   "note": "captured from real software: WIMP8_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-ck1-ti": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": true,
+    "rows": 24,
+    "spr16": false,
+    "sprecm": 3,
+    "sprites": 16,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: ck1-ti_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-keen_ep1_8_1": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": true,
+    "rows": 24,
+    "spr16": false,
+    "sprecm": 3,
+    "sprites": 16,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: keen_ep1_8_1_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-retroplex_v0-0-1_ti99_8": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": true,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 3,
+    "sprites": 2,
+    "sprmag": false,
+    "sprmax": 16,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "2x1",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: retroplex_v0-0-1_ti99_8_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-retroplex_v0-0-1_ti99_8_vdpramfull-(3)": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": true,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 3,
+    "sprites": 1,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "2x1",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: retroplex_v0-0-1_ti99_8_vdpramfull (3).bin",
+   "overbudget": []
+  },
+  "dump-stevie48": {
+   "budget_us": 31.8,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 48,
+    "spr16": false,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 4,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: stevie48_vdpramfull.bin",
+   "overbudget": []
+  },
+  "dump-stevie60": {
+   "budget_us": 31.8,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 60,
+    "spr16": false,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 4,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "captured from real software: stevie60_vdpramfull.bin",
+   "overbudget": []
+  },
+  "gm1-bml-fat": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": true,
+    "bmlpri": true,
+    "bmltrns": true,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "priority bitmap layer, transparent and fat pixels",
+   "overbudget": []
+  },
+  "gm1-bml-full": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "full-width opaque priority bitmap - the tile pass is skipped",
+   "overbudget": []
+  },
+  "gm1-bml-pri": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "priority bitmap layer - over layer 1, under layer 2, under sprites",
+   "overbudget": []
+  },
+  "gm1-bml-under": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "bitmap layer below the tiles",
+   "overbudget": []
+  },
+  "gm1-coarse": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "coarse scroll to cell 20, single name page",
+   "overbudget": []
+  },
+  "gm1-coarse-hpage": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "2x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "coarse scroll past the end with the horizontal page swap on",
+   "overbudget": []
+  },
+  "gm1-ecm0": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "one tile layer, the ECM0 emitter",
+   "overbudget": []
+  },
+  "gm1-ecm1": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 1,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "one tile layer, two bitplanes",
+   "overbudget": []
+  },
+  "gm1-ecm2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 2,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "one tile layer, three bitplanes",
+   "overbudget": []
+  },
+  "gm1-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "one tile layer, four bitplanes",
+   "overbudget": []
+  },
+  "gm1-hscroll-3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "layer 1 fine scroll 3",
+   "overbudget": []
+  },
+  "gm1-hscroll-7": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "layer 1 fine scroll 7 - a whole cell bar one pixel",
+   "overbudget": []
+  },
+  "gm1-hscroll-split": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "layers scrolled by different amounts - tmsCopyAlignMask",
+   "overbudget": []
+  },
+  "gm1-layers-off": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": false,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both tile layers disabled - only the backdrop may remain",
+   "overbudget": []
+  },
+  "gm1-locked": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": true,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "plain TMS9918 Graphics I - renderTileRowLocked, no F18A anything",
+   "overbudget": []
+  },
+  "gm1-palette": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 3,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 3,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 3,
+    "t2scroll": ""
+   },
+   "note": "palette select for layer 1, layer 2 and sprites at once",
+   "overbudget": []
+  },
+  "gm1-posattr": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 1,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "attributes by position rather than by name, ECM1",
+   "overbudget": []
+  },
+  "gm1-posattr-pages": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 1,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "position attributes read from a name table whose base already carries the page bits. They are added to the colour table base, so the attributes are 0xC00 along from it - and a differently coloured table sits where forcing the bits instead of adding them would read. Real software puts its name table there; nothing else here does",
+   "overbudget": []
+  },
+  "gm1-priority": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 2,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "ECM2 priority tiles over sprites - attribute bit 7",
+   "overbudget": []
+  },
+  "gm1-priority-scroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 2,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 6,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "priority tiles over sprites with both layers finely scrolled by different amounts. A scrolled row starts its first tile left of the screen, and the sprite mask a priority tile clears is in screen pixels - so that tile is the one case the two disagree on",
+   "overbudget": []
+  },
+  "gm1-scroll-both": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "XY"
+   },
+   "note": "both layers scrolled in both axes, all four registers different - the case where a scroll taken from the wrong layer or the wrong axis has nowhere to hide",
+   "overbudget": []
+  },
+  "gm1-scroll-cross": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "Y"
+   },
+   "note": "layer 1 across, layer 2 down - the two layers on different axes, which no scene reached and one real dump does",
+   "overbudget": []
+  },
+  "gm1-scroll-cross-back": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "Y",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "layer 1 down, layer 2 across - the other way round, because the two layers take their scroll from different registers and a shared address generator",
+   "overbudget": []
+  },
+  "gm1-sprites": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "sprites over both tile layers, ECM0",
+   "overbudget": []
+  },
+  "gm1-sprites-ecm1": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 1,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "32 ECM1 sprites, one bit plane - the emitter's cheapest index",
+   "overbudget": []
+  },
+  "gm1-sprites-ecm2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 2,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "32 ECM2 sprites, two bit planes",
+   "overbudget": []
+  },
+  "gm1-sprites-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 3,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "32 ECM3 sprites, three bit planes - 2048 quads a frame, which is the densest the 32-sprite limit allows",
+   "overbudget": []
+  },
+  "gm1-sprites-ecm3-mag": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 3,
+    "sprites": 16,
+    "sprmag": true,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "16 magnified ECM3 sprites, which is the other ECM emit loop: four pixels into an aligned buffer, then doubled out under the collision mask. Sixteen because a magnified sprite covers 32 scanlines, so this is the same 2048 quads - and 32 of them do not fit at 252 MHz",
+   "overbudget": []
+  },
+  "gm1-t1-off": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": false,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "layer 1 disabled with layer 2 on - D4's second case",
+   "overbudget": []
+  },
+  "gm1-t2-ecm0": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both tile layers, ECM0 - the selection mask and the composite",
+   "overbudget": []
+  },
+  "gm1-t2-ecm1": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 1,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both tile layers, ECM1",
+   "overbudget": []
+  },
+  "gm1-t2-ecm2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 2,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both tile layers, ECM2",
+   "overbudget": []
+  },
+  "gm1-t2-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both tile layers, ECM3",
+   "overbudget": []
+  },
+  "gm1-t2-hscroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "layer 2 scrolled across and layer 1 not - the only arrangement where the second layer's own scroll is what places it, with nothing on the first to move with it",
+   "overbudget": []
+  },
+  "gm1-t2-vscroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "Y"
+   },
+   "note": "layer 2 scrolled down and layer 1 not",
+   "overbudget": []
+  },
+  "gm1-t2-vscroll-page": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x2",
+    "t1ps": 0,
+    "t1scroll": "Y",
+    "t2": true,
+    "t2pages": "1x2",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "Y"
+   },
+   "note": "both layers scrolled vertically into their other pages",
+   "overbudget": []
+  },
+  "gm1-vscroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "Y",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "layer 1 vertical scroll 100, no page swap",
+   "overbudget": []
+  },
+  "gm1-vscroll-page": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM1",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x2",
+    "t1ps": 0,
+    "t1scroll": "Y",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "vertical scroll wrapping into the other name page",
+   "overbudget": []
+  },
+  "gm2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Graphics II, three pattern and colour pages, full name mask",
+   "overbudget": []
+  },
+  "gm2-bml-pri": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "a priority bitmap layer in Graphics II - under the tiles it outranks, over layer 1, under sprites",
+   "overbudget": []
+  },
+  "gm2-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Graphics II at ECM3 - ECM composes with the mode through the plane 1 address alone, so the thirds become per-third colour sets (plan 2.8)",
+   "overbudget": []
+  },
+  "gm2-locked": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": true,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Graphics II locked - same path, no F18A palette",
+   "overbudget": []
+  },
+  "gm2-namemask": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "R3 low bits masking the name to 0-63, colour page fixed",
+   "overbudget": []
+  },
+  "gm2-nosplit": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "R4 page bits clear, so all three thirds read page 0",
+   "overbudget": []
+  },
+  "gm2-palette": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 3,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "R0x18 palette select, which GM2 applies to non-zero colours only",
+   "overbudget": []
+  },
+  "gm2-posattr": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "position attributes have no effect in an ECM0 graphics mode: they move the attribute address, which only ECM1-3 reads",
+   "overbudget": []
+  },
+  "gm2-scroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Graphics II with both scrolls - the pattern third follows the scrolled row",
+   "overbudget": []
+  },
+  "gm2-sprites": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "sprites over Graphics II",
+   "overbudget": []
+  },
+  "gm2-t2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "GM2",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Graphics II with tile layer 2 - both layers share the colour table, because the GM2 colour base is a single register bit",
+   "overbudget": []
+  },
+  "mcm": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "MCM",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Multicolor - the pattern byte is the colour pair",
+   "overbudget": []
+  },
+  "mcm-bml-pri": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "MCM",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Multicolor with a priority bitmap layer",
+   "overbudget": []
+  },
+  "mcm-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "MCM",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Multicolor at ECM3, which is not multicolour at all: the faked pattern is ECM0-only, so only the plane 1 address survives (plan 2.8)",
+   "overbudget": []
+  },
+  "mcm-locked": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": true,
+    "mode": "MCM",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Multicolor locked",
+   "overbudget": []
+  },
+  "mcm-scroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "MCM",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Multicolor with both scrolls - the vertical one moves which tiles are fetched but not which four-line block of each is shown (plan 2.5)",
+   "overbudget": []
+  },
+  "mcm-sprites": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "MCM",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "sprites over Multicolor",
+   "overbudget": []
+  },
+  "mcm-t2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "MCM",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "Multicolor with tile layer 2",
+   "overbudget": []
+  },
+  "t40": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40-column text, six pixels a cell, one colour pair",
+   "overbudget": []
+  },
+  "t40-48rows": {
+   "budget_us": 31.8,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 48,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40 columns by 48 rows - R0 bit 3 renders every VGA line instead of doubling it, so the same 24 rows of cells become 48 and the renderer has half a line's time to make each one",
+   "overbudget": []
+  },
+  "t40-48rows-sprites": {
+   "budget_us": 31.8,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 48,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "sprites over 48-row text. The sprite grid does not double with the rows - the library halves y before it plans a sprite - so each sprite covers two rendered lines and its own y is still 0-191. What the sprites add is what the diagnostic overlay then pushes over",
+   "overbudget": []
+  },
+  "t40-60rows": {
+   "budget_us": 31.8,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 60,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40 columns by 60 rows - 30 rows doubled, 480 rendered lines, the tallest frame this firmware produces. Its worst row clears a 31.8 us line by under a microsecond, so the six-pixel cell being the expensive text emitter still shows here more than anywhere: the diagnostic overlay puts it back over",
+   "overbudget": []
+  },
+  "t40-bml-pri": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "a priority bitmap layer in 40-column text, arbitrated by the same composite the graphics modes use",
+   "overbudget": []
+  },
+  "t40-bml-under": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "a bitmap layer below 40-column text, with the first three cells of every row at colour zero. A cell whose colour byte is zero draws no pixel at all at all, so the layer under it must show - and a *leading* run of them is the one place that used to paint the backdrop instead (D8)",
+   "overbudget": []
+  },
+  "t40-ecm1": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 1,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40-column text at ECM1: two bitplanes, and the sub-palette from the attribute byte instead of a colour pair. The attribute is indexed by name, which is the form position attributes are off",
+   "overbudget": []
+  },
+  "t40-ecm2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 2,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40-column text at ECM2 - three bitplanes",
+   "overbudget": []
+  },
+  "t40-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40-column text at ECM3 - four bitplanes, and the bottom band's punctuation carries every combination of priority, flipX, flipY and transparent",
+   "overbudget": []
+  },
+  "t40-ecm3-posattr": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "ECM3 text with position attributes, so the attribute walks with the cell and its address takes the row offset that a by-name one must not",
+   "overbudget": []
+  },
+  "t40-ecm3-scroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "ECM3 text scrolled both ways: the row runs two cells long and the priority clear has to reach the sprite mask in screen pixels, not buffer ones",
+   "overbudget": []
+  },
+  "t40-ecm3-sprites": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "sprites under ECM3 text, where the attribute's priority bit decides per cell which is on top",
+   "overbudget": []
+  },
+  "t40-hscroll-past-row": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "text scrolled further than a row is wide, which the F18A does not wrap. Its column counter is seeded with hscroll/6 and wraps on reaching the last column, so a start cell of 40 never meets 39 and the row reads on into the next one: the layer comes out a character row high. Layer 1 at 240 lands on the boundary exactly, layer 2 at 250 a row and four pixels past it",
+   "overbudget": []
+  },
+  "t40-hscroll-split": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "both text layers scrolled horizontally by different amounts - tmsCopyAlignMask over a six-pixel cell",
+   "overbudget": []
+  },
+  "t40-locked": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": true,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40-column text locked - no sprites at all",
+   "overbudget": []
+  },
+  "t40-palette": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 3,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 2,
+    "t2scroll": ""
+   },
+   "note": "both 40-column text layers on their own sub-palettes. Text takes the tile palette select like every other mode: an ECM0 pixel is PIX, PRI, then `tileps_s & pix_colr_s`, and the backdrop is built the same way from layer 1's selector",
+   "overbudget": []
+  },
+  "t40-posattr": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40-column text with a colour byte per cell - the 6-pixel 8bpp emitter",
+   "overbudget": []
+  },
+  "t40-scroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "XY",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "40-column text with both scroll registers set. 163 pixels is cell 27 plus one, so the row wraps to its own first cell partway across",
+   "overbudget": []
+  },
+  "t40-scroll-cross": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "Y"
+   },
+   "note": "40-column text with layer 1 across and layer 2 down - the six-pixel cell has its own scroll arithmetic and its own emitter",
+   "overbudget": []
+  },
+  "t40-sprites": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "sprites over 40-column text, which only the F18A allows",
+   "overbudget": []
+  },
+  "t40-t2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both 40-column text layers, layer 2 blended in as it is emitted - the same shape 80 columns uses, and for the same reason",
+   "overbudget": []
+  },
+  "t40-t2-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "T40",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both 40-column text layers at ECM3 - the coverage mask six pixels at a time, from the plane mask rather than the colour byte",
+   "overbudget": []
+  },
+  "t80": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80-column text, two colours from R7",
+   "overbudget": []
+  },
+  "t80-30rows": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 30,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80 columns by 30 rows - 240 scanlines, not 192",
+   "overbudget": []
+  },
+  "t80-48rows": {
+   "budget_us": 31.8,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 48,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80 columns by 48 rows - 3840 cells, twice the rows at the narrowest cell",
+   "overbudget": []
+  },
+  "t80-60rows": {
+   "budget_us": 31.8,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 60,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 32,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80 columns by 60 rows - 4800 cells over 480 rendered lines, which is every pixel this board can address and the heaviest frame in the library. Its colour table does not fit under NAME2, so it takes that space",
+   "overbudget": []
+  },
+  "t80-bml-pri": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": true,
+    "bmlfat": false,
+    "bmlpri": true,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80-column text with a priority bitmap layer",
+   "overbudget": []
+  },
+  "t80-ecm3": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 3,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80-column text with ECM3 selected",
+   "overbudget": []
+  },
+  "t80-hscroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "both 80-column layers scrolled horizontally by different amounts. The offset inside the first cell is only ever 0, 2 or 4 pixels (plan 2.4), so the emitter backs up whole cells and keeps its three-word store",
+   "overbudget": []
+  },
+  "t80-hscroll-past-row": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "X"
+   },
+   "note": "the same overrun at 80 columns, and at the same register value. Worth its own scene because it is not the same code: without the 8bpp tier a TEXT80 line falls past the branch the 40-column one takes and is emitted packed two pixels to a byte, so a change to either emitter moves one of these two and not the other",
+   "overbudget": []
+  },
+  "t80-hscroll-plain": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": false,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80-column text scrolled with the two colours from R7 - three byte stores a cell, so the wrap is a second run rather than a test",
+   "overbudget": []
+  },
+  "t80-posattr": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80-column text with a colour byte per cell",
+   "overbudget": []
+  },
+  "t80-scroll-cross": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "X",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "Y"
+   },
+   "note": "80-column text with layer 1 across and layer 2 down",
+   "overbudget": []
+  },
+  "t80-sprites": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 8,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "sprites over 80-column text, on their own 256-pixel grid",
+   "overbudget": []
+  },
+  "t80-t2": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "both text layers, layer 2 blended inside the layer 2 pass",
+   "overbudget": []
+  },
+  "t80-t2-sparse": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "layer 2 mostly empty, so the four-cell transparent skip fires",
+   "overbudget": []
+  },
+  "t80-tiles-off": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": false,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "layer 1 disabled in 80-column text",
+   "overbudget": []
+  },
+  "t80-vscroll": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x1",
+    "t1ps": 0,
+    "t1scroll": "Y",
+    "t2": true,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": "Y"
+   },
+   "note": "both text layers scrolled vertically by different amounts",
+   "overbudget": []
+  },
+  "t80-vscroll-page": {
+   "budget_us": 63.6,
+   "features": {
+    "bml": false,
+    "bmlfat": false,
+    "bmlpri": false,
+    "bmltrns": false,
+    "ecm": 0,
+    "gpu": false,
+    "locked": false,
+    "mode": "T80",
+    "posattr": true,
+    "rows": 24,
+    "spr16": true,
+    "sprecm": 0,
+    "sprites": 0,
+    "sprmag": false,
+    "sprmax": 31,
+    "sprps": 0,
+    "t1": true,
+    "t1pages": "1x2",
+    "t1ps": 0,
+    "t1scroll": "Y",
+    "t2": false,
+    "t2pages": "1x1",
+    "t2pri": false,
+    "t2ps": 0,
+    "t2scroll": ""
+   },
+   "note": "80-column text scrolling past its last row with the vertical page size bit set, which does nothing: a text row's name address is a row count times a column count and the page bit is never part of it in either direction",
+   "overbudget": []
+  }
+ },
+ "schema": 2
+}

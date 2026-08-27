@@ -1,0 +1,1036 @@
+200048e4 <vrEmuTmsDiagUpdate>:
+200048e4:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+200048e6:	4645      	mov	r5, r8
+200048e8:	46de      	mov	lr, fp
+200048ea:	4657      	mov	r7, sl
+200048ec:	464e      	mov	r6, r9
+200048ee:	b5e0      	push	{r5, r6, r7, lr}
+200048f0:	4b91      	ldr	r3, [pc, #580]	@ (20004b38 <vrEmuTmsDiagUpdate+0x254>)
+200048f2:	4d92      	ldr	r5, [pc, #584]	@ (20004b3c <vrEmuTmsDiagUpdate+0x258>)
+200048f4:	6018      	str	r0, [r3, #0]
+200048f6:	4a92      	ldr	r2, [pc, #584]	@ (20004b40 <vrEmuTmsDiagUpdate+0x25c>)
+200048f8:	682b      	ldr	r3, [r5, #0]
+200048fa:	5c9a      	ldrb	r2, [r3, r2]
+200048fc:	2a00      	cmp	r2, #0
+200048fe:	d00a      	beq.n	20004916 <vrEmuTmsDiagUpdate+0x32>
+20004900:	2203      	movs	r2, #3
+20004902:	0014      	movs	r4, r2
+20004904:	4004      	ands	r4, r0
+20004906:	4202      	tst	r2, r0
+20004908:	d100      	bne.n	2000490c <vrEmuTmsDiagUpdate+0x28>
+2000490a:	e13d      	b.n	20004b88 <vrEmuTmsDiagUpdate+0x2a4>
+2000490c:	0016      	movs	r6, r2
+2000490e:	3001      	adds	r0, #1
+20004910:	4006      	ands	r6, r0
+20004912:	4202      	tst	r2, r0
+20004914:	d00f      	beq.n	20004936 <vrEmuTmsDiagUpdate+0x52>
+20004916:	4a8b      	ldr	r2, [pc, #556]	@ (20004b44 <vrEmuTmsDiagUpdate+0x260>)
+20004918:	5c9a      	ldrb	r2, [r3, r2]
+2000491a:	2a00      	cmp	r2, #0
+2000491c:	d005      	beq.n	2000492a <vrEmuTmsDiagUpdate+0x46>
+2000491e:	2203      	movs	r2, #3
+20004920:	0011      	movs	r1, r2
+20004922:	3001      	adds	r0, #1
+20004924:	4001      	ands	r1, r0
+20004926:	4202      	tst	r2, r0
+20004928:	d03e      	beq.n	200049a8 <vrEmuTmsDiagUpdate+0xc4>
+2000492a:	bcf0      	pop	{r4, r5, r6, r7}
+2000492c:	46bb      	mov	fp, r7
+2000492e:	46b2      	mov	sl, r6
+20004930:	46a9      	mov	r9, r5
+20004932:	46a0      	mov	r8, r4
+20004934:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+20004936:	4b84      	ldr	r3, [pc, #528]	@ (20004b48 <vrEmuTmsDiagUpdate+0x264>)
+20004938:	6818      	ldr	r0, [r3, #0]
+2000493a:	f7fd fe37 	bl	200025ac <__wrap___aeabi_i2f>
+2000493e:	1c01      	adds	r1, r0, #0
+20004940:	2083      	movs	r0, #131	@ 0x83
+20004942:	05c0      	lsls	r0, r0, #23
+20004944:	f7fd fdd9 	bl	200024fa <__wrap___aeabi_fsub>
+20004948:	21f6      	movs	r1, #246	@ 0xf6
+2000494a:	4b80      	ldr	r3, [pc, #512]	@ (20004b4c <vrEmuTmsDiagUpdate+0x268>)
+2000494c:	1c04      	adds	r4, r0, #0
+2000494e:	0589      	lsls	r1, r1, #22
+20004950:	6818      	ldr	r0, [r3, #0]
+20004952:	f7fd fdec 	bl	2000252e <__wrap___aeabi_fmul>
+20004956:	1c01      	adds	r1, r0, #0
+20004958:	1c20      	adds	r0, r4, #0
+2000495a:	f7fd fde8 	bl	2000252e <__wrap___aeabi_fmul>
+2000495e:	497c      	ldr	r1, [pc, #496]	@ (20004b50 <vrEmuTmsDiagUpdate+0x26c>)
+20004960:	f7fd fde5 	bl	2000252e <__wrap___aeabi_fmul>
+20004964:	21fc      	movs	r1, #252	@ 0xfc
+20004966:	0589      	lsls	r1, r1, #22
+20004968:	f7fd fdca 	bl	20002500 <__wrap___aeabi_fadd>
+2000496c:	f7fd fe72 	bl	20002654 <__wrap___aeabi_f2uiz>
+20004970:	4c78      	ldr	r4, [pc, #480]	@ (20004b54 <vrEmuTmsDiagUpdate+0x270>)
+20004972:	210a      	movs	r1, #10
+20004974:	72e6      	strb	r6, [r4, #11]
+20004976:	0005      	movs	r5, r0
+20004978:	f7fd fd14 	bl	200023a4 <__wrap___aeabi_uidiv>
+2000497c:	3130      	adds	r1, #48	@ 0x30
+2000497e:	72a1      	strb	r1, [r4, #10]
+20004980:	0028      	movs	r0, r5
+20004982:	210a      	movs	r1, #10
+20004984:	f7fd fd0e 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004988:	210a      	movs	r1, #10
+2000498a:	0006      	movs	r6, r0
+2000498c:	f7fd fd0a 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004990:	232e      	movs	r3, #46	@ 0x2e
+20004992:	3130      	adds	r1, #48	@ 0x30
+20004994:	7261      	strb	r1, [r4, #9]
+20004996:	7223      	strb	r3, [r4, #8]
+20004998:	2d63      	cmp	r5, #99	@ 0x63
+2000499a:	d900      	bls.n	2000499e <vrEmuTmsDiagUpdate+0xba>
+2000499c:	e313      	b.n	20004fc6 <vrEmuTmsDiagUpdate+0x6e2>
+2000499e:	3b27      	subs	r3, #39	@ 0x27
+200049a0:	60e3      	str	r3, [r4, #12]
+200049a2:	3329      	adds	r3, #41	@ 0x29
+200049a4:	71e3      	strb	r3, [r4, #7]
+200049a6:	e7c0      	b.n	2000492a <vrEmuTmsDiagUpdate+0x46>
+200049a8:	4a6b      	ldr	r2, [pc, #428]	@ (20004b58 <vrEmuTmsDiagUpdate+0x274>)
+200049aa:	20f0      	movs	r0, #240	@ 0xf0
+200049ac:	5c9a      	ldrb	r2, [r3, r2]
+200049ae:	4c6b      	ldr	r4, [pc, #428]	@ (20004b5c <vrEmuTmsDiagUpdate+0x278>)
+200049b0:	0292      	lsls	r2, r2, #10
+200049b2:	0013      	movs	r3, r2
+200049b4:	0180      	lsls	r0, r0, #6
+200049b6:	0026      	movs	r6, r4
+200049b8:	4003      	ands	r3, r0
+200049ba:	72e1      	strb	r1, [r4, #11]
+200049bc:	4202      	tst	r2, r0
+200049be:	d100      	bne.n	200049c2 <vrEmuTmsDiagUpdate+0xde>
+200049c0:	e39d      	b.n	200050fe <vrEmuTmsDiagUpdate+0x81a>
+200049c2:	2230      	movs	r2, #48	@ 0x30
+200049c4:	0a19      	lsrs	r1, r3, #8
+200049c6:	72a2      	strb	r2, [r4, #10]
+200049c8:	7262      	strb	r2, [r4, #9]
+200049ca:	3a21      	subs	r2, #33	@ 0x21
+200049cc:	400a      	ands	r2, r1
+200049ce:	0b1b      	lsrs	r3, r3, #12
+200049d0:	2a09      	cmp	r2, #9
+200049d2:	d800      	bhi.n	200049d6 <vrEmuTmsDiagUpdate+0xf2>
+200049d4:	e266      	b.n	20004ea4 <vrEmuTmsDiagUpdate+0x5c0>
+200049d6:	3237      	adds	r2, #55	@ 0x37
+200049d8:	7222      	strb	r2, [r4, #8]
+200049da:	2b00      	cmp	r3, #0
+200049dc:	d100      	bne.n	200049e0 <vrEmuTmsDiagUpdate+0xfc>
+200049de:	e266      	b.n	20004eae <vrEmuTmsDiagUpdate+0x5ca>
+200049e0:	2407      	movs	r4, #7
+200049e2:	3330      	adds	r3, #48	@ 0x30
+200049e4:	71f3      	strb	r3, [r6, #7]
+200049e6:	60f4      	str	r4, [r6, #12]
+200049e8:	f007 fd54 	bl	2000c494 <vrEmuTms9918DisplayMode>
+200049ec:	682a      	ldr	r2, [r5, #0]
+200049ee:	4b5c      	ldr	r3, [pc, #368]	@ (20004b60 <vrEmuTmsDiagUpdate+0x27c>)
+200049f0:	2801      	cmp	r0, #1
+200049f2:	d100      	bne.n	200049f6 <vrEmuTmsDiagUpdate+0x112>
+200049f4:	e363      	b.n	200050be <vrEmuTmsDiagUpdate+0x7da>
+200049f6:	2100      	movs	r1, #0
+200049f8:	5cd2      	ldrb	r2, [r2, r3]
+200049fa:	485a      	ldr	r0, [pc, #360]	@ (20004b64 <vrEmuTmsDiagUpdate+0x280>)
+200049fc:	0193      	lsls	r3, r2, #6
+200049fe:	0006      	movs	r6, r0
+20004a00:	72c1      	strb	r1, [r0, #11]
+20004a02:	2a00      	cmp	r2, #0
+20004a04:	d101      	bne.n	20004a0a <vrEmuTmsDiagUpdate+0x126>
+20004a06:	f000 fc04 	bl	20005212 <vrEmuTmsDiagUpdate+0x92e>
+20004a0a:	2230      	movs	r2, #48	@ 0x30
+20004a0c:	0919      	lsrs	r1, r3, #4
+20004a0e:	7282      	strb	r2, [r0, #10]
+20004a10:	3a21      	subs	r2, #33	@ 0x21
+20004a12:	400a      	ands	r2, r1
+20004a14:	0a19      	lsrs	r1, r3, #8
+20004a16:	2a09      	cmp	r2, #9
+20004a18:	d800      	bhi.n	20004a1c <vrEmuTmsDiagUpdate+0x138>
+20004a1a:	e36e      	b.n	200050fa <vrEmuTmsDiagUpdate+0x816>
+20004a1c:	3237      	adds	r2, #55	@ 0x37
+20004a1e:	7272      	strb	r2, [r6, #9]
+20004a20:	2900      	cmp	r1, #0
+20004a22:	d100      	bne.n	20004a26 <vrEmuTmsDiagUpdate+0x142>
+20004a24:	e3c4      	b.n	200051b0 <vrEmuTmsDiagUpdate+0x8cc>
+20004a26:	220f      	movs	r2, #15
+20004a28:	0b1b      	lsrs	r3, r3, #12
+20004a2a:	400a      	ands	r2, r1
+20004a2c:	2a09      	cmp	r2, #9
+20004a2e:	d800      	bhi.n	20004a32 <vrEmuTmsDiagUpdate+0x14e>
+20004a30:	e353      	b.n	200050da <vrEmuTmsDiagUpdate+0x7f6>
+20004a32:	3237      	adds	r2, #55	@ 0x37
+20004a34:	7232      	strb	r2, [r6, #8]
+20004a36:	2b00      	cmp	r3, #0
+20004a38:	d100      	bne.n	20004a3c <vrEmuTmsDiagUpdate+0x158>
+20004a3a:	e353      	b.n	200050e4 <vrEmuTmsDiagUpdate+0x800>
+20004a3c:	2407      	movs	r4, #7
+20004a3e:	3330      	adds	r3, #48	@ 0x30
+20004a40:	71f3      	strb	r3, [r6, #7]
+20004a42:	60f4      	str	r4, [r6, #12]
+20004a44:	f007 fd26 	bl	2000c494 <vrEmuTms9918DisplayMode>
+20004a48:	1e43      	subs	r3, r0, #1
+20004a4a:	1e5a      	subs	r2, r3, #1
+20004a4c:	4193      	sbcs	r3, r2
+20004a4e:	2203      	movs	r2, #3
+20004a50:	425b      	negs	r3, r3
+20004a52:	6829      	ldr	r1, [r5, #0]
+20004a54:	4013      	ands	r3, r2
+20004a56:	4a44      	ldr	r2, [pc, #272]	@ (20004b68 <vrEmuTmsDiagUpdate+0x284>)
+20004a58:	000e      	movs	r6, r1
+20004a5a:	5c8a      	ldrb	r2, [r1, r2]
+20004a5c:	2100      	movs	r1, #0
+20004a5e:	4d43      	ldr	r5, [pc, #268]	@ (20004b6c <vrEmuTmsDiagUpdate+0x288>)
+20004a60:	3304      	adds	r3, #4
+20004a62:	4013      	ands	r3, r2
+20004a64:	02da      	lsls	r2, r3, #11
+20004a66:	72e9      	strb	r1, [r5, #11]
+20004a68:	2b00      	cmp	r3, #0
+20004a6a:	d100      	bne.n	20004a6e <vrEmuTmsDiagUpdate+0x18a>
+20004a6c:	e34a      	b.n	20005104 <vrEmuTmsDiagUpdate+0x820>
+20004a6e:	2330      	movs	r3, #48	@ 0x30
+20004a70:	0b11      	lsrs	r1, r2, #12
+20004a72:	72ab      	strb	r3, [r5, #10]
+20004a74:	726b      	strb	r3, [r5, #9]
+20004a76:	0a12      	lsrs	r2, r2, #8
+20004a78:	3b21      	subs	r3, #33	@ 0x21
+20004a7a:	4013      	ands	r3, r2
+20004a7c:	3330      	adds	r3, #48	@ 0x30
+20004a7e:	722b      	strb	r3, [r5, #8]
+20004a80:	2900      	cmp	r1, #0
+20004a82:	d100      	bne.n	20004a86 <vrEmuTmsDiagUpdate+0x1a2>
+20004a84:	e358      	b.n	20005138 <vrEmuTmsDiagUpdate+0x854>
+20004a86:	2407      	movs	r4, #7
+20004a88:	3130      	adds	r1, #48	@ 0x30
+20004a8a:	71e9      	strb	r1, [r5, #7]
+20004a8c:	4b38      	ldr	r3, [pc, #224]	@ (20004b70 <vrEmuTmsDiagUpdate+0x28c>)
+20004a8e:	60ec      	str	r4, [r5, #12]
+20004a90:	5cf2      	ldrb	r2, [r6, r3]
+20004a92:	21fe      	movs	r1, #254	@ 0xfe
+20004a94:	01d2      	lsls	r2, r2, #7
+20004a96:	0013      	movs	r3, r2
+20004a98:	2000      	movs	r0, #0
+20004a9a:	4d36      	ldr	r5, [pc, #216]	@ (20004b74 <vrEmuTmsDiagUpdate+0x290>)
+20004a9c:	0189      	lsls	r1, r1, #6
+20004a9e:	400b      	ands	r3, r1
+20004aa0:	72e8      	strb	r0, [r5, #11]
+20004aa2:	420a      	tst	r2, r1
+20004aa4:	d100      	bne.n	20004aa8 <vrEmuTmsDiagUpdate+0x1c4>
+20004aa6:	e337      	b.n	20005118 <vrEmuTmsDiagUpdate+0x834>
+20004aa8:	2230      	movs	r2, #48	@ 0x30
+20004aaa:	0919      	lsrs	r1, r3, #4
+20004aac:	72aa      	strb	r2, [r5, #10]
+20004aae:	3a21      	subs	r2, #33	@ 0x21
+20004ab0:	4011      	ands	r1, r2
+20004ab2:	3130      	adds	r1, #48	@ 0x30
+20004ab4:	0a18      	lsrs	r0, r3, #8
+20004ab6:	7269      	strb	r1, [r5, #9]
+20004ab8:	d100      	bne.n	20004abc <vrEmuTmsDiagUpdate+0x1d8>
+20004aba:	e33a      	b.n	20005132 <vrEmuTmsDiagUpdate+0x84e>
+20004abc:	4002      	ands	r2, r0
+20004abe:	0b1b      	lsrs	r3, r3, #12
+20004ac0:	2a09      	cmp	r2, #9
+20004ac2:	d800      	bhi.n	20004ac6 <vrEmuTmsDiagUpdate+0x1e2>
+20004ac4:	e2eb      	b.n	2000509e <vrEmuTmsDiagUpdate+0x7ba>
+20004ac6:	3237      	adds	r2, #55	@ 0x37
+20004ac8:	722a      	strb	r2, [r5, #8]
+20004aca:	2b00      	cmp	r3, #0
+20004acc:	d100      	bne.n	20004ad0 <vrEmuTmsDiagUpdate+0x1ec>
+20004ace:	e2eb      	b.n	200050a8 <vrEmuTmsDiagUpdate+0x7c4>
+20004ad0:	2407      	movs	r4, #7
+20004ad2:	3330      	adds	r3, #48	@ 0x30
+20004ad4:	71eb      	strb	r3, [r5, #7]
+20004ad6:	4b28      	ldr	r3, [pc, #160]	@ (20004b78 <vrEmuTmsDiagUpdate+0x294>)
+20004ad8:	60ec      	str	r4, [r5, #12]
+20004ada:	5cf3      	ldrb	r3, [r6, r3]
+20004adc:	21e0      	movs	r1, #224	@ 0xe0
+20004ade:	02db      	lsls	r3, r3, #11
+20004ae0:	001a      	movs	r2, r3
+20004ae2:	2000      	movs	r0, #0
+20004ae4:	4d25      	ldr	r5, [pc, #148]	@ (20004b7c <vrEmuTmsDiagUpdate+0x298>)
+20004ae6:	0189      	lsls	r1, r1, #6
+20004ae8:	400a      	ands	r2, r1
+20004aea:	72e8      	strb	r0, [r5, #11]
+20004aec:	420b      	tst	r3, r1
+20004aee:	d100      	bne.n	20004af2 <vrEmuTmsDiagUpdate+0x20e>
+20004af0:	e315      	b.n	2000511e <vrEmuTmsDiagUpdate+0x83a>
+20004af2:	2330      	movs	r3, #48	@ 0x30
+20004af4:	0b11      	lsrs	r1, r2, #12
+20004af6:	72ab      	strb	r3, [r5, #10]
+20004af8:	726b      	strb	r3, [r5, #9]
+20004afa:	0a12      	lsrs	r2, r2, #8
+20004afc:	3b21      	subs	r3, #33	@ 0x21
+20004afe:	4013      	ands	r3, r2
+20004b00:	3330      	adds	r3, #48	@ 0x30
+20004b02:	722b      	strb	r3, [r5, #8]
+20004b04:	2900      	cmp	r1, #0
+20004b06:	d100      	bne.n	20004b0a <vrEmuTmsDiagUpdate+0x226>
+20004b08:	e319      	b.n	2000513e <vrEmuTmsDiagUpdate+0x85a>
+20004b0a:	2407      	movs	r4, #7
+20004b0c:	3130      	adds	r1, #48	@ 0x30
+20004b0e:	71e9      	strb	r1, [r5, #7]
+20004b10:	60ec      	str	r4, [r5, #12]
+20004b12:	f007 fcbf 	bl	2000c494 <vrEmuTms9918DisplayMode>
+20004b16:	4b1a      	ldr	r3, [pc, #104]	@ (20004b80 <vrEmuTmsDiagUpdate+0x29c>)
+20004b18:	0080      	lsls	r0, r0, #2
+20004b1a:	58c0      	ldr	r0, [r0, r3]
+20004b1c:	4a19      	ldr	r2, [pc, #100]	@ (20004b84 <vrEmuTmsDiagUpdate+0x2a0>)
+20004b1e:	7801      	ldrb	r1, [r0, #0]
+20004b20:	2900      	cmp	r1, #0
+20004b22:	d005      	beq.n	20004b30 <vrEmuTmsDiagUpdate+0x24c>
+20004b24:	7011      	strb	r1, [r2, #0]
+20004b26:	7841      	ldrb	r1, [r0, #1]
+20004b28:	3001      	adds	r0, #1
+20004b2a:	3201      	adds	r2, #1
+20004b2c:	2900      	cmp	r1, #0
+20004b2e:	d1f9      	bne.n	20004b24 <vrEmuTmsDiagUpdate+0x240>
+20004b30:	2300      	movs	r3, #0
+20004b32:	7013      	strb	r3, [r2, #0]
+20004b34:	e6f9      	b.n	2000492a <vrEmuTmsDiagUpdate+0x46>
+20004b36:	46c0      	nop			@ (mov r8, r8)
+20004b38:	2002741c 	.word	0x2002741c
+20004b3c:	2000d534 	.word	0x2000d534
+20004b40:	00010062 	.word	0x00010062
+20004b44:	00010064 	.word	0x00010064
+20004b48:	20028648 	.word	0x20028648
+20004b4c:	20027478 	.word	0x20027478
+20004b50:	42c80000 	.word	0x42c80000
+20004b54:	20026be8 	.word	0x20026be8
+20004b58:	0000602e 	.word	0x0000602e
+20004b5c:	20026c48 	.word	0x20026c48
+20004b60:	0000602f 	.word	0x0000602f
+20004b64:	20022a58 	.word	0x20022a58
+20004b68:	00006030 	.word	0x00006030
+20004b6c:	20026c68 	.word	0x20026c68
+20004b70:	00006031 	.word	0x00006031
+20004b74:	20026e98 	.word	0x20026e98
+20004b78:	00006032 	.word	0x00006032
+20004b7c:	20026ea8 	.word	0x20026ea8
+20004b80:	2000d578 	.word	0x2000d578
+20004b84:	20026c38 	.word	0x20026c38
+20004b88:	4bce      	ldr	r3, [pc, #824]	@ (20004ec4 <vrEmuTmsDiagUpdate+0x5e0>)
+20004b8a:	681e      	ldr	r6, [r3, #0]
+20004b8c:	4699      	mov	r9, r3
+20004b8e:	08b0      	lsrs	r0, r6, #2
+20004b90:	f7fd fd07 	bl	200025a2 <__wrap___aeabi_ui2f>
+20004b94:	49cc      	ldr	r1, [pc, #816]	@ (20004ec8 <vrEmuTmsDiagUpdate+0x5e4>)
+20004b96:	f7fd fcb6 	bl	20002506 <__wrap___aeabi_fdiv>
+20004b9a:	49cc      	ldr	r1, [pc, #816]	@ (20004ecc <vrEmuTmsDiagUpdate+0x5e8>)
+20004b9c:	f7ff fa2c 	bl	20003ff8 <flt2Str.constprop.2>
+20004ba0:	4bcb      	ldr	r3, [pc, #812]	@ (20004ed0 <vrEmuTmsDiagUpdate+0x5ec>)
+20004ba2:	469a      	mov	sl, r3
+20004ba4:	681b      	ldr	r3, [r3, #0]
+20004ba6:	0898      	lsrs	r0, r3, #2
+20004ba8:	4698      	mov	r8, r3
+20004baa:	f7fd fcfa 	bl	200025a2 <__wrap___aeabi_ui2f>
+20004bae:	49c6      	ldr	r1, [pc, #792]	@ (20004ec8 <vrEmuTmsDiagUpdate+0x5e4>)
+20004bb0:	f7fd fca9 	bl	20002506 <__wrap___aeabi_fdiv>
+20004bb4:	49c7      	ldr	r1, [pc, #796]	@ (20004ed4 <vrEmuTmsDiagUpdate+0x5f0>)
+20004bb6:	f7ff fa1f 	bl	20003ff8 <flt2Str.constprop.2>
+20004bba:	4bc7      	ldr	r3, [pc, #796]	@ (20004ed8 <vrEmuTmsDiagUpdate+0x5f4>)
+20004bbc:	4dc7      	ldr	r5, [pc, #796]	@ (20004edc <vrEmuTmsDiagUpdate+0x5f8>)
+20004bbe:	469b      	mov	fp, r3
+20004bc0:	681b      	ldr	r3, [r3, #0]
+20004bc2:	72ec      	strb	r4, [r5, #11]
+20004bc4:	001f      	movs	r7, r3
+20004bc6:	429e      	cmp	r6, r3
+20004bc8:	d200      	bcs.n	20004bcc <vrEmuTmsDiagUpdate+0x2e8>
+20004bca:	e166      	b.n	20004e9a <vrEmuTmsDiagUpdate+0x5b6>
+20004bcc:	0019      	movs	r1, r3
+20004bce:	0030      	movs	r0, r6
+20004bd0:	f7fd fbe8 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004bd4:	210a      	movs	r1, #10
+20004bd6:	0004      	movs	r4, r0
+20004bd8:	f7fd fbe4 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004bdc:	3130      	adds	r1, #48	@ 0x30
+20004bde:	72a9      	strb	r1, [r5, #10]
+20004be0:	2c09      	cmp	r4, #9
+20004be2:	d800      	bhi.n	20004be6 <vrEmuTmsDiagUpdate+0x302>
+20004be4:	e2ae      	b.n	20005144 <vrEmuTmsDiagUpdate+0x860>
+20004be6:	210a      	movs	r1, #10
+20004be8:	0020      	movs	r0, r4
+20004bea:	f7fd fbdb 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004bee:	210a      	movs	r1, #10
+20004bf0:	0006      	movs	r6, r0
+20004bf2:	f7fd fbd7 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004bf6:	3130      	adds	r1, #48	@ 0x30
+20004bf8:	7269      	strb	r1, [r5, #9]
+20004bfa:	2c63      	cmp	r4, #99	@ 0x63
+20004bfc:	d800      	bhi.n	20004c00 <vrEmuTmsDiagUpdate+0x31c>
+20004bfe:	e2aa      	b.n	20005156 <vrEmuTmsDiagUpdate+0x872>
+20004c00:	210a      	movs	r1, #10
+20004c02:	0030      	movs	r0, r6
+20004c04:	f7fd fbce 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c08:	210a      	movs	r1, #10
+20004c0a:	0006      	movs	r6, r0
+20004c0c:	f7fd fbca 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c10:	23fa      	movs	r3, #250	@ 0xfa
+20004c12:	3130      	adds	r1, #48	@ 0x30
+20004c14:	7229      	strb	r1, [r5, #8]
+20004c16:	009b      	lsls	r3, r3, #2
+20004c18:	429c      	cmp	r4, r3
+20004c1a:	d200      	bcs.n	20004c1e <vrEmuTmsDiagUpdate+0x33a>
+20004c1c:	e2a1      	b.n	20005162 <vrEmuTmsDiagUpdate+0x87e>
+20004c1e:	210a      	movs	r1, #10
+20004c20:	0030      	movs	r0, r6
+20004c22:	f7fd fbbf 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c26:	210a      	movs	r1, #10
+20004c28:	0006      	movs	r6, r0
+20004c2a:	f7fd fbbb 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c2e:	4bac      	ldr	r3, [pc, #688]	@ (20004ee0 <vrEmuTmsDiagUpdate+0x5fc>)
+20004c30:	3130      	adds	r1, #48	@ 0x30
+20004c32:	71e9      	strb	r1, [r5, #7]
+20004c34:	429c      	cmp	r4, r3
+20004c36:	d800      	bhi.n	20004c3a <vrEmuTmsDiagUpdate+0x356>
+20004c38:	e296      	b.n	20005168 <vrEmuTmsDiagUpdate+0x884>
+20004c3a:	210a      	movs	r1, #10
+20004c3c:	0030      	movs	r0, r6
+20004c3e:	f7fd fbb1 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c42:	210a      	movs	r1, #10
+20004c44:	0006      	movs	r6, r0
+20004c46:	f7fd fbad 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c4a:	4ba6      	ldr	r3, [pc, #664]	@ (20004ee4 <vrEmuTmsDiagUpdate+0x600>)
+20004c4c:	3130      	adds	r1, #48	@ 0x30
+20004c4e:	71a9      	strb	r1, [r5, #6]
+20004c50:	429c      	cmp	r4, r3
+20004c52:	d800      	bhi.n	20004c56 <vrEmuTmsDiagUpdate+0x372>
+20004c54:	e291      	b.n	2000517a <vrEmuTmsDiagUpdate+0x896>
+20004c56:	210a      	movs	r1, #10
+20004c58:	0030      	movs	r0, r6
+20004c5a:	f7fd fba3 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c5e:	210a      	movs	r1, #10
+20004c60:	0006      	movs	r6, r0
+20004c62:	f7fd fb9f 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c66:	4ba0      	ldr	r3, [pc, #640]	@ (20004ee8 <vrEmuTmsDiagUpdate+0x604>)
+20004c68:	3130      	adds	r1, #48	@ 0x30
+20004c6a:	7169      	strb	r1, [r5, #5]
+20004c6c:	429c      	cmp	r4, r3
+20004c6e:	d800      	bhi.n	20004c72 <vrEmuTmsDiagUpdate+0x38e>
+20004c70:	e286      	b.n	20005180 <vrEmuTmsDiagUpdate+0x89c>
+20004c72:	210a      	movs	r1, #10
+20004c74:	0030      	movs	r0, r6
+20004c76:	f7fd fb95 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c7a:	210a      	movs	r1, #10
+20004c7c:	0006      	movs	r6, r0
+20004c7e:	f7fd fb91 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c82:	4b9a      	ldr	r3, [pc, #616]	@ (20004eec <vrEmuTmsDiagUpdate+0x608>)
+20004c84:	3130      	adds	r1, #48	@ 0x30
+20004c86:	7129      	strb	r1, [r5, #4]
+20004c88:	429c      	cmp	r4, r3
+20004c8a:	d800      	bhi.n	20004c8e <vrEmuTmsDiagUpdate+0x3aa>
+20004c8c:	e281      	b.n	20005192 <vrEmuTmsDiagUpdate+0x8ae>
+20004c8e:	210a      	movs	r1, #10
+20004c90:	0030      	movs	r0, r6
+20004c92:	f7fd fb87 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c96:	210a      	movs	r1, #10
+20004c98:	0006      	movs	r6, r0
+20004c9a:	f7fd fb83 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004c9e:	4b94      	ldr	r3, [pc, #592]	@ (20004ef0 <vrEmuTmsDiagUpdate+0x60c>)
+20004ca0:	3130      	adds	r1, #48	@ 0x30
+20004ca2:	70e9      	strb	r1, [r5, #3]
+20004ca4:	429c      	cmp	r4, r3
+20004ca6:	d800      	bhi.n	20004caa <vrEmuTmsDiagUpdate+0x3c6>
+20004ca8:	e276      	b.n	20005198 <vrEmuTmsDiagUpdate+0x8b4>
+20004caa:	210a      	movs	r1, #10
+20004cac:	0030      	movs	r0, r6
+20004cae:	f7fd fb79 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004cb2:	210a      	movs	r1, #10
+20004cb4:	0006      	movs	r6, r0
+20004cb6:	f7fd fb75 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004cba:	4b8e      	ldr	r3, [pc, #568]	@ (20004ef4 <vrEmuTmsDiagUpdate+0x610>)
+20004cbc:	3130      	adds	r1, #48	@ 0x30
+20004cbe:	70a9      	strb	r1, [r5, #2]
+20004cc0:	429c      	cmp	r4, r3
+20004cc2:	d800      	bhi.n	20004cc6 <vrEmuTmsDiagUpdate+0x3e2>
+20004cc4:	e271      	b.n	200051aa <vrEmuTmsDiagUpdate+0x8c6>
+20004cc6:	210a      	movs	r1, #10
+20004cc8:	0030      	movs	r0, r6
+20004cca:	f7fd fb6b 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004cce:	2301      	movs	r3, #1
+20004cd0:	3030      	adds	r0, #48	@ 0x30
+20004cd2:	7068      	strb	r0, [r5, #1]
+20004cd4:	60eb      	str	r3, [r5, #12]
+20004cd6:	2300      	movs	r3, #0
+20004cd8:	4c87      	ldr	r4, [pc, #540]	@ (20004ef8 <vrEmuTmsDiagUpdate+0x614>)
+20004cda:	72e3      	strb	r3, [r4, #11]
+20004cdc:	45b8      	cmp	r8, r7
+20004cde:	d200      	bcs.n	20004ce2 <vrEmuTmsDiagUpdate+0x3fe>
+20004ce0:	e0d6      	b.n	20004e90 <vrEmuTmsDiagUpdate+0x5ac>
+20004ce2:	0039      	movs	r1, r7
+20004ce4:	4640      	mov	r0, r8
+20004ce6:	f7fd fb5d 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004cea:	210a      	movs	r1, #10
+20004cec:	0005      	movs	r5, r0
+20004cee:	f7fd fb59 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004cf2:	3130      	adds	r1, #48	@ 0x30
+20004cf4:	72a1      	strb	r1, [r4, #10]
+20004cf6:	2d09      	cmp	r5, #9
+20004cf8:	d800      	bhi.n	20004cfc <vrEmuTmsDiagUpdate+0x418>
+20004cfa:	e226      	b.n	2000514a <vrEmuTmsDiagUpdate+0x866>
+20004cfc:	210a      	movs	r1, #10
+20004cfe:	0028      	movs	r0, r5
+20004d00:	f7fd fb50 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d04:	210a      	movs	r1, #10
+20004d06:	0006      	movs	r6, r0
+20004d08:	f7fd fb4c 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d0c:	3130      	adds	r1, #48	@ 0x30
+20004d0e:	7261      	strb	r1, [r4, #9]
+20004d10:	2d63      	cmp	r5, #99	@ 0x63
+20004d12:	d800      	bhi.n	20004d16 <vrEmuTmsDiagUpdate+0x432>
+20004d14:	e21c      	b.n	20005150 <vrEmuTmsDiagUpdate+0x86c>
+20004d16:	210a      	movs	r1, #10
+20004d18:	0030      	movs	r0, r6
+20004d1a:	f7fd fb43 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d1e:	210a      	movs	r1, #10
+20004d20:	0006      	movs	r6, r0
+20004d22:	f7fd fb3f 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d26:	23fa      	movs	r3, #250	@ 0xfa
+20004d28:	3130      	adds	r1, #48	@ 0x30
+20004d2a:	7221      	strb	r1, [r4, #8]
+20004d2c:	009b      	lsls	r3, r3, #2
+20004d2e:	429d      	cmp	r5, r3
+20004d30:	d200      	bcs.n	20004d34 <vrEmuTmsDiagUpdate+0x450>
+20004d32:	e213      	b.n	2000515c <vrEmuTmsDiagUpdate+0x878>
+20004d34:	210a      	movs	r1, #10
+20004d36:	0030      	movs	r0, r6
+20004d38:	f7fd fb34 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d3c:	210a      	movs	r1, #10
+20004d3e:	0006      	movs	r6, r0
+20004d40:	f7fd fb30 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d44:	4b66      	ldr	r3, [pc, #408]	@ (20004ee0 <vrEmuTmsDiagUpdate+0x5fc>)
+20004d46:	3130      	adds	r1, #48	@ 0x30
+20004d48:	71e1      	strb	r1, [r4, #7]
+20004d4a:	429d      	cmp	r5, r3
+20004d4c:	d800      	bhi.n	20004d50 <vrEmuTmsDiagUpdate+0x46c>
+20004d4e:	e20e      	b.n	2000516e <vrEmuTmsDiagUpdate+0x88a>
+20004d50:	210a      	movs	r1, #10
+20004d52:	0030      	movs	r0, r6
+20004d54:	f7fd fb26 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d58:	210a      	movs	r1, #10
+20004d5a:	0006      	movs	r6, r0
+20004d5c:	f7fd fb22 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d60:	4b60      	ldr	r3, [pc, #384]	@ (20004ee4 <vrEmuTmsDiagUpdate+0x600>)
+20004d62:	3130      	adds	r1, #48	@ 0x30
+20004d64:	71a1      	strb	r1, [r4, #6]
+20004d66:	429d      	cmp	r5, r3
+20004d68:	d800      	bhi.n	20004d6c <vrEmuTmsDiagUpdate+0x488>
+20004d6a:	e203      	b.n	20005174 <vrEmuTmsDiagUpdate+0x890>
+20004d6c:	210a      	movs	r1, #10
+20004d6e:	0030      	movs	r0, r6
+20004d70:	f7fd fb18 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d74:	210a      	movs	r1, #10
+20004d76:	0006      	movs	r6, r0
+20004d78:	f7fd fb14 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d7c:	4b5a      	ldr	r3, [pc, #360]	@ (20004ee8 <vrEmuTmsDiagUpdate+0x604>)
+20004d7e:	3130      	adds	r1, #48	@ 0x30
+20004d80:	7161      	strb	r1, [r4, #5]
+20004d82:	429d      	cmp	r5, r3
+20004d84:	d800      	bhi.n	20004d88 <vrEmuTmsDiagUpdate+0x4a4>
+20004d86:	e1fe      	b.n	20005186 <vrEmuTmsDiagUpdate+0x8a2>
+20004d88:	210a      	movs	r1, #10
+20004d8a:	0030      	movs	r0, r6
+20004d8c:	f7fd fb0a 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d90:	210a      	movs	r1, #10
+20004d92:	0006      	movs	r6, r0
+20004d94:	f7fd fb06 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004d98:	4b54      	ldr	r3, [pc, #336]	@ (20004eec <vrEmuTmsDiagUpdate+0x608>)
+20004d9a:	3130      	adds	r1, #48	@ 0x30
+20004d9c:	7121      	strb	r1, [r4, #4]
+20004d9e:	429d      	cmp	r5, r3
+20004da0:	d800      	bhi.n	20004da4 <vrEmuTmsDiagUpdate+0x4c0>
+20004da2:	e1f3      	b.n	2000518c <vrEmuTmsDiagUpdate+0x8a8>
+20004da4:	210a      	movs	r1, #10
+20004da6:	0030      	movs	r0, r6
+20004da8:	f7fd fafc 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004dac:	210a      	movs	r1, #10
+20004dae:	0006      	movs	r6, r0
+20004db0:	f7fd faf8 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004db4:	4b4e      	ldr	r3, [pc, #312]	@ (20004ef0 <vrEmuTmsDiagUpdate+0x60c>)
+20004db6:	3130      	adds	r1, #48	@ 0x30
+20004db8:	70e1      	strb	r1, [r4, #3]
+20004dba:	429d      	cmp	r5, r3
+20004dbc:	d800      	bhi.n	20004dc0 <vrEmuTmsDiagUpdate+0x4dc>
+20004dbe:	e1ee      	b.n	2000519e <vrEmuTmsDiagUpdate+0x8ba>
+20004dc0:	210a      	movs	r1, #10
+20004dc2:	0030      	movs	r0, r6
+20004dc4:	f7fd faee 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004dc8:	210a      	movs	r1, #10
+20004dca:	0006      	movs	r6, r0
+20004dcc:	f7fd faea 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004dd0:	4b48      	ldr	r3, [pc, #288]	@ (20004ef4 <vrEmuTmsDiagUpdate+0x610>)
+20004dd2:	3130      	adds	r1, #48	@ 0x30
+20004dd4:	70a1      	strb	r1, [r4, #2]
+20004dd6:	429d      	cmp	r5, r3
+20004dd8:	d800      	bhi.n	20004ddc <vrEmuTmsDiagUpdate+0x4f8>
+20004dda:	e1e3      	b.n	200051a4 <vrEmuTmsDiagUpdate+0x8c0>
+20004ddc:	210a      	movs	r1, #10
+20004dde:	0030      	movs	r0, r6
+20004de0:	f7fd fae0 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004de4:	2301      	movs	r3, #1
+20004de6:	3030      	adds	r0, #48	@ 0x30
+20004de8:	7060      	strb	r0, [r4, #1]
+20004dea:	60e3      	str	r3, [r4, #12]
+20004dec:	2600      	movs	r6, #0
+20004dee:	465b      	mov	r3, fp
+20004df0:	601e      	str	r6, [r3, #0]
+20004df2:	4653      	mov	r3, sl
+20004df4:	601e      	str	r6, [r3, #0]
+20004df6:	464b      	mov	r3, r9
+20004df8:	4a40      	ldr	r2, [pc, #256]	@ (20004efc <vrEmuTmsDiagUpdate+0x618>)
+20004dfa:	601e      	str	r6, [r3, #0]
+20004dfc:	4b40      	ldr	r3, [pc, #256]	@ (20004f00 <vrEmuTmsDiagUpdate+0x61c>)
+20004dfe:	6814      	ldr	r4, [r2, #0]
+20004e00:	6a9b      	ldr	r3, [r3, #40]	@ 0x28
+20004e02:	4690      	mov	r8, r2
+20004e04:	1b1c      	subs	r4, r3, r4
+20004e06:	0020      	movs	r0, r4
+20004e08:	001f      	movs	r7, r3
+20004e0a:	f000 fdf5 	bl	200059f8 <vrEmuTmsGpuTime>
+20004e0e:	f7fd fbc8 	bl	200025a2 <__wrap___aeabi_ui2f>
+20004e12:	1c05      	adds	r5, r0, #0
+20004e14:	0020      	movs	r0, r4
+20004e16:	f7fd fbc4 	bl	200025a2 <__wrap___aeabi_ui2f>
+20004e1a:	1c01      	adds	r1, r0, #0
+20004e1c:	1c28      	adds	r0, r5, #0
+20004e1e:	f7fd fb72 	bl	20002506 <__wrap___aeabi_fdiv>
+20004e22:	4938      	ldr	r1, [pc, #224]	@ (20004f04 <vrEmuTmsDiagUpdate+0x620>)
+20004e24:	f7fd fb83 	bl	2000252e <__wrap___aeabi_fmul>
+20004e28:	4927      	ldr	r1, [pc, #156]	@ (20004ec8 <vrEmuTmsDiagUpdate+0x5e4>)
+20004e2a:	f7fd fb80 	bl	2000252e <__wrap___aeabi_fmul>
+20004e2e:	21fc      	movs	r1, #252	@ 0xfc
+20004e30:	0589      	lsls	r1, r1, #22
+20004e32:	f7fd fb65 	bl	20002500 <__wrap___aeabi_fadd>
+20004e36:	f7fd fc0d 	bl	20002654 <__wrap___aeabi_f2uiz>
+20004e3a:	4c33      	ldr	r4, [pc, #204]	@ (20004f08 <vrEmuTmsDiagUpdate+0x624>)
+20004e3c:	210a      	movs	r1, #10
+20004e3e:	72e6      	strb	r6, [r4, #11]
+20004e40:	0005      	movs	r5, r0
+20004e42:	f7fd faaf 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004e46:	3130      	adds	r1, #48	@ 0x30
+20004e48:	72a1      	strb	r1, [r4, #10]
+20004e4a:	0028      	movs	r0, r5
+20004e4c:	210a      	movs	r1, #10
+20004e4e:	f7fd faa9 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004e52:	210a      	movs	r1, #10
+20004e54:	0006      	movs	r6, r0
+20004e56:	f7fd faa5 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004e5a:	3130      	adds	r1, #48	@ 0x30
+20004e5c:	0030      	movs	r0, r6
+20004e5e:	7261      	strb	r1, [r4, #9]
+20004e60:	210a      	movs	r1, #10
+20004e62:	f7fd fa9f 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004e66:	210a      	movs	r1, #10
+20004e68:	0006      	movs	r6, r0
+20004e6a:	f7fd fa9b 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004e6e:	232e      	movs	r3, #46	@ 0x2e
+20004e70:	71e3      	strb	r3, [r4, #7]
+20004e72:	23fa      	movs	r3, #250	@ 0xfa
+20004e74:	3130      	adds	r1, #48	@ 0x30
+20004e76:	7221      	strb	r1, [r4, #8]
+20004e78:	009b      	lsls	r3, r3, #2
+20004e7a:	429d      	cmp	r5, r3
+20004e7c:	d246      	bcs.n	20004f0c <vrEmuTmsDiagUpdate+0x628>
+20004e7e:	2306      	movs	r3, #6
+20004e80:	60e3      	str	r3, [r4, #12]
+20004e82:	332a      	adds	r3, #42	@ 0x2a
+20004e84:	71a3      	strb	r3, [r4, #6]
+20004e86:	f000 fdc3 	bl	20005a10 <vrEmuTmsGpuResetTime>
+20004e8a:	4643      	mov	r3, r8
+20004e8c:	601f      	str	r7, [r3, #0]
+20004e8e:	e54c      	b.n	2000492a <vrEmuTmsDiagUpdate+0x46>
+20004e90:	230a      	movs	r3, #10
+20004e92:	60e3      	str	r3, [r4, #12]
+20004e94:	3326      	adds	r3, #38	@ 0x26
+20004e96:	72a3      	strb	r3, [r4, #10]
+20004e98:	e7a8      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+20004e9a:	230a      	movs	r3, #10
+20004e9c:	60eb      	str	r3, [r5, #12]
+20004e9e:	3326      	adds	r3, #38	@ 0x26
+20004ea0:	72ab      	strb	r3, [r5, #10]
+20004ea2:	e718      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+20004ea4:	3230      	adds	r2, #48	@ 0x30
+20004ea6:	7222      	strb	r2, [r4, #8]
+20004ea8:	2b00      	cmp	r3, #0
+20004eaa:	d000      	beq.n	20004eae <vrEmuTmsDiagUpdate+0x5ca>
+20004eac:	e598      	b.n	200049e0 <vrEmuTmsDiagUpdate+0xfc>
+20004eae:	2408      	movs	r4, #8
+20004eb0:	2200      	movs	r2, #0
+20004eb2:	3c01      	subs	r4, #1
+20004eb4:	1aa4      	subs	r4, r4, r2
+20004eb6:	2130      	movs	r1, #48	@ 0x30
+20004eb8:	3201      	adds	r2, #1
+20004eba:	1930      	adds	r0, r6, r4
+20004ebc:	f7fd fc2e 	bl	2000271c <__wrap_memset>
+20004ec0:	e591      	b.n	200049e6 <vrEmuTmsDiagUpdate+0x102>
+20004ec2:	46c0      	nop			@ (mov r8, r8)
+20004ec4:	20027314 	.word	0x20027314
+20004ec8:	447a0000 	.word	0x447a0000
+20004ecc:	20026c88 	.word	0x20026c88
+20004ed0:	20027310 	.word	0x20027310
+20004ed4:	20026bf8 	.word	0x20026bf8
+20004ed8:	20027318 	.word	0x20027318
+20004edc:	20026c78 	.word	0x20026c78
+20004ee0:	0000270f 	.word	0x0000270f
+20004ee4:	0001869f 	.word	0x0001869f
+20004ee8:	000f423f 	.word	0x000f423f
+20004eec:	0098967f 	.word	0x0098967f
+20004ef0:	05f5e0ff 	.word	0x05f5e0ff
+20004ef4:	3b9ac9ff 	.word	0x3b9ac9ff
+20004ef8:	20026ef8 	.word	0x20026ef8
+20004efc:	2002747c 	.word	0x2002747c
+20004f00:	40054000 	.word	0x40054000
+20004f04:	42c80000 	.word	0x42c80000
+20004f08:	20026c18 	.word	0x20026c18
+20004f0c:	210a      	movs	r1, #10
+20004f0e:	0030      	movs	r0, r6
+20004f10:	f7fd fa48 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f14:	210a      	movs	r1, #10
+20004f16:	0006      	movs	r6, r0
+20004f18:	f7fd fa44 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f1c:	4bbe      	ldr	r3, [pc, #760]	@ (20005218 <vrEmuTmsDiagUpdate+0x934>)
+20004f1e:	3130      	adds	r1, #48	@ 0x30
+20004f20:	71a1      	strb	r1, [r4, #6]
+20004f22:	429d      	cmp	r5, r3
+20004f24:	d800      	bhi.n	20004f28 <vrEmuTmsDiagUpdate+0x644>
+20004f26:	e146      	b.n	200051b6 <vrEmuTmsDiagUpdate+0x8d2>
+20004f28:	210a      	movs	r1, #10
+20004f2a:	0030      	movs	r0, r6
+20004f2c:	f7fd fa3a 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f30:	210a      	movs	r1, #10
+20004f32:	0006      	movs	r6, r0
+20004f34:	f7fd fa36 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f38:	4bb8      	ldr	r3, [pc, #736]	@ (2000521c <vrEmuTmsDiagUpdate+0x938>)
+20004f3a:	3130      	adds	r1, #48	@ 0x30
+20004f3c:	7161      	strb	r1, [r4, #5]
+20004f3e:	429d      	cmp	r5, r3
+20004f40:	d800      	bhi.n	20004f44 <vrEmuTmsDiagUpdate+0x660>
+20004f42:	e13f      	b.n	200051c4 <vrEmuTmsDiagUpdate+0x8e0>
+20004f44:	210a      	movs	r1, #10
+20004f46:	0030      	movs	r0, r6
+20004f48:	f7fd fa2c 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f4c:	210a      	movs	r1, #10
+20004f4e:	0006      	movs	r6, r0
+20004f50:	f7fd fa28 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f54:	4bb2      	ldr	r3, [pc, #712]	@ (20005220 <vrEmuTmsDiagUpdate+0x93c>)
+20004f56:	3130      	adds	r1, #48	@ 0x30
+20004f58:	7121      	strb	r1, [r4, #4]
+20004f5a:	429d      	cmp	r5, r3
+20004f5c:	d800      	bhi.n	20004f60 <vrEmuTmsDiagUpdate+0x67c>
+20004f5e:	e13c      	b.n	200051da <vrEmuTmsDiagUpdate+0x8f6>
+20004f60:	210a      	movs	r1, #10
+20004f62:	0030      	movs	r0, r6
+20004f64:	f7fd fa1e 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f68:	210a      	movs	r1, #10
+20004f6a:	0006      	movs	r6, r0
+20004f6c:	f7fd fa1a 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f70:	4bac      	ldr	r3, [pc, #688]	@ (20005224 <vrEmuTmsDiagUpdate+0x940>)
+20004f72:	3130      	adds	r1, #48	@ 0x30
+20004f74:	70e1      	strb	r1, [r4, #3]
+20004f76:	429d      	cmp	r5, r3
+20004f78:	d800      	bhi.n	20004f7c <vrEmuTmsDiagUpdate+0x698>
+20004f7a:	e135      	b.n	200051e8 <vrEmuTmsDiagUpdate+0x904>
+20004f7c:	210a      	movs	r1, #10
+20004f7e:	0030      	movs	r0, r6
+20004f80:	f7fd fa10 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f84:	210a      	movs	r1, #10
+20004f86:	0006      	movs	r6, r0
+20004f88:	f7fd fa0c 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004f8c:	4ba6      	ldr	r3, [pc, #664]	@ (20005228 <vrEmuTmsDiagUpdate+0x944>)
+20004f8e:	3130      	adds	r1, #48	@ 0x30
+20004f90:	70a1      	strb	r1, [r4, #2]
+20004f92:	429d      	cmp	r5, r3
+20004f94:	d800      	bhi.n	20004f98 <vrEmuTmsDiagUpdate+0x6b4>
+20004f96:	e12a      	b.n	200051ee <vrEmuTmsDiagUpdate+0x90a>
+20004f98:	210a      	movs	r1, #10
+20004f9a:	0030      	movs	r0, r6
+20004f9c:	f7fd fa02 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004fa0:	210a      	movs	r1, #10
+20004fa2:	0006      	movs	r6, r0
+20004fa4:	f7fd f9fe 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004fa8:	4ba0      	ldr	r3, [pc, #640]	@ (2000522c <vrEmuTmsDiagUpdate+0x948>)
+20004faa:	3130      	adds	r1, #48	@ 0x30
+20004fac:	7061      	strb	r1, [r4, #1]
+20004fae:	429d      	cmp	r5, r3
+20004fb0:	d800      	bhi.n	20004fb4 <vrEmuTmsDiagUpdate+0x6d0>
+20004fb2:	e123      	b.n	200051fc <vrEmuTmsDiagUpdate+0x918>
+20004fb4:	210a      	movs	r1, #10
+20004fb6:	0030      	movs	r0, r6
+20004fb8:	f7fd f9f4 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004fbc:	2300      	movs	r3, #0
+20004fbe:	3030      	adds	r0, #48	@ 0x30
+20004fc0:	7020      	strb	r0, [r4, #0]
+20004fc2:	60e3      	str	r3, [r4, #12]
+20004fc4:	e75f      	b.n	20004e86 <vrEmuTmsDiagUpdate+0x5a2>
+20004fc6:	210a      	movs	r1, #10
+20004fc8:	0030      	movs	r0, r6
+20004fca:	f7fd f9eb 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004fce:	210a      	movs	r1, #10
+20004fd0:	0006      	movs	r6, r0
+20004fd2:	f7fd f9e7 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004fd6:	23fa      	movs	r3, #250	@ 0xfa
+20004fd8:	3130      	adds	r1, #48	@ 0x30
+20004fda:	71e1      	strb	r1, [r4, #7]
+20004fdc:	009b      	lsls	r3, r3, #2
+20004fde:	429d      	cmp	r5, r3
+20004fe0:	d200      	bcs.n	20004fe4 <vrEmuTmsDiagUpdate+0x700>
+20004fe2:	e0eb      	b.n	200051bc <vrEmuTmsDiagUpdate+0x8d8>
+20004fe4:	210a      	movs	r1, #10
+20004fe6:	0030      	movs	r0, r6
+20004fe8:	f7fd f9dc 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004fec:	210a      	movs	r1, #10
+20004fee:	0006      	movs	r6, r0
+20004ff0:	f7fd f9d8 	bl	200023a4 <__wrap___aeabi_uidiv>
+20004ff4:	4b88      	ldr	r3, [pc, #544]	@ (20005218 <vrEmuTmsDiagUpdate+0x934>)
+20004ff6:	3130      	adds	r1, #48	@ 0x30
+20004ff8:	71a1      	strb	r1, [r4, #6]
+20004ffa:	429d      	cmp	r5, r3
+20004ffc:	d800      	bhi.n	20005000 <vrEmuTmsDiagUpdate+0x71c>
+20004ffe:	e0e4      	b.n	200051ca <vrEmuTmsDiagUpdate+0x8e6>
+20005000:	210a      	movs	r1, #10
+20005002:	0030      	movs	r0, r6
+20005004:	f7fd f9ce 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005008:	210a      	movs	r1, #10
+2000500a:	0006      	movs	r6, r0
+2000500c:	f7fd f9ca 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005010:	4b82      	ldr	r3, [pc, #520]	@ (2000521c <vrEmuTmsDiagUpdate+0x938>)
+20005012:	3130      	adds	r1, #48	@ 0x30
+20005014:	7161      	strb	r1, [r4, #5]
+20005016:	429d      	cmp	r5, r3
+20005018:	d800      	bhi.n	2000501c <vrEmuTmsDiagUpdate+0x738>
+2000501a:	e0da      	b.n	200051d2 <vrEmuTmsDiagUpdate+0x8ee>
+2000501c:	210a      	movs	r1, #10
+2000501e:	0030      	movs	r0, r6
+20005020:	f7fd f9c0 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005024:	210a      	movs	r1, #10
+20005026:	0006      	movs	r6, r0
+20005028:	f7fd f9bc 	bl	200023a4 <__wrap___aeabi_uidiv>
+2000502c:	4b7c      	ldr	r3, [pc, #496]	@ (20005220 <vrEmuTmsDiagUpdate+0x93c>)
+2000502e:	3130      	adds	r1, #48	@ 0x30
+20005030:	7121      	strb	r1, [r4, #4]
+20005032:	429d      	cmp	r5, r3
+20005034:	d800      	bhi.n	20005038 <vrEmuTmsDiagUpdate+0x754>
+20005036:	e0d3      	b.n	200051e0 <vrEmuTmsDiagUpdate+0x8fc>
+20005038:	210a      	movs	r1, #10
+2000503a:	0030      	movs	r0, r6
+2000503c:	f7fd f9b2 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005040:	210a      	movs	r1, #10
+20005042:	0006      	movs	r6, r0
+20005044:	f7fd f9ae 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005048:	4b76      	ldr	r3, [pc, #472]	@ (20005224 <vrEmuTmsDiagUpdate+0x940>)
+2000504a:	3130      	adds	r1, #48	@ 0x30
+2000504c:	70e1      	strb	r1, [r4, #3]
+2000504e:	429d      	cmp	r5, r3
+20005050:	d800      	bhi.n	20005054 <vrEmuTmsDiagUpdate+0x770>
+20005052:	e0cf      	b.n	200051f4 <vrEmuTmsDiagUpdate+0x910>
+20005054:	210a      	movs	r1, #10
+20005056:	0030      	movs	r0, r6
+20005058:	f7fd f9a4 	bl	200023a4 <__wrap___aeabi_uidiv>
+2000505c:	210a      	movs	r1, #10
+2000505e:	0006      	movs	r6, r0
+20005060:	f7fd f9a0 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005064:	4b70      	ldr	r3, [pc, #448]	@ (20005228 <vrEmuTmsDiagUpdate+0x944>)
+20005066:	3130      	adds	r1, #48	@ 0x30
+20005068:	70a1      	strb	r1, [r4, #2]
+2000506a:	429d      	cmp	r5, r3
+2000506c:	d800      	bhi.n	20005070 <vrEmuTmsDiagUpdate+0x78c>
+2000506e:	e0c8      	b.n	20005202 <vrEmuTmsDiagUpdate+0x91e>
+20005070:	210a      	movs	r1, #10
+20005072:	0030      	movs	r0, r6
+20005074:	f7fd f996 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005078:	210a      	movs	r1, #10
+2000507a:	0006      	movs	r6, r0
+2000507c:	f7fd f992 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005080:	4b6a      	ldr	r3, [pc, #424]	@ (2000522c <vrEmuTmsDiagUpdate+0x948>)
+20005082:	3130      	adds	r1, #48	@ 0x30
+20005084:	7061      	strb	r1, [r4, #1]
+20005086:	429d      	cmp	r5, r3
+20005088:	d800      	bhi.n	2000508c <vrEmuTmsDiagUpdate+0x7a8>
+2000508a:	e0be      	b.n	2000520a <vrEmuTmsDiagUpdate+0x926>
+2000508c:	210a      	movs	r1, #10
+2000508e:	0030      	movs	r0, r6
+20005090:	f7fd f988 	bl	200023a4 <__wrap___aeabi_uidiv>
+20005094:	2300      	movs	r3, #0
+20005096:	3030      	adds	r0, #48	@ 0x30
+20005098:	7020      	strb	r0, [r4, #0]
+2000509a:	60e3      	str	r3, [r4, #12]
+2000509c:	e445      	b.n	2000492a <vrEmuTmsDiagUpdate+0x46>
+2000509e:	3230      	adds	r2, #48	@ 0x30
+200050a0:	722a      	strb	r2, [r5, #8]
+200050a2:	2b00      	cmp	r3, #0
+200050a4:	d000      	beq.n	200050a8 <vrEmuTmsDiagUpdate+0x7c4>
+200050a6:	e513      	b.n	20004ad0 <vrEmuTmsDiagUpdate+0x1ec>
+200050a8:	2201      	movs	r2, #1
+200050aa:	2408      	movs	r4, #8
+200050ac:	3a01      	subs	r2, #1
+200050ae:	3c01      	subs	r4, #1
+200050b0:	1aa4      	subs	r4, r4, r2
+200050b2:	2130      	movs	r1, #48	@ 0x30
+200050b4:	3201      	adds	r2, #1
+200050b6:	1928      	adds	r0, r5, r4
+200050b8:	f7fd fb30 	bl	2000271c <__wrap_memset>
+200050bc:	e50b      	b.n	20004ad6 <vrEmuTmsDiagUpdate+0x1f2>
+200050be:	5cd3      	ldrb	r3, [r2, r3]
+200050c0:	2200      	movs	r2, #0
+200050c2:	495b      	ldr	r1, [pc, #364]	@ (20005230 <vrEmuTmsDiagUpdate+0x94c>)
+200050c4:	09db      	lsrs	r3, r3, #7
+200050c6:	000e      	movs	r6, r1
+200050c8:	72ca      	strb	r2, [r1, #11]
+200050ca:	2b00      	cmp	r3, #0
+200050cc:	d100      	bne.n	200050d0 <vrEmuTmsDiagUpdate+0x7ec>
+200050ce:	e0a0      	b.n	20005212 <vrEmuTmsDiagUpdate+0x92e>
+200050d0:	2330      	movs	r3, #48	@ 0x30
+200050d2:	2200      	movs	r2, #0
+200050d4:	72b3      	strb	r3, [r6, #10]
+200050d6:	7273      	strb	r3, [r6, #9]
+200050d8:	3b2e      	subs	r3, #46	@ 0x2e
+200050da:	3230      	adds	r2, #48	@ 0x30
+200050dc:	7232      	strb	r2, [r6, #8]
+200050de:	2b00      	cmp	r3, #0
+200050e0:	d000      	beq.n	200050e4 <vrEmuTmsDiagUpdate+0x800>
+200050e2:	e4ab      	b.n	20004a3c <vrEmuTmsDiagUpdate+0x158>
+200050e4:	2408      	movs	r4, #8
+200050e6:	2201      	movs	r2, #1
+200050e8:	3a01      	subs	r2, #1
+200050ea:	3c01      	subs	r4, #1
+200050ec:	1aa4      	subs	r4, r4, r2
+200050ee:	2130      	movs	r1, #48	@ 0x30
+200050f0:	3201      	adds	r2, #1
+200050f2:	1930      	adds	r0, r6, r4
+200050f4:	f7fd fb12 	bl	2000271c <__wrap_memset>
+200050f8:	e4a3      	b.n	20004a42 <vrEmuTmsDiagUpdate+0x15e>
+200050fa:	3230      	adds	r2, #48	@ 0x30
+200050fc:	e48f      	b.n	20004a1e <vrEmuTmsDiagUpdate+0x13a>
+200050fe:	240b      	movs	r4, #11
+20005100:	2203      	movs	r2, #3
+20005102:	e6d6      	b.n	20004eb2 <vrEmuTmsDiagUpdate+0x5ce>
+20005104:	240b      	movs	r4, #11
+20005106:	2203      	movs	r2, #3
+20005108:	3c01      	subs	r4, #1
+2000510a:	1aa4      	subs	r4, r4, r2
+2000510c:	2130      	movs	r1, #48	@ 0x30
+2000510e:	3201      	adds	r2, #1
+20005110:	1928      	adds	r0, r5, r4
+20005112:	f7fd fb03 	bl	2000271c <__wrap_memset>
+20005116:	e4b9      	b.n	20004a8c <vrEmuTmsDiagUpdate+0x1a8>
+20005118:	240b      	movs	r4, #11
+2000511a:	2203      	movs	r2, #3
+2000511c:	e7c7      	b.n	200050ae <vrEmuTmsDiagUpdate+0x7ca>
+2000511e:	240b      	movs	r4, #11
+20005120:	2203      	movs	r2, #3
+20005122:	3c01      	subs	r4, #1
+20005124:	1aa4      	subs	r4, r4, r2
+20005126:	2130      	movs	r1, #48	@ 0x30
+20005128:	3201      	adds	r2, #1
+2000512a:	1928      	adds	r0, r5, r4
+2000512c:	f7fd faf6 	bl	2000271c <__wrap_memset>
+20005130:	e4ee      	b.n	20004b10 <vrEmuTmsDiagUpdate+0x22c>
+20005132:	2202      	movs	r2, #2
+20005134:	2409      	movs	r4, #9
+20005136:	e7b9      	b.n	200050ac <vrEmuTmsDiagUpdate+0x7c8>
+20005138:	2408      	movs	r4, #8
+2000513a:	2200      	movs	r2, #0
+2000513c:	e7e4      	b.n	20005108 <vrEmuTmsDiagUpdate+0x824>
+2000513e:	2408      	movs	r4, #8
+20005140:	2200      	movs	r2, #0
+20005142:	e7ee      	b.n	20005122 <vrEmuTmsDiagUpdate+0x83e>
+20005144:	230a      	movs	r3, #10
+20005146:	60eb      	str	r3, [r5, #12]
+20005148:	e5c5      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+2000514a:	230a      	movs	r3, #10
+2000514c:	60e3      	str	r3, [r4, #12]
+2000514e:	e64d      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+20005150:	2309      	movs	r3, #9
+20005152:	60e3      	str	r3, [r4, #12]
+20005154:	e64a      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+20005156:	2309      	movs	r3, #9
+20005158:	60eb      	str	r3, [r5, #12]
+2000515a:	e5bc      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+2000515c:	2308      	movs	r3, #8
+2000515e:	60e3      	str	r3, [r4, #12]
+20005160:	e644      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+20005162:	2308      	movs	r3, #8
+20005164:	60eb      	str	r3, [r5, #12]
+20005166:	e5b6      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+20005168:	2307      	movs	r3, #7
+2000516a:	60eb      	str	r3, [r5, #12]
+2000516c:	e5b3      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+2000516e:	2307      	movs	r3, #7
+20005170:	60e3      	str	r3, [r4, #12]
+20005172:	e63b      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+20005174:	2306      	movs	r3, #6
+20005176:	60e3      	str	r3, [r4, #12]
+20005178:	e638      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+2000517a:	2306      	movs	r3, #6
+2000517c:	60eb      	str	r3, [r5, #12]
+2000517e:	e5aa      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+20005180:	2305      	movs	r3, #5
+20005182:	60eb      	str	r3, [r5, #12]
+20005184:	e5a7      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+20005186:	2305      	movs	r3, #5
+20005188:	60e3      	str	r3, [r4, #12]
+2000518a:	e62f      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+2000518c:	2304      	movs	r3, #4
+2000518e:	60e3      	str	r3, [r4, #12]
+20005190:	e62c      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+20005192:	2304      	movs	r3, #4
+20005194:	60eb      	str	r3, [r5, #12]
+20005196:	e59e      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+20005198:	2303      	movs	r3, #3
+2000519a:	60eb      	str	r3, [r5, #12]
+2000519c:	e59b      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+2000519e:	2303      	movs	r3, #3
+200051a0:	60e3      	str	r3, [r4, #12]
+200051a2:	e623      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+200051a4:	2302      	movs	r3, #2
+200051a6:	60e3      	str	r3, [r4, #12]
+200051a8:	e620      	b.n	20004dec <vrEmuTmsDiagUpdate+0x508>
+200051aa:	2302      	movs	r3, #2
+200051ac:	60eb      	str	r3, [r5, #12]
+200051ae:	e592      	b.n	20004cd6 <vrEmuTmsDiagUpdate+0x3f2>
+200051b0:	2409      	movs	r4, #9
+200051b2:	2202      	movs	r2, #2
+200051b4:	e798      	b.n	200050e8 <vrEmuTmsDiagUpdate+0x804>
+200051b6:	2306      	movs	r3, #6
+200051b8:	60e3      	str	r3, [r4, #12]
+200051ba:	e664      	b.n	20004e86 <vrEmuTmsDiagUpdate+0x5a2>
+200051bc:	2307      	movs	r3, #7
+200051be:	60e3      	str	r3, [r4, #12]
+200051c0:	f7ff fbb3 	bl	2000492a <vrEmuTmsDiagUpdate+0x46>
+200051c4:	2305      	movs	r3, #5
+200051c6:	60e3      	str	r3, [r4, #12]
+200051c8:	e65d      	b.n	20004e86 <vrEmuTmsDiagUpdate+0x5a2>
+200051ca:	2306      	movs	r3, #6
+200051cc:	60e3      	str	r3, [r4, #12]
+200051ce:	f7ff fbac 	bl	2000492a <vrEmuTmsDiagUpdate+0x46>
+200051d2:	2305      	movs	r3, #5
+200051d4:	60e3      	str	r3, [r4, #12]
+200051d6:	f7ff fba8 	bl	2000492a <vrEmuTmsDiagUpdate+0x46>
+200051da:	2304      	movs	r3, #4
+200051dc:	60e3      	str	r3, [r4, #12]
+200051de:	e652      	b.n	20004e86 <vrEmuTmsDiagUpdate+0x5a2>
+200051e0:	2304      	movs	r3, #4
+200051e2:	60e3      	str	r3, [r4, #12]
+200051e4:	f7ff fba1 	bl	2000492a <vrEmuTmsDiagUpdate+0x46>
+200051e8:	2303      	movs	r3, #3
+200051ea:	60e3      	str	r3, [r4, #12]
+200051ec:	e64b      	b.n	20004e86 <vrEmuTmsDiagUpdate+0x5a2>
+200051ee:	2302      	movs	r3, #2
+200051f0:	60e3      	str	r3, [r4, #12]
+200051f2:	e648      	b.n	20004e86 <vrEmuTmsDiagUpdate+0x5a2>
+200051f4:	2303      	movs	r3, #3
+200051f6:	60e3      	str	r3, [r4, #12]
+200051f8:	f7ff fb97 	bl	2000492a <vrEmuTmsDiagUpdate+0x46>
+200051fc:	2301      	movs	r3, #1
+200051fe:	60e3      	str	r3, [r4, #12]
+20005200:	e641      	b.n	20004e86 <vrEmuTmsDiagUpdate+0x5a2>
+20005202:	2302      	movs	r3, #2
+20005204:	60e3      	str	r3, [r4, #12]
+20005206:	f7ff fb90 	bl	2000492a <vrEmuTmsDiagUpdate+0x46>
+2000520a:	2301      	movs	r3, #1
+2000520c:	60e3      	str	r3, [r4, #12]
+2000520e:	f7ff fb8c 	bl	2000492a <vrEmuTmsDiagUpdate+0x46>
+20005212:	240b      	movs	r4, #11
+20005214:	2203      	movs	r2, #3
+20005216:	e768      	b.n	200050ea <vrEmuTmsDiagUpdate+0x806>
+20005218:	0000270f 	.word	0x0000270f
+2000521c:	0001869f 	.word	0x0001869f
+20005220:	000f423f 	.word	0x000f423f
+20005224:	0098967f 	.word	0x0098967f
+20005228:	05f5e0ff 	.word	0x05f5e0ff
+2000522c:	3b9ac9ff 	.word	0x3b9ac9ff
+20005230:	20022a58 	.word	0x20022a58

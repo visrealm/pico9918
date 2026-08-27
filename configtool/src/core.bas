@@ -39,47 +39,15 @@ CONST CONF_STRUCT_LEN = (CONF_HELP + CONF_HELP_LEN)
 CONST CONF_VALUE_LABEL_LEN = 6
 
 ' -------------------------------
-' PICO9918 Config Ids.
-' See Pico9918Options enum in main.c
-CONST CONF_PICO_MODEL       = 0
-CONST CONF_HW_VERSION       = 1
-CONST CONF_SW_VERSION       = 2
-CONST CONF_SW_PATCH_VERSION = 3
-CONST CONF_CLOCK_TESTED     = 4
-CONST CONF_DISP_DRIVER      = 5
-' ^^^ read only
-
-' now the read/write ones
-CONST CONF_CRT_SCANLINES    = 8         ' 0 (off) or 1 (on)
-CONST CONF_SCANLINE_SPRITES = 9         ' 0 - 3 where value = (1 << (x + 2))
-CONST CONF_CLOCK_PRESET_ID  = 10        ' 0 - 2 see ClockSettings in main.c
-CONST CONF_SCART_MODE       = 11        ' 0 = PAL 576i, 1 = NTSC 480i
-CONST CONF_DISP_DRIVER_PREF = 13        ' 0 = AUTO, 1 = force VGA, 2 = force SCART
-CONST CONF_VGA_MODE         = 14        ' 0 = 480p60 (extensible)
-CONST CONF_DIAG             = 16
-CONST CONF_DIAG_REGISTERS   = 17
-CONST CONF_DIAG_PERFORMANCE = 18
-CONST CONF_DIAG_PALETTE     = 19
-CONST CONF_DIAG_ADDRESS     = 20
-' ^^^ read/write config IDs
-
-' pending-block mirror (read) and command bytes (write 1 to trigger)
-CONST CONF_PENDING_STATE        = 200
-CONST CONF_PENDING_DRIVER_PREF  = 201
-CONST CONF_PENDING_VGA_MODE     = 202
-CONST CONF_PENDING_SCART_MODE   = 203
-CONST CONF_PENDING_CLOCK_PRESET = 204
-CONST CONF_SAVE_FORCED          = 252
-CONST CONF_PENDING_CANCEL       = 253
-CONST CONF_PENDING_CONFIRM      = 254
+' PICO9918 Config Ids. Generated from the library's authoritative
+' pico9918_config.h by tools/config2bas.py - never declare a PICO9918_CONF_*
+' byte index here.
+INCLUDE "config-ids.bas"
 
 ' must match firmware src/config.h
 CONST PENDING_STATE_CONFIRMED = $C0
 CONST PENDING_STATE_PENDING   = $9E
 CONST PENDING_STATE_ARMED     = $A0
-
-' now the "special" config IDs
-CONST CONF_SAVE_TO_FLASH    = 255
 ' -------------------------------
 
 CONST CONF_MENU_PALETTE     = 251
@@ -154,15 +122,15 @@ main: PROCEDURE
 
         IF (statReg AND $E8) = $E8 THEN
             VDP_STATUS_REG = 12  ' config
-            VDP_REG(58) = CONF_SW_VERSION
+            VDP_REG(58) = PICO9918_CONF_SW_VERSION
             optValue = VDP_STATUS
             verMajor = optValue / 16
             verMinor = optValue AND $0f
-            VDP_REG(58) = CONF_SW_PATCH_VERSION
+            VDP_REG(58) = PICO9918_CONF_SW_PATCH_VERSION
             verPatch = VDP_STATUS
-            VDP_REG(58) = CONF_PICO_MODEL
+            VDP_REG(58) = PICO9918_CONF_PICO_MODEL
             picoModel = VDP_STATUS
-            VDP_REG(58) = CONF_HW_VERSION
+            VDP_REG(58) = PICO9918_CONF_HW_VERSION
             optValue = VDP_STATUS
             hwMajor = optValue / 16
             hwMinor = optValue AND $0f

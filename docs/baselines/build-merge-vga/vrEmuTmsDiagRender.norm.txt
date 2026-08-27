@@ -1,0 +1,372 @@
+<ADDR> <vrEmuTmsDiagRender>:
+push	{r4, r5, r6, r7, lr}
+mov	r7, sl
+mov	r6, r9
+mov	r5, r8
+mov	lr, fp
+push	{r5, r6, r7, lr}
+ldr	r7, [pc, #704]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+ldr	r3, [pc, #708]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+ldr	r6, [r7, #0]
+subs	r0, #1
+ldrb	r3, [r6, r3]
+movs	r4, r2
+uxth	r2, r0
+mov	r8, r2
+sub	sp, #36	@ 0x24
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+movs	r3, r1
+subs	r3, #26
+cmp	r3, r2
+bgt.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+movs	r1, #6
+mov	r0, r8
+bl	<ADDR> <__wrap___aeabi_uidiv>
+mov	r2, r8
+uxth	r5, r0
+lsls	r3, r5, #1
+adds	r3, r3, r5
+lsls	r3, r3, #1
+subs	r1, r2, r3
+ldrb	r3, [r6, #11]
+mov	sl, r1
+subs	r2, r3, #1
+sbcs	r3, r2
+movs	r2, #30
+negs	r3, r3
+ands	r2, r3
+ldr	r3, [pc, #648]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+adds	r2, #8
+ldr	r3, [r3, #0]
+mov	r9, r2
+cmp	r3, r5
+ble.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r3, [pc, #640]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+lsls	r2, r5, #2
+ldr	r3, [r2, r3]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+uxth	r0, r1
+movs	r1, r4
+blx	r3
+ldr	r6, [r7, #0]
+ldr	r3, [pc, #624]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+ldrb	r3, [r6, r3]
+cmp	r3, #0
+bne.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+cmp	r9, r5
+bgt.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r3, r8
+cmp	r3, #47	@ 0x2f
+bls.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r3, [pc, #608]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+subs	r5, #8
+lsls	r5, r5, #2
+ldr	r5, [r5, r3]
+ldr	r3, [pc, #604]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+add	r7, sp, #20
+str	r3, [sp, #20]
+movs	r3, #0
+movs	r1, #10
+strb	r3, [r7, #4]
+movs	r0, r5
+bl	<ADDR> <__wrap___aeabi_uidiv>
+movs	r3, r0
+adds	r3, #48	@ 0x30
+strb	r3, [r7, #1]
+lsls	r3, r0, #2
+adds	r0, r0, r3
+movs	r3, r5
+mov	r2, sl
+lsls	r0, r0, #1
+adds	r3, #48	@ 0x30
+subs	r3, r3, r0
+strb	r3, [r7, #2]
+uxth	r3, r2
+mov	fp, r3
+lsls	r3, r2, #16
+lsrs	r3, r3, #16
+cmp	r3, #5
+bls.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r2, [pc, #552]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+lsls	r3, r3, #1
+mov	r9, r3
+ldrh	r3, [r4, r2]
+ldr	r1, [pc, #548]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+lsrs	r3, r3, #2
+ands	r3, r1
+mov	ip, r1
+ldr	r1, [pc, #544]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+strh	r3, [r4, r2]
+mov	sl, r1
+movs	r2, #82	@ 0x52
+ldr	r3, [pc, #540]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+str	r6, [sp, #8]
+str	r5, [sp, #12]
+movs	r1, #48	@ 0x30
+movs	r0, #15
+subs	r2, #32
+ands	r1, r2
+add	r1, r9
+lsls	r1, r1, #3
+ands	r2, r0
+add	r1, sl
+ldrsb	r6, [r1, r2]
+lsls	r1, r3, #1
+adds	r2, r3, #1
+adds	r1, r4, r1
+uxth	r2, r2
+cmp	r6, #0
+bge.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r5, ip
+ldrh	r0, [r1, #0]
+lsrs	r0, r0, #2
+ands	r0, r5
+strh	r0, [r1, #0]
+lsls	r2, r2, #1
+adds	r1, r3, #2
+adds	r2, r4, r2
+uxth	r1, r1
+lsls	r0, r6, #25
+bpl.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r5, ip
+ldrh	r0, [r2, #0]
+lsrs	r0, r0, #2
+ands	r0, r5
+strh	r0, [r2, #0]
+lsls	r1, r1, #1
+adds	r2, r3, #3
+adds	r1, r4, r1
+uxth	r2, r2
+lsls	r0, r6, #26
+bpl.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r5, ip
+ldrh	r0, [r1, #0]
+lsrs	r0, r0, #2
+ands	r0, r5
+strh	r0, [r1, #0]
+lsls	r2, r2, #1
+adds	r1, r3, #4
+adds	r2, r4, r2
+uxth	r1, r1
+lsls	r0, r6, #27
+bpl.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r5, ip
+ldrh	r0, [r2, #0]
+lsrs	r0, r0, #2
+ands	r0, r5
+strh	r0, [r2, #0]
+lsls	r1, r1, #1
+adds	r2, r3, #5
+adds	r1, r4, r1
+uxth	r2, r2
+lsls	r0, r6, #28
+bpl.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r5, ip
+ldrh	r0, [r1, #0]
+lsrs	r0, r0, #2
+ands	r0, r5
+strh	r0, [r1, #0]
+lsls	r2, r2, #1
+adds	r1, r3, #6
+adds	r2, r4, r2
+uxth	r1, r1
+lsls	r6, r6, #29
+bmi.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r5, ip
+ldrh	r0, [r2, #0]
+adds	r7, #1
+lsrs	r0, r0, #2
+ands	r0, r5
+strh	r0, [r2, #0]
+ldrb	r2, [r7, #0]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+movs	r3, r1
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r0, [pc, #368]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+adds	r7, #1
+strh	r0, [r2, #0]
+ldrb	r2, [r7, #0]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+lsls	r0, r1, #1
+adds	r3, #8
+adds	r1, #1
+ldr	r6, [sp, #8]
+ldr	r5, [sp, #12]
+lsls	r1, r1, #1
+uxth	r2, r3
+ldrh	r3, [r4, r0]
+ldr	r7, [pc, #328]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+lsrs	r3, r3, #2
+ands	r3, r7
+strh	r3, [r4, r0]
+ldrh	r3, [r4, r1]
+adds	r6, r6, r5
+lsrs	r3, r3, #2
+ands	r3, r7
+strh	r3, [r4, r1]
+ldr	r3, [pc, #324]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+ldr	r5, [pc, #328]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+adds	r6, r6, r3
+ldrb	r3, [r6, #0]
+mov	r0, fp
+lsrs	r3, r3, #4
+lsls	r3, r3, #2
+ldr	r1, [r3, r5]
+str	r4, [sp, #0]
+ldr	r3, [pc, #316]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+bl	<ADDR> <vrEmuTmsDiagRenderText.constprop.0>
+lsls	r3, r0, #1
+ldrh	r2, [r4, r3]
+adds	r0, #2
+lsrs	r2, r2, #2
+ands	r2, r7
+strh	r2, [r4, r3]
+adds	r3, #2
+ldrh	r2, [r4, r3]
+lsrs	r2, r2, #2
+ands	r2, r7
+strh	r2, [r4, r3]
+movs	r3, #15
+ldrb	r1, [r6, #0]
+uxth	r2, r0
+ands	r3, r1
+lsls	r3, r3, #2
+ldr	r1, [r3, r5]
+mov	r0, fp
+ldr	r3, [pc, #272]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+str	r4, [sp, #0]
+bl	<ADDR> <vrEmuTmsDiagRenderText.constprop.0>
+add	sp, #36	@ 0x24
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+adds	r5, r2, #2
+subs	r0, r5, r1
+adds	r0, #24
+movs	r1, #6
+bl	<ADDR> <__wrap___aeabi_uidiv>
+uxtb	r3, r0
+mov	sl, r0
+mov	r9, r3
+cmp	r3, #3
+bls.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+movs	r0, r5
+movs	r1, #6
+bl	<ADDR> <__wrap___aeabi_idiv>
+mov	fp, r1
+add	r1, sp, #20
+movs	r2, r1
+ldr	r3, [pc, #216]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+ldmia	r3!, {r0, r5}
+stmia	r2!, {r0, r5}
+ldrh	r0, [r3, #0]
+strh	r0, [r2, #0]
+ldrb	r3, [r3, #2]
+strb	r3, [r2, #2]
+mov	r3, r9
+adds	r3, #48	@ 0x30
+strb	r3, [r1, #8]
+mov	r3, fp
+movs	r2, #2
+uxth	r0, r3
+str	r4, [sp, #0]
+ldr	r3, [pc, #172]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+bl	<ADDR> <vrEmuTmsDiagRenderText.constprop.0>
+mov	r3, fp
+cmp	r3, #5
+bne.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r3, sl
+movs	r1, #255	@ 0xff
+ands	r1, r3
+ldr	r3, [pc, #172]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+lsls	r1, r1, #5
+adds	r3, r6, r3
+adds	r1, r1, r3
+movs	r3, #144	@ 0x90
+movs	r2, r4
+movs	r0, #240	@ 0xf0
+mov	ip, r4
+lsls	r3, r3, #3
+adds	r2, #128	@ 0x80
+adds	r5, r4, r3
+ldrh	r3, [r1, #0]
+adds	r1, #2
+bics	r3, r0
+lsrs	r4, r3, #8
+ands	r4, r0
+orrs	r3, r4
+lsls	r3, r3, #20
+lsrs	r4, r3, #20
+lsrs	r3, r3, #4
+adds	r3, r3, r4
+str	r3, [r2, #0]
+str	r3, [r2, #4]
+str	r3, [r2, #8]
+str	r3, [r2, #12]
+str	r3, [r2, #16]
+str	r3, [r2, #20]
+str	r3, [r2, #24]
+str	r3, [r2, #28]
+str	r3, [r2, #32]
+str	r3, [r2, #36]	@ 0x24
+str	r3, [r2, #40]	@ 0x28
+str	r3, [r2, #44]	@ 0x2c
+str	r3, [r2, #48]	@ 0x30
+str	r3, [r2, #52]	@ 0x34
+str	r3, [r2, #56]	@ 0x38
+adds	r2, #64	@ 0x40
+cmp	r2, r5
+bne.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+mov	r4, ip
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+movs	r2, #140	@ 0x8c
+ldr	r1, [pc, #92]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+ldr	r0, [pc, #52]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+lsls	r2, r2, #2
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r0, [pc, #60]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r0, [pc, #56]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r0, [pc, #52]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r0, [pc, #48]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+ldr	r0, [pc, #44]	@ (<ADDR> <vrEmuTmsDiagRender+OFF>)
+b.n	<ADDR> <vrEmuTmsDiagRender+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

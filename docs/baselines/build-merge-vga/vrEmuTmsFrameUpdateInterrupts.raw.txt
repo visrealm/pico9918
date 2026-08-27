@@ -1,0 +1,111 @@
+20003a64 <vrEmuTmsFrameUpdateInterrupts>:
+20003a64:	b530      	push	{r4, r5, lr}
+20003a66:	46c6      	mov	lr, r8
+20003a68:	0004      	movs	r4, r0
+20003a6a:	b500      	push	{lr}
+20003a6c:	2100      	movs	r1, #0
+20003a6e:	2009      	movs	r0, #9
+20003a70:	f7fd fd7e 	bl	20001570 <irq_set_enabled>
+20003a74:	2100      	movs	r1, #0
+20003a76:	200a      	movs	r0, #10
+20003a78:	f7fd fd7a 	bl	20001570 <irq_set_enabled>
+20003a7c:	f3bf 8f5f 	dmb	sy
+20003a80:	4b2e      	ldr	r3, [pc, #184]	@ (20003b3c <vrEmuTmsFrameUpdateInterrupts+0xd8>)
+20003a82:	4a2f      	ldr	r2, [pc, #188]	@ (20003b40 <vrEmuTmsFrameUpdateInterrupts+0xdc>)
+20003a84:	681b      	ldr	r3, [r3, #0]
+20003a86:	5c98      	ldrb	r0, [r3, r2]
+20003a88:	569a      	ldrsb	r2, [r3, r2]
+20003a8a:	2a00      	cmp	r2, #0
+20003a8c:	db47      	blt.n	20003b1e <vrEmuTmsFrameUpdateInterrupts+0xba>
+20003a8e:	0642      	lsls	r2, r0, #25
+20003a90:	d43d      	bmi.n	20003b0e <vrEmuTmsFrameUpdateInterrupts+0xaa>
+20003a92:	221f      	movs	r2, #31
+20003a94:	4390      	bics	r0, r2
+20003a96:	4320      	orrs	r0, r4
+20003a98:	21ff      	movs	r1, #255	@ 0xff
+20003a9a:	4a29      	ldr	r2, [pc, #164]	@ (20003b40 <vrEmuTmsFrameUpdateInterrupts+0xdc>)
+20003a9c:	5498      	strb	r0, [r3, r2]
+20003a9e:	4a29      	ldr	r2, [pc, #164]	@ (20003b44 <vrEmuTmsFrameUpdateInterrupts+0xe0>)
+20003aa0:	5498      	strb	r0, [r3, r2]
+20003aa2:	4a29      	ldr	r2, [pc, #164]	@ (20003b48 <vrEmuTmsFrameUpdateInterrupts+0xe4>)
+20003aa4:	7812      	ldrb	r2, [r2, #0]
+20003aa6:	0212      	lsls	r2, r2, #8
+20003aa8:	430a      	orrs	r2, r1
+20003aaa:	7ad9      	ldrb	r1, [r3, #11]
+20003aac:	2900      	cmp	r1, #0
+20003aae:	d033      	beq.n	20003b18 <vrEmuTmsFrameUpdateInterrupts+0xb4>
+20003ab0:	4926      	ldr	r1, [pc, #152]	@ (20003b4c <vrEmuTmsFrameUpdateInterrupts+0xe8>)
+20003ab2:	5c59      	ldrb	r1, [r3, r1]
+20003ab4:	000c      	movs	r4, r1
+20003ab6:	210f      	movs	r1, #15
+20003ab8:	4021      	ands	r1, r4
+20003aba:	060c      	lsls	r4, r1, #24
+20003abc:	4314      	orrs	r4, r2
+20003abe:	4a21      	ldr	r2, [pc, #132]	@ (20003b44 <vrEmuTmsFrameUpdateInterrupts+0xe0>)
+20003ac0:	1859      	adds	r1, r3, r1
+20003ac2:	5c8a      	ldrb	r2, [r1, r2]
+20003ac4:	0412      	lsls	r2, r2, #16
+20003ac6:	4322      	orrs	r2, r4
+20003ac8:	4921      	ldr	r1, [pc, #132]	@ (20003b50 <vrEmuTmsFrameUpdateInterrupts+0xec>)
+20003aca:	614a      	str	r2, [r1, #20]
+20003acc:	4921      	ldr	r1, [pc, #132]	@ (20003b54 <vrEmuTmsFrameUpdateInterrupts+0xf0>)
+20003ace:	5c5a      	ldrb	r2, [r3, r1]
+20003ad0:	4694      	mov	ip, r2
+20003ad2:	4a21      	ldr	r2, [pc, #132]	@ (20003b58 <vrEmuTmsFrameUpdateInterrupts+0xf4>)
+20003ad4:	5c9a      	ldrb	r2, [r3, r2]
+20003ad6:	0692      	lsls	r2, r2, #26
+20003ad8:	d501      	bpl.n	20003ade <vrEmuTmsFrameUpdateInterrupts+0x7a>
+20003ada:	0600      	lsls	r0, r0, #24
+20003adc:	d423      	bmi.n	20003b26 <vrEmuTmsFrameUpdateInterrupts+0xc2>
+20003ade:	4662      	mov	r2, ip
+20003ae0:	2a00      	cmp	r2, #0
+20003ae2:	d007      	beq.n	20003af4 <vrEmuTmsFrameUpdateInterrupts+0x90>
+20003ae4:	2100      	movs	r1, #0
+20003ae6:	4a1b      	ldr	r2, [pc, #108]	@ (20003b54 <vrEmuTmsFrameUpdateInterrupts+0xf0>)
+20003ae8:	5499      	strb	r1, [r3, r2]
+20003aea:	23d0      	movs	r3, #208	@ 0xd0
+20003aec:	2280      	movs	r2, #128	@ 0x80
+20003aee:	061b      	lsls	r3, r3, #24
+20003af0:	03d2      	lsls	r2, r2, #15
+20003af2:	615a      	str	r2, [r3, #20]
+20003af4:	f3bf 8f5f 	dmb	sy
+20003af8:	2101      	movs	r1, #1
+20003afa:	2009      	movs	r0, #9
+20003afc:	f7fd fd38 	bl	20001570 <irq_set_enabled>
+20003b00:	2101      	movs	r1, #1
+20003b02:	200a      	movs	r0, #10
+20003b04:	f7fd fd34 	bl	20001570 <irq_set_enabled>
+20003b08:	bc20      	pop	{r5}
+20003b0a:	46a8      	mov	r8, r5
+20003b0c:	bd30      	pop	{r4, r5, pc}
+20003b0e:	221f      	movs	r2, #31
+20003b10:	0021      	movs	r1, r4
+20003b12:	4391      	bics	r1, r2
+20003b14:	4308      	orrs	r0, r1
+20003b16:	e7bf      	b.n	20003a98 <vrEmuTmsFrameUpdateInterrupts+0x34>
+20003b18:	0401      	lsls	r1, r0, #16
+20003b1a:	430a      	orrs	r2, r1
+20003b1c:	e7d4      	b.n	20003ac8 <vrEmuTmsFrameUpdateInterrupts+0x64>
+20003b1e:	2220      	movs	r2, #32
+20003b20:	4022      	ands	r2, r4
+20003b22:	4310      	orrs	r0, r2
+20003b24:	e7b8      	b.n	20003a98 <vrEmuTmsFrameUpdateInterrupts+0x34>
+20003b26:	4662      	mov	r2, ip
+20003b28:	2a00      	cmp	r2, #0
+20003b2a:	d1e3      	bne.n	20003af4 <vrEmuTmsFrameUpdateInterrupts+0x90>
+20003b2c:	3201      	adds	r2, #1
+20003b2e:	545a      	strb	r2, [r3, r1]
+20003b30:	23d0      	movs	r3, #208	@ 0xd0
+20003b32:	2280      	movs	r2, #128	@ 0x80
+20003b34:	061b      	lsls	r3, r3, #24
+20003b36:	03d2      	lsls	r2, r2, #15
+20003b38:	619a      	str	r2, [r3, #24]
+20003b3a:	e7db      	b.n	20003af4 <vrEmuTmsFrameUpdateInterrupts+0x90>
+20003b3c:	2000d534 	.word	0x2000d534
+20003b40:	00010152 	.word	0x00010152
+20003b44:	0000b02c 	.word	0x0000b02c
+20003b48:	20028676 	.word	0x20028676
+20003b4c:	0000603b 	.word	0x0000603b
+20003b50:	50300000 	.word	0x50300000
+20003b54:	00010151 	.word	0x00010151
+20003b58:	0000602d 	.word	0x0000602d

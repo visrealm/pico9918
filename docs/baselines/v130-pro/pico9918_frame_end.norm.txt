@@ -1,0 +1,158 @@
+<ADDR> <pico9918_frame_end>:
+stmdb	sp!, {r4, r5, r6, r7, r8, lr}
+ldr	r7, [pc, #392]	@ (<ADDR> <pico9918_frame_end+OFF>)
+vmov	s15, r1
+vldr	s14, [r7]
+vadd.f32	s15, s15, s14
+ldr	r6, [pc, #384]	@ (<ADDR> <pico9918_frame_end+OFF>)
+mov	r4, r0
+ldr	r1, [r6, #0]
+ldr	r0, [pc, #380]	@ (<ADDR> <pico9918_frame_end+OFF>)
+adds	r1, #1
+ldr.w	r8, [r0]
+lsls	r0, r1, #26
+sub	sp, #8
+mov	r5, r3
+vstr	s15, [r7]
+str	r1, [r6, #0]
+beq.n	<ADDR> <pico9918_frame_end+OFF>
+ldr	r3, [pc, #364]	@ (<ADDR> <pico9918_frame_end+OFF>)
+add.w	r7, r8, #24576	@ 0x6000
+ldrb	r1, [r3, #0]
+cbnz	r1, <ADDR> <pico9918_frame_end+OFF>
+ldrb	r1, [r7, #1]
+ubfx	r0, r1, #6, #1
+lsls	r1, r1, #25
+strb	r0, [r3, #0]
+bmi.w	<ADDR> <pico9918_frame_end+OFF>
+add.w	r3, r8, #65536	@ 0x10000
+ldrb.w	r1, [r3, #96]	@ 0x60
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_frame_end+OFF>
+ldrb.w	r2, [r3, #1518]	@ 0x5ee
+cmp	r2, #0
+beq.n	<ADDR> <pico9918_frame_end+OFF>
+ldrb.w	r1, [r7, #49]	@ 0x31
+ldrb	r3, [r5, #4]
+and.w	r1, r1, #64	@ 0x40
+cbz	r3, <ADDR> <pico9918_frame_end+OFF>
+cmp	r1, #0
+bne.n	<ADDR> <pico9918_frame_end+OFF>
+movs	r3, #192	@ 0xc0
+ldr	r0, [pc, #304]	@ (<ADDR> <pico9918_frame_end+OFF>)
+mov	r1, r3
+str	r3, [r0, #0]
+mov	r0, r3
+ldrh	r2, [r5, #6]
+subs	r3, r2, r0
+add.w	r3, r3, r3, lsr #31
+asrs	r3, r3, #1
+strd	r0, r3, [r4]
+mov	r0, r4
+ldr	r5, [pc, #284]	@ (<ADDR> <pico9918_frame_end+OFF>)
+add	r1, r3
+str	r3, [r5, #0]
+str	r1, [r4, #8]
+add	sp, #8
+ldmia.w	sp!, {r4, r5, r6, r7, r8, pc}
+ldr	r2, [r5, #0]
+ldrb	r3, [r7, #0]
+add.w	r2, r2, r2, lsr #31
+and.w	r6, r3, #8
+asrs	r2, r2, #1
+ubfx	r3, r3, #3, #1
+lsls	r2, r3
+uxth	r2, r2
+rsb	r3, r3, #2
+strb	r3, [r5, #5]
+strh	r2, [r5, #6]
+cbz	r1, <ADDR> <pico9918_frame_end+OFF>
+movs	r1, #240	@ 0xf0
+mov.w	r3, #480	@ 0x1e0
+mov	r0, r1
+mov	r5, r3
+cmp	r6, #0
+beq.n	<ADDR> <pico9918_frame_end+OFF>
+mov	r1, r3
+ldr	r3, [pc, #220]	@ (<ADDR> <pico9918_frame_end+OFF>)
+mov	r0, r5
+str	r5, [r3, #0]
+b.n	<ADDR> <pico9918_frame_end+OFF>
+movs	r1, #192	@ 0xc0
+mov.w	r3, #384	@ 0x180
+mov	r0, r1
+mov	r5, r3
+cmp	r6, #0
+bne.n	<ADDR> <pico9918_frame_end+OFF>
+b.n	<ADDR> <pico9918_frame_end+OFF>
+movs	r3, #240	@ 0xf0
+b.n	<ADDR> <pico9918_frame_end+OFF>
+vldr	s14, [pc, #200]	@ <ADDR> <pico9918_frame_end+OFF>
+vmul.f32	s15, s15, s14
+vmov	r0, s15
+vstr	s15, [r7]
+str	r2, [sp, #4]
+bl	<ADDR> <pico9918_diag_set_temperature>
+vldr	s13, [r7]
+vmov.f32	s14, #16	@ 0xADDR  4.0
+vmov.f32	s15, #96	@ 0xADDR  0.5
+vfma.f32	s15, s13, s14
+vcvt.u32.f32	s15, s15
+movs	r1, #0
+vmov	r3, s15
+str	r1, [r7, #0]
+add.w	r1, r8, #45056	@ 0xb000
+ldr	r2, [sp, #4]
+strb	r3, [r1, #13]
+b.n	<ADDR> <pico9918_frame_end+OFF>
+movs	r0, #1
+add.w	r2, r8, #45056	@ 0xb000
+ldrb	r1, [r2, #1]
+orr.w	r1, r1, #2
+strb	r1, [r2, #1]
+ldrb.w	r2, [r7, #50]	@ 0x32
+strb.w	r0, [r3, #1518]	@ 0x5ee
+lsls	r2, r2, #26
+ldrb.w	r2, [r3, #336]	@ 0x150
+it	mi
+strbmi.w	r0, [r3, #48]	@ 0x30
+cbnz	r2, <ADDR> <pico9918_frame_end+OFF>
+movs	r0, #128	@ 0x80
+bl	<ADDR> <pico9918_frame_update_interrupts>
+b.n	<ADDR> <pico9918_frame_end+OFF>
+mov	r0, r2
+str	r3, [sp, #4]
+bl	<ADDR> <pico9918_diag_set_frame_rate>
+ldr	r0, [r6, #0]
+bl	<ADDR> <pico9918_diag_update>
+ldr	r3, [sp, #4]
+b.n	<ADDR> <pico9918_frame_end+OFF>
+ldr	r3, [pc, #68]	@ (<ADDR> <pico9918_frame_end+OFF>)
+str	r0, [r3, #0]
+b.n	<ADDR> <pico9918_frame_end+OFF>
+str	r2, [sp, #4]
+bl	<ADDR> <pico9918_splash_allow_hide>
+ldr	r3, [r6, #0]
+ldr	r2, [sp, #4]
+cmp.w	r3, #900	@ 0x384
+ble.w	<ADDR> <pico9918_frame_end+OFF>
+ldr	r3, [pc, #56]	@ (<ADDR> <pico9918_frame_end+OFF>)
+ldr	r3, [r3, #0]
+cmp	r3, #0
+beq.w	<ADDR> <pico9918_frame_end+OFF>
+blx	r3
+ldr	r2, [sp, #4]
+b.n	<ADDR> <pico9918_frame_end+OFF>
+movs	r2, #0
+strb.w	r2, [r3, #336]	@ 0x150
+bl	<ADDR> <pico9918_config_apply>
+bl	<ADDR> <pico9918_diag_config_updated>
+b.n	<ADDR> <pico9918_frame_end+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

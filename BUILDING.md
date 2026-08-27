@@ -1,4 +1,4 @@
-# Building PICO9918
+# Building PICO9918 {#building}
 
 This document describes how to build the PICO9918 firmware and configurator ROMs.
 
@@ -6,18 +6,18 @@ This document describes how to build the PICO9918 firmware and configurator ROMs
 
 ### Required Tools
 - **CMake 3.13+**: Build system generator
-- **ARM GNU Toolchain**: Cross-compiler for ARM Cortex-M0+ (RP2040)
+- **ARM GNU Toolchain**: Cross-compiler for ARM Cortex-M33 (RP2350) and Cortex-M0+ (RP2040)
 - **Raspberry Pi Pico SDK**: Firmware compilation (v2.1.1 recommended for compatibility)
 - **Python 3**: Build scripts and asset conversion
-- **Git**: For submodules and dependencies
+- **Git**: For the checkout and dependencies
 
 ### Platform-Specific Setup
 
 #### Windows
 ```bash
 # Install dependencies
-# Download and install ARM GNU Toolchain 13.2.1-1.1 from:
-# https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-win32-x64.zip
+# Download and install ARM GNU Toolchain 15.2.Rel1 from:
+# https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 # Extract to C:\arm-toolchain\ and add to PATH
 
 # Python dependencies
@@ -56,9 +56,9 @@ cd ..
 brew install cmake ninja python3 git
 
 # Install ARM GNU Toolchain (same version as other platforms for consistency)
-curl -L "https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases/download/v13.2.1-1.1/xpack-arm-none-eabi-gcc-13.2.1-1.1-darwin-arm64.tar.gz" -o arm-toolchain.tar.gz
-sudo tar -xzf arm-toolchain.tar.gz -C /opt
-echo 'export PATH="/opt/xpack-arm-none-eabi-gcc-13.2.1-1.1/bin:$PATH"' >> ~/.zshrc
+curl -L "https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads" -o arm-toolchain.tar.xz
+sudo tar -xJf arm-toolchain.tar.xz -C /opt
+echo 'export PATH="/opt/arm-gnu-toolchain-15.2.rel1/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 
 # Python dependencies (may require --break-system-packages on newer macOS)
@@ -95,14 +95,24 @@ cmake --build . --target build_configurators
 
 Outputs in `build/dist/`: combined `.uf2` firmware and all configurator ROMs.
 
-**Firmware only (RP2040)**
+**Firmware only**
 ```bash
 mkdir build && cd build
 cmake ..
 cmake --build . --target firmware
 ```
 
-Output: `build/dist/pico9918-vga-build-<version>.uf2`
+`PICO_BOARD` defaults to `pico9918pro`, so this builds the RP2350 firmware and
+writes `build/dist/pico9918pro-v<version>.uf2`. For the RP2040 board, configure
+with `-DPICO_BOARD=pico9918`, which writes `build/dist/pico9918-v<version>.uf2`.
+
+Artifacts built off any branch other than `main` carry the branch name, so the
+same build on this branch is `pico9918pro-v<version>-<branch>.uf2`. A VGA-only
+build (`-DPICO9918_ENABLE_SCART=OFF`) adds `-vgaonly`, and `-DPICO9918_DIAG=ON`
+adds `-diag`.
+
+The `firmware` target is what populates `build/dist/`; a bare `cmake --build .`
+leaves it empty.
 
 ### Firmware Configuration Options
 
@@ -116,6 +126,10 @@ cmake .. -DPICO9918_DIAG=ON
 - **`PICO9918_ENABLE_SCART`** (ON/OFF, default ON): Runtime SCART dongle autodetect. VGA is always supported; when a SCART dongle is detected at boot, output switches to RGBs and the PAL/NTSC timing comes from the user configuration. Set OFF to produce a pure VGA-only firmware with no SCART detection code.
 - **`PICO9918_NO_SPLASH`** (OFF/ON): Disable splash screen on startup
 - **`PICO9918_DIAG`** (OFF/ON): Enable diagnostic mode by default
+- **`PICO9918_TEXT80_8BPP`** (board default): 80-column text at 8bpp, which is what ECM, tile palette select and the bitmap layer need in T80. Defaults ON for the RP2350 board, OFF for the RP2040, which lacks the budget for the 512-byte line it costs.
+- **`PICO9918_COLD_IN_FLASH`** (ON/OFF, default ON): Keep boot-only code and data resident in flash (XIP) rather than copying it to RAM, buying back SRAM. See `src/xip.h` for what may not live there.
+- **`PICO9918_GPU_FRAME_COUNTER`** (OFF/ON): Enable the GPU frame counter, which adds a row to the diagnostic performance panel.
+- **`PICO9918_LIVE_TEST`** (OFF/ON): Test builds only - the SWD live capture buffer used by `test/live/`. It costs about a microsecond a line, so timing readings from such a build are not valid. See [DEBUGGING.md](DEBUGGING.md).
 
 #### Configuration Examples
 ```bash
@@ -174,7 +188,7 @@ wins over the file.
 
 ### Firmware Targets
 - **`firmware`**: Build firmware and copy to `build/dist/` (unified CMake system only)
-- **`pico9918-vga-build-<version>`**: Direct firmware target name (available in all builds)
+- **`pico9918[pro]-v<version>[-<branch>]`**: Direct firmware target name, which is also the artifact name (available in all builds)
 
 ### VSCode Firmware Build
 Use the Raspberry Pi Pico VSCode extension:
@@ -196,11 +210,11 @@ Set build options in `.vscode/settings.json`:
 ```
 
 ### Firmware Architecture
-- **Core 0**: TMS9918A emulation, host interface  
-- **Core 1**: VGA output generation
+- **Core 0**: bring-up, then the F18A GPU loop
+- **Core 1**: host bus interface, VGA output and per-scanline TMS9918A rendering
 - **PIO**: Hardware-timed signal generation
 - **DMA**: Memory transfers and sprite processing
-- **Flash**: Configuration storage in upper 1MB
+- **Flash**: Configuration storage in the top 4KB, with a pending block one sector below
 
 ### SDK Performance Patch
 
@@ -235,22 +249,25 @@ The configurator creates ROM files for retro computers that can upload firmware 
 
 The recommended approach is the **combined build** above, which builds firmware and all configurator ROMs together and embeds the combined RP2040+RP2350 firmware in each ROM.
 
-To build configurator ROMs against an existing firmware (standalone):
+To build configurator ROMs against an existing firmware UF2 (standalone):
 ```bash
 mkdir build && cd build
-cmake .. -DPICO9918_BUILD_COMBINED=ON
-cmake --build . --target combined
-cmake --build . --target build_configurators
+cmake .. -DCONFIGURATOR_ONLY=ON -DPICO9918_FIRMWARE_UF2_PATH=<path-to-firmware.uf2>
+cmake --build . --target configurator_all
 ```
 
 ### Configurator Targets
-- **`configurator_all`**: Build all configurator ROMs
-- **`ti99`**: TI-99/4A ROM (8KB banks)
-- **`coleco`**: ColecoVision ROM (16KB banks)
-- **`msx_asc16`**: MSX ASCII16 mapper ROM
-- **`msx_konami`**: MSX Konami mapper ROM
+- **`configurator_all`**: `ti99`, `coleco`, `msx_asc16`, `msx_konami`, each with its `_lite` variant, plus `nabu` and `sg1000`
+- **`ti99`** / **`ti99_lite`**: TI-99/4A ROM (8KB banks)
+- **`coleco`** / **`coleco_lite`**: ColecoVision ROM (16KB banks)
+- **`msx_asc16`** / **`msx_asc16_lite`**: MSX ASCII16 mapper ROM
+- **`msx_konami`** / **`msx_konami_lite`**: MSX Konami mapper ROM
 - **`nabu`**: NABU computer ROM
-- **`creativision`**: CreatiVision ROM
+- **`sg1000`**: SG-1000/SC-3000 ROM
+- **`creativision`**: CreatiVision ROM. Currently does not assemble - the image overruns its 16KB ROM, so it is excluded from `configurator_all` rather than failing every build.
+
+The `_lite` variants are built with `NO_UPGRADE`, which drops the firmware-update
+path and the embedded firmware image with it.
 
 ### Individual Platform Builds
 ```bash
@@ -298,7 +315,8 @@ cmake .. -DBUILD_TOOLS_FROM_SOURCE=OFF
 | MSX ASCII16 | 16KB | `.rom` | GASM80 | ASCII16 mapper |
 | MSX Konami | 16KB | `.rom` | GASM80 | Konami mapper |
 | NABU | None | `.nabu` | GASM80 | NABU computer |
-| CreatiVision | None | `.bin` | GASM80 | CreatiVision console |
+| SG-1000/SC-3000 | None | `.sg` | GASM80 | No banking, so no firmware upgrade |
+| CreatiVision | None | `.bin` | GASM80 | Overruns its 16KB ROM; not built by `configurator_all` |
 
 ## Combined Build (Recommended)
 
@@ -314,7 +332,7 @@ cmake --build . --target build_configurators
 ```
 
 All outputs land in `build/dist/`:
-- **Combined firmware**: `pico9918-vga-<version>.uf2` - works on both RP2040 and RP2350
+- **Combined firmware**: `pico9918-v<version>.uf2` - works on both RP2040 and RP2350
 - **Configurator ROMs**: All platform ROMs, each embedding the combined firmware
 
 ### Ninja Generator (Faster)
@@ -339,22 +357,24 @@ cmake ..
 cmake --build . --target firmware
 ```
 
-Output: `build/dist/pico9918-vga-build-<version>.uf2` (RP2040 only)
+Output: `build/dist/pico9918pro-v<version>.uf2`, the RP2350 firmware, since
+`PICO_BOARD` defaults to `pico9918pro`.
 
-For RP2350 (PICO9918 PRO) firmware only, set the board in CMake or use the combined build above.
+For the RP2040 board, configure with `-DPICO_BOARD=pico9918`, or use the combined
+build above to produce both.
 
 ## Cross-Platform Support
 
 All major platforms are supported with consistent toolchains and build processes. See the **Platform-Specific Setup** section above for detailed installation instructions.
 
 ### Platform Summary
-- **Windows**: Native build with ARM GNU Toolchain 13.2.1-1.1
-- **Linux**: Native build with `gcc-arm-none-eabi` package  
-- **macOS**: Native build with ARM GNU Toolchain 13.2.1-1.1 (for consistency)
+- **Windows**: Native build with ARM GNU Toolchain 15.2.Rel1
+- **Linux**: Native build with ARM GNU Toolchain 15.2.Rel1
+- **macOS**: Native build with ARM GNU Toolchain 15.2.Rel1 (for consistency)
 - **WSL**: Use Linux instructions within Windows Subsystem for Linux
 
 ### Important Notes
-- **Toolchain Consistency**: All platforms use ARM GNU Toolchain 13.2.1-1.1 to ensure identical builds
+- **Toolchain Consistency**: All platforms use ARM GNU Toolchain 15.2.Rel1 to ensure identical builds
 - **macOS Python**: May require `--break-system-packages` flag for pip on newer macOS versions
 - **SDK Version**: Use Pico SDK 2.1.1 specifically - newer versions may cause linker issues
 
@@ -381,10 +401,10 @@ The project includes GitHub Actions workflows that automatically build on every 
 ```
 build/
 ├── dist/                                      # Final artifacts
-│   ├── pico9918-vga-<version>.uf2             # Combined RP2040+RP2350 firmware
-│   ├── pico9918_<version>_ti99_8.bin          # TI-99/4A ROM (with combined firmware)
-│   ├── pico9918_<version>_cv.rom              # ColecoVision ROM
-│   ├── pico9918_<version>_msx_asc16.rom       # MSX ROM
+│   ├── pico9918-v<version>.uf2                # Combined RP2040+RP2350 firmware
+│   ├── pico9918conf-v<version>_ti99_8.bin     # TI-99/4A ROM (with combined firmware)
+│   ├── pico9918conf-v<version>_cv.rom         # ColecoVision ROM
+│   ├── pico9918conf-v<version>_msx_asc16.rom  # MSX ROM
 │   └── ...                                    # Other platform ROMs
 ├── pico9918/dist/                             # RP2040-only firmware
 ├── pico9918pro/dist/                          # RP2350-only firmware
@@ -395,7 +415,7 @@ build/
 ```
 build/
 ├── dist/                                      # Final artifacts
-│   └── pico9918-vga-build-<version>.uf2       # RP2040 firmware
+│   └── pico9918pro-v<version>.uf2             # RP2350 firmware (the default board)
 └── src/                                       # Build intermediates
 ```
 
@@ -419,9 +439,11 @@ cd pico-sdk && git submodule update --init
 export PICO_SDK_PATH=$PWD
 cd ../your-build-directory
 cmake ..
-
-# Note: PICO_SDK_FETCH_FROM_GIT_TAG has known issues with tag resolution
 ```
+
+The automatic fetch (`-DPICO_SDK_FETCH_FROM_GIT=ON -DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1`)
+is what CI uses and what the quick start recommends; install the SDK by hand only
+if you want one checkout shared across build directories.
 
 **SDK patch issues**
 ```bash
@@ -449,9 +471,11 @@ cmake .. -DBUILD_TOOLS_FROM_SOURCE=ON
 ```
 
 **Firmware dependency error**
+
+The configurator ROMs embed a firmware UF2 from `build/dist/`, which only the
+`firmware` target populates:
 ```bash
-# Build firmware first
-cmake --build .
+cmake --build . --target firmware
 ```
 
 ### General Issues

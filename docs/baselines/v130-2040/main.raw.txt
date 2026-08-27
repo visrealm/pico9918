@@ -1,0 +1,116 @@
+10000be0 <main>:
+10000be0:	23d0      	movs	r3, #208	@ 0xd0
+10000be2:	2200      	movs	r2, #0
+10000be4:	b530      	push	{r4, r5, lr}
+10000be6:	061b      	lsls	r3, r3, #24
+10000be8:	b0ef      	sub	sp, #444	@ 0x1bc
+10000bea:	611a      	str	r2, [r3, #16]
+10000bec:	2280      	movs	r2, #128	@ 0x80
+10000bee:	03d2      	lsls	r2, r2, #15
+10000bf0:	621a      	str	r2, [r3, #32]
+10000bf2:	2105      	movs	r1, #5
+10000bf4:	483b      	ldr	r0, [pc, #236]	@ (10000ce4 <main+0x104>)
+10000bf6:	f000 ffbb 	bl	10001b70 <__gpio_set_function_masked_veneer>
+10000bfa:	f000 ff81 	bl	10001b00 <__currentHwVersion_veneer>
+10000bfe:	f000 f967 	bl	10000ed0 <detectScartDongle>
+10000c02:	f000 ff5d 	bl	10001ac0 <__systemClockInit_veneer>
+10000c06:	f000 ff8b 	bl	10001b20 <__pico9918_init_veneer>
+10000c0a:	4837      	ldr	r0, [pc, #220]	@ (10000ce8 <main+0x108>)
+10000c0c:	f000 ff40 	bl	10001a90 <__multicore_launch_core1_veneer>
+10000c10:	4b36      	ldr	r3, [pc, #216]	@ (10000cec <main+0x10c>)
+10000c12:	681c      	ldr	r4, [r3, #0]
+10000c14:	4b36      	ldr	r3, [pc, #216]	@ (10000cf0 <main+0x110>)
+10000c16:	18e5      	adds	r5, r4, r3
+10000c18:	0028      	movs	r0, r5
+10000c1a:	f000 ff31 	bl	10001a80 <__readConfig_veneer>
+10000c1e:	0028      	movs	r0, r5
+10000c20:	f000 f9aa 	bl	10000f78 <applyPendingDisplay>
+10000c24:	f000 ff0c 	bl	10001a40 <__updateDispDriver_veneer>
+10000c28:	f001 f81a 	bl	10001c60 <__systemClockApplyConfig_veneer>
+10000c2c:	f000 f92c 	bl	10000e88 <vdpClocksInit>
+10000c30:	f000 fefe 	bl	10001a30 <__paletteInit_veneer>
+10000c34:	2100      	movs	r1, #0
+10000c36:	229c      	movs	r2, #156	@ 0x9c
+10000c38:	a847      	add	r0, sp, #284	@ 0x11c
+10000c3a:	f000 fff9 	bl	10001c30 <____wrap_memset_veneer>
+10000c3e:	4b2d      	ldr	r3, [pc, #180]	@ (10000cf4 <main+0x114>)
+10000c40:	5ce3      	ldrb	r3, [r4, r3]
+10000c42:	1e19      	subs	r1, r3, #0
+10000c44:	d004      	beq.n	10000c50 <main+0x70>
+10000c46:	4b2c      	ldr	r3, [pc, #176]	@ (10000cf8 <main+0x118>)
+10000c48:	5ce1      	ldrb	r1, [r4, r3]
+10000c4a:	1e4b      	subs	r3, r1, #1
+10000c4c:	4199      	sbcs	r1, r3
+10000c4e:	3101      	adds	r1, #1
+10000c50:	a824      	add	r0, sp, #144	@ 0x90
+10000c52:	f000 ff95 	bl	10001b80 <__vgaGetParams_veneer>
+10000c56:	2284      	movs	r2, #132	@ 0x84
+10000c58:	a924      	add	r1, sp, #144	@ 0x90
+10000c5a:	a847      	add	r0, sp, #284	@ 0x11c
+10000c5c:	f000 ff20 	bl	10001aa0 <____wrap_memcpy_veneer>
+10000c60:	a847      	add	r0, sp, #284	@ 0x11c
+10000c62:	f001 f815 	bl	10001c90 <__rendererConfigureVga_veneer>
+10000c66:	228c      	movs	r2, #140	@ 0x8c
+10000c68:	a94b      	add	r1, sp, #300	@ 0x12c
+10000c6a:	4668      	mov	r0, sp
+10000c6c:	f000 ff18 	bl	10001aa0 <____wrap_memcpy_veneer>
+10000c70:	9b4a      	ldr	r3, [sp, #296]	@ 0x128
+10000c72:	9948      	ldr	r1, [sp, #288]	@ 0x120
+10000c74:	9a49      	ldr	r2, [sp, #292]	@ 0x124
+10000c76:	9847      	ldr	r0, [sp, #284]	@ 0x11c
+10000c78:	f000 fc6a 	bl	10001550 <vgaInit>
+10000c7c:	481f      	ldr	r0, [pc, #124]	@ (10000cfc <main+0x11c>)
+10000c7e:	f000 fef7 	bl	10001a70 <__pico9918_config_set_applied_callback_veneer>
+10000c82:	481f      	ldr	r0, [pc, #124]	@ (10000d00 <main+0x120>)
+10000c84:	f000 ffcc 	bl	10001c20 <__pico9918_frame_set_config_reload_callback_veneer>
+10000c88:	f000 f9ce 	bl	10001028 <initTemperature>
+10000c8c:	f000 fdd0 	bl	10001830 <pico9918_diag_init>
+10000c90:	f000 ff36 	bl	10001b00 <__currentHwVersion_veneer>
+10000c94:	4b1b      	ldr	r3, [pc, #108]	@ (10000d04 <main+0x124>)
+10000c96:	2803      	cmp	r0, #3
+10000c98:	d100      	bne.n	10000c9c <main+0xbc>
+10000c9a:	4b1b      	ldr	r3, [pc, #108]	@ (10000d08 <main+0x128>)
+10000c9c:	0018      	movs	r0, r3
+10000c9e:	491b      	ldr	r1, [pc, #108]	@ (10000d0c <main+0x12c>)
+10000ca0:	f000 fea6 	bl	100019f0 <__pico9918_diag_set_version_info_veneer>
+10000ca4:	2102      	movs	r1, #2
+10000ca6:	2200      	movs	r2, #0
+10000ca8:	4b12      	ldr	r3, [pc, #72]	@ (10000cf4 <main+0x114>)
+10000caa:	5ce3      	ldrb	r3, [r4, r3]
+10000cac:	4299      	cmp	r1, r3
+10000cae:	4152      	adcs	r2, r2
+10000cb0:	4252      	negs	r2, r2
+10000cb2:	4013      	ands	r3, r2
+10000cb4:	4a16      	ldr	r2, [pc, #88]	@ (10000d10 <main+0x130>)
+10000cb6:	009b      	lsls	r3, r3, #2
+10000cb8:	5899      	ldr	r1, [r3, r2]
+10000cba:	4a16      	ldr	r2, [pc, #88]	@ (10000d14 <main+0x134>)
+10000cbc:	5898      	ldr	r0, [r3, r2]
+10000cbe:	f001 f817 	bl	10001cf0 <__pico9918_diag_set_output_name_veneer>
+10000cc2:	2000      	movs	r0, #0
+10000cc4:	f000 ffec 	bl	10001ca0 <__multicore_fifo_push_blocking_veneer>
+10000cc8:	f000 ff92 	bl	10001bf0 <__pico9918_gpu_init_veneer>
+10000ccc:	4812      	ldr	r0, [pc, #72]	@ (10000d18 <main+0x138>)
+10000cce:	f000 ffb7 	bl	10001c40 <__pico9918_gpu_set_flash_callback_veneer>
+10000cd2:	4812      	ldr	r0, [pc, #72]	@ (10000d1c <main+0x13c>)
+10000cd4:	f000 ff94 	bl	10001c00 <__pico9918_gpu_set_config_save_callback_veneer>
+10000cd8:	f000 fe9a 	bl	10001a10 <__pico9918_gpu_loop_veneer>
+10000cdc:	2000      	movs	r0, #0
+10000cde:	b06f      	add	sp, #444	@ 0x1bc
+10000ce0:	bd30      	pop	{r4, r5, pc}
+10000ce2:	46c0      	nop			@ (mov r8, r8)
+10000ce4:	3cffc000 	.word	0x3cffc000
+10000ce8:	10000bc1 	.word	0x10000bc1
+10000cec:	20022eb0 	.word	0x20022eb0
+10000cf0:	00010050 	.word	0x00010050
+10000cf4:	00010055 	.word	0x00010055
+10000cf8:	0001005b 	.word	0x0001005b
+10000cfc:	200159d9 	.word	0x200159d9
+10000d00:	200159f9 	.word	0x200159f9
+10000d04:	20022518 	.word	0x20022518
+10000d08:	20022510 	.word	0x20022510
+10000d0c:	20022520 	.word	0x20022520
+10000d10:	200227e0 	.word	0x200227e0
+10000d14:	200227ec 	.word	0x200227ec
+10000d18:	20015e51 	.word	0x20015e51
+10000d1c:	20015601 	.word	0x20015601

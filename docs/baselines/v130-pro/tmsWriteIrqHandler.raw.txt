@@ -1,0 +1,132 @@
+20019940 <tmsWriteIrqHandler>:
+20019940:	b510      	push	{r4, lr}
+20019942:	4a5f      	ldr	r2, [pc, #380]	@ (20019ac0 <tmsWriteIrqHandler+0x180>)
+20019944:	4b5f      	ldr	r3, [pc, #380]	@ (20019ac4 <tmsWriteIrqHandler+0x184>)
+20019946:	6a11      	ldr	r1, [r2, #32]
+20019948:	681b      	ldr	r3, [r3, #0]
+2001994a:	f011 4e80 	ands.w	lr, r1, #1073741824	@ 0x40000000
+2001994e:	b082      	sub	sp, #8
+20019950:	b2c8      	uxtb	r0, r1
+20019952:	d025      	beq.n	200199a0 <tmsWriteIrqHandler+0x60>
+20019954:	f503 3280 	add.w	r2, r3, #65536	@ 0x10000
+20019958:	f892 c02a 	ldrb.w	ip, [r2, #42]	@ 0x2a
+2001995c:	f1bc 0f00 	cmp.w	ip, #0
+20019960:	d14e      	bne.n	20019a00 <tmsWriteIrqHandler+0xc0>
+20019962:	2101      	movs	r1, #1
+20019964:	f882 002b 	strb.w	r0, [r2, #43]	@ 0x2b
+20019968:	f892 002c 	ldrb.w	r0, [r2, #44]	@ 0x2c
+2001996c:	f503 4cc0 	add.w	ip, r3, #24576	@ 0x6000
+20019970:	f882 102a 	strb.w	r1, [r2, #42]	@ 0x2a
+20019974:	f89c 1001 	ldrb.w	r1, [ip, #1]
+20019978:	f011 0120 	ands.w	r1, r1, #32
+2001997c:	d003      	beq.n	20019986 <tmsWriteIrqHandler+0x46>
+2001997e:	f503 4130 	add.w	r1, r3, #45056	@ 0xb000
+20019982:	7809      	ldrb	r1, [r1, #0]
+20019984:	09c9      	lsrs	r1, r1, #7
+20019986:	f892 e5ec 	ldrb.w	lr, [r2, #1516]	@ 0x5ec
+2001998a:	458e      	cmp	lr, r1
+2001998c:	d01f      	beq.n	200199ce <tmsWriteIrqHandler+0x8e>
+2001998e:	f882 15ec 	strb.w	r1, [r2, #1516]	@ 0x5ec
+20019992:	f04f 0e16 	mov.w	lr, #22
+20019996:	f081 0101 	eor.w	r1, r1, #1
+2001999a:	ec41 e040 	mcrr	0, 4, lr, r1, cr0
+2001999e:	e016      	b.n	200199ce <tmsWriteIrqHandler+0x8e>
+200199a0:	f503 4cc0 	add.w	ip, r3, #24576	@ 0x6000
+200199a4:	f99c 202f 	ldrsb.w	r2, [ip, #47]	@ 0x2f
+200199a8:	f89c 102f 	ldrb.w	r1, [ip, #47]	@ 0x2f
+200199ac:	2a00      	cmp	r2, #0
+200199ae:	f503 3280 	add.w	r2, r3, #65536	@ 0x10000
+200199b2:	db40      	blt.n	20019a36 <tmsWriteIrqHandler+0xf6>
+200199b4:	f882 e02a 	strb.w	lr, [r2, #42]	@ 0x2a
+200199b8:	f882 002c 	strb.w	r0, [r2, #44]	@ 0x2c
+200199bc:	6a51      	ldr	r1, [r2, #36]	@ 0x24
+200199be:	f99c e030 	ldrsb.w	lr, [ip, #48]	@ 0x30
+200199c2:	448e      	add	lr, r1
+200199c4:	f3c1 010d 	ubfx	r1, r1, #0, #14
+200199c8:	5458      	strb	r0, [r3, r1]
+200199ca:	f8c2 e024 	str.w	lr, [r2, #36]	@ 0x24
+200199ce:	493e      	ldr	r1, [pc, #248]	@ (20019ac8 <tmsWriteIrqHandler+0x188>)
+200199d0:	f892 202f 	ldrb.w	r2, [r2, #47]	@ 0x2f
+200199d4:	7008      	strb	r0, [r1, #0]
+200199d6:	0200      	lsls	r0, r0, #8
+200199d8:	f040 00ff 	orr.w	r0, r0, #255	@ 0xff
+200199dc:	2a00      	cmp	r2, #0
+200199de:	d037      	beq.n	20019a50 <tmsWriteIrqHandler+0x110>
+200199e0:	f89c 200f 	ldrb.w	r2, [ip, #15]
+200199e4:	f002 020f 	and.w	r2, r2, #15
+200199e8:	4413      	add	r3, r2
+200199ea:	f503 4330 	add.w	r3, r3, #45056	@ 0xb000
+200199ee:	781b      	ldrb	r3, [r3, #0]
+200199f0:	0612      	lsls	r2, r2, #24
+200199f2:	ea42 4203 	orr.w	r2, r2, r3, lsl #16
+200199f6:	4b32      	ldr	r3, [pc, #200]	@ (20019ac0 <tmsWriteIrqHandler+0x180>)
+200199f8:	4310      	orrs	r0, r2
+200199fa:	6158      	str	r0, [r3, #20]
+200199fc:	b002      	add	sp, #8
+200199fe:	bd10      	pop	{r4, pc}
+20019a00:	060c      	lsls	r4, r1, #24
+20019a02:	f000 0c40 	and.w	ip, r0, #64	@ 0x40
+20019a06:	d42c      	bmi.n	20019a62 <tmsWriteIrqHandler+0x122>
+20019a08:	f892 002b 	ldrb.w	r0, [r2, #43]	@ 0x2b
+20019a0c:	0209      	lsls	r1, r1, #8
+20019a0e:	f401 517c 	and.w	r1, r1, #16128	@ 0x3f00
+20019a12:	4301      	orrs	r1, r0
+20019a14:	6251      	str	r1, [r2, #36]	@ 0x24
+20019a16:	f1bc 0f00 	cmp.w	ip, #0
+20019a1a:	d125      	bne.n	20019a68 <tmsWriteIrqHandler+0x128>
+20019a1c:	5c58      	ldrb	r0, [r3, r1]
+20019a1e:	f503 4cc0 	add.w	ip, r3, #24576	@ 0x6000
+20019a22:	f882 002c 	strb.w	r0, [r2, #44]	@ 0x2c
+20019a26:	f99c e030 	ldrsb.w	lr, [ip, #48]	@ 0x30
+20019a2a:	4471      	add	r1, lr
+20019a2c:	6251      	str	r1, [r2, #36]	@ 0x24
+20019a2e:	2100      	movs	r1, #0
+20019a30:	f882 102a 	strb.w	r1, [r2, #42]	@ 0x2a
+20019a34:	e79e      	b.n	20019974 <tmsWriteIrqHandler+0x34>
+20019a36:	f892 4032 	ldrb.w	r4, [r2, #50]	@ 0x32
+20019a3a:	b9d4      	cbnz	r4, 20019a72 <tmsWriteIrqHandler+0x132>
+20019a3c:	2101      	movs	r1, #1
+20019a3e:	f000 000f 	and.w	r0, r0, #15
+20019a42:	f882 0033 	strb.w	r0, [r2, #51]	@ 0x33
+20019a46:	f882 1032 	strb.w	r1, [r2, #50]	@ 0x32
+20019a4a:	f892 002c 	ldrb.w	r0, [r2, #44]	@ 0x2c
+20019a4e:	e7be      	b.n	200199ce <tmsWriteIrqHandler+0x8e>
+20019a50:	f503 4330 	add.w	r3, r3, #45056	@ 0xb000
+20019a54:	781b      	ldrb	r3, [r3, #0]
+20019a56:	ea40 4003 	orr.w	r0, r0, r3, lsl #16
+20019a5a:	4b19      	ldr	r3, [pc, #100]	@ (20019ac0 <tmsWriteIrqHandler+0x180>)
+20019a5c:	6158      	str	r0, [r3, #20]
+20019a5e:	b002      	add	sp, #8
+20019a60:	bd10      	pop	{r4, pc}
+20019a62:	f1bc 0f00 	cmp.w	ip, #0
+20019a66:	d01e      	beq.n	20019aa6 <tmsWriteIrqHandler+0x166>
+20019a68:	f892 002c 	ldrb.w	r0, [r2, #44]	@ 0x2c
+20019a6c:	f503 4cc0 	add.w	ip, r3, #24576	@ 0x6000
+20019a70:	e7dd      	b.n	20019a2e <tmsWriteIrqHandler+0xee>
+20019a72:	f882 e032 	strb.w	lr, [r2, #50]	@ 0x32
+20019a76:	f892 e033 	ldrb.w	lr, [r2, #51]	@ 0x33
+20019a7a:	ea4e 2e00 	orr.w	lr, lr, r0, lsl #8
+20019a7e:	f001 003f 	and.w	r0, r1, #63	@ 0x3f
+20019a82:	f500 5020 	add.w	r0, r0, #10240	@ 0x2800
+20019a86:	f823 e010 	strh.w	lr, [r3, r0, lsl #1]
+20019a8a:	f04f 0001 	mov.w	r0, #1
+20019a8e:	f882 0034 	strb.w	r0, [r2, #52]	@ 0x34
+20019a92:	0648      	lsls	r0, r1, #25
+20019a94:	bf4c      	ite	mi
+20019a96:	3101      	addmi	r1, #1
+20019a98:	f001 017f 	andpl.w	r1, r1, #127	@ 0x7f
+20019a9c:	f88c 102f 	strb.w	r1, [ip, #47]	@ 0x2f
+20019aa0:	f892 002c 	ldrb.w	r0, [r2, #44]	@ 0x2c
+20019aa4:	e793      	b.n	200199ce <tmsWriteIrqHandler+0x8e>
+20019aa6:	f892 102b 	ldrb.w	r1, [r2, #43]	@ 0x2b
+20019aaa:	9301      	str	r3, [sp, #4]
+20019aac:	9200      	str	r2, [sp, #0]
+20019aae:	f00b f9db 	bl	20024e68 <pico9918_write_reg_value>
+20019ab2:	9a00      	ldr	r2, [sp, #0]
+20019ab4:	9b01      	ldr	r3, [sp, #4]
+20019ab6:	f892 002c 	ldrb.w	r0, [r2, #44]	@ 0x2c
+20019aba:	f503 4cc0 	add.w	ip, r3, #24576	@ 0x6000
+20019abe:	e7b6      	b.n	20019a2e <tmsWriteIrqHandler+0xee>
+20019ac0:	50300000 	.word	0x50300000
+20019ac4:	20025f10 	.word	0x20025f10
+20019ac8:	2002c102 	.word	0x2002c102

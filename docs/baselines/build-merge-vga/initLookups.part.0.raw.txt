@@ -1,0 +1,152 @@
+200034c0 <initLookups.part.0>:
+200034c0:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
+200034c2:	201c      	movs	r0, #28
+200034c4:	f7ff fa10 	bl	200028e8 <dma_claim_mask>
+200034c8:	4a41      	ldr	r2, [pc, #260]	@ (200035d0 <initLookups.part.0+0x110>)
+200034ca:	4b42      	ldr	r3, [pc, #264]	@ (200035d4 <initLookups.part.0+0x114>)
+200034cc:	2480      	movs	r4, #128	@ 0x80
+200034ce:	611a      	str	r2, [r3, #16]
+200034d0:	2200      	movs	r2, #0
+200034d2:	4841      	ldr	r0, [pc, #260]	@ (200035d8 <initLookups.part.0+0x118>)
+200034d4:	0164      	lsls	r4, r4, #5
+200034d6:	0553      	lsls	r3, r2, #21
+200034d8:	0651      	lsls	r1, r2, #25
+200034da:	0fdb      	lsrs	r3, r3, #31
+200034dc:	0fc9      	lsrs	r1, r1, #31
+200034de:	0049      	lsls	r1, r1, #1
+200034e0:	009b      	lsls	r3, r3, #2
+200034e2:	430b      	orrs	r3, r1
+200034e4:	0751      	lsls	r1, r2, #29
+200034e6:	0fc9      	lsrs	r1, r1, #31
+200034e8:	430b      	orrs	r3, r1
+200034ea:	0696      	lsls	r6, r2, #26
+200034ec:	0591      	lsls	r1, r2, #22
+200034ee:	0fc9      	lsrs	r1, r1, #31
+200034f0:	0ff6      	lsrs	r6, r6, #31
+200034f2:	0076      	lsls	r6, r6, #1
+200034f4:	0089      	lsls	r1, r1, #2
+200034f6:	4331      	orrs	r1, r6
+200034f8:	0796      	lsls	r6, r2, #30
+200034fa:	0ff6      	lsrs	r6, r6, #31
+200034fc:	4331      	orrs	r1, r6
+200034fe:	b25b      	sxtb	r3, r3
+20003500:	b249      	sxtb	r1, r1
+20003502:	0409      	lsls	r1, r1, #16
+20003504:	021b      	lsls	r3, r3, #8
+20003506:	430b      	orrs	r3, r1
+20003508:	0616      	lsls	r6, r2, #24
+2000350a:	0511      	lsls	r1, r2, #20
+2000350c:	0fc9      	lsrs	r1, r1, #31
+2000350e:	0ff6      	lsrs	r6, r6, #31
+20003510:	0076      	lsls	r6, r6, #1
+20003512:	0089      	lsls	r1, r1, #2
+20003514:	4331      	orrs	r1, r6
+20003516:	0716      	lsls	r6, r2, #28
+20003518:	0ff6      	lsrs	r6, r6, #31
+2000351a:	4331      	orrs	r1, r6
+2000351c:	b249      	sxtb	r1, r1
+2000351e:	430b      	orrs	r3, r1
+20003520:	06d6      	lsls	r6, r2, #27
+20003522:	05d1      	lsls	r1, r2, #23
+20003524:	0fc9      	lsrs	r1, r1, #31
+20003526:	0ff6      	lsrs	r6, r6, #31
+20003528:	0076      	lsls	r6, r6, #1
+2000352a:	0089      	lsls	r1, r1, #2
+2000352c:	4331      	orrs	r1, r6
+2000352e:	2601      	movs	r6, #1
+20003530:	4016      	ands	r6, r2
+20003532:	4331      	orrs	r1, r6
+20003534:	0609      	lsls	r1, r1, #24
+20003536:	3201      	adds	r2, #1
+20003538:	430b      	orrs	r3, r1
+2000353a:	b292      	uxth	r2, r2
+2000353c:	c008      	stmia	r0!, {r3}
+2000353e:	42a2      	cmp	r2, r4
+20003540:	d1c9      	bne.n	200034d6 <initLookups.part.0+0x16>
+20003542:	2300      	movs	r3, #0
+20003544:	2580      	movs	r5, #128	@ 0x80
+20003546:	4825      	ldr	r0, [pc, #148]	@ (200035dc <initLookups.part.0+0x11c>)
+20003548:	4c25      	ldr	r4, [pc, #148]	@ (200035e0 <initLookups.part.0+0x120>)
+2000354a:	8003      	strh	r3, [r0, #0]
+2000354c:	006d      	lsls	r5, r5, #1
+2000354e:	3002      	adds	r0, #2
+20003550:	3301      	adds	r3, #1
+20003552:	111a      	asrs	r2, r3, #4
+20003554:	5ca1      	ldrb	r1, [r4, r2]
+20003556:	220f      	movs	r2, #15
+20003558:	401a      	ands	r2, r3
+2000355a:	5ca2      	ldrb	r2, [r4, r2]
+2000355c:	0209      	lsls	r1, r1, #8
+2000355e:	430a      	orrs	r2, r1
+20003560:	3301      	adds	r3, #1
+20003562:	8002      	strh	r2, [r0, #0]
+20003564:	3002      	adds	r0, #2
+20003566:	42ab      	cmp	r3, r5
+20003568:	d1f3      	bne.n	20003552 <initLookups.part.0+0x92>
+2000356a:	2680      	movs	r6, #128	@ 0x80
+2000356c:	2000      	movs	r0, #0
+2000356e:	2100      	movs	r1, #0
+20003570:	2533      	movs	r5, #51	@ 0x33
+20003572:	2455      	movs	r4, #85	@ 0x55
+20003574:	4f1b      	ldr	r7, [pc, #108]	@ (200035e4 <initLookups.part.0+0x124>)
+20003576:	0076      	lsls	r6, r6, #1
+20003578:	b2ca      	uxtb	r2, r1
+2000357a:	0912      	lsrs	r2, r2, #4
+2000357c:	4302      	orrs	r2, r0
+2000357e:	b2d2      	uxtb	r2, r2
+20003580:	1093      	asrs	r3, r2, #2
+20003582:	0092      	lsls	r2, r2, #2
+20003584:	43aa      	bics	r2, r5
+20003586:	402b      	ands	r3, r5
+20003588:	4313      	orrs	r3, r2
+2000358a:	b25a      	sxtb	r2, r3
+2000358c:	0052      	lsls	r2, r2, #1
+2000358e:	085b      	lsrs	r3, r3, #1
+20003590:	4023      	ands	r3, r4
+20003592:	43a2      	bics	r2, r4
+20003594:	4313      	orrs	r3, r2
+20003596:	547b      	strb	r3, [r7, r1]
+20003598:	3101      	adds	r1, #1
+2000359a:	3010      	adds	r0, #16
+2000359c:	42b1      	cmp	r1, r6
+2000359e:	d1eb      	bne.n	20003578 <initLookups.part.0+0xb8>
+200035a0:	2300      	movs	r3, #0
+200035a2:	4a11      	ldr	r2, [pc, #68]	@ (200035e8 <initLookups.part.0+0x128>)
+200035a4:	4911      	ldr	r1, [pc, #68]	@ (200035ec <initLookups.part.0+0x12c>)
+200035a6:	4812      	ldr	r0, [pc, #72]	@ (200035f0 <initLookups.part.0+0x130>)
+200035a8:	c208      	stmia	r2!, {r3}
+200035aa:	181b      	adds	r3, r3, r0
+200035ac:	428b      	cmp	r3, r1
+200035ae:	d1fa      	bne.n	200035a6 <initLookups.part.0+0xe6>
+200035b0:	4b10      	ldr	r3, [pc, #64]	@ (200035f4 <initLookups.part.0+0x134>)
+200035b2:	4a11      	ldr	r2, [pc, #68]	@ (200035f8 <initLookups.part.0+0x138>)
+200035b4:	611a      	str	r2, [r3, #16]
+200035b6:	4a11      	ldr	r2, [pc, #68]	@ (200035fc <initLookups.part.0+0x13c>)
+200035b8:	601a      	str	r2, [r3, #0]
+200035ba:	2240      	movs	r2, #64	@ 0x40
+200035bc:	609a      	str	r2, [r3, #8]
+200035be:	4b10      	ldr	r3, [pc, #64]	@ (20003600 <initLookups.part.0+0x140>)
+200035c0:	4a10      	ldr	r2, [pc, #64]	@ (20003604 <initLookups.part.0+0x144>)
+200035c2:	611a      	str	r2, [r3, #16]
+200035c4:	4a10      	ldr	r2, [pc, #64]	@ (20003608 <initLookups.part.0+0x148>)
+200035c6:	601a      	str	r2, [r3, #0]
+200035c8:	2201      	movs	r2, #1
+200035ca:	4b10      	ldr	r3, [pc, #64]	@ (2000360c <initLookups.part.0+0x14c>)
+200035cc:	701a      	strb	r2, [r3, #0]
+200035ce:	bdf8      	pop	{r3, r4, r5, r6, r7, pc}
+200035d0:	001fa021 	.word	0x001fa021
+200035d4:	50000100 	.word	0x50000100
+200035d8:	20022be8 	.word	0x20022be8
+200035dc:	20040240 	.word	0x20040240
+200035e0:	2000d160 	.word	0x2000d160
+200035e4:	20040140 	.word	0x20040140
+200035e8:	20040040 	.word	0x20040040
+200035ec:	40404040 	.word	0x40404040
+200035f0:	01010101 	.word	0x01010101
+200035f4:	500000c0 	.word	0x500000c0
+200035f8:	001f9829 	.word	0x001f9829
+200035fc:	200404a0 	.word	0x200404a0
+20003600:	50000080 	.word	0x50000080
+20003604:	001f9029 	.word	0x001f9029
+20003608:	20041a08 	.word	0x20041a08
+2000360c:	20028675 	.word	0x20028675

@@ -1,0 +1,14 @@
+200007f4 <applyConfigHostEffects>:
+200007f4:	b510      	push	{r4, lr}
+200007f6:	4b05      	ldr	r3, [pc, #20]	@ (2000080c <applyConfigHostEffects+0x18>)
+200007f8:	681a      	ldr	r2, [r3, #0]
+200007fa:	4b05      	ldr	r3, [pc, #20]	@ (20000810 <applyConfigHostEffects+0x1c>)
+200007fc:	5cd4      	ldrb	r4, [r2, r3]
+200007fe:	f002 fd39 	bl	20003274 <vgaCurrentParams>
+20000802:	1e63      	subs	r3, r4, #1
+20000804:	419c      	sbcs	r4, r3
+20000806:	2398      	movs	r3, #152	@ 0x98
+20000808:	54c4      	strb	r4, [r0, r3]
+2000080a:	bd10      	pop	{r4, pc}
+2000080c:	2000d534 	.word	0x2000d534
+20000810:	00010058 	.word	0x00010058

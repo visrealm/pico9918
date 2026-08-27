@@ -1,0 +1,266 @@
+<ADDR> <vrEmuTmsConfigApply>:
+ldr	r3, [pc, #408]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+push	{r4, lr}
+ldr	r3, [r3, #0]
+cmp	r3, #0
+beq.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+blx	r3
+ldr	r3, [pc, #400]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldr	r2, [pc, #404]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldr	r0, [r3, #0]
+ldr	r3, [pc, #404]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r2]
+ldrb	r3, [r0, r3]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+b.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+movs	r2, #4
+orrs	r3, r2
+ldr	r2, [pc, #388]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+strb	r3, [r0, r2]
+ldr	r3, [pc, #388]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+movs	r3, #1
+adds	r2, #2
+lsls	r3, r2
+ldr	r2, [pc, #380]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+strb	r3, [r0, r2]
+ldr	r3, [pc, #380]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #380]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #376]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #376]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #376]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #372]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #368]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #368]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #364]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #364]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #364]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #360]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #356]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #356]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #352]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #352]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #352]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #348]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #344]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #344]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #340]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #340]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #340]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #336]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #332]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #332]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #328]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #328]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #328]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #324]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #320]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #320]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #316]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #316]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #316]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #312]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #308]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #308]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #304]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #304]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #304]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #300]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #296]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #296]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #292]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #292]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+ldr	r3, [pc, #292]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+lsls	r2, r2, #8
+ldrb	r3, [r0, r3]
+orrs	r3, r2
+ldr	r2, [pc, #288]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+rev16	r3, r3
+strh	r3, [r0, r2]
+ldr	r3, [pc, #284]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r3]
+movs	r3, #1
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+ldr	r2, [pc, #280]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r2]
+cmp	r2, #0
+beq.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+ldr	r2, [pc, #276]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+strb	r3, [r0, r2]
+ldr	r3, [pc, #276]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r3, [r0, r3]
+subs	r3, #1
+negs	r2, r3
+adcs	r3, r2
+ldrb	r2, [r0, #17]
+cmp	r2, r3
+beq.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+strb	r3, [r0, #17]
+bl	<ADDR> <vrEmuTmsUpdateActiveOps>
+pop	{r4, pc}
+movs	r2, #4
+bics	r3, r2
+b.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+ldr	r2, [pc, #248]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r2, [r0, r2]
+cmp	r2, #0
+bne.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+ldr	r3, [pc, #244]	@ (<ADDR> <vrEmuTmsConfigApply+OFF>)
+ldrb	r3, [r0, r3]
+subs	r2, r3, #1
+sbcs	r3, r2
+b.n	<ADDR> <vrEmuTmsConfigApply+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

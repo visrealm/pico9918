@@ -1,0 +1,5953 @@
+<ADDR> <stageGfxITilesF18A>:
+push	{r4, r5, r6, r7, lr}
+mov	lr, fp
+mov	r7, sl
+mov	r6, r9
+mov	r5, r8
+push	{r5, r6, r7, lr}
+ldr	r3, [pc, #888]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+sub	sp, #124	@ 0x7c
+ldrb	r3, [r3, #0]
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [pc, #884]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r3, [r2, #0]
+mov	r8, r3
+mov	r1, r8
+mov	r4, r8
+ldr	r3, [pc, #876]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r0, [r1, r3]
+ldr	r1, [pc, #876]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrsb	r3, [r4, r3]
+ldrb	r5, [r4, r1]
+mov	r1, r8
+cmp	r3, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r3, r5, #27
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, #0
+add	sp, #124	@ 0x7c
+pop	{r4, r5, r6, r7}
+mov	fp, r7
+mov	sl, r6
+mov	r9, r5
+mov	r8, r4
+pop	{r4, r5, r6, r7, pc}
+mov	r3, r8
+ldrh	r0, [r3, #34]	@ 0x22
+ldr	r3, [r3, #40]	@ 0x28
+mov	r1, r8
+str	r3, [sp, #20]
+movs	r3, #2
+mov	sl, r3
+ands	r3, r5
+str	r3, [sp, #36]	@ 0x24
+movs	r3, #38	@ 0x26
+ldrb	r1, [r1, r3]
+movs	r3, #128	@ 0x80
+negs	r1, r1
+lsls	r3, r3, #4
+ands	r1, r3
+mov	fp, r1
+mov	r1, r8
+ldr	r3, [pc, #812]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+lsls	r4, r0, #21
+ldrb	r3, [r1, r3]
+movs	r1, #240	@ 0xf0
+lsls	r3, r3, #10
+lsls	r1, r1, #6
+ands	r3, r1
+mov	r1, fp
+lsrs	r4, r4, #24
+lsls	r4, r4, #5
+adds	r3, r4, r3
+eors	r3, r1
+str	r3, [sp, #0]
+movs	r7, r3
+ldr	r3, [pc, #788]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r3, [r3, #0]
+subs	r1, r3, #1
+subs	r6, r1, #1
+sbcs	r1, r6
+movs	r6, #127	@ 0x7f
+negs	r1, r1
+ands	r1, r6
+mov	ip, r1
+movs	r1, #128	@ 0x80
+add	ip, r1
+mov	r1, r8
+ldr	r6, [pc, #768]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r6, [r1, r6]
+mov	r1, ip
+ands	r1, r6
+mov	r6, sl
+lsls	r1, r1, #6
+str	r1, [sp, #4]
+tst	r6, r5
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [pc, #756]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+movs	r6, #128	@ 0x80
+ands	r1, r5
+movs	r5, r1
+mov	r1, fp
+lsls	r6, r6, #3
+ands	r6, r7
+orrs	r5, r6
+eors	r1, r5
+adds	r1, r4, r1
+str	r1, [sp, #4]
+mov	r4, r8
+movs	r5, #48	@ 0x30
+ldr	r1, [pc, #732]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+subs	r3, #1
+ldrb	r1, [r4, r1]
+ldr	r4, [pc, #732]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+lsls	r1, r1, #4
+ands	r5, r1
+str	r5, [sp, #28]
+mov	r5, r8
+ldrb	r6, [r5, r4]
+movs	r5, #7
+mov	ip, r5
+ands	r5, r0
+subs	r0, r3, #1
+sbcs	r3, r0
+str	r5, [sp, #8]
+movs	r0, #3
+mov	r5, r8
+ldr	r7, [pc, #708]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+negs	r3, r3
+ldrb	r5, [r5, r7]
+ands	r3, r0
+adds	r3, #4
+ands	r3, r5
+movs	r5, #44	@ 0x2c
+add	r5, r8
+mov	r9, r5
+lsls	r3, r3, #11
+add	r9, r3
+mov	r3, r9
+str	r3, [sp, #16]
+mov	r3, r8
+ldrb	r3, [r3, #11]
+lsrs	r4, r6, #3
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #160	@ 0xa0
+movs	r0, #128	@ 0x80
+movs	r6, #208	@ 0xd0
+lsls	r3, r3, #23
+lsls	r0, r0, #17
+ldr	r1, [r3, r6]
+tst	r1, r0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, r4
+adds	r3, #32
+uxtb	r3, r3
+str	r3, [sp, #12]
+movs	r3, #15
+mov	ip, r3
+ldr	r3, [sp, #28]
+mov	r9, r2
+mov	fp, r3
+ldr	r3, [sp, #16]
+ldr	r6, [sp, #20]
+mov	r8, r3
+add	r1, sp, #112	@ 0x70
+mov	r3, r9
+ldr	r5, [r3, #0]
+ldr	r2, [sp, #0]
+adds	r3, r5, r4
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r2, [r3, #0]
+ldr	r0, [sp, #8]
+lsls	r3, r2, #3
+add	r3, r8
+ldrsb	r3, [r3, r0]
+ldr	r0, [sp, #4]
+lsrs	r2, r2, #3
+adds	r0, r5, r0
+adds	r0, r0, r2
+mov	r7, ip
+mov	r2, ip
+adds	r0, #44	@ 0x2c
+ldrb	r0, [r0, #0]
+ands	r2, r0
+tst	r7, r0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [pc, #588]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r2, [r5, r2]
+ands	r2, r7
+mov	r7, fp
+orrs	r2, r7
+str	r2, [r1, #0]
+lsrs	r0, r0, #4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [pc, #572]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r0, [r5, r2]
+mov	r2, ip
+ands	r0, r2
+mov	r2, fp
+orrs	r0, r2
+str	r0, [r1, #4]
+lsrs	r0, r3, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+adds	r4, #1
+strb	r0, [r6, #0]
+lsls	r0, r3, #25
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+uxtb	r4, r4
+strb	r0, [r6, #1]
+lsls	r0, r3, #26
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r6, #2]
+lsls	r0, r3, #27
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r6, #3]
+lsls	r0, r3, #28
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r6, #4]
+movs	r0, #4
+ands	r0, r3
+ldr	r0, [r1, r0]
+strb	r0, [r6, #5]
+lsls	r0, r3, #30
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r6, #6]
+movs	r0, #1
+ands	r3, r0
+lsls	r3, r3, #2
+ldr	r3, [r1, r3]
+strb	r3, [r6, #7]
+ldr	r3, [sp, #12]
+adds	r6, #8
+cmp	r4, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldrh	r3, [r4, #36]	@ 0x24
+mov	r6, r8
+mov	ip, r3
+ldr	r3, [r4, #40]	@ 0x28
+str	r3, [sp, #12]
+mov	r3, ip
+lsls	r4, r3, #21
+movs	r3, #2
+mov	r9, r3
+ands	r3, r5
+str	r3, [sp, #76]	@ 0x4c
+movs	r3, #39	@ 0x27
+ldrb	r3, [r1, r3]
+movs	r1, #128	@ 0x80
+negs	r3, r3
+lsls	r1, r1, #4
+ands	r3, r1
+ldr	r1, [pc, #436]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+lsrs	r4, r4, #24
+ldrb	r1, [r6, r1]
+movs	r6, #240	@ 0xf0
+lsls	r1, r1, #10
+lsls	r6, r6, #6
+lsls	r7, r4, #5
+ands	r1, r6
+adds	r1, r7, r1
+eors	r1, r3
+str	r1, [sp, #0]
+ldr	r1, [pc, #388]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	sl, r3
+ldrb	r1, [r1, #0]
+ldr	r4, [pc, #412]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+subs	r6, r1, #1
+subs	r3, r6, #1
+sbcs	r6, r3
+movs	r3, #127	@ 0x7f
+negs	r6, r6
+ands	r6, r3
+mov	r3, r8
+ldrb	r3, [r3, r4]
+mov	r4, r9
+adds	r6, #128	@ 0x80
+ands	r6, r3
+lsls	r3, r6, #6
+str	r3, [sp, #4]
+tst	r4, r5
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, r3
+movs	r3, #128	@ 0x80
+ldr	r6, [pc, #352]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+lsls	r3, r3, #3
+ands	r4, r6
+movs	r6, r4
+ldr	r4, [sp, #0]
+ands	r4, r3
+mov	r3, sl
+orrs	r6, r4
+eors	r3, r6
+adds	r3, r7, r3
+str	r3, [sp, #4]
+mov	r4, r8
+ldr	r3, [pc, #332]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r6, [pc, #356]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r4, [r4, r3]
+movs	r3, #48	@ 0x30
+lsls	r7, r4, #2
+ands	r3, r7
+str	r3, [sp, #28]
+mov	r3, r8
+ldrb	r3, [r3, r6]
+subs	r1, #1
+str	r3, [sp, #48]	@ 0x30
+lsrs	r6, r3, #3
+movs	r3, #7
+mov	sl, r3
+mov	r3, ip
+mov	r4, sl
+ands	r3, r4
+str	r3, [sp, #8]
+subs	r3, r1, #1
+sbcs	r1, r3
+movs	r3, #3
+negs	r1, r1
+ands	r1, r3
+mov	ip, r3
+mov	r3, r8
+ldr	r4, [pc, #292]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+adds	r1, #4
+ldrb	r3, [r3, r4]
+ands	r1, r3
+movs	r3, #44	@ 0x2c
+add	r3, r8
+mov	r9, r3
+mov	r3, r8
+lsls	r1, r1, #11
+add	r9, r1
+ldrb	r1, [r3, #11]
+mov	fp, r9
+cmp	r1, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r1, #160	@ 0xa0
+movs	r4, #128	@ 0x80
+movs	r5, #208	@ 0xd0
+lsls	r1, r1, #23
+lsls	r4, r4, #17
+ldr	r3, [r1, r5]
+tst	r3, r4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, #15
+movs	r1, r6
+mov	ip, r0
+adds	r1, #32
+ldr	r0, [sp, #28]
+uxtb	r3, r1
+mov	sl, r0
+mov	r9, r3
+ldr	r5, [sp, #12]
+add	r1, sp, #112	@ 0x70
+str	r2, [sp, #12]
+ldr	r3, [sp, #12]
+ldr	r2, [sp, #0]
+ldr	r4, [r3, #0]
+adds	r3, r4, r6
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r0, [r3, #0]
+ldr	r2, [sp, #8]
+lsls	r3, r0, #3
+add	r3, fp
+ldrsb	r3, [r3, r2]
+lsrs	r2, r0, #3
+mov	r8, r2
+ldr	r2, [sp, #4]
+adds	r0, r4, r2
+mov	r2, ip
+add	r0, r8
+adds	r0, #44	@ 0x2c
+ldrb	r0, [r0, #0]
+ands	r2, r0
+mov	r8, r2
+mov	r2, ip
+tst	r2, r0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r7, ip
+ldr	r2, [pc, #176]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r2, [r4, r2]
+ands	r2, r7
+mov	r8, r2
+mov	r2, r8
+mov	r7, sl
+orrs	r2, r7
+str	r2, [r1, #0]
+lsrs	r0, r0, #4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [pc, #156]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r0, [r4, r2]
+mov	r2, ip
+ands	r0, r2
+mov	r2, sl
+orrs	r0, r2
+str	r0, [r1, #4]
+lsrs	r0, r3, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+adds	r6, #1
+strb	r0, [r5, #0]
+lsls	r0, r3, #25
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+uxtb	r6, r6
+strb	r0, [r5, #1]
+lsls	r0, r3, #26
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r5, #2]
+lsls	r0, r3, #27
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r5, #3]
+lsls	r0, r3, #28
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r5, #4]
+movs	r0, #4
+ands	r0, r3
+ldr	r0, [r1, r0]
+strb	r0, [r5, #5]
+lsls	r0, r3, #30
+lsrs	r0, r0, #31
+lsls	r0, r0, #2
+ldr	r0, [r1, r0]
+strb	r0, [r5, #6]
+movs	r0, #1
+ands	r3, r0
+lsls	r3, r3, #2
+ldr	r3, [r1, r3]
+strb	r3, [r5, #7]
+adds	r5, #8
+cmp	r6, r9
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #12]
+ldr	r3, [r2, #0]
+mov	r8, r3
+mov	r1, r8
+ldr	r3, [pc, #16]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r5, [r1, r3]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+mov	r3, ip
+mov	r5, r8
+ands	r3, r6
+str	r3, [sp, #44]	@ 0x2c
+ldr	r3, [pc, #656]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r3, [r5, r3]
+mov	ip, r3
+movs	r3, #2
+mov	r5, ip
+ands	r5, r3
+movs	r3, r0
+str	r5, [sp, #52]	@ 0x34
+mov	r5, r8
+ands	r3, r6
+str	r3, [sp, #40]	@ 0x28
+ldr	r3, [pc, #640]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r3, [r5, r3]
+movs	r5, r0
+asrs	r3, r3, #4
+ands	r5, r3
+str	r5, [sp, #32]
+tst	r0, r3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #44]	@ 0x2c
+subs	r2, r3, #1
+sbcs	r3, r2
+adds	r3, #31
+mov	fp, r3
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #0
+mov	sl, r3
+ldr	r3, [pc, #600]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r4, [sp, #32]
+str	r3, [sp, #24]
+ldr	r3, [pc, #600]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #68]	@ 0x44
+ldr	r3, [pc, #600]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [pc, #600]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #64]	@ 0x40
+mov	r3, r8
+str	r3, [sp, #72]	@ 0x48
+ldr	r3, [sp, #20]
+mov	ip, r3
+ldr	r3, [sp, #44]	@ 0x2c
+mov	r8, r3
+ldr	r4, [sp, #32]
+cmp	r4, #32
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, r4, #1
+uxtb	r3, r3
+str	r3, [sp, #32]
+mov	r3, sl
+movs	r2, #31
+movs	r5, #25
+ands	r2, r3
+lsrs	r1, r3, #5
+negs	r5, r5
+movs	r3, #255	@ 0xff
+movs	r0, #32
+mov	r9, r5
+lsls	r3, r3, #24
+subs	r0, r0, r2
+lsrs	r3, r2
+add	r9, r2
+str	r0, [sp, #20]
+mov	r0, r9
+lsls	r7, r1, #2
+str	r1, [sp, #12]
+ldr	r1, [sp, #24]
+str	r0, [sp, #48]	@ 0x30
+ldr	r6, [r1, r7]
+bics	r3, r6
+lsls	r3, r2
+cmp	r0, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #12]
+adds	r0, #1
+lsls	r0, r0, #2
+ldr	r5, [r1, r0]
+movs	r1, #255	@ 0xff
+ldr	r0, [sp, #20]
+lsls	r1, r1, #24
+lsls	r1, r0
+movs	r0, r1
+bics	r0, r5
+ldr	r5, [sp, #20]
+lsrs	r0, r5
+orrs	r3, r0
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #72]	@ 0x48
+ldr	r1, [sp, #0]
+ldr	r5, [sp, #28]
+adds	r3, r0, r1
+adds	r3, r3, r4
+ldr	r1, [sp, #4]
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+adds	r0, r0, r1
+ldr	r1, [sp, #16]
+lsrs	r4, r3, #3
+lsls	r3, r3, #3
+adds	r3, r1, r3
+ldr	r1, [sp, #8]
+adds	r0, r0, r4
+ldrb	r3, [r3, r1]
+adds	r0, #44	@ 0x2c
+mov	r9, r3
+movs	r3, #15
+ldrb	r4, [r0, #0]
+movs	r0, r3
+ands	r0, r4
+movs	r1, r0
+movs	r0, r5
+lsrs	r4, r4, #4
+str	r1, [sp, #36]	@ 0x24
+orrs	r0, r1
+orrs	r5, r4
+ldr	r1, [sp, #68]	@ 0x44
+lsls	r5, r5, #2
+ldr	r5, [r5, r1]
+lsls	r0, r0, #2
+str	r5, [sp, #60]	@ 0x3c
+mov	r5, r9
+ands	r3, r5
+ldr	r5, [sp, #52]	@ 0x34
+lsls	r3, r3, #2
+ldr	r3, [r5, r3]
+ldr	r0, [r0, r1]
+str	r3, [sp, #56]	@ 0x38
+mov	r3, r9
+lsrs	r3, r3, #4
+lsls	r3, r3, #2
+ldr	r5, [r5, r3]
+movs	r3, #24
+ldr	r1, [sp, #36]	@ 0x24
+add	r3, r8
+str	r3, [sp, #44]	@ 0x2c
+movs	r3, #255	@ 0xff
+cmp	r1, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, r9
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r1, r9
+eors	r3, r1
+ldr	r1, [sp, #44]	@ 0x2c
+lsls	r3, r1
+mov	r9, r3
+lsrs	r3, r2
+ldr	r1, [sp, #64]	@ 0x40
+ldr	r4, [r1, r7]
+ldr	r1, [sp, #24]
+bics	r3, r4
+movs	r4, r3
+orrs	r3, r6
+str	r3, [r1, r7]
+ldr	r3, [sp, #48]	@ 0x30
+bics	r4, r6
+lsls	r4, r2
+cmp	r3, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, r9
+ldr	r7, [sp, #20]
+ldr	r1, [sp, #12]
+lsls	r3, r7
+ldr	r2, [sp, #64]	@ 0x40
+adds	r1, #1
+lsls	r1, r1, #2
+ldr	r2, [r1, r2]
+bics	r3, r2
+ldr	r2, [sp, #24]
+ldr	r6, [r2, r1]
+mov	r9, r6
+orrs	r6, r3
+str	r6, [r2, r1]
+mov	r2, r9
+bics	r3, r2
+lsrs	r3, r7
+orrs	r4, r3
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #60]	@ 0x3c
+ldr	r2, [sp, #56]	@ 0x38
+eors	r3, r0
+ands	r5, r3
+ands	r2, r3
+ldr	r3, [sp, #44]	@ 0x2c
+eors	r5, r0
+lsrs	r4, r3
+mov	r3, r8
+eors	r0, r2
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r7, ip
+ldr	r3, [sp, #40]	@ 0x28
+adds	r7, #8
+cmp	r3, #1
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r3, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #15
+ldr	r2, [sp, #52]	@ 0x34
+ands	r3, r4
+lsls	r3, r3, #2
+ldr	r6, [r2, r3]
+mov	r3, ip
+lsrs	r4, r4, #4
+lsls	r4, r4, #2
+ldr	r2, [r2, r4]
+ldr	r4, [r3, #0]
+lsls	r1, r5, #8
+eors	r1, r4
+lsls	r3, r2, #8
+ands	r3, r1
+mov	r1, ip
+eors	r3, r4
+str	r3, [r1, #0]
+lsrs	r2, r2, #24
+lsls	r1, r6, #8
+lsls	r3, r0, #8
+lsrs	r5, r5, #24
+orrs	r2, r1
+orrs	r3, r5
+adds	r1, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r1, ip
+ldr	r1, [r1, #4]
+eors	r3, r1
+ands	r3, r2
+eors	r3, r1
+mov	r2, ip
+str	r3, [r2, #4]
+ldr	r3, [r2, #8]
+lsrs	r2, r0, #24
+eors	r2, r3
+lsrs	r1, r6, #24
+ands	r1, r2
+eors	r1, r3
+mov	r3, ip
+str	r1, [r3, #8]
+mov	ip, r7
+mov	r3, sl
+mov	r2, r8
+adds	r3, #8
+subs	r3, r3, r2
+mov	sl, r3
+mov	r3, fp
+subs	r3, #1
+bcs.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	fp, r3
+movs	r3, #0
+mov	r8, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #48]	@ 0x30
+mov	r4, sl
+movs	r1, r3
+ands	r1, r4
+mov	r4, r8
+str	r1, [sp, #52]	@ 0x34
+ldr	r1, [pc, #100]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+asrs	r0, r0, #4
+ldrb	r1, [r4, r1]
+movs	r4, #32
+ands	r4, r1
+str	r4, [sp, #36]	@ 0x24
+mov	r4, ip
+ands	r4, r3
+str	r4, [sp, #44]	@ 0x2c
+mov	r4, ip
+mov	r3, ip
+ands	r4, r0
+str	r4, [sp, #20]
+tst	r3, r0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #52]	@ 0x34
+movs	r1, r3
+subs	r0, r1, #1
+sbcs	r1, r0
+adds	r1, #31
+mov	sl, r1
+ldr	r1, [sp, #36]	@ 0x24
+cmp	r1, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, #32
+ldr	r1, [pc, #52]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+movs	r0, #0
+str	r1, [sp, #24]
+ldr	r1, [pc, #56]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r6, [sp, #40]	@ 0x28
+str	r1, [sp, #20]
+ldr	r1, [pc, #44]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r9, r0
+str	r1, [sp, #36]	@ 0x24
+ldr	r1, [pc, #40]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+movs	r6, r3
+str	r1, [sp, #16]
+ldr	r1, [sp, #44]	@ 0x2c
+str	r5, [sp, #80]	@ 0x50
+lsls	r1, r1, #3
+str	r1, [sp, #68]	@ 0x44
+subs	r1, r4, r1
+str	r1, [sp, #72]	@ 0x48
+mov	r1, r8
+str	r2, [sp, #84]	@ 0x54
+str	r1, [sp, #64]	@ 0x40
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r2, r3
+adds	r3, #1
+uxtb	r3, r3
+str	r3, [sp, #40]	@ 0x28
+ldr	r0, [sp, #64]	@ 0x40
+ldr	r1, [sp, #0]
+movs	r5, #15
+adds	r3, r0, r1
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r2, [r3, #0]
+movs	r3, r0
+ldr	r0, [sp, #4]
+lsrs	r1, r2, #3
+adds	r3, r3, r0
+adds	r3, r3, r1
+lsls	r2, r2, #3
+ldr	r1, [sp, #8]
+add	r2, fp
+ldrb	r4, [r2, r1]
+ldr	r1, [sp, #28]
+adds	r3, #44	@ 0x2c
+movs	r2, r1
+ldrb	r3, [r3, #0]
+ldr	r0, [sp, #36]	@ 0x24
+ands	r5, r3
+orrs	r2, r5
+lsls	r2, r2, #2
+ldr	r2, [r0, r2]
+lsrs	r3, r3, #4
+str	r2, [sp, #48]	@ 0x30
+movs	r2, r1
+orrs	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r0, r2]
+ldr	r1, [sp, #16]
+str	r2, [sp, #52]	@ 0x34
+movs	r2, #15
+ands	r2, r4
+lsls	r2, r2, #2
+ldr	r2, [r1, r2]
+str	r2, [sp, #56]	@ 0x38
+lsrs	r2, r4, #4
+lsls	r2, r2, #2
+ldr	r2, [r1, r2]
+str	r2, [sp, #60]	@ 0x3c
+movs	r2, #24
+mov	ip, r2
+add	ip, r6
+mov	r2, ip
+str	r2, [sp, #32]
+movs	r2, r4
+cmp	r5, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #255	@ 0xff
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+eors	r2, r4
+ldr	r3, [sp, #32]
+movs	r4, #31
+lsls	r2, r3
+mov	r3, r9
+ands	r4, r3
+lsrs	r5, r3, #5
+movs	r3, r2
+lsrs	r3, r4
+ldr	r0, [sp, #20]
+lsls	r1, r5, #2
+ldr	r0, [r0, r1]
+ldr	r7, [sp, #24]
+bics	r3, r0
+ldr	r0, [r7, r1]
+orrs	r0, r3
+mov	r8, r0
+movs	r0, r7
+mov	r7, r8
+str	r7, [r0, r1]
+movs	r7, #25
+negs	r7, r7
+mov	ip, r7
+add	ip, r4
+mov	r7, ip
+lsls	r3, r4
+cmp	r7, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r7, #32
+subs	r4, r7, r4
+lsls	r2, r4
+ldr	r1, [sp, #20]
+adds	r5, #1
+lsls	r5, r5, #2
+ldr	r7, [r1, r5]
+movs	r1, r0
+ldr	r0, [r0, r5]
+bics	r2, r7
+orrs	r0, r2
+lsrs	r2, r4
+str	r0, [r1, r5]
+orrs	r3, r2
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #48]	@ 0x30
+ldr	r1, [sp, #52]	@ 0x34
+ldr	r0, [sp, #60]	@ 0x3c
+ldr	r4, [sp, #56]	@ 0x38
+eors	r1, r2
+ands	r0, r1
+ands	r1, r4
+eors	r0, r2
+eors	r1, r2
+ldr	r2, [sp, #32]
+lsrs	r3, r2
+cmp	r6, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r4, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r4, [r4, r2]
+movs	r2, r1
+ldr	r7, [sp, #68]	@ 0x44
+movs	r5, r4
+lsrs	r2, r7
+str	r2, [sp, #32]
+ldr	r2, [sp, #12]
+lsrs	r5, r7
+ldr	r2, [r2, #0]
+mov	ip, r2
+cmp	r6, #3
+bls.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #12]
+lsrs	r3, r3, #4
+mov	r8, r2
+ldr	r2, [sp, #16]
+lsls	r3, r3, #2
+ldr	r3, [r2, r3]
+ldr	r2, [sp, #72]	@ 0x48
+lsrs	r3, r7
+lsls	r4, r2
+lsls	r1, r2
+lsrs	r0, r7
+orrs	r4, r3
+mov	r3, ip
+orrs	r0, r1
+eors	r0, r3
+ands	r0, r4
+eors	r0, r3
+mov	r3, r8
+stmia	r3!, {r0}
+mov	r8, r3
+ldr	r1, [sp, #12]
+ldr	r2, [sp, #32]
+ldr	r3, [r1, #4]
+eors	r2, r3
+ands	r2, r5
+eors	r2, r3
+mov	r3, r8
+str	r2, [r1, #4]
+str	r3, [sp, #12]
+mov	r3, r9
+adds	r3, #8
+subs	r3, r3, r6
+mov	r9, r3
+mov	r3, sl
+movs	r6, #0
+subs	r3, #1
+bcs.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r3
+ldr	r3, [sp, #40]	@ 0x28
+cmp	r3, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #128	@ 0x80
+ldr	r3, [sp, #0]
+lsls	r2, r2, #3
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #0]
+ldr	r3, [sp, #76]	@ 0x4c
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #4]
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #4]
+movs	r3, #1
+movs	r2, #0
+str	r3, [sp, #40]	@ 0x28
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, ip
+asrs	r3, r3, #2
+ands	r3, r0
+movs	r0, #128	@ 0x80
+lsls	r0, r0, #4
+asrs	r0, r3
+str	r0, [sp, #56]	@ 0x38
+cmp	r5, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r5, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #32
+ands	r3, r1
+str	r3, [sp, #76]	@ 0x4c
+movs	r3, #1
+str	r3, [sp, #72]	@ 0x48
+adds	r3, #14
+str	r3, [sp, #68]	@ 0x44
+movs	r3, #160	@ 0xa0
+movs	r0, #128	@ 0x80
+movs	r7, #208	@ 0xd0
+lsls	r3, r3, #23
+lsls	r0, r0, #17
+ldr	r1, [r3, r7]
+movs	r5, r1
+ands	r5, r0
+tst	r1, r0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [r2, #0]
+mov	fp, r3
+ldr	r3, [sp, #56]	@ 0x38
+lsls	r3, r3, #1
+str	r3, [sp, #80]	@ 0x50
+ldr	r3, [sp, #44]	@ 0x2c
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, r4, #1
+mov	r9, r3
+ldr	r3, [pc, #856]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r7, [r3, #0]
+str	r3, [sp, #24]
+movs	r3, #255	@ 0xff
+lsls	r3, r3, #24
+cmp	r7, r3
+bcc.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, fp
+ldr	r2, [sp, #0]
+adds	r3, r3, r2
+adds	r3, r3, r4
+adds	r3, #44	@ 0x2c
+ldrb	r1, [r3, #0]
+ldr	r3, [sp, #36]	@ 0x24
+movs	r2, r1
+str	r1, [sp, #12]
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, r4
+mov	r3, fp
+ldr	r0, [sp, #4]
+lsls	r1, r1, #3
+adds	r3, r3, r0
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r0, [r3, #0]
+ldr	r2, [sp, #8]
+lsls	r3, r0, #26
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, r2
+movs	r2, #7
+subs	r2, r2, r3
+movs	r3, #16
+ands	r3, r0
+adds	r2, r1, r2
+negs	r1, r3
+adcs	r3, r1
+negs	r4, r3
+ldr	r3, [sp, #16]
+movs	r1, #255	@ 0xff
+ldrb	r3, [r3, r2]
+ands	r4, r1
+mov	ip, r3
+movs	r3, #64	@ 0x40
+ldr	r1, [sp, #32]
+ands	r3, r0
+cmp	r1, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r1, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, ip
+ldr	r3, [pc, #736]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+movs	r1, #0
+ldrb	r3, [r3, r2]
+mov	ip, r3
+movs	r3, #0
+mov	sl, r3
+mov	r3, ip
+orrs	r4, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #44]	@ 0x2c
+sxtb	r3, r0
+adds	r2, #24
+lsls	r4, r2
+cmp	r3, #0
+blt.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [pc, #708]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r3, [r3, #0]
+bics	r4, r3
+movs	r3, r4
+ldr	r5, [sp, #24]
+orrs	r4, r7
+bics	r3, r7
+str	r4, [r5, #0]
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsrs	r3, r2
+ldr	r2, [sp, #68]	@ 0x44
+movs	r4, r3
+ands	r2, r0
+ldr	r0, [sp, #72]	@ 0x48
+ldr	r3, [pc, #680]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+lsls	r2, r0
+ldr	r0, [sp, #76]	@ 0x4c
+ldr	r5, [pc, #676]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+orrs	r2, r0
+lsls	r2, r2, #2
+ldr	r7, [r2, r3]
+movs	r3, #15
+mov	r2, ip
+ldr	r0, [pc, #668]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ands	r2, r3
+ands	r3, r4
+orrs	r2, r1
+lsls	r3, r3, #2
+ldr	r1, [sp, #40]	@ 0x28
+ldr	r3, [r3, r0]
+lsls	r1, r1, #3
+str	r3, [sp, #28]
+lsrs	r3, r1
+lsls	r2, r2, #2
+ldr	r2, [r2, r5]
+str	r3, [sp, #48]	@ 0x30
+orrs	r2, r7
+movs	r3, r2
+lsrs	r3, r1
+str	r2, [sp, #24]
+ldr	r2, [sp, #20]
+str	r4, [sp, #12]
+str	r0, [sp, #64]	@ 0x40
+ldr	r4, [r2, #0]
+str	r3, [sp, #60]	@ 0x3c
+lsls	r6, r6, #29
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, r2
+mov	r8, r2
+mov	r2, ip
+lsrs	r3, r2, #4
+mov	r2, sl
+movs	r6, #32
+orrs	r3, r2
+lsls	r3, r3, #2
+ldr	r2, [r3, r5]
+ldr	r3, [sp, #24]
+subs	r6, r6, r1
+orrs	r2, r7
+lsrs	r2, r1
+lsls	r3, r6
+ldr	r5, [sp, #12]
+orrs	r2, r3
+lsrs	r3, r5, #4
+ldr	r5, [sp, #64]	@ 0x40
+lsls	r3, r3, #2
+ldr	r3, [r3, r5]
+eors	r2, r4
+lsrs	r3, r1
+ldr	r1, [sp, #28]
+lsls	r1, r6
+orrs	r3, r1
+ands	r3, r2
+eors	r3, r4
+mov	r4, r8
+stmia	r0!, {r3}
+ldr	r2, [r4, #4]
+ldr	r3, [sp, #60]	@ 0x3c
+ldr	r1, [sp, #48]	@ 0x30
+eors	r3, r2
+ands	r1, r3
+movs	r3, r1
+eors	r3, r2
+str	r3, [r4, #4]
+movs	r3, #1
+ldr	r2, [sp, #44]	@ 0x2c
+negs	r3, r3
+str	r0, [sp, #20]
+str	r3, [sp, #12]
+movs	r3, #8
+subs	r3, r3, r2
+str	r3, [sp, #28]
+mov	r3, r9
+uxtb	r4, r3
+ldr	r3, [sp, #40]	@ 0x28
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+ldr	r7, [sp, #20]
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, r7, #1
+adds	r3, #255	@ 0xff
+str	r3, [sp, #84]	@ 0x54
+ldr	r3, [pc, #476]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r8, r4
+str	r3, [sp, #36]	@ 0x24
+movs	r3, #7
+ldr	r2, [sp, #8]
+subs	r3, r3, r2
+str	r3, [sp, #88]	@ 0x58
+ldr	r3, [pc, #468]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #92]	@ 0x5c
+ldr	r3, [pc, #468]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #96]	@ 0x60
+ldr	r3, [pc, #468]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #100]	@ 0x64
+ldr	r3, [pc, #468]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #104]	@ 0x68
+mov	r3, r8
+cmp	r3, #32
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, #1
+uxtb	r3, r3
+mov	r2, r8
+mov	r8, r3
+mov	r3, fp
+ldr	r1, [sp, #0]
+adds	r3, r3, r1
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r0, [r3, #0]
+ldr	r3, [sp, #12]
+cmp	r0, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #20]
+ldr	r3, [sp, #28]
+movs	r1, #255	@ 0xff
+subs	r3, r3, r2
+movs	r2, #31
+adds	r3, r7, r3
+lsls	r1, r1, #24
+ands	r2, r3
+lsrs	r4, r3, #5
+movs	r3, r1
+lsrs	r3, r2
+ldr	r6, [sp, #36]	@ 0x24
+lsls	r5, r4, #2
+str	r5, [sp, #64]	@ 0x40
+ldr	r5, [r6, r5]
+str	r4, [sp, #48]	@ 0x30
+bics	r3, r5
+mov	ip, r5
+movs	r5, #32
+subs	r5, r5, r2
+str	r5, [sp, #44]	@ 0x2c
+movs	r5, #25
+negs	r5, r5
+mov	r9, r5
+add	r9, r2
+mov	r5, r9
+lsls	r3, r2
+str	r5, [sp, #60]	@ 0x3c
+cmp	r5, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #44]	@ 0x2c
+adds	r5, r4, #1
+lsls	r1, r6
+ldr	r4, [sp, #36]	@ 0x24
+lsls	r5, r5, #2
+ldr	r5, [r4, r5]
+bics	r1, r5
+lsrs	r1, r6
+orrs	r3, r1
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r1, fp
+ldr	r5, [sp, #4]
+ldr	r6, [sp, #88]	@ 0x58
+adds	r1, r1, r5
+adds	r1, r1, r0
+adds	r1, #44	@ 0x2c
+ldrb	r1, [r1, #0]
+lsls	r3, r0, #3
+lsls	r5, r1, #26
+bmi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #8]
+movs	r5, #254	@ 0xfe
+adds	r6, r6, r3
+lsls	r3, r1, #27
+asrs	r3, r3, #31
+bics	r3, r5
+ldr	r5, [sp, #16]
+adds	r3, #255	@ 0xff
+ldrb	r4, [r5, r6]
+movs	r5, #64	@ 0x40
+ands	r5, r1
+mov	r9, r5
+ldr	r5, [sp, #32]
+str	r4, [sp, #24]
+cmp	r5, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r5, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, r9
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #24]
+ldr	r6, [pc, #252]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r4, [r6, r4]
+str	r4, [sp, #24]
+movs	r4, #0
+mov	r9, r4
+mov	sl, r4
+ldr	r4, [sp, #24]
+orrs	r3, r4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r3, r3, #24
+movs	r6, r3
+sxtb	r0, r1
+lsrs	r6, r2
+cmp	r0, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #64]	@ 0x40
+ldr	r0, [sp, #92]	@ 0x5c
+mov	r5, ip
+ldr	r0, [r0, r4]
+bics	r6, r0
+movs	r0, r6
+orrs	r6, r5
+bics	r0, r5
+ldr	r5, [sp, #36]	@ 0x24
+lsls	r0, r2
+str	r6, [r5, r4]
+ldr	r4, [sp, #60]	@ 0x3c
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #44]	@ 0x2c
+ldr	r4, [sp, #48]	@ 0x30
+lsls	r3, r6
+ldr	r2, [sp, #92]	@ 0x5c
+adds	r4, #1
+lsls	r4, r4, #2
+ldr	r2, [r2, r4]
+bics	r3, r2
+ldr	r2, [r5, r4]
+movs	r6, r2
+orrs	r6, r3
+str	r6, [r5, r4]
+ldr	r6, [sp, #44]	@ 0x2c
+bics	r3, r2
+lsrs	r3, r6
+orrs	r0, r3
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #68]	@ 0x44
+ldr	r2, [sp, #72]	@ 0x48
+ands	r3, r1
+lsls	r3, r2
+mov	r1, sl
+ldr	r2, [sp, #76]	@ 0x4c
+ldr	r5, [sp, #24]
+orrs	r3, r2
+ldr	r2, [sp, #96]	@ 0x60
+lsls	r3, r3, #2
+ldr	r2, [r3, r2]
+lsrs	r3, r5, #4
+orrs	r3, r1
+movs	r1, #15
+mov	r6, r9
+ands	r5, r1
+ldr	r4, [sp, #100]	@ 0x64
+orrs	r5, r6
+lsls	r3, r3, #2
+lsls	r5, r5, #2
+ldr	r3, [r3, r4]
+ldr	r5, [r5, r4]
+orrs	r3, r2
+orrs	r5, r2
+lsrs	r2, r0, #24
+ands	r1, r2
+lsrs	r0, r0, #28
+ldr	r2, [sp, #104]	@ 0x68
+lsls	r1, r1, #2
+lsls	r0, r0, #2
+ldr	r6, [r1, r2]
+ldr	r1, [r0, r2]
+ldr	r0, [sp, #40]	@ 0x28
+ldr	r2, [r7, #0]
+cmp	r0, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r0, #3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r4, r3, #8
+eors	r4, r2
+lsls	r0, r1, #8
+ands	r0, r4
+eors	r0, r2
+lsrs	r3, r3, #24
+lsls	r2, r5, #8
+orrs	r2, r3
+lsrs	r1, r1, #24
+lsls	r3, r6, #8
+orrs	r3, r1
+str	r0, [r7, #0]
+adds	r1, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [r7, #4]
+eors	r2, r1
+ands	r2, r3
+eors	r2, r1
+ldr	r1, [r7, #8]
+str	r2, [r7, #4]
+lsrs	r2, r5, #24
+eors	r2, r1
+lsrs	r3, r6, #24
+ands	r3, r2
+eors	r3, r1
+str	r3, [r7, #8]
+ldr	r3, [sp, #84]	@ 0x54
+adds	r7, #8
+cmp	r7, r3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r3, #1
+ands	r3, r5
+str	r3, [sp, #40]	@ 0x28
+mov	r3, ip
+asrs	r1, r1, #2
+ands	r3, r1
+movs	r1, r3
+movs	r3, #128	@ 0x80
+lsls	r3, r3, #4
+asrs	r3, r1
+str	r3, [sp, #32]
+cmp	r4, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r4, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #32
+ands	r3, r7
+str	r3, [sp, #72]	@ 0x48
+movs	r3, #1
+str	r3, [sp, #68]	@ 0x44
+adds	r3, #14
+str	r3, [sp, #64]	@ 0x40
+movs	r3, #160	@ 0xa0
+movs	r0, #128	@ 0x80
+movs	r4, #208	@ 0xd0
+lsls	r3, r3, #23
+lsls	r0, r0, #17
+ldr	r1, [r3, r4]
+tst	r1, r0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [r2, #0]
+mov	r8, r3
+ldr	r3, [sp, #32]
+lsls	r3, r3, #1
+str	r3, [sp, #60]	@ 0x3c
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #0]
+adds	r1, r6, #1
+add	r3, r8
+adds	r3, r3, r6
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+mov	sl, r1
+ldr	r1, [sp, #76]	@ 0x4c
+movs	r0, r3
+str	r3, [sp, #16]
+cmp	r1, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, r6
+ldr	r1, [sp, #4]
+lsls	r3, r3, #3
+add	r1, r8
+adds	r1, r1, r0
+adds	r1, #44	@ 0x2c
+ldrb	r5, [r1, #0]
+ldr	r1, [sp, #8]
+lsls	r0, r5, #26
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, r1
+movs	r1, #7
+subs	r1, r1, r0
+adds	r3, r3, r1
+movs	r1, #16
+ands	r1, r5
+negs	r0, r1
+adcs	r1, r0
+negs	r6, r1
+mov	r1, fp
+movs	r0, #255	@ 0xff
+ldrb	r1, [r1, r3]
+ands	r6, r0
+mov	ip, r1
+ldr	r1, [sp, #20]
+subs	r0, #191	@ 0xbf
+ands	r0, r5
+cmp	r1, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r1, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r0, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r1, ip
+ldr	r3, [pc, #948]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+movs	r0, #0
+ldrb	r3, [r3, r1]
+mov	ip, r3
+movs	r3, #0
+str	r3, [sp, #28]
+mov	r3, ip
+orrs	r3, r6
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [pc, #932]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r6, [sp, #40]	@ 0x28
+ldr	r4, [r1, #0]
+str	r1, [sp, #24]
+ldr	r1, [sp, #52]	@ 0x34
+adds	r1, #24
+lsls	r3, r1
+cmp	r6, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+sxtb	r6, r5
+cmp	r6, #0
+blt.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [pc, #912]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r6, [r6, #0]
+bics	r3, r6
+ldr	r6, [sp, #24]
+orrs	r4, r3
+str	r4, [r6, #0]
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsrs	r3, r1
+ldr	r1, [sp, #64]	@ 0x40
+movs	r4, r3
+ands	r1, r5
+ldr	r5, [sp, #68]	@ 0x44
+ldr	r3, [pc, #884]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+lsls	r1, r5
+ldr	r5, [sp, #72]	@ 0x48
+ldr	r6, [pc, #884]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+orrs	r1, r5
+lsls	r1, r1, #2
+ldr	r5, [r1, r3]
+movs	r3, #15
+mov	r1, ip
+ands	r1, r3
+orrs	r1, r0
+lsls	r1, r1, #2
+ldr	r1, [r1, r6]
+ldr	r7, [pc, #868]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ands	r3, r4
+orrs	r1, r5
+lsls	r3, r3, #2
+str	r7, [sp, #84]	@ 0x54
+ldr	r7, [r3, r7]
+movs	r3, r1
+ldr	r0, [sp, #44]	@ 0x2c
+str	r7, [sp, #80]	@ 0x50
+lsls	r0, r0, #3
+lsrs	r3, r0
+lsrs	r7, r0
+str	r4, [sp, #16]
+str	r3, [sp, #88]	@ 0x58
+ldr	r4, [sp, #12]
+ldr	r3, [sp, #48]	@ 0x30
+str	r5, [sp, #24]
+str	r1, [sp, #56]	@ 0x38
+ldr	r5, [r4, #0]
+movs	r1, r7
+lsls	r3, r3, #29
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #32
+subs	r3, r3, r0
+str	r3, [sp, #12]
+mov	r3, ip
+ldr	r1, [sp, #28]
+lsrs	r3, r3, #4
+orrs	r3, r1
+lsls	r3, r3, #2
+ldr	r3, [r3, r6]
+ldr	r6, [sp, #24]
+ldr	r1, [sp, #56]	@ 0x38
+orrs	r6, r3
+movs	r3, r6
+ldr	r6, [sp, #12]
+lsrs	r3, r0
+lsls	r1, r6
+ldr	r6, [sp, #16]
+orrs	r1, r3
+lsrs	r3, r6, #4
+ldr	r6, [sp, #84]	@ 0x54
+lsls	r3, r3, #2
+ldr	r3, [r3, r6]
+ldr	r6, [sp, #12]
+lsrs	r3, r0
+ldr	r0, [sp, #80]	@ 0x50
+eors	r1, r5
+lsls	r0, r6
+orrs	r3, r0
+movs	r0, r4
+ands	r3, r1
+eors	r3, r5
+stmia	r4!, {r3}
+ldr	r1, [r0, #4]
+ldr	r3, [sp, #88]	@ 0x58
+str	r4, [sp, #12]
+eors	r3, r1
+ands	r7, r3
+movs	r3, r7
+eors	r3, r1
+str	r3, [r0, #4]
+movs	r3, #1
+negs	r3, r3
+str	r3, [sp, #16]
+movs	r3, #8
+ldr	r1, [sp, #52]	@ 0x34
+subs	r3, r3, r1
+mov	r1, sl
+uxtb	r6, r1
+ldr	r1, [sp, #44]	@ 0x2c
+cmp	r1, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #76]	@ 0x4c
+cmp	r1, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #12]
+str	r2, [sp, #100]	@ 0x64
+subs	r3, r3, r1
+str	r3, [sp, #24]
+movs	r3, #7
+adds	r0, r1, #1
+adds	r0, #255	@ 0xff
+str	r0, [sp, #52]	@ 0x34
+ldr	r0, [sp, #8]
+str	r6, [sp, #12]
+subs	r3, r3, r0
+str	r3, [sp, #56]	@ 0x38
+ldr	r3, [pc, #664]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #76]	@ 0x4c
+ldr	r3, [pc, #668]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #88]	@ 0x58
+ldr	r3, [pc, #668]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #92]	@ 0x5c
+ldr	r3, [pc, #668]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #96]	@ 0x60
+mov	r3, r8
+str	r3, [sp, #28]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r5, ip
+mov	r7, ip
+lsrs	r6, r5, #5
+movs	r5, #31
+lsls	r3, r3, #24
+ands	r5, r7
+movs	r7, r3
+lsrs	r7, r5
+str	r6, [sp, #84]	@ 0x54
+mov	r8, r7
+lsls	r7, r6, #2
+ldr	r6, [sp, #76]	@ 0x4c
+ldr	r6, [r6, r7]
+mov	ip, r6
+movs	r6, #32
+subs	r6, r6, r5
+str	r6, [sp, #80]	@ 0x50
+movs	r6, #25
+negs	r6, r6
+mov	sl, r6
+ldr	r6, [sp, #40]	@ 0x28
+add	sl, r5
+cmp	r6, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+sxtb	r6, r2
+cmp	r6, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [pc, #584]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r6, [sp, #104]	@ 0x68
+ldr	r6, [r6, r7]
+movs	r4, r6
+mov	r6, r8
+bics	r6, r4
+mov	r8, r6
+mov	r6, ip
+mov	r4, r8
+orrs	r6, r4
+ldr	r4, [sp, #76]	@ 0x4c
+str	r6, [r4, r7]
+mov	r6, r8
+mov	r4, sl
+lsls	r6, r5
+movs	r5, r6
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #80]	@ 0x50
+ldr	r7, [sp, #84]	@ 0x54
+lsls	r3, r4
+adds	r7, #1
+ldr	r4, [sp, #104]	@ 0x68
+lsls	r7, r7, #2
+ldr	r4, [r7, r4]
+ldr	r6, [sp, #76]	@ 0x4c
+bics	r3, r4
+ldr	r4, [r6, r7]
+orrs	r4, r3
+str	r4, [r6, r7]
+ldr	r4, [sp, #80]	@ 0x50
+lsrs	r3, r4
+orrs	r5, r3
+subs	r3, r5, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #52]	@ 0x34
+adds	r1, #8
+cmp	r1, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #24]
+mov	ip, r3
+ldr	r3, [sp, #12]
+add	ip, r1
+cmp	r3, #32
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #28]
+ldr	r2, [sp, #0]
+adds	r3, r3, r2
+ldr	r2, [sp, #12]
+adds	r6, r2, #1
+uxtb	r0, r6
+str	r0, [sp, #12]
+adds	r2, r3, r2
+adds	r2, #44	@ 0x2c
+ldrb	r5, [r2, #0]
+ldr	r3, [sp, #16]
+cmp	r3, r5
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #4]
+adds	r2, r3, r5
+ldr	r0, [sp, #28]
+ldr	r4, [sp, #56]	@ 0x38
+adds	r2, r0, r2
+adds	r2, #44	@ 0x2c
+ldrb	r2, [r2, #0]
+lsls	r3, r5, #3
+lsls	r0, r2, #26
+bmi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #8]
+movs	r0, #254	@ 0xfe
+movs	r7, #64	@ 0x40
+adds	r4, r4, r3
+lsls	r3, r2, #27
+asrs	r3, r3, #31
+bics	r3, r0
+mov	r0, fp
+ands	r7, r2
+mov	r8, r7
+ldr	r7, [sp, #20]
+ldrb	r0, [r0, r4]
+adds	r3, #255	@ 0xff
+cmp	r7, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r7, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, r8
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r6, #0
+ldr	r4, [pc, #376]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r9, r6
+ldrb	r0, [r4, r0]
+movs	r4, #0
+str	r4, [sp, #48]	@ 0x30
+orrs	r3, r0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r5, [sp, #16]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, r8
+cmp	r2, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #4
+mov	r1, r8
+cmp	r2, r1
+adcs	r3, r3
+lsls	r3, r3, #2
+add	ip, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+movs	r4, #0
+str	r3, [sp, #32]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r6, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #4
+cmp	r2, r6
+adcs	r3, r3
+lsls	r3, r3, #2
+ldr	r2, [sp, #12]
+mov	ip, r2
+add	ip, r3
+mov	r3, ip
+str	r3, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #8
+mov	r8, r2
+ldr	r2, [sp, #12]
+mov	ip, r2
+ldr	r2, [sp, #44]	@ 0x2c
+add	r8, ip
+cmp	r2, #1
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r2, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r2, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r3, #255	@ 0xff
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r7, [sp, #12]
+ldr	r5, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+lsrs	r3, r3, #4
+ldr	r4, [r5, r2]
+lsls	r3, r3, #2
+ldr	r2, [r7, #0]
+ldr	r3, [r5, r3]
+eors	r0, r2
+ands	r3, r0
+eors	r3, r2
+str	r3, [r7, #0]
+ldr	r3, [r7, #4]
+eors	r1, r3
+ands	r4, r1
+eors	r4, r3
+str	r4, [r7, #4]
+mov	r3, r8
+str	r3, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, r8
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #4
+mov	r2, r8
+cmp	r3, r2
+adcs	r4, r4
+lsls	r4, r4, #2
+add	ip, r4
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #40]	@ 0x28
+ldr	r1, [sp, #52]	@ 0x34
+lsls	r2, r3, #3
+movs	r3, #15
+ands	r3, r4
+lsls	r3, r3, #2
+ldr	r1, [r1, r3]
+movs	r3, r0
+lsrs	r3, r2
+movs	r6, r1
+mov	r7, ip
+str	r3, [sp, #12]
+mov	r3, r8
+lsrs	r6, r2
+ldr	r7, [r7, #0]
+cmp	r3, #3
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, ip
+ldr	r3, [sp, #12]
+eors	r3, r7
+ands	r3, r6
+eors	r3, r7
+str	r3, [r2, #0]
+mov	r3, r8
+cmp	r3, #4
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+add	ip, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #128	@ 0x80
+ldr	r2, [sp, #0]
+lsls	r3, r3, #3
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #0]
+movs	r3, #1
+movs	r2, #0
+mov	r8, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r0, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, r2
+ldr	r2, [sp, #32]
+eors	r2, r3
+ands	r5, r2
+eors	r5, r3
+ldr	r3, [sp, #12]
+str	r5, [r3, #0]
+cmp	r6, #4
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, #4
+str	r3, [sp, #12]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #128	@ 0x80
+ldr	r3, [sp, #0]
+lsls	r2, r2, #3
+eors	r3, r2
+uxth	r2, r3
+ldr	r3, [sp, #28]
+str	r2, [sp, #0]
+adds	r3, r3, r2
+movs	r2, r3
+adds	r2, #44	@ 0x2c
+ldrb	r5, [r2, #0]
+ldr	r2, [sp, #16]
+cmp	r2, r5
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #4]
+adds	r2, r3, r5
+movs	r3, #1
+str	r3, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r3, #0
+str	r3, [sp, #12]
+ldr	r3, [pc, #664]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r4, [sp, #32]
+str	r3, [sp, #24]
+ldr	r3, [pc, #664]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #72]	@ 0x48
+ldr	r3, [pc, #664]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #48]	@ 0x30
+ldr	r3, [pc, #664]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #68]	@ 0x44
+mov	r3, r8
+str	r3, [sp, #76]	@ 0x4c
+ldr	r3, [sp, #20]
+mov	r9, r3
+ldr	r3, [sp, #44]	@ 0x2c
+mov	ip, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r5, r3
+adds	r3, #1
+uxtb	r3, r3
+str	r3, [sp, #32]
+movs	r2, #31
+movs	r1, #32
+ldr	r3, [sp, #12]
+ldr	r7, [sp, #24]
+ands	r2, r3
+subs	r1, r1, r2
+str	r1, [sp, #20]
+movs	r1, #25
+lsrs	r0, r3, #5
+negs	r1, r1
+movs	r3, #255	@ 0xff
+mov	r8, r1
+lsls	r3, r3, #24
+lsrs	r3, r2
+add	r8, r2
+mov	r1, r8
+lsls	r6, r0, #2
+ldr	r4, [r7, r6]
+str	r0, [sp, #44]	@ 0x2c
+bics	r3, r4
+lsls	r3, r2
+cmp	r1, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r1, r0, #1
+movs	r0, #255	@ 0xff
+lsls	r1, r1, #2
+ldr	r7, [r7, r1]
+ldr	r1, [sp, #20]
+lsls	r0, r0, #24
+lsls	r0, r1
+movs	r1, r0
+bics	r1, r7
+ldr	r7, [sp, #20]
+lsrs	r1, r7
+orrs	r3, r1
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #76]	@ 0x4c
+ldr	r0, [sp, #0]
+adds	r3, r1, r0
+adds	r3, r3, r5
+adds	r3, #44	@ 0x2c
+ldrb	r3, [r3, #0]
+ldr	r0, [sp, #4]
+lsrs	r5, r3, #3
+adds	r1, r1, r0
+adds	r1, r1, r5
+adds	r1, #44	@ 0x2c
+ldrb	r5, [r1, #0]
+ldr	r1, [sp, #16]
+lsls	r3, r3, #3
+adds	r3, r1, r3
+ldr	r1, [sp, #8]
+ldr	r0, [sp, #72]	@ 0x48
+ldrb	r7, [r3, r1]
+movs	r1, #15
+ldr	r3, [sp, #28]
+ands	r1, r5
+orrs	r3, r1
+lsls	r3, r3, #2
+ldr	r3, [r3, r0]
+lsrs	r5, r5, #4
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [sp, #28]
+orrs	r3, r5
+lsls	r3, r3, #2
+ldr	r3, [r3, r0]
+ldr	r0, [sp, #48]	@ 0x30
+str	r3, [sp, #56]	@ 0x38
+movs	r3, #15
+ands	r3, r7
+lsls	r3, r3, #2
+ldr	r3, [r0, r3]
+str	r3, [sp, #60]	@ 0x3c
+lsrs	r3, r7, #4
+lsls	r3, r3, #2
+ldr	r3, [r0, r3]
+str	r3, [sp, #64]	@ 0x40
+movs	r3, #24
+add	r3, ip
+mov	sl, r3
+movs	r3, r7
+cmp	r1, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #255	@ 0xff
+cmp	r5, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+eors	r3, r7
+mov	r1, sl
+lsls	r3, r1
+movs	r7, r3
+lsrs	r7, r2
+ldr	r1, [sp, #68]	@ 0x44
+mov	r0, r8
+ldr	r5, [r1, r6]
+ldr	r1, [sp, #24]
+bics	r7, r5
+movs	r5, r7
+bics	r5, r4
+orrs	r4, r7
+lsls	r5, r2
+str	r4, [r1, r6]
+cmp	r0, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #20]
+ldr	r0, [sp, #44]	@ 0x2c
+lsls	r3, r6
+ldr	r2, [sp, #68]	@ 0x44
+adds	r0, #1
+lsls	r0, r0, #2
+ldr	r2, [r0, r2]
+bics	r3, r2
+ldr	r2, [r1, r0]
+movs	r4, r3
+bics	r3, r2
+lsrs	r3, r6
+orrs	r4, r2
+str	r4, [r1, r0]
+orrs	r5, r3
+cmp	r5, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #52]	@ 0x34
+ldr	r3, [sp, #56]	@ 0x38
+ldr	r1, [sp, #64]	@ 0x40
+ldr	r0, [sp, #60]	@ 0x3c
+eors	r3, r2
+ands	r1, r3
+ands	r3, r0
+eors	r1, r2
+eors	r2, r3
+mov	r3, sl
+lsrs	r5, r3
+mov	r3, ip
+mov	r8, r2
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #40]	@ 0x28
+mov	r7, r9
+lsls	r2, r3, #3
+movs	r3, #15
+ldr	r6, [sp, #48]	@ 0x30
+ands	r3, r5
+lsls	r3, r3, #2
+ldr	r4, [r6, r3]
+ldr	r7, [r7, #0]
+movs	r0, r4
+mov	r3, r8
+mov	sl, r7
+mov	r7, ip
+lsrs	r0, r2
+lsrs	r3, r2
+cmp	r7, #3
+bls.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r7, #32
+lsrs	r5, r5, #4
+lsls	r5, r5, #2
+ldr	r5, [r6, r5]
+subs	r7, r7, r2
+lsrs	r5, r2
+lsrs	r1, r2
+mov	r2, r8
+str	r7, [sp, #20]
+ldr	r6, [sp, #20]
+mov	r7, r9
+lsls	r2, r6
+lsls	r4, r6
+orrs	r1, r2
+mov	r2, sl
+orrs	r5, r4
+eors	r1, r2
+ands	r1, r5
+eors	r1, r2
+mov	r2, r9
+stmia	r7!, {r1}
+ldr	r2, [r2, #4]
+eors	r3, r2
+ands	r3, r0
+eors	r3, r2
+mov	r2, r9
+mov	r9, r7
+str	r3, [r2, #4]
+mov	r2, ip
+ldr	r3, [sp, #12]
+adds	r3, #8
+subs	r3, r3, r2
+str	r3, [sp, #12]
+mov	r3, fp
+subs	r3, #1
+bcs.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	fp, r3
+movs	r3, #0
+mov	ip, r3
+ldr	r3, [sp, #32]
+cmp	r3, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #128	@ 0x80
+ldr	r3, [sp, #0]
+lsls	r2, r2, #3
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #0]
+ldr	r3, [sp, #36]	@ 0x24
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #4]
+movs	r5, #0
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #4]
+movs	r3, #1
+str	r3, [sp, #32]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, ip
+cmp	r2, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #4
+mov	r1, ip
+cmp	r2, r1
+adcs	r3, r3
+lsls	r3, r3, #2
+add	r9, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, ip
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #4
+mov	r2, ip
+cmp	r3, r2
+adcs	r5, r5
+lsls	r5, r5, #2
+add	r9, r5
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r7, r9
+ldr	r3, [sp, #40]	@ 0x28
+adds	r7, #8
+cmp	r3, #1
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r3, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r5, #255	@ 0xff
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #15
+mov	r2, r9
+ldr	r0, [sp, #48]	@ 0x30
+ands	r3, r5
+lsrs	r5, r5, #4
+ldr	r2, [r2, #0]
+lsls	r3, r3, #2
+lsls	r5, r5, #2
+ldr	r3, [r0, r3]
+ldr	r0, [r0, r5]
+eors	r1, r2
+ands	r0, r1
+eors	r0, r2
+mov	r2, r9
+mov	r1, r8
+str	r0, [r2, #0]
+ldr	r2, [r2, #4]
+eors	r1, r2
+ands	r3, r1
+eors	r3, r2
+mov	r2, r9
+mov	r9, r7
+str	r3, [r2, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+ldr	r7, [sp, #20]
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, r7, #1
+adds	r3, #255	@ 0xff
+str	r3, [sp, #64]	@ 0x40
+ldr	r3, [pc, #36]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r2, [sp, #8]
+str	r3, [sp, #40]	@ 0x28
+movs	r3, #7
+subs	r3, r3, r2
+str	r3, [sp, #84]	@ 0x54
+ldr	r3, [pc, #40]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r4, [sp, #24]
+str	r3, [sp, #104]	@ 0x68
+ldr	r3, [pc, #28]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #88]	@ 0x58
+ldr	r3, [pc, #16]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #92]	@ 0x5c
+ldr	r3, [pc, #28]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #96]	@ 0x60
+ldr	r3, [pc, #12]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #100]	@ 0x64
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+adds	r6, r3, #1
+movs	r2, r3
+uxtb	r3, r6
+str	r3, [sp, #24]
+mov	r3, fp
+ldr	r1, [sp, #0]
+adds	r3, r3, r1
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r0, [r3, #0]
+ldr	r3, [sp, #12]
+cmp	r0, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #20]
+ldr	r3, [sp, #28]
+movs	r1, #255	@ 0xff
+subs	r3, r3, r2
+movs	r2, #31
+adds	r3, r7, r3
+lsrs	r4, r3, #5
+lsls	r5, r4, #2
+mov	ip, r5
+lsls	r1, r1, #24
+ands	r2, r3
+movs	r3, r1
+mov	r6, ip
+lsrs	r3, r2
+ldr	r5, [sp, #40]	@ 0x28
+str	r4, [sp, #48]	@ 0x30
+ldr	r5, [r5, r6]
+bics	r3, r5
+mov	r9, r5
+movs	r5, #32
+subs	r5, r5, r2
+str	r5, [sp, #44]	@ 0x2c
+movs	r5, #25
+negs	r5, r5
+mov	r8, r5
+add	r8, r2
+mov	r5, r8
+lsls	r3, r2
+str	r5, [sp, #60]	@ 0x3c
+cmp	r5, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #44]	@ 0x2c
+adds	r5, r4, #1
+lsls	r1, r6
+ldr	r4, [sp, #40]	@ 0x28
+lsls	r5, r5, #2
+ldr	r5, [r4, r5]
+bics	r1, r5
+lsrs	r1, r6
+orrs	r3, r1
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r1, fp
+ldr	r5, [sp, #4]
+lsls	r3, r0, #3
+adds	r1, r1, r5
+adds	r1, r1, r0
+adds	r1, #44	@ 0x2c
+ldrb	r1, [r1, #0]
+ldr	r5, [sp, #84]	@ 0x54
+lsls	r4, r1, #26
+bmi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [sp, #8]
+movs	r6, #254	@ 0xfe
+adds	r5, r5, r3
+lsls	r3, r1, #27
+asrs	r3, r3, #31
+bics	r3, r6
+ldr	r6, [sp, #16]
+adds	r3, #255	@ 0xff
+ldrb	r6, [r6, r5]
+str	r6, [sp, #36]	@ 0x24
+movs	r6, #64	@ 0x40
+ands	r6, r1
+mov	r8, r6
+ldr	r6, [sp, #32]
+cmp	r6, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r6, #3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, r8
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #36]	@ 0x24
+ldr	r5, [pc, #912]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r4, [r5, r4]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #0
+mov	r8, r4
+mov	sl, r4
+ldr	r5, [sp, #36]	@ 0x24
+orrs	r3, r5
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r3, r3, #24
+movs	r5, r3
+sxtb	r0, r1
+lsrs	r5, r2
+cmp	r0, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, ip
+ldr	r0, [sp, #88]	@ 0x58
+ldr	r6, [sp, #40]	@ 0x28
+ldr	r0, [r0, r4]
+mov	r4, r9
+bics	r5, r0
+movs	r0, r5
+orrs	r5, r4
+bics	r0, r4
+mov	r4, ip
+str	r5, [r6, r4]
+ldr	r4, [sp, #60]	@ 0x3c
+lsls	r0, r2
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [sp, #44]	@ 0x2c
+ldr	r4, [sp, #48]	@ 0x30
+lsls	r3, r5
+ldr	r2, [sp, #88]	@ 0x58
+adds	r4, #1
+lsls	r4, r4, #2
+ldr	r2, [r4, r2]
+bics	r3, r2
+ldr	r2, [r6, r4]
+movs	r5, r2
+orrs	r5, r3
+str	r5, [r6, r4]
+ldr	r5, [sp, #44]	@ 0x2c
+bics	r3, r2
+lsrs	r3, r5
+orrs	r0, r3
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #68]	@ 0x44
+mov	r4, sl
+ands	r3, r1
+ldr	r1, [sp, #72]	@ 0x48
+ldr	r5, [sp, #36]	@ 0x24
+lsls	r3, r1
+ldr	r1, [sp, #76]	@ 0x4c
+ldr	r6, [sp, #96]	@ 0x60
+orrs	r3, r1
+ldr	r1, [sp, #92]	@ 0x5c
+lsls	r3, r3, #2
+ldr	r1, [r3, r1]
+lsrs	r3, r5, #4
+orrs	r3, r4
+movs	r4, #15
+ands	r5, r4
+mov	ip, r4
+mov	r4, r8
+orrs	r5, r4
+lsls	r3, r3, #2
+lsls	r5, r5, #2
+ldr	r3, [r3, r6]
+ldr	r5, [r5, r6]
+lsrs	r2, r0, #24
+orrs	r3, r1
+orrs	r5, r1
+cmp	r2, #255	@ 0xff
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, ip
+ldr	r6, [sp, #100]	@ 0x64
+lsrs	r0, r0, #28
+ldr	r1, [r7, #0]
+lsls	r0, r0, #2
+ldr	r0, [r0, r6]
+ands	r4, r2
+eors	r3, r1
+ands	r0, r3
+lsls	r4, r4, #2
+ldr	r3, [r7, #4]
+ldr	r2, [r4, r6]
+eors	r5, r3
+ands	r2, r5
+eors	r0, r1
+eors	r2, r3
+str	r0, [r7, #0]
+str	r2, [r7, #4]
+ldr	r3, [sp, #64]	@ 0x40
+adds	r7, #8
+cmp	r7, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #24]
+cmp	r3, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #128	@ 0x80
+ldr	r2, [sp, #0]
+lsls	r3, r3, #3
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #0]
+movs	r3, #1
+movs	r2, #0
+str	r3, [sp, #24]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r0, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+adds	r5, r4, r5
+ldr	r4, [sp, #80]	@ 0x50
+ldrb	r4, [r5, r4]
+mov	sl, r4
+ldr	r4, [sp, #56]	@ 0x38
+ldrb	r5, [r5, r4]
+mov	r4, r8
+cmp	r4, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r6, sl
+ldr	r4, [pc, #648]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r8, r4
+ldrb	r4, [r4, r6]
+ldr	r6, [sp, #36]	@ 0x24
+mov	sl, r4
+mov	r4, r8
+ldrb	r5, [r4, r5]
+ldrb	r4, [r4, r6]
+str	r4, [sp, #36]	@ 0x24
+mov	r4, sl
+lsrs	r6, r4, #4
+lsls	r6, r6, #8
+mov	sl, r6
+movs	r6, #240	@ 0xf0
+orrs	r3, r4
+lsls	r6, r6, #4
+lsls	r4, r4, #8
+ands	r4, r6
+mov	r8, r4
+movs	r6, #240	@ 0xf0
+mov	r4, sl
+ands	r6, r5
+orrs	r4, r6
+mov	sl, r4
+movs	r4, #255	@ 0xff
+orrs	r3, r5
+lsls	r5, r5, #4
+ands	r5, r4
+mov	r4, r8
+orrs	r4, r5
+mov	r8, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+adds	r5, r4, r5
+ldr	r4, [sp, #56]	@ 0x38
+ldrb	r5, [r5, r4]
+mov	r4, r8
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r8
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+movs	r2, #0
+str	r3, [sp, #24]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, r9
+movs	r0, r5
+orrs	r5, r4
+bics	r0, r4
+mov	r4, ip
+lsls	r0, r2
+ldr	r6, [sp, #40]	@ 0x28
+ldr	r2, [sp, #60]	@ 0x3c
+str	r5, [r6, r4]
+cmp	r2, #7
+bls.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #48]	@ 0x30
+ldr	r2, [sp, #44]	@ 0x2c
+adds	r4, #1
+lsls	r4, r4, #2
+lsls	r3, r2
+ldr	r2, [r6, r4]
+movs	r5, r2
+orrs	r5, r3
+bics	r3, r2
+ldr	r2, [sp, #44]	@ 0x2c
+str	r5, [r6, r4]
+lsrs	r3, r2
+orrs	r0, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r8, r4
+mov	sl, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #104]	@ 0x68
+ldr	r6, [sp, #36]	@ 0x24
+ldrb	r5, [r4, r5]
+ldrb	r4, [r4, r6]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #0
+mov	r8, r4
+mov	sl, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r3, [sp, #28]
+movs	r3, #1
+negs	r3, r3
+str	r3, [sp, #12]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+str	r3, [r7, #0]
+str	r5, [r7, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, sl
+eors	r3, r2
+ands	r0, r3
+mov	r3, r9
+eors	r0, r2
+str	r0, [r3, #0]
+mov	r3, ip
+cmp	r7, #4
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+add	r9, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #32
+subs	r3, r3, r2
+str	r3, [sp, #20]
+lsrs	r4, r4, #4
+ldr	r3, [sp, #52]	@ 0x34
+lsls	r4, r4, #2
+ldr	r4, [r3, r4]
+ldr	r3, [sp, #20]
+lsrs	r5, r2
+lsls	r0, r3
+lsrs	r4, r2
+lsls	r1, r3
+mov	r3, ip
+orrs	r0, r5
+orrs	r1, r4
+eors	r0, r7
+ands	r0, r1
+eors	r0, r7
+stmia	r3!, {r0}
+mov	r9, r3
+mov	r3, ip
+ldr	r2, [r3, #4]
+ldr	r3, [sp, #12]
+eors	r3, r2
+ands	r6, r3
+mov	r3, ip
+eors	r6, r2
+mov	ip, r9
+str	r6, [r3, #4]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+adds	r6, r4, r6
+ldr	r4, [sp, #56]	@ 0x38
+ldrb	r6, [r6, r4]
+mov	r4, r9
+cmp	r4, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r9
+movs	r5, #240	@ 0xf0
+mov	r4, sl
+ands	r5, r6
+orrs	r4, r5
+mov	sl, r4
+movs	r4, #255	@ 0xff
+orrs	r3, r6
+lsls	r6, r6, #4
+ands	r6, r4
+mov	r4, r9
+orrs	r4, r6
+mov	r9, r4
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+adds	r6, r4, r6
+ldr	r4, [sp, #80]	@ 0x50
+ldrb	r4, [r6, r4]
+mov	sl, r4
+ldr	r4, [sp, #56]	@ 0x38
+ldrb	r6, [r6, r4]
+mov	r4, r9
+cmp	r4, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r5, sl
+ldr	r4, [pc, #308]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r9, r4
+ldrb	r4, [r4, r5]
+ldr	r5, [sp, #24]
+mov	sl, r4
+mov	r4, r9
+ldrb	r6, [r4, r6]
+ldrb	r4, [r4, r5]
+str	r4, [sp, #24]
+mov	r4, sl
+lsrs	r5, r4, #4
+lsls	r5, r5, #8
+mov	sl, r5
+movs	r5, #240	@ 0xf0
+orrs	r3, r4
+lsls	r5, r5, #4
+lsls	r4, r4, #8
+ands	r4, r5
+mov	r9, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+movs	r2, #0
+mov	r8, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r6, r8
+mov	r5, ip
+orrs	r5, r6
+ldr	r6, [sp, #76]	@ 0x4c
+str	r5, [r6, r7]
+mov	r5, sl
+cmp	r5, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r5, r3
+ldr	r7, [sp, #84]	@ 0x54
+adds	r7, #1
+lsls	r4, r7, #2
+ldr	r7, [sp, #80]	@ 0x50
+lsls	r5, r7
+movs	r7, r5
+ldr	r5, [r6, r4]
+orrs	r5, r7
+str	r5, [r6, r4]
+ldr	r5, [sp, #64]	@ 0x40
+movs	r7, #15
+ands	r2, r5
+ldr	r5, [sp, #68]	@ 0x44
+mov	r6, r9
+lsls	r2, r5
+ldr	r5, [sp, #72]	@ 0x48
+ldr	r4, [sp, #48]	@ 0x30
+orrs	r2, r5
+ldr	r5, [sp, #88]	@ 0x58
+lsls	r2, r2, #2
+ldr	r5, [r2, r5]
+lsrs	r2, r0, #4
+ands	r0, r7
+orrs	r2, r6
+orrs	r0, r4
+ldr	r6, [sp, #92]	@ 0x5c
+lsls	r0, r0, #2
+ldr	r4, [r0, r6]
+lsls	r2, r2, #2
+lsrs	r0, r3, #24
+ands	r7, r0
+ldr	r2, [r2, r6]
+ldr	r0, [sp, #96]	@ 0x60
+lsls	r7, r7, #2
+orrs	r2, r5
+orrs	r4, r5
+ldr	r5, [r7, r0]
+lsrs	r3, r3, #28
+mov	ip, r5
+ldr	r5, [sp, #44]	@ 0x2c
+lsls	r3, r3, #2
+ldr	r0, [r3, r0]
+ldr	r3, [r1, #0]
+cmp	r5, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r5, #3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r7, r2, #8
+eors	r7, r3
+lsls	r5, r0, #8
+ands	r5, r7
+eors	r5, r3
+lsrs	r2, r2, #24
+lsls	r3, r4, #8
+orrs	r3, r2
+mov	r2, ip
+lsrs	r0, r0, #24
+lsls	r2, r2, #8
+orrs	r2, r0
+str	r5, [r1, #0]
+adds	r0, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r1, #4]
+eors	r3, r0
+ands	r3, r2
+eors	r3, r0
+mov	r0, ip
+str	r3, [r1, #4]
+ldr	r3, [r1, #8]
+lsrs	r2, r4, #24
+eors	r2, r3
+lsrs	r0, r0, #24
+ands	r0, r2
+eors	r0, r3
+str	r0, [r1, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #64]	@ 0x40
+ldr	r5, [sp, #80]	@ 0x50
+mov	r8, r3
+ldr	r2, [sp, #84]	@ 0x54
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r1, #1
+negs	r1, r1
+str	r1, [sp, #16]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, #32
+ldr	r3, [sp, #0]
+mov	r9, r1
+add	r3, r8
+str	r3, [sp, #56]	@ 0x38
+ldr	r3, [sp, #4]
+str	r5, [sp, #76]	@ 0x4c
+add	r3, r8
+str	r3, [sp, #60]	@ 0x3c
+ldr	r3, [pc, #40]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r6, [sp, #4]
+str	r3, [sp, #24]
+ldr	r3, [pc, #40]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r6, [sp, #52]	@ 0x34
+str	r3, [sp, #20]
+ldr	r3, [pc, #36]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r2, [sp, #80]	@ 0x50
+str	r3, [sp, #36]	@ 0x24
+ldr	r3, [pc, #36]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #16]
+ldr	r3, [sp, #44]	@ 0x2c
+lsls	r3, r3, #3
+str	r3, [sp, #64]	@ 0x40
+subs	r3, r0, r3
+str	r3, [sp, #68]	@ 0x44
+mov	r3, r8
+str	r3, [sp, #72]	@ 0x48
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+adds	r2, r3, #1
+uxtb	r2, r2
+str	r2, [sp, #4]
+ldr	r2, [sp, #56]	@ 0x38
+ldr	r1, [sp, #60]	@ 0x3c
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r2, [r3, #0]
+movs	r4, #15
+lsrs	r3, r2, #3
+adds	r3, r3, r1
+lsls	r2, r2, #3
+ldr	r1, [sp, #8]
+add	r2, fp
+ldrb	r0, [r2, r1]
+ldr	r1, [sp, #28]
+adds	r3, #44	@ 0x2c
+movs	r2, r1
+ldrb	r3, [r3, #0]
+ldr	r5, [sp, #36]	@ 0x24
+ands	r4, r3
+orrs	r2, r4
+lsls	r2, r2, #2
+ldr	r2, [r5, r2]
+lsrs	r3, r3, #4
+str	r2, [sp, #52]	@ 0x34
+movs	r2, r1
+orrs	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r5, r2]
+ldr	r1, [sp, #16]
+str	r2, [sp, #48]	@ 0x30
+movs	r2, #15
+ands	r2, r0
+lsls	r2, r2, #2
+ldr	r2, [r1, r2]
+str	r2, [sp, #40]	@ 0x28
+lsrs	r2, r0, #4
+lsls	r2, r2, #2
+ldr	r2, [r1, r2]
+str	r2, [sp, #32]
+movs	r2, #24
+mov	ip, r2
+add	ip, r6
+mov	r2, ip
+str	r2, [sp, #0]
+movs	r2, #255	@ 0xff
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, r0
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+eors	r2, r0
+ldr	r3, [sp, #0]
+movs	r0, #31
+lsls	r2, r3
+mov	r3, r9
+ands	r0, r3
+lsrs	r4, r3, #5
+movs	r3, r2
+lsrs	r3, r0
+ldr	r5, [sp, #20]
+lsls	r1, r4, #2
+ldr	r5, [r5, r1]
+ldr	r7, [sp, #24]
+bics	r3, r5
+ldr	r5, [r7, r1]
+orrs	r5, r3
+mov	r8, r5
+movs	r5, r7
+mov	r7, r8
+str	r7, [r5, r1]
+movs	r7, #25
+negs	r7, r7
+mov	ip, r7
+add	ip, r0
+mov	r7, ip
+lsls	r3, r0
+cmp	r7, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r7, #32
+subs	r0, r7, r0
+lsls	r2, r0
+ldr	r1, [sp, #20]
+adds	r4, #1
+lsls	r4, r4, #2
+ldr	r7, [r1, r4]
+movs	r1, r5
+ldr	r5, [r5, r4]
+bics	r2, r7
+orrs	r5, r2
+lsrs	r2, r0
+str	r5, [r1, r4]
+orrs	r3, r2
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #52]	@ 0x34
+ldr	r2, [sp, #48]	@ 0x30
+ldr	r5, [sp, #32]
+ldr	r1, [sp, #40]	@ 0x28
+eors	r2, r0
+ands	r5, r2
+ands	r1, r2
+ldr	r2, [sp, #0]
+eors	r5, r0
+lsrs	r3, r2
+eors	r1, r0
+cmp	r6, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #8
+mov	r8, r2
+ldr	r7, [sp, #12]
+ldr	r2, [sp, #44]	@ 0x2c
+add	r8, r7
+cmp	r2, #1
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r2, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r2, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r0, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r0, r2]
+lsrs	r3, r3, #4
+mov	ip, r2
+lsls	r3, r3, #2
+ldr	r2, [r0, r3]
+ldr	r4, [r7, #0]
+lsls	r0, r5, #8
+eors	r0, r4
+lsls	r3, r2, #8
+ands	r3, r0
+mov	r0, ip
+eors	r3, r4
+lsls	r0, r0, #8
+lsrs	r2, r2, #24
+str	r3, [r7, #0]
+lsrs	r5, r5, #24
+lsls	r3, r1, #8
+orrs	r2, r0
+orrs	r3, r5
+adds	r0, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r7, #4]
+eors	r3, r0
+ands	r3, r2
+eors	r3, r0
+mov	r2, ip
+ldr	r0, [sp, #12]
+lsrs	r1, r1, #24
+str	r3, [r0, #4]
+ldr	r3, [r0, #8]
+lsrs	r2, r2, #24
+eors	r1, r3
+ands	r2, r1
+eors	r2, r3
+str	r2, [r0, #8]
+mov	r3, r8
+str	r3, [sp, #12]
+mov	r3, r9
+adds	r3, #8
+subs	r3, r3, r6
+mov	r9, r3
+mov	r3, sl
+subs	r3, #1
+bcc.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r3
+movs	r6, #0
+ldr	r3, [sp, #4]
+cmp	r3, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #1
+movs	r3, #0
+str	r2, [sp, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r6, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #4
+cmp	r2, r6
+adcs	r3, r3
+lsls	r3, r3, #2
+ldr	r2, [sp, #12]
+mov	ip, r2
+add	ip, r3
+mov	r3, ip
+str	r3, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r0, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r0, [r0, r2]
+movs	r2, r1
+movs	r4, r0
+ldr	r7, [sp, #64]	@ 0x40
+lsrs	r4, r7
+lsrs	r2, r7
+ldr	r7, [sp, #12]
+ldr	r7, [r7, #0]
+mov	ip, r7
+cmp	r6, #3
+bls.n	<ADDR> <stageGfxITilesF18A+OFF>
+eors	r2, r7
+ldr	r3, [sp, #12]
+ands	r2, r4
+eors	r2, r7
+str	r2, [r3, #0]
+cmp	r6, #4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, #4
+str	r3, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r7, [sp, #12]
+lsrs	r3, r3, #4
+mov	r8, r7
+ldr	r7, [sp, #16]
+lsls	r3, r3, #2
+ldr	r3, [r7, r3]
+ldr	r7, [sp, #64]	@ 0x40
+lsrs	r3, r7
+ldr	r7, [sp, #68]	@ 0x44
+lsls	r0, r7
+lsls	r1, r7
+ldr	r7, [sp, #64]	@ 0x40
+orrs	r0, r3
+lsrs	r5, r7
+mov	r3, ip
+orrs	r1, r5
+eors	r1, r3
+ands	r1, r0
+eors	r1, r3
+mov	r3, r8
+stmia	r3!, {r1}
+mov	r8, r3
+ldr	r1, [sp, #12]
+ldr	r3, [r1, #4]
+eors	r2, r3
+ands	r4, r2
+eors	r4, r3
+mov	r3, r8
+str	r4, [r1, #4]
+str	r3, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #72]	@ 0x48
+ldr	r5, [sp, #76]	@ 0x4c
+mov	r8, r3
+ldr	r2, [sp, #80]	@ 0x50
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #76]	@ 0x4c
+cmp	r1, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #12]
+mov	r9, r6
+subs	r3, r3, r1
+str	r3, [sp, #24]
+movs	r3, #7
+adds	r0, r1, #1
+adds	r0, #255	@ 0xff
+str	r0, [sp, #44]	@ 0x2c
+ldr	r0, [sp, #8]
+str	r2, [sp, #104]	@ 0x68
+subs	r3, r3, r0
+str	r3, [sp, #56]	@ 0x38
+ldr	r3, [pc, #900]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #100]	@ 0x64
+ldr	r3, [pc, #900]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [pc, #900]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #96]	@ 0x60
+ldr	r3, [pc, #900]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #84]	@ 0x54
+ldr	r3, [pc, #900]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #88]	@ 0x58
+ldr	r3, [pc, #900]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #92]	@ 0x5c
+mov	r3, r8
+str	r3, [sp, #28]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r3, r3, #24
+movs	r5, #31
+movs	r6, r3
+ands	r5, r7
+lsrs	r6, r5
+lsrs	r0, r7, #5
+mov	ip, r6
+str	r0, [sp, #80]	@ 0x50
+lsls	r6, r0, #2
+ldr	r0, [sp, #52]	@ 0x34
+str	r3, [sp, #48]	@ 0x30
+ldr	r7, [r0, r6]
+movs	r0, #32
+subs	r0, r0, r5
+str	r0, [sp, #76]	@ 0x4c
+movs	r0, #25
+negs	r0, r0
+mov	sl, r0
+ldr	r0, [sp, #40]	@ 0x28
+add	sl, r5
+cmp	r0, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+sxtb	r0, r2
+cmp	r0, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #96]	@ 0x60
+ldr	r0, [r0, r6]
+movs	r3, r0
+mov	r0, ip
+bics	r0, r3
+ldr	r3, [sp, #52]	@ 0x34
+orrs	r7, r0
+str	r7, [r3, r6]
+lsls	r0, r5
+mov	r3, sl
+movs	r5, r0
+cmp	r3, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #76]	@ 0x4c
+ldr	r3, [sp, #48]	@ 0x30
+ldr	r6, [sp, #80]	@ 0x50
+lsls	r3, r0
+ldr	r7, [sp, #96]	@ 0x60
+adds	r6, #1
+lsls	r6, r6, #2
+ldr	r7, [r6, r7]
+bics	r3, r7
+mov	ip, r3
+ldr	r3, [sp, #52]	@ 0x34
+ldr	r7, [r3, r6]
+str	r3, [sp, #48]	@ 0x30
+mov	r3, ip
+orrs	r7, r3
+ldr	r3, [sp, #48]	@ 0x30
+str	r7, [r3, r6]
+mov	r3, ip
+lsrs	r3, r0
+orrs	r5, r3
+cmp	r5, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #44]	@ 0x2c
+adds	r1, #8
+cmp	r1, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #24]
+adds	r7, r3, r1
+mov	r3, r9
+cmp	r3, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #28]
+ldr	r2, [sp, #0]
+adds	r3, r3, r2
+mov	r2, r9
+adds	r0, r2, #1
+uxtb	r0, r0
+mov	r9, r0
+adds	r2, r3, r2
+adds	r2, #44	@ 0x2c
+ldrb	r5, [r2, #0]
+ldr	r3, [sp, #16]
+cmp	r5, r3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #4]
+adds	r2, r3, r5
+ldr	r0, [sp, #28]
+ldr	r4, [sp, #56]	@ 0x38
+adds	r2, r0, r2
+adds	r2, #44	@ 0x2c
+ldrb	r2, [r2, #0]
+lsls	r3, r5, #3
+lsls	r0, r2, #26
+bmi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #8]
+movs	r0, #254	@ 0xfe
+adds	r4, r4, r3
+lsls	r3, r2, #27
+movs	r6, #64	@ 0x40
+asrs	r3, r3, #31
+bics	r3, r0
+mov	r0, fp
+ands	r6, r2
+mov	ip, r6
+ldrb	r0, [r0, r4]
+ldr	r6, [sp, #20]
+adds	r3, #255	@ 0xff
+str	r0, [sp, #12]
+cmp	r6, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r6, #3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r0, ip
+cmp	r0, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [pc, #628]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r0, [sp, #12]
+ldrb	r0, [r4, r0]
+movs	r4, #0
+str	r0, [sp, #12]
+movs	r0, #0
+mov	r8, r0
+ldr	r0, [sp, #12]
+orrs	r3, r0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r5, [sp, #16]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #128	@ 0x80
+ldr	r2, [sp, #0]
+lsls	r3, r3, #3
+eors	r3, r2
+uxth	r2, r3
+ldr	r3, [sp, #28]
+str	r2, [sp, #0]
+adds	r3, r3, r2
+movs	r2, r3
+adds	r2, #44	@ 0x2c
+ldrb	r5, [r2, #0]
+ldr	r2, [sp, #16]
+cmp	r5, r2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #4]
+adds	r2, r3, r5
+movs	r3, #1
+mov	r9, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r0, ip
+mov	r5, sl
+orrs	r7, r0
+ldr	r0, [sp, #52]	@ 0x34
+str	r7, [r0, r6]
+cmp	r5, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [sp, #76]	@ 0x4c
+ldr	r7, [sp, #48]	@ 0x30
+ldr	r6, [sp, #80]	@ 0x50
+lsls	r7, r5
+adds	r6, #1
+lsls	r6, r6, #2
+ldr	r5, [r0, r6]
+orrs	r5, r7
+str	r5, [r0, r6]
+ldr	r0, [sp, #64]	@ 0x40
+ldr	r3, [sp, #48]	@ 0x30
+ands	r2, r0
+ldr	r0, [sp, #68]	@ 0x44
+lsrs	r5, r3, #24
+lsls	r2, r0
+ldr	r0, [sp, #72]	@ 0x48
+ldr	r3, [sp, #88]	@ 0x58
+orrs	r2, r0
+ldr	r0, [sp, #84]	@ 0x54
+lsls	r2, r2, #2
+ldr	r6, [r2, r0]
+ldr	r0, [sp, #12]
+lsrs	r2, r0, #4
+mov	r0, r8
+orrs	r2, r0
+lsls	r2, r2, #2
+ldr	r7, [r3, r2]
+movs	r2, #15
+ldr	r0, [sp, #12]
+orrs	r7, r6
+ands	r0, r2
+orrs	r0, r4
+lsls	r0, r0, #2
+ldr	r0, [r3, r0]
+orrs	r0, r6
+cmp	r5, #255	@ 0xff
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #48]	@ 0x30
+ands	r2, r5
+lsrs	r3, r3, #28
+ldr	r5, [sp, #92]	@ 0x5c
+ldr	r4, [r1, #0]
+lsls	r3, r3, #2
+ldr	r3, [r3, r5]
+eors	r7, r4
+ands	r3, r7
+eors	r3, r4
+lsls	r2, r2, #2
+str	r3, [r1, #0]
+ldr	r3, [r1, #4]
+ldr	r2, [r2, r5]
+eors	r0, r3
+ands	r2, r0
+eors	r2, r3
+str	r2, [r1, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #60]	@ 0x3c
+add	r4, fp
+ldrb	r0, [r4, r0]
+mov	sl, r0
+ldr	r0, [sp, #32]
+ldrb	r4, [r4, r0]
+mov	r0, ip
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r6, sl
+ldr	r0, [pc, #408]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	ip, r0
+ldrb	r0, [r0, r6]
+ldr	r6, [sp, #12]
+mov	sl, r0
+mov	r0, ip
+ldrb	r4, [r0, r4]
+ldrb	r0, [r0, r6]
+str	r0, [sp, #12]
+mov	r0, sl
+orrs	r3, r0
+lsrs	r0, r0, #4
+lsls	r0, r0, #8
+mov	r8, r0
+mov	r0, sl
+lsls	r6, r0, #8
+movs	r0, #240	@ 0xf0
+lsls	r0, r0, #4
+ands	r6, r0
+mov	sl, r6
+movs	r0, #240	@ 0xf0
+ands	r0, r4
+movs	r6, r0
+mov	r0, r8
+orrs	r0, r6
+mov	r8, r0
+orrs	r3, r4
+lsls	r0, r4, #4
+movs	r4, #255	@ 0xff
+ands	r4, r0
+mov	r0, sl
+orrs	r4, r0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #32]
+add	r4, fp
+ldrb	r4, [r4, r0]
+mov	r0, ip
+cmp	r0, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, ip
+mov	r8, ip
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+ldr	r0, [sp, #0]
+mov	r9, r3
+ldr	r3, [sp, #28]
+movs	r2, #0
+adds	r3, r3, r0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, #0
+mov	r8, r0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #100]	@ 0x64
+ldr	r6, [sp, #12]
+ldrb	r4, [r0, r4]
+ldrb	r0, [r0, r6]
+str	r0, [sp, #12]
+movs	r0, #0
+mov	sl, r0
+mov	r8, r0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r7, [r1, #0]
+str	r0, [r1, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #60]	@ 0x3c
+add	r4, fp
+ldrb	r7, [r4, r6]
+ldr	r6, [sp, #32]
+ldrb	r4, [r4, r6]
+mov	r6, r8
+cmp	r6, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [pc, #264]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r7, [r6, r7]
+ldrb	r4, [r6, r4]
+ldrb	r0, [r6, r0]
+lsrs	r6, r7, #4
+lsls	r6, r6, #8
+mov	r9, r6
+movs	r6, #240	@ 0xf0
+orrs	r3, r7
+lsls	r6, r6, #4
+lsls	r7, r7, #8
+ands	r7, r6
+mov	sl, r7
+movs	r6, #240	@ 0xf0
+ands	r6, r4
+movs	r7, r6
+mov	r6, r9
+orrs	r3, r4
+orrs	r6, r7
+lsls	r4, r4, #4
+mov	r9, r6
+movs	r6, r4
+movs	r4, #255	@ 0xff
+ands	r4, r6
+mov	r6, sl
+orrs	r6, r4
+str	r6, [sp, #48]	@ 0x30
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #32]
+add	r4, fp
+ldrb	r4, [r4, r6]
+mov	r6, r8
+cmp	r6, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r8
+mov	r9, r8
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+movs	r5, #0
+str	r3, [sp, #32]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #0
+str	r3, [sp, #76]	@ 0x4c
+adds	r3, #2
+str	r3, [sp, #72]	@ 0x48
+adds	r3, #12
+str	r3, [sp, #68]	@ 0x44
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #0
+str	r3, [sp, #76]	@ 0x4c
+adds	r3, #2
+str	r3, [sp, #72]	@ 0x48
+adds	r3, #13
+str	r3, [sp, #68]	@ 0x44
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #8
+add	r9, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #8
+add	ip, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+movs	r2, #0
+str	r3, [sp, #40]	@ 0x28
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #0
+str	r3, [sp, #72]	@ 0x48
+adds	r3, #2
+str	r3, [sp, #68]	@ 0x44
+adds	r3, #12
+str	r3, [sp, #64]	@ 0x40
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, ip
+movs	r0, r6
+bics	r0, r4
+orrs	r6, r4
+lsls	r0, r2
+ldr	r5, [sp, #36]	@ 0x24
+ldr	r4, [sp, #64]	@ 0x40
+ldr	r2, [sp, #60]	@ 0x3c
+str	r6, [r5, r4]
+cmp	r2, #7
+bls.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #48]	@ 0x30
+ldr	r2, [sp, #44]	@ 0x2c
+adds	r4, #1
+lsls	r4, r4, #2
+lsls	r3, r2
+ldr	r2, [r5, r4]
+movs	r6, r2
+orrs	r6, r3
+bics	r3, r2
+ldr	r2, [sp, #44]	@ 0x2c
+str	r6, [r5, r4]
+lsrs	r3, r2
+orrs	r0, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r3, #255	@ 0xff
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r4, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+lsrs	r3, r3, #4
+ldr	r0, [r4, r2]
+lsls	r3, r3, #2
+ldr	r2, [r7, #0]
+ldr	r3, [r4, r3]
+eors	r5, r2
+ands	r3, r5
+eors	r3, r2
+str	r3, [r7, #0]
+ldr	r3, [r7, #4]
+eors	r1, r3
+ands	r0, r1
+eors	r0, r3
+str	r0, [r7, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r2, #15
+ldr	r0, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r0, r2]
+lsrs	r3, r3, #4
+mov	ip, r2
+lsls	r3, r3, #2
+ldr	r2, [r0, r3]
+ldr	r4, [r7, #0]
+lsls	r0, r5, #16
+eors	r0, r4
+lsls	r3, r2, #16
+ands	r3, r0
+mov	r0, ip
+eors	r3, r4
+lsls	r0, r0, #16
+lsrs	r2, r2, #16
+str	r3, [r7, #0]
+lsrs	r5, r5, #16
+lsls	r3, r1, #16
+orrs	r2, r0
+orrs	r3, r5
+adds	r0, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r7, #4]
+eors	r3, r0
+ands	r3, r2
+eors	r3, r0
+mov	r2, ip
+ldr	r0, [sp, #12]
+lsrs	r1, r1, #16
+str	r3, [r0, #4]
+ldr	r3, [r0, #8]
+lsrs	r2, r2, #16
+eors	r1, r3
+ands	r2, r1
+eors	r2, r3
+str	r2, [r0, #8]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r0, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r0, r2]
+lsrs	r3, r3, #4
+mov	ip, r2
+lsls	r3, r3, #2
+ldr	r2, [r0, r3]
+ldr	r4, [r7, #0]
+lsls	r0, r5, #24
+eors	r0, r4
+lsls	r3, r2, #24
+ands	r3, r0
+mov	r0, ip
+eors	r3, r4
+lsls	r0, r0, #24
+lsrs	r2, r2, #8
+str	r3, [r7, #0]
+lsrs	r5, r5, #8
+lsls	r3, r1, #24
+orrs	r2, r0
+orrs	r3, r5
+adds	r0, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r7, #4]
+eors	r3, r0
+ands	r3, r2
+eors	r3, r0
+mov	r2, ip
+ldr	r0, [sp, #12]
+lsrs	r1, r1, #8
+str	r3, [r0, #4]
+ldr	r3, [r0, #8]
+lsrs	r2, r2, #8
+eors	r1, r3
+ands	r2, r1
+eors	r2, r3
+str	r2, [r0, #8]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r4, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r4, r2]
+ldr	r7, [sp, #12]
+mov	ip, r2
+lsrs	r3, r3, #4
+lsls	r3, r3, #2
+ldr	r3, [r4, r3]
+ldr	r5, [r7, #0]
+lsls	r4, r0, #8
+lsls	r2, r3, #8
+eors	r4, r5
+ands	r2, r4
+eors	r2, r5
+str	r2, [r7, #0]
+lsrs	r0, r0, #24
+lsls	r2, r1, #8
+orrs	r0, r2
+mov	r2, ip
+lsrs	r3, r3, #24
+lsls	r2, r2, #8
+orrs	r3, r2
+adds	r2, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [r7, #4]
+eors	r0, r2
+ands	r0, r3
+eors	r0, r2
+mov	r2, ip
+ldr	r3, [sp, #12]
+lsrs	r1, r1, #24
+str	r0, [r3, #4]
+movs	r0, r3
+ldr	r3, [r3, #8]
+lsrs	r2, r2, #24
+eors	r1, r3
+ands	r2, r1
+eors	r2, r3
+str	r2, [r0, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r4, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r4, r2]
+ldr	r7, [sp, #12]
+mov	ip, r2
+lsrs	r3, r3, #4
+lsls	r3, r3, #2
+ldr	r3, [r4, r3]
+ldr	r5, [r7, #0]
+lsls	r4, r0, #16
+lsls	r2, r3, #16
+eors	r4, r5
+ands	r2, r4
+eors	r2, r5
+str	r2, [r7, #0]
+lsrs	r0, r0, #16
+lsls	r2, r1, #16
+orrs	r0, r2
+mov	r2, ip
+lsrs	r3, r3, #16
+lsls	r2, r2, #16
+orrs	r3, r2
+adds	r2, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [r7, #4]
+eors	r0, r2
+ands	r0, r3
+eors	r0, r2
+mov	r2, ip
+ldr	r3, [sp, #12]
+lsrs	r1, r1, #16
+str	r0, [r3, #4]
+movs	r0, r3
+ldr	r3, [r3, #8]
+lsrs	r2, r2, #16
+eors	r1, r3
+ands	r2, r1
+eors	r2, r3
+str	r2, [r0, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #15
+ldr	r4, [sp, #16]
+ands	r2, r3
+lsls	r2, r2, #2
+ldr	r2, [r4, r2]
+ldr	r7, [sp, #12]
+mov	ip, r2
+lsrs	r3, r3, #4
+lsls	r3, r3, #2
+ldr	r3, [r4, r3]
+ldr	r5, [r7, #0]
+lsls	r4, r0, #24
+lsls	r2, r3, #24
+eors	r4, r5
+ands	r2, r4
+eors	r2, r5
+str	r2, [r7, #0]
+lsrs	r0, r0, #8
+lsls	r2, r1, #24
+orrs	r0, r2
+mov	r2, ip
+lsrs	r3, r3, #8
+lsls	r2, r2, #24
+orrs	r3, r2
+adds	r2, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [r7, #4]
+eors	r0, r2
+ands	r0, r3
+eors	r0, r2
+mov	r2, ip
+ldr	r3, [sp, #12]
+lsrs	r1, r1, #8
+str	r0, [r3, #4]
+movs	r0, r3
+ldr	r3, [r3, #8]
+lsrs	r2, r2, #8
+eors	r1, r3
+ands	r2, r1
+eors	r2, r3
+str	r2, [r0, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #0
+str	r3, [sp, #72]	@ 0x48
+adds	r3, #2
+str	r3, [sp, #68]	@ 0x44
+adds	r3, #13
+str	r3, [sp, #64]	@ 0x40
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+ldr	r0, [sp, #0]
+str	r3, [sp, #12]
+ldr	r3, [sp, #28]
+movs	r2, #0
+adds	r3, r3, r0
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, r7, #1
+adds	r3, #255	@ 0xff
+str	r3, [sp, #60]	@ 0x3c
+ldr	r3, [pc, #672]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r9, r4
+str	r3, [sp, #40]	@ 0x28
+ldr	r3, [pc, #672]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #92]	@ 0x5c
+ldr	r3, [pc, #672]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #96]	@ 0x60
+ldr	r3, [pc, #672]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #100]	@ 0x64
+ldr	r3, [pc, #672]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #88]	@ 0x58
+ldr	r3, [pc, #672]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #84]	@ 0x54
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, #1
+uxtb	r3, r3
+mov	r2, r9
+mov	r8, r9
+mov	r9, r3
+mov	r3, fp
+ldr	r1, [sp, #0]
+adds	r3, r3, r1
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r0, [r3, #0]
+ldr	r3, [sp, #12]
+cmp	r0, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #20]
+ldr	r3, [sp, #28]
+movs	r1, #255	@ 0xff
+subs	r3, r3, r2
+adds	r3, r7, r3
+lsrs	r4, r3, #5
+str	r4, [sp, #24]
+lsls	r4, r4, #2
+mov	ip, r4
+mov	r5, ip
+ldr	r4, [sp, #40]	@ 0x28
+movs	r2, #31
+ldr	r5, [r4, r5]
+movs	r4, #25
+lsls	r1, r1, #24
+negs	r4, r4
+ands	r2, r3
+mov	sl, r4
+movs	r3, r1
+movs	r6, #32
+lsrs	r3, r2
+add	sl, r2
+mov	r4, sl
+bics	r3, r5
+subs	r6, r6, r2
+str	r5, [sp, #44]	@ 0x2c
+lsls	r3, r2
+movs	r5, r6
+str	r6, [sp, #64]	@ 0x40
+str	r4, [sp, #48]	@ 0x30
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r1, r6
+ldr	r4, [sp, #24]
+adds	r6, r4, #1
+ldr	r4, [sp, #40]	@ 0x28
+lsls	r6, r6, #2
+ldr	r6, [r4, r6]
+bics	r1, r6
+lsrs	r1, r5
+orrs	r3, r1
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, fp
+ldr	r1, [sp, #4]
+lsls	r6, r0, #3
+adds	r3, r3, r1
+add	r3, r8
+adds	r3, #44	@ 0x2c
+ldrb	r1, [r3, #0]
+ldr	r3, [sp, #8]
+lsls	r4, r1, #26
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, r3
+movs	r3, #7
+subs	r3, r3, r4
+adds	r6, r6, r3
+movs	r3, #16
+ands	r3, r1
+movs	r4, r3
+negs	r3, r4
+adcs	r3, r4
+movs	r4, #255	@ 0xff
+negs	r3, r3
+ands	r3, r4
+ldr	r4, [sp, #16]
+ldrb	r4, [r4, r6]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #64	@ 0x40
+ands	r4, r1
+mov	r8, r4
+ldr	r4, [sp, #32]
+cmp	r4, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r4, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, r8
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [sp, #36]	@ 0x24
+ldr	r4, [sp, #84]	@ 0x54
+ldrb	r4, [r4, r5]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #0
+mov	r8, r4
+mov	sl, r4
+ldr	r4, [sp, #36]	@ 0x24
+orrs	r3, r4
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r3, r3, #24
+movs	r6, r3
+sxtb	r0, r1
+lsrs	r6, r2
+cmp	r0, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, ip
+ldr	r0, [sp, #88]	@ 0x58
+ldr	r0, [r0, r4]
+ldr	r4, [sp, #44]	@ 0x2c
+bics	r6, r0
+movs	r0, r6
+bics	r0, r4
+orrs	r4, r6
+movs	r5, r4
+mov	r4, ip
+ldr	r6, [sp, #40]	@ 0x28
+lsls	r0, r2
+str	r5, [r6, r4]
+ldr	r4, [sp, #48]	@ 0x30
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [sp, #64]	@ 0x40
+ldr	r4, [sp, #24]
+lsls	r3, r5
+ldr	r2, [sp, #88]	@ 0x58
+adds	r4, #1
+lsls	r4, r4, #2
+ldr	r2, [r4, r2]
+bics	r3, r2
+movs	r5, r3
+ldr	r2, [r6, r4]
+orrs	r5, r2
+str	r5, [r6, r4]
+ldr	r5, [sp, #64]	@ 0x40
+bics	r3, r2
+lsrs	r3, r5
+orrs	r0, r3
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #68]	@ 0x44
+mov	r4, sl
+ands	r3, r1
+ldr	r1, [sp, #72]	@ 0x48
+ldr	r5, [sp, #36]	@ 0x24
+lsls	r3, r1
+ldr	r1, [sp, #76]	@ 0x4c
+ldr	r6, [sp, #96]	@ 0x60
+orrs	r3, r1
+ldr	r1, [sp, #92]	@ 0x5c
+lsls	r3, r3, #2
+ldr	r1, [r3, r1]
+lsrs	r3, r5, #4
+orrs	r3, r4
+movs	r4, #15
+ands	r5, r4
+mov	ip, r4
+mov	r4, r8
+orrs	r5, r4
+lsls	r3, r3, #2
+lsls	r5, r5, #2
+ldr	r3, [r3, r6]
+ldr	r5, [r5, r6]
+lsrs	r2, r0, #24
+orrs	r3, r1
+orrs	r5, r1
+cmp	r2, #255	@ 0xff
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, ip
+ldr	r6, [sp, #100]	@ 0x64
+lsrs	r0, r0, #28
+ldr	r1, [r7, #0]
+lsls	r0, r0, #2
+ldr	r0, [r0, r6]
+ands	r4, r2
+eors	r3, r1
+ands	r0, r3
+lsls	r4, r4, #2
+ldr	r3, [r7, #4]
+ldr	r2, [r4, r6]
+eors	r5, r3
+ands	r2, r5
+eors	r0, r1
+eors	r2, r3
+str	r0, [r7, #0]
+str	r2, [r7, #4]
+ldr	r3, [sp, #60]	@ 0x3c
+adds	r7, #8
+cmp	r7, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, r9
+cmp	r3, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #128	@ 0x80
+ldr	r2, [sp, #0]
+lsls	r3, r3, #3
+eors	r2, r3
+uxth	r2, r2
+str	r2, [sp, #0]
+ldr	r2, [sp, #4]
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #4]
+movs	r3, #0
+mov	r8, r3
+adds	r3, #1
+mov	r9, r3
+movs	r2, #0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r0, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+ldr	r5, [sp, #56]	@ 0x38
+adds	r6, r4, r6
+ldr	r4, [sp, #80]	@ 0x50
+ldrb	r4, [r6, r4]
+ldrb	r6, [r6, r5]
+mov	r5, r8
+mov	sl, r4
+cmp	r5, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [sp, #84]	@ 0x54
+ldrb	r4, [r5, r4]
+ldrb	r6, [r5, r6]
+mov	sl, r4
+ldr	r4, [sp, #36]	@ 0x24
+ldrb	r4, [r5, r4]
+str	r4, [sp, #36]	@ 0x24
+mov	r4, sl
+lsrs	r5, r4, #4
+lsls	r5, r5, #8
+mov	sl, r5
+movs	r5, #240	@ 0xf0
+orrs	r3, r4
+lsls	r5, r5, #4
+lsls	r4, r4, #8
+ands	r4, r5
+mov	r8, r4
+movs	r4, #240	@ 0xf0
+mov	r5, sl
+ands	r4, r6
+orrs	r5, r4
+movs	r4, #255	@ 0xff
+orrs	r3, r6
+lsls	r6, r6, #4
+ands	r6, r4
+mov	r4, r8
+orrs	r4, r6
+mov	sl, r5
+mov	r8, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+adds	r6, r4, r6
+ldr	r4, [sp, #56]	@ 0x38
+ldrb	r6, [r6, r4]
+mov	r4, r8
+cmp	r4, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #84]	@ 0x54
+ldr	r5, [sp, #36]	@ 0x24
+ldrb	r6, [r4, r6]
+ldrb	r4, [r4, r5]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #0
+mov	r8, r4
+mov	sl, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r8, r3
+movs	r3, #1
+movs	r2, #0
+mov	r9, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, r6
+mov	r5, ip
+ldr	r4, [sp, #44]	@ 0x2c
+bics	r0, r4
+orrs	r6, r4
+lsls	r0, r2
+ldr	r4, [sp, #40]	@ 0x28
+ldr	r2, [sp, #48]	@ 0x30
+str	r6, [r4, r5]
+cmp	r2, #7
+bls.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #64]	@ 0x40
+movs	r2, r4
+lsls	r3, r6
+ldr	r4, [sp, #24]
+str	r3, [sp, #24]
+adds	r4, #1
+lsls	r4, r4, #2
+ldr	r3, [r2, r4]
+ldr	r5, [sp, #24]
+orrs	r5, r3
+str	r5, [r2, r4]
+movs	r2, r3
+ldr	r3, [sp, #24]
+bics	r3, r2
+lsrs	r3, r6
+orrs	r0, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r8
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r8
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r3, [r7, #0]
+str	r5, [r7, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+adds	r3, r7, #1
+adds	r3, #255	@ 0xff
+str	r3, [sp, #64]	@ 0x40
+ldr	r3, [pc, #880]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r8, r4
+str	r3, [sp, #44]	@ 0x2c
+ldr	r3, [pc, #876]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r2, [sp, #8]
+str	r3, [sp, #96]	@ 0x60
+ldr	r3, [pc, #876]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #100]	@ 0x64
+ldr	r3, [pc, #876]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #104]	@ 0x68
+ldr	r3, [pc, #876]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #92]	@ 0x5c
+movs	r3, #7
+subs	r3, r3, r2
+str	r3, [sp, #88]	@ 0x58
+mov	r3, r8
+cmp	r3, #32
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r3, #1
+uxtb	r3, r3
+mov	r2, r8
+mov	r9, r8
+mov	r8, r3
+mov	r3, fp
+ldr	r1, [sp, #0]
+adds	r3, r3, r1
+adds	r3, r3, r2
+adds	r3, #44	@ 0x2c
+ldrb	r0, [r3, #0]
+ldr	r3, [sp, #12]
+cmp	r3, r0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #20]
+ldr	r3, [sp, #28]
+movs	r1, #255	@ 0xff
+subs	r3, r3, r2
+adds	r3, r7, r3
+lsrs	r4, r3, #5
+str	r4, [sp, #24]
+lsls	r4, r4, #2
+mov	ip, r4
+mov	r5, ip
+ldr	r4, [sp, #44]	@ 0x2c
+movs	r2, #31
+ldr	r5, [r4, r5]
+movs	r4, #25
+lsls	r1, r1, #24
+negs	r4, r4
+ands	r2, r3
+mov	sl, r4
+movs	r3, r1
+movs	r6, #32
+lsrs	r3, r2
+add	sl, r2
+mov	r4, sl
+bics	r3, r5
+subs	r6, r6, r2
+str	r5, [sp, #48]	@ 0x30
+lsls	r3, r2
+movs	r5, r6
+str	r6, [sp, #84]	@ 0x54
+str	r4, [sp, #60]	@ 0x3c
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r1, r6
+ldr	r4, [sp, #24]
+adds	r6, r4, #1
+ldr	r4, [sp, #44]	@ 0x2c
+lsls	r6, r6, #2
+ldr	r6, [r4, r6]
+bics	r1, r6
+lsrs	r1, r5
+orrs	r3, r1
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, fp
+ldr	r1, [sp, #4]
+lsls	r6, r0, #3
+adds	r3, r3, r1
+add	r3, r9
+adds	r3, #44	@ 0x2c
+ldrb	r1, [r3, #0]
+ldr	r3, [sp, #8]
+lsls	r4, r1, #26
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #88]	@ 0x58
+adds	r6, r6, r3
+movs	r3, #16
+ands	r3, r1
+movs	r4, r3
+negs	r3, r4
+adcs	r3, r4
+movs	r4, #255	@ 0xff
+negs	r3, r3
+ands	r3, r4
+ldr	r4, [sp, #16]
+ldrb	r4, [r4, r6]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #64	@ 0x40
+ands	r4, r1
+mov	r9, r4
+ldr	r4, [sp, #32]
+cmp	r4, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r4, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, r9
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #36]	@ 0x24
+ldr	r6, [pc, #668]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r4, [r6, r4]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #0
+mov	r9, r4
+mov	sl, r4
+ldr	r4, [sp, #36]	@ 0x24
+orrs	r3, r4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r3, r3, #24
+movs	r6, r3
+sxtb	r0, r1
+lsrs	r6, r2
+cmp	r0, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, ip
+ldr	r0, [sp, #92]	@ 0x5c
+ldr	r0, [r0, r4]
+ldr	r4, [sp, #48]	@ 0x30
+bics	r6, r0
+movs	r0, r6
+bics	r0, r4
+orrs	r4, r6
+movs	r5, r4
+mov	r4, ip
+ldr	r6, [sp, #44]	@ 0x2c
+lsls	r0, r2
+str	r5, [r6, r4]
+ldr	r4, [sp, #60]	@ 0x3c
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [sp, #84]	@ 0x54
+ldr	r4, [sp, #24]
+lsls	r3, r5
+ldr	r2, [sp, #92]	@ 0x5c
+adds	r4, #1
+lsls	r4, r4, #2
+ldr	r2, [r2, r4]
+bics	r3, r2
+movs	r5, r3
+ldr	r2, [r6, r4]
+orrs	r5, r2
+str	r5, [r6, r4]
+ldr	r5, [sp, #84]	@ 0x54
+bics	r3, r2
+lsrs	r3, r5
+orrs	r0, r3
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #68]	@ 0x44
+ldr	r2, [sp, #72]	@ 0x48
+ands	r3, r1
+lsls	r3, r2
+mov	r1, sl
+ldr	r2, [sp, #76]	@ 0x4c
+ldr	r4, [sp, #36]	@ 0x24
+orrs	r3, r2
+ldr	r2, [sp, #96]	@ 0x60
+lsls	r3, r3, #2
+ldr	r2, [r3, r2]
+lsrs	r3, r4, #4
+orrs	r3, r1
+movs	r1, #15
+mov	r6, r9
+ands	r4, r1
+ldr	r5, [sp, #100]	@ 0x64
+orrs	r4, r6
+lsls	r3, r3, #2
+lsls	r4, r4, #2
+ldr	r3, [r3, r5]
+ldr	r5, [r4, r5]
+orrs	r3, r2
+orrs	r5, r2
+lsrs	r2, r0, #24
+ands	r1, r2
+lsrs	r0, r0, #28
+ldr	r2, [sp, #104]	@ 0x68
+lsls	r1, r1, #2
+lsls	r0, r0, #2
+ldr	r6, [r1, r2]
+ldr	r2, [r0, r2]
+ldr	r0, [sp, #40]	@ 0x28
+ldr	r1, [r7, #0]
+cmp	r0, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r0, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r4, r3, #24
+eors	r4, r1
+lsls	r0, r2, #24
+ands	r0, r4
+eors	r0, r1
+lsrs	r3, r3, #8
+lsls	r1, r5, #24
+orrs	r3, r1
+lsrs	r2, r2, #8
+lsls	r1, r6, #24
+orrs	r2, r1
+str	r0, [r7, #0]
+adds	r1, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [r7, #4]
+eors	r3, r1
+ands	r3, r2
+eors	r3, r1
+ldr	r1, [r7, #8]
+lsrs	r2, r5, #8
+str	r3, [r7, #4]
+eors	r2, r1
+lsrs	r3, r6, #8
+ands	r3, r2
+eors	r3, r1
+str	r3, [r7, #8]
+ldr	r3, [sp, #64]	@ 0x40
+adds	r7, #8
+cmp	r7, r3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #128	@ 0x80
+ldr	r2, [sp, #0]
+lsls	r3, r3, #3
+eors	r2, r3
+uxth	r2, r2
+str	r2, [sp, #0]
+ldr	r2, [sp, #4]
+eors	r3, r2
+uxth	r3, r3
+str	r3, [sp, #4]
+movs	r3, #0
+mov	r9, r3
+adds	r3, #1
+mov	r8, r3
+movs	r2, #0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r0, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+adds	r6, r4, r6
+ldr	r4, [sp, #56]	@ 0x38
+ldrb	r6, [r6, r4]
+mov	r4, r9
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [pc, #356]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r5, [sp, #36]	@ 0x24
+ldrb	r6, [r4, r6]
+ldrb	r4, [r4, r5]
+str	r4, [sp, #36]	@ 0x24
+movs	r4, #0
+mov	r9, r4
+mov	sl, r4
+movs	r4, #240	@ 0xf0
+mov	r5, sl
+ands	r4, r6
+orrs	r5, r4
+movs	r4, #255	@ 0xff
+orrs	r3, r6
+lsls	r6, r6, #4
+ands	r6, r4
+mov	r4, r9
+orrs	r4, r6
+mov	sl, r5
+mov	r9, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #16]
+ldr	r5, [sp, #56]	@ 0x38
+adds	r6, r4, r6
+ldr	r4, [sp, #80]	@ 0x50
+ldrb	r4, [r6, r4]
+ldrb	r6, [r6, r5]
+mov	r5, r9
+mov	sl, r4
+cmp	r5, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r5, [pc, #296]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r4, [r5, r4]
+ldrb	r6, [r5, r6]
+mov	sl, r4
+ldr	r4, [sp, #36]	@ 0x24
+ldrb	r4, [r5, r4]
+str	r4, [sp, #36]	@ 0x24
+mov	r4, sl
+lsrs	r5, r4, #4
+lsls	r5, r5, #8
+mov	sl, r5
+movs	r5, #240	@ 0xf0
+orrs	r3, r4
+lsls	r5, r5, #4
+lsls	r4, r4, #8
+ands	r4, r5
+mov	r9, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r9, r3
+movs	r3, #1
+movs	r2, #0
+mov	r8, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, r6
+mov	r5, ip
+ldr	r4, [sp, #48]	@ 0x30
+bics	r0, r4
+orrs	r6, r4
+lsls	r0, r2
+ldr	r4, [sp, #44]	@ 0x2c
+ldr	r2, [sp, #60]	@ 0x3c
+str	r6, [r4, r5]
+cmp	r2, #7
+bls.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #84]	@ 0x54
+movs	r2, r4
+lsls	r3, r6
+ldr	r4, [sp, #24]
+str	r3, [sp, #24]
+adds	r4, #1
+lsls	r4, r4, #2
+ldr	r3, [r2, r4]
+ldr	r5, [sp, #24]
+orrs	r5, r3
+str	r5, [r2, r4]
+movs	r2, r3
+ldr	r3, [sp, #24]
+bics	r3, r2
+lsrs	r3, r6
+orrs	r0, r3
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #8
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #8
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #44]	@ 0x2c
+adds	r1, #8
+cmp	r1, r2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #24]
+adds	r7, r2, r1
+movs	r2, #1
+mov	r9, r2
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r4, #255	@ 0xff
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #15
+mov	r2, ip
+ldr	r1, [sp, #52]	@ 0x34
+ands	r3, r4
+lsrs	r4, r4, #4
+ldr	r2, [r2, #0]
+lsls	r3, r3, #2
+lsls	r4, r4, #2
+ldr	r3, [r1, r3]
+ldr	r1, [r1, r4]
+eors	r5, r2
+ands	r1, r5
+eors	r1, r2
+mov	r2, ip
+str	r1, [r2, #0]
+ldr	r2, [r2, #4]
+eors	r0, r2
+ands	r3, r0
+eors	r3, r2
+mov	r2, ip
+str	r3, [r2, #4]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #15
+ldr	r2, [sp, #52]	@ 0x34
+ands	r3, r4
+lsls	r3, r3, #2
+ldr	r6, [r2, r3]
+mov	r3, ip
+lsrs	r4, r4, #4
+lsls	r4, r4, #2
+ldr	r2, [r2, r4]
+ldr	r4, [r3, #0]
+lsls	r1, r5, #16
+eors	r1, r4
+lsls	r3, r2, #16
+ands	r3, r1
+mov	r1, ip
+eors	r3, r4
+str	r3, [r1, #0]
+lsrs	r2, r2, #16
+lsls	r1, r6, #16
+lsls	r3, r0, #16
+lsrs	r5, r5, #16
+orrs	r2, r1
+orrs	r3, r5
+adds	r1, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r1, ip
+ldr	r1, [r1, #4]
+eors	r3, r1
+ands	r3, r2
+eors	r3, r1
+mov	r2, ip
+str	r3, [r2, #4]
+ldr	r3, [r2, #8]
+lsrs	r2, r0, #16
+eors	r2, r3
+lsrs	r1, r6, #16
+ands	r1, r2
+eors	r1, r3
+mov	r3, ip
+str	r1, [r3, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+movs	r3, #15
+ldr	r2, [sp, #52]	@ 0x34
+ands	r3, r4
+lsls	r3, r3, #2
+ldr	r6, [r2, r3]
+mov	r3, ip
+lsrs	r4, r4, #4
+lsls	r4, r4, #2
+ldr	r2, [r2, r4]
+ldr	r4, [r3, #0]
+lsls	r1, r5, #24
+eors	r1, r4
+lsls	r3, r2, #24
+ands	r3, r1
+mov	r1, ip
+eors	r3, r4
+str	r3, [r1, #0]
+lsrs	r2, r2, #8
+lsls	r1, r6, #24
+lsls	r3, r0, #24
+lsrs	r5, r5, #8
+orrs	r2, r1
+orrs	r3, r5
+adds	r1, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r1, ip
+ldr	r1, [r1, #4]
+eors	r3, r1
+ands	r3, r2
+eors	r3, r1
+mov	r2, ip
+str	r3, [r2, #4]
+ldr	r3, [r2, #8]
+lsrs	r2, r0, #8
+eors	r2, r3
+lsrs	r1, r6, #8
+ands	r1, r2
+eors	r1, r3
+mov	r3, ip
+str	r1, [r3, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r9
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	sl, r9
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r9, r4
+mov	sl, r4
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [pc, #924]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r5, [sp, #24]
+ldrb	r6, [r4, r6]
+ldrb	r4, [r4, r5]
+str	r4, [sp, #24]
+movs	r4, #0
+mov	r9, r4
+mov	sl, r4
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #15
+ldr	r2, [sp, #48]	@ 0x30
+ands	r3, r5
+lsrs	r5, r5, #4
+lsls	r3, r3, #2
+lsls	r5, r5, #2
+ldr	r6, [r2, r3]
+ldr	r3, [r2, r5]
+mov	r2, r9
+ldr	r4, [r2, #0]
+lsls	r0, r1, #8
+eors	r0, r4
+lsls	r2, r3, #8
+ands	r2, r0
+mov	r0, r9
+eors	r2, r4
+str	r2, [r0, #0]
+mov	r2, r8
+lsrs	r1, r1, #24
+lsls	r2, r2, #8
+orrs	r1, r2
+lsrs	r3, r3, #24
+lsls	r2, r6, #8
+orrs	r3, r2
+adds	r2, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [r0, #4]
+eors	r1, r2
+ands	r1, r3
+eors	r1, r2
+mov	r3, r9
+mov	r2, r8
+str	r1, [r3, #4]
+ldr	r3, [r3, #8]
+lsrs	r2, r2, #24
+eors	r2, r3
+lsrs	r6, r6, #24
+ands	r6, r2
+eors	r6, r3
+mov	r3, r9
+mov	r9, r7
+str	r6, [r3, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #15
+ldr	r2, [sp, #48]	@ 0x30
+ands	r3, r5
+lsrs	r5, r5, #4
+lsls	r3, r3, #2
+lsls	r5, r5, #2
+ldr	r6, [r2, r3]
+ldr	r3, [r2, r5]
+mov	r2, r9
+ldr	r4, [r2, #0]
+lsls	r0, r1, #16
+eors	r0, r4
+lsls	r2, r3, #16
+ands	r2, r0
+mov	r0, r9
+eors	r2, r4
+str	r2, [r0, #0]
+mov	r2, r8
+lsrs	r1, r1, #16
+lsls	r2, r2, #16
+orrs	r1, r2
+lsrs	r3, r3, #16
+lsls	r2, r6, #16
+orrs	r3, r2
+adds	r2, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [r0, #4]
+eors	r1, r2
+ands	r1, r3
+eors	r1, r2
+mov	r3, r9
+mov	r2, r8
+str	r1, [r3, #4]
+ldr	r3, [r3, #8]
+lsrs	r2, r2, #16
+eors	r2, r3
+lsrs	r6, r6, #16
+ands	r6, r2
+eors	r6, r3
+mov	r3, r9
+mov	r9, r7
+str	r6, [r3, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #15
+ldr	r2, [sp, #48]	@ 0x30
+ands	r3, r5
+lsrs	r5, r5, #4
+lsls	r3, r3, #2
+lsls	r5, r5, #2
+ldr	r6, [r2, r3]
+ldr	r3, [r2, r5]
+mov	r2, r9
+ldr	r4, [r2, #0]
+lsls	r0, r1, #24
+eors	r0, r4
+lsls	r2, r3, #24
+ands	r2, r0
+mov	r0, r9
+eors	r2, r4
+str	r2, [r0, #0]
+mov	r2, r8
+lsrs	r1, r1, #8
+lsls	r2, r2, #24
+orrs	r1, r2
+lsrs	r3, r3, #8
+lsls	r2, r6, #24
+orrs	r3, r2
+adds	r2, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [r0, #4]
+eors	r1, r2
+ands	r1, r3
+eors	r1, r2
+mov	r3, r9
+mov	r2, r8
+str	r1, [r3, #4]
+ldr	r3, [r3, #8]
+lsrs	r2, r2, #8
+eors	r2, r3
+lsrs	r6, r6, #8
+ands	r6, r2
+eors	r6, r3
+mov	r3, r9
+mov	r9, r7
+str	r6, [r3, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #12]
+mov	sl, r6
+subs	r3, r3, r1
+str	r3, [sp, #24]
+ldr	r3, [pc, #636]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+adds	r0, r1, #1
+str	r3, [sp, #48]	@ 0x30
+ldr	r3, [pc, #636]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+adds	r0, #255	@ 0xff
+str	r3, [sp, #84]	@ 0x54
+ldr	r3, [pc, #632]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r0, [sp, #44]	@ 0x2c
+str	r3, [sp, #88]	@ 0x58
+ldr	r3, [pc, #632]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r2, [sp, #100]	@ 0x64
+str	r3, [sp, #92]	@ 0x5c
+ldr	r3, [pc, #628]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #96]	@ 0x60
+ldr	r3, [pc, #604]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r3, [sp, #76]	@ 0x4c
+mov	r3, r8
+str	r3, [sp, #12]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, #31
+ldr	r6, [sp, #28]
+lsls	r3, r3, #24
+ands	r4, r6
+lsrs	r5, r6, #5
+movs	r6, r3
+lsrs	r6, r4
+movs	r7, r6
+ldr	r6, [sp, #48]	@ 0x30
+str	r5, [sp, #56]	@ 0x38
+lsls	r5, r5, #2
+ldr	r6, [r6, r5]
+str	r6, [sp, #28]
+movs	r6, #32
+subs	r6, r6, r4
+str	r6, [sp, #52]	@ 0x34
+movs	r6, #25
+negs	r6, r6
+mov	r8, r6
+ldr	r6, [sp, #40]	@ 0x28
+add	r8, r4
+cmp	r6, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+sxtb	r6, r2
+cmp	r6, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #96]	@ 0x60
+ldr	r6, [r6, r5]
+str	r6, [sp, #80]	@ 0x50
+movs	r6, r7
+ldr	r7, [sp, #80]	@ 0x50
+bics	r6, r7
+ldr	r7, [sp, #28]
+str	r6, [sp, #80]	@ 0x50
+orrs	r7, r6
+ldr	r6, [sp, #48]	@ 0x30
+str	r7, [r6, r5]
+ldr	r6, [sp, #80]	@ 0x50
+mov	r5, r8
+lsls	r6, r4
+movs	r4, r6
+cmp	r5, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r7, [sp, #52]	@ 0x34
+ldr	r5, [sp, #56]	@ 0x38
+lsls	r3, r7
+adds	r5, #1
+ldr	r7, [sp, #96]	@ 0x60
+lsls	r5, r5, #2
+ldr	r7, [r5, r7]
+ldr	r6, [sp, #48]	@ 0x30
+bics	r3, r7
+ldr	r7, [r6, r5]
+orrs	r7, r3
+str	r7, [r6, r5]
+ldr	r7, [sp, #52]	@ 0x34
+lsrs	r3, r7
+orrs	r4, r3
+cmp	r4, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #44]	@ 0x2c
+adds	r1, #8
+cmp	r3, r1
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #24]
+ldr	r2, [sp, #12]
+adds	r3, r1, r3
+str	r3, [sp, #28]
+ldr	r3, [sp, #0]
+mov	ip, r3
+mov	r3, sl
+add	r2, ip
+cmp	r3, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r0, sl
+movs	r3, r0
+adds	r6, r0, #1
+uxtb	r6, r6
+adds	r2, r2, r0
+adds	r2, #44	@ 0x2c
+ldrb	r5, [r2, #0]
+ldr	r2, [sp, #16]
+mov	sl, r6
+cmp	r5, r2
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #4]
+adds	r3, r3, r2
+ldr	r2, [sp, #12]
+lsls	r4, r5, #3
+adds	r3, r2, r3
+adds	r3, #44	@ 0x2c
+ldrb	r2, [r3, #0]
+ldr	r3, [sp, #8]
+lsls	r0, r2, #26
+bpl.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, r3
+movs	r3, #7
+subs	r3, r3, r0
+movs	r0, #16
+ands	r0, r2
+adds	r4, r4, r3
+negs	r3, r0
+adcs	r0, r3
+movs	r3, #255	@ 0xff
+movs	r6, #64	@ 0x40
+negs	r0, r0
+ands	r3, r0
+mov	r0, fp
+ands	r6, r2
+mov	r8, r6
+ldr	r6, [sp, #20]
+ldrb	r0, [r0, r4]
+cmp	r6, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r6, #3
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, r8
+cmp	r4, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #76]	@ 0x4c
+ldrb	r0, [r4, r0]
+movs	r4, #0
+mov	ip, r4
+mov	r9, r4
+orrs	r3, r0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r5, [sp, #16]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #128	@ 0x80
+mov	r2, ip
+lsls	r3, r3, #3
+eors	r2, r3
+uxth	r0, r2
+ldr	r2, [sp, #12]
+str	r0, [sp, #0]
+adds	r2, r2, r0
+movs	r0, r2
+adds	r0, #44	@ 0x2c
+ldrb	r5, [r0, #0]
+ldr	r0, [sp, #4]
+eors	r3, r0
+movs	r0, #1
+mov	sl, r0
+ldr	r0, [sp, #16]
+uxth	r3, r3
+str	r3, [sp, #4]
+cmp	r0, r5
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #44]	@ 0x2c
+adds	r1, #8
+cmp	r1, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #24]
+adds	r3, r1, r3
+str	r3, [sp, #28]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, r7
+ldr	r6, [sp, #28]
+orrs	r4, r6
+movs	r7, r4
+ldr	r4, [sp, #48]	@ 0x30
+str	r7, [r4, r5]
+mov	r4, r8
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, r3
+ldr	r6, [sp, #52]	@ 0x34
+ldr	r5, [sp, #56]	@ 0x38
+lsls	r4, r6
+adds	r5, #1
+ldr	r6, [sp, #48]	@ 0x30
+lsls	r5, r5, #2
+ldr	r7, [r6, r5]
+orrs	r4, r7
+str	r4, [r6, r5]
+ldr	r5, [sp, #64]	@ 0x40
+mov	r6, r9
+ands	r2, r5
+ldr	r5, [sp, #68]	@ 0x44
+lsrs	r4, r3, #24
+lsls	r2, r5
+ldr	r5, [sp, #72]	@ 0x48
+orrs	r2, r5
+ldr	r5, [sp, #84]	@ 0x54
+lsls	r2, r2, #2
+ldr	r5, [r2, r5]
+lsrs	r2, r0, #4
+orrs	r2, r6
+ldr	r6, [sp, #88]	@ 0x58
+lsls	r2, r2, #2
+ldr	r7, [r2, r6]
+movs	r2, #15
+ands	r0, r2
+mov	r8, r2
+mov	r2, ip
+orrs	r0, r2
+lsls	r0, r0, #2
+ldr	r0, [r0, r6]
+orrs	r7, r5
+orrs	r0, r5
+cmp	r4, #255	@ 0xff
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, r8
+ldr	r5, [sp, #92]	@ 0x5c
+lsrs	r3, r3, #28
+ands	r2, r4
+lsls	r3, r3, #2
+ldr	r4, [r1, #0]
+ldr	r3, [r3, r5]
+eors	r7, r4
+ands	r3, r7
+eors	r3, r4
+lsls	r2, r2, #2
+str	r3, [r1, #0]
+ldr	r3, [r1, #4]
+ldr	r2, [r2, r5]
+eors	r0, r3
+ands	r2, r0
+eors	r2, r3
+str	r2, [r1, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #60]	@ 0x3c
+add	r4, fp
+ldrb	r6, [r4, r6]
+mov	ip, r6
+ldr	r6, [sp, #32]
+ldrb	r4, [r4, r6]
+mov	r6, r8
+cmp	r6, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r7, ip
+ldr	r6, [sp, #76]	@ 0x4c
+ldrb	r7, [r6, r7]
+ldrb	r4, [r6, r4]
+mov	ip, r7
+ldrb	r0, [r6, r0]
+mov	r6, ip
+orrs	r3, r6
+lsrs	r6, r6, #4
+lsls	r6, r6, #8
+mov	r9, r6
+mov	r6, ip
+lsls	r6, r6, #8
+mov	ip, r6
+movs	r6, #240	@ 0xf0
+lsls	r6, r6, #4
+movs	r7, r6
+mov	r6, ip
+ands	r6, r7
+mov	ip, r6
+movs	r6, #240	@ 0xf0
+ands	r6, r4
+movs	r7, r6
+mov	r6, r9
+orrs	r6, r7
+mov	r9, r6
+movs	r6, #255	@ 0xff
+orrs	r3, r4
+lsls	r4, r4, #4
+ands	r4, r6
+mov	r6, ip
+orrs	r6, r4
+mov	ip, r6
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #32]
+add	r4, fp
+ldrb	r4, [r4, r6]
+mov	r6, r8
+cmp	r6, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r6, [sp, #76]	@ 0x4c
+ldrb	r4, [r6, r4]
+ldrb	r0, [r6, r0]
+movs	r6, #0
+mov	ip, r6
+mov	r9, r6
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r6, #1
+movs	r0, #0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	ip, r8
+mov	r9, r8
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	ip, r8
+mov	r9, r8
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+str	r7, [r1, #0]
+str	r0, [r1, #4]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #12]
+ldr	r2, [sp, #100]	@ 0x64
+mov	r8, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #12]
+str	r2, [sp, #108]	@ 0x6c
+subs	r3, r3, r1
+str	r3, [sp, #24]
+ldr	r3, [pc, #920]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+adds	r0, r1, #1
+str	r3, [sp, #52]	@ 0x34
+ldr	r3, [pc, #920]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+adds	r0, #255	@ 0xff
+str	r3, [sp, #88]	@ 0x58
+ldr	r3, [pc, #916]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+str	r0, [sp, #56]	@ 0x38
+str	r3, [sp, #92]	@ 0x5c
+ldr	r3, [pc, #916]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r0, [sp, #8]
+str	r3, [sp, #96]	@ 0x60
+movs	r3, #7
+subs	r3, r3, r0
+str	r3, [sp, #84]	@ 0x54
+mov	r3, r8
+str	r3, [sp, #28]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r0, ip
+movs	r5, #31
+lsls	r3, r3, #24
+lsrs	r7, r0, #5
+ands	r5, r0
+movs	r0, r3
+lsrs	r0, r5
+movs	r4, r0
+lsls	r0, r7, #2
+mov	r9, r0
+str	r7, [sp, #80]	@ 0x50
+mov	r7, r9
+ldr	r0, [sp, #52]	@ 0x34
+ldr	r0, [r0, r7]
+mov	ip, r0
+movs	r0, #32
+subs	r0, r0, r5
+str	r0, [sp, #76]	@ 0x4c
+movs	r0, #25
+negs	r0, r0
+mov	sl, r0
+ldr	r0, [sp, #40]	@ 0x28
+add	sl, r5
+cmp	r0, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+sxtb	r0, r2
+cmp	r0, #0
+bge.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [pc, #840]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r7, [r0, r7]
+str	r0, [sp, #104]	@ 0x68
+movs	r0, r4
+bics	r0, r7
+mov	r7, ip
+orrs	r7, r0
+movs	r4, r7
+str	r0, [sp, #100]	@ 0x64
+mov	r0, r9
+ldr	r7, [sp, #52]	@ 0x34
+str	r4, [r7, r0]
+ldr	r0, [sp, #100]	@ 0x64
+mov	r4, sl
+lsls	r0, r5
+movs	r5, r0
+cmp	r4, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [sp, #76]	@ 0x4c
+ldr	r7, [sp, #80]	@ 0x50
+lsls	r3, r4
+ldr	r0, [sp, #104]	@ 0x68
+adds	r7, #1
+lsls	r7, r7, #2
+ldr	r4, [r7, r0]
+ldr	r0, [sp, #52]	@ 0x34
+bics	r3, r4
+ldr	r4, [r0, r7]
+orrs	r4, r3
+str	r4, [r0, r7]
+ldr	r4, [sp, #76]	@ 0x4c
+lsrs	r3, r4
+orrs	r5, r3
+cmp	r5, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #56]	@ 0x38
+adds	r1, #8
+cmp	r1, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #24]
+ldr	r2, [sp, #28]
+mov	ip, r3
+ldr	r3, [sp, #0]
+add	ip, r1
+mov	r8, r3
+add	r2, r8
+cmp	r6, #32
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r0, r6
+movs	r3, r0
+adds	r6, #1
+uxtb	r6, r6
+adds	r2, r2, r0
+adds	r2, #44	@ 0x2c
+ldrb	r7, [r2, #0]
+ldr	r2, [sp, #16]
+cmp	r7, r2
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #4]
+adds	r3, r3, r2
+movs	r0, #32
+ldr	r2, [sp, #28]
+lsls	r5, r7, #3
+adds	r3, r2, r3
+adds	r3, #44	@ 0x2c
+ldrb	r2, [r3, #0]
+ldr	r3, [sp, #8]
+tst	r0, r2
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #84]	@ 0x54
+movs	r0, #16
+ands	r0, r2
+adds	r5, r5, r3
+negs	r3, r0
+adcs	r0, r3
+movs	r3, #255	@ 0xff
+negs	r0, r0
+movs	r4, #64	@ 0x40
+ands	r3, r0
+mov	r0, fp
+ands	r4, r2
+mov	r8, r4
+ldrb	r0, [r0, r5]
+ldr	r4, [sp, #20]
+str	r0, [sp, #12]
+cmp	r4, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r4, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r0, r8
+cmp	r0, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #12]
+ldr	r4, [pc, #648]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r0, [r4, r0]
+str	r0, [sp, #12]
+movs	r0, #0
+mov	r8, r0
+str	r0, [sp, #48]	@ 0x30
+ldr	r0, [sp, #12]
+orrs	r3, r0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r7, [sp, #16]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #36]	@ 0x24
+cmp	r3, #0
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #128	@ 0x80
+mov	r2, r8
+lsls	r3, r3, #3
+eors	r2, r3
+uxth	r0, r2
+ldr	r2, [sp, #28]
+str	r0, [sp, #0]
+adds	r2, r2, r0
+movs	r0, r2
+adds	r0, #44	@ 0x2c
+ldrb	r7, [r0, #0]
+ldr	r0, [sp, #4]
+subs	r6, #31
+eors	r3, r0
+ldr	r0, [sp, #16]
+uxth	r3, r3
+str	r3, [sp, #4]
+cmp	r0, r7
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #56]	@ 0x38
+adds	r1, #8
+cmp	r1, r3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #24]
+mov	ip, r3
+add	ip, r1
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r0, ip
+movs	r5, r4
+mov	r7, r9
+orrs	r5, r0
+ldr	r0, [sp, #52]	@ 0x34
+str	r5, [r0, r7]
+mov	r0, sl
+cmp	r0, #7
+bhi.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r5, r3
+ldr	r0, [sp, #76]	@ 0x4c
+ldr	r7, [sp, #80]	@ 0x50
+lsls	r5, r0
+movs	r4, r5
+ldr	r0, [sp, #52]	@ 0x34
+adds	r7, #1
+lsls	r7, r7, #2
+ldr	r5, [r0, r7]
+orrs	r5, r4
+str	r5, [r0, r7]
+ldr	r0, [sp, #64]	@ 0x40
+ldr	r4, [sp, #48]	@ 0x30
+ands	r2, r0
+ldr	r0, [sp, #68]	@ 0x44
+ldr	r7, [sp, #92]	@ 0x5c
+lsls	r2, r0
+ldr	r0, [sp, #72]	@ 0x48
+orrs	r2, r0
+ldr	r0, [sp, #88]	@ 0x58
+lsls	r2, r2, #2
+ldr	r5, [r2, r0]
+ldr	r0, [sp, #12]
+lsrs	r2, r0, #4
+orrs	r2, r4
+lsls	r2, r2, #2
+ldr	r2, [r2, r7]
+movs	r4, #15
+orrs	r2, r5
+mov	r9, r2
+mov	r2, r8
+ands	r0, r4
+orrs	r0, r2
+lsls	r0, r0, #2
+ldr	r7, [r0, r7]
+lsrs	r0, r3, #24
+ands	r4, r0
+ldr	r0, [sp, #96]	@ 0x60
+lsls	r4, r4, #2
+ldr	r2, [r4, r0]
+lsrs	r3, r3, #28
+ldr	r4, [sp, #44]	@ 0x2c
+lsls	r3, r3, #2
+mov	ip, r2
+ldr	r3, [r3, r0]
+mov	r2, r9
+ldr	r0, [r1, #0]
+orrs	r7, r5
+cmp	r4, #2
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+cmp	r4, #3
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r5, r2, #24
+eors	r5, r0
+lsls	r4, r3, #24
+ands	r4, r5
+eors	r4, r0
+lsrs	r2, r2, #8
+lsls	r0, r7, #24
+orrs	r2, r0
+mov	r0, ip
+lsrs	r3, r3, #8
+lsls	r0, r0, #24
+orrs	r3, r0
+str	r4, [r1, #0]
+adds	r0, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r1, #4]
+eors	r2, r0
+ands	r2, r3
+eors	r2, r0
+mov	r0, ip
+ldr	r3, [r1, #8]
+str	r2, [r1, #4]
+lsrs	r2, r7, #8
+eors	r2, r3
+lsrs	r0, r0, #8
+ands	r0, r2
+eors	r0, r3
+str	r0, [r1, #8]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #60]	@ 0x3c
+add	r5, fp
+ldrb	r0, [r5, r0]
+mov	sl, r0
+ldr	r0, [sp, #32]
+ldrb	r5, [r5, r0]
+mov	r0, r8
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, sl
+ldr	r0, [pc, #356]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	r8, r0
+ldrb	r0, [r0, r4]
+ldr	r4, [sp, #12]
+mov	sl, r0
+mov	r0, r8
+ldrb	r5, [r0, r5]
+ldrb	r0, [r0, r4]
+str	r0, [sp, #12]
+mov	r0, sl
+orrs	r3, r0
+lsrs	r0, r0, #4
+lsls	r0, r0, #8
+mov	r9, r0
+mov	r0, sl
+lsls	r4, r0, #8
+movs	r0, #240	@ 0xf0
+lsls	r0, r0, #4
+ands	r0, r4
+mov	r8, r0
+movs	r4, #240	@ 0xf0
+mov	r0, r9
+ands	r4, r5
+orrs	r4, r0
+movs	r0, #255	@ 0xff
+orrs	r3, r5
+lsls	r5, r5, #4
+ands	r5, r0
+mov	r0, r8
+orrs	r0, r5
+mov	r8, r0
+str	r4, [sp, #48]	@ 0x30
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [sp, #32]
+add	r5, fp
+ldrb	r5, [r5, r0]
+mov	r0, r8
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r4, [pc, #280]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldr	r0, [sp, #12]
+ldrb	r5, [r4, r5]
+ldrb	r0, [r4, r0]
+str	r0, [sp, #12]
+movs	r0, #0
+mov	r8, r0
+mov	r9, r0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r6, #1
+movs	r0, #0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r1, #4
+ldr	r0, [sp, #52]	@ 0x34
+cmp	r1, r0
+adcs	r3, r3
+ldr	r1, [sp, #12]
+lsls	r3, r3, #2
+mov	ip, r1
+add	ip, r3
+mov	r3, ip
+str	r3, [sp, #12]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #28]
+ldr	r2, [sp, #104]	@ 0x68
+mov	r8, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r5, #8
+add	r9, r5
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r4, #8
+add	ip, r4
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r6, #0
+ldr	r7, [pc, #204]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+mov	sl, r6
+mov	r9, r6
+ldrb	r4, [r7, r4]
+ldrb	r0, [r7, r0]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+str	r0, [sp, #48]	@ 0x30
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r9, r8
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r6, #0
+str	r4, [sp, #48]	@ 0x30
+mov	r9, r6
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #4
+ldr	r2, [sp, #44]	@ 0x2c
+cmp	r3, r2
+adcs	r5, r5
+ldr	r3, [sp, #20]
+lsls	r5, r5, #2
+mov	ip, r3
+add	ip, r5
+mov	r3, ip
+str	r3, [sp, #20]
+movs	r3, #1
+negs	r3, r3
+str	r3, [sp, #12]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #4
+ldr	r2, [sp, #44]	@ 0x2c
+cmp	r3, r2
+adcs	r4, r4
+ldr	r3, [sp, #20]
+lsls	r4, r4, #2
+mov	ip, r3
+add	ip, r4
+mov	r3, ip
+str	r3, [sp, #20]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, r4
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #60]	@ 0x3c
+ldr	r4, [sp, #32]
+add	r3, fp
+ldrb	r1, [r3, r1]
+ldrb	r3, [r3, r4]
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r4, ip
+ldr	r0, [pc, #96]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r1, [r0, r1]
+ldrb	r3, [r0, r3]
+ldrb	r0, [r0, r4]
+mov	ip, r0
+movs	r0, #240	@ 0xf0
+lsrs	r4, r1, #4
+orrs	r6, r1
+lsls	r0, r0, #4
+lsls	r1, r1, #8
+lsls	r4, r4, #8
+ands	r1, r0
+movs	r0, #240	@ 0xf0
+ands	r0, r3
+orrs	r0, r4
+str	r0, [sp, #28]
+movs	r0, #255	@ 0xff
+orrs	r6, r3
+lsls	r3, r3, #4
+ands	r0, r3
+orrs	r0, r1
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #32]
+add	r3, fp
+ldrb	r3, [r3, r1]
+cmp	r0, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r0, ip
+ldr	r1, [pc, #40]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r3, [r1, r3]
+ldrb	r1, [r1, r0]
+mov	ip, r1
+movs	r1, #0
+movs	r4, #0
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+str	r5, [sp, #48]	@ 0x30
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+nop			@ (mov r8, r8)
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+ldr	r1, [sp, #16]
+adds	r2, r1, r2
+ldr	r1, [sp, #56]	@ 0x38
+ldrb	r5, [r2, r1]
+movs	r1, #0
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, ip
+ldr	r3, [pc, #776]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+movs	r1, #0
+ldrb	r5, [r3, r5]
+ldrb	r3, [r3, r2]
+mov	ip, r3
+movs	r3, #0
+movs	r2, #240	@ 0xf0
+ands	r2, r5
+orrs	r2, r3
+mov	sl, r2
+movs	r2, #255	@ 0xff
+orrs	r4, r5
+lsls	r5, r5, #4
+ands	r2, r5
+orrs	r1, r2
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [sp, #16]
+ldr	r5, [sp, #56]	@ 0x38
+adds	r2, r1, r2
+ldr	r1, [sp, #80]	@ 0x50
+ldrb	r5, [r2, r5]
+ldrb	r1, [r2, r1]
+cmp	r3, #0
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r2, ip
+ldr	r3, [pc, #724]	@ (<ADDR> <stageGfxITilesF18A+OFF>)
+ldrb	r1, [r3, r1]
+ldrb	r5, [r3, r5]
+ldrb	r3, [r3, r2]
+mov	ip, r3
+lsrs	r3, r1, #4
+lsls	r2, r1, #8
+orrs	r4, r1
+movs	r1, #240	@ 0xf0
+lsls	r1, r1, #4
+lsls	r3, r3, #8
+ands	r1, r2
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, ip
+stmia	r3!, {r0, r1}
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+str	r5, [r7, #0]
+str	r1, [r7, #4]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r4, r3, #8
+eors	r4, r1
+lsls	r0, r2, #8
+ands	r0, r4
+eors	r0, r1
+lsrs	r3, r3, #24
+lsls	r1, r5, #8
+orrs	r3, r1
+lsrs	r2, r2, #24
+lsls	r1, r6, #8
+orrs	r2, r1
+str	r0, [r7, #0]
+adds	r1, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [r7, #4]
+eors	r3, r1
+ands	r3, r2
+eors	r3, r1
+ldr	r1, [r7, #8]
+lsrs	r2, r5, #24
+str	r3, [r7, #4]
+eors	r2, r1
+lsrs	r3, r6, #24
+ands	r3, r2
+eors	r3, r1
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r4, r3, #16
+eors	r4, r1
+lsls	r0, r2, #16
+ands	r0, r4
+eors	r0, r1
+lsrs	r3, r3, #16
+lsls	r1, r5, #16
+orrs	r3, r1
+lsrs	r2, r2, #16
+lsls	r1, r6, #16
+orrs	r2, r1
+str	r0, [r7, #0]
+adds	r1, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [r7, #4]
+eors	r3, r1
+ands	r3, r2
+eors	r3, r1
+ldr	r1, [r7, #8]
+lsrs	r2, r5, #16
+str	r3, [r7, #4]
+eors	r2, r1
+lsrs	r3, r6, #16
+ands	r3, r2
+eors	r3, r1
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r4, r3, #24
+eors	r4, r2
+lsls	r0, r1, #24
+ands	r0, r4
+eors	r0, r2
+lsrs	r3, r3, #8
+lsls	r2, r5, #24
+orrs	r2, r3
+lsrs	r1, r1, #8
+lsls	r3, r6, #24
+orrs	r3, r1
+str	r0, [r7, #0]
+adds	r1, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [r7, #4]
+eors	r2, r1
+ands	r2, r3
+eors	r2, r1
+ldr	r1, [r7, #8]
+str	r2, [r7, #4]
+lsrs	r2, r5, #8
+eors	r2, r1
+lsrs	r3, r6, #8
+ands	r3, r2
+eors	r3, r1
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r4, r3, #16
+eors	r4, r2
+lsls	r0, r1, #16
+ands	r0, r4
+eors	r0, r2
+lsrs	r3, r3, #16
+lsls	r2, r5, #16
+orrs	r2, r3
+lsrs	r1, r1, #16
+lsls	r3, r6, #16
+orrs	r3, r1
+str	r0, [r7, #0]
+adds	r1, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r1, [r7, #4]
+eors	r2, r1
+ands	r2, r3
+eors	r2, r1
+ldr	r1, [r7, #8]
+str	r2, [r7, #4]
+lsrs	r2, r5, #16
+eors	r2, r1
+lsrs	r3, r6, #16
+ands	r3, r2
+eors	r3, r1
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r7, r2, #16
+eors	r7, r3
+lsls	r5, r0, #16
+ands	r5, r7
+eors	r5, r3
+lsrs	r2, r2, #16
+lsls	r3, r4, #16
+orrs	r3, r2
+mov	r2, ip
+lsrs	r0, r0, #16
+lsls	r2, r2, #16
+orrs	r2, r0
+str	r5, [r1, #0]
+adds	r0, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r1, #4]
+eors	r3, r0
+ands	r3, r2
+eors	r3, r0
+mov	r0, ip
+str	r3, [r1, #4]
+ldr	r3, [r1, #8]
+lsrs	r2, r4, #16
+eors	r2, r3
+lsrs	r0, r0, #16
+ands	r0, r2
+eors	r0, r3
+str	r0, [r1, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r7, r2, #24
+eors	r7, r3
+lsls	r5, r0, #24
+ands	r5, r7
+eors	r5, r3
+lsrs	r2, r2, #8
+lsls	r3, r4, #24
+orrs	r3, r2
+mov	r2, ip
+lsrs	r0, r0, #8
+lsls	r2, r2, #24
+orrs	r2, r0
+str	r5, [r1, #0]
+adds	r0, r2, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r1, #4]
+eors	r3, r0
+ands	r3, r2
+eors	r3, r0
+mov	r0, ip
+str	r3, [r1, #4]
+ldr	r3, [r1, #8]
+lsrs	r2, r4, #8
+eors	r2, r3
+lsrs	r0, r0, #8
+ands	r0, r2
+eors	r0, r3
+str	r0, [r1, #8]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r5, r2, #8
+eors	r5, r0
+lsls	r4, r3, #8
+ands	r4, r5
+eors	r4, r0
+lsrs	r2, r2, #24
+lsls	r0, r7, #8
+orrs	r2, r0
+mov	r0, ip
+lsrs	r3, r3, #24
+lsls	r0, r0, #8
+orrs	r3, r0
+str	r4, [r1, #0]
+adds	r0, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r1, #4]
+eors	r2, r0
+ands	r2, r3
+eors	r2, r0
+str	r2, [r1, #4]
+mov	r2, ip
+ldr	r3, [r1, #8]
+lsrs	r7, r7, #24
+eors	r7, r3
+lsrs	r2, r2, #24
+ands	r2, r7
+eors	r2, r3
+str	r2, [r1, #8]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+lsls	r5, r2, #16
+eors	r5, r0
+lsls	r4, r3, #16
+ands	r4, r5
+eors	r4, r0
+lsrs	r2, r2, #16
+lsls	r0, r7, #16
+orrs	r2, r0
+mov	r0, ip
+lsrs	r3, r3, #16
+lsls	r0, r0, #16
+orrs	r3, r0
+str	r4, [r1, #0]
+adds	r0, r3, #1
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r0, [r1, #4]
+eors	r2, r0
+ands	r2, r3
+eors	r2, r0
+mov	r0, ip
+ldr	r3, [r1, #8]
+str	r2, [r1, #4]
+lsrs	r2, r7, #16
+eors	r2, r3
+lsrs	r0, r0, #16
+ands	r0, r2
+eors	r0, r3
+str	r0, [r1, #8]
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, r9
+mov	r9, r7
+str	r1, [r3, #0]
+str	r2, [r3, #4]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+mov	r3, ip
+str	r5, [r3, #0]
+str	r0, [r3, #4]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r1, #4
+ldr	r0, [sp, #52]	@ 0x34
+cmp	r1, r0
+adcs	r3, r3
+ldr	r1, [sp, #12]
+lsls	r3, r3, #2
+mov	ip, r1
+add	ip, r3
+mov	r3, ip
+str	r3, [sp, #12]
+movs	r3, #1
+negs	r3, r3
+str	r3, [sp, #16]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #88]	@ 0x58
+eors	r3, r5
+ands	r1, r3
+movs	r3, r1
+ldr	r1, [sp, #12]
+eors	r3, r5
+str	r3, [r1, #0]
+ldr	r3, [sp, #52]	@ 0x34
+cmp	r3, #4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r1, #4
+subs	r3, #5
+str	r1, [sp, #12]
+str	r3, [sp, #16]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #0
+str	r3, [sp, #28]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r2, #4
+ldr	r1, [sp, #44]	@ 0x2c
+cmp	r2, r1
+adcs	r3, r3
+ldr	r2, [sp, #20]
+lsls	r3, r3, #2
+mov	ip, r2
+add	ip, r3
+mov	r3, ip
+str	r3, [sp, #20]
+movs	r3, #1
+negs	r3, r3
+movs	r2, r1
+str	r3, [sp, #12]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r1, #0
+mov	sl, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #48]	@ 0x30
+eors	r3, r4
+ands	r2, r3
+movs	r3, r2
+ldr	r2, [sp, #20]
+eors	r3, r4
+str	r3, [r2, #0]
+ldr	r3, [sp, #44]	@ 0x2c
+cmp	r3, #4
+bne.n	<ADDR> <stageGfxITilesF18A+OFF>
+adds	r2, #4
+subs	r3, #5
+str	r2, [sp, #20]
+str	r3, [sp, #12]
+ldr	r2, [sp, #44]	@ 0x2c
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #52]	@ 0x34
+adds	r1, #8
+cmp	r1, r2
+beq.n	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r2, [sp, #24]
+mov	ip, r2
+movs	r2, #1
+add	ip, r1
+str	r2, [sp, #12]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #28]
+ldr	r2, [sp, #100]	@ 0x64
+mov	r8, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+ldr	r3, [sp, #28]
+ldr	r2, [sp, #108]	@ 0x6c
+mov	r8, r3
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, r5
+b.n	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+negs	r3, r3
+str	r3, [sp, #16]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+movs	r3, #1
+negs	r3, r3
+ldr	r2, [sp, #44]	@ 0x2c
+str	r3, [sp, #12]
+bl	<ADDR> <stageGfxITilesF18A+OFF>
+	.word	<ADDR>

@@ -1,0 +1,68 @@
+2000022c <eofInterrupt>:
+2000022c:	2001      	movs	r0, #1
+2000022e:	b570      	push	{r4, r5, r6, lr}
+20000230:	2502      	movs	r5, #2
+20000232:	4b20      	ldr	r3, [pc, #128]	@ (200002b4 <eofInterrupt+0x88>)
+20000234:	4c20      	ldr	r4, [pc, #128]	@ (200002b8 <eofInterrupt+0x8c>)
+20000236:	7018      	strb	r0, [r3, #0]
+20000238:	4920      	ldr	r1, [pc, #128]	@ (200002bc <eofInterrupt+0x90>)
+2000023a:	6823      	ldr	r3, [r4, #0]
+2000023c:	5c5a      	ldrb	r2, [r3, r1]
+2000023e:	432a      	orrs	r2, r5
+20000240:	545a      	strb	r2, [r3, r1]
+20000242:	4a1f      	ldr	r2, [pc, #124]	@ (200002c0 <eofInterrupt+0x94>)
+20000244:	5c9a      	ldrb	r2, [r3, r2]
+20000246:	0692      	lsls	r2, r2, #26
+20000248:	d500      	bpl.n	2000024c <eofInterrupt+0x20>
+2000024a:	7318      	strb	r0, [r3, #12]
+2000024c:	f002 f9a0 	bl	20002590 <coreTemperatureC>
+20000250:	4d1c      	ldr	r5, [pc, #112]	@ (200002c4 <eofInterrupt+0x98>)
+20000252:	6829      	ldr	r1, [r5, #0]
+20000254:	f003 fa8c 	bl	20003770 <__wrap___aeabi_fadd>
+20000258:	4b1b      	ldr	r3, [pc, #108]	@ (200002c8 <eofInterrupt+0x9c>)
+2000025a:	6028      	str	r0, [r5, #0]
+2000025c:	681b      	ldr	r3, [r3, #0]
+2000025e:	069b      	lsls	r3, r3, #26
+20000260:	d005      	beq.n	2000026e <eofInterrupt+0x42>
+20000262:	6824      	ldr	r4, [r4, #0]
+20000264:	4b19      	ldr	r3, [pc, #100]	@ (200002cc <eofInterrupt+0xa0>)
+20000266:	5ce2      	ldrb	r2, [r4, r3]
+20000268:	2a00      	cmp	r2, #0
+2000026a:	d11b      	bne.n	200002a4 <eofInterrupt+0x78>
+2000026c:	bd70      	pop	{r4, r5, r6, pc}
+2000026e:	21f2      	movs	r1, #242	@ 0xf2
+20000270:	0589      	lsls	r1, r1, #22
+20000272:	f003 fa94 	bl	2000379e <__wrap___aeabi_fmul>
+20000276:	6028      	str	r0, [r5, #0]
+20000278:	f001 f9fa 	bl	20001670 <diagSetTemperature>
+2000027c:	2181      	movs	r1, #129	@ 0x81
+2000027e:	6828      	ldr	r0, [r5, #0]
+20000280:	05c9      	lsls	r1, r1, #23
+20000282:	f003 fa8c 	bl	2000379e <__wrap___aeabi_fmul>
+20000286:	21fc      	movs	r1, #252	@ 0xfc
+20000288:	0589      	lsls	r1, r1, #22
+2000028a:	f003 fa71 	bl	20003770 <__wrap___aeabi_fadd>
+2000028e:	f003 fb15 	bl	200038bc <__wrap___aeabi_f2uiz>
+20000292:	6824      	ldr	r4, [r4, #0]
+20000294:	4b0e      	ldr	r3, [pc, #56]	@ (200002d0 <eofInterrupt+0xa4>)
+20000296:	54e0      	strb	r0, [r4, r3]
+20000298:	2300      	movs	r3, #0
+2000029a:	602b      	str	r3, [r5, #0]
+2000029c:	4b0b      	ldr	r3, [pc, #44]	@ (200002cc <eofInterrupt+0xa0>)
+2000029e:	5ce2      	ldrb	r2, [r4, r3]
+200002a0:	2a00      	cmp	r2, #0
+200002a2:	d0e3      	beq.n	2000026c <eofInterrupt+0x40>
+200002a4:	2200      	movs	r2, #0
+200002a6:	54e2      	strb	r2, [r4, r3]
+200002a8:	f000 fc1e 	bl	20000ae8 <applyConfig>
+200002ac:	f001 fd0a 	bl	20001cc4 <diagnosticsConfigUpdated>
+200002b0:	e7dc      	b.n	2000026c <eofInterrupt+0x40>
+200002b2:	46c0      	nop			@ (mov r8, r8)
+200002b4:	200274d7 	.word	0x200274d7
+200002b8:	2000c7e4 	.word	0x2000c7e4
+200002bc:	0000b02d 	.word	0x0000b02d
+200002c0:	0000605e 	.word	0x0000605e
+200002c4:	20027454 	.word	0x20027454
+200002c8:	2002636c 	.word	0x2002636c
+200002cc:	00010150 	.word	0x00010150
+200002d0:	0000b039 	.word	0x0000b039

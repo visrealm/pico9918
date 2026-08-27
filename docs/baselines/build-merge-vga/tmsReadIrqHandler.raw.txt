@@ -1,0 +1,112 @@
+20005e90 <tmsReadIrqHandler>:
+20005e90:	4b32      	ldr	r3, [pc, #200]	@ (20005f5c <tmsReadIrqHandler+0xcc>)
+20005e92:	b510      	push	{r4, lr}
+20005e94:	6a5a      	ldr	r2, [r3, #36]	@ 0x24
+20005e96:	4b32      	ldr	r3, [pc, #200]	@ (20005f60 <tmsReadIrqHandler+0xd0>)
+20005e98:	681b      	ldr	r3, [r3, #0]
+20005e9a:	7ad9      	ldrb	r1, [r3, #11]
+20005e9c:	468c      	mov	ip, r1
+20005e9e:	2101      	movs	r1, #1
+20005ea0:	0008      	movs	r0, r1
+20005ea2:	4010      	ands	r0, r2
+20005ea4:	4211      	tst	r1, r2
+20005ea6:	d121      	bne.n	20005eec <tmsReadIrqHandler+0x5c>
+20005ea8:	7198      	strb	r0, [r3, #6]
+20005eaa:	6818      	ldr	r0, [r3, #0]
+20005eac:	492d      	ldr	r1, [pc, #180]	@ (20005f64 <tmsReadIrqHandler+0xd4>)
+20005eae:	0482      	lsls	r2, r0, #18
+20005eb0:	0c92      	lsrs	r2, r2, #18
+20005eb2:	189a      	adds	r2, r3, r2
+20005eb4:	322c      	adds	r2, #44	@ 0x2c
+20005eb6:	7812      	ldrb	r2, [r2, #0]
+20005eb8:	721a      	strb	r2, [r3, #8]
+20005eba:	5659      	ldrsb	r1, [r3, r1]
+20005ebc:	1809      	adds	r1, r1, r0
+20005ebe:	6019      	str	r1, [r3, #0]
+20005ec0:	4929      	ldr	r1, [pc, #164]	@ (20005f68 <tmsReadIrqHandler+0xd8>)
+20005ec2:	700a      	strb	r2, [r1, #0]
+20005ec4:	21ff      	movs	r1, #255	@ 0xff
+20005ec6:	0212      	lsls	r2, r2, #8
+20005ec8:	430a      	orrs	r2, r1
+20005eca:	4661      	mov	r1, ip
+20005ecc:	2900      	cmp	r1, #0
+20005ece:	d021      	beq.n	20005f14 <tmsReadIrqHandler+0x84>
+20005ed0:	4926      	ldr	r1, [pc, #152]	@ (20005f6c <tmsReadIrqHandler+0xdc>)
+20005ed2:	5c58      	ldrb	r0, [r3, r1]
+20005ed4:	210f      	movs	r1, #15
+20005ed6:	4001      	ands	r1, r0
+20005ed8:	4825      	ldr	r0, [pc, #148]	@ (20005f70 <tmsReadIrqHandler+0xe0>)
+20005eda:	185b      	adds	r3, r3, r1
+20005edc:	5c1b      	ldrb	r3, [r3, r0]
+20005ede:	0609      	lsls	r1, r1, #24
+20005ee0:	041b      	lsls	r3, r3, #16
+20005ee2:	430b      	orrs	r3, r1
+20005ee4:	431a      	orrs	r2, r3
+20005ee6:	4b1d      	ldr	r3, [pc, #116]	@ (20005f5c <tmsReadIrqHandler+0xcc>)
+20005ee8:	615a      	str	r2, [r3, #20]
+20005eea:	bd10      	pop	{r4, pc}
+20005eec:	2100      	movs	r1, #0
+20005eee:	7199      	strb	r1, [r3, #6]
+20005ef0:	4661      	mov	r1, ip
+20005ef2:	0c50      	lsrs	r0, r2, #17
+20005ef4:	b2c0      	uxtb	r0, r0
+20005ef6:	2900      	cmp	r1, #0
+20005ef8:	d011      	beq.n	20005f1e <tmsReadIrqHandler+0x8e>
+20005efa:	0e51      	lsrs	r1, r2, #25
+20005efc:	d012      	beq.n	20005f24 <tmsReadIrqHandler+0x94>
+20005efe:	4a1a      	ldr	r2, [pc, #104]	@ (20005f68 <tmsReadIrqHandler+0xd8>)
+20005f00:	7812      	ldrb	r2, [r2, #0]
+20005f02:	2901      	cmp	r1, #1
+20005f04:	d1de      	bne.n	20005ec4 <tmsReadIrqHandler+0x34>
+20005f06:	4201      	tst	r1, r0
+20005f08:	d0dc      	beq.n	20005ec4 <tmsReadIrqHandler+0x34>
+20005f0a:	481a      	ldr	r0, [pc, #104]	@ (20005f74 <tmsReadIrqHandler+0xe4>)
+20005f0c:	5c1c      	ldrb	r4, [r3, r0]
+20005f0e:	438c      	bics	r4, r1
+20005f10:	541c      	strb	r4, [r3, r0]
+20005f12:	e7d7      	b.n	20005ec4 <tmsReadIrqHandler+0x34>
+20005f14:	4916      	ldr	r1, [pc, #88]	@ (20005f70 <tmsReadIrqHandler+0xe0>)
+20005f16:	5c5b      	ldrb	r3, [r3, r1]
+20005f18:	041b      	lsls	r3, r3, #16
+20005f1a:	431a      	orrs	r2, r3
+20005f1c:	e7e3      	b.n	20005ee6 <tmsReadIrqHandler+0x56>
+20005f1e:	7c59      	ldrb	r1, [r3, #17]
+20005f20:	2901      	cmp	r1, #1
+20005f22:	d0ea      	beq.n	20005efa <tmsReadIrqHandler+0x6a>
+20005f24:	221f      	movs	r2, #31
+20005f26:	0001      	movs	r1, r0
+20005f28:	4391      	bics	r1, r2
+20005f2a:	4a13      	ldr	r2, [pc, #76]	@ (20005f78 <tmsReadIrqHandler+0xe8>)
+20005f2c:	b249      	sxtb	r1, r1
+20005f2e:	5c9a      	ldrb	r2, [r3, r2]
+20005f30:	438a      	bics	r2, r1
+20005f32:	0640      	lsls	r0, r0, #25
+20005f34:	d501      	bpl.n	20005f3a <tmsReadIrqHandler+0xaa>
+20005f36:	201f      	movs	r0, #31
+20005f38:	4302      	orrs	r2, r0
+20005f3a:	480f      	ldr	r0, [pc, #60]	@ (20005f78 <tmsReadIrqHandler+0xe8>)
+20005f3c:	541a      	strb	r2, [r3, r0]
+20005f3e:	480c      	ldr	r0, [pc, #48]	@ (20005f70 <tmsReadIrqHandler+0xe0>)
+20005f40:	541a      	strb	r2, [r3, r0]
+20005f42:	4a09      	ldr	r2, [pc, #36]	@ (20005f68 <tmsReadIrqHandler+0xd8>)
+20005f44:	7812      	ldrb	r2, [r2, #0]
+20005f46:	2900      	cmp	r1, #0
+20005f48:	dabc      	bge.n	20005ec4 <tmsReadIrqHandler+0x34>
+20005f4a:	2000      	movs	r0, #0
+20005f4c:	490b      	ldr	r1, [pc, #44]	@ (20005f7c <tmsReadIrqHandler+0xec>)
+20005f4e:	5458      	strb	r0, [r3, r1]
+20005f50:	21d0      	movs	r1, #208	@ 0xd0
+20005f52:	2080      	movs	r0, #128	@ 0x80
+20005f54:	0609      	lsls	r1, r1, #24
+20005f56:	03c0      	lsls	r0, r0, #15
+20005f58:	6148      	str	r0, [r1, #20]
+20005f5a:	e7b3      	b.n	20005ec4 <tmsReadIrqHandler+0x34>
+20005f5c:	50300000 	.word	0x50300000
+20005f60:	2000d534 	.word	0x2000d534
+20005f64:	0000605c 	.word	0x0000605c
+20005f68:	20028676 	.word	0x20028676
+20005f6c:	0000603b 	.word	0x0000603b
+20005f70:	0000b02c 	.word	0x0000b02c
+20005f74:	0000b02d 	.word	0x0000b02d
+20005f78:	00010152 	.word	0x00010152
+20005f7c:	00010151 	.word	0x00010151

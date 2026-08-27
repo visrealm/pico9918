@@ -1,0 +1,166 @@
+<ADDR> <pico9918_config_apply>:
+ldr	r3, [pc, #516]	@ (<ADDR> <pico9918_config_apply+OFF>)
+stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ldr	r3, [r3, #0]
+cbz	r3, <ADDR> <pico9918_config_apply+OFF>
+blx	r3
+ldr	r3, [pc, #508]	@ (<ADDR> <pico9918_config_apply+OFF>)
+ldr	r2, [r3, #0]
+add.w	r3, r2, #65536	@ 0x10000
+ldrb.w	r1, [r3, #337]	@ 0x151
+cmp	r1, #0
+beq.w	<ADDR> <pico9918_config_apply+OFF>
+movs	r4, #0
+ldrb.w	r1, [r3, #88]	@ 0x58
+add.w	r6, r2, #24576	@ 0x6000
+ldrb.w	r0, [r6, #50]	@ 0x32
+strb.w	r4, [r3, #337]	@ 0x151
+cmp	r1, #0
+bne.w	<ADDR> <pico9918_config_apply+OFF>
+and.w	r0, r0, #251	@ 0xfb
+movs	r4, #0
+ldrb.w	r1, [r3, #89]	@ 0x59
+strb.w	r0, [r6, #50]	@ 0x32
+ldrb.w	r7, [r3, #208]	@ 0xd0
+ldrb.w	r5, [r3, #209]	@ 0xd1
+mov	lr, r4
+orr.w	r5, r5, r7, lsl #8
+movs	r7, #1
+mov	r9, r4
+adds	r1, #2
+lsl.w	r1, r7, r1
+mov	r8, lr
+strb	r1, [r6, #30]
+ldrb.w	r6, [r3, #210]	@ 0xd2
+ldrb.w	r1, [r3, #211]	@ 0xd3
+rev16	r5, r5
+orr.w	r1, r1, r6, lsl #8
+uxth	r5, r5
+rev16	r1, r1
+mov	ip, r4
+mov	r0, r4
+uxth	r1, r1
+bfi	r4, r5, #0, #16
+ldrb.w	r6, [r3, #212]	@ 0xd4
+bfi	r4, r1, #16, #16
+ldrb.w	r1, [r3, #213]	@ 0xd5
+mov	r7, lr
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #214]	@ 0xd6
+bfi	r9, r1, #0, #16
+ldrb.w	r1, [r3, #215]	@ 0xd7
+mov	r5, lr
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #216]	@ 0xd8
+bfi	r9, r1, #16, #16
+ldrb.w	r1, [r3, #217]	@ 0xd9
+add.w	sl, r2, #20480	@ 0x5000
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #218]	@ 0xda
+bfi	lr, r1, #0, #16
+ldrb.w	r1, [r3, #219]	@ 0xdb
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #220]	@ 0xdc
+bfi	lr, r1, #16, #16
+ldrb.w	r1, [r3, #221]	@ 0xdd
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #222]	@ 0xde
+bfi	r8, r1, #0, #16
+ldrb.w	r1, [r3, #223]	@ 0xdf
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #224]	@ 0xe0
+bfi	r8, r1, #16, #16
+ldrb.w	r1, [r3, #225]	@ 0xe1
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #226]	@ 0xe2
+bfi	ip, r1, #0, #16
+ldrb.w	r1, [r3, #227]	@ 0xe3
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #228]	@ 0xe4
+bfi	ip, r1, #16, #16
+ldrb.w	r1, [r3, #229]	@ 0xe5
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #230]	@ 0xe6
+bfi	r7, r1, #0, #16
+ldrb.w	r1, [r3, #231]	@ 0xe7
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #232]	@ 0xe8
+bfi	r7, r1, #16, #16
+ldrb.w	r1, [r3, #233]	@ 0xe9
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #234]	@ 0xea
+bfi	r0, r1, #0, #16
+ldrb.w	r1, [r3, #235]	@ 0xeb
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #236]	@ 0xec
+bfi	r0, r1, #16, #16
+ldrb.w	r1, [r3, #237]	@ 0xed
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+ldrb.w	r6, [r3, #238]	@ 0xee
+bfi	r5, r1, #0, #16
+ldrb.w	r1, [r3, #239]	@ 0xef
+strd	r4, r9, [sl]
+orr.w	r1, r1, r6, lsl #8
+rev16	r1, r1
+uxth	r1, r1
+bfi	r5, r1, #16, #16
+movw	r1, #20496	@ 0x5010
+add.w	r6, r2, #20480	@ 0x5000
+adds	r6, #16
+strd	lr, r8, [r6, #-8]
+str.w	ip, [r2, r1]
+mov.w	r2, #1
+str	r7, [r6, #4]
+strd	r0, r5, [sl, #24]
+strb.w	r2, [r3, #52]	@ 0x34
+ldrb.w	r2, [r3, #100]	@ 0x64
+cbnz	r2, <ADDR> <pico9918_config_apply+OFF>
+ldrb.w	r2, [r3, #99]	@ 0x63
+cbz	r2, <ADDR> <pico9918_config_apply+OFF>
+movs	r1, #1
+ldrb.w	r2, [r3, #95]	@ 0x5f
+strb.w	r1, [r3, #96]	@ 0x60
+sub.w	r2, r2, #1
+clz	r2, r2
+lsrs	r2, r2, #5
+strb.w	r2, [r3, #53]	@ 0x35
+ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
+ldrb.w	r2, [r3, #98]	@ 0x62
+cmp	r2, #0
+bne.n	<ADDR> <pico9918_config_apply+OFF>
+ldrb.w	r1, [r3, #97]	@ 0x61
+subs	r1, r1, r2
+it	ne
+movne	r1, #1
+b.n	<ADDR> <pico9918_config_apply+OFF>
+orr.w	r0, r0, #4
+b.n	<ADDR> <pico9918_config_apply+OFF>
+nop
+	.word	<ADDR>
+	.word	<ADDR>

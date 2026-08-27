@@ -1,0 +1,214 @@
+200177b8 <pico9918_palette_regenerate>:
+200177b8:	2200      	movs	r2, #0
+200177ba:	b5f0      	push	{r4, r5, r6, r7, lr}
+200177bc:	4b63      	ldr	r3, [pc, #396]	@ (2001794c <pico9918_palette_regenerate+0x194>)
+200177be:	b089      	sub	sp, #36	@ 0x24
+200177c0:	681d      	ldr	r5, [r3, #0]
+200177c2:	4b63      	ldr	r3, [pc, #396]	@ (20017950 <pico9918_palette_regenerate+0x198>)
+200177c4:	54ea      	strb	r2, [r5, r3]
+200177c6:	f00a fcab 	bl	20022120 <pico9918_display_mode>
+200177ca:	23a0      	movs	r3, #160	@ 0xa0
+200177cc:	01db      	lsls	r3, r3, #7
+200177ce:	2804      	cmp	r0, #4
+200177d0:	d037      	beq.n	20017842 <pico9918_palette_regenerate+0x8a>
+200177d2:	18e8      	adds	r0, r5, r3
+200177d4:	4a5f      	ldr	r2, [pc, #380]	@ (20017954 <pico9918_palette_regenerate+0x19c>)
+200177d6:	3380      	adds	r3, #128	@ 0x80
+200177d8:	4c5f      	ldr	r4, [pc, #380]	@ (20017958 <pico9918_palette_regenerate+0x1a0>)
+200177da:	4960      	ldr	r1, [pc, #384]	@ (2001795c <pico9918_palette_regenerate+0x1a4>)
+200177dc:	18ed      	adds	r5, r5, r3
+200177de:	6806      	ldr	r6, [r0, #0]
+200177e0:	0a33      	lsrs	r3, r6, #8
+200177e2:	4073      	eors	r3, r6
+200177e4:	4023      	ands	r3, r4
+200177e6:	4073      	eors	r3, r6
+200177e8:	b29e      	uxth	r6, r3
+200177ea:	0c1b      	lsrs	r3, r3, #16
+200177ec:	434e      	muls	r6, r1
+200177ee:	434b      	muls	r3, r1
+200177f0:	6016      	str	r6, [r2, #0]
+200177f2:	6053      	str	r3, [r2, #4]
+200177f4:	6846      	ldr	r6, [r0, #4]
+200177f6:	0a33      	lsrs	r3, r6, #8
+200177f8:	4073      	eors	r3, r6
+200177fa:	4023      	ands	r3, r4
+200177fc:	4073      	eors	r3, r6
+200177fe:	b29e      	uxth	r6, r3
+20017800:	0c1b      	lsrs	r3, r3, #16
+20017802:	434e      	muls	r6, r1
+20017804:	434b      	muls	r3, r1
+20017806:	6096      	str	r6, [r2, #8]
+20017808:	60d3      	str	r3, [r2, #12]
+2001780a:	6886      	ldr	r6, [r0, #8]
+2001780c:	0a33      	lsrs	r3, r6, #8
+2001780e:	4073      	eors	r3, r6
+20017810:	4023      	ands	r3, r4
+20017812:	4073      	eors	r3, r6
+20017814:	b29e      	uxth	r6, r3
+20017816:	0c1b      	lsrs	r3, r3, #16
+20017818:	434e      	muls	r6, r1
+2001781a:	434b      	muls	r3, r1
+2001781c:	6116      	str	r6, [r2, #16]
+2001781e:	6153      	str	r3, [r2, #20]
+20017820:	68c6      	ldr	r6, [r0, #12]
+20017822:	3010      	adds	r0, #16
+20017824:	0a33      	lsrs	r3, r6, #8
+20017826:	4073      	eors	r3, r6
+20017828:	4023      	ands	r3, r4
+2001782a:	4073      	eors	r3, r6
+2001782c:	b29e      	uxth	r6, r3
+2001782e:	0c1b      	lsrs	r3, r3, #16
+20017830:	434e      	muls	r6, r1
+20017832:	434b      	muls	r3, r1
+20017834:	6196      	str	r6, [r2, #24]
+20017836:	61d3      	str	r3, [r2, #28]
+20017838:	3220      	adds	r2, #32
+2001783a:	4285      	cmp	r5, r0
+2001783c:	d1cf      	bne.n	200177de <pico9918_palette_regenerate+0x26>
+2001783e:	b009      	add	sp, #36	@ 0x24
+20017840:	bdf0      	pop	{r4, r5, r6, r7, pc}
+20017842:	58eb      	ldr	r3, [r5, r3]
+20017844:	4844      	ldr	r0, [pc, #272]	@ (20017958 <pico9918_palette_regenerate+0x1a0>)
+20017846:	0a19      	lsrs	r1, r3, #8
+20017848:	4059      	eors	r1, r3
+2001784a:	4f42      	ldr	r7, [pc, #264]	@ (20017954 <pico9918_palette_regenerate+0x19c>)
+2001784c:	4001      	ands	r1, r0
+2001784e:	4059      	eors	r1, r3
+20017850:	4a42      	ldr	r2, [pc, #264]	@ (2001795c <pico9918_palette_regenerate+0x1a4>)
+20017852:	9100      	str	r1, [sp, #0]
+20017854:	b28c      	uxth	r4, r1
+20017856:	4354      	muls	r4, r2
+20017858:	603c      	str	r4, [r7, #0]
+2001785a:	0c0c      	lsrs	r4, r1, #16
+2001785c:	4940      	ldr	r1, [pc, #256]	@ (20017960 <pico9918_palette_regenerate+0x1a8>)
+2001785e:	4354      	muls	r4, r2
+20017860:	607c      	str	r4, [r7, #4]
+20017862:	586c      	ldr	r4, [r5, r1]
+20017864:	2388      	movs	r3, #136	@ 0x88
+20017866:	0a21      	lsrs	r1, r4, #8
+20017868:	4061      	eors	r1, r4
+2001786a:	4001      	ands	r1, r0
+2001786c:	4061      	eors	r1, r4
+2001786e:	9101      	str	r1, [sp, #4]
+20017870:	b28c      	uxth	r4, r1
+20017872:	4354      	muls	r4, r2
+20017874:	60bc      	str	r4, [r7, #8]
+20017876:	0c0c      	lsrs	r4, r1, #16
+20017878:	493a      	ldr	r1, [pc, #232]	@ (20017964 <pico9918_palette_regenerate+0x1ac>)
+2001787a:	4354      	muls	r4, r2
+2001787c:	60fc      	str	r4, [r7, #12]
+2001787e:	586c      	ldr	r4, [r5, r1]
+20017880:	466e      	mov	r6, sp
+20017882:	0a21      	lsrs	r1, r4, #8
+20017884:	4061      	eors	r1, r4
+20017886:	4001      	ands	r1, r0
+20017888:	4061      	eors	r1, r4
+2001788a:	9102      	str	r1, [sp, #8]
+2001788c:	b28c      	uxth	r4, r1
+2001788e:	4354      	muls	r4, r2
+20017890:	613c      	str	r4, [r7, #16]
+20017892:	0c0c      	lsrs	r4, r1, #16
+20017894:	4934      	ldr	r1, [pc, #208]	@ (20017968 <pico9918_palette_regenerate+0x1b0>)
+20017896:	4354      	muls	r4, r2
+20017898:	617c      	str	r4, [r7, #20]
+2001789a:	586c      	ldr	r4, [r5, r1]
+2001789c:	00db      	lsls	r3, r3, #3
+2001789e:	0a21      	lsrs	r1, r4, #8
+200178a0:	4061      	eors	r1, r4
+200178a2:	4001      	ands	r1, r0
+200178a4:	4061      	eors	r1, r4
+200178a6:	9103      	str	r1, [sp, #12]
+200178a8:	b28c      	uxth	r4, r1
+200178aa:	4354      	muls	r4, r2
+200178ac:	61bc      	str	r4, [r7, #24]
+200178ae:	0c0c      	lsrs	r4, r1, #16
+200178b0:	492e      	ldr	r1, [pc, #184]	@ (2001796c <pico9918_palette_regenerate+0x1b4>)
+200178b2:	4354      	muls	r4, r2
+200178b4:	61fc      	str	r4, [r7, #28]
+200178b6:	586c      	ldr	r4, [r5, r1]
+200178b8:	0a21      	lsrs	r1, r4, #8
+200178ba:	4061      	eors	r1, r4
+200178bc:	4001      	ands	r1, r0
+200178be:	4061      	eors	r1, r4
+200178c0:	9104      	str	r1, [sp, #16]
+200178c2:	b28c      	uxth	r4, r1
+200178c4:	4354      	muls	r4, r2
+200178c6:	623c      	str	r4, [r7, #32]
+200178c8:	0c0c      	lsrs	r4, r1, #16
+200178ca:	4929      	ldr	r1, [pc, #164]	@ (20017970 <pico9918_palette_regenerate+0x1b8>)
+200178cc:	4354      	muls	r4, r2
+200178ce:	627c      	str	r4, [r7, #36]	@ 0x24
+200178d0:	586c      	ldr	r4, [r5, r1]
+200178d2:	0a21      	lsrs	r1, r4, #8
+200178d4:	4061      	eors	r1, r4
+200178d6:	4001      	ands	r1, r0
+200178d8:	4061      	eors	r1, r4
+200178da:	9105      	str	r1, [sp, #20]
+200178dc:	b28c      	uxth	r4, r1
+200178de:	4354      	muls	r4, r2
+200178e0:	62bc      	str	r4, [r7, #40]	@ 0x28
+200178e2:	0c0c      	lsrs	r4, r1, #16
+200178e4:	4923      	ldr	r1, [pc, #140]	@ (20017974 <pico9918_palette_regenerate+0x1bc>)
+200178e6:	4354      	muls	r4, r2
+200178e8:	62fc      	str	r4, [r7, #44]	@ 0x2c
+200178ea:	586c      	ldr	r4, [r5, r1]
+200178ec:	0a21      	lsrs	r1, r4, #8
+200178ee:	4061      	eors	r1, r4
+200178f0:	4001      	ands	r1, r0
+200178f2:	4061      	eors	r1, r4
+200178f4:	9106      	str	r1, [sp, #24]
+200178f6:	b28c      	uxth	r4, r1
+200178f8:	4354      	muls	r4, r2
+200178fa:	633c      	str	r4, [r7, #48]	@ 0x30
+200178fc:	0c0c      	lsrs	r4, r1, #16
+200178fe:	491e      	ldr	r1, [pc, #120]	@ (20017978 <pico9918_palette_regenerate+0x1c0>)
+20017900:	4354      	muls	r4, r2
+20017902:	637c      	str	r4, [r7, #52]	@ 0x34
+20017904:	586c      	ldr	r4, [r5, r1]
+20017906:	003d      	movs	r5, r7
+20017908:	0a21      	lsrs	r1, r4, #8
+2001790a:	4061      	eors	r1, r4
+2001790c:	4001      	ands	r1, r0
+2001790e:	4061      	eors	r1, r4
+20017910:	3580      	adds	r5, #128	@ 0x80
+20017912:	b288      	uxth	r0, r1
+20017914:	4350      	muls	r0, r2
+20017916:	63b8      	str	r0, [r7, #56]	@ 0x38
+20017918:	0c08      	lsrs	r0, r1, #16
+2001791a:	4350      	muls	r0, r2
+2001791c:	63f8      	str	r0, [r7, #60]	@ 0x3c
+2001791e:	9107      	str	r1, [sp, #28]
+20017920:	18ff      	adds	r7, r7, r3
+20017922:	002a      	movs	r2, r5
+20017924:	4668      	mov	r0, sp
+20017926:	8874      	ldrh	r4, [r6, #2]
+20017928:	3a40      	subs	r2, #64	@ 0x40
+2001792a:	c808      	ldmia	r0!, {r3}
+2001792c:	0419      	lsls	r1, r3, #16
+2001792e:	0c1b      	lsrs	r3, r3, #16
+20017930:	041b      	lsls	r3, r3, #16
+20017932:	4321      	orrs	r1, r4
+20017934:	4323      	orrs	r3, r4
+20017936:	6011      	str	r1, [r2, #0]
+20017938:	6053      	str	r3, [r2, #4]
+2001793a:	3208      	adds	r2, #8
+2001793c:	42aa      	cmp	r2, r5
+2001793e:	d1f4      	bne.n	2001792a <pico9918_palette_regenerate+0x172>
+20017940:	3540      	adds	r5, #64	@ 0x40
+20017942:	3602      	adds	r6, #2
+20017944:	42bd      	cmp	r5, r7
+20017946:	d1ec      	bne.n	20017922 <pico9918_palette_regenerate+0x16a>
+20017948:	e779      	b.n	2001783e <pico9918_palette_regenerate+0x86>
+2001794a:	46c0      	nop			@ (mov r8, r8)
+2001794c:	20022eb0 	.word	0x20022eb0
+20017950:	00010034 	.word	0x00010034
+20017954:	20028eac 	.word	0x20028eac
+20017958:	00f000f0 	.word	0x00f000f0
+2001795c:	00010001 	.word	0x00010001
+20017960:	00005004 	.word	0x00005004
+20017964:	00005008 	.word	0x00005008
+20017968:	0000500c 	.word	0x0000500c
+2001796c:	00005010 	.word	0x00005010
+20017970:	00005014 	.word	0x00005014
+20017974:	00005018 	.word	0x00005018
+20017978:	0000501c 	.word	0x0000501c

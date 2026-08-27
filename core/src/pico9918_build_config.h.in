@@ -1,0 +1,50 @@
+/*
+ * pico9918-core - build configuration (GENERATED)
+ *
+ * Copyright (c) 2026 Troy Schrapel
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico9918-core
+ *
+ * DO NOT EDIT - generated from pico9918_build_config.h.in by CMake.
+ *
+ * Records the choices the library was actually COMPILED with, so a consumer
+ * cannot silently disagree with the binary it links against. A plain compile
+ * definition on the library target cannot do this job: it reaches the library's
+ * own translation units and nothing else, so a consumer built by a different
+ * build system sees the platform defaults instead and the mismatch is silent.
+ */
+
+#ifndef _PICO9918_BUILD_CONFIG_H
+#define _PICO9918_BUILD_CONFIG_H
+
+/*
+ * Width of PICO9918_PIXEL_T in the compiled library, in bytes.
+ *
+ * The pixel policy is a per-build choice (2 for the Pico BGR12 policy, which
+ * the golden harness also selects; 4 for the desktop RGBA8888 default), and it
+ * changes the layout of every pixel buffer and palette the library exports.
+ * Public headers that expose PICO9918_PIXEL_T assert against this.
+ */
+#define PICO9918_BUILD_PIXEL_SIZE @PICO9918_ASSET_PIXEL_SIZE@
+
+/*
+ * Whether the compiled library renders 80-column text at eight bits a pixel.
+ *
+ * It doubles the widest line, so PICO9918_SCANLINE_BUFFER_SIZE is derived from this
+ * rather than from the consumer's own flags - a consumer that disagreed would allocate
+ * half the buffer the library writes.
+ */
+#define PICO9918_BUILD_TEXT80_8BPP @PICO9918_BUILD_TEXT80_8BPP@
+
+/*
+ * Which chip the compiled library is: 0 a TMS9918A, 1 an F18A.
+ *
+ * A 0 build has no GPU, no unlock and 16KB of VRAM, and the enhanced renderer is not
+ * in the archive - so this is what lets a consumer find that out at compile time
+ * rather than at link time.
+ */
+#define PICO9918_BUILD_MODE @PICO9918_MODE@
+
+#endif // _PICO9918_BUILD_CONFIG_H

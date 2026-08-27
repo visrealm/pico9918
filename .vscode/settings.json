@@ -49,7 +49,6 @@
     "files.associations": {
         "version.h": "c",
         "system_error": "c",
-        "vremutms9918.h": "c",
         "cstdint": "c",
         "array": "c",
         "string": "c",
@@ -60,7 +59,6 @@
         "random": "c",
         "dma.h": "c",
         "ssi.h": "c",
-        "vremutms9918priv.h": "c",
         "tms9918.pio.h": "c",
         "temperature.h": "c",
         "bmp_splash.h": "c",

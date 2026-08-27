@@ -1,0 +1,114 @@
+200199b4 <gpioIrqHandler>:
+200199b4:	b570      	push	{r4, r5, r6, lr}
+200199b6:	2104      	movs	r1, #4
+200199b8:	2017      	movs	r0, #23
+200199ba:	f7fc fcbf 	bl	2001633c <gpio_acknowledge_irq>
+200199be:	2100      	movs	r1, #0
+200199c0:	2009      	movs	r0, #9
+200199c2:	f7fc fdb9 	bl	20016538 <irq_set_enabled>
+200199c6:	2100      	movs	r1, #0
+200199c8:	200a      	movs	r0, #10
+200199ca:	f7fc fdb5 	bl	20016538 <irq_set_enabled>
+200199ce:	f3bf 8f5f 	dmb	sy
+200199d2:	f008 f919 	bl	20021c08 <pico9918_reset>
+200199d6:	4b30      	ldr	r3, [pc, #192]	@ (20019a98 <gpioIrqHandler+0xe4>)
+200199d8:	25b0      	movs	r5, #176	@ 0xb0
+200199da:	681c      	ldr	r4, [r3, #0]
+200199dc:	4b2f      	ldr	r3, [pc, #188]	@ (20019a9c <gpioIrqHandler+0xe8>)
+200199de:	022d      	lsls	r5, r5, #8
+200199e0:	18e0      	adds	r0, r4, r3
+200199e2:	f7fc f891 	bl	20015b08 <readConfig>
+200199e6:	2280      	movs	r2, #128	@ 0x80
+200199e8:	4b2d      	ldr	r3, [pc, #180]	@ (20019aa0 <gpioIrqHandler+0xec>)
+200199ea:	0092      	lsls	r2, r2, #2
+200199ec:	601a      	str	r2, [r3, #0]
+200199ee:	2280      	movs	r2, #128	@ 0x80
+200199f0:	00d2      	lsls	r2, r2, #3
+200199f2:	601a      	str	r2, [r3, #0]
+200199f4:	2380      	movs	r3, #128	@ 0x80
+200199f6:	4a2b      	ldr	r2, [pc, #172]	@ (20019aa4 <gpioIrqHandler+0xf0>)
+200199f8:	061b      	lsls	r3, r3, #24
+200199fa:	6013      	str	r3, [r2, #0]
+200199fc:	6013      	str	r3, [r2, #0]
+200199fe:	4a2a      	ldr	r2, [pc, #168]	@ (20019aa8 <gpioIrqHandler+0xf4>)
+20019a00:	4e2a      	ldr	r6, [pc, #168]	@ (20019aac <gpioIrqHandler+0xf8>)
+20019a02:	6013      	str	r3, [r2, #0]
+20019a04:	6013      	str	r3, [r2, #0]
+20019a06:	2300      	movs	r3, #0
+20019a08:	22f8      	movs	r2, #248	@ 0xf8
+20019a0a:	7033      	strb	r3, [r6, #0]
+20019a0c:	331f      	adds	r3, #31
+20019a0e:	5563      	strb	r3, [r4, r5]
+20019a10:	4b27      	ldr	r3, [pc, #156]	@ (20019ab0 <gpioIrqHandler+0xfc>)
+20019a12:	0152      	lsls	r2, r2, #5
+20019a14:	52e2      	strh	r2, [r4, r3]
+20019a16:	2201      	movs	r2, #1
+20019a18:	4b26      	ldr	r3, [pc, #152]	@ (20019ab4 <gpioIrqHandler+0x100>)
+20019a1a:	54e2      	strb	r2, [r4, r3]
+20019a1c:	f7fb feae 	bl	2001577c <rendererReset>
+20019a20:	23ff      	movs	r3, #255	@ 0xff
+20019a22:	7832      	ldrb	r2, [r6, #0]
+20019a24:	0212      	lsls	r2, r2, #8
+20019a26:	431a      	orrs	r2, r3
+20019a28:	4b23      	ldr	r3, [pc, #140]	@ (20019ab8 <gpioIrqHandler+0x104>)
+20019a2a:	5ce3      	ldrb	r3, [r4, r3]
+20019a2c:	2b00      	cmp	r3, #0
+20019a2e:	d021      	beq.n	20019a74 <gpioIrqHandler+0xc0>
+20019a30:	4b22      	ldr	r3, [pc, #136]	@ (20019abc <gpioIrqHandler+0x108>)
+20019a32:	5ce1      	ldrb	r1, [r4, r3]
+20019a34:	230f      	movs	r3, #15
+20019a36:	400b      	ands	r3, r1
+20019a38:	0619      	lsls	r1, r3, #24
+20019a3a:	18e3      	adds	r3, r4, r3
+20019a3c:	5d5b      	ldrb	r3, [r3, r5]
+20019a3e:	430a      	orrs	r2, r1
+20019a40:	041b      	lsls	r3, r3, #16
+20019a42:	4313      	orrs	r3, r2
+20019a44:	4a1e      	ldr	r2, [pc, #120]	@ (20019ac0 <gpioIrqHandler+0x10c>)
+20019a46:	6153      	str	r3, [r2, #20]
+20019a48:	f7fe f976 	bl	20017d38 <pico9918_splash_reset>
+20019a4c:	4b18      	ldr	r3, [pc, #96]	@ (20019ab0 <gpioIrqHandler+0xfc>)
+20019a4e:	5ce3      	ldrb	r3, [r4, r3]
+20019a50:	2b00      	cmp	r3, #0
+20019a52:	d11a      	bne.n	20019a8a <gpioIrqHandler+0xd6>
+20019a54:	23d0      	movs	r3, #208	@ 0xd0
+20019a56:	2280      	movs	r2, #128	@ 0x80
+20019a58:	061b      	lsls	r3, r3, #24
+20019a5a:	03d2      	lsls	r2, r2, #15
+20019a5c:	615a      	str	r2, [r3, #20]
+20019a5e:	f3bf 8f5f 	dmb	sy
+20019a62:	2101      	movs	r1, #1
+20019a64:	2009      	movs	r0, #9
+20019a66:	f7fc fd67 	bl	20016538 <irq_set_enabled>
+20019a6a:	2101      	movs	r1, #1
+20019a6c:	200a      	movs	r0, #10
+20019a6e:	f7fc fd63 	bl	20016538 <irq_set_enabled>
+20019a72:	bd70      	pop	{r4, r5, r6, pc}
+20019a74:	5d63      	ldrb	r3, [r4, r5]
+20019a76:	041b      	lsls	r3, r3, #16
+20019a78:	4313      	orrs	r3, r2
+20019a7a:	4a11      	ldr	r2, [pc, #68]	@ (20019ac0 <gpioIrqHandler+0x10c>)
+20019a7c:	6153      	str	r3, [r2, #20]
+20019a7e:	f7fe f95b 	bl	20017d38 <pico9918_splash_reset>
+20019a82:	4b0b      	ldr	r3, [pc, #44]	@ (20019ab0 <gpioIrqHandler+0xfc>)
+20019a84:	5ce3      	ldrb	r3, [r4, r3]
+20019a86:	2b00      	cmp	r3, #0
+20019a88:	d0e4      	beq.n	20019a54 <gpioIrqHandler+0xa0>
+20019a8a:	23d0      	movs	r3, #208	@ 0xd0
+20019a8c:	2280      	movs	r2, #128	@ 0x80
+20019a8e:	061b      	lsls	r3, r3, #24
+20019a90:	03d2      	lsls	r2, r2, #15
+20019a92:	619a      	str	r2, [r3, #24]
+20019a94:	e7e3      	b.n	20019a5e <gpioIrqHandler+0xaa>
+20019a96:	46c0      	nop			@ (mov r8, r8)
+20019a98:	20022eb0 	.word	0x20022eb0
+20019a9c:	00010050 	.word	0x00010050
+20019aa0:	e000e280 	.word	0xe000e280
+20019aa4:	503010e8 	.word	0x503010e8
+20019aa8:	503010d0 	.word	0x503010d0
+20019aac:	200292da 	.word	0x200292da
+20019ab0:	000103ac 	.word	0x000103ac
+20019ab4:	000103ae 	.word	0x000103ae
+20019ab8:	0001002f 	.word	0x0001002f
+20019abc:	0000600f 	.word	0x0000600f
+20019ac0:	50300000 	.word	0x50300000

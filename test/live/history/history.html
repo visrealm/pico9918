@@ -1,0 +1,495 @@
+<title>Scanline History</title>
+<style>
+:root{
+  --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"Cascadia Code","Cascadia Mono",Consolas,SFMono-Regular,Menlo,monospace;
+  --ground:#f1f2f6; --surface:#fff; --surface-2:#e9ebf1;
+  --ink:#161922; --ink-2:#3d4354; --muted:#5d6478;
+  --rule:#d8dbe4; --rule-soft:#e6e8ef;
+  --accent:#0a6e7a; --accent-soft:rgba(10,110,122,.12);
+  --good:#1a7f2e; --over:#b93430;
+  --g-gm1:#1a7f2e; --g-gm2:#2aa84e; --g-mcm:#9b3b8e;
+  --g-t40:#3a3bc4; --g-t80:#6a62dc; --g-dump:#6e7484;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0e1016; --surface:#171a23; --surface-2:#1e222d;
+    --ink:#e3e6ef; --ink-2:#b9bfd0; --muted:#868da0;
+    --rule:#2a3040; --rule-soft:#212633;
+    --accent:#42ebf5; --accent-soft:rgba(66,235,245,.14);
+    --good:#21c842; --over:#fc5554;
+    --g-gm1:#21b03b; --g-gm2:#5edc78; --g-mcm:#c95bba;
+    --g-t40:#5455ed; --g-t80:#7e75fc; --g-dump:#9aa0b2;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0e1016; --surface:#171a23; --surface-2:#1e222d;
+  --ink:#e3e6ef; --ink-2:#b9bfd0; --muted:#868da0;
+  --rule:#2a3040; --rule-soft:#212633;
+  --accent:#42ebf5; --accent-soft:rgba(66,235,245,.14);
+  --good:#21c842; --over:#fc5554;
+  --g-gm1:#21b03b; --g-gm2:#5edc78; --g-mcm:#c95bba;
+  --g-t40:#5455ed; --g-t80:#7e75fc; --g-dump:#9aa0b2;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:40px 24px 72px; display:flex; flex-direction:column; gap:34px}
+h1{font-size:31px; line-height:1.15; margin:0; font-weight:650; letter-spacing:-.02em; text-wrap:balance}
+h2{font-size:17px; margin:0; font-weight:640; letter-spacing:-.01em}
+p{margin:0; max-width:66ch; color:var(--ink-2)}
+.eyebrow{
+  font-family:var(--mono); font-size:11px; text-transform:uppercase;
+  letter-spacing:.11em; color:var(--muted); margin:0;
+}
+.num{font-family:var(--mono); font-variant-numeric:tabular-nums}
+
+header{display:flex; flex-wrap:wrap; gap:20px; align-items:flex-end; justify-content:space-between}
+.switch{display:flex; gap:2px; padding:3px; background:var(--surface-2); border-radius:9px}
+.switch button{
+  font:inherit; font-family:var(--mono); font-size:12.5px; letter-spacing:.03em;
+  padding:7px 15px; border:0; border-radius:6px; cursor:pointer;
+  background:transparent; color:var(--ink-2);
+}
+.switch button[aria-pressed="true"]{background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.10)}
+.switch button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+section{display:flex; flex-direction:column; gap:14px}
+.card{background:var(--surface); border:1px solid var(--rule-soft); border-radius:12px; padding:20px}
+
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr)); gap:14px}
+.kpi{background:var(--surface); border:1px solid var(--rule-soft); border-radius:12px; padding:16px 18px}
+.kpi .v{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:33px; line-height:1.1; letter-spacing:-.02em; display:block}
+.kpi .k{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--muted); display:block; margin-bottom:7px}
+.kpi .n{font-size:12.5px; color:var(--muted); display:block; margin-top:5px}
+.kpi.good .v{color:var(--good)}
+
+.facets{display:grid; grid-template-columns:repeat(auto-fit,minmax(268px,1fr)); gap:14px}
+.facet{background:var(--surface); border:1px solid var(--rule-soft); border-radius:12px; padding:14px 14px 8px}
+.facet-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:2px}
+.facet-name{font-family:var(--mono); font-size:12.5px; font-weight:600; letter-spacing:.04em}
+.facet-n{font-family:var(--mono); font-size:11px; color:var(--muted)}
+
+.legend{display:flex; flex-wrap:wrap; gap:7px 17px; align-items:center}
+.legend span{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:11.5px; color:var(--ink-2)}
+.legend i{display:inline-block; width:14px; height:3px; border-radius:2px}
+.legend i.sq{width:11px; height:11px; border-radius:3px}
+
+svg{display:block; width:100%; height:auto; overflow:visible}
+.grid{stroke:var(--rule-soft); stroke-width:1}
+.axis{stroke:var(--rule); stroke-width:1}
+.tick{font-family:var(--mono); font-size:10px; fill:var(--muted)}
+.mark-ring{stroke:var(--surface); stroke-width:2}
+.hit{fill:transparent; cursor:pointer}
+.cross{stroke:var(--rule); stroke-width:1; pointer-events:none; opacity:0}
+
+.tip{
+  position:fixed; z-index:9; pointer-events:none; opacity:0; transform:translate(-50%,-100%);
+  background:var(--surface); color:var(--ink); border:1px solid var(--rule);
+  border-radius:8px; padding:8px 11px; box-shadow:0 6px 22px rgba(0,0,0,.17);
+  font-family:var(--mono); font-size:12px; white-space:nowrap;
+}
+.tip b{font-size:14px; font-variant-numeric:tabular-nums}
+.tip .lbl{color:var(--muted)}
+
+.tablewrap{overflow:auto; max-height:540px; background:var(--surface); border:1px solid var(--rule-soft); border-radius:12px}
+table{border-collapse:collapse; width:100%; font-size:13px}
+th,td{text-align:right; padding:7px 12px; border-bottom:1px solid var(--rule-soft); white-space:nowrap}
+th{font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:600; position:sticky; top:0; background:var(--surface)}
+td:first-child,th:first-child{text-align:left; font-family:var(--mono); font-size:12px}
+tbody tr:last-child td{border-bottom:0}
+td.n{font-family:var(--mono); font-variant-numeric:tabular-nums}
+td.dn{color:var(--good)} td.up{color:var(--over)}
+.chip{display:inline-block; font-family:var(--mono); font-size:10.5px; padding:1px 7px; border-radius:20px; background:var(--surface-2); color:var(--ink-2)}
+
+.notes{display:flex; flex-direction:column; gap:9px; font-size:13.5px; color:var(--muted); max-width:78ch}
+.notes b{color:var(--ink-2); font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">pico9918 · render-perf</p>
+      <h1>What 230 commits did to a scanline</h1>
+    </div>
+    <div class="switch" role="group" aria-label="Board">
+      <button data-board="2040" aria-pressed="true">RP2040</button>
+      <button data-board="pro" aria-pressed="false">PRO</button>
+    </div>
+  </header>
+
+  <p id="intro"></p>
+
+  <section>
+    <p class="eyebrow">Scenes that already worked at the branch point</p>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section>
+    <h2>Optimised, or newly possible</h2>
+    <p>Every scene the harness sets up renders on any vintage, so a build that cannot do the
+       feature draws something cheaper. Each scene is sorted by whether its cost <em>stepped</em>
+       mid-branch, which is what a feature arriving looks like.</p>
+    <div class="card">
+      <div class="legend" id="comp-legend" style="margin-bottom:12px"></div>
+      <div id="composition"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Median render time across the sampled branch</h2>
+    <p>One panel per VDP mode, over the scenes that already worked - mixing in a scene that
+       gained its feature would draw new capability as a slowdown. Modes with fewer than three
+       such scenes are left out; the table has them all.</p>
+    <div class="facets" id="facets"></div>
+  </section>
+
+  <section>
+    <h2>Biggest movers</h2>
+    <p>First sample to the branch tip, for the scenes that worked throughout.</p>
+    <div class="card">
+      <div class="legend" style="margin-bottom:14px">
+        <span><i style="background:var(--muted)"></i>first sample</span>
+        <span><i class="sq" style="background:var(--good)"></i>faster at the tip</span>
+        <span><i class="sq" style="background:var(--over)"></i>slower at the tip</span>
+      </div>
+      <div id="dumbbell"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every scene</h2>
+    <div class="tablewrap"><table id="table"></table></div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Reading these numbers</p>
+    <div class="notes" id="notes"></div>
+  </section>
+</div>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const RAW = null;
+const DATA = RAW;
+const MODES = ["gm1","gm2","mcm","t40","t80","dump"];
+const SVGNS = "http://www.w3.org/2000/svg";
+const tip = document.getElementById("tip");
+let board = "2040";
+
+function el(tag, attrs, parent){
+  const n = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function svgRoot(host, w, h){
+  host.textContent = "";
+  const s = el("svg", {viewBox:`0 0 ${w} ${h}`, role:"img"}, host);
+  return s;
+}
+function hue(mode){ return `var(--g-${mode})`; }
+function fmt(v){ return v === null || v === undefined ? "-" : v.toFixed(2); }
+
+// Values lead, labels follow: the number is the strong element in the readout.
+function showTip(x, y, value, label){
+  tip.textContent = "";
+  const b = document.createElement("b");
+  b.textContent = value;
+  const s = document.createElement("span");
+  s.className = "lbl";
+  s.textContent = " " + label;
+  tip.append(b, s);
+  tip.style.left = x + "px";
+  tip.style.top = (y - 12) + "px";
+  tip.style.opacity = "1";
+}
+function hideTip(){ tip.style.opacity = "0"; }
+
+function bindTip(node, value, label){
+  const enter = ev => {
+    const r = (ev.currentTarget.getBoundingClientRect ? ev.currentTarget : node).getBoundingClientRect();
+    showTip(r.left + r.width / 2, r.top, value, label);
+  };
+  node.addEventListener("pointerenter", enter);
+  node.addEventListener("focus", enter);
+  node.addEventListener("pointerleave", hideTip);
+  node.addEventListener("blur", hideTip);
+  node.setAttribute("tabindex", "0");
+}
+
+function kpis(d){
+  const host = document.getElementById("kpis");
+  host.textContent = "";
+  const s = d.summary;
+  const tiles = [
+    ["median render", (s.median > 0 ? "+" : "") + s.median.toFixed(2), "microseconds a scanline, across " + s.optimised + " scenes", s.median < 0],
+    ["best single scene", s.best.toFixed(2), "us on " + d.scenes.filter(x => x.arrived === null && x.delta === s.best).map(x => x.name)[0], true],
+    ["faster / slower", s.faster + " / " + s.slower, "of " + s.optimised + " that worked throughout", false],
+    ["gained a feature", String(s.gained), "scenes the branch made possible at all", false],
+  ];
+  for (const [k, v, n, good] of tiles){
+    const c = document.createElement("div");
+    c.className = "kpi" + (good ? " good" : "");
+    const kk = document.createElement("span"); kk.className = "k"; kk.textContent = k;
+    const vv = document.createElement("span"); vv.className = "v"; vv.textContent = v;
+    const nn = document.createElement("span"); nn.className = "n"; nn.textContent = n;
+    c.append(kk, vv, nn);
+    host.appendChild(c);
+  }
+}
+
+function composition(d){
+  const host = document.getElementById("composition");
+  const leg = document.getElementById("comp-legend");
+  leg.textContent = "";
+  for (const [label, fill] of [["already worked, then optimised - by mode", null],
+                               ["gained the feature on the branch", "var(--muted)"]]){
+    const sp = document.createElement("span");
+    const i = document.createElement("i");
+    i.className = "sq";
+    if (fill) i.style.background =
+      "repeating-linear-gradient(45deg,var(--muted) 0 3px,transparent 3px 6px)";
+    else i.style.background = "linear-gradient(90deg,var(--g-gm1),var(--g-t80))";
+    sp.append(i, document.createTextNode(label));
+    leg.appendChild(sp);
+  }
+  const rows = MODES.map(m => {
+    const all = d.scenes.filter(s => s.mode === m);
+    return {mode:m, opt:all.filter(s => s.arrived === null).length,
+            gain:all.filter(s => s.arrived !== null).length};
+  }).filter(r => r.opt + r.gain > 0);
+
+  const rowH = 30, gap = 10, padL = 52, padR = 78;
+  const w = 900, h = rows.length * (rowH + gap);
+  const s = svgRoot(host, w, h);
+  const defs = el("defs", {}, s);
+  const pat = el("pattern", {id:"hatch", patternUnits:"userSpaceOnUse", width:6, height:6,
+                             patternTransform:"rotate(45)"}, defs);
+  el("line", {x1:0, y1:0, x2:0, y2:6, stroke:"var(--muted)", "stroke-width":3.2}, pat);
+  const max = Math.max(...rows.map(r => r.opt + r.gain));
+  const span = w - padL - padR;
+
+  rows.forEach((r, i) => {
+    const y = i * (rowH + gap);
+    const bh = 17, by = y + (rowH - bh) / 2;
+    const t = el("text", {x:0, y:by + bh - 4, class:"tick"}, s);
+    t.style.fontSize = "12px"; t.style.fill = "var(--ink-2)";
+    t.textContent = r.mode;
+
+    const wo = span * r.opt / max;
+    const wg = span * r.gain / max;
+    if (r.opt){
+      // the mode's own hue, which ties the row to its panel below and keeps a large
+      // fill off the accent - a saturated block at this size reads loud
+      el("rect", {x:padL, y:by, width:Math.max(wo, 4), height:bh, rx:4, fill:hue(r.mode)}, s);
+      const hit = el("rect", {x:padL, y:by - 4, width:Math.max(wo, 4), height:bh + 8, class:"hit"}, s);
+      bindTip(hit, r.opt + " scenes", r.mode + " already worked");
+    }
+    if (r.gain){
+      // a 2px surface gap between the two fills, never a border. Hatched rather than a
+      // second solid: dump's own hue is grey, so a grey fill there would be unreadable
+      // against this one.
+      el("rect", {x:padL + wo + 2, y:by, width:Math.max(wg - 2, 4), height:bh, rx:4,
+                  fill:"url(#hatch)"}, s);
+      const hit = el("rect", {x:padL + wo + 2, y:by - 4, width:Math.max(wg - 2, 4), height:bh + 8, class:"hit"}, s);
+      bindTip(hit, r.gain + " scenes", r.mode + " gained the feature");
+    }
+    const lab = el("text", {x:padL + wo + wg + 8, y:by + bh - 4, class:"tick"}, s);
+    lab.textContent = r.gain ? r.opt + " + " + r.gain : String(r.opt);
+  });
+}
+
+function facets(d){
+  const host = document.getElementById("facets");
+  host.textContent = "";
+  const pts = d.points;
+  const usable = MODES.filter(m => d.series[m] && d.series[m].count >= 3);
+
+  for (const mode of usable){
+    const ser = d.series[mode];
+    const card = document.createElement("div");
+    card.className = "facet";
+    const head = document.createElement("div");
+    head.className = "facet-head";
+    const nm = document.createElement("span"); nm.className = "facet-name"; nm.textContent = mode;
+    const n = document.createElement("span"); n.className = "facet-n"; n.textContent = ser.count + " scenes";
+    head.append(nm, n);
+    card.appendChild(head);
+    const plot = document.createElement("div");
+    card.appendChild(plot);
+    host.appendChild(card);
+
+    const w = 300, h = 132, padL = 34, padR = 12, padT = 12, padB = 22;
+    const s = svgRoot(plot, w, h);
+    const vals = ser.median.filter(v => v !== null);
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const pad = (hi - lo) * 0.22 || 1;
+    const y0 = lo - pad, y1 = hi + pad;
+    const X = i => padL + (w - padL - padR) * (pts.length === 1 ? 0 : i / (pts.length - 1));
+    const Y = v => padT + (h - padT - padB) * (1 - (v - y0) / (y1 - y0));
+
+    for (const g of [hi, lo]){
+      el("line", {x1:padL, x2:w - padR, y1:Y(g), y2:Y(g), class:"grid"}, s);
+      const t = el("text", {x:padL - 6, y:Y(g) + 3, class:"tick", "text-anchor":"end"}, s);
+      t.textContent = g.toFixed(1);
+    }
+    el("line", {x1:padL, x2:w - padR, y1:h - padB, y2:h - padB, class:"axis"}, s);
+
+    let dpath = "";
+    ser.median.forEach((v, i) => {
+      if (v === null) return;
+      dpath += (dpath ? " L" : "M") + X(i) + "," + Y(v);
+    });
+    el("path", {d:dpath, fill:"none", stroke:hue(mode), "stroke-width":2,
+                "stroke-linecap":"round", "stroke-linejoin":"round"}, s);
+
+    ser.median.forEach((v, i) => {
+      if (v === null) return;
+      const last = i === ser.median.length - 1;
+      el("circle", {cx:X(i), cy:Y(v), r:last ? 4.5 : 3, fill:hue(mode),
+                    class:last ? "mark-ring" : ""}, s);
+      // hit target far larger than the mark
+      const hit = el("rect", {x:X(i) - 14, y:padT, width:28, height:h - padT - padB, class:"hit"}, s);
+      bindTip(hit, v.toFixed(2) + " us", mode + " median at " + pts[i].label);
+    });
+
+    // direct-label the endpoint only, never every point
+    const endIdx = ser.median.length - 1;
+    if (ser.median[endIdx] !== null){
+      const t = el("text", {x:X(endIdx) - 6, y:Y(ser.median[endIdx]) - 9, class:"tick", "text-anchor":"end"}, s);
+      t.style.fill = "var(--ink)"; t.style.fontWeight = "600";
+      t.textContent = ser.median[endIdx].toFixed(1);
+    }
+    pts.forEach((p, i) => {
+      if (i % 2 && i !== pts.length - 1) return;
+      const t = el("text", {x:X(i), y:h - 7, class:"tick", "text-anchor":"middle"}, s);
+      t.textContent = p.label;
+    });
+  }
+}
+
+function dumbbell(d){
+  const host = document.getElementById("dumbbell");
+  const rows = d.scenes.filter(s => s.arrived === null)
+                       .sort((a, b) => a.delta - b.delta).slice(0, 12);
+  const rowH = 26, padL = 178, padR = 54, padB = 26;
+  const w = 900, h = rows.length * rowH + 14 + padB;
+  const s = svgRoot(host, w, h);
+  const all = rows.flatMap(r => r.values.filter(v => v !== null));
+  const lo = Math.floor(Math.min(...all) / 5) * 5, hi = Math.ceil(Math.max(...all) / 5) * 5;
+  const X = v => padL + (w - padL - padR) * (v - lo) / ((hi - lo) || 1);
+  const axisY = h - padB + 6;
+
+  // without a scale the horizontal position of a dot means nothing
+  for (let v = lo; v <= hi; v += 5){
+    el("line", {x1:X(v), x2:X(v), y1:6, y2:axisY, class:"grid"}, s);
+    const t = el("text", {x:X(v), y:axisY + 13, class:"tick", "text-anchor":"middle"}, s);
+    t.textContent = v;
+  }
+  const unit = el("text", {x:w - padR + 8, y:axisY + 13, class:"tick"}, s);
+  unit.textContent = "us";
+
+  rows.forEach((r, i) => {
+    const y = i * rowH + 14;
+    const first = r.values.find(v => v !== null);
+    const last = [...r.values].reverse().find(v => v !== null);
+    const good = last < first;
+    const col = good ? "var(--good)" : "var(--over)";
+
+    const nm = el("text", {x:0, y:y + 4, class:"tick"}, s);
+    nm.style.fontSize = "11.5px"; nm.style.fill = "var(--ink-2)";
+    nm.textContent = r.name;
+
+    el("line", {x1:X(first), x2:X(last), y1:y, y2:y, stroke:col,
+                "stroke-width":3, "stroke-linecap":"round"}, s);
+    el("circle", {cx:X(first), cy:y, r:4, fill:"var(--muted)", class:"mark-ring"}, s);
+    el("circle", {cx:X(last), cy:y, r:5, fill:col, class:"mark-ring"}, s);
+
+    const lab = el("text", {x:w - padR + 8, y:y + 4, class:"tick", "text-anchor":"start"}, s);
+    lab.style.fill = col; lab.style.fontWeight = "600";
+    lab.textContent = (r.delta > 0 ? "+" : "") + r.delta.toFixed(2);
+
+    const hit = el("rect", {x:padL - 10, y:y - rowH / 2, width:w - padL - padR + 20, height:rowH, class:"hit"}, s);
+    bindTip(hit, fmt(first) + " → " + fmt(last) + " us", r.name);
+  });
+}
+
+function table(d){
+  const t = document.getElementById("table");
+  t.textContent = "";
+  const thead = t.createTHead().insertRow();
+  const cols = ["scene", "mode", "state", ...d.points.map(p => p.label), "Δ"];
+  for (const c of cols){
+    const th = document.createElement("th");
+    th.textContent = c;
+    thead.appendChild(th);
+  }
+  const tb = t.createTBody();
+  for (const s of [...d.scenes].sort((a, b) => a.name.localeCompare(b.name))){
+    const r = tb.insertRow();
+    r.insertCell().textContent = s.name;
+    r.insertCell().textContent = s.mode;
+    const st = r.insertCell();
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    chip.textContent = s.arrived === null ? "worked" : "arrived #" + s.arrived;
+    st.appendChild(chip);
+    for (const v of s.values){
+      const c = r.insertCell();
+      c.className = "n";
+      c.textContent = fmt(v);
+    }
+    const dc = r.insertCell();
+    dc.className = "n " + (s.arrived !== null ? "" : s.delta < 0 ? "dn" : "up");
+    dc.textContent = (s.delta > 0 ? "+" : "") + s.delta.toFixed(2);
+  }
+}
+
+function notes(d){
+  const host = document.getElementById("notes");
+  host.textContent = "";
+  const items = [
+    ["render, not line. ", "pico9918_scan_line's own microseconds. The line metric exists at every sample but changed meaning at branch index 87, where the sample moved to close after the diagnostic overlay draws."],
+    ["Index 119-121 is excluded. ", "The 8bpp tier had landed without the RP2040 fixes that arrived at 122. The RP2040 will not run those builds at all; the PRO does not crash but is not doing the work either, so its readings there are low for a reason that is not performance."],
+    ["A step is read as a feature. ", "A scene whose cost rises by more than a third, and by more than 2 us, between consecutive samples is taken to have gained its feature there. Observed steps are 5 to 40 us, far outside the between-build floor of 1.5 us on RP2040 and 0.5 on the PRO."],
+    ["The tier is RP2040-off. ", "80-column 8bpp is a PRO capability, so T80 scenes count as optimised on the RP2040 and as newly capable on the PRO. That is the whole difference between the two boards' totals."],
+    ["Same compiler throughout. ", "Every sample is gcc 15.2.1; the toolchain pin never changes on the branch, so there is no compiler effect mixed in."],
+  ];
+  for (const [b, rest] of items){
+    const p = document.createElement("p");
+    const strong = document.createElement("b");
+    strong.textContent = b;
+    p.append(strong, document.createTextNode(rest));
+    host.appendChild(p);
+  }
+}
+
+function render(){
+  const d = DATA[board];
+  const intro = document.getElementById("intro");
+  const first = d.points[0], tipPt = d.points[d.points.length - 1];
+  intro.textContent = d.points.length + " points along the render-perf branch, measured over SWD on real "
+    + "hardware with one harness. Branch sample " + first.label + " (" + first.date + ") to the tip (" + tipPt.date + "), "
+    + d.scenes.length + " scenes on the " + (board === "pro" ? "PICO9918 PRO, RP2350" : "PICO9918, RP2040")
+    + " at 252 MHz.";
+  kpis(d); composition(d); facets(d); dumbbell(d); table(d); notes(d);
+}
+
+for (const b of document.querySelectorAll(".switch button")){
+  b.addEventListener("click", () => {
+    board = b.dataset.board;
+    for (const o of document.querySelectorAll(".switch button"))
+      o.setAttribute("aria-pressed", String(o === b));
+    hideTip();
+    render();
+  });
+}
+if (DATA) render();
+</script>

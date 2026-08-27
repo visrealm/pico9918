@@ -1,0 +1,199 @@
+name: Core Library
+
+# The library's own gates, run from this repository as well as from the
+# published one. `core/` is a subtree of this repository and is split out to
+# visrealm/pico9918-core, whose .github/workflows/ci.yml runs the same jobs
+# through the same script - but only once a split has been pushed. This is what
+# gates the library here, where the changes are actually made.
+#
+# It also runs the one gate the published repository cannot: the renderer suite
+# driven through test/live/runner.py, which is the stage list a board run uses.
+# The suite itself is core's - core/tools/ci.sh runs it there against the shim
+# alone; this proves the runner that also drives hardware still agrees with it.
+#
+# Path-filtered, because the firmware's own seven workflows already run on every
+# push and none of this depends on the firmware.
+
+on:
+  push:
+    paths:
+      - 'core/**'
+      - 'test/live/**'
+      - '.github/workflows/core.yml'
+  pull_request:
+    paths:
+      - 'core/**'
+      - 'test/live/**'
+      - '.github/workflows/core.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  goldens:
+    name: Golden frames
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The overlay assets are generated at build time by tools/img2carray.py.
+      # Without pillow the configure step still passes and the build fails later
+      # on "No module named 'PIL'".
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python -m pip install --upgrade pillow
+      - run: core/tools/ci.sh goldens
+
+  live-desktop:
+    name: Live runner over the shim (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux, os: ubuntu-latest, shell: bash }
+          - { name: macos, os: macos-latest, shell: bash }
+          - { name: windows-mingw, os: windows-latest, shell: 'msys2 {0}' }
+          - { name: windows-msvc, os: windows-latest, shell: cmd }
+    steps:
+      - uses: actions/checkout@v4
+      - if: matrix.name == 'windows-mingw'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-python-pillow
+      - if: matrix.name != 'windows-mingw'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - if: matrix.name != 'windows-mingw'
+        run: python -m pip install --upgrade pillow
+      - if: matrix.name != 'windows-msvc'
+        run: test/live/ci.sh
+      # cmd, so vcvars64 survives into the build. tools/msvc.cmd finds the
+      # toolset with vswhere and hands off to bash - see the note in it for
+      # why this is not -G "Visual Studio 17 2022".
+      - if: matrix.name == 'windows-msvc'
+        run: core\tools\msvc.cmd test/live/ci.sh
+
+  warnings:
+    name: Warnings (${{ matrix.cc }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, cc: gcc }
+          - { os: macos-latest, cc: clang }
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python -m pip install --upgrade pillow
+      - run: core/tools/ci.sh warnings
+
+  multi:
+    name: Multi-instance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python -m pip install --upgrade pillow
+      - run: core/tools/ci.sh multi
+
+  tms9918:
+    name: TMS9918A mode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python -m pip install --upgrade pillow
+      - run: core/tools/ci.sh tms9918
+
+  python:
+    name: Python module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      # pillow because this job configures the library, which generates the overlays.
+      - run: python -m pip install --upgrade pillow
+      - run: core/tools/ci.sh python
+
+  docs:
+    name: Doxygen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y doxygen
+      # The Doxyfile is generated, so this job configures the library too.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python -m pip install --upgrade pillow
+      - run: core/tools/ci.sh doxygen
+
+  package:
+    name: Package (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux, os: ubuntu-latest, shell: bash }
+          - { name: macos, os: macos-latest, shell: bash }
+          - { name: windows-mingw, os: windows-latest, shell: 'msys2 {0}' }
+          - { name: windows-msvc, os: windows-latest, shell: cmd }
+    steps:
+      - uses: actions/checkout@v4
+      - if: matrix.name == 'windows-mingw'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-python-pillow
+      - if: matrix.name != 'windows-mingw'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - if: matrix.name != 'windows-mingw'
+        run: python -m pip install --upgrade pillow
+      - if: matrix.name != 'windows-msvc'
+        run: core/tools/ci.sh package
+      # cmd, so vcvars64 survives into the build. tools/msvc.cmd finds the
+      # toolset with vswhere and hands off to bash - see the note in it for
+      # why this is not -G "Visual Studio 17 2022".
+      - if: matrix.name == 'windows-msvc'
+        run: core\tools\msvc.cmd core/tools/ci.sh package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pico9918-core-${{ matrix.name }}
+          path: |
+            core/build-ci/lib/pico9918-core-*.tar.gz
+            core/build-ci/lib/pico9918-core-*.zip

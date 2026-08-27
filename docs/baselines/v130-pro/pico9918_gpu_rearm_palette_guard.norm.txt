@@ -1,0 +1,20 @@
+<ADDR> <pico9918_gpu_rearm_palette_guard>:
+ldr	r3, [pc, #44]	@ (<ADDR> <pico9918_gpu_rearm_palette_guard+OFF>)
+ldr	r3, [r3, #0]
+add.w	r3, r3, #65536	@ 0x10000
+ldrb.w	r2, [r3, #52]	@ 0x34
+cbnz	r2, <ADDR> <pico9918_gpu_rearm_palette_guard+OFF>
+movs	r0, #1
+ldr	r1, [pc, #32]	@ (<ADDR> <pico9918_gpu_rearm_palette_guard+OFF>)
+ldr.w	ip, [pc, #36]	@ <ADDR> <pico9918_gpu_rearm_palette_guard+OFF>
+strb.w	r2, [ip]
+str.w	r0, [r1, #152]	@ 0x98
+ldr.w	r2, [r1, #160]	@ 0xa0
+orrs	r2, r0
+str.w	r2, [r1, #160]	@ 0xa0
+strb.w	r0, [r3, #52]	@ 0x34
+bx	lr
+nop
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

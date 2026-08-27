@@ -1,0 +1,7 @@
+# A shell script checked out with CRLF fails on MSYS2 and on a Linux runner
+# alike, with "\r: command not found" pointing at the wrong line.
+*.sh text eol=lf
+
+# A batch file wants CRLF: cmd.exe has been known to mishandle a label or a
+# goto in an LF-only .cmd, and the failure looks like a missing command.
+*.cmd text eol=crlf

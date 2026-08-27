@@ -1,0 +1,10 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/pico9918_coreTargets.cmake")
+
+# The pixel policy, the instance mode and the asset width the library was built
+# with travel with the exported target as PUBLIC compile definitions, so a
+# consumer inherits them and the generated headers' static assertions can catch a
+# mismatch. Nothing here needs to restate them.
+
+check_required_components(pico9918_core)

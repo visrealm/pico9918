@@ -181,7 +181,8 @@ def generateProto(varName, src, inRam, isHeader) -> str:
     """
     typePrefix = ("extern " if isHeader else " ")
     varNamePrefix = "" if isHeader else (
-        "__aligned(4) " + ("" if inRam else "__in_flash() "))
+        "__aligned(" + ("4" if inRam else "8") + ") " +
+        ("" if inRam else "__in_flash() "))
     dataType = "uint8_t " if src.palette else "uint16_t "
     suffix = ";" if isHeader else " = "
     proto = ""

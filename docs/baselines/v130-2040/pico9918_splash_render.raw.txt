@@ -1,0 +1,97 @@
+20017d50 <pico9918_splash_render>:
+20017d50:	b5f0      	push	{r4, r5, r6, r7, lr}
+20017d52:	46d6      	mov	lr, sl
+20017d54:	464f      	mov	r7, r9
+20017d56:	4646      	mov	r6, r8
+20017d58:	b5c0      	push	{r6, r7, lr}
+20017d5a:	2800      	cmp	r0, #0
+20017d5c:	d14d      	bne.n	20017dfa <pico9918_splash_render+0xaa>
+20017d5e:	4d2a      	ldr	r5, [pc, #168]	@ (20017e08 <pico9918_splash_render+0xb8>)
+20017d60:	682c      	ldr	r4, [r5, #0]
+20017d62:	293b      	cmp	r1, #59	@ 0x3b
+20017d64:	d840      	bhi.n	20017de8 <pico9918_splash_render+0x98>
+20017d66:	3c01      	subs	r4, #1
+20017d68:	602c      	str	r4, [r5, #0]
+20017d6a:	18d3      	adds	r3, r2, r3
+20017d6c:	1ac3      	subs	r3, r0, r3
+20017d6e:	1b1b      	subs	r3, r3, r4
+20017d70:	b29b      	uxth	r3, r3
+20017d72:	2b09      	cmp	r3, #9
+20017d74:	d833      	bhi.n	20017dde <pico9918_splash_render+0x8e>
+20017d76:	212c      	movs	r1, #44	@ 0x2c
+20017d78:	4359      	muls	r1, r3
+20017d7a:	4b24      	ldr	r3, [pc, #144]	@ (20017e0c <pico9918_splash_render+0xbc>)
+20017d7c:	2730      	movs	r7, #48	@ 0x30
+20017d7e:	18c9      	adds	r1, r1, r3
+20017d80:	232c      	movs	r3, #44	@ 0x2c
+20017d82:	4698      	mov	r8, r3
+20017d84:	3313      	adds	r3, #19
+20017d86:	469c      	mov	ip, r3
+20017d88:	3b33      	subs	r3, #51	@ 0x33
+20017d8a:	469a      	mov	sl, r3
+20017d8c:	2403      	movs	r4, #3
+20017d8e:	9809      	ldr	r0, [sp, #36]	@ 0x24
+20017d90:	4d1f      	ldr	r5, [pc, #124]	@ (20017e10 <pico9918_splash_render+0xc0>)
+20017d92:	3008      	adds	r0, #8
+20017d94:	4488      	add	r8, r1
+20017d96:	780b      	ldrb	r3, [r1, #0]
+20017d98:	4666      	mov	r6, ip
+20017d9a:	001a      	movs	r2, r3
+20017d9c:	43b2      	bics	r2, r6
+20017d9e:	1192      	asrs	r2, r2, #6
+20017da0:	d002      	beq.n	20017da8 <pico9918_splash_render+0x58>
+20017da2:	0052      	lsls	r2, r2, #1
+20017da4:	5b52      	ldrh	r2, [r2, r5]
+20017da6:	8002      	strh	r2, [r0, #0]
+20017da8:	003a      	movs	r2, r7
+20017daa:	401a      	ands	r2, r3
+20017dac:	1116      	asrs	r6, r2, #4
+20017dae:	2a00      	cmp	r2, #0
+20017db0:	d002      	beq.n	20017db8 <pico9918_splash_render+0x68>
+20017db2:	0072      	lsls	r2, r6, #1
+20017db4:	5aaa      	ldrh	r2, [r5, r2]
+20017db6:	8042      	strh	r2, [r0, #2]
+20017db8:	4652      	mov	r2, sl
+20017dba:	401a      	ands	r2, r3
+20017dbc:	1096      	asrs	r6, r2, #2
+20017dbe:	2a00      	cmp	r2, #0
+20017dc0:	d002      	beq.n	20017dc8 <pico9918_splash_render+0x78>
+20017dc2:	0072      	lsls	r2, r6, #1
+20017dc4:	5aaa      	ldrh	r2, [r5, r2]
+20017dc6:	8082      	strh	r2, [r0, #4]
+20017dc8:	0022      	movs	r2, r4
+20017dca:	401a      	ands	r2, r3
+20017dcc:	421c      	tst	r4, r3
+20017dce:	d002      	beq.n	20017dd6 <pico9918_splash_render+0x86>
+20017dd0:	0052      	lsls	r2, r2, #1
+20017dd2:	5aab      	ldrh	r3, [r5, r2]
+20017dd4:	80c3      	strh	r3, [r0, #6]
+20017dd6:	3101      	adds	r1, #1
+20017dd8:	3008      	adds	r0, #8
+20017dda:	4588      	cmp	r8, r1
+20017ddc:	d1db      	bne.n	20017d96 <pico9918_splash_render+0x46>
+20017dde:	bce0      	pop	{r5, r6, r7}
+20017de0:	46ba      	mov	sl, r7
+20017de2:	46b1      	mov	r9, r6
+20017de4:	46a8      	mov	r8, r5
+20017de6:	bdf0      	pop	{r4, r5, r6, r7, pc}
+20017de8:	4e0a      	ldr	r6, [pc, #40]	@ (20017e14 <pico9918_splash_render+0xc4>)
+20017dea:	7836      	ldrb	r6, [r6, #0]
+20017dec:	2e00      	cmp	r6, #0
+20017dee:	d0bc      	beq.n	20017d6a <pico9918_splash_render+0x1a>
+20017df0:	29f0      	cmp	r1, #240	@ 0xf0
+20017df2:	d9ba      	bls.n	20017d6a <pico9918_splash_render+0x1a>
+20017df4:	3401      	adds	r4, #1
+20017df6:	602c      	str	r4, [r5, #0]
+20017df8:	e7b7      	b.n	20017d6a <pico9918_splash_render+0x1a>
+20017dfa:	9908      	ldr	r1, [sp, #32]
+20017dfc:	4288      	cmp	r0, r1
+20017dfe:	d8ee      	bhi.n	20017dde <pico9918_splash_render+0x8e>
+20017e00:	4901      	ldr	r1, [pc, #4]	@ (20017e08 <pico9918_splash_render+0xb8>)
+20017e02:	680c      	ldr	r4, [r1, #0]
+20017e04:	e7b1      	b.n	20017d6a <pico9918_splash_render+0x1a>
+20017e06:	46c0      	nop			@ (mov r8, r8)
+20017e08:	20023200 	.word	0x20023200
+20017e0c:	200280f0 	.word	0x200280f0
+20017e10:	200282a8 	.word	0x200282a8
+20017e14:	200292d7 	.word	0x200292d7

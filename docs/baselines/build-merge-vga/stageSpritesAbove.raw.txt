@@ -1,0 +1,4 @@
+2000c044 <stageSpritesAbove>:
+2000c044:	b510      	push	{r4, lr}
+2000c046:	f7fe fed9 	bl	2000adfc <vrEmuTms9918OutputSprites>
+2000c04a:	bd10      	pop	{r4, pc}

@@ -1,4 +1,7 @@
-/*
+/**
+ * \file
+ * \brief host bus pin names published in the binary info block, for picotool
+ *
  * Project: pico9918
  *
  * Copyright (c) 2024 Troy Schrapel
@@ -22,5 +25,6 @@ bi_decl(bi_1pin_with_name(GPIO_CSW, "Write"));
 bi_decl(bi_1pin_with_name(GPIO_MODE, "Mode"));
 bi_decl(bi_1pin_with_name(GPIO_INT, "Interrupt"));
 
+// v0.4+ only
 bi_decl(bi_1pin_with_name(GPIO_RESET, "Host Reset"));
 bi_decl(bi_1pin_with_name(GPIO_MODE1, "Mode 1 (V9938)"));

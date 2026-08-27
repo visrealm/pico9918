@@ -1,0 +1,267 @@
+2000045c <main>:
+2000045c:	b5f0      	push	{r4, r5, r6, r7, lr}
+2000045e:	46ce      	mov	lr, r9
+20000460:	4647      	mov	r7, r8
+20000462:	23d0      	movs	r3, #208	@ 0xd0
+20000464:	2200      	movs	r2, #0
+20000466:	b580      	push	{r7, lr}
+20000468:	061b      	lsls	r3, r3, #24
+2000046a:	b0cf      	sub	sp, #316	@ 0x13c
+2000046c:	611a      	str	r2, [r3, #16]
+2000046e:	2280      	movs	r2, #128	@ 0x80
+20000470:	03d2      	lsls	r2, r2, #15
+20000472:	2105      	movs	r1, #5
+20000474:	621a      	str	r2, [r3, #32]
+20000476:	4885      	ldr	r0, [pc, #532]	@ (2000068c <main+0x230>)
+20000478:	f000 ffd6 	bl	20001428 <gpio_set_function_masked>
+2000047c:	f000 f938 	bl	200006f0 <currentHwVersion>
+20000480:	f000 f968 	bl	20000754 <detectScartDongle>
+20000484:	f000 fa3c 	bl	20000900 <shouldUseScartClock>
+20000488:	4e81      	ldr	r6, [pc, #516]	@ (20000690 <main+0x234>)
+2000048a:	2800      	cmp	r0, #0
+2000048c:	d001      	beq.n	20000492 <main+0x36>
+2000048e:	4b81      	ldr	r3, [pc, #516]	@ (20000694 <main+0x238>)
+20000490:	6033      	str	r3, [r6, #0]
+20000492:	4d81      	ldr	r5, [pc, #516]	@ (20000698 <main+0x23c>)
+20000494:	682b      	ldr	r3, [r5, #0]
+20000496:	009a      	lsls	r2, r3, #2
+20000498:	18d2      	adds	r2, r2, r3
+2000049a:	6833      	ldr	r3, [r6, #0]
+2000049c:	0092      	lsls	r2, r2, #2
+2000049e:	189b      	adds	r3, r3, r2
+200004a0:	689a      	ldr	r2, [r3, #8]
+200004a2:	681c      	ldr	r4, [r3, #0]
+200004a4:	685f      	ldr	r7, [r3, #4]
+200004a6:	7b18      	ldrb	r0, [r3, #12]
+200004a8:	9225      	str	r2, [sp, #148]	@ 0x94
+200004aa:	f001 fdfd 	bl	200020a8 <vreg_set_voltage>
+200004ae:	2001      	movs	r0, #1
+200004b0:	f001 fb32 	bl	20001b18 <sleep_ms>
+200004b4:	9a25      	ldr	r2, [sp, #148]	@ 0x94
+200004b6:	0039      	movs	r1, r7
+200004b8:	0020      	movs	r0, r4
+200004ba:	f001 fcc3 	bl	20001e44 <set_sys_clock_pll>
+200004be:	f00a fbf5 	bl	2000acac <vrEmuTms9918Init>
+200004c2:	4876      	ldr	r0, [pc, #472]	@ (2000069c <main+0x240>)
+200004c4:	f002 f9e2 	bl	2000288c <multicore_launch_core1>
+200004c8:	4c75      	ldr	r4, [pc, #468]	@ (200006a0 <main+0x244>)
+200004ca:	4b76      	ldr	r3, [pc, #472]	@ (200006a4 <main+0x248>)
+200004cc:	6820      	ldr	r0, [r4, #0]
+200004ce:	18c0      	adds	r0, r0, r3
+200004d0:	f000 fabe 	bl	20000a50 <readConfig>
+200004d4:	4b73      	ldr	r3, [pc, #460]	@ (200006a4 <main+0x248>)
+200004d6:	6820      	ldr	r0, [r4, #0]
+200004d8:	18c0      	adds	r0, r0, r3
+200004da:	f000 fa47 	bl	2000096c <applyPendingDisplay>
+200004de:	f000 f969 	bl	200007b4 <updateDispDriver>
+200004e2:	6822      	ldr	r2, [r4, #0]
+200004e4:	4b70      	ldr	r3, [pc, #448]	@ (200006a8 <main+0x24c>)
+200004e6:	5cd3      	ldrb	r3, [r2, r3]
+200004e8:	682a      	ldr	r2, [r5, #0]
+200004ea:	4293      	cmp	r3, r2
+200004ec:	d013      	beq.n	20000516 <main+0xba>
+200004ee:	2214      	movs	r2, #20
+200004f0:	435a      	muls	r2, r3
+200004f2:	602b      	str	r3, [r5, #0]
+200004f4:	6833      	ldr	r3, [r6, #0]
+200004f6:	189b      	adds	r3, r3, r2
+200004f8:	7b18      	ldrb	r0, [r3, #12]
+200004fa:	681d      	ldr	r5, [r3, #0]
+200004fc:	685e      	ldr	r6, [r3, #4]
+200004fe:	689f      	ldr	r7, [r3, #8]
+20000500:	b2c0      	uxtb	r0, r0
+20000502:	f001 fdd1 	bl	200020a8 <vreg_set_voltage>
+20000506:	2001      	movs	r0, #1
+20000508:	f001 fb06 	bl	20001b18 <sleep_ms>
+2000050c:	003a      	movs	r2, r7
+2000050e:	0031      	movs	r1, r6
+20000510:	0028      	movs	r0, r5
+20000512:	f001 fc97 	bl	20001e44 <set_sys_clock_pll>
+20000516:	f000 f8eb 	bl	200006f0 <currentHwVersion>
+2000051a:	6822      	ldr	r2, [r4, #0]
+2000051c:	4b63      	ldr	r3, [pc, #396]	@ (200006ac <main+0x250>)
+2000051e:	5cd6      	ldrb	r6, [r2, r3]
+20000520:	2803      	cmp	r0, #3
+20000522:	d100      	bne.n	20000526 <main+0xca>
+20000524:	e0a7      	b.n	20000676 <main+0x21a>
+20000526:	2319      	movs	r3, #25
+20000528:	4699      	mov	r9, r3
+2000052a:	3b01      	subs	r3, #1
+2000052c:	4698      	mov	r8, r3
+2000052e:	4d60      	ldr	r5, [pc, #384]	@ (200006b0 <main+0x254>)
+20000530:	00f6      	lsls	r6, r6, #3
+20000532:	59af      	ldr	r7, [r5, r6]
+20000534:	2100      	movs	r1, #0
+20000536:	1c38      	adds	r0, r7, #0
+20000538:	f002 f82e 	bl	20002598 <__wrap___aeabi_fcmpgt>
+2000053c:	2800      	cmp	r0, #0
+2000053e:	d100      	bne.n	20000542 <main+0xe6>
+20000540:	e08e      	b.n	20000660 <main+0x204>
+20000542:	2102      	movs	r1, #2
+20000544:	4648      	mov	r0, r9
+20000546:	1c3a      	adds	r2, r7, #0
+20000548:	f7ff fe2a 	bl	200001a0 <initClock>
+2000054c:	19ad      	adds	r5, r5, r6
+2000054e:	686d      	ldr	r5, [r5, #4]
+20000550:	2100      	movs	r1, #0
+20000552:	1c28      	adds	r0, r5, #0
+20000554:	f002 f820 	bl	20002598 <__wrap___aeabi_fcmpgt>
+20000558:	2800      	cmp	r0, #0
+2000055a:	d100      	bne.n	2000055e <main+0x102>
+2000055c:	e075      	b.n	2000064a <main+0x1ee>
+2000055e:	2103      	movs	r1, #3
+20000560:	4640      	mov	r0, r8
+20000562:	1c2a      	adds	r2, r5, #0
+20000564:	f7ff fe1c 	bl	200001a0 <initClock>
+20000568:	2301      	movs	r3, #1
+2000056a:	6825      	ldr	r5, [r4, #0]
+2000056c:	22a0      	movs	r2, #160	@ 0xa0
+2000056e:	742b      	strb	r3, [r5, #16]
+20000570:	2100      	movs	r1, #0
+20000572:	a826      	add	r0, sp, #152	@ 0x98
+20000574:	f002 f8d2 	bl	2000271c <__wrap_memset>
+20000578:	4b4e      	ldr	r3, [pc, #312]	@ (200006b4 <main+0x258>)
+2000057a:	5ceb      	ldrb	r3, [r5, r3]
+2000057c:	2b00      	cmp	r3, #0
+2000057e:	d100      	bne.n	20000582 <main+0x126>
+20000580:	e07e      	b.n	20000680 <main+0x224>
+20000582:	4b4d      	ldr	r3, [pc, #308]	@ (200006b8 <main+0x25c>)
+20000584:	a826      	add	r0, sp, #152	@ 0x98
+20000586:	5ce9      	ldrb	r1, [r5, r3]
+20000588:	1e4b      	subs	r3, r1, #1
+2000058a:	4199      	sbcs	r1, r3
+2000058c:	3101      	adds	r1, #1
+2000058e:	f002 fe7b 	bl	20003288 <vgaGetParams>
+20000592:	2190      	movs	r1, #144	@ 0x90
+20000594:	2288      	movs	r2, #136	@ 0x88
+20000596:	4b49      	ldr	r3, [pc, #292]	@ (200006bc <main+0x260>)
+20000598:	a802      	add	r0, sp, #8
+2000059a:	1840      	adds	r0, r0, r1
+2000059c:	5083      	str	r3, [r0, r2]
+2000059e:	4b48      	ldr	r3, [pc, #288]	@ (200006c0 <main+0x264>)
+200005a0:	a802      	add	r0, sp, #8
+200005a2:	1840      	adds	r0, r0, r1
+200005a4:	3204      	adds	r2, #4
+200005a6:	5083      	str	r3, [r0, r2]
+200005a8:	4b46      	ldr	r3, [pc, #280]	@ (200006c4 <main+0x268>)
+200005aa:	a802      	add	r0, sp, #8
+200005ac:	1840      	adds	r0, r0, r1
+200005ae:	3204      	adds	r2, #4
+200005b0:	5083      	str	r3, [r0, r2]
+200005b2:	4b45      	ldr	r3, [pc, #276]	@ (200006c8 <main+0x26c>)
+200005b4:	a802      	add	r0, sp, #8
+200005b6:	1840      	adds	r0, r0, r1
+200005b8:	3204      	adds	r2, #4
+200005ba:	5083      	str	r3, [r0, r2]
+200005bc:	239c      	movs	r3, #156	@ 0x9c
+200005be:	a802      	add	r0, sp, #8
+200005c0:	1841      	adds	r1, r0, r1
+200005c2:	3a95      	subs	r2, #149	@ 0x95
+200005c4:	50ca      	str	r2, [r1, r3]
+200005c6:	4668      	mov	r0, sp
+200005c8:	3291      	adds	r2, #145	@ 0x91
+200005ca:	a92a      	add	r1, sp, #168	@ 0xa8
+200005cc:	f002 f8ac 	bl	20002728 <__wrap___aeabi_memcpy>
+200005d0:	9b29      	ldr	r3, [sp, #164]	@ 0xa4
+200005d2:	9927      	ldr	r1, [sp, #156]	@ 0x9c
+200005d4:	9a28      	ldr	r2, [sp, #160]	@ 0xa0
+200005d6:	9826      	ldr	r0, [sp, #152]	@ 0x98
+200005d8:	f002 fb42 	bl	20002c60 <vgaInit>
+200005dc:	483b      	ldr	r0, [pc, #236]	@ (200006cc <main+0x270>)
+200005de:	f003 f8ef 	bl	200037c0 <vrEmuTmsConfigSetAppliedCallback>
+200005e2:	483b      	ldr	r0, [pc, #236]	@ (200006d0 <main+0x274>)
+200005e4:	f003 fa38 	bl	20003a58 <vrEmuTmsFrameSetConfigReloadCallback>
+200005e8:	f000 fe1a 	bl	20001220 <initTemperature>
+200005ec:	f003 ff62 	bl	200044b4 <vrEmuTmsDiagInit>
+200005f0:	f000 f87e 	bl	200006f0 <currentHwVersion>
+200005f4:	4b37      	ldr	r3, [pc, #220]	@ (200006d4 <main+0x278>)
+200005f6:	2803      	cmp	r0, #3
+200005f8:	d100      	bne.n	200005fc <main+0x1a0>
+200005fa:	4b37      	ldr	r3, [pc, #220]	@ (200006d8 <main+0x27c>)
+200005fc:	0018      	movs	r0, r3
+200005fe:	4937      	ldr	r1, [pc, #220]	@ (200006dc <main+0x280>)
+20000600:	f003 ffcc 	bl	2000459c <vrEmuTmsDiagSetVersionInfo>
+20000604:	6822      	ldr	r2, [r4, #0]
+20000606:	4b2b      	ldr	r3, [pc, #172]	@ (200006b4 <main+0x258>)
+20000608:	2102      	movs	r1, #2
+2000060a:	5cd3      	ldrb	r3, [r2, r3]
+2000060c:	2200      	movs	r2, #0
+2000060e:	4299      	cmp	r1, r3
+20000610:	4152      	adcs	r2, r2
+20000612:	4252      	negs	r2, r2
+20000614:	4013      	ands	r3, r2
+20000616:	4a32      	ldr	r2, [pc, #200]	@ (200006e0 <main+0x284>)
+20000618:	009b      	lsls	r3, r3, #2
+2000061a:	5899      	ldr	r1, [r3, r2]
+2000061c:	4a31      	ldr	r2, [pc, #196]	@ (200006e4 <main+0x288>)
+2000061e:	5898      	ldr	r0, [r3, r2]
+20000620:	f003 ffda 	bl	200045d8 <vrEmuTmsDiagSetOutputName>
+20000624:	2000      	movs	r0, #0
+20000626:	f002 f8a9 	bl	2000277c <multicore_fifo_push_blocking>
+2000062a:	f005 f9b7 	bl	2000599c <vrEmuTmsGpuInit>
+2000062e:	482e      	ldr	r0, [pc, #184]	@ (200006e8 <main+0x28c>)
+20000630:	f005 f994 	bl	2000595c <vrEmuTmsGpuSetFlashCallback>
+20000634:	482d      	ldr	r0, [pc, #180]	@ (200006ec <main+0x290>)
+20000636:	f005 f997 	bl	20005968 <vrEmuTmsGpuSetConfigSaveCallback>
+2000063a:	f005 f9ef 	bl	20005a1c <vrEmuTmsGpuLoop>
+2000063e:	2000      	movs	r0, #0
+20000640:	b04f      	add	sp, #316	@ 0x13c
+20000642:	bcc0      	pop	{r6, r7}
+20000644:	46b9      	mov	r9, r7
+20000646:	46b0      	mov	r8, r6
+20000648:	bdf0      	pop	{r4, r5, r6, r7, pc}
+2000064a:	4640      	mov	r0, r8
+2000064c:	f000 fe9e 	bl	2000138c <gpio_init>
+20000650:	4642      	mov	r2, r8
+20000652:	2301      	movs	r3, #1
+20000654:	4093      	lsls	r3, r2
+20000656:	22d0      	movs	r2, #208	@ 0xd0
+20000658:	0612      	lsls	r2, r2, #24
+2000065a:	6253      	str	r3, [r2, #36]	@ 0x24
+2000065c:	6193      	str	r3, [r2, #24]
+2000065e:	e783      	b.n	20000568 <main+0x10c>
+20000660:	464f      	mov	r7, r9
+20000662:	0038      	movs	r0, r7
+20000664:	f000 fe92 	bl	2000138c <gpio_init>
+20000668:	2301      	movs	r3, #1
+2000066a:	22d0      	movs	r2, #208	@ 0xd0
+2000066c:	40bb      	lsls	r3, r7
+2000066e:	0612      	lsls	r2, r2, #24
+20000670:	6253      	str	r3, [r2, #36]	@ 0x24
+20000672:	6193      	str	r3, [r2, #24]
+20000674:	e76a      	b.n	2000054c <main+0xf0>
+20000676:	231d      	movs	r3, #29
+20000678:	4699      	mov	r9, r3
+2000067a:	3b06      	subs	r3, #6
+2000067c:	4698      	mov	r8, r3
+2000067e:	e756      	b.n	2000052e <main+0xd2>
+20000680:	0019      	movs	r1, r3
+20000682:	a826      	add	r0, sp, #152	@ 0x98
+20000684:	f002 fe00 	bl	20003288 <vgaGetParams>
+20000688:	e783      	b.n	20000592 <main+0x136>
+2000068a:	46c0      	nop			@ (mov r8, r8)
+2000068c:	3cffc000 	.word	0x3cffc000
+20000690:	2000d4d4 	.word	0x2000d4d4
+20000694:	2000cbe4 	.word	0x2000cbe4
+20000698:	20027434 	.word	0x20027434
+2000069c:	20000409 	.word	0x20000409
+200006a0:	2000d534 	.word	0x2000d534
+200006a4:	00010050 	.word	0x00010050
+200006a8:	0001005a 	.word	0x0001005a
+200006ac:	0001005c 	.word	0x0001005c
+200006b0:	2000cb88 	.word	0x2000cb88
+200006b4:	00010055 	.word	0x00010055
+200006b8:	0001005b 	.word	0x0001005b
+200006bc:	200061fd 	.word	0x200061fd
+200006c0:	20000121 	.word	0x20000121
+200006c4:	20000119 	.word	0x20000119
+200006c8:	20000111 	.word	0x20000111
+200006cc:	200007f5 	.word	0x200007f5
+200006d0:	20000815 	.word	0x20000815
+200006d4:	2000c808 	.word	0x2000c808
+200006d8:	2000c800 	.word	0x2000c800
+200006dc:	2000c810 	.word	0x2000c810
+200006e0:	2000cb70 	.word	0x2000cb70
+200006e4:	2000cb7c 	.word	0x2000cb7c
+200006e8:	20001051 	.word	0x20001051
+200006ec:	20000165 	.word	0x20000165

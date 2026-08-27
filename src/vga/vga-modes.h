@@ -1,4 +1,7 @@
-/*
+/**
+ * \file
+ * \brief the known VGA and RGBs display modes and their pixel scaling
+ *
  * Project: pico9918 - vga
  *
  * Copyright (c) 2024 Troy Schrapel
@@ -6,13 +9,13 @@
  * This code is licensed under the MIT license
  *
  * https://github.com/visrealm/pico9918
- *
  */
 
 #pragma once
 
 #include "vga.h"
 
+/** \brief the display modes vgaGetParams() knows */
 typedef enum
 {
   VGA_640_480_60HZ,
@@ -27,15 +30,16 @@ typedef enum
 } VgaMode;
 
 
-/*
- * get the vga parameters for known modes
+/** \brief  the vga parameters for a known mode, at pixel scale 1
+ *  \return the mode's parameters, or all zeroes if \p mode is not known
  */
 VgaParams vgaGetParams(VgaMode mode);
 
-/*
- * set the scale/multiplier of virtual pixel size
- */
+/** \brief set both pixel scales, false if \p params is null or the scale is below 1 */
 bool setVgaParamsScale(VgaParams* params, int pixelScale);
-bool setVgaParamsScaleXY(VgaParams* params, int pixelScaleX, int pixelScaleY);
+
+/** \brief set the horizontal pixel scale, which redefines hVirtualPixels */
 bool setVgaParamsScaleX(VgaParams* params, int pixelScale);
+
+/** \brief set the vertical pixel scale, which redefines vVirtualPixels */
 bool setVgaParamsScaleY(VgaParams* params, int pixelScale);

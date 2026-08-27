@@ -27,7 +27,7 @@ resetOptions: PROCEDURE
     NEXT I
 
     g_diagDirty = FALSE
-    FOR I = CONF_DIAG TO CONF_DIAG_ADDRESS
+    FOR I = PICO9918_CONF_DIAG TO PICO9918_CONF_DIAG_ADDRESS
         IF tempConfigValues(I) <> savedConfigValues(I) THEN g_diagDirty = TRUE
     NEXT I
 
@@ -50,13 +50,13 @@ saveOptions: PROCEDURE
     ' factory reset takes the FORCED path so the user isn't asked to confirm
     ' a change they just chose
     IF g_resetPending THEN
-        VDP_CONFIG(CONF_SAVE_FORCED) = 1
+        VDP_CONFIG(PICO9918_CONF_SAVE_FORCED) = 1
         g_resetPending = FALSE
     ELSE
-        VDP_CONFIG(CONF_SAVE_TO_FLASH) = 1
+        VDP_CONFIG(PICO9918_CONF_SAVE_TO_FLASH) = 1
     END IF
 
-    clockChanged = savedConfigValues(CONF_CLOCK_PRESET_ID) <> tempConfigValues(CONF_CLOCK_PRESET_ID)
+    clockChanged = savedConfigValues(PICO9918_CONF_CLOCK_PRESET_ID) <> tempConfigValues(PICO9918_CONF_CLOCK_PRESET_ID)
 
     ' update device values again
     FOR I = 0 TO CONF_COUNT - 1
@@ -100,8 +100,8 @@ vdpLoadConfigValues: PROCEDURE
 ' apply current options to the PICO9918
 ' -----------------------------------------------------------------------------
 applyConfigValues: PROCEDURE
-    VDP_REG(50) = tempConfigValues(CONF_CRT_SCANLINES) * 4         ' set crt scanlines
-    VDP_REG(30) = pow2(tempConfigValues(CONF_SCANLINE_SPRITES) + 2)   ' set scanline sprites
+    VDP_REG(50) = tempConfigValues(PICO9918_CONF_CRT_SCANLINES) * 4         ' set crt scanlines
+    VDP_REG(30) = pow2(tempConfigValues(PICO9918_CONF_SCANLINE_SPRITES) + 2)   ' set scanline sprites
 
     ' write the user's configured palette to page 0 (the target VDP palette)
     PAL_PORT(PAL_PAGE_TARGET, 0)

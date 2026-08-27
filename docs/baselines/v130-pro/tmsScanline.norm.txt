@@ -1,0 +1,66 @@
+<ADDR> <tmsScanline>:
+push	{r4, r5, r6, lr}
+mov	r4, r1
+ldr	r3, [r4, #44]	@ 0x2c
+sub	sp, #16
+str	r3, [sp, #8]
+ldrh.w	r3, [r4, #68]	@ 0x44
+add	r1, sp, #8
+mov	r5, r0
+mov	r6, r2
+strh.w	r3, [sp, #12]
+bl	<ADDR> <pico9918_frame_scanline>
+cbnz	r0, <ADDR> <tmsScanline+OFF>
+add	sp, #16
+pop	{r4, r5, r6, pc}
+bl	<ADDR> <pendingDisplayBanner>
+cmp	r0, #1
+ubfx	r5, r5, #0, #12
+beq.n	<ADDR> <tmsScanline+OFF>
+cmp	r0, #2
+beq.n	<ADDR> <tmsScanline+OFF>
+ldr	r3, [pc, #112]	@ (<ADDR> <tmsScanline+OFF>)
+ldr	r3, [r3, #0]
+add.w	r3, r3, #65536	@ 0x10000
+ldrb.w	r3, [r3, #96]	@ 0x60
+cmp	r3, #0
+beq.n	<ADDR> <tmsScanline+OFF>
+mov.w	r2, #1342177280	@ 0xADDR
+ldr.w	r3, [r2, #144]	@ 0x90
+lsls	r3, r3, #5
+bmi.n	<ADDR> <tmsScanline+OFF>
+mov	r2, r6
+mov	r0, r5
+ldrh	r1, [r4, #46]	@ 0x2e
+bl	<ADDR> <pico9918_diag_render>
+add	sp, #16
+pop	{r4, r5, r6, pc}
+mov.w	r2, #1342177280	@ 0xADDR
+ldr.w	r3, [r2, #144]	@ 0x90
+lsls	r0, r3, #5
+bmi.n	<ADDR> <tmsScanline+OFF>
+movw	ip, #4095	@ 0xfff
+movs	r3, #8
+movs	r2, #210	@ 0xd2
+mov	r0, r5
+ldr	r1, [pc, #52]	@ (<ADDR> <tmsScanline+OFF>)
+str	r6, [sp, #4]
+str.w	ip, [sp]
+bl	<ADDR> <pico9918_diag_render_text>
+b.n	<ADDR> <tmsScanline+OFF>
+mov.w	r2, #1342177280	@ 0xADDR
+ldr.w	r3, [r2, #144]	@ 0x90
+lsls	r1, r3, #5
+bmi.n	<ADDR> <tmsScanline+OFF>
+movw	ip, #4095	@ 0xfff
+movs	r3, #8
+movs	r2, #198	@ 0xc6
+mov	r0, r5
+ldr	r1, [pc, #20]	@ (<ADDR> <tmsScanline+OFF>)
+str	r6, [sp, #4]
+str.w	ip, [sp]
+bl	<ADDR> <pico9918_diag_render_text>
+b.n	<ADDR> <tmsScanline+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

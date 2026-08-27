@@ -1,0 +1,102 @@
+<ADDR> <reloadStoredConfig>:
+movs	r2, #128	@ 0x80
+push	{r4, r5, r6, r7, lr}
+ldr	r6, [pc, #184]	@ (<ADDR> <reloadStoredConfig+OFF>)
+ldr	r3, [pc, #188]	@ (<ADDR> <reloadStoredConfig+OFF>)
+ldr	r4, [r6, #0]
+sub	sp, #12
+adds	r7, r4, r3
+movs	r0, r7
+ldr	r1, [pc, #180]	@ (<ADDR> <reloadStoredConfig+OFF>)
+lsls	r2, r2, #1
+bl	<ADDR> <__wrap___aeabi_memcpy>
+mov	r2, sp
+movs	r3, #0
+strb	r3, [r2, #7]
+ldr	r3, [pc, #164]	@ (<ADDR> <reloadStoredConfig+OFF>)
+adds	r5, r2, #7
+ldrb	r1, [r4, r3]
+movs	r0, r7
+subs	r1, #1
+negs	r3, r1
+adcs	r1, r3
+ldr	r2, [pc, #156]	@ (<ADDR> <reloadStoredConfig+OFF>)
+movs	r3, r5
+uxtb	r1, r1
+bl	<ADDR> <vrEmuTmsConfigValidate>
+ldrb	r3, [r5, #0]
+movs	r7, r0
+cmp	r3, #0
+beq.n	<ADDR> <reloadStoredConfig+OFF>
+movs	r3, #1
+ldr	r2, [pc, #128]	@ (<ADDR> <reloadStoredConfig+OFF>)
+ldr	r5, [pc, #140]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r3, [r4, r2]
+ldrb	r3, [r5, #0]
+cmp	r3, #0
+beq.n	<ADDR> <reloadStoredConfig+OFF>
+ldr	r3, [pc, #132]	@ (<ADDR> <reloadStoredConfig+OFF>)
+ldrb	r3, [r3, #0]
+ldr	r2, [pc, #132]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r3, [r4, r2]
+cmp	r7, #0
+beq.n	<ADDR> <reloadStoredConfig+OFF>
+movs	r2, #18
+ldr	r3, [pc, #128]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r2, [r4, r3]
+movs	r3, #1
+ldr	r2, [pc, #124]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r3, [r4, r2]
+ldr	r2, [pc, #124]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r3, [r4, r2]
+movs	r1, #1
+ldr	r2, [r6, #0]
+ldr	r3, [pc, #120]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r1, [r2, r3]
+add	sp, #12
+pop	{r4, r5, r6, r7, pc}
+movs	r2, #1
+movs	r1, #0
+movs	r0, #23
+bl	<ADDR> <gpio_set_pulls>
+movs	r0, #1
+bl	<ADDR> <sleep_ms>
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+ldr	r3, [r3, #4]
+lsls	r2, r2, #16
+tst	r3, r2
+beq.n	<ADDR> <reloadStoredConfig+OFF>
+movs	r3, #16
+ldr	r2, [pc, #60]	@ (<ADDR> <reloadStoredConfig+OFF>)
+strb	r3, [r2, #0]
+movs	r2, #1
+strb	r2, [r5, #0]
+b.n	<ADDR> <reloadStoredConfig+OFF>
+movs	r2, #0
+movs	r1, #1
+movs	r0, #23
+bl	<ADDR> <gpio_set_pulls>
+movs	r0, #1
+bl	<ADDR> <sleep_ms>
+movs	r3, #208	@ 0xd0
+movs	r2, #128	@ 0x80
+lsls	r3, r3, #24
+ldr	r3, [r3, #4]
+lsls	r2, r2, #16
+tst	r3, r2
+beq.n	<ADDR> <reloadStoredConfig+OFF>
+movs	r3, #3
+b.n	<ADDR> <reloadStoredConfig+OFF>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>
+	.word	<ADDR>

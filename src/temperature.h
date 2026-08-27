@@ -1,4 +1,7 @@
-/*
+/**
+ * \file
+ * \brief on-die temperature sensor
+ *
  * Project: pico9918
  *
  * Copyright (c) 2024 Troy Schrapel
@@ -12,11 +15,8 @@
 #pragma once
 
 
-/* initialise temperature sensor */
-void initTemperature();
+/** \brief enable the temperature sensor and select its ADC input */
+void initTemperature(void);
 
-/* read temperature (celsius) */
-float coreTemperatureC();
-
-/* read temperature (fahrenheit) */
-float coreTemperatureF();
+/** \brief die temperature in celsius */
+float coreTemperatureC(void);

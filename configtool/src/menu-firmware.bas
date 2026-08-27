@@ -41,7 +41,7 @@ firmwareMenu: PROCEDURE
 
     ' Determine which firmware section to use based on detected hardware
     VDP_STATUS_REG = 12
-    VDP_REG(58) = CONF_PICO_MODEL
+    VDP_REG(58) = PICO9918_CONF_PICO_MODEL
     fwModel = VDP_STATUS
     VDP_STATUS_REG0
     IF fwModel = PICO_MODEL_RP2350 THEN
