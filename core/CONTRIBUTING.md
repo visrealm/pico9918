@@ -2,8 +2,8 @@
 
 This repository is **generated**. The library is developed at `core/` inside
 [visrealm/pico9918](https://github.com/visrealm/pico9918) and split out from
-there by `tools/split.sh`, so a pull request opened here has nowhere to land: the
-next split overwrites it.
+there by `tools/publish.sh`, so a pull request opened here has nowhere to land:
+the next publish overwrites it.
 
 That is not bureaucracy. Every scanline this code renders has a time budget on an
 RP2040 running at video rate, and the only place a change can be measured against

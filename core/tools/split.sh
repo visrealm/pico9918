@@ -67,6 +67,15 @@ git diff --quiet && git diff --cached --quiet || {
   exit 1
 }
 
+# Splitting a branch that no longer contains the move rebases whatever it does
+# find onto the pre-move history and diverges from what is published, silently.
+git merge-base --is-ancestor "$MOVE" "$SOURCE" 2> /dev/null || {
+  echo "split.sh: $MOVE, the move commit, is not in $SOURCE's history. This was the" >&2
+  echo "          one-time bootstrap and its result is published; to publish a change" >&2
+  echo "          use tools/publish.sh. To regenerate the history, SPLIT_SOURCE=core-history." >&2
+  exit 1
+}
+
 START=$(git rev-parse --abbrev-ref HEAD)
 cleanup() { git checkout --quiet "$START" 2> /dev/null || true; }
 trap cleanup EXIT
