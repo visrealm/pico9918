@@ -1,0 +1,53 @@
+name: Core Package
+
+# That `cmake --install` and CPack produce a consumable archive on every
+# toolchain. Only visrealm/pico9918-core attaches them to a release.
+
+on:
+  push:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-package.yml'
+  pull_request:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-package.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  package:
+    name: Package (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux, os: ubuntu-latest, shell: bash }
+          - { name: macos, os: macos-latest, shell: bash }
+          - { name: windows-mingw, os: windows-latest, shell: 'msys2 {0}' }
+          - { name: windows-msvc, os: windows-latest, shell: cmd }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+        with:
+          toolchain: ${{ matrix.name }}
+      - if: matrix.name != 'windows-msvc'
+        run: core/tools/ci.sh package
+      # cmd, so vcvars64 survives into the build. tools/msvc.cmd finds the
+      # toolset with vswhere and hands off to bash - see the note in it for
+      # why this is not -G "Visual Studio 17 2022".
+      - if: matrix.name == 'windows-msvc'
+        run: core\tools\msvc.cmd core/tools/ci.sh package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pico9918-core-${{ matrix.name }}
+          path: |
+            core/build-ci/lib/pico9918-core-*.tar.gz
+            core/build-ci/lib/pico9918-core-*.zip

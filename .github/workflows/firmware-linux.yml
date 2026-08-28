@@ -15,7 +15,7 @@ on:
       - 'core/tools/ci.sh'
       - 'core/.github/**'
       - 'test/live/**'
-      - '.github/workflows/core.yml'
+      - '.github/workflows/core-*.yml'
   pull_request:
     branches: [ '**' ]
   workflow_dispatch:

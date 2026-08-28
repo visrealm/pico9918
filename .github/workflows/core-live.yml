@@ -1,0 +1,51 @@
+name: Core Live Runner
+
+# The one gate visrealm/pico9918-core cannot run: the renderer suite driven
+# through test/live/runner.py, which is the stage list a board run uses. The
+# suite is core's - core/tools/ci.sh runs it there against the shim alone; this
+# proves the runner that also drives hardware still agrees with it.
+
+on:
+  push:
+    paths:
+      - 'core/**'
+      - 'test/live/**'
+      - '.github/workflows/core-live.yml'
+  pull_request:
+    paths:
+      - 'core/**'
+      - 'test/live/**'
+      - '.github/workflows/core-live.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  live-desktop:
+    name: Live runner over the shim (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux, os: ubuntu-latest, shell: bash }
+          - { name: macos, os: macos-latest, shell: bash }
+          - { name: windows-mingw, os: windows-latest, shell: 'msys2 {0}' }
+          - { name: windows-msvc, os: windows-latest, shell: cmd }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+        with:
+          toolchain: ${{ matrix.name }}
+      - if: matrix.name != 'windows-msvc'
+        run: test/live/ci.sh
+      # cmd, so vcvars64 survives into the build. tools/msvc.cmd finds the
+      # toolset with vswhere and hands off to bash - see the note in it for
+      # why this is not -G "Visual Studio 17 2022".
+      - if: matrix.name == 'windows-msvc'
+        run: core\tools\msvc.cmd test/live/ci.sh

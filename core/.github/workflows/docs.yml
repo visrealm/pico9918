@@ -1,0 +1,41 @@
+name: Docs
+
+# Doxygen runs clean over the public headers, and the default branch publishes
+# what it produced to GitHub Pages.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  docs:
+    name: Doxygen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The Doxyfile is generated, so this job configures the library too.
+      - uses: ./.github/actions/env
+        with:
+          doxygen: 'true'
+      - run: tools/ci.sh doxygen
+      # Generated, never committed. Uploaded on every run so a pull request can
+      # be read as a site; only the default branch publishes it.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: doc/code
+
+  pages:
+    name: Publish the API documentation
+    needs: docs
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

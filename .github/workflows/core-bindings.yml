@@ -1,0 +1,28 @@
+name: Core Bindings
+
+# The CPython extension in core/bindings/python. The commands live in
+# core/tools/ci.sh and visrealm/pico9918-core runs the same ones.
+
+on:
+  push:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-bindings.yml'
+  pull_request:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-bindings.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  python:
+    name: Python module
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+      - run: core/tools/ci.sh python

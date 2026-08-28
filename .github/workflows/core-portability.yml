@@ -1,0 +1,37 @@
+name: Core Portability
+
+# That the library compiles clean under both front ends. The cross-toolchain
+# renderer gate here is core-live.yml, which drives the same scenes through
+# test/live/runner.py; visrealm/pico9918-core runs tools/ci.sh suite instead.
+
+on:
+  push:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-portability.yml'
+  pull_request:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-portability.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  warnings:
+    name: Warnings (${{ matrix.cc }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, cc: gcc }
+          - { os: macos-latest, cc: clang }
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+      - run: core/tools/ci.sh warnings

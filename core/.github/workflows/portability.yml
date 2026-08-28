@@ -1,0 +1,53 @@
+name: Portability
+
+# That the library builds and renders the same on every toolchain it claims to
+# support, and compiles clean under both front ends.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  suite:
+    name: Renderer suite (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux, os: ubuntu-latest, shell: bash }
+          - { name: macos, os: macos-latest, shell: bash }
+          - { name: windows-mingw, os: windows-latest, shell: 'msys2 {0}' }
+          - { name: windows-msvc, os: windows-latest, shell: cmd }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+        with:
+          toolchain: ${{ matrix.name }}
+      - if: matrix.name != 'windows-msvc'
+        run: tools/ci.sh suite
+      # cmd, so vcvars64 survives into the build. tools/msvc.cmd finds the
+      # toolset with vswhere and hands off to bash - see the note in it for
+      # why this is not -G "Visual Studio 17 2022".
+      - if: matrix.name == 'windows-msvc'
+        run: tools\msvc.cmd tools/ci.sh suite
+
+  warnings:
+    name: Warnings (${{ matrix.cc }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, cc: gcc }
+          - { os: macos-latest, cc: clang }
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh warnings

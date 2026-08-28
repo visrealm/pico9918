@@ -1,0 +1,31 @@
+name: Core Docs
+
+# Doxygen runs clean over the library's public headers. Only
+# visrealm/pico9918-core publishes the result; here it is a gate.
+
+on:
+  push:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-docs.yml'
+  pull_request:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-docs.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  docs:
+    name: Doxygen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # The Doxyfile is generated, so this job configures the library too.
+      - uses: ./core/.github/actions/env
+        with:
+          doxygen: 'true'
+      - run: core/tools/ci.sh doxygen

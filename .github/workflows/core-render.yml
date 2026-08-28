@@ -1,0 +1,46 @@
+name: Core Render
+
+# What the library's renderer computes. Gates core/ from the repository where it
+# is changed; the commands live in core/tools/ci.sh and visrealm/pico9918-core
+# runs the same ones. Path-filtered, because the firmware's own workflows
+# already run on every push and none of this depends on the firmware.
+
+on:
+  push:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-render.yml'
+  pull_request:
+    paths:
+      - 'core/**'
+      - '.github/workflows/core-render.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  goldens:
+    name: Golden frames
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+      - run: core/tools/ci.sh goldens
+
+  tms9918:
+    name: TMS9918A mode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+      - run: core/tools/ci.sh tms9918
+
+  multi:
+    name: Multi-instance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+      - run: core/tools/ci.sh multi

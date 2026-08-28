@@ -1,6 +1,10 @@
 # pico9918-core
 
-<a href="https://github.com/visrealm/pico9918-core/actions/workflows/ci.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/ci.yml/badge.svg"/></a>
+<a href="https://github.com/visrealm/pico9918-core/actions/workflows/render.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/render.yml/badge.svg"/></a>
+<a href="https://github.com/visrealm/pico9918-core/actions/workflows/portability.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/portability.yml/badge.svg"/></a>
+<a href="https://github.com/visrealm/pico9918-core/actions/workflows/bindings.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/bindings.yml/badge.svg"/></a>
+<a href="https://github.com/visrealm/pico9918-core/actions/workflows/docs.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/docs.yml/badge.svg"/></a>
+<a href="https://github.com/visrealm/pico9918-core/actions/workflows/package.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/package.yml/badge.svg"/></a>
 
 TMS9918A / TMS9928A / TMS9929A video display processor emulation with F18A
 enhancements, in C11 with no runtime dependencies.

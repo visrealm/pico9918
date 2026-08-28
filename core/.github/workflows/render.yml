@@ -1,0 +1,34 @@
+name: Render
+
+# What the renderer computes: full-frame goldens, the TMS9918A-only build, and
+# two instances proving nothing scanline state is shared between them.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  goldens:
+    name: Golden frames
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh goldens
+
+  tms9918:
+    name: TMS9918A mode
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh tms9918
+
+  multi:
+    name: Multi-instance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh multi
