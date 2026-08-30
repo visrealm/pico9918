@@ -121,9 +121,15 @@ installed package: `cmake -S examples -B build-examples -DCMAKE_PREFIX_PATH=<sta
 | [`render_frame.c`](examples/render_frame.c) | Graphics I from nothing: registers, three tables, 192 lines, a PPM |
 | [`host_bus.c`](examples/host_bus.c) | the same screen driven the way a guest machine drives it - two ports, four operations, and a frame interrupt acknowledged by reading the status port |
 | [`f18a_modes.c`](examples/f18a_modes.c) | one name table drawn twice, locked and unlocked: ECM2, attributes by screen position, the second tile layer and both scrolls |
-| [`gpu_program.c`](examples/gpu_program.c) | Tursi's Mandelbrot, loaded into VRAM and run on the F18A's TMS9900 |
+| [`gpu_program.c`](examples/gpu_program.c) | a program loaded into VRAM and run on the F18A's TMS9900, on a thread of its own beside a raster paced to 60Hz |
 
 The last two need `PICO9918_MODE=1` and are skipped without it.
+
+[`gpu_program.py`](examples/gpu_program.py) is the same job the other way round: one
+thread, alternating bounded slices of program with lines of raster. Both shapes are
+real, and which one a host wants is the decision those two files are about - a GPU
+program can wait on the display, so a host that never advances the raster while one
+runs waits forever. They run the same two programs, and are worth reading together.
 
 ## From Python
 
@@ -145,8 +151,36 @@ vdp.write_vram(0x3800, bytes(32 * 24))
 frame = vdp.indices(192)          # one palette index a byte
 ```
 
-It needs the default `PICO9918_SINGLE_INSTANCE=0` - a class per VDP is the point of it -
-and exposes the GPU calls when the library was built `PICO9918_MODE=1`.
+It needs the default `PICO9918_SINGLE_INSTANCE=0` - a class per VDP is the point of it.
+
+Built `PICO9918_MODE=1`, it carries the F18A's GPU as well. Unlock the chip, put a
+TMS9900 program in VRAM and write its entry address to VR54 and VR55 - the low byte
+last, because writing that one is what starts it:
+
+```python
+vdp.gpu_init()
+vdp.unlock()
+vdp.write_vram(0x1B02, program)
+vdp.write_reg(0x36, 0x1B)
+vdp.write_reg(0x37, 0x02)   # arms it at 0x1B02 and away it goes
+vdp.gpu_step()              # runs to IDLE, then returns
+```
+
+`gpu_step()` runs the program to completion, which is fine until the program waits on
+something. A GPU program can read the scanline being scanned out at `>7000`, and one
+that pages a bitmap in the vertical blank polls it until the raster is somewhere safe -
+so `gpu_step()` never returns, because the caller that would move the raster is the one
+blocked inside it. `gpu_step_n()` is bounded and comes back with the PC kept, which is
+what lets the one thread do both:
+
+```python
+while vdp.gpu_step_n(20000):
+    vdp.raster()            # a display line, and the register that program is reading
+```
+
+The firmware instead gives the GPU a core of its own. A Python caller has no way to hand
+it one - the GIL is held across every call into the module, deliberately - so the
+interleave above is the shape to reach for here.
 
 ## Building
 
@@ -197,7 +231,7 @@ and it is the same script CI runs:
 
 ```
 tools/ci.sh goldens     the 16 committed frames, byte-exact
-tools/ci.sh suite       111 scenes, five properties and a GPU program, both line widths
+tools/ci.sh suite       111 scenes, five properties and two GPU programs, both widths
 tools/ci.sh warnings    -Wall -Wextra -Werror
 tools/ci.sh multi       the instance threaded through every signature
 tools/ci.sh tms9918     PICO9918_MODE=0, its frame against the F18A build's

@@ -28,6 +28,9 @@ IMAGE = os.path.join(HERE, "image.bin")
 SUITE = os.path.join(HERE, "..", "..", "test", "suite")
 MANDEL = os.path.join(SUITE, "data", "gpu-programs", "mandel.bin")
 REFERENCE = os.path.join(SUITE, "oracle", "reference", "gpu-mandel.bin.z")
+CUBE = os.path.join(SUITE, "data", "gpu-programs", "cube.bin")
+CUBE_REFERENCE = os.path.join(SUITE, "oracle", "reference", "gpu-cube.bin.z")
+CUBE_FRAMES = 256  # what cube.a99's FRAMES says, and it flips once a frame
 
 ROWS = 192
 GRAPHICS_I = 0
@@ -133,6 +136,49 @@ def test_gpu():
     check("the frame the suite froze", vdp.indices(rows), want)
 
 
+def test_gpu_interleaved():
+    """The cube, on one thread, against the same frozen frame the suite compares it to.
+
+    It is here rather than beside the Mandelbrot because it is the program that WAITS:
+    it pages its bitmap in the vertical blank, so it only finishes if raster() moves the
+    scanline register while gpu_step_n() is between slices.
+
+    The picture is not what makes this a test. The cube draws its 192 frames whatever
+    the pacing, so a broken interleave still produces the right image - what it cannot
+    produce is the right NUMBER of frames. One flip a frame is the most a program
+    waiting on the blank can manage, so anything under 192 says the wait fell through:
+    a budget expires between a compare and the jump that reads it, and a resume that
+    rebuilt the CPU with a zeroed status register took the branch on flags nothing set.
+    """
+    print("a GPU program that waits on the raster")
+    entry = 0x3200
+    program = open(CUBE, "rb").read()
+    image = bytearray(0x4000)
+    image[entry:entry + len(program)] = program
+
+    vdp = pico9918.Vdp()
+    vdp.gpu_init()
+    vdp.unlock()
+    vdp.write_vram(0, bytes(image))
+    vdp.raster(481)                     # a frame, so the raster it reads holds a value
+    vdp.write_reg(0x36, entry >> 8)
+    vdp.write_reg(0x37, entry & 0xFF)   # the low byte is what starts it
+
+    frames = lines = 0
+    while vdp.gpu_step_n(20000):
+        frames += vdp.raster()
+        lines += 1
+        if lines > 1_000_000:
+            raise AssertionError("the cube never finished - is raster() advancing?")
+    print("  ok  %d frames over %d raster lines" % (frames, lines))
+    if frames < CUBE_FRAMES:
+        raise AssertionError("%d frames for %d flips - the wait is falling through"
+                             % (frames, CUBE_FRAMES))
+
+    want = zlib.decompress(open(CUBE_REFERENCE, "rb").read())
+    check("the frame the suite froze", vdp.indices(ROWS), want)
+
+
 def test_lifetime():
     """What a functional test cannot see. Both assertions bind in a release interpreter:
     the type's refcount tracks live instances exactly, so a dealloc that never runs shows
@@ -181,6 +227,7 @@ def main():
     if pico9918.MODE:
         test_unlock()
         test_gpu()
+        test_gpu_interleaved()
 
     if args.png:
         from PIL import Image

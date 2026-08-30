@@ -43,6 +43,7 @@
 #endif
 
 #include "pico9918.h"
+#include "pico9918_frame.h"
 #include "pico9918_util.h"
 
 #if PICO9918_BUILD_MODE
@@ -63,7 +64,18 @@ typedef struct
 {
   PyObject_HEAD pico9918_t* vdp;
   PyObject* weakreflist;
+  /* where raster() has got to, per instance - see it for why a VDP driven from
+     Python has a display at all */
+  uint16_t rasterY;
+  uint16_t rasterLines;
+  uint8_t rasterScale;
 } VdpObject;
+
+/* The display raster() drives. A caller reading indices back has no display and needs
+   none, so these are not settable: what they are for is giving the F18A's scanline
+   register something to count, and 640x480 at 60Hz is the shipping VGA mode. */
+#define RASTER_WIDTH 640
+#define RASTER_LINES 480
 
 /* -------------------------------------------------------------------------
  * Argument conversion
@@ -155,6 +167,10 @@ static PyObject* vdpNew(PyTypeObject* type, PyObject* args, PyObject* kwds)
     Py_DECREF(self);
     return PyErr_NoMemory();
   }
+
+  self->rasterY     = 0;
+  self->rasterLines = RASTER_LINES;
+  self->rasterScale = 1;
 
   resetInstance(self->vdp);
   return (PyObject*)self;
@@ -446,6 +462,16 @@ static PyObject* vdpGpuStep(VdpObject* self, PyObject* Py_UNUSED(ignored))
   Py_RETURN_NONE;
 }
 
+static PyObject* vdpGpuStepN(VdpObject* self, PyObject* args, PyObject* kwds)
+{
+  static char* kwlist[]  = {"instructions", NULL};
+  uint32_t instructions = 0;
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O&:gpu_step_n", kwlist, convertU32,
+                                   &instructions))
+    return NULL;
+  return PyBool_FromLong(pico9918_gpu_step_n(self->vdp, instructions));
+}
+
 static PyObject* vdpGpuTime(VdpObject* Py_UNUSED(self), PyObject* args, PyObject* kwds)
 {
   static char* kwlist[] = {"total_time", NULL};
@@ -458,6 +484,45 @@ static PyObject* vdpGpuResetTime(VdpObject* Py_UNUSED(self), PyObject* Py_UNUSED
 {
   pico9918_gpu_reset_time();
   Py_RETURN_NONE;
+}
+
+/* Advance the display raster, which is the one thing a GPU program can wait on and the
+   one thing scan_line() does not do. scan_line renders a line; it does not publish one,
+   and the F18A's scanline register at >7000 is what a program polls to page a bitmap in
+   the vertical blank. Without this, such a program never comes back - and interleaving
+   it with gpu_step_n() is the whole shape of a single-threaded host.
+
+   The pixels are discarded. A caller reading indices back through rgb() or indices()
+   wants nothing from this but the raster's position. */
+static PyObject* vdpRaster(VdpObject* self, PyObject* args, PyObject* kwds)
+{
+  static char* kwlist[] = {"lines", NULL};
+  uint32_t lines        = 1;
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O&:raster", kwlist, convertU32, &lines))
+    return NULL;
+
+  static PICO9918_PIXEL_T pixels[RASTER_WIDTH + 16];
+  unsigned long frames = 0;
+
+  while (lines--)
+  {
+    if (self->rasterY < self->rasterLines)
+    {
+      pico9918_scanline_params_t params = {RASTER_WIDTH, self->rasterLines, false, 0};
+      pico9918_frame_scanline(self->vdp, self->rasterY++, &params, pixels);
+      continue;
+    }
+
+    pico9918_frame_porch(self->vdp);
+    pico9918_frame_display_t display = {RASTER_LINES, false, self->rasterScale,
+                                        self->rasterLines};
+    pico9918_frame_end(self->vdp, 30.0f, 60.0f, &display);
+    self->rasterScale = display.vPixelScale;
+    self->rasterLines = display.vVirtualPixels;
+    self->rasterY     = 0;
+    ++frames;
+  }
+  return PyLong_FromUnsignedLong(frames);
 }
 
 #endif /* PICO9918_BUILD_MODE */
@@ -494,6 +559,10 @@ static PyMethodDef vdpMethods[] = {
 #if PICO9918_BUILD_MODE
   VDP_NOARGS("gpu_init", vdpGpuInit, NULL),
   VDP_NOARGS("gpu_step", vdpGpuStep, "run the pending GPU program to completion"),
+  VDP_KW("gpu_step_n", vdpGpuStepN,
+         "run at most `instructions` of it, True while it still has work"),
+  VDP_KW("raster", vdpRaster,
+         "advance the display raster `lines` lines, returning the frames completed"),
   VDP_KW("gpu_time", vdpGpuTime, NULL),
   VDP_NOARGS("gpu_reset_time", vdpGpuResetTime, NULL),
 #endif
