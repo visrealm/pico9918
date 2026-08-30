@@ -107,6 +107,17 @@ static inline void wr16(uint8_t* m, uint16_t a, uint16_t v)
   m[(uint16_t)(a + 1)] = (uint8_t)(v & 0xFF);
 }
 
+/* Report a write to an address the program chose - see Tms9900Cpu::onWrite, which
+   also carries what this deliberately does not cover. */
+#if defined(TMS9900_WATCH_WRITES)
+static inline void watch_write(Tms9900Cpu* cpu, uint32_t addr)
+{
+  if (cpu->onWrite) cpu->onWrite(cpu->mem, addr);
+}
+#else
+#define watch_write(cpu, addr) ((void)0)
+#endif
+
 /* Workspace address: WP + r*2 as uint32_t to handle WP=0xFFFE overflow
  * past the 64KB boundary into the workspace overflow area */
 static inline uint32_t wp_addr(Tms9900Cpu* cpu, uint8_t r)
@@ -219,6 +230,7 @@ static void store_operand(Tms9900Cpu* cpu, const Operand* o, uint16_t v)
     {
       wr16(cpu->mem, o->addr, v);
     }
+    watch_write(cpu, o->addr);
   }
 }
 
@@ -904,6 +916,7 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
         uint8_t pp_wr = (uint8_t)(flags & 0x03);
         b             = (uint8_t)((b & ~pix_mask[s]) | (pp_wr << pix_shift[s]));
         cpu->mem[a]   = b;
+        watch_write(cpu, a);
       }
 
       if (flags & 0x0800) /* PIX_R: read back pixel into dest reg */
@@ -1100,12 +1113,27 @@ void tms9900_init(Tms9900Cpu* cpu, uint8_t* mem, uint8_t* regx38, uint16_t pc, u
   cpu->pc     = pc;
   cpu->wp     = wp;
   cpu->st     = 0;
+#if defined(TMS9900_WATCH_WRITES)
+  cpu->onWrite = NULL;
+#endif
 }
 
 uint16_t run9900_c(Tms9900Cpu* cpu)
 {
+  return run9900_budget_c(cpu, 0, NULL);
+}
+
+uint16_t run9900_budget_c(Tms9900Cpu* cpu, uint32_t budget, bool* outOfBudget)
+{
+  const int limited = budget != 0;
+  if (outOfBudget) *outOfBudget = false;
   while ((*cpu->regx38 & 1u) != 0)
   {
+    if (limited && budget-- == 0)
+    {
+      if (outOfBudget) *outOfBudget = true;
+      return cpu->pc;
+    }
     uint16_t inst = fetchw(cpu);
     uint8_t op_hi = (uint8_t)(inst >> 8); /* top byte of instruction */
 

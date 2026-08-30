@@ -3320,6 +3320,7 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
       if (regIndex == 0x37)
       {
         TMS_REGISTER(tms9918, 0x38) = 0;
+        tms9918->gpuStatus          = 0; /* a new program, not a resumed one */
         tms9918->restart            = 1;
       }
     }

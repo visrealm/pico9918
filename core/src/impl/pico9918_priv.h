@@ -203,6 +203,13 @@ struct pico9918_s
 
   uint16_t gpuAddress;
 
+  /* The GPU's status register, across a bounded step and nothing else. run9900 keeps
+     it in a local, which is all a run to completion needs; a budget can expire between
+     the compare that sets a flag and the jump that reads it, so a resume that started
+     from zero would take the wrong branch. Only the portable core takes a budget, so
+     only the portable core reads this. */
+  uint16_t gpuStatus;
+
   /* address or register write stage (0 or 1) */
   uint8_t regWriteStage;
 

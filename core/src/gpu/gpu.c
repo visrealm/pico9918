@@ -39,12 +39,28 @@
 #if defined(PICO_BUILD) && !defined(PICO9918_GPU_C_CORE)
 /* run9900() implemented in platform/thumb9900_{m0,m33}.S */
 extern uint16_t run9900(uint8_t* memory, uint16_t pc, uint16_t wp, uint8_t* regx38);
+#define PICO9918_GPU_BUDGETED 0
 #else
-static uint16_t run9900(uint8_t* mem, uint16_t pc, uint16_t wp, uint8_t* r38)
+/* Only the portable core takes a budget: the hand-written Thumb cores are what a
+   board runs, and a board has a core to spare. A budget of zero is no budget, so
+   this is the only entry the portable core needs. */
+#define PICO9918_GPU_BUDGETED 1
+#if defined(TMS9900_WATCH_WRITES)
+static void gpuDmaWatch(uint8_t* vram, uint32_t addr);
+#endif
+
+static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t wp, uint8_t* r38,
+                              uint32_t budget, uint16_t* st, bool* outOfBudget)
 {
   Tms9900Cpu cpu;
   tms9900_init(&cpu, mem, r38, pc, wp);
-  return run9900_c(&cpu);
+#if defined(TMS9900_WATCH_WRITES)
+  cpu.onWrite = gpuDmaWatch;
+#endif
+  cpu.st = *st;
+  const uint16_t next = run9900_budget_c(&cpu, budget, outOfBudget);
+  *st                 = cpu.st;
+  return next;
 }
 #endif
 
@@ -122,20 +138,21 @@ void isr_hardfault(void)
 /* -------------------------------------------------------------------------
  * Run a GPU DMA job
  * ---------------------------------------------------------------------- */
-static void triggerGpuDma(PICO9918_INST_ONLY_ARG)
+
+static void triggerGpuDma(uint8_t* vram)
 {
-  uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram.bytes + 0x8000));
-  uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(tms9918->vram.bytes + 0x8002));
-  uint32_t width       = tms9918->vram.bytes[0x8004];
-  uint32_t height      = tms9918->vram.bytes[0x8005];
-  uint32_t stride      = tms9918->vram.bytes[0x8006];
-  uint32_t params      = tms9918->vram.bytes[0x8007];
+  uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8000));
+  uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8002));
+  uint32_t width       = vram[0x8004];
+  uint32_t height      = vram[0x8005];
+  uint32_t stride      = vram[0x8006];
+  uint32_t params      = vram[0x8007];
 
   int32_t dstInc = (params & 0x02) ? -1 : 1;
   int32_t srcInc = (params & 0x01) ? 0 : dstInc;
 
-  uint8_t* srcPtr = tms9918->vram.bytes + srcVramAddr;
-  uint8_t* dstPtr = tms9918->vram.bytes + dstVramAddr;
+  uint8_t* srcPtr = vram + srcVramAddr;
+  uint8_t* dstPtr = vram + dstVramAddr;
   for (uint32_t y = 0; y < height; ++y)
   {
     for (uint32_t x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc) *dstPtr = *srcPtr;
@@ -143,8 +160,20 @@ static void triggerGpuDma(PICO9918_INST_ONLY_ARG)
     dstPtr += (stride - width) * dstInc;
   }
 
-  *(uint16_t*)(tms9918->vram.bytes + 0x8008) = 0;
+  *(uint16_t*)(vram + 0x8008) = 0;
 }
+
+#if defined(TMS9900_WATCH_WRITES)
+/*
+ * The MPU's job, done in software. Region 0 guards 32 bytes at 0x8000 and its
+ * handler reads the trigger, so this is the same test at the same moment - which
+ * is what lets a program start a transfer and carry straight on.
+ */
+static void gpuDmaWatch(uint8_t* vram, uint32_t addr)
+{
+  if ((addr & ~(uint32_t)0x1F) == 0x8000 && vram[0x8008]) triggerGpuDma(vram);
+}
+#endif
 
 /* -------------------------------------------------------------------------
  * MPU guards (Pico only). Region 0 covers the GPU DMA port, region 1 the
@@ -217,8 +246,10 @@ void __not_in_flash_func(pico9918_gpu_rearm_palette_guard)(PICO9918_INST_ONLY_AR
 /* -------------------------------------------------------------------------
  * Core GPU execution (non-inlined for stack safety)
  * ---------------------------------------------------------------------- */
-static PICO9918_NOINLINE void volatileHack(PICO9918_INST_ONLY_ARG)
+static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
 {
+  bool running     = false;
+  bool outOfBudget = false;
   tms9918->restart = 0;
   if ((tms9918->gpuAddress & 1) == 0) /* Odd addresses crash the RP2040 */
   {
@@ -238,16 +269,27 @@ static PICO9918_NOINLINE void volatileHack(PICO9918_INST_ONLY_ARG)
 #endif
 #endif /* PICO_BUILD */
 
+#if PICO9918_GPU_BUDGETED
+    lastAddress = run9900Budget(tms9918->vram.bytes, lastAddress, 0xFFFE,
+                                &TMS_REGISTER(tms9918, 0x38), budget, &tms9918->gpuStatus,
+                                &outOfBudget);
+#else
+    (void)budget;
     lastAddress = run9900(tms9918->vram.bytes, lastAddress, 0xFFFE, &TMS_REGISTER(tms9918, 0x38));
+#endif
 
 #ifdef PICO_BUILD
     mpu_hw->ctrl = 0; /* Turn off memory protection - all models */
 #endif
 
+    /* The run flag still set means the program did not finish - it parked on an
+       IDLE or a self-jump, or a budget ran out. Either way the PC is where to pick
+       it up, but only the budget leaves the program with work still to do. */
     if (TMS_REGISTER(tms9918, 0x38) & 1)
     {
       tms9918->gpuAddress = lastAddress;
       tms9918->restart    = 0;
+      running             = outOfBudget;
     }
 #ifdef PICO_BUILD
     if (didFault)
@@ -257,18 +299,21 @@ static PICO9918_NOINLINE void volatileHack(PICO9918_INST_ONLY_ARG)
          ahead of the trigger; with the palette region already down, the fault cannot
          have been PRAM */
       if (tms9918->vram.bytes[0x8008])
-        triggerGpuDma(PICO9918_INST_ONLY);
+        triggerGpuDma(tms9918->vram.bytes);
       else if (!pico9918_gpu_palette_guard_off)
         gpuPaletteFault(PICO9918_INST_ONLY);
       goto restart;
     }
-#else
-    /* no MPU to fault on the port, so it is read once the program stops itself */
-    if (tms9918->vram.bytes[0x8008]) triggerGpuDma(PICO9918_INST_ONLY);
 #endif
   }
+  /* A budget that ran out leaves a program that is still running, and saying so is
+     the whole point of it. Without one the flags come down exactly as they always
+     have, including for a program parked on a self-jump. */
+  if (running) return true;
+
   TMS_STATUS(tms9918, 2) &= ~0x80; /* Stopped */
   TMS_REGISTER(tms9918, 0x38) = 0;
+  return false;
 }
 
 /* -------------------------------------------------------------------------
@@ -331,7 +376,7 @@ void pico9918_gpu_step(PICO9918_INST_ONLY_ARG)
   {
     reportedBack      = false;
     uint32_t gpuStart = PICO9918_HOST_TIME_US();
-    volatileHack(PICO9918_INST_ONLY);
+    volatileHack(PICO9918_INST 0);
     gpuTimeUs += PICO9918_HOST_TIME_US() - gpuStart;
   }
   reportedBack = true;
@@ -350,6 +395,46 @@ void pico9918_gpu_step(PICO9918_INST_ONLY_ARG)
       if (gpu_config_save_cb) gpu_config_save_cb(tms9918->config, key);
     }
   }
+}
+
+/*
+ * The same pass, but capped, for a host that has only the one thread.
+ *
+ * The cap is what lets a caller interleave: a program that waits on the scanline at
+ * >7000 cannot finish until something advances it, and nothing can while the core is
+ * inside run9900. Returning with the PC kept is what makes the next call carry on.
+ */
+bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions)
+{
+  bool running = false;
+
+  if (tms9918->restart)
+  {
+    reportedBack      = false;
+    uint32_t gpuStart = PICO9918_HOST_TIME_US();
+    running           = volatileHack(PICO9918_INST instructions);
+    gpuTimeUs += PICO9918_HOST_TIME_US() - gpuStart;
+    /* volatileHack clears it on the way in, so put it back for the next slice */
+    if (running) tms9918->restart = 1;
+  }
+  reportedBack = !running;
+
+  if (tms9918->flash)
+  {
+    if (gpu_flash_cb) gpu_flash_cb();
+  }
+
+  for (int i = 0; i < (int)(sizeof(configActionKeys) / sizeof(configActionKeys[0])); ++i)
+  {
+    const uint8_t key = configActionKeys[i];
+    if (tms9918->config[key])
+    {
+      tms9918->config[key] = 0;
+      if (gpu_config_save_cb) gpu_config_save_cb(tms9918->config, key);
+    }
+  }
+
+  return running;
 }
 
 /*

@@ -62,18 +62,46 @@ void pico9918_gpu_loop(PICO9918_INST_ONLY_ARG);
  * One pass of that loop: run a pending trigger to completion, then dispatch any
  * flash and config-action requests. Returns.
  *
- * For a host with no core to spare - a test harness, or any single-threaded
- * emulator. It is the loop's body rather than a second copy of it, so a program
- * run this way is run by the same code the device runs it with, and it is timed
- * into the same accumulator pico9918_gpu_time reads.
+ * It is the loop's body rather than a second copy of it, so a program run this
+ * way is run by the same code the device runs it with, and it is timed into the
+ * same accumulator pico9918_gpu_time reads.
  *
  * How long it takes is the program's business: run9900 returns on IDLE or when
  * the program clears its own run flag (TMS register 0x38 bit 0), and a program
- * that does neither does not return. A caller that cannot accept that needs a
- * second thread of control to clear that byte.
+ * that does neither does not return.
+ *
+ * Which makes this the wrong entry for a host with one thread, however much it
+ * looks like the right one. A program may WAIT on the display - the scanline
+ * being scanned out is readable at >7000 - and the caller that would advance the
+ * raster is the one blocked in here. Use pico9918_gpu_step_n for that, or give
+ * the GPU a thread and render on the one you have.
  */
 PICO9918_DLLEXPORT
 void pico9918_gpu_step(PICO9918_INST_ONLY_ARG);
+
+/**
+ * The same pass, capped at `instructions`, returning true while the program still
+ * has work left. Zero means no cap, which is pico9918_gpu_step().
+ *
+ * This is the entry for a host with one thread. pico9918_gpu_step() cannot come back
+ * until the program stops itself, so a program that waits on the scanline at >7000 -
+ * to page a bitmap in the vertical blank, say - would wait forever: the caller that
+ * would advance the raster is the one blocked inside it. Capped, the caller gets
+ * control back with the PC kept, renders, and calls again:
+ *
+ *     while (pico9918_gpu_step_n(PICO9918_INST 20000))
+ *       renderOneScanline();
+ *
+ * A host with a thread to spare wants pico9918_gpu_loop() on it instead, which is
+ * what the firmware does. Both shapes are real; this one asks nothing of the host
+ * but a loop.
+ *
+ * Only the portable C core counts instructions. On a board built with the
+ * hand-written Thumb core the cap is ignored and this runs to completion - which
+ * costs that build nothing, because it has a core to give the GPU.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions);
 
 /**
  * Return the GPU's CPU time in microseconds.

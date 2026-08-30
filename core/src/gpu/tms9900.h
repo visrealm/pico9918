@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -34,6 +35,17 @@ extern "C"
 #define TMS_ST_OV  0x08 /* Overflow */
 #define TMS_ST_P   0x04 /* Parity (odd) */
 
+/*
+ * Off-target, nothing watches memory for the library the way a Pico's MPU does, so
+ * a write to the GPU's DMA port is not seen until the run returns - which is far
+ * too late for a program that triggers a transfer and then keeps going. The
+ * interpreter reports writes instead. On a Pico the hardware does it and none of
+ * this is compiled.
+ */
+#if !defined(PICO_BUILD)
+#define TMS9900_WATCH_WRITES 1
+#endif
+
   typedef struct Tms9900Cpu
   {
     uint8_t* mem;    /* Pointer to memory backing the CPU */
@@ -41,6 +53,19 @@ extern "C"
     uint32_t pc;     /* Program counter (uint32_t to handle WP=0xFFFE overflow) */
     uint16_t wp;     /* Workspace pointer */
     uint16_t st;     /* Status register (flag layout matches assembly core) */
+#if defined(TMS9900_WATCH_WRITES)
+    /*
+     * Called after a write to an address the running program chose, or null.
+     *
+     * LIMITATION: workspace-relative writes are not reported - register stores and
+     * the context saves BLWP and XOP make. Those land at WP+n, and WP is >FFFE, so
+     * they can only reach a watched address if a program moves its workspace onto
+     * one with LWPI. Nothing does. Widening this means routing set_reg and the
+     * context saves through the same watch, which costs the CPU core's hot path a
+     * call per register write.
+     */
+    void (*onWrite)(uint8_t* mem, uint32_t addr);
+#endif
   } Tms9900Cpu;
 
   /* Initialize a CPU context */
@@ -48,6 +73,22 @@ extern "C"
 
   /* Execute until regx38 bit0 is cleared or an IDLE occurs. Returns final PC. */
   uint16_t run9900_c(Tms9900Cpu* cpu);
+
+  /* The same, giving up after at most `budget` instructions - zero means no limit.
+     Returns the PC either way, which is what makes it resumable: a host with one
+     thread interleaves this with its renderer, and a program that waits on the
+     raster gets a raster that moves.
+
+     A budget that runs out and a program that parks on an IDLE or a self-jump both
+     leave the run flag set, so the flag cannot tell them apart. `outOfBudget`, if
+     given, does: only that one has work still to do.
+
+     The PC is not the whole of what a resume needs. A budget expires BETWEEN
+     instructions, which includes between a compare and the jump that reads what it
+     set, so `cpu->st` has to come back too: build the next call's Tms9900Cpu from the
+     one this returned rather than from tms9900_init, which starts the status at zero
+     and would have that jump decide on flags nothing set. */
+  uint16_t run9900_budget_c(Tms9900Cpu* cpu, uint32_t budget, bool* outOfBudget);
 
 #ifdef __cplusplus
 }
