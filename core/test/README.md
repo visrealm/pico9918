@@ -6,7 +6,7 @@ you ran last.
 | Question | Where | What it is | Needs |
 |---|---|---|---|
 | Does the renderer still draw exactly what it drew before? | [`golden/`](golden/) | A C program that dumps every line of fixed scenes byte for byte | A C compiler |
-| Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 111 scenes, five property suites and a TMS9900 GPU program | A C compiler and Python |
+| Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 111 scenes, five property suites and two TMS9900 GPU programs | A C compiler and Python |
 | Is the installed package actually usable? | [`package/`](package/) | A separate project that finds the library with `find_package` and calls it | A C compiler |
 | Does the TMS9900 GPU core execute correctly? | [`tms9900/`](tms9900/) | Every instruction group through both cores, results compared | A Pico |
 

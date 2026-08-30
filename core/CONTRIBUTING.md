@@ -38,7 +38,7 @@ does.
 Whichever side it is applied on:
 
     tools/ci.sh goldens     the 16 committed frames, byte-exact
-    tools/ci.sh suite       111 scenes, five properties and a GPU program, both line widths
+    tools/ci.sh suite       111 scenes, five properties and two GPU programs, both widths
     tools/ci.sh warnings    -Wall -Wextra -Werror
     tools/ci.sh multi       the instance threaded through every signature
     tools/ci.sh tms9918     PICO9918_MODE=0, its frame against the F18A build's

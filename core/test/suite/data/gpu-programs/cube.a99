@@ -1,0 +1,614 @@
+*
+* pico9918-core - a solid rotating cube, drawn by the F18A's GPU.
+*
+* Two bits a pixel is four colours, and a cube never shows more than three faces at
+* once - so opposite faces share one, and the bitmap only ever says WHICH face a
+* pixel belongs to. What colour that face is lives in palette RAM, and the program
+* rewrites it every frame: the light is fixed, the cube turns under it, and three
+* words of PRAM carry the shading a per-pixel renderer would have to redraw.
+*
+* Two bitmaps, and VR32 says which one is on screen. The frame being drawn is never
+* the frame being displayed, and the page and the palette both change in the vertical
+* blank, so a viewer never catches a half-drawn cube or a half-shaded one.
+*
+* That is the point of the fixture. From a program running inside VRAM it drives:
+*   the VDP register file at >6000, the bitmap layer's own registers included
+*   the 2bpp bitmap layer, and VR32 flipped every frame to page between two
+*   palette RAM at >5000, rewritten every frame
+*   the scanline counter at >7000, waited on every frame
+*   IDLE, once the last frame is on screen
+*
+* Which makes it a fixture for the HOST too: a host that does not advance the raster
+* while a program runs hangs here rather than quietly rendering the wrong thing.
+*
+* Nothing here clips, so the cube has to fit. After the spin a vertex reaches
+* R*sqrt(2), and the tilt then takes y to R*(cosB + sqrt(2)*sinB) = 1.62*R - so it
+* is height that binds, not width, and 48 is the largest R that lands inside 160
+* rows. Grow the cube and the span buffers overflow first.
+*
+* Fixed point is Q14 throughout (1.0 = >4000). The cube spins about Y and is tilted
+* a constant 33.75 degrees about X. The tilt is what puts a third face on screen at
+* all, and because it never changes, neither does the top's angle to the viewer -
+* so the top holds one shade all the way round while the sides sweep.
+*
+* Assembled with xdt99:  xas99.py -b -R -18 -a '>3200' cube.a99 -o cube.bin
+*
+* GPU address space (f18a_gpu.vhd):
+*   >0000-3FFF VRAM   >4000-47FF GRAM   >5000-507F PRAM
+*   >6000-603F VDP registers      >7000 scanline (read-only)
+*
+       AORG >3200
+*
+* VRAM layout:
+*   >0000-18FF  bitmap A          >1900-31FF  bitmap B
+*   >3200       this program
+*   >3800-3A7F  span buffers      >3A80-3ABF  variables
+*   >3B00-3B1F  the tile colour table, which stays zero
+*   >3F00       sprite attributes
+*
+BUFA   EQU  >0000
+BUFB   EQU  >1900
+BMLW   EQU  160                   a square bitmap: the cube is as tall as it is wide
+BMLH   EQU  160
+BPR    EQU  40                    bytes a row - BMLW / 4
+BMLSZ  EQU  6400                  BPR * BMLH
+CENTX  EQU  80                    the middle of the bitmap, not of the screen
+CENTY  EQU  80
+*
+SPRATT EQU  >3F00
+CTAB   EQU  >3B00                 32 zero bytes: every tile transparent
+VDPREG EQU  >6000
+SCANLN EQU  >7000                 the line being scanned out
+PRAM   EQU  >5000
+PALRED EQU  PRAM+>42              palette entry 33, the X faces
+PALGRN EQU  PRAM+>44              entry 34, the Y faces
+PALBLU EQU  PRAM+>46              entry 35, the Z faces
+*
+TILT   EQU  6                     table steps of tilt - 33.75 degrees
+*
+* The table has 64 entries to the turn, but ANGLE counts in 256ths of one of those,
+* so how far the cube turns in a frame is not tied to how coarse the table is - see
+* SINF. A turn is 64*256, which is also where 16 bits wrap, so ANGLE needs no mask.
+TURN   EQU  16384
+SPIN   EQU  64                    256 frames to the turn
+START  EQU  1536                  six table entries in, where a frame looks best
+FRAMES EQU  256                   one turn, then stop
+*
+* The leftmost and rightmost x the face covers on each row.
+XMIN   EQU  >3800                 BMLH words
+XMAX   EQU  >3940                 BMLH words
+*
+SXTAB  EQU  >3A80                 8 projected x
+SYTAB  EQU  >3A90                 8 projected y
+SINA   EQU  >3AA0
+COSA   EQU  >3AA2
+SINB   EQU  >3AA4
+COSB   EQU  >3AA6
+ANGLE  EQU  >3AA8
+BACK   EQU  >3AAA                 the bitmap being drawn into
+FCOLR  EQU  >3AAC                 2bpp index of the face being drawn
+FYMIN  EQU  >3AAE
+FYMAX  EQU  >3AB0
+NZ     EQU  >3AB2                 how square-on the visible face is: its normal's z
+FBASE  EQU  >3AB4                 byte offset of the visible face in FACES
+PALBUF EQU  >3AB6                 the frame's three colours, until FLIP posts them
+LEFT   EQU  >3ABC                 frames still to draw
+*
+* ---------------------------------------------------------------------------
+CUBE   BL   @SETUP
+       LI   R0,START
+       MOV  R0,@ANGLE
+       LI   R0,FRAMES
+       MOV  R0,@LEFT
+       LI   R0,BUFA
+       MOV  R0,@BACK
+NEXTF  BL   @CLRBML
+       BL   @PROJ
+       BL   @DOFACE
+       BL   @FLIP
+       MOV  @ANGLE,R0
+       AI   R0,SPIN
+       MOV  R0,@ANGLE
+       MOV  @LEFT,R0
+       DEC  R0
+       MOV  R0,@LEFT
+       JNE  NEXTF
+       IDLE
+*
+* ---------------------------------------------------------------------------
+* Show the bitmap just drawn, and start drawing into the other one.
+*
+* In the vertical blank, and not only the page: the palette goes with it. Both are
+* what the frame LOOKS like, so both have to land between two frames rather than
+* inside one - a page flipped mid-picture shows one cube on top of another, and a
+* palette written mid-picture shades the same face two ways down the screen. The
+* shading is computed a face at a time as the drawing goes, so it waits here in
+* PALBUF rather than going straight to PRAM.
+* The wait is for the EDGE into the blank, not for the blank: out of it first, then
+* into it. A drawing that finished quickly is still inside the blank it flipped on,
+* and a level test would let it flip again in the same one - two frames on the glass
+* for one frame of the display, and the turn running at whatever speed the host draws.
+FLIP   CLR  R0
+FLIPP  MOVB @SCANLN,R0            >FF is the F18A's vsync line, and the top border
+       CI   R0,>FF00              leaves it there, so the window is wide
+       JEQ  FLIPP
+FLIPW  MOVB @SCANLN,R0
+       CI   R0,>FF00
+       JNE  FLIPW
+       MOV  @BACK,R0
+       SRL  R0,6                  VR32 is the base address, 64 bytes to the unit
+       SLA  R0,8                  MOVB sends the high byte
+       MOVB R0,@VDPREG+>20
+       MOV  @PALBUF,@PALRED
+       MOV  @PALBUF+2,@PALGRN
+       MOV  @PALBUF+4,@PALBLU
+       LI   R0,BUFB
+       XOR  @BACK,R0
+       MOV  R0,@BACK
+       RT
+*
+* ---------------------------------------------------------------------------
+* Registers, then the bitmap layer's own, then the sprite list off. The tile
+* tables are never filled: every colour table entry is zero, so whatever the
+* name and pattern tables happen to hold, every tile is transparent and the
+* backdrop is what shows around the bitmap.
+SETUP  LI   R1,VREGS
+       LI   R2,VDPREG
+       LI   R3,8
+SETRLP MOVB *R1+,*R2+
+       DEC  R3
+       JNE  SETRLP
+       LI   R1,BMLREG
+       LI   R2,VDPREG+>1F
+       LI   R3,6
+SETBLP MOVB *R1+,*R2+
+       DEC  R3
+       JNE  SETBLP
+       LI   R1,>D000
+       MOVB R1,@SPRATT
+       RT
+*
+* ---------------------------------------------------------------------------
+* Eight words a turn round the loop: at one, two instructions in three are the loop
+* rather than the clearing, and this covers the whole bitmap every frame.
+CLRBML MOV  @BACK,R0
+       LI   R1,BMLSZ/16
+CLRLP  CLR  *R0+
+       CLR  *R0+
+       CLR  *R0+
+       CLR  *R0+
+       CLR  *R0+
+       CLR  *R0+
+       CLR  *R0+
+       CLR  *R0+
+       DEC  R1
+       JNE  CLRLP
+       RT
+*
+* ---------------------------------------------------------------------------
+* r0 = (r0 * r1) >> 14, both signed. Clobbers R0-R2 and R4, nothing above.
+SMUL   CLR  R4                    R4 goes to -1 if the result is negative
+       MOV  R0,R0
+       JGT  SMULB
+       JEQ  SMULB
+       NEG  R0
+       SETO R4
+SMULB  MOV  R1,R2
+       JGT  SMULC
+       JEQ  SMULC
+       NEG  R2
+       INV  R4
+SMULC  MPY  R2,R0                 R0:R1 = R0 * R2
+       SRL  R1,14
+       SLA  R0,2
+       SOC  R0,R1
+       MOV  R1,R0
+       MOV  R4,R4
+       JEQ  SMULD
+       NEG  R0
+SMULD  RT
+*
+* ---------------------------------------------------------------------------
+* sin of the angle in R2, into R0.
+*
+* The angle's high byte picks a table entry and its low byte says how far past that
+* entry it falls, and the answer is that far along the straight line to the next one.
+* Which is what decouples how smoothly the cube turns from how big the table is: a
+* whole entry is 5.6 degrees and would be a coarse step to take in one frame, while
+* the line across one of those is never a thousandth of full scale away from the
+* curve - a twentieth of a pixel at this radius.
+*
+* Clobbers R0-R4, R7 and R8, none of which a caller is holding across it.
+SINF   MOV  R11,R8
+       MOV  R2,R3
+       SRL  R3,8
+       ANDI R3,63
+       SLA  R3,1
+       MOV  @SINTB(R3),R7         the entry the angle lands on
+       AI   R3,2
+       ANDI R3,>7E                and the next, wrapping round with the turn
+       MOV  @SINTB(R3),R0
+       S    R7,R0                 the rise across that step
+       MOV  R2,R1
+       ANDI R1,>00FF
+       SLA  R1,6                  how far along it, as Q14
+       BL   @SMUL
+       A    R7,R0
+       B    *R8
+*
+* ---------------------------------------------------------------------------
+* Spin every vertex about Y, tilt about X, drop z. Orthographic, so there is no
+* divide anywhere in here.
+PROJ   MOV  R11,R10
+       MOV  @ANGLE,R2
+       BL   @SINF
+       MOV  R0,@SINA
+       MOV  @ANGLE,R2
+       AI   R2,TURN/4             cos A is sin a quarter turn on
+       BL   @SINF
+       MOV  R0,@COSA
+       MOV  @SINTB+12,@SINB       the tilt is a whole entry, so it is read straight
+       MOV  @SINTB+44,@COSB       out - TILT*2, and (TILT+16)*2
+       CLR  R5                    byte offset into VERTS
+       CLR  R6                    byte offset into SXTAB / SYTAB
+PROJLP MOV  @VERTS(R5),R12
+       MOV  @VERTS+2(R5),R13
+       MOV  @VERTS+4(R5),R14
+       MOV  R12,R0                x1 = x cosA + z sinA
+       MOV  @COSA,R1
+       BL   @SMUL
+       MOV  R0,R3
+       MOV  R14,R0
+       MOV  @SINA,R1
+       BL   @SMUL
+       A    R0,R3
+       MOV  R14,R0                z1 = z cosA - x sinA
+       MOV  @COSA,R1
+       BL   @SMUL
+       MOV  R0,R7
+       MOV  R12,R0
+       MOV  @SINA,R1
+       BL   @SMUL
+       S    R0,R7
+       MOV  R13,R0                y2 = y cosB - z1 sinB
+       MOV  @COSB,R1
+       BL   @SMUL
+       MOV  R0,R8
+       MOV  R7,R0
+       MOV  @SINB,R1
+       BL   @SMUL
+       S    R0,R8
+       AI   R3,CENTX
+       MOV  R3,@SXTAB(R6)
+       NEG  R8                    rows count down the screen, so +y is up
+       AI   R8,CENTY
+       MOV  R8,@SYTAB(R6)
+       AI   R5,6
+       INCT R6
+       CI   R6,16
+       JLT  PROJLP
+       B    *R10
+*
+* ---------------------------------------------------------------------------
+* The three visible faces, one per axis. Which of a pair faces us is the sign of
+* its normal's z, so there is no winding test and no depth sort.
+DOFACE MOV  R11,R10
+       CLR  R15
+FACELP BL   @NORMAL
+       MOV  @NZ,R0
+       JGT  FACEPO
+       NEG  @NZ                   the other one of the pair faces us, so z comes
+*                                 out of here positive whichever member it is
+       MOV  R15,R0
+       SLA  R0,1
+       INC  R0
+       JMP  FACEGO
+FACEPO MOV  R15,R0
+       SLA  R0,1
+FACEGO SLA  R0,2                  four vertex indices a face
+       MOV  R0,@FBASE
+       MOV  R15,R0                colour 1, 2 or 3 - one per axis
+       INC  R0
+       MOV  R0,@FCOLR
+       BL   @LIGHT
+       BL   @FILL
+       INC  R15
+       CI   R15,3
+       JLT  FACELP
+       B    *R10
+*
+* ---------------------------------------------------------------------------
+* The z of pair R15's + face normal, rotated into view space. Only z: it is both
+* the visibility test and, once DOFACE has made it positive, the whole of the
+* shading - so x and y would be computed to be multiplied by nothing.
+NORMAL MOV  R11,R9
+       MOV  R15,R0
+       JEQ  NRMX
+       CI   R0,1
+       JEQ  NRMY
+       MOV  @COSA,R0              +Z: (sinA, -cosA sinB, cosA cosB)
+       MOV  @COSB,R1
+       BL   @SMUL
+       MOV  R0,@NZ
+       B    *R9
+NRMX   MOV  @SINA,R0              +X: (cosA, sinA sinB, -sinA cosB)
+       MOV  @COSB,R1
+       BL   @SMUL
+       NEG  R0
+       MOV  R0,@NZ
+       B    *R9
+NRMY   MOV  @SINB,@NZ             +Y: (0, cosB, sinB) - it never turns, so this
+       B    *R9                   never changes
+*
+* ---------------------------------------------------------------------------
+* n . light, into an intensity, into this face's palette entry. Not one pixel
+* changes here - only what the index already in the bitmap means.
+*
+* The light is at the viewer, and that is the only place it can be. A pair shares
+* one palette entry and its two members swap over edge-on, so the entry has to come
+* out the same for both at that instant or the swap is a visible step. Their dots
+* are +d and -d, which agree only at d = 0 - so the light has to be perpendicular
+* to every edge-on normal, and edge-on to the viewer is what edge-on means.
+*
+* So the dot is the visible normal's z, DOFACE has already made that positive, and
+* the whole of the shading is a shift: a face is brightest square-on and falls to
+* the ambient at either silhouette, which is where it is a hairline anyway.
+LIGHT  MOV  R11,R9
+       MOV  @NZ,R3
+       SRL  R3,10                 Q14 down to a nibble - cosB caps it at 13
+       AI   R3,2                  2..15 - the ambient keeps a face off pure black
+       MOV  @FCOLR,R0
+       CI   R0,1
+       JNE  LIGHTC
+       SLA  R3,8
+       MOV  R3,@PALBUF
+       B    *R9
+LIGHTC CI   R0,2
+       JNE  LIGHTD
+       SLA  R3,4
+       MOV  R3,@PALBUF+2
+       B    *R9
+LIGHTD MOV  R3,@PALBUF+4
+       B    *R9
+*
+* ---------------------------------------------------------------------------
+* Fill the quad at FBASE. Its four edges are walked into a per-row min and max,
+* so a convex face is one span a row and needs no sorting.
+FILL   MOV  R11,R9
+       LI   R0,>7FFF
+       MOV  R0,@FYMIN
+       LI   R0,>8000
+       MOV  R0,@FYMAX
+       MOV  @FBASE,R5
+       CLR  R6
+FBNDLP MOVB @FACES(R5),R7
+       SRL  R7,8
+       SLA  R7,1
+       MOV  @SYTAB(R7),R0
+       C    R0,@FYMIN
+       JGT  FBND1
+       MOV  R0,@FYMIN
+FBND1  C    R0,@FYMAX
+       JLT  FBND2
+       MOV  R0,@FYMAX
+FBND2  INC  R5
+       INC  R6
+       CI   R6,4
+       JLT  FBNDLP
+*
+       MOV  @FYMIN,R6             only the rows this face touches
+       LI   R0,>7FFF
+       LI   R1,>8000
+FCLRLP MOV  R6,R7
+       SLA  R7,1
+       MOV  R0,@XMIN(R7)
+       MOV  R1,@XMAX(R7)
+       INC  R6
+       C    R6,@FYMAX
+       JLE  FCLRLP
+*
+       MOV  @FBASE,R5
+       CLR  R6
+FEDGLP MOVB @FACES(R5),R7
+       SRL  R7,8
+       SLA  R7,1
+       MOV  @SXTAB(R7),R0         the edge goes to EDGE in registers, and stays there
+       MOV  @SYTAB(R7),R1
+       MOV  R6,R8                 the next vertex round, wrapping at four
+       INC  R8
+       ANDI R8,3
+       MOV  @FBASE,R7
+       A    R8,R7
+       MOVB @FACES(R7),R7
+       SRL  R7,8
+       SLA  R7,1
+       MOV  @SXTAB(R7),R2
+       MOV  @SYTAB(R7),R3
+       BL   @EDGE
+       INC  R5
+       INC  R6
+       CI   R6,4
+       JLT  FEDGLP
+*
+* A span is at most two ragged bytes with whole ones between, so it is written as
+* that: one masked merge at each end and a store per byte in the middle. Neither the
+* colour nor the address arithmetic changes while a face is drawn, so both are lifted
+* out here - this loop covers most of the pixels the program draws.
+       MOV  @FCOLR,R4
+       MOVB @SOLID(R4),R3         all four pixels this face's colour
+       MOV  @FYMIN,R12
+       MOV  R12,R14
+       SLA  R14,3
+       MOV  R14,R0
+       SLA  R0,2
+       A    R0,R14                y * 40
+       A    @BACK,R14             where this row starts
+FROWLP MOV  R12,R13
+       SLA  R13,1
+       MOV  @XMIN(R13),R1
+       MOV  @XMAX(R13),R2
+       C    R1,R2
+       JGT  FROWNX
+       MOV  R1,R4
+       SRL  R4,2
+       A    R14,R4                the byte the span opens in
+       MOV  R2,R5
+       SRL  R5,2
+       A    R14,R5                the byte it closes in
+       MOV  R1,R6
+       ANDI R6,3
+       C    R4,R5
+       JEQ  FONE
+       MOV  R6,R6
+       JEQ  FRIGHT                it already opens on a byte
+       MOVB @MASKL(R6),R7
+       BL   @MERGE
+       INC  R4
+FRIGHT MOV  R2,R8
+       ANDI R8,3
+       CI   R8,3
+       JEQ  FSOLID                and already closes on one
+       MOVB @MASKR(R8),R7
+       MOV  R4,R13                MERGE writes where R4 points, so lend it R4
+       MOV  R5,R4
+       BL   @MERGE
+       MOV  R13,R4
+       DEC  R5
+FSOLID C    R4,R5
+       JGT  FROWNX
+FSOLLP MOVB R3,*R4+
+       C    R4,R5
+       JLE  FSOLLP
+       JMP  FROWNX
+FONE   MOV  R2,R8                 both ends inside one byte, so both mask it
+       ANDI R8,3
+       MOVB @MASKR(R8),R0
+       MOVB @MASKL(R6),R7
+       INV  R0
+       SZCB R0,R7                 the pixels the two ends agree on
+       BL   @MERGE
+FROWNX INC  R12
+       AI   R14,BPR
+       C    R12,@FYMAX
+       JLE  FROWLP
+       B    *R9
+*
+* ---------------------------------------------------------------------------
+* This face's colour into the byte at R4, but only the pixels R7 masks. Clobbers
+* R0, R6 and R8 - not R5, which the caller is still holding the far end in.
+MERGE  MOV  R7,R8
+       INV  R8
+       MOVB *R4,R6
+       SZCB R7,R6                 out with the pixels being replaced
+       MOV  R3,R0
+       SZCB R8,R0
+       SOCB R0,R6                 in with this face's, where the mask says
+       MOVB R6,*R4
+       RT
+*
+* ---------------------------------------------------------------------------
+* One edge, into the span buffers. Bresenham, so no divide.
+*
+* Every value it steps lives in a register. A symbolic operand is an extra word to
+* fetch and an address to form before the access, and this loop turns once per pixel
+* of every edge of every face.
+*
+* In:  R0,R1 the first end   R2,R3 the second.  Out: nothing but the span buffers.
+* Uses R4 dx, R7 dy (negative), R8 and R12 the two directions, R13 the error, R14
+* scratch - none of which the caller is holding.
+EDGE   MOV  R2,R4
+       S    R0,R4
+       LI   R8,1
+       MOV  R4,R4
+       JGT  EDGA
+       JEQ  EDGA
+       NEG  R4
+       LI   R8,-1
+EDGA   MOV  R3,R7
+       S    R1,R7
+       LI   R12,1
+       MOV  R7,R7
+       JGT  EDGB
+       JEQ  EDGB
+       NEG  R7
+       LI   R12,-1
+EDGB   NEG  R7                    dy is carried negative
+       MOV  R4,R13
+       A    R7,R13
+EDGLP  MOV  R1,R14
+       SLA  R14,1
+       C    R0,@XMIN(R14)
+       JGT  EDGC
+       MOV  R0,@XMIN(R14)
+EDGC   C    R0,@XMAX(R14)
+       JLT  EDGD
+       MOV  R0,@XMAX(R14)
+EDGD   C    R0,R2
+       JNE  EDGE2
+       C    R1,R3
+       JEQ  EDGEND
+EDGE2  MOV  R13,R14
+       SLA  R14,1
+       C    R14,R7
+       JLT  EDGE3
+       A    R7,R13
+       A    R8,R0
+EDGE3  C    R14,R4
+       JGT  EDGLP
+       A    R4,R13
+       A    R12,R1
+       JMP  EDGLP
+EDGEND RT
+*
+* ---------------------------------------------------------------------------
+* VR1 >C0 is 16K and display on. VR3 >EC puts the colour table at >3B00, which
+* is never written - so every tile is transparent and the backdrop shows around
+* the bitmap. VR5 >7E puts sprite attributes at >3F00, where one >D0 ends the
+* list.
+VREGS  DATA >00C0,>00EC,>007E,>0001
+*
+* VR31 >C8  enable, priority, opaque, 2bpp, palette group 8 - entries 32-35
+* VR32 >6C  bitmap B is on screen first, while A is drawn
+* VR33 >20  x = 32     VR34 >18  y = 24    - centres 192x144 on 256x192
+* VR35 >C0  192 pixels across                VR36 >90  144 rows
+BMLREG DATA >C864,>3010,>A0A0
+*
+* Colour c in all four pixels of a byte, for the middle of a span. Four pixels to a
+* byte, most significant first, so pixel p owns bits 7-2p and 6-2p.
+SOLID  BYTE >00,>55,>AA,>FF
+*
+* The bits from pixel p to the end of the byte, and from its start to pixel p - the
+* two ragged ends of a span, and their AND when one byte holds both.
+MASKL  BYTE >FF,>3F,>0F,>03
+MASKR  BYTE >C0,>F0,>FC,>FF
+       EVEN
+*
+* The cube, +/-50 on a side: a tilted diagonal still lands inside 144 rows.
+VERTS  DATA -48,-48,-48
+       DATA  48,-48,-48
+       DATA  48, 48,-48
+       DATA -48, 48,-48
+       DATA -48,-48, 48
+       DATA  48,-48, 48
+       DATA  48, 48, 48
+       DATA -48, 48, 48
+*
+* Four vertices a face, in perimeter order, + face then - face of each axis.
+FACES  BYTE 1,5,6,2              +X
+       BYTE 4,0,3,7              -X
+       BYTE 3,2,6,7              +Y
+       BYTE 4,5,1,0              -Y
+       BYTE 5,4,7,6              +Z
+       BYTE 0,1,2,3              -Z
+*
+* sin, Q14, 64 steps to the turn. cos is the same table a quarter turn on.
+SINTB  DATA >0000,>0646,>0C7C,>1294,>187E,>1E2B,>238E,>289A
+       DATA >2D41,>3179,>3537,>3871,>3B21,>3D3F,>3EC5,>3FB1
+       DATA >4000,>3FB1,>3EC5,>3D3F,>3B21,>3871,>3537,>3179
+       DATA >2D41,>289A,>238E,>1E2B,>187E,>1294,>0C7C,>0646
+       DATA >0000,>F9BA,>F384,>ED6C,>E782,>E1D5,>DC72,>D766
+       DATA >D2BF,>CE87,>CAC9,>C78F,>C4DF,>C2C1,>C13B,>C04F
+       DATA >C000,>C04F,>C13B,>C2C1,>C4DF,>C78F,>CAC9,>CE87
+       DATA >D2BF,>D766,>DC72,>E1D5,>E782,>ED6C,>F384,>F9BA
+*
+       END

@@ -7,16 +7,21 @@
     python gpu.py --update            freeze the picture a program draws
     python gpu.py --png shots         also write a PNG per program
 
-The programs are other people's work, and `data/gpu-programs/README.md` credits each one.
-`gpu-mandel` is **Tursi's** F18A GPU Mandelbrot, which is the point of it: a program
-written by someone who was not thinking about our renderer.
+`data/gpu-programs/README.md` credits each program. `gpu-mandel` is **Tursi's** F18A
+GPU Mandelbrot, which is the point of it: a program written by someone who was not
+thinking about our renderer. `gpu-cube` was written for this suite, and covers what
+Mandelbrot does not touch: the bitmap layer, VR32 paged between two of them, palette
+RAM rewritten every frame, and the scanline counter waited on before either changes -
+which makes it a test of the host as well, since a host that runs a program without
+advancing the raster never gets it back.
 
 **The program is the scene.** Every other stage here writes a register file and a
 VRAM image and asks what the renderer makes of it. A GPU program is handed a blank
-VDP and writes both itself, so what goes in is 548 bytes and a start address, and
-what comes out is a picture that took twenty-three million TMS9900 instructions to
-produce. That covers the GPU the way no register write can: the whole instruction
-set, the VDP register file at >6000, and the F18A's hidden workspace at >FFFE.
+VDP and writes both itself, so what goes in is a few hundred bytes and a start
+address, and what comes out is a picture that took up to twenty-three million
+TMS9900 instructions to produce. That covers the GPU the way no register write can:
+the whole instruction set, the VDP register file at >6000, and the F18A's hidden
+workspace at >FFFE.
 
 **Two numbers, and only one of them is the test.** The picture is compared against
 a frozen reference, byte for byte, the same way a scene is - that is the assertion.
@@ -55,6 +60,12 @@ PROGRAM_SPACE = 0x4000
 Program = collections.namedtuple("Program", "file entry credit note timeout")
 
 PROGRAMS = {
+    "gpu-cube": Program(
+        "cube.bin", 0x3200, "pico9918-core",
+        "a solid cube turning under a fixed light, on the 2bpp bitmap layer - two "
+        "bitmaps paged by VR32, the shading carried by three words of palette RAM, "
+        "and both changed in the vertical blank the program waits for",
+        timeout=60.0),
     "gpu-mandel": Program(
         "mandel.bin", 0x1B02, "Tursi",
         "the Mandelbrot set in Graphics II, 14 iterations of Q13 fixed point - it "

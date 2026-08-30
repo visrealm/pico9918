@@ -37,7 +37,8 @@
  *   r <hexaddr> <len>      read: "data <len>" then <len> raw bytes
  *   frames <n>             render n frames, discarding them
  *   capture                render one frame: "capture <rows> <width>" then the rows
- *   gpu <hexaddr>          start a GPU program at <hexaddr> on its own thread
+ *   gpu <hexaddr>          start a GPU program at <hexaddr> on its own thread, with
+ *                          the raster running under it for as long as it does
  *   gpupoll                "gpu running", or "gpu done <microseconds>"
  *   gpustop                clear the GPU's run flag, which stops it where it is
  *   quit
@@ -126,12 +127,28 @@ void liveDesktopCaptureRow(uint16_t y, uint16_t height, uint16_t width_, const u
   memcpy(capture + (uint32_t)y * width_, indices, width_);
 }
 
+/* One renderer at a time. A board has core 1 and only core 1 drawing; here the raster
+   thread further down and whatever command is in flight both call in, and they share
+   the capture buffer, the frame geometry and the vertical scale that goes with it. */
+#ifdef _WIN32
+static SRWLOCK renderLock = SRWLOCK_INIT;
+#define RENDER_LOCK()   AcquireSRWLockExclusive(&renderLock)
+#define RENDER_UNLOCK() ReleaseSRWLockExclusive(&renderLock)
+#else
+static pthread_mutex_t renderLock = PTHREAD_MUTEX_INITIALIZER;
+#define RENDER_LOCK()   pthread_mutex_lock(&renderLock)
+#define RENDER_UNLOCK() pthread_mutex_unlock(&renderLock)
+#endif
+
 /* One frame, in the order the firmware's VGA layer calls it: every visible line, the
    end-of-scanline trigger on the line the geometry named, the porch, then the end of
    frame. The geometry a frame runs under is the PREVIOUS frame's, which is not a
    simplification - pico9918_frame_end is the only thing that recomputes it on the
-   device too, and the host arms the trigger register from its return value. */
-static void renderFrame(void)
+   device too, and the host arms the trigger register from its return value.
+
+   Take the lock over a whole sequence, not a frame at a time, wherever the frames
+   have to belong to each other - a capture is two of them and the counters between. */
+static void renderFrameUnlocked(void)
 {
   viewScale                     = vPixelScale;
   pico9918_scanline_params_t params = {H_VIRTUAL_PIXELS, (uint16_t)vVirtualPixels, false, 0};
@@ -147,6 +164,13 @@ static void renderFrame(void)
   vPixelScale                  = display.vPixelScale;
   vVirtualPixels               = display.vVirtualPixels;
   triggerLine                  = geom.triggerScanline;
+}
+
+static void renderFrame(void)
+{
+  RENDER_LOCK();
+  renderFrameUnlocked();
+  RENDER_UNLOCK();
 }
 
 /* The frame as a picture, for the viewer: 512 columns by 384 or 480 lines, which is
@@ -216,73 +240,120 @@ static size_t buildView(void)
  * it finished, and being able to watch one draw is most of why a harness would run
  * a program that takes twenty-three million instructions.
  *
- * The two threads share VRAM with no lock, and that is the fidelity rather than an
+ * A second thread renders under it, which is core 1's half of the same shape, and it
+ * is not optional: a program can WAIT on the raster, and one that does gets nothing
+ * back from a host whose raster only moves when a command asks for a frame.
+ *
+ * The threads share VRAM with no lock, and that is the fidelity rather than an
  * oversight: on the device they share it across two cores with no lock either.
  * Every access is a byte, so a reader sees the old value or the new one, and a
- * half-drawn frame is the truth about a half-drawn picture.
+ * half-drawn frame is the truth about a half-drawn picture. Rendering is the one
+ * thing that IS locked, and only against this process's own second renderer - see
+ * renderFrame.
  * ---------------------------------------------------------------------- */
 static volatile int gpuBusy = 0;
 
+typedef struct
+{
 #ifdef _WIN32
-static HANDLE gpuThread = NULL;
+  HANDLE handle;
+#else
+  pthread_t id;
+#endif
+  int live;
+} thread_t;
 
-static DWORD WINAPI gpuBody(LPVOID unused)
+#ifdef _WIN32
+#define THREAD_BODY(name) static DWORD WINAPI name(LPVOID unused)
+#define THREAD_DONE       return 0
+typedef LPTHREAD_START_ROUTINE thread_body_t;
+
+static int threadStart(thread_t* t, thread_body_t body)
 {
-  (void)unused;
-  pico9918_gpu_step();
-  gpuBusy = 0;
-  return 0;
+  t->handle = CreateThread(NULL, 0, body, NULL, 0, NULL);
+  t->live   = t->handle != NULL;
+  return t->live;
 }
 
-static int gpuSpawn(void)
+static void threadJoin(thread_t* t)
 {
-  gpuThread = CreateThread(NULL, 0, gpuBody, NULL, 0, NULL);
-  return gpuThread != NULL;
-}
-
-static void gpuReap(void)
-{
-  if (!gpuThread) return;
-  WaitForSingleObject(gpuThread, INFINITE);
-  CloseHandle(gpuThread);
-  gpuThread = NULL;
+  if (!t->live) return;
+  WaitForSingleObject(t->handle, INFINITE);
+  CloseHandle(t->handle);
+  t->live = 0;
 }
 #else
-static pthread_t gpuThread;
-static int gpuSpawned = 0;
+#define THREAD_BODY(name) static void* name(void* unused)
+#define THREAD_DONE       return NULL
+typedef void* (*thread_body_t)(void*);
 
-static void* gpuBody(void* unused)
+static int threadStart(thread_t* t, thread_body_t body)
 {
-  (void)unused;
-  pico9918_gpu_step();
-  gpuBusy = 0;
-  return NULL;
+  t->live = pthread_create(&t->id, NULL, body, NULL) == 0;
+  return t->live;
 }
 
-static int gpuSpawn(void)
+static void threadJoin(thread_t* t)
 {
-  gpuSpawned = pthread_create(&gpuThread, NULL, gpuBody, NULL) == 0;
-  return gpuSpawned;
-}
-
-static void gpuReap(void)
-{
-  if (!gpuSpawned) return;
-  pthread_join(gpuThread, NULL);
-  gpuSpawned = 0;
+  if (!t->live) return;
+  pthread_join(t->id, NULL);
+  t->live = 0;
 }
 #endif
 
+static thread_t gpuThread;
+static thread_t rasterThread;
+
+THREAD_BODY(gpuBody)
+{
+  (void)unused;
+  pico9918_gpu_step();
+  gpuBusy = 0;
+  THREAD_DONE;
+}
+
+/* The raster, for as long as a program runs.
+ *
+ * A program that waits on the scanline register at >7000 - to page a bitmap in the
+ * vertical blank, say - only ever sees it move if something is rendering. A board
+ * always has core 1 doing that; nothing here did, so such a program waited forever
+ * and the harness called it a timeout.
+ *
+ * Flat out rather than at 60Hz, which is the one place this deliberately parts with
+ * the device. A board's raster is paced by its display, so a program that waits on it
+ * waits in real time. A harness has no display to wait for, and pacing this would
+ * charge a program's wall clock to the frames it waits through rather than to the
+ * work it does. */
+THREAD_BODY(rasterBody)
+{
+  (void)unused;
+  while (gpuBusy) renderFrame();
+  THREAD_DONE;
+}
+
+static void gpuReap(void)
+{
+  threadJoin(&gpuThread);
+  threadJoin(&rasterThread);
+}
+
 static void gpuStart(uint16_t addr)
 {
-  gpuReap(); /* whatever ran last, before its thread handle is overwritten */
+  gpuReap(); /* whatever ran last, before its thread handles are overwritten */
   tms9918->gpuAddress = addr;
   tms9918->restart    = 1;
   pico9918_gpu_reset_time();
   gpuBusy = 1;
-  if (!gpuSpawn())
+  if (threadStart(&gpuThread, gpuBody))
   {
-    /* no thread to be had: the program still runs, it just cannot be watched */
+    /* after the GPU thread, so a failure to spawn it cannot leave this one spinning
+       on a gpuBusy nothing will ever clear */
+    threadStart(&rasterThread, rasterBody);
+  }
+  else
+  {
+    /* no thread to be had: the program still runs, it just cannot be watched, and a
+       program that waits on the raster will not come back */
     pico9918_gpu_step();
     gpuBusy = 0;
   }
@@ -390,8 +461,10 @@ int main(void)
       /* one frame, as a picture. The viewer paces itself: the render is well under a
          millisecond, so where 60 frames a second is decided is the side with a clock
          that can wait, not this one. */
-      renderFrame();
-      size_t n = buildView();
+      RENDER_LOCK();
+      renderFrameUnlocked();
+      size_t n = buildView(); /* reads the buffer that frame just filled */
+      RENDER_UNLOCK();
       if (!n)
       {
         reply("error nothing rendered yet");
@@ -434,10 +507,12 @@ int main(void)
          gets this for free: its capture arms at the next frame boundary, so a whole
          frame always separates the scene from the picture. Without it twelve scenes
          come back at the PREVIOUS scene's height. */
-      renderFrame();
+      RENDER_LOCK();
+      renderFrameUnlocked();
 
       rows = width = missed = 0;
-      renderFrame();
+      renderFrameUnlocked();
+      RENDER_UNLOCK();
       if (missed)
       {
         reply("error capture overflowed");

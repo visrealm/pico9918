@@ -5,7 +5,7 @@
     cmake --build build-suite
     python test/suite/run.py            (or: cd test && python -m suite.run)
 
-111 scenes, five property suites and a TMS9900 GPU program, each compared against
+111 scenes, five property suites and two TMS9900 GPU programs, each compared against
 a committed frame. It asserts what the library computes and never what it cost -
 the microseconds belong to a device, and the firmware repository's runner is what
 reads them.
