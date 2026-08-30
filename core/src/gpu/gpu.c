@@ -139,6 +139,23 @@ void isr_hardfault(void)
  * Run a GPU DMA job
  * ---------------------------------------------------------------------- */
 
+/* A transfer that runs off an end of the map. The engine's address register is 16 bits so
+   it comes back at the other end, which a pointer walk cannot do and no correct program
+   asks for - so this stays out of line rather than unrolling into the caller. */
+static PICO9918_NOINLINE void dmaWrapped(uint8_t* vram, uint32_t src, uint32_t dst,
+                                         uint32_t width, uint32_t height, int32_t advance,
+                                         int32_t srcInc, int32_t dstInc)
+{
+  uint16_t s = (uint16_t)src;
+  uint16_t d = (uint16_t)dst;
+  for (uint32_t y = 0; y < height; ++y)
+  {
+    for (uint32_t x = 0; x < width; ++x, s += srcInc, d += dstInc) vram[d] = vram[s];
+    s += advance * srcInc;
+    d += advance * dstInc;
+  }
+}
+
 static void triggerGpuDma(uint8_t* vram)
 {
   uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8000));
@@ -153,11 +170,46 @@ static void triggerGpuDma(uint8_t* vram)
 
   uint8_t* srcPtr = vram + srcVramAddr;
   uint8_t* dstPtr = vram + dstVramAddr;
-  for (uint32_t y = 0; y < height; ++y)
+
+  /* Going forward, a row is one library call, and rows that touch collapse into a
+     single call over the whole rectangle. */
+  const uint32_t run  = (stride == width) ? width * height : width;
+  const uint32_t rows = (stride == width) ? 1 : height;
+
+  /* The engine's addresses are 16 bits and wrap, which a pointer walk cannot do, so the
+     library calls below only take a transfer whose furthest byte stays inside the map. */
+  const uint32_t reach    = (width && height) ? (height - 1) * stride + width - 1 : 0;
+  const uint32_t srcReach = srcInc ? reach : 0;
+  const bool     inRange  = (dstInc < 0)
+                              ? (dstVramAddr >= reach && srcVramAddr >= srcReach)
+                              : (dstVramAddr + reach <= 0xFFFF && srcVramAddr + srcReach <= 0xFFFF);
+
+  if (!inRange)
+    dmaWrapped(vram, srcVramAddr, dstVramAddr, width, height,
+               (int32_t)stride - (int32_t)width, srcInc, dstInc);
+  else if (srcInc == 0 && dstInc == 1)
   {
-    for (uint32_t x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc) *dstPtr = *srcPtr;
-    srcPtr += (stride - width) * srcInc;
-    dstPtr += (stride - width) * dstInc;
+    const uint8_t value = *srcPtr;
+    for (uint32_t y = 0; y < rows; ++y, dstPtr += stride) memset(dstPtr, value, run);
+  }
+  /* Disjoint runs only. A destination overlapping its source ahead of it smears the
+     source along, which is what the byte loop does and what memcpy would not, and one
+     overlapping behind is a copy memcpy is not allowed to make at all. */
+  else if (srcInc == 1 && (dstPtr >= srcPtr + run || srcPtr >= dstPtr + run))
+  {
+    for (uint32_t y = 0; y < rows; ++y, srcPtr += stride, dstPtr += stride)
+      memcpy(dstPtr, srcPtr, run);
+  }
+  else
+  {
+    /* Signed, because a stride under the width steps back into the row just written. */
+    const int32_t advance = (int32_t)stride - (int32_t)width;
+    for (uint32_t y = 0; y < height; ++y)
+    {
+      for (uint32_t x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc) *dstPtr = *srcPtr;
+      srcPtr += advance * srcInc;
+      dstPtr += advance * dstInc;
+    }
   }
 
   *(uint16_t*)(vram + 0x8008) = 0;
