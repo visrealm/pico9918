@@ -160,10 +160,13 @@ static void triggerGpuDma(uint8_t* vram)
 {
   uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8000));
   uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8002));
-  uint32_t width       = vram[0x8004];
-  uint32_t height      = vram[0x8005];
-  uint32_t stride      = vram[0x8006];
-  uint32_t params      = vram[0x8007];
+  /* Both counts are loop counters the engine tests against one, so a zero walks the
+     whole byte before it gets there: 0 is 256, and the largest transfer is the map. */
+  const uint32_t widthByte = vram[0x8004];
+  uint32_t width           = widthByte ? widthByte : 256;
+  uint32_t height          = vram[0x8005] ? vram[0x8005] : 256;
+  uint32_t stride          = vram[0x8006];
+  uint32_t params          = vram[0x8007];
 
   int32_t dstInc = (params & 0x02) ? -1 : 1;
   int32_t srcInc = (params & 0x01) ? 0 : dstInc;
@@ -171,14 +174,19 @@ static void triggerGpuDma(uint8_t* vram)
   uint8_t* srcPtr = vram + srcVramAddr;
   uint8_t* dstPtr = vram + dstVramAddr;
 
+  /* Rows touch when the stride matches the width, which for a 256-wide row is a stride
+     byte of zero - so the comparison is between the bytes, not the counts. */
+  const bool contiguous = stride == widthByte;
+  const uint32_t rowStep = contiguous ? width : stride;
+
   /* Going forward, a row is one library call, and rows that touch collapse into a
      single call over the whole rectangle. */
-  const uint32_t run  = (stride == width) ? width * height : width;
-  const uint32_t rows = (stride == width) ? 1 : height;
+  const uint32_t run  = contiguous ? width * height : width;
+  const uint32_t rows = contiguous ? 1 : height;
 
   /* The engine's addresses are 16 bits and wrap, which a pointer walk cannot do, so the
      library calls below only take a transfer whose furthest byte stays inside the map. */
-  const uint32_t reach    = (width && height) ? (height - 1) * stride + width - 1 : 0;
+  const uint32_t reach    = (height - 1) * rowStep + width - 1;
   const uint32_t srcReach = srcInc ? reach : 0;
   const bool     inRange  = (dstInc < 0)
                               ? (dstVramAddr >= reach && srcVramAddr >= srcReach)
@@ -186,24 +194,24 @@ static void triggerGpuDma(uint8_t* vram)
 
   if (!inRange)
     dmaWrapped(vram, srcVramAddr, dstVramAddr, width, height,
-               (int32_t)stride - (int32_t)width, srcInc, dstInc);
+               (int32_t)rowStep - (int32_t)width, srcInc, dstInc);
   else if (srcInc == 0 && dstInc == 1)
   {
     const uint8_t value = *srcPtr;
-    for (uint32_t y = 0; y < rows; ++y, dstPtr += stride) memset(dstPtr, value, run);
+    for (uint32_t y = 0; y < rows; ++y, dstPtr += rowStep) memset(dstPtr, value, run);
   }
   /* Disjoint runs only. A destination overlapping its source ahead of it smears the
      source along, which is what the byte loop does and what memcpy would not, and one
      overlapping behind is a copy memcpy is not allowed to make at all. */
   else if (srcInc == 1 && (dstPtr >= srcPtr + run || srcPtr >= dstPtr + run))
   {
-    for (uint32_t y = 0; y < rows; ++y, srcPtr += stride, dstPtr += stride)
+    for (uint32_t y = 0; y < rows; ++y, srcPtr += rowStep, dstPtr += rowStep)
       memcpy(dstPtr, srcPtr, run);
   }
   else
   {
     /* Signed, because a stride under the width steps back into the row just written. */
-    const int32_t advance = (int32_t)stride - (int32_t)width;
+    const int32_t advance = (int32_t)rowStep - (int32_t)width;
     for (uint32_t y = 0; y < height; ++y)
     {
       for (uint32_t x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc) *dstPtr = *srcPtr;
