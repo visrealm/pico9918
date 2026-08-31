@@ -18,7 +18,7 @@
 #
 # Usage: tools/ci.sh <goldens|suite|warnings|doxygen|package|multi|tms9918|chip|python>
 #
-#   goldens   the 16 committed frames, byte-exact
+#   goldens   the 18 committed frames, byte-exact
 #   suite     111 scenes, five properties and a GPU program, both line widths
 #   warnings  -Wall -Wextra -Werror
 #   doxygen   the docs build, and what it still reports

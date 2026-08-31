@@ -550,6 +550,60 @@ static void sceneF18aEcm3Bml(void)
   regWrite(50, 0x02); /* per-position tile attributes */
 }
 
+/* F18A unlocked: a bitmap layer the display wraps rather than crops. A full-width
+ * opaque priority layer started mid-line puts its overrun back at column zero of the
+ * same line, which is what makes VR33 a horizontal scroll, and covers the line so the
+ * tile layers do not run. A row count reaching past the last scanline still stops. */
+static void sceneF18aBmlWrap(void)
+{
+  lcgSeed(0x9009);
+  vramFillLcg(0x0000, 0x4000);
+  unlockF18a();
+  regWrite(0, 0x02);  /* Graphics II */
+  regWrite(1, 0xe0);  /* display on, 8px sprites */
+  regWrite(2, 0x0e);
+  regWrite(3, 0xff);  /* color table 0x2000 */
+  regWrite(4, 0x03);  /* pattern table 0x0000 */
+  regWrite(5, 0x76);
+  regWrite(6, 0x03);
+  regWrite(7, 0x01);
+  regWrite(31, 0xc0); /* BML: enabled, priority, opaque, 2bpp */
+  regWrite(32, 0x10); /* BML addr 0x0400 */
+  regWrite(33, 0x28); /* BML x = 40, so the last 40 columns come back at column 0 */
+  regWrite(34, 0x50); /* BML top = 80 */
+  regWrite(35, 0x00); /* BML width = 64 bytes (256px, wider than the room left) */
+  regWrite(36, 0xff); /* BML height = 255, past the last scanline */
+  regWrite(49, 0x21); /* ECM2 tiles | ECM1 sprites */
+  regWrite(51, 0x10); /* sprites to process: 16 */
+}
+
+/* F18A unlocked: a bitmap layer whose width is not a whole number of bytes. Four
+ * pixels to a byte, so the stride rounds up and every row lands a byte further on
+ * than a truncating divide would put it - the only case where the two differ, and
+ * every other bitmap scene here is a multiple of four. */
+static void sceneF18aBmlStride(void)
+{
+  lcgSeed(0xa00a);
+  vramFillLcg(0x0000, 0x4000);
+  unlockF18a();
+  regWrite(0, 0x00);  /* Graphics I */
+  regWrite(1, 0xe0);  /* display on, 8px sprites */
+  regWrite(2, 0x0e);
+  regWrite(3, 0x20);  /* color table 0x0800 */
+  regWrite(4, 0x04);
+  regWrite(5, 0x76);
+  regWrite(6, 0x03);
+  regWrite(7, 0x01);
+  regWrite(31, 0xc0); /* BML: enabled, priority, opaque, 2bpp */
+  regWrite(32, 0x10); /* BML addr 0x0400 */
+  regWrite(33, 0x14); /* BML x = 20 */
+  regWrite(34, 0x10); /* BML top = 16 */
+  regWrite(35, 0x66); /* BML width = 102px, so 26 bytes a row and not 25 */
+  regWrite(36, 0x80); /* BML height = 128 */
+  regWrite(49, 0x00); /* T2 off, no ECM, no 30-row */
+  regWrite(51, 0x08); /* sprites to process: 8 */
+}
+
 /* F18A unlocked TEXT80 with position-based attributes and a second tile
  * layer - exercises the packed two-pixels-per-byte layered path */
 static void sceneF18aText80Attrs(void)
@@ -780,6 +834,8 @@ static const Scene scenes[] = {
   { "f18a-text80-attrs",  192, sceneF18aText80Attrs },
   { "f18a-vram-snapshot", 192, sceneF18aVramSnapshot},
   { "f18a-bml-priority",  192, sceneF18aBmlPriority },
+  { "f18a-bml-wrap",      192, sceneF18aBmlWrap     },
+  { "f18a-bml-stride",    192, sceneF18aBmlStride   },
   { "f18a-ecm0",          192, sceneF18aEcm0        },
   { "f18a-gfx2",          192, sceneF18aGfx2        },
   { "raw-reset",            8, sceneRawReset        },

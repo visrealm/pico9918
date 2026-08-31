@@ -2676,7 +2676,9 @@ static inline bool __time_critical_func(renderBitmapLayer)(PICO9918_INST_ARG uin
   }
 
   uint32_t currentMask = 0;
-  uint8_t xPos         = TMS_REGISTER(tms9918, 0x21);
+  /* a byte, so a layer running past the right edge comes back at column zero of the same
+     line rather than being cropped - which is what makes R33 a horizontal scroll */
+  uint8_t xPos = TMS_REGISTER(tms9918, 0x21);
 
   if (bmlCtl & 0x10) // fat 4bpp pixels?
   {
@@ -2778,7 +2780,9 @@ static bool __time_critical_func(bitmap_layer_scan_line)(PICO9918_INST_ARG uint1
   y -= top;
   if (y >= TMS_REGISTER(tms9918, 0x24)) return true;
 
-  const uint8_t width = TMS_REGISTER(tms9918, 0x23) ? (TMS_REGISTER(tms9918, 0x23) >> 2) : 64;
+  /* row stride in bytes, four pixels each, rounded up so every row starts on a byte */
+  const uint8_t bmlWidth = TMS_REGISTER(tms9918, 0x23);
+  const uint8_t width    = bmlWidth ? ((bmlWidth + 3) >> 2) : 64;
   const uint16_t addr = (TMS_REGISTER(tms9918, 0x20) << 6) + (y * width);
 
   return renderBitmapLayer(PICO9918_INST y, !(bmlCtl & 0x20), width, addr, bmlCtl, pixels);

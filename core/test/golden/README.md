@@ -37,6 +37,8 @@ The shipping configuration: `PICO9918_MODE=1` (F18A) with
 | f18a-text80-attrs | 192 | TEXT80 position-based attributes with a second tile layer |
 | f18a-vram-snapshot | 192 | dense LCG VRAM with ECM2, both layers, scrolls, transparent 2bpp bitmap layer - stand-in for GPU output as static VRAM state |
 | f18a-bml-priority | 192 | BML priority/write-mask (VR31 bit 0x40) with a width-64 fully-opaque band that suppresses the tile layers, over ECM2 tiles and ECM1 sprites crossing the band edges |
+| f18a-bml-wrap | 192 | a bitmap layer wrapped by the display rather than cropped by it - a full-width opaque priority layer at x=40 putting its overrun back at column 0, and a height running past the last scanline |
+| f18a-bml-stride | 192 | a bitmap layer 102 pixels wide - not a whole number of bytes, so the row stride rounds up to 26 and this is the only scene where a truncating divide would place the rows differently |
 | f18a-ecm0 | 192 | unlocked ECM0 tile path with h-scroll shift==2, non-ECM sprites below tiles including a colour-0 transparent sprite (sprite-mask release), and ReadData/read-ahead data-port traffic feeding the sprite table |
 | f18a-gfx2 | 192 | unlocked Graphics II - the f18aOpsTable Graphics-II row (stage4 sprites-then-bitmap trampoline) with 16px sprites and a transparent 2bpp bitmap window |
 | raw-reset | 8 | pico9918_reset() called from a deterministic unlocked+configured state, first lines rendered with no mode nudge - the post-reset contract (display off, backdrop 0, default palette) |
