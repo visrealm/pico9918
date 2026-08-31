@@ -28,6 +28,15 @@ option(PICO9918_TEXT80_8BPP "80-column text at 8bpp: ECM, palette select and bit
 # both the asset and its render path, so the image costs nothing in flash.
 option(PICO9918_NO_SPLASH "Omit the splash overlay and its image asset" OFF)
 
+# Which chip an instance answers as, chosen per instance at runtime rather than by
+# this file: a TMS9918A, an F18A, or a PICO9918. OFF is the default and is what a
+# board builds - every gate folds to a constant, the instance carries no extra field
+# and the entry points are not compiled, so a firmware pays nothing for a switch it
+# never throws. A host emulating more than one chip out of one archive turns it on.
+# It needs the F18A build: the personalities above the base are not in a MODE=0
+# archive to select.
+option(PICO9918_RUNTIME_CHIP "Select the chip personality at runtime" OFF)
+
 # Diagnostics overlay: optional GPU-frames row. The count is host-pushed, so the
 # row and the setter that feeds it appear together or not at all.
 option(PICO9918_DIAG_GPU_FRAME_COUNTER "Include the diag GPU-frames row" OFF)

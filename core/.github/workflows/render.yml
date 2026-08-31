@@ -1,7 +1,8 @@
 name: Render
 
-# What the renderer computes: full-frame goldens, the TMS9918A-only build, and
-# two instances proving nothing scanline state is shared between them.
+# What the renderer computes: full-frame goldens, the TMS9918A-only build, the
+# runtime chip switch, and two instances proving no scanline state is shared
+# between them.
 
 on:
   push:
@@ -24,6 +25,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/env
       - run: tools/ci.sh tms9918
+
+  chip:
+    name: Runtime chip switch
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh chip
 
   multi:
     name: Multi-instance

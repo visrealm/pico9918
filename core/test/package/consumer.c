@@ -14,13 +14,24 @@
  * only resolved in the build tree, a PUBLIC definition lost on the way out.
  *
  * Written for either instance mode, since which one the library was built with
- * is a property of the installed package rather than of this file.
+ * is a property of the installed package rather than of this file. Same for the
+ * runtime chip switch, which only a PICO9918_RUNTIME_CHIP=ON package exports.
  */
 
 #include "pico9918.h"
 #include "pico9918_util.h"
 
 #include <stdio.h>
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+/* VR15 selects which status register a read returns, so it is how a host reads any of
+   them. Above R7, so it needs an unlocked device. */
+static uint8_t statusReg(PICO9918_INST_ARG uint8_t index)
+{
+  pico9918_write_register_value(PICO9918_INST 15, index);
+  return pico9918_read_status(PICO9918_INST_ONLY);
+}
+#endif
 
 int main(void)
 {
@@ -33,6 +44,72 @@ int main(void)
     printf("pico9918_new failed\n");
     return 1;
   }
+#endif
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+  /* The entry points exist only where the generated header says the library was built
+     with them, so reaching them at all is half of what this proves. The other half is
+     that the choice does something: a TMS9918A has no answer to the F18A unlock write, so
+     its register file stays eight wide. Runs before the setup below, which then leaves
+     the instance in the state the rest of the file expects. */
+  if (pico9918_chip(PICO9918_INST_ONLY) != PICO9918_CHIP_MAX)
+  {
+    printf("a new instance is not PICO9918_CHIP_MAX\n");
+    return 1;
+  }
+
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918A);
+  if (pico9918_chip(PICO9918_INST_ONLY) != PICO9918_CHIP_TMS9918A)
+  {
+    printf("the chip did not step down\n");
+    return 1;
+  }
+
+  /* Locked, a write above R7 is ignored and a read masks to the low three bits, so VR33
+     both fails to take and reads back as the VR1 it aliases. Unlocked it is itself. That
+     pair is the register file's width, which is what the unlock actually buys. */
+  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
+  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
+  pico9918_write_register_value(PICO9918_INST 0x21, 0x5a);
+  if (pico9918_reg_value(PICO9918_INST 0x21) != pico9918_reg_value(PICO9918_INST 0x01))
+  {
+    printf("a TMS9918A honoured the unlock\n");
+    return 1;
+  }
+
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_PICO9918);
+  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
+  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
+  pico9918_write_register_value(PICO9918_INST 0x21, 0x5a);
+  if (pico9918_reg_value(PICO9918_INST 0x21) != 0x5a)
+  {
+    printf("a PICO9918 refused the unlock: VR33 0x%02x\n",
+           pico9918_reg_value(PICO9918_INST 0x21));
+    return 1;
+  }
+
+  /* VR58 selects a config option and VR59 writes it, with SR12 reading back what landed.
+     A real F18A has no such port, so neither register may reach it - and VR59 is the one
+     that writes, so gating VR58 alone would leave the board's config open. */
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
+  pico9918_write_register_value(PICO9918_INST 58, 8);
+  pico9918_write_register_value(PICO9918_INST 59, 0x5a);
+  if (statusReg(PICO9918_INST 12) == 0x5a)
+  {
+    printf("an F18A reached the config port\n");
+    return 1;
+  }
+
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_PICO9918);
+  pico9918_write_register_value(PICO9918_INST 58, 8);
+  pico9918_write_register_value(PICO9918_INST 59, 0x5a);
+  if (statusReg(PICO9918_INST 12) != 0x5a)
+  {
+    printf("a PICO9918 could not reach the config port\n");
+    return 1;
+  }
+
+  printf("pico9918-core: chip switch honoured, the register file and config port follow it\n");
 #endif
 
   pico9918_reset(PICO9918_INST_ONLY);

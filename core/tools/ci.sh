@@ -16,7 +16,7 @@
 # it behaves the same whether the library is the repository root or a directory
 # inside one.
 #
-# Usage: tools/ci.sh <goldens|suite|warnings|doxygen|package|multi|tms9918|python>
+# Usage: tools/ci.sh <goldens|suite|warnings|doxygen|package|multi|tms9918|chip|python>
 #
 #   goldens   the 16 committed frames, byte-exact
 #   suite     111 scenes, five properties and a GPU program, both line widths
@@ -25,9 +25,10 @@
 #   package   install, then find_package it from a separate project and run it
 #   multi     the library and the consumer, instance threaded through every signature
 #   tms9918   PICO9918_MODE=0, and the frame it renders against the F18A build's
+#   chip      PICO9918_RUNTIME_CHIP=ON, the only job that compiles the chip switch
 #   python    the Python module against an installed library, and what it renders
 #
-# Every job but the last three configures F18A and a single instance, which is what
+# Every job but the last four configures F18A and a single instance, which is what
 # the firmware ships.
 #
 # CI_GENERATOR selects a generator (default: CMake's own choice) and CI_CONFIG
@@ -226,6 +227,26 @@ tms9918() {
 # whole point of a binding and the module refuses to compile the other way.
 # Not named `python`: PY falls back to the bare `python` above, and a shell function of
 # that name is what `command -v "$PY"` finds and what every "$PY" here would then run.
+# The runtime chip switch is off in every other job, so nothing else compiles any of
+# this. Both instance modes, because it adds instance fields and that is where the two
+# differ, and then the consumer: the choice travels in the generated header, so the
+# thing worth proving is that a separate project picks it up and gets the entry points.
+chip() {
+  configure "$OUT/chip" "$LIBROOT" -DPICO9918_RUNTIME_CHIP=ON -DPICO9918_WERROR=ON \
+    -DCMAKE_C_FLAGS=-O2
+  build "$OUT/chip"
+
+  INSTANCE=0
+  stage=$OUT/chip-stage
+  configure "$OUT/chip-lib" "$LIBROOT" -DPICO9918_RUNTIME_CHIP=ON -DPICO9918_WERROR=ON \
+    -DCMAKE_C_FLAGS=-O2 "-DCMAKE_INSTALL_PREFIX=$stage"
+  build "$OUT/chip-lib"
+  $CMAKE --install "$OUT/chip-lib" --config "$CONFIG"
+  configure "$OUT/chip-consumer" "$LIBROOT/test/package" "-DCMAKE_PREFIX_PATH=$stage"
+  build "$OUT/chip-consumer"
+  "$(findExe "$OUT/chip-consumer" consumer)"
+}
+
 pythonModule() {
   INSTANCE=0
   stage=$OUT/py-stage
@@ -256,9 +277,10 @@ doxygen) docs ;;
 package) package ;;
 multi) multi ;;
 tms9918) tms9918 ;;
+chip) chip ;;
 python) pythonModule ;;
 *)
-  echo "usage: tools/ci.sh <goldens|suite|warnings|doxygen|package|multi|tms9918|python>" >&2
+  echo "usage: tools/ci.sh <goldens|suite|warnings|doxygen|package|multi|tms9918|chip|python>" >&2
   exit 2
   ;;
 esac

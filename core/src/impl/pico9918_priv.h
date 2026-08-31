@@ -172,6 +172,33 @@ typedef struct
 #define PICO9918_UNLOCK_WRITE(R, V) false
 #endif
 
+/* What a personality answers to. Derived once, in pico9918_set_chip, so each site reads
+   one bit rather than re-deriving the ladder. Only what a personality can be asked to do
+   differently is a bit: the GPU is not one, because a program can only be started
+   through registers the unlock gate already covers.
+
+   Without the runtime switch there is nothing to gate - the build is one chip, and what
+   that chip can do it already does - so every one of them folds to a literal true and
+   the gates cost a board exactly what they cost it before they existed. */
+#define PICO9918_FEAT_UNLOCK  0x01 /* the F18A unlock write is honoured */
+#define PICO9918_FEAT_CONFIG  0x02 /* the VR58/59 config port and R63 firmware update */
+#define PICO9918_FEAT_OVERLAY 0x04 /* the splash and diagnostics overlays */
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+#if PICO9918_MODE != PICO9918_MODE_F18A
+#error "PICO9918_RUNTIME_CHIP needs the F18A build - a MODE=0 archive has no personality above the base to select"
+#endif
+#define PICO9918_HAS(T, F) (((T)->features & (F)) != 0)
+/* SR1 is what software probing for an F18A reads: 0xE0 is the F18A ID, and the PICO9918
+   sets 0x08 for anyone who cares that it is not a real one. The base personality shares
+   the F18A value and never shows it: reaching SR1 needs a write to R15, which is above
+   the eight a locked device admits. */
+#define PICO9918_SR1_ID(T) (((T)->chip == PICO9918_CHIP_PICO9918) ? 0xE8 : 0xE0)
+#else
+#define PICO9918_HAS(T, F) true
+#define PICO9918_SR1_ID(T) 0xE8
+#endif
+
 #if MAPPED_REGISTERS
 #define TMS_REGISTER(T, R) (T->vram.map.registers[R])
 #else
@@ -233,6 +260,14 @@ struct pico9918_s
 
   /* runtime base VDP selection (independent of F18A unlock) */
   uint8_t vdpBase; /* PICO9918_BASE_TMS9918 or PICO9918_BASE_V9938 */
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+  /* which chip this instance answers as, and the same thing as the bit per feature the
+     gates read. Both survive a reset - see pico9918_set_chip. Absent from a board's
+     build, which is one chip and gates nothing. */
+  uint8_t chip;     /* pico9918_chip_t */
+  uint8_t features; /* PICO9918_FEAT_* - read through PICO9918_HAS */
+#endif
 
   bool scanlineHasSprites;
 

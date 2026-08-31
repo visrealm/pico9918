@@ -90,6 +90,46 @@ typedef enum
   TMS_MODE_COUNT,
 } pico9918_mode_t;
 
+#if PICO9918_BUILD_RUNTIME_CHIP
+
+/**
+ * \brief which chip an instance answers as
+ *
+ * A strict capability ladder: each personality is the one below it plus what the real
+ * hardware adds, so one value orders them all.
+ *
+ *   TMS9918A  the base. The unlock write is refused, so the register file stays eight
+ *             wide, there is no GPU to start, and the enhanced renderer folds away
+ *             exactly as it does on a locked device.
+ *   F18A      unlockable: the full register file, the enhanced modes and the GPU. None
+ *             of the PICO9918's own extensions - a real F18A has no config port and no
+ *             overlays - and it identifies as a real one in SR1.
+ *   PICO9918  an F18A plus this board's extensions: the VR58/59 config port, the
+ *             firmware-update register, and the splash and diagnostics overlays.
+ *
+ * Declared only where the library was built PICO9918_RUNTIME_CHIP=ON, which a board
+ * does not: what the build fixes either way is the memory map, and a firmware that is
+ * one chip has nothing to select. See PICO9918_BUILD_RUNTIME_CHIP.
+ */
+typedef enum
+{
+  PICO9918_CHIP_TMS9918A = 0, /**< a TMS9918A: locked, no GPU, no extensions */
+  PICO9918_CHIP_F18A     = 1, /**< an F18A: unlock, enhanced renderer, GPU */
+  PICO9918_CHIP_PICO9918 = 2, /**< an F18A plus the PICO9918's own extensions */
+} pico9918_chip_t;
+
+/**
+ * \brief the highest personality this build can be, and what a new instance is
+ *
+ * The switch needs the F18A build, so this is the top of the ladder. A PICO9918_MODE=0
+ * archive cannot have it at all - it has no 64KB map, no GPU and no enhanced renderer,
+ * so nothing above the base is a personality it could honour - and the build is
+ * rejected rather than quietly capped.
+ */
+#define PICO9918_CHIP_MAX PICO9918_CHIP_PICO9918
+
+#endif // PICO9918_BUILD_RUNTIME_CHIP
+
 /** \brief the sixteen TMS9918 colours, in palette-index order */
 typedef enum
 {
@@ -168,6 +208,29 @@ PICO9918_DLLEXPORT
 pico9918_t* pico9918_new(void);
 
 #endif
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+
+/**
+ * \brief select which chip this instance answers as
+ *
+ * Clamped to PICO9918_CHIP_MAX, so a request the build cannot honour comes back as the
+ * highest it can rather than as a half-honoured one - read pico9918_chip() to find out
+ * which you got. Stepping down from an unlocked personality relocks the device, because
+ * the register file it would otherwise leave visible is not one a TMS9918A has.
+ *
+ * A reset preserves it: the personality is the chip on the board, not state the bus can
+ * clear. A new instance starts at PICO9918_CHIP_MAX, which is what a consumer that never
+ * calls this keeps.
+ */
+PICO9918_DLLEXPORT
+void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip);
+
+/** \brief which chip this instance answers as */
+PICO9918_DLLEXPORT
+pico9918_chip_t pico9918_chip(PICO9918_INST_ONLY_ARG);
+
+#endif // PICO9918_BUILD_RUNTIME_CHIP
 
 /** \brief reset the TMS9918 */
 PICO9918_DLLEXPORT

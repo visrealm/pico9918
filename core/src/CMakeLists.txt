@@ -126,6 +126,21 @@ else()
   set(PICO9918_BUILD_TEXT80_8BPP 0)
 endif()
 
+# It adds instance fields and two entry points, so it belongs in the generated header
+# with the other choices a consumer cannot be allowed to disagree with. Nothing else
+# carries it - a compile definition would reach the library's TUs and not the
+# consumer's, which is the mismatch that header exists to prevent.
+if(PICO9918_RUNTIME_CHIP)
+  if(PICO9918_MODE LESS 1)
+    message(FATAL_ERROR
+      "PICO9918_RUNTIME_CHIP needs PICO9918_MODE=1: a MODE=0 archive has no 64KB map, no "
+      "GPU and no enhanced renderer, so it has no personality above the base to select.")
+  endif()
+  set(PICO9918_BUILD_RUNTIME_CHIP 1)
+else()
+  set(PICO9918_BUILD_RUNTIME_CHIP 0)
+endif()
+
 # Also record these in a GENERATED HEADER, not only as compile definitions. A
 # definition reaches the library's own TUs and nothing else, so a consumer built
 # by a different build system silently falls back to the platform default and the

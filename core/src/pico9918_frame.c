@@ -252,7 +252,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
     }
   }
 
-  if (tms9918->config[PICO9918_CONF_DIAG])
+  if (tms9918->config[PICO9918_CONF_DIAG] && PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY))
   {
     /* the overlay has no clock of its own, so the host's display timing is pushed
        right before it recomputes. The dropped-frame and GPU-frame counters need no
@@ -346,8 +346,9 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
       TMS_STATUS(tms9918, 0x03)  = tms9918->vram.map.scanline;
     }
 
-    if (!pico9918_valid_writes_impl(PICO9918_INST_ONLY) ||
-        (pico9918_frame_count_impl(PICO9918_INST_ONLY) < 600))
+    if (PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY) &&
+        (!pico9918_valid_writes_impl(PICO9918_INST_ONLY) ||
+         (pico9918_frame_count_impl(PICO9918_INST_ONLY) < 600)))
     {
       PICO9918_FILL32_WAIT(PICO9918_FILL_BORDER);
 
@@ -441,7 +442,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
 
   /* the overlay is part of what the line costs, so it draws before the sample closes.
      Border lines draw it host-side instead - the banner has to come first there. */
-  if (tms9918->config[PICO9918_CONF_DIAG])
+  if (tms9918->config[PICO9918_CONF_DIAG] && PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY))
   {
     PICO9918_FILL32_WAIT(PICO9918_FILL_BORDER);
     pico9918_diag_render(PICO9918_INST y + pico9918_v_border_impl(PICO9918_INST_ONLY),

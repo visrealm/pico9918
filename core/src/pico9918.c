@@ -88,6 +88,9 @@ void __time_critical_func(pico9918_init)(void)
      writer of the render base - so without this the host bus can read it before the
      host has loaded a config. */
   tms9918->vdpBase = PICO9918_BASE_TMS9918;
+#if PICO9918_BUILD_RUNTIME_CHIP
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_MAX);
+#endif
   initLookups();
   pico9918_reset(PICO9918_INST_ONLY);
 }
@@ -105,6 +108,9 @@ PICO9918_DLLEXPORT pico9918_t* pico9918_new(void)
   if (tms9918 != NULL)
   {
     tms9918->vdpBase = PICO9918_BASE_TMS9918; /* see pico9918_init */
+#if PICO9918_BUILD_RUNTIME_CHIP
+    pico9918_set_chip(tms9918, PICO9918_CHIP_MAX);
+#endif
     initLookups();
     pico9918_reset(tms9918);
   }
@@ -250,6 +256,60 @@ static PICO9918_NOINLINE void vdpRegisterReset(pico9918_t* tms9918)
 }
 
 
+#if PICO9918_BUILD_RUNTIME_CHIP
+
+/** \brief the feature bits a personality answers to - the ladder, in one place */
+static uint8_t chipFeatures(pico9918_chip_t chip)
+{
+  switch (chip)
+  {
+    case PICO9918_CHIP_PICO9918:
+      return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_CONFIG | PICO9918_FEAT_OVERLAY;
+    case PICO9918_CHIP_F18A:
+      return PICO9918_FEAT_UNLOCK;
+    default:
+      return 0;
+  }
+}
+
+/** \brief select which chip this instance answers as */
+PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip)
+{
+  /* unsigned, so a value below the base clamps here too rather than being stored */
+  if ((unsigned)chip > (unsigned)PICO9918_CHIP_MAX)
+  {
+    chip = PICO9918_CHIP_MAX;
+  }
+
+  tms9918->chip     = (uint8_t)chip;
+  tms9918->features = chipFeatures(chip);
+
+  /* A personality that cannot unlock cannot be left unlocked either: the wide register
+     file and the enhanced renderer both hang off this one flag, and a device that kept
+     them across the step down would be neither chip. A GPU program already running is
+     the same problem - the registers that start one are out of reach now, and nothing in
+     the core stops it on its own. */
+  if (!PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK))
+  {
+    tms9918->isUnlocked         = false;
+    tms9918->unlockCount        = 0;
+    tms9918->lockedMask         = 0x07;
+    TMS_REGISTER(tms9918, 0x38) = 0;
+  }
+
+  /* Written here as well as in the reset, so a personality chosen after one is not a
+     frame late in answering a probe. */
+  TMS_STATUS(tms9918, 1) = PICO9918_SR1_ID(tms9918);
+}
+
+/** \brief which chip this instance answers as */
+PICO9918_DLLEXPORT pico9918_chip_t pico9918_chip(PICO9918_INST_ONLY_ARG)
+{
+  return (pico9918_chip_t)tms9918->chip;
+}
+
+#endif // PICO9918_BUILD_RUNTIME_CHIP
+
 /** \brief reset the new TMS9918 */
 PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_ARG)
 {
@@ -263,7 +323,9 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
   tms9918->flash               = 0;
   memset(&TMS_STATUS(tms9918, 0), 0, TMS_STATUS_REGISTERS);
   TMS_STATUS(tms9918, 0)   = 0x1f;
-  TMS_STATUS(tms9918, 1)   = 0xE8; // ID = F18A (0xE0) set 0x08 for anyone who cares it's not a real one
+  /* ID = F18A (0xE0), plus 0x08 for anyone who cares it's not a real one. Which chip
+     this is does not reset - see pico9918_set_chip. */
+  TMS_STATUS(tms9918, 1)   = PICO9918_SR1_ID(tms9918);
   TMS_STATUS(tms9918, 14)  = 0x1A; // Version
   tms9918->readAheadBuffer = 0;
 
@@ -3292,7 +3354,7 @@ uint8_t __time_critical_func(pico9918_reg_value)(PICO9918_INST_ARG pico9918_regi
 PICO9918_DLLEXPORT
 void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_register_t reg, uint8_t value)
 {
-  if (PICO9918_UNLOCK_WRITE(reg, value))
+  if (PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK) && PICO9918_UNLOCK_WRITE(reg, value))
   {
     TMS_REGISTER(tms9918, 0x39) = 0x1c; // Allow this one through even when locked
     if (++tms9918->unlockCount == 2)
@@ -3328,7 +3390,7 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
     {
       tms9918->restart = 1;
     }
-    else if (regIndex == 0x3F) // firmware update
+    else if (regIndex == 0x3F && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG)) // firmware update
     {
       // b7      : 0 = idle:   1 = execute
       // b6      : 0 = verify: 1 = write
@@ -3387,12 +3449,14 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
         TMS_STATUS(tms9918, 0x0b) = milliQ >> 8;
       }
     }
-    else if (regIndex == 58) // SR12 holds the value of the option in VR58 (options)
+    // SR12 holds the value of the option in VR58 (options)
+    else if (regIndex == 58 && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))
     {
       TMS_STATUS(tms9918, 12) = tms9918->config[TMS_REGISTER(tms9918, 58)];
     }
-    else if (regIndex == 59 &&
-             TMS_REGISTER(tms9918, 58) >= 8) // option number in reg 58, value in 59 (options)
+    // option number in reg 58, value in 59 (options)
+    else if (regIndex == 59 && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG) &&
+             TMS_REGISTER(tms9918, 58) >= 8)
     {
       tms9918->config[TMS_REGISTER(tms9918, 58)] = value;
       TMS_STATUS(tms9918, 12)                    = value;

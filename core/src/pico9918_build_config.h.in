@@ -47,4 +47,14 @@
  */
 #define PICO9918_BUILD_MODE @PICO9918_MODE@
 
+/*
+ * Whether the compiled library picks its chip personality at runtime.
+ *
+ * 1 adds two fields to the instance and two entry points to the API, so a consumer
+ * that disagreed with the binary would be calling into an ABI the library did not
+ * compile. 0 - what a board builds - fixes the personality at whatever the build
+ * already is, and every gate that reads it folds to a constant.
+ */
+#define PICO9918_BUILD_RUNTIME_CHIP @PICO9918_BUILD_RUNTIME_CHIP@
+
 #endif // _PICO9918_BUILD_CONFIG_H
