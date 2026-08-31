@@ -3057,9 +3057,10 @@ static void frameIntGroup(void)
 
   /* ---- branch B: F clear, no 5S. tempStatus replaces the low five bits. ----
    *
-   * 0x1f is the post-reset latch (pico9918_frame_reset_int_impl writes exactly
-   * 0x1f), so this row is the state a real frame starts from. */
-  frameIntQuad("int-b-reset", 0x1f, 0x9f);
+   * 0x1f + 0x80 -> 0x80 is the vertical blank, and the other DISCRIMINATING case of
+   * this group: the blank runs no sprite scan, so it names no sprite, and an OR here
+   * would leave the previous line's ID standing as though it had. */
+  frameIntQuad("int-b-vblank", 0x1f, 0x80);
   /* empty latch, everything arrives at once */
   frameIntQuad("int-b-empty", 0x00, 0xc5);
   /* incumbent COL must be PRESERVED across the replacement: the `& 0xe0` on the

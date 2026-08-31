@@ -793,7 +793,7 @@ PICO9918_INLINE void pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY_ARG)
  */
 PICO9918_INLINE void pico9918_frame_reset_int_impl(PICO9918_INST_ONLY_ARG)
 {
-  pico9918_set_status_impl(PICO9918_INST 0x1f);
+  pico9918_set_status_impl(PICO9918_INST 0x00);
   tms9918->frameInt     = false;
   tms9918->frameDoneInt = true;
 }

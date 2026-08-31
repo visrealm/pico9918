@@ -322,7 +322,6 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
   tms9918->palWriteStage0Value = 0;
   tms9918->flash               = 0;
   memset(&TMS_STATUS(tms9918, 0), 0, TMS_STATUS_REGISTERS);
-  TMS_STATUS(tms9918, 0)   = 0x1f;
   /* ID = F18A (0xE0), plus 0x08 for anyone who cares it's not a real one. Which chip
      this is does not reset - see pico9918_set_chip. */
   TMS_STATUS(tms9918, 1)   = PICO9918_SR1_ID(tms9918);
@@ -913,7 +912,9 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   const uint8_t spriteSizePx       = spriteSize << spriteMag;
   const uint16_t spritePatternAddr = tmsSpritePatternTableAddr(tms9918);
   uint32_t spritesShown            = 0;
-  uint8_t tempStatus               = 0x1f;
+  /* the sprite-number field reads zero unless a fifth sprite latches one into it: the
+     scan counter is parked at zero whenever it is not walking the attribute table */
+  uint8_t tempStatus               = 0;
   uint32_t transparentCount        = 0;
 
   // ecm settings
@@ -975,7 +976,6 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
     {
       if (((tempStatus & STATUS_5S) == 0) && (!unlimited || spritesShown > scanlineSprites))
       {
-        tempStatus &= 0xe0;
         tempStatus |= STATUS_5S | spriteIndices[n];
       }
 
