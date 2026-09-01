@@ -1,6 +1,18 @@
-/*
- * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+/**
+ * \file
+ * \brief PICO9918 PRO board definition - an RP2350 booting to a higher system
+ *        clock, so the crystal is given longer to settle
  *
+ * Project: pico9918
+ *
+ * Copyright (c) 2026 Troy Schrapel
+ *
+ * This code is licensed under the MIT license
+ *
+ * https://github.com/visrealm/pico9918
+ *
+ * The peripheral pin and flash values below come from the Pico SDK's
+ * boards/pico2.h: Copyright (c) 2020 Raspberry Pi (Trading) Ltd,
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
