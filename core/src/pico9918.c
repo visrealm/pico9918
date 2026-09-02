@@ -130,7 +130,8 @@ static inline pico9918_mode_t tmsMode(pico9918_t* tms9918)
 {
   if (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_MODE_GRAPHICS_II)
     return TMS_MODE_GRAPHICS_II;
-  else if (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_MODE_TEXT_80)
+  /* An F18A honours M4 while still locked, so the test is the personality, not the lock. */
+  else if (PICO9918_M4(tms9918))
     return TMS_MODE_TEXT80;
   else
     return r1Modes[(TMS_REGISTER(tms9918, TMS_REG_1) & (TMS_R1_MODE_MULTICOLOR | TMS_R1_MODE_TEXT)) >> 3];
@@ -3381,9 +3382,17 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
   {
     tms9918->unlockCount = 0;
 
-    if ((reg & ~tms9918->lockedMask) != 0x80) return; //ignore higher registers when locked
-
     int regIndex = reg & tms9918->lockedMask; // was 0x07
+
+    /* Locked only, since reg is 0x80-0xBF: a 9918A latches three address bits, so VR8 is
+       VR0. An F18A keeps VR57 reachable, and with M4 set ignores VR8+ rather than aliasing. */
+    if ((reg & ~tms9918->lockedMask) != 0x80)
+    {
+      if (reg == (0x80 | 0x39) && PICO9918_CAN_UNLOCK(tms9918))
+        regIndex = 0x39;
+      else if (PICO9918_M4(tms9918))
+        return;
+    }
 
     TMS_REGISTER(tms9918, regIndex) = value;
     if (regIndex < 0x0f) return;
@@ -3396,11 +3405,8 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
         TMS_REGISTER(tms9918, 0x38) = 0;
         tms9918->gpuStatus          = 0; /* a new program, not a resumed one */
         tms9918->restart            = 1;
-        /* Run it HERE when the host handed the library the GPU, rather than leaving it
-           armed for a scanline. Software probing for an F18A writes a two-instruction
-           self-modifying program and reads the result back a handful of host cycles
-           later, so a program that has not run yet reads as no F18A at all. A no-op
-           for a board, and for a host with a GPU thread. */
+        /* Here, not a scanline later: an F18A probe reads its result back within a
+           handful of host cycles. A no-op unless the host set a GPU rate. */
         pico9918_gpu_service(PICO9918_INST_ONLY);
       }
     }

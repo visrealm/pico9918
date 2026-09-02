@@ -221,6 +221,17 @@ typedef struct
 #define TMS_STATUS(T, R) (T->status[R])
 #endif
 
+/* A TMS9918A does not decode R0 bit 2. Build-time as well as runtime: PICO9918_HAS folds
+   to true in a MODE=0 archive, so neither may be written as PICO9918_HAS alone. */
+#if PICO9918_MODE == PICO9918_MODE_F18A
+#define PICO9918_CAN_UNLOCK(T) PICO9918_HAS(T, PICO9918_FEAT_UNLOCK)
+#define PICO9918_M4(T)                                                                             \
+  (PICO9918_CAN_UNLOCK(T) && (TMS_REGISTER(T, TMS_REG_0) & TMS_R0_MODE_TEXT_80))
+#else
+#define PICO9918_CAN_UNLOCK(T) false
+#define PICO9918_M4(T)         false
+#endif
+
 
 /* PRIVATE DATA STRUCTURE
   * ---------------------- */

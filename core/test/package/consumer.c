@@ -109,6 +109,79 @@ int main(void)
     return 1;
   }
 
+  /* M4 is F18A-only and honoured there even while locked, so the gate is the personality.
+     The mode is cached at render time, hence the scan_line before each read. */
+  pico9918_write_register_value(PICO9918_INST 0, 0x04); /* M4 - F18A-only, so no public name */
+  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
+
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918A);
+  pico9918_scan_line(PICO9918_INST 0);
+  if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT)
+  {
+    printf("a TMS9918A with M4 and the text bit is not in 40-column text: mode %d\n",
+           (int)pico9918_display_mode(PICO9918_INST_ONLY));
+    return 1;
+  }
+
+  /* Mode comes from M1/M2/M3 alone, so the bit selects nothing. */
+  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE);
+  pico9918_scan_line(PICO9918_INST 0);
+  if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_GRAPHICS_I)
+  {
+    printf("a TMS9918A with R0 bit 2 set is not in Graphics I: mode %d\n",
+           (int)pico9918_display_mode(PICO9918_INST_ONLY));
+    return 1;
+  }
+
+  /* Three address bits, so VR8 is VR0 and the write lands. */
+  pico9918_write_register_value(PICO9918_INST 0, 0x00);
+  pico9918_write_register_value(PICO9918_INST 8, TMS_R0_MODE_GRAPHICS_II);
+  if (pico9918_reg_value(PICO9918_INST 0) != TMS_R0_MODE_GRAPHICS_II)
+  {
+    printf("a TMS9918A dropped a VR8 write instead of masking it into VR0: VR0 0x%02x\n",
+           pico9918_reg_value(PICO9918_INST 0));
+    return 1;
+  }
+  pico9918_write_register_value(PICO9918_INST 0, 0x04);
+
+  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
+  pico9918_scan_line(PICO9918_INST 0);
+  if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80)
+  {
+    printf("a locked F18A refused 80-column text, which TurboForth needs\n");
+    return 1;
+  }
+
+  /* With M4 set it ignores them instead, so VR0-15 setup writes cannot reach VR0-7. */
+  pico9918_write_register_value(PICO9918_INST 8, 0x3f);
+  if (pico9918_reg_value(PICO9918_INST 0) != 0x04)
+  {
+    printf("a locked F18A in 80 columns masked a VR8 write into VR0: VR0 0x%02x\n",
+           pico9918_reg_value(PICO9918_INST 0));
+    return 1;
+  }
+
+  /* M4 clear and it latches three bits like a 9918A again. */
+  pico9918_write_register_value(PICO9918_INST 0, 0x00);
+  pico9918_write_register_value(PICO9918_INST 8, TMS_R0_MODE_GRAPHICS_II);
+  if (pico9918_reg_value(PICO9918_INST 0) != TMS_R0_MODE_GRAPHICS_II)
+  {
+    printf("a locked F18A with M4 clear dropped a VR8 write: VR0 0x%02x\n",
+           pico9918_reg_value(PICO9918_INST 0));
+    return 1;
+  }
+
+  /* VR57 stays reachable while locked; three address bits would put it in VR1. */
+  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K);
+  pico9918_write_register_value(PICO9918_INST 57, 0x00);
+  if (pico9918_reg_value(PICO9918_INST 1) != TMS_R1_RAM_16K)
+  {
+    printf("a VR57 write was latched into VR1: VR1 0x%02x\n",
+           pico9918_reg_value(PICO9918_INST 1));
+    return 1;
+  }
+
   printf("pico9918-core: chip switch honoured, the register file and config port follow it\n");
 #endif
 
