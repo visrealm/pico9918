@@ -295,6 +295,7 @@ PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip
     tms9918->unlockCount        = 0;
     tms9918->lockedMask         = 0x07;
     TMS_REGISTER(tms9918, 0x38) = 0;
+    tms9918->palDirty           = 1; // the 80-column line narrows with it
   }
 
   /* Written here as well as in the reset, so a personality chosen after one is not a
@@ -3367,6 +3368,10 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
       tms9918->isUnlocked         = true;
       tms9918->lockedMask         = 0x3f;
       TMS_REGISTER(tms9918, 0x1e) = MAX_SPRITES - 1; // scanline sprite limit
+      /* the 80-column line is a byte a pixel once unlocked, and the LUT is built to
+         match it. The mode has not changed, so nothing else raises this - and the
+         rebuild must land before this line renders, not on the next one. */
+      tms9918->palDirty = 1;
     }
   }
   else

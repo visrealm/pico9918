@@ -214,12 +214,9 @@ static void dumpPalette(uint8_t out[GOLDEN_PAL_BYTES])
  * own path and digested:
  *
  *   surface 0 "lib"   pico9918_palette_regenerate() + PICO9918_EXPAND_INDEXED,
- *                     i.e. the library's own path. The golden build force-
- *                     includes goldenPixelPolicy.h, so PICO9918_PIXEL_T is the
- *                     SHIPPING BGR16 policy and this surface is the pixel
- *                     stream the device emits - not the desktop RGBA8888
- *                     default, which no device produces (and which the
- *                     current palette module miscomputes; see that header).
+ *                     i.e. the library's own path. One pixel policy ships and it
+ *                     is the platform default, so this surface is the pixel
+ *                     stream the device emits.
  *                     On its own this is self-capture: it pins the library
  *                     against itself and proves little.
  *
@@ -294,10 +291,10 @@ static PICO9918_PIXEL_T libPixels[POST_PAL_PIXELS];
 static uint16_t       refPixels[POST_PAL_PIXELS];
 
 /* The two surfaces are compared value-for-value, so the library's pixel type
-   must match the reference's. If the golden policy is not force-included (or
-   drifts to a wider pixel) this fires here instead of surfacing as thousands
-   of confusing digest mismatches. The LUT type is asserted for the same
-   reason - the expansion indexes it as packed pairs. */
+   must match the reference's. If the shipped policy drifts to a wider pixel this
+   fires here instead of surfacing as thousands of confusing digest mismatches.
+   The LUT type is asserted for the same reason - the expansion indexes it as
+   packed pairs. */
 _Static_assert(sizeof(PICO9918_PIXEL_T) == sizeof(uint16_t),
                "golden surfaces require the 16-bit Pico pixel policy");
 _Static_assert(sizeof(PICO9918_PALETTE_LUT_T) == sizeof(uint32_t),
@@ -892,7 +889,8 @@ static void renderScene(const Scene* scene, int* lines5s, int* linesCol)
      * and not their scheduling. */
     if (pico9918_palette_dirty())
     {
-      const bool paired = pico9918_display_mode(PICO9918_INST_ONLY) == TMS_MODE_TEXT80;
+      const bool paired = pico9918_display_mode(PICO9918_INST_ONLY) == TMS_MODE_TEXT80 &&
+                          pico9918_line_bytes(PICO9918_INST_ONLY) == TMS9918_PIXELS_X;
       pico9918_palette_regenerate();
       refRegenerate(paired);
     }
