@@ -16,10 +16,12 @@
 # it behaves the same whether the library is the repository root or a directory
 # inside one.
 #
-# Usage: tools/ci.sh <goldens|suite|warnings|doxygen|package|multi|tms9918|chip|python>
+# Usage: tools/ci.sh <goldens|suite|pixels|gpu|warnings|doxygen|package|multi|tms9918|chip|python>
 #
 #   goldens   the 18 committed frames, byte-exact
 #   suite     111 scenes, five properties and a GPU program, both line widths
+#   pixels    both palette LUT layouts and the scanline geometry, both line widths
+#   gpu       the library-paced GPU, and the arming write it runs a program on
 #   warnings  -Wall -Wextra -Werror
 #   doxygen   the docs build, and what it still reports
 #   package   install, then find_package it from a separate project and run it
@@ -117,6 +119,25 @@ tier() {
 suite() {
   tier default
   tier w512 -DLIVE_DESKTOP_TEXT80_8BPP=ON
+}
+
+# Both LUT layouts and the geometry a host reads them back through, at both line
+# widths for the same reason the suite runs two tiers.
+pixels() {
+  for width in OFF ON; do
+    dir=$OUT/pixel-$width
+    configure "$dir" "$LIBROOT" -DPICO9918_PIXEL_TEST=ON -DPICO9918_TEXT80_8BPP=$width \
+              -DCMAKE_C_FLAGS=-O2
+    build "$dir"
+    "$(findExe "$dir" pixel_test)"
+  done
+}
+
+# The GPU rate: an armed program has to have run before the arming write returns.
+gpu() {
+  configure "$OUT-gpu" "$LIBROOT" -DPICO9918_GPU_TEST=ON -DCMAKE_C_FLAGS=-O2
+  build "$OUT-gpu"
+  "$(findExe "$OUT-gpu" gpu_test)"
 }
 
 warnings() {
@@ -272,6 +293,8 @@ pythonModule() {
 case ${1:-} in
 goldens) goldens ;;
 suite) suite ;;
+pixels) pixels ;;
+gpu) gpu ;;
 warnings) warnings ;;
 doxygen) docs ;;
 package) package ;;
@@ -280,7 +303,7 @@ tms9918) tms9918 ;;
 chip) chip ;;
 python) pythonModule ;;
 *)
-  echo "usage: tools/ci.sh <goldens|suite|warnings|doxygen|package|multi|tms9918|chip|python>" >&2
+  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|warnings|doxygen|package|multi|tms9918|chip|python>" >&2
   exit 2
   ;;
 esac

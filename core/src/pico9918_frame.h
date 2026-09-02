@@ -231,6 +231,39 @@ extern "C"
                              PICO9918_PIXEL_T* pixels);
 
   /**
+   * \brief generate one OUTPUT line - the entry for a host that scans out a fixed frame
+   *
+   * `outputLine` runs 0 to the host's output height (480 for VGA) in EVERY mode, so a
+   * host presents a constant number of lines and never sees vPixelScale, double rows,
+   * the CRT-scanlines setting or the diagnostics overlay. This maps the line to a virtual
+   * one, renders only where a new one starts, completes the overlay on the border lines
+   * pico9918_frame_scanline leaves alone, and dims every second output line.
+   *
+   * Returns whether `pixels` changed. False means the buffer still holds what the last
+   * call left, so a host keeping a converted copy can present that again rather than
+   * converting the same pixels twice.
+   *
+   * `params->vVirtualPixels` is an output here - the library owns it. Progressive hosts
+   * only; an interlaced one drives pico9918_frame_scanline per field.
+   */
+  PICO9918_DLLEXPORT
+  bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,
+                                pico9918_scanline_params_t* params, PICO9918_PIXEL_T* pixels);
+
+  /**
+   * \brief one pixel from the buffer above as 0x00RRGGBB
+   *
+   * A rendered pixel is the board's: BGR12, four bits a channel, red's nibble
+   * lowest. A host blitting to a 32-bit surface converts through here rather than
+   * unpacking the nibbles itself - OR in whatever alpha its format wants.
+   */
+  static inline uint32_t pico9918_pixel_rgb888(PICO9918_PIXEL_T pixel)
+  {
+    const uint32_t p = (uint32_t)pixel;
+    return ((p & 0x00f) * 0x11u) << 16 | (((p >> 4) & 0x00f) * 0x11u) << 8 | ((p >> 8) & 0x00f) * 0x11u;
+  }
+
+  /**
    * \brief register the host's late-config-reload hook
    *
    * Fires from pico9918_frame_end, once, on the frame that first sees the display

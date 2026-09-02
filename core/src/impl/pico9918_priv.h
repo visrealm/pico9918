@@ -253,6 +253,15 @@ struct pico9918_s
   volatile uint8_t restart;
   volatile uint8_t flash;
 
+#if PICO9918_MODE == PICO9918_MODE_F18A
+  /* Who runs an armed GPU program. Zero - the default - is nobody here: the board's
+     second core, or a host thread. Non-zero and the library runs it itself, on the
+     thread that armed it and again on each scanline, at gpuSlice instructions a go.
+     See pico9918_gpu_set_clock. */
+  uint32_t gpuIps;
+  uint32_t gpuSlice;
+#endif
+
   /* palette writes are done in two stages too */
   uint8_t palWriteStage;
   uint8_t palWriteStage0Value;
@@ -673,6 +682,8 @@ PICO9918_INLINE void pico9918_frame_reset_count_impl(PICO9918_INST_ONLY_ARG)
 extern int pico9918_v_pixels;
 extern uint32_t pico9918_v_border;
 extern bool pico9918_valid_writes;
+extern uint8_t pico9918_v_scale;
+extern uint16_t pico9918_v_virtual;
 
 /* The border colour word the border-fill DMA instance reads. Declared here only so
    pico9918.c's initLookups() can point the fill

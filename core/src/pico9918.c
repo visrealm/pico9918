@@ -12,6 +12,9 @@
 
 
 #include "impl/pico9918_priv.h"
+/* pico9918_gpu_service: the register writes below are where a GPU program is armed,
+   and a host that handed the library the GPU wants it run there. */
+#include "impl/pico9918_gpu_priv.h"
 
 #include <string.h>
 
@@ -3393,11 +3396,18 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
         TMS_REGISTER(tms9918, 0x38) = 0;
         tms9918->gpuStatus          = 0; /* a new program, not a resumed one */
         tms9918->restart            = 1;
+        /* Run it HERE when the host handed the library the GPU, rather than leaving it
+           armed for a scanline. Software probing for an F18A writes a two-instruction
+           self-modifying program and reads the result back a handful of host cycles
+           later, so a program that has not run yet reads as no F18A at all. A no-op
+           for a board, and for a host with a GPU thread. */
+        pico9918_gpu_service(PICO9918_INST_ONLY);
       }
     }
     else if ((regIndex == 0x38) && (value & 1))
     {
       tms9918->restart = 1;
+      pico9918_gpu_service(PICO9918_INST_ONLY);
     }
     else if (regIndex == 0x3F && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG)) // firmware update
     {

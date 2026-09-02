@@ -80,6 +80,35 @@ PICO9918_DLLEXPORT
 void pico9918_gpu_step(PICO9918_INST_ONLY_ARG);
 
 /**
+ * Rough GPU throughput, in TMS9900 instructions a second, for pico9918_gpu_set_clock.
+ *
+ * At the top clock preset, not the 252MHz a board boots at. The PRO and F18A figures sit
+ * where a measured comparison puts them - a PRO at 352MHz beats an F18A, which lands at
+ * a PRO's 302MHz preset within a couple of percent - and the RP2040 where cycle-counting
+ * its dispatch does. Read the GPU% row of the diagnostics overlay to do better.
+ */
+#define PICO9918_GPU_IPS_CLASSIC 7000000u  /* PICO9918, RP2040 at 352MHz */
+#define PICO9918_GPU_IPS_PRO     10000000u ///< PICO9918 PRO, RP2350 at 352MHz
+#define PICO9918_GPU_IPS_F18A    8500000u  ///< the F18A itself, ie. a PRO at 302MHz
+
+/**
+ * Hand GPU execution to the library, at this many instructions a second.
+ *
+ * Zero - the default - leaves the GPU to whoever else drives it: a board's second core,
+ * or a host thread running pico9918_gpu_loop(). Set a rate and the library runs it
+ * instead, from the register write that arms a program and once per scanline after, and
+ * a host that sets one calls no other GPU entry point. Arming matters: software probing
+ * for an F18A reads its result back a few cycles later, so a GPU serviced once a scanline
+ * has not run yet and the probe intermittently sees no F18A at all.
+ *
+ * The rate becomes a per-scanline slice, re-derived each frame, so a mode change needs
+ * nothing from the host. Ignored where pico9918_gpu_step_n's cap is - a hand-written
+ * Thumb core runs to completion - and it charges GPU time to the calling thread.
+ */
+PICO9918_DLLEXPORT
+void pico9918_gpu_set_clock(PICO9918_INST_ARG uint32_t instructionsPerSecond);
+
+/**
  * The same pass, capped at `instructions`, returning true while the program still
  * has work left. Zero means no cap, which is pico9918_gpu_step().
  *

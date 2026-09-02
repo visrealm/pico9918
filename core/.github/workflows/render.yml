@@ -1,8 +1,8 @@
 name: Render
 
-# What the renderer computes: full-frame goldens, the TMS9918A-only build, the
-# runtime chip switch, and two instances proving no scanline state is shared
-# between them.
+# What the renderer computes: full-frame goldens, the palette-to-framebuffer path
+# at both line widths, the TMS9918A-only build, the runtime chip switch, and two
+# instances proving no scanline state is shared between them.
 
 on:
   push:
@@ -17,6 +17,22 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/env
       - run: tools/ci.sh goldens
+
+  pixels:
+    name: Pixel path
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh pixels
+
+  gpu:
+    name: GPU pacing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh gpu
 
   tms9918:
     name: TMS9918A mode

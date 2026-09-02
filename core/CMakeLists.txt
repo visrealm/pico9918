@@ -126,6 +126,20 @@ if (PICO9918_GOLDEN)
   add_subdirectory(test/golden)
 endif()
 
+# The palette LUT's two layouts and the scanline geometry a host reads them back
+# through. Runs at either line width - build it with PICO9918_TEXT80_8BPP=ON for
+# the wide row, which is the half nothing else covers.
+option(PICO9918_PIXEL_TEST "Build the post-palette pixel-path test" OFF)
+if (PICO9918_PIXEL_TEST)
+  add_subdirectory(test/pixel)
+endif()
+
+# The GPU rate the library paces itself from, and the arming write it runs a program on.
+option(PICO9918_GPU_TEST "Build the library-paced GPU test" OFF)
+if (PICO9918_GPU_TEST AND PICO9918_MODE)
+  add_subdirectory(test/gpu)
+endif()
+
 # The examples build against pico9918::core the way a consumer does, so they are
 # also a check that the alias and the public headers are enough on their own.
 # Off by default: a host that vendors the library wants the library, not its

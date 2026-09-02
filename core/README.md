@@ -110,6 +110,82 @@ fixed address instead: `pico9918_init()` replaces `pico9918_new()` and every cal
 drops its first argument. The `PICO9918_INST` macros in `pico9918.h` spell a call that
 compiles either way, which is what the examples and the tests use.
 
+## Scanlines and pixels
+
+The loop above reads palette *indexes* and colours them itself, which is the smaller
+surface. `pico9918_frame_scanline()` is the other one: it composes a whole display
+line - borders, the picture, the blanking and scanline registers, the line interrupt,
+the GPU trigger and the palette LUT - into a buffer of `PICO9918_PIXEL_T`, which is
+what a board's video layer wants.
+
+The buffer is `hVirtualPixels` wide, and every mode fills the same window:
+
+| pixels | |
+|---|---|
+| `0 .. hBorder-1` | left border, the backdrop colour |
+| `hBorder .. hBorder+511` | the picture, always 512 pixels - a 256-wide mode is doubled into it, and unlocked 80-column text on the 8bpp tier already fills it |
+| `hBorder+512 ..` | right border |
+
+where `hBorder` is `(hVirtualPixels - 512) / 2`. A host that reads the window at a
+different offset, or expects only half of it to have been written, gets the border
+fill through the middle of its picture rather than an error.
+
+A pixel is the board's format: BGR12 in 16 bits, four bits a channel, red's nibble
+lowest. One policy ships and it is the platform default on target and off, so a host
+converts to its own surface format rather than asking the library to render into it:
+
+```c
+framebuffer[x] = pico9918_pixel_rgb888(line[x]) | 0xff000000u;  // ARGB8888
+```
+
+Vertically the frame is a fixed height too, and `pico9918_frame_output_line()` is the
+entry that keeps it that way. A host asks for output lines 0 to 479 in every mode and
+gets back whether the buffer changed:
+
+```c
+for (unsigned y = 0; y < 480; ++y)
+  if (pico9918_frame_output_line(tms9918, y, &params, line)) convert(line);
+  present(y, converted);
+```
+
+Everything vertical is behind that call. Normally two output lines share one rendered
+line, so the second returns `false` and a host presents its existing conversion again.
+In double-rows mode there are 480 rendered lines instead of 240 and every call returns
+`true`. The CRT-scanlines setting darkens every second output line and is applied in
+there as well, which is why the return is "did the pixels change" rather than "was this
+a repeat" - a dimmed repeat needs converting again.
+
+So a host never sees `vPixelScale`, double rows, row-30 mode or the scanline setting.
+`pico9918_frame_scanline()` below it renders one *virtual* line and is what the board
+and interlaced SCART drive instead, a line at a time as their DMA asks for them.
+
+Every `PICO9918_*` symbol in `platform/` is `#ifndef`-guarded, so a host *can* replace
+the policy - but the scanline is laid out in 32-bit words holding two pixels, and the
+80-column palette build stages through `uint16_t`, so a wider pixel is not a supported
+substitution. The generated `pico9918_build_config.h` records the width the library was
+compiled with and the public headers assert against it, so a mismatch is a compile
+error rather than a wrongly strided buffer.
+
+## The GPU
+
+An F18A's GPU is a TMS9900 that guest software arms by writing VR55, and it has to run
+somewhere. Give the library a rate and it runs it for you:
+
+```c
+pico9918_gpu_set_clock(tms9918, PICO9918_GPU_IPS_PRO);
+```
+
+That is the whole integration - a host that sets a rate calls no other GPU entry point.
+The library runs a slice per scanline, re-derived each frame, and also runs one from
+inside the register write that *arms* a program. That second part matters: software
+probing for an F18A writes a two-instruction self-modifying program and reads the result
+back a few cycles later, so a GPU serviced only once a scanline has not run yet and the
+probe intermittently reports no F18A at all.
+
+`PICO9918_GPU_IPS_CLASSIC`, `_PRO` and `_F18A` are rough throughputs for the two board
+tiers and the original hardware. A host with a thread to spare can leave the rate at zero
+and run `pico9918_gpu_loop()` on that thread instead, which is what the firmware does.
+
 ## Examples
 
 `PICO9918_EXAMPLES=ON` adds these to the library's own build. Each links
@@ -232,6 +308,8 @@ and it is the same script CI runs:
 ```
 tools/ci.sh goldens     the 16 committed frames, byte-exact
 tools/ci.sh suite       111 scenes, five properties and two GPU programs, both widths
+tools/ci.sh pixels      both palette LUT layouts and the line geometry, both widths
+tools/ci.sh gpu         the library-paced GPU, and the write that arms a program
 tools/ci.sh warnings    -Wall -Wextra -Werror
 tools/ci.sh multi       the instance threaded through every signature
 tools/ci.sh tms9918     PICO9918_MODE=0, its frame against the F18A build's

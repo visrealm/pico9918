@@ -41,6 +41,12 @@ int pico9918_v_pixels      = 192;
 uint32_t pico9918_v_border = 0;
 bool pico9918_valid_writes = false;
 
+/* The vertical scale and virtual line count the last geometry settled on, so
+   pico9918_frame_output_line can map an output line without the host tracking either.
+   Seeded progressive, which is what a host gets before its first frame. */
+uint8_t pico9918_v_scale    = 2;
+uint16_t pico9918_v_virtual = 240;
+
 #if PICO9918_DIAG_GPU_FRAME_COUNTER
 /* GPU frames observed at end of frame. Opt-in, and it sits with the accumulation
    that feeds it: the increment is per-frame and the reset is on console reset,
@@ -195,6 +201,11 @@ pico9918_frame_geometry_t pico9918_frame_geometry(PICO9918_INST_ARG pico9918_fra
     display->vVirtualPixels = (display->displayPixels / yScale) << (bool)doubleRows;
   }
 
+  /* Outside the conditional so both arms publish: under interlace these are the host's
+     own values, which it owns and the library would otherwise never learn. */
+  pico9918_v_scale   = display->vPixelScale;
+  pico9918_v_virtual = display->vVirtualPixels;
+
   int baseRows = (TMS_REGISTER(tms9918, 0x31) & 0x40) ? 30 : 24;
   pico9918_v_pixels = baseRows << 3;
   if (yScale > 1 && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)) pico9918_v_pixels <<= 1;
@@ -224,6 +235,10 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
 #if PICO9918_DIAG_GPU_FRAME_COUNTER
   pico9918_gpu_frame_count += (TMS_STATUS(tms9918, 2) & 0x80) != 0;
 #endif
+
+  /* The slice is per scanline, so it moves with the mode: 30-row and double-row change
+     the line count, and a PAL machine the refresh. Both arrive here. */
+  pico9918_gpu_note_frame(PICO9918_INST display->vVirtualPixels, frameRateHz);
 
   {
     static float tempAccum = 0.0f;
@@ -376,6 +391,11 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
       pico9918_gpu_trigger(PICO9918_INST_ONLY);
     }
 
+    /* Border lines too: a program that pages a bitmap in the vertical blank is
+       waiting on exactly these, and stalling it here would be the deadlock the
+       capped step exists to avoid. */
+    pico9918_gpu_service(PICO9918_INST_ONLY);
+
     return true;
   }
 
@@ -454,5 +474,55 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   if (tms9918->config[PICO9918_CONF_DIAG_PERFORMANCE])
     pico9918_diag_update_render_time(renderTime, PICO9918_HOST_TIME_US() - lineStart);
 
+  /* A program still running gets its slice for this line. The arming write already ran
+     the short ones; this is what carries a long one forward, and it is the whole of
+     what a host used to do by hand after its own line loop. */
+  pico9918_gpu_service(PICO9918_INST_ONLY);
+
   return false;
+}
+
+/* One stop over a whole line, borders included. The parity comes from the output line,
+   where vga.c takes it from the repeat index - which at vPixelScale 1 is stuck at zero
+   and so dims nothing. */
+static bool dimLine(PICO9918_INST_ARG PICO9918_PIXEL_T* pixels, uint32_t count,
+                    uint32_t outputLine)
+{
+  if (!(outputLine & 1) || !tms9918->config[PICO9918_CONF_CRT_SCANLINES]) return false;
+
+  uint32_t* pairs = (uint32_t*)pixels;
+  for (uint32_t i = 0; i < count / 2; ++i) pairs[i] = PICO9918_PIXEL_PAIR_DIM(pairs[i]);
+  return true;
+}
+
+/**
+ * \brief see the header.
+ *
+ * The render is skipped on a repeat rather than redone: the host still holds the line in
+ * its buffer, which is how the board's DMA reads it twice too.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,
+                              pico9918_scanline_params_t* params, PICO9918_PIXEL_T* pixels)
+{
+  const uint32_t scale = pico9918_v_scale ? pico9918_v_scale : 1;
+  bool           fresh = false;
+
+  params->vVirtualPixels = pico9918_v_virtual;
+
+  if (outputLine % scale == 0)
+  {
+    const uint16_t y = (uint16_t)(outputLine / scale);
+
+    /* The border arm leaves the overlay to the caller so a host can put its own banner
+       under it. With nothing to put there, draw it: the panels span the frame, and the
+       border return is what says which lines were skipped. */
+    if (pico9918_frame_scanline(PICO9918_INST y, params, pixels) &&
+        tms9918->config[PICO9918_CONF_DIAG] && PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY))
+      pico9918_diag_render(PICO9918_INST y, params->vVirtualPixels, pixels);
+
+    fresh = true;
+  }
+
+  return dimLine(PICO9918_INST pixels, params->hVirtualPixels, outputLine) || fresh;
 }

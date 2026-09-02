@@ -507,3 +507,50 @@ void pico9918_gpu_loop(PICO9918_INST_ONLY_ARG)
     pico9918_gpu_step(PICO9918_INST_ONLY);
   }
 }
+
+/*
+ * Instructions a scanline, from a rate. Never zero while a rate is set: a slice of
+ * nothing would arm the GPU and never advance it, which is worse than running it too
+ * fast. Sixty fields of 240 lines until the first pico9918_frame_end says otherwise -
+ * the shape every mode is within a factor of two of.
+ */
+#define GPU_SLICE_FROM_IPS(ips, lines, hz) ((uint32_t)((ips) / ((lines) * (hz))) + 1u)
+
+void pico9918_gpu_set_clock(PICO9918_INST_ARG uint32_t instructionsPerSecond)
+{
+#if PICO9918_GPU_BUDGETED
+  tms9918->gpuIps   = instructionsPerSecond;
+  tms9918->gpuSlice = instructionsPerSecond ? GPU_SLICE_FROM_IPS(instructionsPerSecond, 240u, 60u) : 0u;
+#else
+  /* Refused, not honoured: the hand-written Thumb cores ignore the cap and run a
+     program to completion, so a slice taken inside a bus write could never come back
+     from one waiting on the raster. The builds that have those cores are boards, and a
+     board runs the GPU on a core of its own - there is nothing here to pace. */
+  (void)instructionsPerSecond;
+  tms9918->gpuIps   = 0;
+  tms9918->gpuSlice = 0;
+#endif
+}
+
+/* Re-derived per frame, because a mode change moves both the line count and, on a
+   50Hz machine, the rate. Called from pico9918_frame_end. */
+void pico9918_gpu_note_frame(PICO9918_INST_ARG uint32_t lines, float frameRateHz)
+{
+  if (!tms9918->gpuIps || !lines || frameRateHz < 1.0f) return;
+
+  tms9918->gpuSlice = GPU_SLICE_FROM_IPS(tms9918->gpuIps, lines, (uint32_t)frameRateHz);
+}
+
+/*
+ * One slice, for the library's own two service points: the register write that arms a
+ * program, and each scanline while one is still running.
+ *
+ * Gated on the unlock rather than the personality: a program can only be armed on an
+ * unlocked device, and stepping one down clears that flag - so this is also what stops
+ * a program armed as an F18A from running on as a TMS9918A, which pico9918_set_chip
+ * deliberately leaves to whoever runs the GPU.
+ */
+void pico9918_gpu_run_slice(PICO9918_INST_ONLY_ARG)
+{
+  if (PICO9918_UNLOCKED(tms9918)) pico9918_gpu_step_n(PICO9918_INST tms9918->gpuSlice);
+}
