@@ -607,9 +607,7 @@ static void renderPalette(PICO9918_INST_ARG int y, uint32_t vVirtualPixels, PICO
         uint32_t color = tms9918->vram.map.pram[palette * 16 + c] & 0xFF0F;
         color |= (color & 0xf000) >> 8;
         color &= 0xfff;
-#if PICO9918_BUILD_PIXEL_SIZE == 2
-        /* Shipping path, preserved verbatim: two 16-bit pixels per 32-bit store,
-         * so 15 stores cover the 30-pixel swatch. */
+        /* two 16-bit pixels per 32-bit store, so 15 stores cover the 30-pixel swatch */
         color |= color << 16;
         uint32_t* pix32 = (uint32_t*)pixels;
         for (int i = 0; i < 15; ++i)
@@ -617,25 +615,6 @@ static void renderPalette(PICO9918_INST_ARG int y, uint32_t vVirtualPixels, PICO
           pix32[xPos++] = color;
         }
         xPos++;
-#else
-        /* Wider pixel: the pair trick does not apply (a 32-bit store would cover
-         * one pixel, not two, and the strip would come out half width). Same
-         * 30 pixels, written singly. xPos stays in PAIR units so the gap
-         * arithmetic below is unchanged.
-         *
-         * GEOMETRY only. `color` is still a BGR12 word, so under a 32-bit RGBA
-         * policy these swatches render near-black with a junk alpha - the
-         * transform above has no wide-pixel form, for the same reason
-         * platform/desktop's PICO9918_PIXEL_FROM_RGB12 is marked BROKEN. This branch
-         * exists so the loop is not silently half-width and the assumption is
-         * visible; it is not a claim that the panel is correct off-target. No
-         * desktop consumer draws it today. */
-        for (int i = 0; i < 30; ++i)
-        {
-          pixels[xPos * 2 + i] = (PICO9918_PIXEL_T)color;
-        }
-        xPos += 16;
-#endif
       }
     }
   }

@@ -152,47 +152,35 @@ extern pico9918_copy32_t pico9918_copy;
 
 
 /*
- * Pixel output policy - RGBA8888 in memory order (R,G,B,A at ascending bytes),
- * which is what SDL_PIXELFORMAT_RGBA32 / a GL RGBA8 texture expect on a
- * little-endian host.
+ * Pixel output policy - the board's, off-target: BGR12 in a 16-bit pixel, red's LSB
+ * at bit 0, green's at 4, blue's at 8, bits 15-12 dead at the pins. Identical to
+ * platform/pico/platform_pico.h, which cannot be included here - it pulls in
+ * hardware/dma.h - so test/golden/CMakeLists.txt fails the configure if the two drift.
+ *
+ * ONE WIDTH, deliberately. The scanline is laid out in 32-bit words holding two
+ * pixels: the half-border arithmetic and the fill counts in pico9918_frame.c, and the
+ * pair-packed LUT below. A wider pixel halves the picture, and pico9918_palette.c's
+ * paired build stages through uint16_t, so it cannot build an 80-column LUT at all. A
+ * host converts to its display format on its own side of the line.
  */
 #ifndef PICO9918_PIXEL_T
-typedef uint32_t PICO9918_PIXEL_T;
+typedef uint16_t PICO9918_PIXEL_T;
 #define PICO9918_PIXEL_T PICO9918_PIXEL_T
 #endif
 
 /*
- * Expand a palette entry to RGBA8888. Each 4-bit channel is replicated into
- * 8 bits (0xf -> 0xff), alpha is opaque.
- *
- * BROKEN - DO NOT USE. This reads the entry as canonical
- * 0x0RGB, but a real pram entry is byte-swapped RGB444 (0xGB0R) - see the input
- * contract documented in platform/pico/platform_pico.h. Fed actual pram it
- * reads the always-set alpha/pad nibble as green and transposes red with blue, so
- * EVERY colour comes out with G=0xff: CGA blue (0xF00A -> pram 0x0AF0) renders as
- * R=AA G=FF B=00, bright yellow.
- *
- * Not reachable today - the golden harness selects the shipping Pico policy
- * (see test/golden/goldenPixelPolicy.h) and no emulator consumes the expansion
- * yet. This is a SECOND desktop defect, distinct from the LUT pair-packing
- * overflow. A correct version must either byte-swap first or read nibbles 15-12=G,
- * 11-8=B, 3-0=R directly.
- *
- * NOBODY IS ON EITHER, deliberately: neither is reachable from the Pico path, so
- * fixing them is unrelated work until the desktop pixel path is load-bearing. They
- * belong to whoever makes it so - the first emulator consumer, or V9938 work needing
- * desktop output.
+ * Expand a palette entry. The input is a pram entry: byte-swapped RGB444, 0xGB0R,
+ * so 15-12 is green, 11-8 blue and 3-0 red. Green is replicated into 7-4, and the
+ * 0xFF0F mask is what keeps the top nibble's copy out of blue's MSB on the RP2040
+ * CRT-dim path, which shifts the whole word right unmasked.
  */
 #ifndef PICO9918_PIXEL_FROM_RGB12
 #define PICO9918_PIXEL_FROM_RGB12(rgb) \
-  ((PICO9918_PIXEL_T)(((uint32_t)((((rgb) >> 8) & 0x0f) * 0x11)) | \
-                    ((uint32_t)((((rgb) >> 4) & 0x0f) * 0x11) << 8) | \
-                    ((uint32_t)((((rgb)) & 0x0f) * 0x11) << 16) | 0xff000000u))
+  ((PICO9918_PIXEL_T)(((rgb) & 0xFF0F) | ((((rgb) & 0xFF0F) >> 12) << 4)))
 #endif
 
-/* Both entries of a word at once. No assumption about the transform here - it is
-   applied to each half - so this only holds where a pixel fits in 16 bits, which is
-   the same condition the paired (TEXT80) LUT build already carries. */
+/* Both entries of a word at once. The transform is applied to each half rather than
+   assumed, so a host overriding only PICO9918_PIXEL_FROM_RGB12 gets this for free. */
 #ifndef PICO9918_PIXEL_FROM_RGB12_PAIR
 #define PICO9918_PIXEL_FROM_RGB12_PAIR(packed) \
   ((((uint32_t)PICO9918_PIXEL_FROM_RGB12((packed) >> 16)) << 16) | \
@@ -207,27 +195,37 @@ typedef uint32_t PICO9918_PIXEL_T;
 #define PICO9918_LOW16(x) ((uint32_t)(uint16_t)(x))
 #endif
 
-/* Dim an existing pixel - two stops down, per channel, alpha preserved. */
+/* Dim an existing pixel (diagnostics overlay) - two stops down, per channel. */
 #ifndef PICO9918_PIXEL_DARKEN
-#define PICO9918_PIXEL_DARKEN(p) ((PICO9918_PIXEL_T)((((p) >> 2) & 0x003f3f3fu) | ((p) & 0xff000000u)))
+#define PICO9918_PIXEL_DARKEN(p) ((PICO9918_PIXEL_T)(((p) >> 2) & 0x333))
 #endif
 
-/* The unit the overlay's glyph blit works on: one pixel to a word off-target,
-   since a pixel already fills one. */
+/* One stop down, both pixels of a word at once - the CRT-scanline effect. The mask is
+   what keeps each channel's LSB out of the channel below it, and out of the next
+   pixel's MSB. The board's VGA layer can skip it on RP2040, where the strays are dead
+   at the pins; a host has no pin boundary to hide them behind. */
+#ifndef PICO9918_PIXEL_PAIR_DIM
+#define PICO9918_PIXEL_PAIR_DIM(w) (((w) >> 1) & 0x07770777u)
+#endif
+
+/* The unit the overlay's glyph blit works on. Two pixels to a word, so a glyph cell
+   is three stores rather than six, and the darkened background falls out of the same
+   masked expression as the ink. */
 #ifndef PICO9918_INK_T
-typedef PICO9918_PIXEL_T PICO9918_INK_T;
+typedef uint32_t PICO9918_INK_T;
 #define PICO9918_INK_T PICO9918_INK_T
-#define PICO9918_INK_PIXELS    1
-#define PICO9918_INK_FILL(fg)  (fg)
-#define PICO9918_INK_DARKEN(w) PICO9918_PIXEL_DARKEN(w)
-#define PICO9918_INK_ONE(k)    ((PICO9918_INK_T)~(PICO9918_INK_T)0)
+#define PICO9918_INK_PIXELS    2
+#define PICO9918_INK_FILL(fg)  PICO9918_PIXEL_PAIR(fg)
+#define PICO9918_INK_DARKEN(w) (((w) >> 2) & 0x03330333u)
+#define PICO9918_INK_ONE(k)    (0xffffu << ((k) * 16))
 #endif
 
 /*
- * Palette LUT - one pixel per entry (no pair packing off-target).
+ * Palette LUT - 256 entries of a packed pixel *pair* (two 16-bit pixels in one
+ * 32-bit word), so the expansion loop emits one store per two output pixels.
  */
 #ifndef PICO9918_PALETTE_LUT_T
-typedef PICO9918_PIXEL_T PICO9918_PALETTE_LUT_T;
+typedef uint32_t PICO9918_PALETTE_LUT_T;
 #define PICO9918_PALETTE_LUT_T PICO9918_PALETTE_LUT_T
 #endif
 
@@ -236,8 +234,39 @@ typedef PICO9918_PIXEL_T PICO9918_PALETTE_LUT_T;
 #define PICO9918_EXPAND_INIT(lut) ((void)0)
 #endif
 
-/* The 80-column 8bpp line - see the Pico header. Packing two pixels per word assumes a
-   16-bit pixel, the same condition the paired LUT build already carries. */
+/*
+ * Indexed bytes -> pixel pairs. 8-way unrolled; n is a multiple of 8
+ * (TMS9918_PIXELS_X and its V9938 multiples all are).
+ */
+#ifndef PICO9918_EXPAND_INDEXED
+#define PICO9918_EXPAND_INDEXED(dst, src, n, lut) \
+  do \
+  { \
+    const uint8_t* _s              = (const uint8_t*)(src); \
+    const uint8_t* _e              = _s + (n); \
+    uint32_t* _d                   = (uint32_t*)(dst); \
+    const PICO9918_PALETTE_LUT_T* _l = (lut); \
+    while (_s < _e) \
+    { \
+      _d[0] = _l[_s[0]]; \
+      _d[1] = _l[_s[1]]; \
+      _d[2] = _l[_s[2]]; \
+      _d[3] = _l[_s[3]]; \
+      _d[4] = _l[_s[4]]; \
+      _d[5] = _l[_s[5]]; \
+      _d[6] = _l[_s[6]]; \
+      _d[7] = _l[_s[7]]; \
+      _d += 8; \
+      _s += 8; \
+    } \
+  } while (0)
+#endif
+
+/*
+ * The 80-column 8bpp line, which is already at full pixel width: a LUT entry holds the
+ * colour in both halves, so a destination word is two indices and two lookups rather
+ * than one index doubled.
+ */
 #ifndef PICO9918_EXPAND_INDEXED_WIDE
 #define PICO9918_EXPAND_INDEXED_WIDE(dst, src, n, lut) \
   do \
@@ -247,17 +276,6 @@ typedef PICO9918_PIXEL_T PICO9918_PALETTE_LUT_T;
     const PICO9918_PALETTE_LUT_T* _l = (lut); \
     for (unsigned _i = 0; _i < (unsigned)(n); _i += 2) \
       _d[_i / 2] = (_l[_s[_i]] & 0xffff) | (_l[_s[_i + 1]] << 16); \
-  } while (0)
-#endif
-
-#ifndef PICO9918_EXPAND_INDEXED
-#define PICO9918_EXPAND_INDEXED(dst, src, n, lut) \
-  do \
-  { \
-    const uint8_t* _s              = (const uint8_t*)(src); \
-    PICO9918_PIXEL_T* _d             = (PICO9918_PIXEL_T*)(dst); \
-    const PICO9918_PALETTE_LUT_T* _l = (lut); \
-    for (unsigned _i = 0; _i < (unsigned)(n); ++_i) _d[_i] = _l[_s[_i]]; \
   } while (0)
 #endif
 

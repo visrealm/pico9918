@@ -49,8 +49,8 @@
 _Static_assert(sizeof(PICO9918_PIXEL_T) == PICO9918_BUILD_PIXEL_SIZE,
                "PICO9918_PIXEL_T does not match the width this library was built "
                "with (see pico9918_build_config.h). Select the same pixel "
-               "policy the library used - platform/ and, for the shipping "
-               "BGR12 policy off-target, test/golden/goldenPixelPolicy.h.");
+               "policy the library used - one ships, and it is the default in "
+               "platform/ on both platforms.");
 
 #ifdef __cplusplus
 extern "C"

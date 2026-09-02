@@ -139,24 +139,21 @@ def getFileHeader(fileName, romFileList, ramFileList, args, isHeaderFile) -> str
     # The platform dispatch header supplies PICO9918_PIXEL_T /
     # PICO9918_PIXEL_FROM_RGB12 and, off-target, the __aligned fallback that used to
     # come from pico.h. One include covers both platforms, and a host overriding
-    # the pixel policy (test/golden/goldenPixelPolicy.h) is honoured here too.
+    # the pixel policy is honoured here too.
     hdrText += "#include \"impl/platform.h\"\n"
-    # The palette arrays are PICO9918_PIXEL_T, whose width is a per-build POLICY
-    # choice (uint16_t on Pico and under the golden force-include, uint32_t for
-    # the plain desktop default). The array is compiled into the library, so a
-    # consumer TU that does not have the same policy in effect would silently
-    # misread it - wrong element size, wrong stride, reads past the end. There is
-    # no link error for that, so pin it: the library stamps the width it built
-    # with, and any consumer disagreeing fails to compile instead of rendering
-    # garbage.
+    # The palette arrays are PICO9918_PIXEL_T. One width ships, but the policy is
+    # host-overridable, and the array is compiled into the library - so a consumer
+    # TU that does not have the same policy in effect would silently misread it:
+    # wrong element size, wrong stride, reads past the end. There is no link error
+    # for that, so pin it: the library stamps the width it built with, and any
+    # consumer disagreeing fails to compile instead of rendering garbage.
     hdrText += (
         "\n/* Pixel-policy width guard - see the note in img2carray.py. */\n"
         "#ifdef PICO9918_ASSET_PIXEL_SIZE\n"
         "_Static_assert(sizeof(PICO9918_PIXEL_T) == PICO9918_ASSET_PIXEL_SIZE,\n"
         "               \"PICO9918_PIXEL_T differs from the width these generated \"\n"
         "               \"assets were built with - the pixel policy must match \"\n"
-        "               \"the library's (see platform/ and test/golden/\"\n"
-        "               \"goldenPixelPolicy.h)\");\n"
+        "               \"the library's - see platform/)\");\n"
         "#endif")
     return hdrText
 

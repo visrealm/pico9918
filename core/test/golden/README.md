@@ -83,20 +83,15 @@ localised to the exact pixel by re-scanning the in-memory buffers.
 
 ### Which pixel format the goldens store
 
-The **shipping Pico BGR16 format**, on both surfaces - not the desktop
-RGBA8888 default. The golden build force-includes `goldenPixelPolicy.h` into
-every TU (library and harness alike) through the documented host-override
-mechanism that `platform/desktop/platform_std.h` provides. Two reasons:
+The **shipping BGR16 format**, on both surfaces. One pixel policy ships and it is
+the platform default on target and off, so the goldens pin the surface a device
+produces by pinning the default itself - no force-include, and a change to
+either `platform/` header fails the frames.
 
-- BGR16 is what the device produces. The expansion has only ever run on Pico;
-  capturing the desktop expansion would pin a surface no hardware emits.
-- The desktop expansion is currently **wrong**. `pico9918_palette.c` is
-  written for a 16-bit pixel: the doubled build packs a pair with
-  `PICO9918_PIXEL_FROM_RGB12(data) * 0x10001` and the paired build stages
-  through `uint16_t tmpPal[16]`. Under the desktop 32-bit RGBA pixel the
-  multiply overflows (`0xffaa00cc` -> `0x007600cc`) and `tmpPal` truncates
-  (`0xffaa00cc` -> `0x000000cc`). That defect is real and unfixed; it is
-  deliberately not baked into the goldens.
+The two headers are written out separately (`platform/pico` cannot be included
+off-target; `platform/desktop` cannot use its interpolator arm), so
+`test/golden/CMakeLists.txt` fails the configure if their formulas drift apart,
+and `golden.c` static-asserts the pixel and LUT widths it needs.
 
 ### Why an independent reference
 

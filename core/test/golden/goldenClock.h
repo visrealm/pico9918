@@ -9,8 +9,8 @@
  * https://github.com/visrealm/pico9918-core
  *
  * Force-included (-include) into every TU of the golden build - the library AND
- * the harness - alongside goldenPixelPolicy.h, through the same documented
- * host-override mechanism (see impl/platform.h).
+ * the harness - through the documented host-override mechanism (see
+ * impl/platform.h).
  *
  * WHY THIS EXISTS
  *

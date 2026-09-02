@@ -6,27 +6,27 @@
 #
 # Note: -O2 (or higher) is required.
 
-# goldenPixelPolicy.h copies the pixel policy out of platform/pico (which cannot
-# be included off-target - it pulls in hardware/dma.h). The goldens only pin the
-# shipping formula as long as that copy stays faithful, so drift is a configure
-# error rather than something a reviewer has to notice.
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/goldenPixelPolicy.h PICO9918_GOLDEN_POLICY)
+# One pixel policy ships, but it is written out twice: platform/pico cannot be
+# included off-target (it pulls in hardware/dma.h) and platform/desktop cannot use
+# its interpolator arm. The goldens pin what a device produces only as long as the
+# two stay identical, so drift is a configure error rather than something a
+# reviewer has to notice.
+file(READ ${CMAKE_SOURCE_DIR}/src/platform/desktop/platform_std.h PICO9918_STD_POLICY)
 file(READ ${CMAKE_SOURCE_DIR}/src/platform/pico/platform_pico.h PICO9918_PICO_POLICY)
-# Every formula the goldens pin must appear here, or the shipping header can
-# drift from the golden copy and the goldens silently pin a stale formula.
-# Type identity is not checkable by substring (the shipping header uses
-# typedef, the golden copy #define) - golden.c static-asserts those instead.
+# Every formula the goldens pin must appear in both. Type identity is not checkable
+# by substring (one guards its typedef with #ifndef) - golden.c static-asserts those.
 foreach(snippet
     "((PICO9918_PIXEL_T)(((rgb) & 0xFF0F) | ((((rgb) & 0xFF0F) >> 12) << 4)))"
     "((PICO9918_PIXEL_T)(((p) >> 2) & 0x333))"
+    "(((w) >> 1) & 0x07770777u)"
     "_d[7] = _l[_s[7]];")
-  string(FIND "${PICO9918_GOLDEN_POLICY}" "${snippet}" _inGolden)
+  string(FIND "${PICO9918_STD_POLICY}" "${snippet}" _inStd)
   string(FIND "${PICO9918_PICO_POLICY}" "${snippet}" _inPico)
-  if(_inGolden EQUAL -1 OR _inPico EQUAL -1)
+  if(_inStd EQUAL -1 OR _inPico EQUAL -1)
     message(FATAL_ERROR
-      "golden pixel policy has drifted from platform/pico - not found in both:\n"
+      "the two pixel policies have drifted - not found in both:\n"
       "  ${snippet}\n"
-      "Re-sync test/golden/goldenPixelPolicy.h with "
+      "Re-sync src/platform/desktop/platform_std.h with "
       "src/platform/pico/platform_pico.h.")
   endif()
 endforeach()

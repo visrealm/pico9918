@@ -273,6 +273,12 @@ typedef uint16_t PICO9918_PIXEL_T;
 /* Dim an existing pixel (diagnostics overlay) - two stops down, per channel. */
 #define PICO9918_PIXEL_DARKEN(p) ((PICO9918_PIXEL_T)(((p) >> 2) & 0x333))
 
+/* One stop down, both pixels of a word at once - the CRT-scanline effect. The mask is
+   what keeps each channel's LSB out of the channel below it, and out of the next
+   pixel's MSB. vga.c omits it on RP2040, where the strays are dead at the pins and the
+   pindir mask covers the rest; anything writing to a host buffer cannot. */
+#define PICO9918_PIXEL_PAIR_DIM(w) (((w) >> 1) & 0x07770777u)
+
 /*
  * The unit the overlay's glyph blit works on. Two pixels to a word here, so a
  * glyph cell is three stores rather than six, and the darkened background falls

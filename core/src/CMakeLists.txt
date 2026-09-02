@@ -112,13 +112,10 @@ endif()
 # it and the generated headers' _Static_assert can catch a policy mismatch. The
 # arrays live inside the library while the declarations are included by consumers,
 # and a width disagreement is otherwise silent (wrong element size and stride, no
-# link error). uint16_t whenever the Pico policy is in effect - on-target, or on
-# desktop under the golden force-include - uint32_t for the plain desktop default.
-if(PICO9918_PICO_BUILD OR PICO9918_GOLDEN)
-  set(PICO9918_ASSET_PIXEL_SIZE 2)
-else()
-  set(PICO9918_ASSET_PIXEL_SIZE 4)
-endif()
+# link error). One width ships, on both platforms - see the note on
+# PICO9918_PIXEL_T in platform/desktop/platform_std.h - so this is what a host
+# overriding the policy is held to.
+set(PICO9918_ASSET_PIXEL_SIZE 2)
 
 if(PICO9918_TEXT80_8BPP)
   set(PICO9918_BUILD_TEXT80_8BPP 1)

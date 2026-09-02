@@ -101,30 +101,20 @@ else()
   endif()
 endif()
 
-# Golden builds select the SHIPPING (Pico BGR16) pixel policy through the
-# documented host-override mechanism, so the captured post-palette surface is
-# the one the device produces rather than the desktop RGBA8888 default. Applied
-# to the library and the harness alike - both must agree on PICO9918_PIXEL_T.
-#
-# goldenClock.h rides the same mechanism to replace the library's one wall-clock
-# read with a deterministic counter. It must reach the LIBRARY's TUs,
-# not just the harness: the clock is read inside diag.c and
+# goldenClock.h replaces the library's one wall-clock read with a deterministic
+# counter, through the documented host-override mechanism. It must reach the
+# LIBRARY's TUs, not just the harness: the clock is read inside diag.c and
 # pico9918.c, so a harness-only define would change nothing.
+#
+# The pixel policy is NOT overridden here. One policy ships and it is the platform
+# default on both platforms, so the goldens pin the surface a device produces by
+# pinning the default itself - guarded against drift from platform/pico in
+# test/golden/CMakeLists.txt, and against a width change by golden.c's asserts.
 if (PICO9918_GOLDEN)
   if (MSVC)
-    # /FI takes its file in the same token, so neither of the two can be
-    # de-duplicated away.
-    add_compile_options(
-      "/FI${CMAKE_CURRENT_SOURCE_DIR}/test/golden/goldenPixelPolicy.h"
-      "/FI${CMAKE_CURRENT_SOURCE_DIR}/test/golden/goldenClock.h")
+    add_compile_options("/FI${CMAKE_CURRENT_SOURCE_DIR}/test/golden/goldenClock.h")
   else()
-    # One option per -include, and each pairs the flag with its file via SHELL: so
-    # CMake does not de-duplicate the two identical "-include" tokens - it does,
-    # leaving one bare filename that gcc reads as a second input ("cannot specify
-    # '-o' with '-c' ... with multiple files").
-    add_compile_options(
-      "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/test/golden/goldenPixelPolicy.h"
-      "SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/test/golden/goldenClock.h")
+    add_compile_options("SHELL:-include ${CMAKE_CURRENT_SOURCE_DIR}/test/golden/goldenClock.h")
   endif()
 endif()
 
