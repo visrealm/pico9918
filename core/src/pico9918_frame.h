@@ -233,18 +233,12 @@ extern "C"
   /**
    * \brief generate one OUTPUT line - the entry for a host that scans out a fixed frame
    *
-   * `outputLine` runs 0 to the host's output height (480 for VGA) in EVERY mode, so a
-   * host presents a constant number of lines and never sees vPixelScale, double rows,
-   * the CRT-scanlines setting or the diagnostics overlay. This maps the line to a virtual
-   * one, renders only where a new one starts, completes the overlay on the border lines
-   * pico9918_frame_scanline leaves alone, and dims every second output line.
+   * `outputLine` runs 0 to the host's output height (480 for VGA) in every mode, so a host
+   * never sees vPixelScale, double rows, the CRT-scanlines setting or the overlay.
    *
-   * Returns whether `pixels` changed. False means the buffer still holds what the last
-   * call left, so a host keeping a converted copy can present that again rather than
-   * converting the same pixels twice.
-   *
-   * `params->vVirtualPixels` is an output here - the library owns it. Progressive hosts
-   * only; an interlaced one drives pico9918_frame_scanline per field.
+   * Returns whether `pixels` changed; false means a host's converted copy still stands.
+   * `params->vVirtualPixels` is an output here. Progressive hosts only - an interlaced one
+   * drives pico9918_frame_scanline per field.
    */
   PICO9918_DLLEXPORT
   bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,

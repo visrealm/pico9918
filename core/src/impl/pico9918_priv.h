@@ -159,6 +159,16 @@ typedef struct
 #endif
 } pico9918_mem_map_t;
 
+/* Whether a GPU pass can be capped, and so whether the library can pace one itself. The
+   hand-written Thumb cores run a program to completion and ignore a cap; the builds that
+   have them are boards, which run the GPU on a core of their own. Here rather than in
+   gpu.c because the scanline path has to fold the pacing away, not test for it. */
+#if defined(PICO_BUILD) && !defined(PICO9918_GPU_C_CORE)
+#define PICO9918_GPU_BUDGETED 0
+#else
+#define PICO9918_GPU_BUDGETED 1
+#endif
+
 /* Has the F18A been unlocked, and is this the write that unlocks it? A TMS9918A cannot be,
    so both are literals there - and graphics_i_scan_line forks on the first exactly once,
    which is what makes the entire enhanced renderer fold away in that build rather than
@@ -253,11 +263,8 @@ struct pico9918_s
   volatile uint8_t restart;
   volatile uint8_t flash;
 
-#if PICO9918_MODE == PICO9918_MODE_F18A
-  /* Who runs an armed GPU program. Zero - the default - is nobody here: the board's
-     second core, or a host thread. Non-zero and the library runs it itself, on the
-     thread that armed it and again on each scanline, at gpuSlice instructions a go.
-     See pico9918_gpu_set_clock. */
+#if PICO9918_MODE == PICO9918_MODE_F18A && PICO9918_GPU_BUDGETED
+  /* Zero leaves an armed program to whoever else runs it. See pico9918_gpu_set_clock. */
   uint32_t gpuIps;
   uint32_t gpuSlice;
 #endif

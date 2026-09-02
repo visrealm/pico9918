@@ -37,20 +37,13 @@ PICO9918_INLINE void pico9918_gpu_trigger(PICO9918_INST_ONLY_ARG)
  * Everything below is gpu.c's, and gpu.c is not in a TMS9918A library - so a MODE=0
  * build must not see even a declaration it could call and fail to link.
  */
-#if PICO9918_MODE == PICO9918_MODE_F18A
+#if PICO9918_MODE == PICO9918_MODE_F18A && PICO9918_GPU_BUDGETED
 
-/*
- * Give an armed program a slice, if the host asked the library to run it at all.
- *
- * Out of line and in gpu.c because it steps the core, which this header exists to
- * avoid pulling in. The gpuSlice test is here so the common case - a host driving the
- * GPU itself, or a board running it on another core - is one load and a branch at the
- * call site rather than a call.
- */
+/* A slice for an armed program. In gpu.c because it steps the core; the gpuSlice test
+   is here so a host driving the GPU itself pays a load and a branch, not a call. */
 void pico9918_gpu_run_slice(PICO9918_INST_ONLY_ARG);
 
-/* Re-derive the slice from the rate, for the line count and refresh this frame ran at.
-   Called from pico9918_frame_end; a no-op unless a rate was set. */
+/* Re-derive the slice from the rate for this frame's line count and refresh. */
 void pico9918_gpu_note_frame(PICO9918_INST_ARG uint32_t lines, float frameRateHz);
 
 PICO9918_INLINE void pico9918_gpu_service(PICO9918_INST_ONLY_ARG)
@@ -60,8 +53,9 @@ PICO9918_INLINE void pico9918_gpu_service(PICO9918_INST_ONLY_ARG)
 
 #else
 
-/* A TMS9918A has no GPU to arm, and the register writes that would are above the eight
-   it admits - so the call sites stay unguarded and these fold away. */
+/* A TMS9918A has no GPU to arm, and an unbudgeted core is a board's, which runs one on
+   a core of its own - so the call sites stay unguarded and these fold away, rather than
+   leaving the scanline path a test that can never be true. */
 PICO9918_INLINE void pico9918_gpu_service(PICO9918_INST_ONLY_ARG)
 {
   (void)tms9918;

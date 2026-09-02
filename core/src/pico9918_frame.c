@@ -41,9 +41,7 @@ int pico9918_v_pixels      = 192;
 uint32_t pico9918_v_border = 0;
 bool pico9918_valid_writes = false;
 
-/* The vertical scale and virtual line count the last geometry settled on, so
-   pico9918_frame_output_line can map an output line without the host tracking either.
-   Seeded progressive, which is what a host gets before its first frame. */
+/* What pico9918_frame_output_line maps an output line through. Seeded progressive. */
 uint8_t pico9918_v_scale    = 2;
 uint16_t pico9918_v_virtual = 240;
 
@@ -201,8 +199,7 @@ pico9918_frame_geometry_t pico9918_frame_geometry(PICO9918_INST_ARG pico9918_fra
     display->vVirtualPixels = (display->displayPixels / yScale) << (bool)doubleRows;
   }
 
-  /* Outside the conditional so both arms publish: under interlace these are the host's
-     own values, which it owns and the library would otherwise never learn. */
+  /* Outside the conditional so both arms publish; under interlace these are the host's. */
   pico9918_v_scale   = display->vPixelScale;
   pico9918_v_virtual = display->vVirtualPixels;
 
@@ -236,8 +233,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
   pico9918_gpu_frame_count += (TMS_STATUS(tms9918, 2) & 0x80) != 0;
 #endif
 
-  /* The slice is per scanline, so it moves with the mode: 30-row and double-row change
-     the line count, and a PAL machine the refresh. Both arrive here. */
+  /* The slice is per scanline, so it moves with the line count and the refresh. */
   pico9918_gpu_note_frame(PICO9918_INST display->vVirtualPixels, frameRateHz);
 
   {
@@ -391,9 +387,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
       pico9918_gpu_trigger(PICO9918_INST_ONLY);
     }
 
-    /* Border lines too: a program that pages a bitmap in the vertical blank is
-       waiting on exactly these, and stalling it here would be the deadlock the
-       capped step exists to avoid. */
+    /* Border lines too: a program paging in the vertical blank waits on exactly these. */
     pico9918_gpu_service(PICO9918_INST_ONLY);
 
     return true;
@@ -474,17 +468,14 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   if (tms9918->config[PICO9918_CONF_DIAG_PERFORMANCE])
     pico9918_diag_update_render_time(renderTime, PICO9918_HOST_TIME_US() - lineStart);
 
-  /* A program still running gets its slice for this line. The arming write already ran
-     the short ones; this is what carries a long one forward, and it is the whole of
-     what a host used to do by hand after its own line loop. */
+  /* A long program's slice for this line; the arming write already ran the short ones. */
   pico9918_gpu_service(PICO9918_INST_ONLY);
 
   return false;
 }
 
-/* One stop over a whole line, borders included. The parity comes from the output line,
-   where vga.c takes it from the repeat index - which at vPixelScale 1 is stuck at zero
-   and so dims nothing. */
+/* One stop over a whole line, borders included. Parity by output line, not repeat index -
+   that is stuck at zero when vPixelScale is 1. */
 static bool dimLine(PICO9918_INST_ARG PICO9918_PIXEL_T* pixels, uint32_t count,
                     uint32_t outputLine)
 {
@@ -495,12 +486,7 @@ static bool dimLine(PICO9918_INST_ARG PICO9918_PIXEL_T* pixels, uint32_t count,
   return true;
 }
 
-/**
- * \brief see the header.
- *
- * The render is skipped on a repeat rather than redone: the host still holds the line in
- * its buffer, which is how the board's DMA reads it twice too.
- */
+/** \brief see the header. A repeat re-reads the host's buffer rather than re-rendering. */
 PICO9918_DLLEXPORT
 bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,
                               pico9918_scanline_params_t* params, PICO9918_PIXEL_T* pixels)

@@ -36,15 +36,10 @@
 #include "tms9900.h"
 #include "impl/platform.h" /* PICO9918_HOST_TIME_US */
 
-#if defined(PICO_BUILD) && !defined(PICO9918_GPU_C_CORE)
+#if !PICO9918_GPU_BUDGETED
 /* run9900() implemented in platform/thumb9900_{m0,m33}.S */
 extern uint16_t run9900(uint8_t* memory, uint16_t pc, uint16_t wp, uint8_t* regx38);
-#define PICO9918_GPU_BUDGETED 0
 #else
-/* Only the portable core takes a budget: the hand-written Thumb cores are what a
-   board runs, and a board has a core to spare. A budget of zero is no budget, so
-   this is the only entry the portable core needs. */
-#define PICO9918_GPU_BUDGETED 1
 #if defined(TMS9900_WATCH_WRITES)
 static void gpuDmaWatch(uint8_t* vram, uint32_t addr);
 #endif
@@ -526,11 +521,12 @@ void pico9918_gpu_set_clock(PICO9918_INST_ARG uint32_t instructionsPerSecond)
      program to completion, so a slice taken inside a bus write could never come back
      from one waiting on the raster. The builds that have those cores are boards, and a
      board runs the GPU on a core of its own - there is nothing here to pace. */
+  (void)tms9918;
   (void)instructionsPerSecond;
-  tms9918->gpuIps   = 0;
-  tms9918->gpuSlice = 0;
 #endif
 }
+
+#if PICO9918_GPU_BUDGETED
 
 /* Re-derived per frame, because a mode change moves both the line count and, on a
    50Hz machine, the rate. Called from pico9918_frame_end. */
@@ -554,3 +550,5 @@ void pico9918_gpu_run_slice(PICO9918_INST_ONLY_ARG)
 {
   if (PICO9918_UNLOCKED(tms9918)) pico9918_gpu_step_n(PICO9918_INST tms9918->gpuSlice);
 }
+
+#endif
