@@ -126,6 +126,11 @@ bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], bool modelMatches, u
   return true;
 }
 
+uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG)
+{
+  return tms9918->config;
+}
+
 /* host config-applied hook - see the header for the contract */
 static void (*configAppliedCallback)(void) = NULL;
 

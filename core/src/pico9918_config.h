@@ -151,6 +151,16 @@ extern const pico9918_config_field_t pico9918_config_fields[];
 extern const size_t pico9918_config_field_count;
 
 /**
+ * \brief the instance's CONFIG_BYTES settings block
+ *
+ * The same bytes pico9918_config_validate() checks and pico9918_config_apply() acts
+ * on, so a host reads its stored block into this and applies it. Persistence stays
+ * the host's - the library never reaches storage - and so does the decision to
+ * write, since these are settings a user chose rather than VDP state.
+ */
+uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
+
+/**
  * \brief validate a config block just read from host storage
  *
  * currentVerFull is the host's running firmware version, packed as

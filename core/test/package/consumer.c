@@ -19,6 +19,7 @@
  */
 
 #include "pico9918.h"
+#include "pico9918_config.h"
 #include "pico9918_util.h"
 
 #include <stdio.h>
@@ -207,6 +208,38 @@ int main(void)
 
   printf("pico9918-core: %u-byte line, status 0x%02x, palette entry 1 0x%08x\n",
          (unsigned)bytes, status, pico9918_palette[1]);
+
+  /* The settings block a host loads out of its own storage. Writable through the
+     accessor and read by the library, which is the whole contract - so setting one
+     panel byte and applying must derive the summary the overlay gates on. */
+  uint8_t* config = pico9918_config(PICO9918_INST_ONLY);
+  if (!config)
+  {
+    printf("pico9918_config returned NULL\n");
+    return 1;
+  }
+
+  config[PICO9918_CONF_DIAG]           = 0;
+  config[PICO9918_CONF_DIAG_REGISTERS] = 1;
+  pico9918_config_apply(PICO9918_INST_ONLY);
+
+  if (!pico9918_config(PICO9918_INST_ONLY)[PICO9918_CONF_DIAG])
+  {
+    printf("config applied but the derived DIAG summary stayed clear\n");
+    return 1;
+  }
+
+  config[PICO9918_CONF_DIAG_REGISTERS] = 0;
+  pico9918_config_apply(PICO9918_INST_ONLY);
+
+  if (pico9918_config(PICO9918_INST_ONLY)[PICO9918_CONF_DIAG])
+  {
+    printf("every panel is off and the derived DIAG summary is still set\n");
+    return 1;
+  }
+
+  printf("pico9918-core: config block reachable, %u bytes, applied both ways\n",
+         (unsigned)CONFIG_BYTES);
 
 #if !PICO9918_SINGLE_INSTANCE
   /* Two VDPs at once is what this mode is for, and no other test can check it: every
