@@ -3243,6 +3243,31 @@ static bool frameCompare(const char* dataDir)
   return true;
 }
 
+/* Not a digest: the splash groups above call pico9918_splash_render directly, with the
+   frame count as a parameter, so they pin the animation and nothing pins the gate that
+   decides whether it is drawn at all. That gate reads the frame count, and validWrites
+   latches once per run - so a reset rewinding only the animation leaves it shut. */
+static bool resetCheck(void)
+{
+  if (pico9918_frame_count_impl() == 0)
+  {
+    printf("[FAIL] %-19s frame count was already zero, so this proves nothing\n", "reset");
+    return false;
+  }
+
+  pico9918_reset();
+
+  if (pico9918_frame_count_impl() != 0)
+  {
+    printf("[FAIL] %-19s pico9918_reset left the frame count at %d, so the splash gate stays shut\n",
+           "reset", pico9918_frame_count_impl());
+    return false;
+  }
+
+  printf("[PASS] %-19s splash gate reopens\n", "reset");
+  return true;
+}
+
 /* ---------------------------------------------------------------------------
  * Entry point
  * ------------------------------------------------------------------------- */
@@ -3293,6 +3318,9 @@ int main(int argc, char* argv[])
    * that state, which is what keeps the 14 committed scene goldens and the overlay
    * artifact byte-identical. */
   if (!(capture ? frameCapture(dataDir) : frameCompare(dataDir))) ++failures;
+
+  /* after the frame group, which is what leaves the counter above zero */
+  if (!resetCheck()) ++failures;
 
   if (capture)
   {

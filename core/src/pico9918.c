@@ -345,6 +345,10 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
     tms9918->vram.map.pram[i] = __builtin_bswap16(defaultPalette[i]);
   }
 
+  /* Both halves, or neither works: the frame count is what reopens the splash gate -
+     validWrites is a once-per-run latch and stays set - and the rewind is what makes the
+     animation play from its start rather than from wherever it stopped. */
+  pico9918_frame_reset_count_impl(PICO9918_INST_ONLY);
   pico9918_splash_reset();
 
   /* ram intentionally left in unknown state */

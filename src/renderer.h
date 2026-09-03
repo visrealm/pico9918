@@ -16,8 +16,5 @@
 #include <stdint.h>
 #include "vga.h"
 
-/** \brief restart the frame count and treat this frame's interrupt as already raised */
-void rendererReset(void);
-
 /** \brief install the renderer's scanline, frame and porch callbacks into \p params, before vgaInit() */
 void rendererConfigureVga(VgaInitParams* params);

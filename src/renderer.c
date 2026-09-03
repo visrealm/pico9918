@@ -123,12 +123,6 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   }
 }
 
-/** \brief restart the frame count and treat this frame's interrupt as already raised */
-void rendererReset(void)
-{
-  pico9918_frame_reset_count_impl();
-}
-
 /** \brief install the renderer's scanline, frame and porch callbacks into \p params */
 void rendererConfigureVga(VgaInitParams* params)
 {
