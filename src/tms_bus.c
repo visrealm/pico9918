@@ -99,7 +99,6 @@ static void __not_in_flash_func(gpioIrqHandler)(void)
   rendererReset();
   updateTmsReadAhead();
 
-  pico9918_splash_reset();
   PICO9918_HOST_SET_INT(pico9918_frame_int_impl());
   PICO9918_HOST_EXIT_CRITICAL();
 }

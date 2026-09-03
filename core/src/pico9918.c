@@ -15,6 +15,7 @@
 /* pico9918_gpu_service: the register writes below are where a GPU program is armed,
    and a host that handed the library the GPU wants it run there. */
 #include "impl/pico9918_gpu_priv.h"
+#include "overlay/splash.h" /* pico9918_reset re-arms the splash, as a host reset does */
 
 #include <string.h>
 
@@ -343,6 +344,8 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
   {
     tms9918->vram.map.pram[i] = __builtin_bswap16(defaultPalette[i]);
   }
+
+  pico9918_splash_reset();
 
   /* ram intentionally left in unknown state */
 }
