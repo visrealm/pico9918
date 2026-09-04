@@ -9,10 +9,16 @@
 TMS9918A / TMS9928A / TMS9929A video display processor emulation with F18A
 enhancements, in C11 with no runtime dependencies.
 
-It renders **one scanline at a time** into a buffer you own, allocates nothing per
-line, and never calls back into your program. That is what lets the same code drive
-the [PICO9918](https://github.com/visrealm/pico9918) at video rate on an RP2040 and
-sit inside a desktop emulator unchanged.
+It renders **one scanline at a time** into a buffer you own and allocates nothing per
+line. The bus and renderer never call back into your program: drive `pico9918_write_*`
+and `pico9918_scan_line` and nothing above you runs. That is what lets the same code
+drive the [PICO9918](https://github.com/visrealm/pico9918) at video rate on an RP2040
+and sit inside a desktop emulator unchanged.
+
+The integration layer above it does call back, in four places you register yourself -
+`pico9918_config_set_applied_callback`, `pico9918_frame_set_config_reload_callback`,
+`pico9918_gpu_set_flash_callback` and `pico9918_gpu_set_config_save_callback`. Each
+fires at most once a frame, never from the scanline body, and NULL is the default.
 
 Building the overlay image assets (the splash and the diagnostics font) needs
 **Python 3 with [pillow](https://pypi.org/project/pillow/)** at build time -
