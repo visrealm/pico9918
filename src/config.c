@@ -180,10 +180,17 @@ bool writePendingDisplay(const PendingDisplay* p)
 {
   flash_range_erase(PENDING_FLASH_OFFSET, 0x1000);
 
+  /* flash_range_program takes whole 256-byte pages, so the record is staged in one, the
+     rest left at the erased value. Static rather than a local: core 0's stack is small,
+     main holds most of it for the run, and the bus IRQs push onto the same stack. */
+  static uint8_t page[FLASH_PAGE_SIZE];
+  memset(page, 0xff, sizeof(page));
+  memcpy(page, p, sizeof(*p));
+
   int attempts = 5;
   while (attempts--)
   {
-    flash_range_program(PENDING_FLASH_OFFSET, (const uint8_t*)p, sizeof(*p));
+    flash_range_program(PENDING_FLASH_OFFSET, page, sizeof(page));
 
     if (memcmp(PENDING_FLASH_ADDR, p, sizeof(*p)) == 0) return true;
   }
