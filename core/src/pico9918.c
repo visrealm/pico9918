@@ -861,10 +861,10 @@ static PICO9918_SECTION_SCRATCH_X(lookup) uint8_t spriteIndices[MAX_SPRITES];
 static uint32_t __time_critical_func(collectSpriteRows)(PICO9918_INST_ARG uint16_t y)
 {
   const uint32_t unlockedMask = -(uint32_t)PICO9918_UNLOCKED(tms9918);
-  const uint32_t row30Mode    = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x40) & unlockedMask;
+  const uint32_t row30Mode    = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) & unlockedMask;
   /* the first row is YPOS -1, and both the wrap threshold and the row it lands on carry that
      offset, so the list walks raw YPOS and never adds it */
-  const int32_t realY = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x08) ? 0 : 1;
+  const int32_t realY = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_Y_REAL) ? 0 : 1;
   const int32_t maxY  = (row30Mode ? 0xf0 : 0xe0) - realY;
   const int32_t yAdj  = (int32_t)y - realY;
 
@@ -938,12 +938,12 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   uint32_t transparentCount        = 0;
 
   // ecm settings
-  const uint32_t ecm            = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x03) & unlockedMask;
+  const uint32_t ecm            = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_SPRITE) & unlockedMask;
   const uint32_t ecmColorOffset = (ecm == 3) ? 2 : ecm;
   const uint32_t ecmColorMask   = (ecm == 3) ? 0x0e : 0x0f;
-  const uint32_t ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & 0xc0) >> 6);
+  const uint32_t ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_SPRITE_STRIDE) >> 6);
 
-  uint8_t pal = (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & 0x30) & unlockedMask;
+  uint8_t pal = (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_SPRITE_PS) & unlockedMask;
   if (ecm == 1)
   {
     pal &= 0x20;
@@ -954,7 +954,7 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   }
 
   const uint32_t scanlineSprites = TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES);
-  const uint32_t unlimited       = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x08) & unlockedMask;
+  const uint32_t unlimited       = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_REPORT_MAX) & unlockedMask;
 
   for (uint32_t n = 0; n < spriteCount; ++n)
   {
@@ -1464,7 +1464,7 @@ static inline void tileLayerAddr(PICO9918_INST_ARG const uint16_t rawY, const Ti
     int virtY = y + TMS_REGISTER(tms9918, config->vertScrollReg);
     /* the field wraps at the height actually rendered, which R0's row doubling
        doubles - 384 or 480 rather than 192 or 240 */
-    const int maxY = ((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x40) ? (8 * 30) : (8 * 24))
+    const int maxY = ((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? (8 * 30) : (8 * 24))
                      << (bool)(TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS);
 
     if (virtY >= maxY)
@@ -1601,7 +1601,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
   {
     ecmColorOffset = (ecm == 3) ? 2 : ecm;
     ecmColorMask   = (ecm == 3) ? 0x0e : 0x0f;
-    ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & 0x0c) >> 2);
+    ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_TILE_STRIDE) >> 2);
     pal            = (ecm == 1) ? (pal & 0x20) : 0;
   }
 
@@ -2118,7 +2118,7 @@ static EMITTER_NOINLINE void __time_critical_func(text_scan_line)(PICO9918_INST_
   const uint8_t numCols       = wide ? TEXT80_NUM_COLS : TEXT_NUM_COLS;
   const uint8_t nameTableMask = (wide && !PICO9918_UNLOCKED(tms9918)) ? 0x0c : 0x0f;
 
-  const bool attrPerPos = PICO9918_UNLOCKED(tms9918) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x02);
+  const bool attrPerPos = PICO9918_UNLOCKED(tms9918) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_POS_ATTR);
 
   TileRowAddr addr;
   uint16_t rowNamesAddr, colorTableAddr;
@@ -2137,13 +2137,13 @@ static EMITTER_NOINLINE void __time_critical_func(text_scan_line)(PICO9918_INST_
 
   if (attrPerPos)
   {
-    const bool tilesDisabled = TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x10;
+    const bool tilesDisabled = TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF;
     if (!tilesDisabled)
       renderText80Layer(PICO9918_INST tms9918->vram.bytes + rowNamesAddr, patternTable,
                         tms9918->vram.bytes + colorTableAddr, true, pixels - 4 * t1.bytes, t1.startCol,
                         t1.cells, t1.scrolled);
 
-    if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x80)
+    if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_TILE2_ENABLE)
     {
       const TextScroll t2 = textScroll80(PICO9918_INST & T2_CONFIG);
       tileLayerAddr(PICO9918_INST y, &T2_CONFIG, numCols, nameTableMask, true, false, false, attrPerPos, &addr,
@@ -2507,7 +2507,7 @@ PICO9918_INLINE_HOT void renderTileRow(TILE_ROW_PARAMS, const bool isTile2,
   {
     ecmColorOffset = (ecm == 3) ? 2 : ecm;
     ecmColorMask   = (ecm == 3) ? 0x0e : 0x0f;
-    ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & 0x0c) >> 2);
+    ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_TILE_STRIDE) >> 2);
     pal            = (ecm == 1) ? (pal & 0x20) : 0;
   }
 
@@ -2583,7 +2583,7 @@ static void (*const tileRowClones[2][6])(TILE_ROW_PARAMS) = {
 static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG uint16_t y,
                                                              const TileLayerConfig* config, const bool blend)
 {
-  const uint32_t ecm     = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x30) >> 4;
+  const uint32_t ecm     = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_TILE) >> 4;
   const bool gm2         = tmsCachedMode == TMS_MODE_GRAPHICS_II;
   const bool mcm         = tmsCachedMode == TMS_MODE_MULTICOLOR;
   const bool wide        = TEXT80_WIDE_ROW;
@@ -2591,7 +2591,7 @@ static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG ui
   const uint8_t textCols = wide ? TEXT80_NUM_COLS : TEXT_NUM_COLS;
 
   /* text takes its colour per cell at ECM0 too; a graphics mode there does not (D6) */
-  const bool attrPerPos = (text || ecm) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x02);
+  const bool attrPerPos = (text || ecm) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_POS_ATTR);
 
   TileRowAddr addr;
   uint16_t rowNamesAddr, colorTableAddr;
@@ -3176,8 +3176,8 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
       const bool textRow      = wide || tmsCachedMode == TMS_MODE_TEXT;
       const int t1Scroll      = scrollOffset(TMS_REGISTER(tms9918, PICO9918_REG_T1_HSCROLL), textRow, wide);
       const int t2Scroll      = scrollOffset(TMS_REGISTER(tms9918, PICO9918_REG_T2_HSCROLL), textRow, wide);
-      const bool tile2Enabled = TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x80;
-      const bool tile1Enabled = !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x10);
+      const bool tile2Enabled = TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_TILE2_ENABLE;
+      const bool tile1Enabled = !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF);
 
       /* An 8bpp 80-column ECM0 line can have layer 2 merge into layer 1 as it emits rather than into
          a coverage mask for the composite to arbitrate. Above ECM0 it cannot: priority is attr(0)
@@ -3190,8 +3190,8 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
          512-pixel one, so "clear it where layer 2 drew" is not expressible bit for bit - a BML pixel
          spans two tile pixels, and a half-covered one is not something to guess at. */
       const bool blend = wide && tile1Enabled && tile2Enabled &&
-                         !((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x30) >> 4) &&
-                         !(TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL) & 0x80);
+                         !((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_TILE) >> 4) &&
+                         !(TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL) & PICO9918_R31_BML_ENABLE);
 
       if (tile2Enabled && !blend)
       {
@@ -3235,7 +3235,7 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
          at a time, and on Cortex-M0+ an unaligned word load is a HardFault rather than a slow one -
          so a scroll of 3 handed straight out took the RP2040 down, where the RP2350 never noticed. */
       if (tile1Enabled && (!tile2Enabled || blend) && !underLayer && !(t1Scroll & 3) &&
-          !(TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL) & 0x80))
+          !(TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL) & PICO9918_R31_BML_ENABLE))
       {
         uint8_t* line = tms9918->tileLayer1Buffer + t1Scroll;
 
@@ -3311,7 +3311,7 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
      the plain index in both nibbles instead. */
   const uint8_t bgc        = tmsMainBgColor(tms9918);
   const bool packedNibbles = tmsCachedMode == TMS_MODE_TEXT80 && !TEXT80_WIDE_ROW;
-  bg = repeatedPalette(bgc | (packedNibbles ? bgc << 4 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & 0x03) << 4));
+  bg = repeatedPalette(bgc | (packedNibbles ? bgc << 4 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4));
 #if PICO9918_TEXT80_8BPP
   /* a wide row is twice the line to fill, and the count is per mode rather than per build */
   PICO9918_FILL32_SET_COUNT(PICO9918_FILL_LINE, pico9918_line_bytes(PICO9918_INST_ONLY) / 4);

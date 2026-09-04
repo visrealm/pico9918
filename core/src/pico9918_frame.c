@@ -135,7 +135,7 @@ void pico9918_frame_raise_end_of_frame_int(PICO9918_INST_ONLY_ARG)
 {
   pico9918_set_frame_done_int_impl(PICO9918_INST true);
   TMS_STATUS(tms9918, 0x01) |= 0x02;
-  if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x20)
+  if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_GPU_VSYNC)
   {
     pico9918_gpu_trigger(PICO9918_INST_ONLY);
   }
@@ -203,7 +203,7 @@ pico9918_frame_geometry_t pico9918_frame_geometry(PICO9918_INST_ARG pico9918_fra
   pico9918_v_scale   = display->vPixelScale;
   pico9918_v_virtual = display->vVirtualPixels;
 
-  int baseRows = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & 0x40) ? 30 : 24;
+  int baseRows = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? 30 : 24;
   pico9918_v_pixels = baseRows << 3;
   if (yScale > 1 && (TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS)) pico9918_v_pixels <<= 1;
   pico9918_v_border = (display->vVirtualPixels - pico9918_v_pixels) / 2;
@@ -252,7 +252,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
   if (!pico9918_valid_writes)
   {
     // has the display been enabled?
-    if ((pico9918_valid_writes = (TMS_REGISTER(tms9918, TMS_REG_1) & 0x40)) != 0)
+    if ((pico9918_valid_writes = (TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_DISP_ACTIVE)) != 0)
     {
       pico9918_splash_allow_hide();
       if (pico9918_frame_count > PICO9918_FRAME_STARTUP_FRAMES)
@@ -334,7 +334,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   const bool packedNibbles =
     pico9918_display_mode(PICO9918_INST_ONLY) == TMS_MODE_TEXT80 && lineBytes == TMS9918_PIXELS_X;
   pico9918_border_bg = pico9918_palette_lut[(pico9918_reg_value(PICO9918_INST TMS_REG_FG_BG_COLOR) & 0x0f) |
-                                  (packedNibbles ? 0 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & 0x03) << 4)];
+                                  (packedNibbles ? 0 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4)];
 
   if (y == 0)
   {
@@ -382,7 +382,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
       pico9918_palette_regenerate(PICO9918_INST_ONLY);
     }
 
-    if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x40)
+    if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_GPU_HSYNC)
     {
       pico9918_gpu_trigger(PICO9918_INST_ONLY);
     }
@@ -432,7 +432,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
     tempStatus |= STATUS_INT;
   }
 
-  if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & 0x40)
+  if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_GPU_HSYNC)
   {
     pico9918_gpu_trigger(PICO9918_INST_ONLY);
   }

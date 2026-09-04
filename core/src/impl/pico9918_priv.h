@@ -489,9 +489,9 @@ PICO9918_INLINE uint8_t pico9918_read_status_impl(PICO9918_INST_ONLY_ARG)
   tms9918->regWriteStage = 0;
 
   tms9918->palWriteStage = 0;
-  TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= 0x7f; // reset data port palette mode
+  TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= (uint8_t)~PICO9918_R47_DATA_PORT; // reset data port palette mode
 
-  const uint8_t readReg = TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) & 0x0F;
+  const uint8_t readReg = TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) & PICO9918_R15_STATUS_NUM;
   const uint8_t readVal = TMS_STATUS(tms9918, readReg);
 
   pico9918_status_read_core(PICO9918_INST readReg, readVal);
@@ -512,7 +512,7 @@ PICO9918_INLINE_HOT uint8_t pico9918_peek_status_impl(PICO9918_INST_ONLY_ARG)
  */
 PICO9918_INLINE_HOT void pico9918_write_data_impl(PICO9918_INST_ARG uint8_t data)
 {
-  if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & 0x80) // data port is in palette mode
+  if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & PICO9918_R47_DATA_PORT) // data port is in palette mode
   {
     if (tms9918->palWriteStage == 0)
     {
@@ -524,18 +524,18 @@ PICO9918_INLINE_HOT void pico9918_write_data_impl(PICO9918_INST_ARG uint8_t data
       tms9918->palWriteStage = 0;
 
       // this looks backwards because ARM is little-endian, TMS9900 is big-endian.
-      tms9918->vram.map.pram[TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & 0x3f] =
+      tms9918->vram.map.pram[TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & PICO9918_R47_INDEX] =
         (tms9918->palWriteStage0Value) | (data << 8);
       tms9918->palDirty = 1;
 
       // reset data port palette mode
-      if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & 0x40)
+      if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & PICO9918_R47_AUTO_INC)
       {
         ++TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL);
       }
       else
       {
-        TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= 0x7f;
+        TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= (uint8_t)~PICO9918_R47_DATA_PORT;
       }
     }
   }
