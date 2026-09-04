@@ -125,7 +125,8 @@ PICO9918_DLLEXPORT pico9918_t* pico9918_new(void)
 #endif
 
 
-pico9918_mode_t r1Modes[] = {TMS_MODE_GRAPHICS_I, TMS_MODE_MULTICOLOR, TMS_MODE_TEXT, TMS_MODE_GRAPHICS_I};
+static const pico9918_mode_t r1Modes[] = {TMS_MODE_GRAPHICS_I, TMS_MODE_MULTICOLOR, TMS_MODE_TEXT,
+                                          TMS_MODE_GRAPHICS_I};
 
 static inline pico9918_mode_t tmsMode(pico9918_t* tms9918)
 {
