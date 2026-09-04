@@ -52,6 +52,14 @@ static int total  = 0;
 static int passed = 0;
 static int failed = 0;
 
+/* Off-target the two passes over a case are the SAME core, so counting both doubles
+   the headline for no extra coverage. These count one pass, and are what gets
+   reported there. On a board both passes are independent and all four agree. */
+static int indepTotal  = 0;
+static int indepPassed = 0;
+static int indepFailed = 0;
+static int indepPass   = 1;
+
 /* -------------------------------------------------------------------------
  * Memory helpers (big-endian word access)
  * ---------------------------------------------------------------------- */
@@ -98,6 +106,10 @@ static void run_asm(void)
   run9900(mem, PROG, WP, &r38);
 #else
   run_c();
+  /* That was the C core, and every case runs run_c() as its second pass, so the
+     checks about to be made are a repeat of it. Set AFTER the call - run_c() has
+     just marked itself countable. */
+  indepPass = 0;
 #endif
 }
 
@@ -107,17 +119,21 @@ static void run_c(void)
   Tms9900Cpu cpu;
   tms9900_init(&cpu, mem, &r38, PROG, WP);
   run9900_c(&cpu);
+  indepPass = 1;
 }
 
 /* Print a test result */
 static void check(const char* label, int ok, const char* detail)
 {
   total++;
+  if (indepPass) indepTotal++;
   if (ok) {
     passed++;
+    if (indepPass) indepPassed++;
     printf("    PASS: %s\n", label);
   } else {
     failed++;
+    if (indepPass) indepFailed++;
     printf("    FAIL: %s - %s\n", label, detail);
     printf("          regs:");
     for (int i = 0; i < 8; i++) printf(" R%d=%04X", i, r16(REG(i)));
@@ -166,10 +182,15 @@ static inline void ori_op (uint8_t* b, uint16_t* o, uint8_t rd, uint16_t imm) { 
 static inline void ci     (uint8_t* b, uint16_t* o, uint8_t rd, uint16_t imm) { emit(b,o,(uint16_t)(0x0280u|rd)); emit(b,o,imm); }
 static inline void stwp   (uint8_t* b, uint16_t* o, uint8_t rd)               { emit(b,o,(uint16_t)(0x02A0u|rd)); }
 static inline void stst   (uint8_t* b, uint16_t* o, uint8_t rd)               { emit(b,o,(uint16_t)(0x02C0u|rd)); }
+static inline void lwpi   (uint8_t* b, uint16_t* o, uint16_t wp)              { emit(b,o,0x02E0u); emit(b,o,wp); }
+static inline void limi   (uint8_t* b, uint16_t* o, uint16_t mask)            { emit(b,o,0x0300u); emit(b,o,mask); }
 static inline void rtwp   (uint8_t* b, uint16_t* o)                           { emit(b,o,0x0380u); }
 
 static inline void blwp   (uint8_t* b, uint16_t* o, uint16_t addr) { emit(b,o,(uint16_t)(0x0400u|(2u<<4)|0)); emit(b,o,addr); }
 static inline void b_ind  (uint8_t* b, uint16_t* o, uint8_t rd)    { emit(b,o,(uint16_t)(0x0440u|(1u<<4)|rd)); }
+static inline void b_abs  (uint8_t* b, uint16_t* o, uint16_t addr) { emit(b,o,(uint16_t)(0x0440u|(2u<<4)|0)); emit(b,o,addr); }
+/* X takes the operand's VALUE as the instruction, so Ts=00 executes what Rd holds */
+static inline void x_reg  (uint8_t* b, uint16_t* o, uint8_t rd)    { emit(b,o,(uint16_t)(0x0480u|rd)); }
 static inline void clr    (uint8_t* b, uint16_t* o, uint8_t rd)    { emit(b,o,(uint16_t)(0x04C0u|rd)); }
 static inline void neg    (uint8_t* b, uint16_t* o, uint8_t rd)    { emit(b,o,(uint16_t)(0x0500u|rd)); }
 static inline void inv    (uint8_t* b, uint16_t* o, uint8_t rd)    { emit(b,o,(uint16_t)(0x0540u|rd)); }
@@ -189,14 +210,30 @@ static inline void srl    (uint8_t* b, uint16_t* o, uint8_t rd, uint8_t c) { emi
 static inline void sla    (uint8_t* b, uint16_t* o, uint8_t rd, uint8_t c) { emit(b,o,(uint16_t)(0x0A00u|((uint16_t)(c&0xF)<<4)|(rd&0xF))); }
 static inline void src_op (uint8_t* b, uint16_t* o, uint8_t rd, uint8_t c) { emit(b,o,(uint16_t)(0x0B00u|((uint16_t)(c&0xF)<<4)|(rd&0xF))); }
 
-static inline void jmp    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1000u|(uint8_t)off)); }
-static inline void jlt    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1A00u|(uint8_t)off)); }
-static inline void jle    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1200u|(uint8_t)off)); }
-static inline void jeq    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1300u|(uint8_t)off)); }
-static inline void jne    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1600u|(uint8_t)off)); }
-static inline void jgt    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1500u|(uint8_t)off)); }
-static inline void joc    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1C00u|(uint8_t)off)); }
-static inline void jnc    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint16_t)(0x1D00u|(uint8_t)off)); }
+/* Jump format: 0001 CCCC DDDDDDDD. The condition nibble is emitted from the index both
+   cores dispatch on - handle_branch_group in gpu/tms9900.c, JMPTBL in thumb9900_*.S,
+   which agree row for row - rather than written out per instruction: three of the
+   hand-written constants here were wrong, and because those three encoders were never
+   called, nothing said so. 0x1A00 is JL not JLT, 0x1C00 is JOP not JOC, and 0x1D00 is
+   SBO - a no-op, so a test written with it would have proved nothing at all. */
+static inline void jcc(uint8_t* b, uint16_t* o, uint8_t cond, int8_t off)
+{
+  emit(b, o, (uint16_t)(0x1000u | ((uint16_t)(cond & 0xF) << 8) | (uint8_t)off));
+}
+
+static inline void jmp    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x0,off); }
+static inline void jlt    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x1,off); }
+static inline void jle    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x2,off); }
+static inline void jeq    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x3,off); }
+static inline void jhe    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x4,off); }
+static inline void jgt    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x5,off); }
+static inline void jne    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x6,off); }
+static inline void jnc    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x7,off); }
+static inline void joc    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x8,off); }
+static inline void jno    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0x9,off); }
+static inline void jl     (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0xA,off); }
+static inline void jh     (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0xB,off); }
+static inline void jop    (uint8_t* b, uint16_t* o, int8_t off) { jcc(b,o,0xC,off); }
 
 static inline void coc    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x2000u|((uint16_t)rd<<6)|rs)); }
 static inline void czc    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x2400u|((uint16_t)rd<<6)|rs)); }
@@ -205,16 +242,22 @@ static inline void pix    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { em
 static inline void mpy    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x3800u|((uint16_t)rd<<6)|rs)); }
 static inline void div_op (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x3C00u|((uint16_t)rd<<6)|rs)); }
 
+/* Format 1. The byte forms sit 0x1000 above their word form and address the operand's
+   EVEN byte, which for a register operand is its high byte. */
 static inline void szc_rr (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x4000u|((uint16_t)rd<<6)|rs)); }
+static inline void szcb_rr(uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x5000u|((uint16_t)rd<<6)|rs)); }
 static inline void sub_rr (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x6000u|((uint16_t)rd<<6)|rs)); }
+static inline void sb_rr  (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x7000u|((uint16_t)rd<<6)|rs)); }
 static inline void cb_rr  (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x9000u|((uint16_t)rd<<6)|rs)); }
 static inline void add_rr (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xA000u|((uint16_t)rd<<6)|rs)); }
+static inline void ab_rr  (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xB000u|((uint16_t)rd<<6)|rs)); }
 static inline void mov_rr (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xC000u|((uint16_t)rd<<6)|rs)); }
 static inline void mov_ir (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xC000u|((uint16_t)rd<<6)|(1u<<4)|rs)); }
 static inline void mov_ri (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xC000u|((uint16_t)(0x10u|rd)<<6)|rs)); }
 static inline void mov_ar (uint8_t* b, uint16_t* o, uint16_t addr, uint8_t rd) { emit(b,o,(uint16_t)(0xC000u|((uint16_t)rd<<6)|(2u<<4)|0)); emit(b,o,addr); }
 static inline void movb_rr(uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xD000u|((uint16_t)rd<<6)|rs)); }
 static inline void soc_rr (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xE000u|((uint16_t)rd<<6)|rs)); }
+static inline void socb_rr(uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0xF000u|((uint16_t)rd<<6)|rs)); }
 
 /* -------------------------------------------------------------------------
  * Test groups - each test prints its name, runs ASM then C, reports PASS/FAIL
@@ -367,6 +410,45 @@ static void test_arithmetic(void)
   setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("DIV quot", 0, 3); CHECK_REG("DIV rem", 1, 0);
   setup(NULL); load_prog(p,n); run_c();   CHECK_REG("DIV quot", 0, 3); CHECK_REG("DIV rem", 1, 0);
 
+  /* AB / SB - the byte arithmetic pair, on a register's HIGH byte, with a low half
+     that has to survive. No carry out of the byte here: that is a separate rule from
+     the word forms and is what the low half proves. */
+  printf("  AB R0,R1 (0x01+0x02 in the high byte)\n");
+  n=0; li(p,&n,0,0x0100); li(p,&n,1,0x0234); ab_rr(p,&n,0,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("AB", 1, 0x0334);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("AB", 1, 0x0334);
+
+  printf("  SB R0,R1 (0x05-0x02 in the high byte)\n");
+  n=0; li(p,&n,0,0x0200); li(p,&n,1,0x0534); sb_rr(p,&n,0,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("SB", 1, 0x0334);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("SB", 1, 0x0334);
+
+  /* DIV overflow, both ways in. The dividend is the register PAIR, so the rule is
+     "divisor greater than the high word" - and a zero divisor is the degenerate case
+     of it. Either way the pair is left alone, which is the part worth pinning: a core
+     that computed first and checked after would have written a quotient here. */
+  printf("  DIV by zero (overflow, operands unchanged)\n");
+  n=0; li(p,&n,0,1); li(p,&n,1,2); li(p,&n,2,0); div_op(p,&n,2,0); stst(p,&n,3); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("DIV/0 hi", 0, 1); CHECK_REG("DIV/0 lo", 1, 2);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("DIV/0 hi", 0, 1); CHECK_REG("DIV/0 lo", 1, 2);
+  setup(NULL); load_prog(p,n); run_asm(); { uint16_t st=r16(REG(3));
+    snprintf(_det,sizeof(_det),"ST=%04X OV-bit missing",st);
+    check("DIV/0 OV [ASM]", (st&0x0800)!=0, _det); }
+  setup(NULL); load_prog(p,n); run_c();   { uint16_t st=r16(REG(3));
+    snprintf(_det,sizeof(_det),"ST=%04X OV-bit missing",st);
+    check("DIV/0 OV [C]",   (st&0x0800)!=0, _det); }
+
+  printf("  DIV quotient too wide (overflow)\n");
+  n=0; li(p,&n,0,5); li(p,&n,1,0); li(p,&n,2,4); div_op(p,&n,2,0); stst(p,&n,3); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("DIV OV hi", 0, 5); CHECK_REG("DIV OV lo", 1, 0);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("DIV OV hi", 0, 5); CHECK_REG("DIV OV lo", 1, 0);
+  setup(NULL); load_prog(p,n); run_asm(); { uint16_t st=r16(REG(3));
+    snprintf(_det,sizeof(_det),"ST=%04X OV-bit missing",st);
+    check("DIV wide OV [ASM]", (st&0x0800)!=0, _det); }
+  setup(NULL); load_prog(p,n); run_c();   { uint16_t st=r16(REG(3));
+    snprintf(_det,sizeof(_det),"ST=%04X OV-bit missing",st);
+    check("DIV wide OV [C]",   (st&0x0800)!=0, _det); }
+
   /* NEG 0x8000 -> overflow */
   printf("  NEG 0x8000 (overflow)\n");
   n=0; li(p,&n,0,0x8000); neg(p,&n,0); stst(p,&n,1); emit(p,&n,IDLE);
@@ -442,6 +524,39 @@ static void test_logical(void)
   setup(NULL); load_prog(p,n); run_c();   { uint16_t st=r16(REG(2));
     snprintf(_det,sizeof(_det),"ST=%04X EQ-bit missing",st);
     check("COC EQ [C]",   (st&0x2000)!=0, _det); }
+
+  /* CZC - EQ set when every bit the mask sets is zero in the destination. The
+     complement of COC above, and the only other instruction in that group. */
+  printf("  CZC R0,R1 (all clear)\n");
+  n=0; li(p,&n,0,0x00FF); li(p,&n,1,0xFF00); czc(p,&n,0,1); stst(p,&n,2); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); { uint16_t st=r16(REG(2));
+    snprintf(_det,sizeof(_det),"ST=%04X EQ-bit missing",st);
+    check("CZC EQ [ASM]", (st&0x2000)!=0, _det); }
+  setup(NULL); load_prog(p,n); run_c();   { uint16_t st=r16(REG(2));
+    snprintf(_det,sizeof(_det),"ST=%04X EQ-bit missing",st);
+    check("CZC EQ [C]",   (st&0x2000)!=0, _det); }
+
+  printf("  CZC R0,R1 (one bit set)\n");
+  n=0; li(p,&n,0,0x00FF); li(p,&n,1,0xFF01); czc(p,&n,0,1); stst(p,&n,2); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); { uint16_t st=r16(REG(2));
+    snprintf(_det,sizeof(_det),"ST=%04X EQ-bit should be clear",st);
+    check("CZC not EQ [ASM]", (st&0x2000)==0, _det); }
+  setup(NULL); load_prog(p,n); run_c();   { uint16_t st=r16(REG(2));
+    snprintf(_det,sizeof(_det),"ST=%04X EQ-bit should be clear",st);
+    check("CZC not EQ [C]",   (st&0x2000)==0, _det); }
+
+  /* The byte forms of SZC and SOC. A register operand's byte is its HIGH byte, so the
+     low half must come through untouched - which is the half a word-wide
+     implementation of these would quietly clobber. */
+  printf("  SZCB R0,R1\n");
+  n=0; li(p,&n,0,0x0F00); li(p,&n,1,0xFF55); szcb_rr(p,&n,0,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("SZCB", 1, 0xF055);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("SZCB", 1, 0xF055);
+
+  printf("  SOCB R0,R1\n");
+  n=0; li(p,&n,0,0x0F00); li(p,&n,1,0xF055); socb_rr(p,&n,0,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("SOCB", 1, 0xFF55);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("SOCB", 1, 0xFF55);
 
   /* CB (compare byte) - sets EQ when high bytes match */
   printf("  CB R0,R1 (equal)\n");
@@ -555,6 +670,103 @@ static void test_branches(void)
   p[bl_off+3] = (uint8_t)(sub_addr&0xFF);
   setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("BL/RT R0", 0, 0xBEEF);
   setup(NULL); load_prog(p,n); run_c();   CHECK_REG("BL/RT R0", 0, 0xBEEF);
+
+  /* B *Rn - the register holds the target. RT is this instruction with Rn=R11, so a
+     core can pass the BL/RT case above and still have the general form wrong. */
+  printf("  B *R5\n");
+  n=0;
+  uint16_t li5_off = n;                /* the immediate is the word after the opcode */
+  li(p,&n,5,0);                        /* patched below to the target address */
+  b_ind(p,&n,5);
+  li(p,&n,0,0xDEAD);                   /* skipped when the branch works */
+  emit(p,&n,IDLE);
+  uint16_t bind_target = (uint16_t)(PROG + n);
+  li(p,&n,0,0xB00B);
+  emit(p,&n,IDLE);
+  p[li5_off+2] = (uint8_t)(bind_target >> 8);
+  p[li5_off+3] = (uint8_t)(bind_target & 0xFF);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("B *R5", 0, 0xB00B);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("B *R5", 0, 0xB00B);
+
+  /* B @addr - same target, symbolic operand, and no link register written */
+  printf("  B @addr\n");
+  n=0;
+  uint16_t babs_off = n;
+  b_abs(p,&n,0);                       /* patched below */
+  li(p,&n,0,0xDEAD);                   /* skipped */
+  emit(p,&n,IDLE);
+  uint16_t babs_target = (uint16_t)(PROG + n);
+  li(p,&n,0,0xCAFE);
+  emit(p,&n,IDLE);
+  p[babs_off+2] = (uint8_t)(babs_target >> 8);
+  p[babs_off+3] = (uint8_t)(babs_target & 0xFF);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("B @addr", 0, 0xCAFE);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("B @addr", 0, 0xCAFE);
+}
+
+/* Every encodable jump condition, taken and not taken. Worth its own group because the
+   conditions are the part a hand-written core gets subtly wrong: JLT and JL differ only
+   in signedness, JLE and JHE are the two that also fire on EQ, and JOP reads a flag only
+   the byte operations write. */
+static void test_jumps(void)
+{
+  printf("\n=== Jump conditions ===\n");
+  uint8_t p[MAX_PROG]; uint16_t n;
+
+  /* Each case sets the flags, jumps two words over a marker LI, then reads R1: taken
+     leaves it at zero, not taken leaves the marker. The jump must be the last thing
+     emitted before the check. */
+#define CHECK_JUMP(lbl, taken) do { \
+  li(p,&n,1,0xDEAD); emit(p,&n,IDLE); \
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG(lbl, 1, (taken) ? 0 : 0xDEAD); \
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG(lbl, 1, (taken) ? 0 : 0xDEAD); \
+} while(0)
+
+  printf("  JMP\n");
+  n=0; jmp(p,&n,2);                                    CHECK_JUMP("JMP", 1);
+
+  /* CI leaves LGT (unsigned >), AGT (signed >) and EQ. -1 is unsigned-high and
+     signed-low at once, which is what separates the two families. */
+  printf("  JLT / JGT (signed)\n");
+  n=0; li(p,&n,0,0xFFFF); ci(p,&n,0,1); jlt(p,&n,2);   CHECK_JUMP("JLT taken", 1);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,3); jlt(p,&n,2);   CHECK_JUMP("JLT not taken", 0);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,3); jgt(p,&n,2);   CHECK_JUMP("JGT taken", 1);
+  n=0; li(p,&n,0,0xFFFF); ci(p,&n,0,1); jgt(p,&n,2);   CHECK_JUMP("JGT not taken", 0);
+
+  printf("  JL / JH (unsigned)\n");
+  n=0; li(p,&n,0,1);      ci(p,&n,0,5); jl(p,&n,2);    CHECK_JUMP("JL taken", 1);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,1); jl(p,&n,2);    CHECK_JUMP("JL not taken", 0);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,1); jh(p,&n,2);    CHECK_JUMP("JH taken", 1);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,5); jh(p,&n,2);    CHECK_JUMP("JH not taken", 0);
+
+  /* The two that also fire on EQ */
+  printf("  JLE / JHE\n");
+  n=0; li(p,&n,0,1);      ci(p,&n,0,5); jle(p,&n,2);   CHECK_JUMP("JLE on less", 1);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,5); jle(p,&n,2);   CHECK_JUMP("JLE on equal", 1);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,1); jle(p,&n,2);   CHECK_JUMP("JLE not taken", 0);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,1); jhe(p,&n,2);   CHECK_JUMP("JHE on greater", 1);
+  n=0; li(p,&n,0,5);      ci(p,&n,0,5); jhe(p,&n,2);   CHECK_JUMP("JHE on equal", 1);
+  n=0; li(p,&n,0,1);      ci(p,&n,0,5); jhe(p,&n,2);   CHECK_JUMP("JHE not taken", 0);
+
+  printf("  JOC / JNC\n");
+  n=0; li(p,&n,0,0xFFFF); ai(p,&n,0,1); joc(p,&n,2);   CHECK_JUMP("JOC taken", 1);
+  n=0; li(p,&n,0,0);      ai(p,&n,0,1); joc(p,&n,2);   CHECK_JUMP("JOC not taken", 0);
+  n=0; li(p,&n,0,0);      ai(p,&n,0,1); jnc(p,&n,2);   CHECK_JUMP("JNC taken", 1);
+  n=0; li(p,&n,0,0xFFFF); ai(p,&n,0,1); jnc(p,&n,2);   CHECK_JUMP("JNC not taken", 0);
+
+  /* 0x7FFF+1 is the signed overflow that is not a carry, so this separates the two */
+  printf("  JNO\n");
+  n=0; li(p,&n,0,1);      ai(p,&n,0,1); jno(p,&n,2);   CHECK_JUMP("JNO taken", 1);
+  n=0; li(p,&n,0,0x7FFF); ai(p,&n,0,1); jno(p,&n,2);   CHECK_JUMP("JNO not taken", 0);
+
+  /* Parity comes from CB's SOURCE byte: 0x01 is one bit, 0x03 is two */
+  printf("  JOP\n");
+  n=0; li(p,&n,2,0x0100); li(p,&n,3,0); cb_rr(p,&n,2,3); jop(p,&n,2);
+                                                        CHECK_JUMP("JOP taken", 1);
+  n=0; li(p,&n,2,0x0300); li(p,&n,3,0); cb_rr(p,&n,2,3); jop(p,&n,2);
+                                                        CHECK_JUMP("JOP not taken", 0);
+
+#undef CHECK_JUMP
 }
 
 static void test_misc(void)
@@ -583,6 +795,31 @@ static void test_misc(void)
   n=0; stwp(p,&n,0); emit(p,&n,IDLE);
   setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("STWP", 0, WP);
   setup(NULL); load_prog(p,n); run_c();   CHECK_REG("STWP", 0, WP);
+
+  /* X - the operand's VALUE is the instruction. R5 holds INC R0 (0x0580), so a core
+     that executed it correctly increments R0 without ever fetching 0x0580 from the
+     program stream. */
+  printf("  X R5 (executing INC R0)\n");
+  n=0; li(p,&n,5,0x0580); li(p,&n,0,5); x_reg(p,&n,5); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("X INC R0", 0, 6);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("X INC R0", 0, 6);
+
+  /* LWPI - the following LI has to land in the NEW workspace, so this checks the
+     register file moved rather than just that a word was consumed. */
+  printf("  LWPI (register file moves)\n");
+  n=0; lwpi(p,&n,SCRATCH); li(p,&n,0,0x1234); stwp(p,&n,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm();
+    CHECK_MEM16("LWPI new R0", SCRATCH, 0x1234); CHECK_MEM16("LWPI WP", SCRATCH+2, SCRATCH);
+  setup(NULL); load_prog(p,n); run_c();
+    CHECK_MEM16("LWPI new R0", SCRATCH, 0x1234); CHECK_MEM16("LWPI WP", SCRATCH+2, SCRATCH);
+
+  /* LIMI - this core has no interrupt mask, so the only thing it can get wrong is the
+     immediate word: consume it and the LI below runs, fetch it as an opcode and the
+     program derails. That is exactly the failure worth a test. */
+  printf("  LIMI (immediate consumed)\n");
+  n=0; limi(p,&n,2); li(p,&n,0,7); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_REG("LIMI then LI", 0, 7);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_REG("LIMI then LI", 0, 7);
 }
 
 /* PIX in BL mode, on the three things a byte-per-four-pixels layer decides:
@@ -730,13 +967,19 @@ int main(void)
   test_logical();
   test_shifts();
   test_branches();
+  test_jumps();
   test_misc();
   test_pix();
   test_blwp();
   test_stress();
 
   printf("\n=========================================\n");
+#ifdef PICO_BUILD
   printf("  Results: %d/%d passed  (%d failed)\n", passed, total, failed);
+#else
+  printf("  Results: %d/%d passed  (%d failed)\n", indepPassed, indepTotal, indepFailed);
+  printf("  One core, so the %d checks run are each case twice\n", total);
+#endif
   printf("=========================================\n");
   if (failed == 0)
     printf("  ALL TESTS PASSED\n");
