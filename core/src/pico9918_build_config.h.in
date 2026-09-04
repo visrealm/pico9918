@@ -57,4 +57,14 @@
  */
 #define PICO9918_BUILD_RUNTIME_CHIP @PICO9918_BUILD_RUNTIME_CHIP@
 
+/*
+ * Whether the compiled library takes the instance as an implicit global.
+ *
+ * 1 removes the pico9918_t* parameter from nearly every public entry point. C symbols
+ * encode no argument types, so a consumer that disagrees with this compiles, links
+ * clean, and then calls with the wrong argument list - which is why pico9918.h derives
+ * PICO9918_SINGLE_INSTANCE from this rather than trusting the consumer's own flags.
+ */
+#define PICO9918_BUILD_SINGLE_INSTANCE @PICO9918_BUILD_SINGLE_INSTANCE@
+
 #endif // _PICO9918_BUILD_CONFIG_H

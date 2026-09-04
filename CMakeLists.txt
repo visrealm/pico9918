@@ -110,6 +110,10 @@ add_definitions(-DPICO9918_MODE=1)
 # Also expose mode as a CMake variable for the library's CMakeLists.txt
 set(PICO9918_MODE 1 CACHE STRING "TMS9918 emulation mode (0=TMS9918, 1=F18A; V9938 is additive via PICO9918_V9938_BASE)")
 
+# Likewise, so the library stamps the instance mode into its generated header. The
+# definition above reaches the compiler; only the variable reaches that header.
+set(PICO9918_SINGLE_INSTANCE 1 CACHE BOOL "One implicit VDP instance, dropping the pico9918_t* parameter")
+
 # 80-column text at eight bits a pixel. A board capability rather than a chip, so it stays
 # orthogonal to PICO9918_MODE: it buys the tile palette select, ECM, the bitmap
 # layer and the shared composite there, none of which four bits a pixel can represent. It costs a

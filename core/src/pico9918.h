@@ -45,6 +45,19 @@
 #define PICO9918_DLLEXPORT_CONST PICO9918_DLLEXPORT
 #endif
 
+#include "pico9918_build_config.h"
+
+/* The instance mode comes from the generated header, not from the consumer's own flags:
+ * it changes the calling convention of nearly every entry point below, and C symbols
+ * carry no argument types, so a disagreement would link clean and then call wrongly.
+ * A consumer may still state it - that is what the library's own build does - but it
+ * has to agree with the archive. */
+#ifndef PICO9918_SINGLE_INSTANCE
+#define PICO9918_SINGLE_INSTANCE PICO9918_BUILD_SINGLE_INSTANCE
+#elif (PICO9918_SINGLE_INSTANCE != 0) != (PICO9918_BUILD_SINGLE_INSTANCE != 0)
+#error "PICO9918_SINGLE_INSTANCE disagrees with the archive - drop it and let pico9918_build_config.h supply it"
+#endif
+
 /* INST_ONLY_ARG is `void`, not empty: an empty parameter list is a declaration
  * without a prototype, which clang rejects under -Wstrict-prototypes and C23
  * gives a different meaning. INST_ARG stays empty - it is always followed by
@@ -64,8 +77,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#include "pico9918_build_config.h"
 
 /** \brief a VDP instance. Opaque: the layout is private to the library */
 struct pico9918_s;

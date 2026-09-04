@@ -282,6 +282,11 @@ they reach consumers through the exported target and the generated
 `pico9918_build_config.h`. Size a line buffer with `PICO9918_SCANLINE_BUFFER_SIZE` and
 it will be right for the library you actually linked.
 
+Do not define `PICO9918_SINGLE_INSTANCE` yourself when you include a header from an
+installed library: `pico9918.h` takes it from that generated header, so leaving it alone
+is what guarantees your calls match the archive. Defining it to the wrong value is a
+`#error` rather than a wrong argument list.
+
 ## Installing
 
 ```

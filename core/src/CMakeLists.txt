@@ -144,6 +144,15 @@ else()
   set(PICO9918_BUILD_RUNTIME_CHIP 0)
 endif()
 
+# The most dangerous of the lot: it changes the calling convention of nearly every
+# public entry point, and C symbols carry no argument types, so a consumer that
+# disagrees links cleanly and then passes arguments the library never expects.
+if(PICO9918_SINGLE_INSTANCE)
+  set(PICO9918_BUILD_SINGLE_INSTANCE 1)
+else()
+  set(PICO9918_BUILD_SINGLE_INSTANCE 0)
+endif()
+
 # Also record these in a GENERATED HEADER, not only as compile definitions. A
 # definition reaches the library's own TUs and nothing else, so a consumer built
 # by a different build system silently falls back to the platform default and the
@@ -173,9 +182,10 @@ endif()
 target_compile_definitions(${LIBRARY} PRIVATE
   PICO9918_MODE=${PICO9918_MODE})
 
-# Single-instance mode changes the public API signatures (pico9918.h), so
-# it must propagate to consumers. The firmware sets it via add_definitions();
-# standalone (desktop) builds pass it as a cache variable instead.
+# Single-instance mode changes the public API signatures (pico9918.h). The generated
+# header is what a consumer actually derives it from, so this definition is only for
+# the library's own translation units and for a consumer that states it explicitly -
+# pico9918.h holds such a one to agreeing with the stamp.
 if(PICO9918_SINGLE_INSTANCE)
   target_compile_definitions(${LIBRARY} PUBLIC PICO9918_SINGLE_INSTANCE=1)
 endif()
