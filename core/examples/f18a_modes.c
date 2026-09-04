@@ -68,21 +68,9 @@
 #define TILE_STRIPE 2 /* layer 2's ribbon; tile 0 is blank, which is the rest of layer 2 */
 #define NUM_TILES   (TILE_STRIPE + 1)
 
-/* The public enum names R0-R7, the registers a TMS9918A has. The rest are by number. */
-#define VR_NAME2      0x0A
-#define VR_COLOR2     0x0B
-#define VR_T2_HSCROLL 0x19
-#define VR_T2_VSCROLL 0x1A
-#define VR_T1_HSCROLL 0x1B
-#define VR_T1_VSCROLL 0x1C
-#define VR_ECM_STRIDE 0x1D
-#define VR_TILE_MODE  0x31
-#define VR_TILE_ATTR  0x32
-#define VR_UNLOCK     0x39
-
-static void writeReg(PICO9918_INST_ARG uint8_t reg, uint8_t value)
+static void writeReg(PICO9918_INST_ARG pico9918_register_t reg, uint8_t value)
 {
-  pico9918_write_register_value(PICO9918_INST(pico9918_register_t) reg, value);
+  pico9918_write_register_value(PICO9918_INST reg, value);
 }
 
 static void writeVram(PICO9918_INST_ARG uint16_t addr, const uint8_t* data, size_t len)
@@ -195,12 +183,13 @@ int main(int argc, char** argv)
   /* Written now, while the chip is locked, and dropped: a locked F18A takes R0-R7 and
      nothing else. The two files are the proof - this one renders as plain Graphics I
      with R49 already asking for ECM2 and a second layer. */
-  writeReg(PICO9918_INST VR_TILE_MODE, 0xA0);
+  writeReg(PICO9918_INST PICO9918_REG_ENHANCED1,
+           PICO9918_R49_TILE2_ENABLE | PICO9918_R49_ECM_TILE_2);
   renderPpm(PICO9918_INST lockedOut);
 
   /* 0x1C twice into R57. It is the one register write a locked device honours. */
-  writeReg(PICO9918_INST VR_UNLOCK, 0x1C);
-  writeReg(PICO9918_INST VR_UNLOCK, 0x1C);
+  writeReg(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
+  writeReg(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
 
   /* Attributes by position, one per cell, laid out exactly like the name table: diamond
      bands out from the centre. The tile never changes, so every colour here comes from
@@ -228,21 +217,22 @@ int main(int argc, char** argv)
   memset(cells, 0x10, sizeof cells);
   writeVram(PICO9918_INST COLOR2, cells, sizeof cells);
 
-  writeReg(PICO9918_INST VR_NAME2, NAME2 >> 10);
-  writeReg(PICO9918_INST VR_COLOR2, COLOR2 >> 6);
-  writeReg(PICO9918_INST VR_ECM_STRIDE, 0x88); /* 512 bytes a plane, tiles and sprites */
-  writeReg(PICO9918_INST VR_TILE_ATTR, 0x02);  /* attributes by position */
-  writeReg(PICO9918_INST VR_TILE_MODE, 0xA0);  /* ECM2 | layer 2 */
+  writeReg(PICO9918_INST PICO9918_REG_NAME_TABLE2, NAME2 >> 10);
+  writeReg(PICO9918_INST PICO9918_REG_COLOR_TABLE2, COLOR2 >> 6);
+  writeReg(PICO9918_INST PICO9918_REG_PAGE_SIZE, 0x88); /* 512 bytes a plane, tiles and sprites */
+  writeReg(PICO9918_INST PICO9918_REG_ENHANCED2, PICO9918_R50_POS_ATTR);
+  writeReg(PICO9918_INST PICO9918_REG_ENHANCED1,
+           PICO9918_R49_TILE2_ENABLE | PICO9918_R49_ECM_TILE_2);
 
   /* A different amount on each axis of each layer, which is where a scroll taken from
      the wrong register shows. The low three bits are the fine offset, the rest cells. */
-  writeReg(PICO9918_INST VR_T1_HSCROLL, 3);
-  writeReg(PICO9918_INST VR_T1_VSCROLL, 100);
-  writeReg(PICO9918_INST VR_T2_HSCROLL, 11);
-  writeReg(PICO9918_INST VR_T2_VSCROLL, 37);
+  writeReg(PICO9918_INST PICO9918_REG_T1_HSCROLL, 3);
+  writeReg(PICO9918_INST PICO9918_REG_T1_VSCROLL, 100);
+  writeReg(PICO9918_INST PICO9918_REG_T2_HSCROLL, 11);
+  writeReg(PICO9918_INST PICO9918_REG_T2_VSCROLL, 37);
 
   printf("unlocked: R49 reads back 0x%02X\n",
-         pico9918_reg_value(PICO9918_INST(pico9918_register_t) VR_TILE_MODE));
+         pico9918_reg_value(PICO9918_INST PICO9918_REG_ENHANCED1));
 
   renderPpm(PICO9918_INST f18aOut);
 

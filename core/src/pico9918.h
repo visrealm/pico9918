@@ -179,6 +179,38 @@ typedef enum
   TMS_REG_SPRITE_ATTR_TABLE = TMS_REG_5,
   TMS_REG_SPRITE_PATT_TABLE = TMS_REG_6,
   TMS_REG_FG_BG_COLOR       = TMS_REG_7,
+
+  /* The accessors take all 64 registers. A locked device decodes only the eight above,
+     so everything below needs the F18A personality unlocked first. */
+  PICO9918_REG_NAME_TABLE2      = 10, /**< tile layer 2 name table base */
+  PICO9918_REG_COLOR_TABLE2     = 11, /**< tile layer 2 colour table base */
+  PICO9918_REG_STATUS_SELECT    = 15, /**< which status register S1 reads back, and the counter controls */
+  PICO9918_REG_HORZ_INT_LINE    = 19, /**< scanline the horizontal interrupt fires on */
+  PICO9918_REG_PALETTE_SELECT   = 24, /**< sub-palette for sprites and each tile layer */
+  PICO9918_REG_T2_HSCROLL       = 25, /**< tile layer 2 horizontal scroll */
+  PICO9918_REG_T2_VSCROLL       = 26, /**< tile layer 2 vertical scroll */
+  PICO9918_REG_T1_HSCROLL       = 27, /**< tile layer 1 horizontal scroll */
+  PICO9918_REG_T1_VSCROLL       = 28, /**< tile layer 1 vertical scroll */
+  PICO9918_REG_PAGE_SIZE        = 29, /**< scroll page sizes, and the ECM pattern plane stride */
+  PICO9918_REG_MAX_SCAN_SPRITES = 30, /**< sprites drawn per scanline before the limit bites */
+  PICO9918_REG_BML_CONTROL      = 31, /**< bitmap layer enable, priority, transparency, fat pixels */
+  PICO9918_REG_BML_BASE         = 32, /**< bitmap layer base address, in 64-byte units */
+  PICO9918_REG_BML_X            = 33, /**< bitmap layer left edge */
+  PICO9918_REG_BML_TOP_ROW      = 34, /**< bitmap layer top row */
+  PICO9918_REG_BML_WIDTH        = 35, /**< bitmap layer width in pixels */
+  PICO9918_REG_BML_HEIGHT       = 36, /**< bitmap layer height in rows */
+  PICO9918_REG_PALETTE_CONTROL  = 47, /**< palette data port mode, auto-increment and index */
+  PICO9918_REG_VRAM_INC         = 48, /**< signed VRAM address increment per access */
+  PICO9918_REG_ENHANCED1        = 49, /**< tile layer 2, 30-row mode, ECM levels, real Y */
+  PICO9918_REG_ENHANCED2        = 50, /**< GPU triggers, per-position attributes, layer priority */
+  PICO9918_REG_MAX_SPRITES      = 51, /**< sprites processed per frame before the scan stops */
+  PICO9918_REG_GPU_PC_MSB       = 54, /**< GPU program counter, high byte */
+  PICO9918_REG_GPU_PC_LSB       = 55, /**< GPU program counter, low byte - writing it also starts the GPU */
+  PICO9918_REG_GPU_CONTROL      = 56, /**< GPU load and trigger */
+  PICO9918_REG_UNLOCK           = 57, /**< two consecutive writes of 0x1c unlock the F18A personality */
+  PICO9918_REG_CONFIG_INDEX     = 58, /**< PICO9918 only: which configuration byte R59 addresses */
+  PICO9918_REG_CONFIG_VALUE     = 59, /**< PICO9918 only: the configuration byte R58 selected */
+  PICO9918_REG_FLASH_CONTROL    = 63, /**< PICO9918 only: flash operation control */
 } pico9918_register_t;
 
 #define TMS9918_PIXELS_X 256 /**< active display width, every mode */

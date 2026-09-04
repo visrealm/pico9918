@@ -31,7 +31,7 @@
    them. Above R7, so it needs an unlocked device. */
 static uint8_t statusReg(PICO9918_INST_ARG uint8_t index)
 {
-  pico9918_write_register_value(PICO9918_INST 15, index);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_STATUS_SELECT, index);
   return pico9918_read_status(PICO9918_INST_ONLY);
 }
 
@@ -93,8 +93,8 @@ int main(void)
   /* Locked, a write above R7 is ignored and a read masks to the low three bits, so VR33
      both fails to take and reads back as the VR1 it aliases. Unlocked it is itself. That
      pair is the register file's width, which is what the unlock actually buys. */
-  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
-  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
   pico9918_write_register_value(PICO9918_INST 0x21, 0x5a);
   if (pico9918_reg_value(PICO9918_INST 0x21) != pico9918_reg_value(PICO9918_INST 0x01))
   {
@@ -103,8 +103,8 @@ int main(void)
   }
 
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_PICO9918);
-  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
-  pico9918_write_register_value(PICO9918_INST 57, 0x1c);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
   pico9918_write_register_value(PICO9918_INST 0x21, 0x5a);
   if (pico9918_reg_value(PICO9918_INST 0x21) != 0x5a)
   {
@@ -117,8 +117,8 @@ int main(void)
      A real F18A has no such port, so neither register may reach it - and VR59 is the one
      that writes, so gating VR58 alone would leave the board's config open. */
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
-  pico9918_write_register_value(PICO9918_INST 58, 8);
-  pico9918_write_register_value(PICO9918_INST 59, 0x5a);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_CONFIG_INDEX, 8);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_CONFIG_VALUE, 0x5a);
   if (statusReg(PICO9918_INST 12) == 0x5a)
   {
     printf("an F18A reached the config port\n");
@@ -126,8 +126,8 @@ int main(void)
   }
 
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_PICO9918);
-  pico9918_write_register_value(PICO9918_INST 58, 8);
-  pico9918_write_register_value(PICO9918_INST 59, 0x5a);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_CONFIG_INDEX, 8);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_CONFIG_VALUE, 0x5a);
   if (statusReg(PICO9918_INST 12) != 0x5a)
   {
     printf("a PICO9918 could not reach the config port\n");
@@ -136,8 +136,8 @@ int main(void)
 
   /* M4 is F18A-only and honoured there even while locked, so the gate is the personality.
      The mode is cached at render time, hence the scan_line before each read. */
-  pico9918_write_register_value(PICO9918_INST 0, 0x04); /* M4 - F18A-only, so no public name */
-  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_0, PICO9918_R0_M4);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
 
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918A);
   pico9918_scan_line(PICO9918_INST 0);
@@ -149,7 +149,7 @@ int main(void)
   }
 
   /* Mode comes from M1/M2/M3 alone, so the bit selects nothing. */
-  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE);
   pico9918_scan_line(PICO9918_INST 0);
   if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_GRAPHICS_I)
   {
@@ -169,7 +169,7 @@ int main(void)
   }
   pico9918_write_register_value(PICO9918_INST 0, 0x04);
 
-  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
   pico9918_scan_line(PICO9918_INST 0);
   if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80)
@@ -198,7 +198,7 @@ int main(void)
   }
 
   /* VR57 stays reachable while locked; three address bits would put it in VR1. */
-  pico9918_write_register_value(PICO9918_INST 1, TMS_R1_RAM_16K);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K);
   pico9918_write_register_value(PICO9918_INST 57, 0x00);
   if (pico9918_reg_value(PICO9918_INST 1) != TMS_R1_RAM_16K)
   {
