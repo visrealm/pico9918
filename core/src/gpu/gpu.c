@@ -93,7 +93,7 @@ static int didFault = 0;
 void isr_hardfault(void)
 {
   didFault                    = 1;
-  TMS_REGISTER(tms9918, 0x38) = 0; /* Stop the GPU */
+  TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 0; /* Stop the GPU */
   mpu_hw->ctrl                = 0; /* Turn off memory protection - all models */
 }
 #endif /* PICO_BUILD */
@@ -281,7 +281,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
 #ifdef PICO_BUILD
   restart:
 #endif
-    TMS_REGISTER(tms9918, 0x38) = 1;
+    TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 1;
     TMS_STATUS(tms9918, 2) |= 0x80; /* Running */
 
 #ifdef PICO_BUILD
@@ -294,11 +294,11 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
 
 #if PICO9918_GPU_BUDGETED
     lastAddress = run9900Budget(tms9918->vram.bytes, lastAddress, 0xFFFE,
-                                &TMS_REGISTER(tms9918, 0x38), budget, &tms9918->gpuStatus,
+                                &TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL), budget, &tms9918->gpuStatus,
                                 &outOfBudget);
 #else
     (void)budget;
-    lastAddress = run9900(tms9918->vram.bytes, lastAddress, 0xFFFE, &TMS_REGISTER(tms9918, 0x38));
+    lastAddress = run9900(tms9918->vram.bytes, lastAddress, 0xFFFE, &TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL));
 #endif
 
 #ifdef PICO_BUILD
@@ -308,7 +308,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
     /* The run flag still set means the program did not finish - it parked on an
        IDLE or a self-jump, or a budget ran out. Either way the PC is where to pick
        it up, but only the budget leaves the program with work still to do. */
-    if (TMS_REGISTER(tms9918, 0x38) & 1)
+    if (TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) & 1)
     {
       tms9918->gpuAddress = lastAddress;
       tms9918->restart    = 0;
@@ -335,7 +335,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
   if (running) return true;
 
   TMS_STATUS(tms9918, 2) &= ~0x80; /* Stopped */
-  TMS_REGISTER(tms9918, 0x38) = 0;
+  TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 0;
   return false;
 }
 

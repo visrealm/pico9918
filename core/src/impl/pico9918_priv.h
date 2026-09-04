@@ -386,7 +386,7 @@ PICO9918_INLINE_HOT void pico9918_write_addr_impl(PICO9918_INST_ARG uint8_t data
       {
         tms9918->readAheadBuffer =
           tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)];
-        tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, 0x30); // increment register
+        tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
       }
     }
     tms9918->regWriteStage = 0;
@@ -489,9 +489,9 @@ PICO9918_INLINE uint8_t pico9918_read_status_impl(PICO9918_INST_ONLY_ARG)
   tms9918->regWriteStage = 0;
 
   tms9918->palWriteStage = 0;
-  TMS_REGISTER(tms9918, 0x2f) &= 0x7f; // reset data port palette mode
+  TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= 0x7f; // reset data port palette mode
 
-  const uint8_t readReg = TMS_REGISTER(tms9918, 0x0F) & 0x0F;
+  const uint8_t readReg = TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) & 0x0F;
   const uint8_t readVal = TMS_STATUS(tms9918, readReg);
 
   pico9918_status_read_core(PICO9918_INST readReg, readVal);
@@ -512,7 +512,7 @@ PICO9918_INLINE_HOT uint8_t pico9918_peek_status_impl(PICO9918_INST_ONLY_ARG)
  */
 PICO9918_INLINE_HOT void pico9918_write_data_impl(PICO9918_INST_ARG uint8_t data)
 {
-  if (TMS_REGISTER(tms9918, 0x2f) & 0x80) // data port is in palette mode
+  if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & 0x80) // data port is in palette mode
   {
     if (tms9918->palWriteStage == 0)
     {
@@ -524,18 +524,18 @@ PICO9918_INLINE_HOT void pico9918_write_data_impl(PICO9918_INST_ARG uint8_t data
       tms9918->palWriteStage = 0;
 
       // this looks backwards because ARM is little-endian, TMS9900 is big-endian.
-      tms9918->vram.map.pram[TMS_REGISTER(tms9918, 0x2f) & 0x3f] =
+      tms9918->vram.map.pram[TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & 0x3f] =
         (tms9918->palWriteStage0Value) | (data << 8);
       tms9918->palDirty = 1;
 
       // reset data port palette mode
-      if (TMS_REGISTER(tms9918, 0x2f) & 0x40)
+      if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & 0x40)
       {
-        ++TMS_REGISTER(tms9918, 0x2f);
+        ++TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL);
       }
       else
       {
-        TMS_REGISTER(tms9918, 0x2f) &= 0x7f;
+        TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= 0x7f;
       }
     }
   }
@@ -544,7 +544,7 @@ PICO9918_INLINE_HOT void pico9918_write_data_impl(PICO9918_INST_ARG uint8_t data
     tms9918->regWriteStage                                                         = 0;
     tms9918->readAheadBuffer                                                       = data;
     tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)] = data;
-    tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, 0x30); // increment register
+    tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
   }
 }
 
@@ -555,7 +555,7 @@ PICO9918_INLINE_HOT uint8_t pico9918_read_data_impl(PICO9918_INST_ONLY_ARG)
   tms9918->regWriteStage   = 0;
   uint8_t currentValue     = tms9918->readAheadBuffer;
   tms9918->readAheadBuffer = tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)];
-  tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, 0x30); // increment register
+  tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
   return currentValue;
 }
 
@@ -564,7 +564,7 @@ PICO9918_INLINE_HOT uint8_t pico9918_read_ahead_data_impl(PICO9918_INST_ONLY_ARG
 {
   tms9918->regWriteStage   = 0;
   tms9918->readAheadBuffer = tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)];
-  tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, 0x30); // increment register
+  tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
   return tms9918->readAheadBuffer;
 }
 
@@ -780,7 +780,7 @@ PICO9918_INLINE uint16_t pico9918_frame_map_line_impl(PICO9918_INST_ARG uint16_t
                                                       bool interlaced, uint8_t fieldOrder)
 {
   uint16_t tmsY = y;
-  if (interlaced && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS)) tmsY = y * 2 + (field ^ fieldOrder);
+  if (interlaced && (TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS)) tmsY = y * 2 + (field ^ fieldOrder);
   return tmsY;
 }
 

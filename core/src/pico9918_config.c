@@ -152,11 +152,11 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG)
     tms9918->configVdpDirty = false;
 
     if (tms9918->config[PICO9918_CONF_CRT_SCANLINES])
-      TMS_REGISTER(tms9918, 50) |= 0x04;
+      TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) |= 0x04;
     else
-      TMS_REGISTER(tms9918, 50) &= ~0x04;
+      TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) &= ~0x04;
 
-    TMS_REGISTER(tms9918, 30) = 1 << (tms9918->config[PICO9918_CONF_SCANLINE_SPRITES] + 2);
+    TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = 1 << (tms9918->config[PICO9918_CONF_SCANLINE_SPRITES] + 2);
 
     for (int i = 0; i < 16; ++i)
     {
