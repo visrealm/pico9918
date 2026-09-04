@@ -1,5 +1,16 @@
 set(PROGRAM tms9900_test)
 
+# On a board the assembly core is the subject and the portable one is the cross-check.
+# Off it there is no assembly core to compare against, so the same cases become the
+# portable core's own per-instruction test - the only one that runs without hardware.
+if(DEFINED PICO_BUILD OR DEFINED PICO_PLATFORM OR DEFINED PICO_SDK_PATH)
+    set(TMS9900_ON_DEVICE ON)
+else()
+    set(TMS9900_ON_DEVICE OFF)
+endif()
+
+if(TMS9900_ON_DEVICE)
+
 # The board runs whichever core its platform selects, so the test links that one
 # and names it - the same rule as src/CMakeLists.txt.
 if(PICO_PLATFORM STREQUAL "rp2040")
@@ -37,3 +48,17 @@ pico_enable_stdio_usb(${PROGRAM} 1)
 pico_enable_stdio_uart(${PROGRAM} 1)
 
 pico_add_extra_outputs(${PROGRAM})
+
+else()
+
+add_executable(${PROGRAM}
+    tms9900_test.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../src/gpu/tms9900.c
+)
+
+target_include_directories(${PROGRAM} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../src/gpu
+)
+
+endif()

@@ -1,8 +1,10 @@
-# TMS9900 Dual-Core Unit Tests
+# TMS9900 Unit Tests
 
-Comprehensive micro-test suite that runs identical TMS9900 programs through both the **ARM assembly core** (`run9900`) and the **portable C core** (`run9900_c` from `tms9900.c`), then compares every register and memory result.
+The TMS9900 the GPU is, instruction by instruction. On a board it runs identical programs through the **ARM assembly core** (`run9900`) and the **portable C core** (`run9900_c` from `tms9900.c`), holding both to the same expected registers and memory.
 
 The assembly core is the one the platform selects, the same way `src/CMakeLists.txt` picks it: `thumb9900_m0.S` on RP2040, `thumb9900_m33.S` otherwise. The two are separate implementations, so a run on one board says nothing about the other - both need flashing. The banner names the core the binary carries.
+
+Off a board there is no assembly core, so both passes run the portable one and every check stands against the value its case states. That makes this file the desktop gate as well: `tools/ci.sh gpucore` builds and runs it, so a change to `tms9900.c` cannot reach a host emulator without these cases passing.
 
 ## What it tests
 
@@ -22,45 +24,47 @@ The assembly core is the one the platform selects, the same way `src/CMakeLists.
 
 ## Pass/Fail strategy
 
-Each test compares:
-1. **Cross-core register match** - all checked registers must agree between ASM and C
-2. **Cross-core memory match** - any listed memory locations must agree
-3. **Known-value checks** - where the expected result is deterministic, both cores must match the expected value
-4. **Flag checks** - OV, C, EQ flags via STST readback
-
-A mismatch between the two cores (not just a wrong value) is always reported as a failure with both cores' values shown, making it easy to pinpoint which core is wrong.
+Every check names the value it expects, and both passes are held to it: registers, listed memory bytes, and the OV / C / EQ flags read back through STST. A core that disagrees with the other fails on its own line rather than being compared against it, and the failing line prints R0-R7 so the state that produced it is visible without re-running.
 
 ## Building
 
+On a board it builds with the firmware, which adds this directory from its own `test/`. The result is `build/<board>/test/tms9900/tms9900_test.uf2`, flashed via BOOTSEL. Each board is its own build: `pico9918` links the m0 core, `pico9918pro` the m33 one.
+
+On a host, from the library root:
+
 ```bash
-cd test/tms9900
-mkdir build && cd build
-cmake .. -DPICO_SDK_PATH=/path/to/pico-sdk
-make -j4
+tools/ci.sh gpucore
 ```
 
-This produces `tms9900_test.uf2`. Flash it to a Pico via BOOTSEL mode.
+or by hand:
 
-## Serial output
+```bash
+cmake -B build-gpucore -DPICO9918_TMS9900_TEST=ON
+cmake --build build-gpucore
+./build-gpucore/test/tms9900/tms9900_test
+```
 
-Connect via USB serial (115200 baud) or UART. Output format:
+## Output
+
+On a board, over USB serial (115200 baud) or UART. On a host, on stdout, and the exit status is non-zero if anything failed.
 
 ```
 =========================================
-  TMS9900 Dual-Core Unit Tests
-  ASM core (m33) vs C core
+  TMS9900 Unit Tests
+  ASM core (m33 ) vs C core
 =========================================
 
 === Data Transfer ===
-  PASS: LI R0, 0x1234
-  PASS: LI R0 value=0x1234
+  LI R0,0x1234
+    PASS: LI R0,0x1234 [ASM]
+    PASS: LI R0,0x1234 [C]
   ...
 
 =========================================
-  Results: 62/62 passed  (0 failed)
+  Results: 108/108 passed  (0 failed)
 =========================================
   ALL TESTS PASSED
 =========================================
 ```
 
-On completion the onboard LED blinks: **solid on** = all pass, **blinking** = failures.
+Each case prints its name before it runs, so a hang names the instruction that caused it. On a board the onboard LED then carries the result: **solid on** = all pass, **blinking** = failures.

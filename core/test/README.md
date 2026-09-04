@@ -1,18 +1,20 @@
 # Tests
 
-Four directories, answering four different questions. Pick by the question, not by whichever one
+Six directories, answering six different questions. Pick by the question, not by whichever one
 you ran last.
 
 | Question | Where | What it is | Needs |
 |---|---|---|---|
 | Does the renderer still draw exactly what it drew before? | [`golden/`](golden/) | A C program that dumps every line of fixed scenes byte for byte | A C compiler |
 | Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 111 scenes, five property suites and two TMS9900 GPU programs | A C compiler and Python |
+| Does the post-palette pixel path lay out the way the header says? | [`pixel/`](pixel/) | Both palette LUT layouts and the scanline geometry, at both line widths | A C compiler |
+| Has an armed GPU program run by the time the arming write returns? | [`gpu/`](gpu/) | The rate the library paces the GPU from, and that write | A C compiler |
 | Is the installed package actually usable? | [`package/`](package/) | A separate project that finds the library with `find_package` and calls it | A C compiler |
-| Does the TMS9900 GPU core execute correctly? | [`tms9900/`](tms9900/) | Every instruction group through both cores, results compared | A Pico |
+| Does the TMS9900 GPU core execute correctly? | [`tms9900/`](tms9900/) | Every instruction group, held to the same expected values | A C compiler; a Pico to also run the assembly cores |
 
-Only the last one needs hardware, and none of them needs a PICO9918. That is the point of the
-library being separable: three of these four run on a laptop in seconds, and CI runs them on Linux,
-macOS and Windows under GCC, Clang, MinGW and MSVC on every push.
+Only the assembly cores need hardware, and nothing here needs a PICO9918. That is the point of the
+library being separable: all of this runs on a laptop in seconds, and CI runs the renderer suite on
+Linux, macOS and Windows under GCC, Clang, MinGW and MSVC on every push.
 
 ## The two that both compare pixels, and why both exist
 

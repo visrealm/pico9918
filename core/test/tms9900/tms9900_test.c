@@ -1,6 +1,6 @@
 /**
  * \file
- * \brief pico9918-core - the TMS9900 cores' unit tests on a Pico: ARM assembly against portable C
+ * \brief pico9918-core - the TMS9900 cores' unit tests: ARM assembly against portable C
  *
  * Copyright (c) 2026 Troy Schrapel
  *
@@ -11,7 +11,7 @@
  * Runs tests sequentially against the ARM assembly core (run9900) then
  * the portable C core (run9900_c), printing PASS/FAIL for each.
  * Each test prints its name BEFORE running so a hang is immediately
- * identifiable from the serial output.
+ * identifiable from the output.
  *
  * Memory layout:
  *   0x0000 - workspace (WP=0x0000, registers R0..R15 at offsets 0..30)
@@ -23,10 +23,18 @@
 #include <string.h>
 #include <stdint.h>
 
+#ifdef PICO_BUILD
 #include "pico/stdlib.h"
+#endif
 #include "tms9900.h"
 
+/* A host has no assembly core to compare against, so both passes run the portable
+   one and every check stands against the value the case states. Which is the point
+   of running here at all: on a board these cases are a cross-check, and off it they
+   are the only per-instruction test the portable core gets. */
+#ifdef PICO_BUILD
 extern uint16_t run9900(uint8_t* memory, uint16_t pc, uint16_t wp, uint8_t* regx38);
+#endif
 
 
 /* -------------------------------------------------------------------------
@@ -38,7 +46,7 @@ extern uint16_t run9900(uint8_t* memory, uint16_t pc, uint16_t wp, uint8_t* regx
 #define SCRATCH   0x0200u
 #define REG(r)    ((uint32_t)(WP + (r) * 2u))
 
-static uint8_t mem[MEM_SIZE] __attribute__((aligned(4)));
+static _Alignas(4) uint8_t mem[MEM_SIZE];
 
 static int total  = 0;
 static int passed = 0;
@@ -81,10 +89,16 @@ static void load_prog(const uint8_t* prog, uint16_t len)
 }
 
 
+static void run_c(void);
+
 static void run_asm(void)
 {
+#ifdef PICO_BUILD
   uint8_t r38 = 1;
   run9900(mem, PROG, WP, &r38);
+#else
+  run_c();
+#endif
 }
 
 static void run_c(void)
@@ -690,6 +704,7 @@ static void test_stress(void)
  * ====================================================================== */
 int main(void)
 {
+#ifdef PICO_BUILD
   stdio_init_all();
 
 #if defined(LIB_PICO_STDIO_USB)
@@ -698,11 +713,16 @@ int main(void)
 #else
   sleep_ms(2000);
 #endif
+#endif
 
   printf("\n");
   printf("=========================================\n");
-  printf("  TMS9900 Dual-Core Unit Tests           \n");
+  printf("  TMS9900 Unit Tests                     \n");
+#ifdef PICO_BUILD
   printf("  ASM core (%-4s) vs C core              \n", TMS9900_ASM_CORE);
+#else
+  printf("  portable C core, both passes            \n");
+#endif
   printf("=========================================\n");
 
   test_data_transfer();
@@ -724,6 +744,8 @@ int main(void)
     printf("  FAILURES DETECTED\n");
   printf("=========================================\n");
 
+#ifdef PICO_BUILD
+  /* A board has nowhere to return an exit status to, so the LED carries it. */
   const uint LED = 25;
   gpio_init(LED);
   gpio_set_dir(LED, GPIO_OUT);
@@ -733,5 +755,6 @@ int main(void)
     gpio_put(LED, 0);
     sleep_ms(500);
   }
-  return 0;
+#endif
+  return failed == 0 ? 0 : 1;
 }

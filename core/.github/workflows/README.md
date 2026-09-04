@@ -8,7 +8,7 @@ One workflow per thing being proven:
 
 | Workflow | Jobs | Proves |
 |---|---|---|
-| `render.yml` | Golden frames, TMS9918A mode, Multi-instance | what the renderer computes |
+| `render.yml` | Golden frames, Pixel path, GPU pacing, GPU instruction set, TMS9918A mode, Runtime chip switch, Multi-instance | what the renderer computes |
 | `portability.yml` | Renderer suite (x4), Warnings (gcc, clang) | it builds and renders the same everywhere |
 | `bindings.yml` | Python module | the CPython extension works against the installed library |
 | `docs.yml` | Doxygen, Publish the API documentation | the headers document cleanly, and publish |

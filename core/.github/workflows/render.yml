@@ -1,8 +1,9 @@
 name: Render
 
 # What the renderer computes: full-frame goldens, the palette-to-framebuffer path
-# at both line widths, the TMS9918A-only build, the runtime chip switch, and two
-# instances proving no scanline state is shared between them.
+# at both line widths, the GPU's pacing and its instruction set, the TMS9918A-only
+# build, the runtime chip switch, and two instances proving no scanline state is
+# shared between them.
 
 on:
   push:
@@ -33,6 +34,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/env
       - run: tools/ci.sh gpu
+
+  gpucore:
+    name: GPU instruction set
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh gpucore
 
   tms9918:
     name: TMS9918A mode

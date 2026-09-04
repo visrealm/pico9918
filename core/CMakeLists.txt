@@ -140,6 +140,15 @@ if (PICO9918_GPU_TEST AND PICO9918_MODE)
   add_subdirectory(test/gpu)
 endif()
 
+# The TMS9900 the GPU is, instruction by instruction. A board cross-checks its assembly
+# core against the portable one and adds test/tms9900 from the firmware's own test/, so
+# this option is the host's: with no assembly core to compare against, the same cases
+# become the portable core's test - and the portable core is what a host ships.
+option(PICO9918_TMS9900_TEST "Build the TMS9900 instruction tests" OFF)
+if (PICO9918_TMS9900_TEST AND PICO9918_MODE)
+  add_subdirectory(test/tms9900)
+endif()
+
 # The examples build against pico9918::core the way a consumer does, so they are
 # also a check that the alias and the public headers are enough on their own.
 # Off by default: a host that vendors the library wants the library, not its

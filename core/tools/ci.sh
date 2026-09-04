@@ -16,12 +16,13 @@
 # it behaves the same whether the library is the repository root or a directory
 # inside one.
 #
-# Usage: tools/ci.sh <goldens|suite|pixels|gpu|warnings|doxygen|package|multi|tms9918|chip|python>
+# Usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|doxygen|package|multi|tms9918|chip|python>
 #
 #   goldens   the 18 committed frames, byte-exact
 #   suite     111 scenes, five properties and a GPU program, both line widths
 #   pixels    both palette LUT layouts and the scanline geometry, both line widths
 #   gpu       the library-paced GPU, and the arming write it runs a program on
+#   gpucore   the GPU's TMS9900, instruction by instruction, on the portable core
 #   warnings  -Wall -Wextra -Werror
 #   doxygen   the docs build, and what it still reports
 #   package   install, then find_package it from a separate project and run it
@@ -138,6 +139,14 @@ gpu() {
   configure "$OUT-gpu" "$LIBROOT" -DPICO9918_GPU_TEST=ON -DCMAKE_C_FLAGS=-O2
   build "$OUT-gpu"
   "$(findExe "$OUT-gpu" gpu_test)"
+}
+
+# The GPU's instruction set. Named for the core rather than the chip, because a job
+# called tms9900 beside the tms9918 one would be one digit from an unrelated thing.
+gpucore() {
+  configure "$OUT-gpucore" "$LIBROOT" -DPICO9918_TMS9900_TEST=ON -DCMAKE_C_FLAGS=-O2
+  build "$OUT-gpucore"
+  "$(findExe "$OUT-gpucore" tms9900_test)"
 }
 
 warnings() {
@@ -295,6 +304,7 @@ goldens) goldens ;;
 suite) suite ;;
 pixels) pixels ;;
 gpu) gpu ;;
+gpucore) gpucore ;;
 warnings) warnings ;;
 doxygen) docs ;;
 package) package ;;
@@ -303,7 +313,7 @@ tms9918) tms9918 ;;
 chip) chip ;;
 python) pythonModule ;;
 *)
-  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|warnings|doxygen|package|multi|tms9918|chip|python>" >&2
+  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|doxygen|package|multi|tms9918|chip|python>" >&2
   exit 2
   ;;
 esac

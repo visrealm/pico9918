@@ -29,6 +29,14 @@ jobs:
       - uses: ./core/.github/actions/env
       - run: core/tools/ci.sh goldens
 
+  gpucore:
+    name: GPU instruction set
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+      - run: core/tools/ci.sh gpucore
+
   tms9918:
     name: TMS9918A mode
     runs-on: ubuntu-latest
