@@ -190,6 +190,7 @@ package() {
   configure "$OUT/consumer" "$LIBROOT/test/package" "-DCMAKE_PREFIX_PATH=$stage"
   build "$OUT/consumer"
   "$(findExe "$OUT/consumer" consumer)"
+  "$(findExe "$OUT/consumer" consumer_cpp)"
 
   (cd "$OUT/lib" && cpack -C "$CONFIG")
   ls -l "$OUT/lib"/pico9918-core-*
