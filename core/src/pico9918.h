@@ -223,6 +223,7 @@ typedef enum
 #define TMS_R0_EXT_VDP_ENABLE   0x01 /**< take video from the external VDP input */
 #define TMS_R0_EXT_VDP_DISABLE  0x00 /**< ignore the external VDP input */
 #define TMS_R0_DOUBLE_ROWS      0x08 /**< PICO9918 only: twice the rows, drawn interlaced. Sprites stay low-res */
+#define TMS_R0_INT_SCANLINE     0x10 /**< assert /INT when the raster reaches the line in R19. The F18A's IE1 */
 
 /** \brief register 1 bits: VRAM size, blanking, interrupt, mode and sprite size */
 #define TMS_R1_RAM_16K          0x80 /**< 16KB of VRAM */

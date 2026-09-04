@@ -79,6 +79,10 @@
 #define STATUS_5S  0x40
 #define STATUS_COL 0x20
 
+/* SR1's low two bits. The rest of it is the identity byte, which never changes. */
+#define STATUS1_HF    0x01 /* the scanline in R19 was reached. Cleared by reading SR1 */
+#define STATUS1_BLANK 0x02 /* the raster is in blanking */
+
 #define PICO9918_MODE_TMS9918 0
 #define PICO9918_MODE_F18A    1
 
@@ -421,6 +425,11 @@ PICO9918_INLINE bool pico9918_status_select_active(PICO9918_INST_ONLY_ARG)
  *      number field to 31 (the reset value) - the flag and its ID clear together.
  * SR1: bit 0 is the R#19 line-interrupt flag, clear-on-read.
  */
+/* Defined below, and needed here: reading SR1 clears the scanline flag, which can be the
+   only thing holding /INT down. An ISR that acknowledged and returned with the pin still
+   asserted would re-enter immediately. */
+PICO9918_INLINE_HOT bool pico9918_interrupt_status_impl(PICO9918_INST_ONLY_ARG);
+
 PICO9918_INLINE_HOT void pico9918_status_read_core(PICO9918_INST_ARG uint8_t readReg, uint8_t readVal)
 {
   if (readReg == 0)
@@ -438,7 +447,17 @@ PICO9918_INLINE_HOT void pico9918_status_read_core(PICO9918_INST_ARG uint8_t rea
   }
   else if (readReg == 1)
   {
-    if (readVal & 0x01) TMS_STATUS(tms9918, 0x01) &= ~0x01;
+    if (readVal & STATUS1_HF)
+    {
+      TMS_STATUS(tms9918, 0x01) &= (uint8_t)~STATUS1_HF;
+      /* the frame source may still be asserting, so re-derive rather than clearing */
+      const bool stillInt = pico9918_interrupt_status_impl(PICO9918_INST_ONLY);
+      if (stillInt != tms9918->frameInt)
+      {
+        tms9918->frameInt = stillInt;
+        PICO9918_HOST_SET_INT(stillInt);
+      }
+    }
   }
 }
 
@@ -573,9 +592,20 @@ PICO9918_INLINE_HOT uint8_t pico9918_read_data_no_inc_impl(PICO9918_INST_ONLY_AR
 }
 
 /** \brief return true if both INT status and INT control set */
+/**
+ * \brief whether /INT should be asserted
+ *
+ * Two independent sources, as on the F18A: the end-of-frame flag under R1's enable, and
+ * the scanline flag under R0's. Neither gates the other - a program that wants only the
+ * scanline interrupt turns R1's off - so the horizontal source cannot be folded into SR0.
+ * The scanline term leads with the flag because it is clear on almost every line, and the
+ * whole term folds away in a TMS9918A build, which has no R19 to arm it.
+ */
 PICO9918_INLINE_HOT bool pico9918_interrupt_status_impl(PICO9918_INST_ONLY_ARG)
 {
-  return (TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_INT_ENABLE) && (TMS_STATUS(tms9918, 0) & STATUS_INT);
+  return ((TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_INT_ENABLE) && (TMS_STATUS(tms9918, 0) & STATUS_INT)) ||
+         (PICO9918_UNLOCKED(tms9918) && (TMS_STATUS(tms9918, 1) & STATUS1_HF) &&
+          (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_INT_SCANLINE));
 }
 
 /** \brief raise the interrupt flag in SR0 and the frame shadow */

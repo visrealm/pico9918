@@ -134,7 +134,7 @@ void pico9918_frame_porch(PICO9918_INST_ONLY_ARG)
 void pico9918_frame_raise_end_of_frame_int(PICO9918_INST_ONLY_ARG)
 {
   pico9918_set_frame_done_int_impl(PICO9918_INST true);
-  TMS_STATUS(tms9918, 0x01) |= 0x02;
+  TMS_STATUS(tms9918, 0x01) |= STATUS1_BLANK;
   if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_GPU_VSYNC)
   {
     pico9918_gpu_trigger(PICO9918_INST_ONLY);
@@ -424,12 +424,14 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   PICO9918_LINE_CAPTURE(y, pico9918_v_pixels_impl(PICO9918_INST_ONLY), lineBytes, lineSource);
 
   /*** F18A status register updates ***/
-  TMS_STATUS(tms9918, 0x01) &= ~0x03;
+  TMS_STATUS(tms9918, 0x01) &= (uint8_t)~STATUS1_BLANK;
 
+  /* The flag latches until the host reads SR1 - it is that read which acknowledges the
+     interrupt. It does not touch SR0: the scanline interrupt is its own source, under
+     R0's enable, and merging it into the frame flag would make it answer to R1's. */
   if (tms9918->vram.map.scanline && (TMS_REGISTER(tms9918, PICO9918_REG_HORZ_INT_LINE) == tms9918->vram.map.scanline))
   {
-    TMS_STATUS(tms9918, 0x01) |= 0x01;
-    tempStatus |= STATUS_INT;
+    TMS_STATUS(tms9918, 0x01) |= STATUS1_HF;
   }
 
   if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_GPU_HSYNC)
