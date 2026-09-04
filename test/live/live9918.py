@@ -80,7 +80,15 @@ XIP_BASE = 0x10000000
 # a value ending 927 here refuses every board it is asked about.
 DPIDR = {"rp2040": 0x0BC12477, "rp2350": 0x4C013477}
 
-TCL_PORT = 6666
+def tcl_port():
+    """A port of this session's own for openocd's TCL RPC. Fixed at one number, two
+    boards could not be driven at once: the second openocd would find the port taken
+    and exit, or worse, the harness would connect to the first board's session and
+    read the wrong chip. The gdb and telnet ports are disabled for the same reason -
+    nothing here uses them, and they would collide the same way."""
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
 
 # 20 MHz takes the golden sweep from 57.5 s to 49.2 s, three runs each, with all 96
 # scenes matching at both. Higher does not help, and the reason is worth keeping: a
@@ -138,6 +146,7 @@ class OpenOcd:
         self.target = target
         self.speed = speed
         self.serial = serial
+        self.port = tcl_port()
         self.log = None
 
     def start(self):
@@ -149,13 +158,15 @@ class OpenOcd:
         args = [OPENOCD, "-s", OPENOCD_SCRIPTS, "-f", "interface/cmsis-dap.cfg"]
         if self.serial:
             args += ["-c", "adapter serial %s" % self.serial]
-        args += ["-f", "target/%s.cfg" % self.target,
+        args += ["-c", "tcl_port %d" % self.port,
+                 "-c", "gdb_port disabled", "-c", "telnet_port disabled",
+                 "-f", "target/%s.cfg" % self.target,
                  "-c", "adapter speed %d" % self.speed]
         self.proc = subprocess.Popen(args, stdout=self.log, stderr=subprocess.STDOUT)
         deadline = time.time() + 10
         while time.time() < deadline:
             try:
-                self.sock = socket.create_connection(("127.0.0.1", TCL_PORT), 1)
+                self.sock = socket.create_connection(("127.0.0.1", self.port), 1)
                 self.sock.settimeout(180)   # programming takes seconds, not milliseconds
                 return
             except OSError:
