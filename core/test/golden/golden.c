@@ -2386,7 +2386,7 @@ static uint16_t frameMapLine(uint16_t yRaw, const FrameParams* params, uint8_t r
  *     precisely so this is a copy rather than a conversion;
  *   - installs reg0 / reg31 in the REAL register file, because the library reads
  *     them from the device rather than taking them as parameters. Written directly
- *     rather than through pico9918_write_reg_value for the same reason the
+ *     rather than through pico9918_write_reg_value_impl for the same reason the
  *     interrupt group writes R1 directly: that path carries unlock-sequence and
  *     locked-mask side effects which are not part of this contract, and R49 is
  *     above the locked mask so it could not be written at all;

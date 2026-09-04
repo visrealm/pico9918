@@ -381,7 +381,7 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_write_addr)(PICO9918_INST_
 {
   pico9918_write_addr_impl(PICO9918_INST data);
   /* An R1 mask change has to move the pin now, not at the next active line. The board's
-     write IRQ does this itself; the direct pico9918_write_reg_value deliberately does not,
+     write IRQ does this itself; the direct pico9918_write_reg_value_impl does not,
      which is what lets the golden surface write a register with nothing reconciling. */
   pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
 }
@@ -1270,7 +1270,7 @@ __time_critical_func(pico9918_output_sprites)(PICO9918_INST_ARG uint16_t y, uint
 {
   const bool spriteMag = tmsSpriteMag(tms9918);
 
-  if (TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS) // double rows (high-res)? still only have low-res sprites
+  if (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS) // double rows (high-res)? still only have low-res sprites
     y >>= 1;
 
   const uint32_t spriteCount = collectSpriteRows(PICO9918_INST y);
@@ -1465,7 +1465,7 @@ static inline void tileLayerAddr(PICO9918_INST_ARG const uint16_t rawY, const Ti
     /* the field wraps at the height actually rendered, which R0's row doubling
        doubles - 384 or 480 rather than 192 or 240 */
     const int maxY = ((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? (8 * 30) : (8 * 24))
-                     << (bool)(TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS);
+                     << (bool)(TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS);
 
     if (virtY >= maxY)
     {
@@ -3374,9 +3374,8 @@ uint8_t __time_critical_func(pico9918_reg_value)(PICO9918_INST_ARG pico9918_regi
   return TMS_REGISTER(tms9918, reg & tms9918->lockedMask); // was 0x07
 }
 
-/** \brief write a register value */
 PICO9918_DLLEXPORT
-void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_register_t reg, uint8_t value)
+void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8_t reg, uint8_t value)
 {
   if (PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK) && PICO9918_UNLOCK_WRITE(reg, value))
   {

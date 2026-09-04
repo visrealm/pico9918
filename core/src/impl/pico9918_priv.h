@@ -79,21 +79,6 @@
 #define STATUS_5S  0x40
 #define STATUS_COL 0x20
 
-#define TMS_R0_MODE_TEXT_80     0x04
-#define TMS_R0_MODE_GRAPHICS_II 0x02
-#define TMS_R0_EXT_VDP_ENABLE   0x01
-
-/* R0 bit 3 - double (high-resolution) rows. Defined once here because both
-   pico9918.c and the frame module need it. */
-#define R0_DOUBLE_ROWS 0x08
-
-#define TMS_R1_DISP_ACTIVE     0x40
-#define TMS_R1_INT_ENABLE      0x20
-#define TMS_R1_MODE_MULTICOLOR 0x08
-#define TMS_R1_MODE_TEXT       0x10
-#define TMS_R1_SPRITE_16       0x02
-#define TMS_R1_SPRITE_MAG2     0x01
-
 #define PICO9918_MODE_TMS9918 0
 #define PICO9918_MODE_F18A    1
 
@@ -355,6 +340,19 @@ extern pico9918_t* const tms9918;
 #endif
 
 /**
+ * \brief set a register from the second byte of a host register write
+ *
+ * \p regSelect is that byte, not a register number: bit 7 set, the register in the low
+ * six. The locked-mask aliasing and the M4 rule are both defined on it, which is why it
+ * is not a pico9918_register_t. Carries the unlock sequence, the GPU arming writes and
+ * the palette rebuild, and deliberately does not reconcile /INT - pico9918_write_addr
+ * does that on the way out. Out of line, unlike its neighbours here: it is large, and
+ * the inline entry below is its only hot caller.
+ */
+PICO9918_DLLEXPORT
+void pico9918_write_reg_value_impl(PICO9918_INST_ARG uint8_t regSelect, uint8_t value);
+
+/**
  * \brief write an address (mode = 1) to the tms9918
  *
  * data: the data (DB0 -> DB7) to send
@@ -376,7 +374,7 @@ PICO9918_INLINE_HOT void pico9918_write_addr_impl(PICO9918_INST_ARG uint8_t data
     {
       if ((data & 0x40) == 0) // 64 registers, so only bit 6 is reserved
       {
-        pico9918_write_reg_value(PICO9918_INST data, tms9918->regWriteStage0Value);
+        pico9918_write_reg_value_impl(PICO9918_INST data, tms9918->regWriteStage0Value);
       }
     }
     else /* address */
@@ -780,7 +778,7 @@ PICO9918_INLINE uint16_t pico9918_frame_map_line_impl(PICO9918_INST_ARG uint16_t
                                                       bool interlaced, uint8_t fieldOrder)
 {
   uint16_t tmsY = y;
-  if (interlaced && (TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS)) tmsY = y * 2 + (field ^ fieldOrder);
+  if (interlaced && (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS)) tmsY = y * 2 + (field ^ fieldOrder);
   return tmsY;
 }
 

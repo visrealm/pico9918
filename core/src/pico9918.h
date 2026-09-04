@@ -219,8 +219,10 @@ typedef enum
 #define TMS_R0_MODE_GRAPHICS_II 0x02 /**< Graphics II - the only mode R0 selects */
 #define TMS_R0_MODE_MULTICOLOR  0x00 /**< Multicolor - selected in R1 */
 #define TMS_R0_MODE_TEXT        0x00 /**< 40-column text - selected in R1 */
+#define TMS_R0_MODE_TEXT_80     0x04 /**< 80-column text, with R1's text mode. The F18A's M4 */
 #define TMS_R0_EXT_VDP_ENABLE   0x01 /**< take video from the external VDP input */
 #define TMS_R0_EXT_VDP_DISABLE  0x00 /**< ignore the external VDP input */
+#define TMS_R0_DOUBLE_ROWS      0x08 /**< PICO9918 only: twice the rows, drawn interlaced. Sprites stay low-res */
 
 /** \brief register 1 bits: VRAM size, blanking, interrupt, mode and sprite size */
 #define TMS_R1_RAM_16K          0x80 /**< 16KB of VRAM */
@@ -240,9 +242,6 @@ typedef enum
 
 /* The F18A register bits worth naming. Every one of these needs the F18A personality
    unlocked, R0's M4 included, and each mask names the field's position, not a value. */
-
-/** \brief register 0's F18A bit */
-#define PICO9918_R0_M4             0x04 /**< with R1's text mode, selects 80-column text */
 
 /** \brief register 24 bits: the sub-palette each layer takes */
 #define PICO9918_R24_SPRITE_PS     0x30 /**< sprite palette select */
@@ -435,10 +434,6 @@ uint8_t pico9918_scan_line(PICO9918_INST_ARG uint16_t y);
 /** \brief return a register value */
 PICO9918_DLLEXPORT
 uint8_t pico9918_reg_value(PICO9918_INST_ARG pico9918_register_t reg);
-
-/** \brief write a register value */
-PICO9918_DLLEXPORT
-void pico9918_write_reg_value(PICO9918_INST_ARG pico9918_register_t reg, uint8_t value);
 
 
 /** \brief return a value from vram */

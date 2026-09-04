@@ -42,7 +42,7 @@ static void fail(const char* what, unsigned where, unsigned wanted, unsigned got
 
 static void regWrite(uint8_t reg, uint8_t value)
 {
-  pico9918_write_reg_value(PICO9918_INST 0x80 | reg, value);
+  pico9918_write_reg_value_impl(PICO9918_INST 0x80 | reg, value);
 }
 
 /* Two writes of 0x1c to R57, which is what an F18A answers to. */
