@@ -141,6 +141,13 @@ typedef struct
   uint16_t introducedIn; /**< packed major(4) | minor(4) | patch(8) */
 } pico9918_config_field_t;
 
+/* The declarations below need C linkage under a C++ host, and this header carries no
+   PICO9918_ macro to supply it - see the dependency rule at the top. */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /**
  * \brief the descriptor table. The host save path reads pendingMirror/max/
  * defaultValue from it
@@ -205,5 +212,9 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
  * host has no such effects and nothing is called.
  */
 void pico9918_config_set_applied_callback(void (*cb)(void));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _PICO9918_CONFIG_H

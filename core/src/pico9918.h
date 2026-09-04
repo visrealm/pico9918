@@ -20,26 +20,25 @@
  * PICO9918_STATIC:              linking pico9918-core statically
  */
 
+/* C linkage under a C++ consumer, plain extern under C. Every mode below carries it: a
+   __declspec on its own leaves the name mangled, so a C++ host links against nothing. */
+#ifdef __cplusplus
+#define PICO9918_LINKAGE extern "C"
+#else
+#define PICO9918_LINKAGE extern
+#endif
+
 #if __EMSCRIPTEN__
 #include <emscripten.h>
-#ifdef __cplusplus
-#define PICO9918_DLLEXPORT       EMSCRIPTEN_KEEPALIVE extern "C"
-#define PICO9918_DLLEXPORT_CONST extern "C"
-#else
-#define PICO9918_DLLEXPORT       EMSCRIPTEN_KEEPALIVE extern
-#define PICO9918_DLLEXPORT_CONST extern
-#endif
+#define PICO9918_DLLEXPORT       EMSCRIPTEN_KEEPALIVE PICO9918_LINKAGE
+#define PICO9918_DLLEXPORT_CONST PICO9918_LINKAGE
 #elif PICO9918_COMPILING_DLL
-#define PICO9918_DLLEXPORT __declspec(dllexport)
+#define PICO9918_DLLEXPORT PICO9918_LINKAGE __declspec(dllexport)
 #elif defined WIN32 && !defined PICO9918_STATIC
-#define PICO9918_DLLEXPORT __declspec(dllimport)
-#else
-#ifdef __cplusplus
-#define PICO9918_DLLEXPORT extern "C"
+#define PICO9918_DLLEXPORT PICO9918_LINKAGE __declspec(dllimport)
 #else
 /** \brief the linkage every public entry point carries - see LINKAGE MODES above */
-#define PICO9918_DLLEXPORT extern
-#endif
+#define PICO9918_DLLEXPORT PICO9918_LINKAGE
 #endif
 
 #ifndef PICO9918_DLLEXPORT_CONST
