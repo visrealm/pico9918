@@ -197,7 +197,7 @@ static void doFlashProgramData(void)
     uint32_t* tempAddr = addr + (blockWords * blockIndex);
     if (*tempAddr == blockIndex)
     {
-      if (memcmp(addr + 1, p + 1, guidBytes) == 0)
+      if (memcmp(tempAddr + 1, p + 1, guidBytes) == 0)
       {
         foundBlock = true;
         addr       = tempAddr;
