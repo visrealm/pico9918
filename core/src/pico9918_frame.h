@@ -194,6 +194,21 @@ extern "C"
    * pico9918_frame_display_t. hVirtualPixels feeds the border-fill count and the
    * half-border offset; vVirtualPixels reaches the splash geometry; the interlace pair
    * selects the field mapping.
+   *
+   * GEOMETRY THE SCANLINE PATH REQUIRES. Not checked per line - this is the video-rate
+   * path and a host's geometry is fixed at a mode change, so the cost belongs where the
+   * mode is chosen. Break one and the failure is silent:
+   *
+   *   hVirtualPixels >= TMS9918_PIXELS_X * 2   the two half-borders are
+   *                                            (hVirtualPixels - 512) / 4 words each,
+   *                                            computed unsigned, so a narrower line
+   *                                            underflows into a fill of ~1G words
+   *   hVirtualPixels a multiple of 4           the halves have to tile the line exactly;
+   *                                            a remainder leaves the right edge unwritten
+   *                                            and disagrees with the border path's own
+   *                                            hVirtualPixels / 2 count
+   *   pixels 4-byte aligned                    the fills and the palette expansion both
+   *                                            address the buffer as uint32_t
    */
   typedef struct
   {
@@ -212,7 +227,8 @@ extern "C"
    *         and bits 11-0 the line within the field, which is the encoding the host's
    *         VGA layer already uses.
    * params: the host's display parameters for this line (above).
-   * pixels: the host's scanline buffer, at least hVirtualPixels wide.
+   * pixels: the host's scanline buffer, at least hVirtualPixels wide and 4-byte
+   *         aligned - see the geometry note on pico9918_scanline_params_t.
    *
    * Returns TRUE when the BORDER path was taken. The host needs exactly this and
    * nothing more: it draws its own overlays after this call, and one of them (the
