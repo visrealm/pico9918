@@ -379,6 +379,10 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_destroy)(PICO9918_INST_ONL
 PICO9918_DLLEXPORT void __time_critical_func(pico9918_write_addr)(PICO9918_INST_ARG uint8_t data)
 {
   pico9918_write_addr_impl(PICO9918_INST data);
+  /* An R1 mask change has to move the pin now, not at the next active line. The board's
+     write IRQ does this itself; the direct pico9918_write_reg_value deliberately does not,
+     which is what lets the golden surface write a register with nothing reconciling. */
+  pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
 }
 
 /** \brief read from the status register */
