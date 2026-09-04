@@ -93,6 +93,17 @@
 #endif
 
 /*
+ * A compile-time assertion a public header can carry. _Static_assert is C11, and MSVC
+ * does not provide it in C++ mode, so a header a C++ host includes cannot use the
+ * keyword directly.
+ */
+#ifdef __cplusplus
+#define PICO9918_STATIC_ASSERT(cond, msg) static_assert(cond, msg)
+#else
+#define PICO9918_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+#endif
+
+/*
  * Host ops header: how a host supplies its own tier-1 ops.
  *
  * A host that owns state a tier-1 op must reach - the PICO9918's PIO read-ahead
