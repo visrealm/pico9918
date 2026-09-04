@@ -689,10 +689,15 @@ def open_board(args):
 
 
 def default_elf(board="pro"):
-    """newest live-test build for the given board, so tests need no path"""
+    """newest live-test build for the given board, so tests need no path
+
+    The directory is what says this is a live build, not the filename: the binary
+    name carries the BRANCH, so `*live.elf` only ever matched on a branch called
+    `live` and every other branch got "no live-test build found" beside a build that
+    was sitting right there."""
     root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     pattern = os.path.join(root, "build-live", "pico9918" + ("pro" if board == "pro" else ""),
-                           "src", "*live.elf")
+                           "src", "*.elf")
     found = sorted(glob.glob(pattern), key=os.path.getmtime)
     if not found:
         raise SystemExit("no live-test build found (configure with -DPICO9918_LIVE_TEST=ON): "
