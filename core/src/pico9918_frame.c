@@ -194,7 +194,7 @@ pico9918_frame_geometry_t pico9918_frame_geometry(PICO9918_INST_ARG pico9918_fra
 
   if (yScale > 1)
   {
-    bool doubleRows         = TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS;
+    bool doubleRows         = TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS;
     display->vPixelScale    = yScale - (bool)doubleRows;
     display->vVirtualPixels = (display->displayPixels / yScale) << (bool)doubleRows;
   }
@@ -205,7 +205,7 @@ pico9918_frame_geometry_t pico9918_frame_geometry(PICO9918_INST_ARG pico9918_fra
 
   int baseRows = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? 30 : 24;
   pico9918_v_pixels = baseRows << 3;
-  if (yScale > 1 && (TMS_REGISTER(tms9918, TMS_REG_0) & R0_DOUBLE_ROWS)) pico9918_v_pixels <<= 1;
+  if (yScale > 1 && (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS)) pico9918_v_pixels <<= 1;
   pico9918_v_border = (display->vVirtualPixels - pico9918_v_pixels) / 2;
 
   pico9918_frame_geometry_t g;
