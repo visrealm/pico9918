@@ -134,6 +134,12 @@ if(PICO9918_RUNTIME_CHIP)
       "GPU and no enhanced renderer, so it has no personality above the base to select.")
   endif()
   set(PICO9918_BUILD_RUNTIME_CHIP 1)
+
+  # The F18A personality's power-on badge artwork, generated only here so a board
+  # never carries this non-const array. Deliberately not gated on
+  # PICO9918_NO_SPLASH: that option drops the PICO9918's own splash, and an F18A
+  # still shows its badge.
+  pico9918_generate_image_source_ram(${LIBRARY} bmp_f18a_badge overlay/res/f18a_badge.png f18aBadge)
 else()
   set(PICO9918_BUILD_RUNTIME_CHIP 0)
 endif()

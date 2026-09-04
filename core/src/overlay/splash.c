@@ -111,3 +111,35 @@ void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, u
   }
 #endif
 }
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+
+#include "overlay/bmp_f18a_badge.h"
+
+_Static_assert(F18ABADGE_HEIGHT == PICO9918_F18A_BADGE_HEIGHT,
+               "the badge asset is not the height the renderer draws");
+_Static_assert(F18ABADGE_WIDTH == PICO9918_F18A_BADGE_WIDTH,
+               "the badge asset is not the width the renderer draws");
+/* img2carray.py emits a 1bpp byte only on every eighth pixel, so any other width
+   loses its last columns with no warning. */
+_Static_assert(F18ABADGE_WIDTH % 8 == 0, "the badge asset width must be a multiple of 8");
+
+bool pico9918_f18a_badge_render(uint16_t outputLine, uint32_t frameCount, PICO9918_PIXEL_T* pixels)
+{
+  if (frameCount >= PICO9918_F18A_BADGE_FRAMES || outputLine >= PICO9918_F18A_BADGE_HEIGHT)
+  {
+    return false;
+  }
+
+  const uint8_t* row = f18aBadge + outputLine * (F18ABADGE_WIDTH / 8);
+
+  /* Opaque, so unlike the splash above there is no index to treat as transparent. */
+  for (uint32_t x = 0; x < PICO9918_F18A_BADGE_WIDTH; ++x)
+  {
+    pixels[x] = f18aBadge_pal[(row[x >> 3] >> (7 - (x & 7))) & 1];
+  }
+
+  return true;
+}
+
+#endif // PICO9918_BUILD_RUNTIME_CHIP

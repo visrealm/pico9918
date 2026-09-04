@@ -510,5 +510,18 @@ bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,
     fresh = true;
   }
 
-  return dimLine(PICO9918_INST pixels, params->hVirtualPixels, outputLine) || fresh;
+  bool changed = dimLine(PICO9918_INST pixels, params->hVirtualPixels, outputLine) || fresh;
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+  /* An F18A shows its own power-on badge where a PICO9918 shows the splash. Here rather
+     than in the scanline path so each row of it is one OUTPUT line, as the hardware's
+     is, and last so nothing dims it - on an F18A the badge outranks the scanline dim as
+     well as the picture. A repeated line still needs it drawn: the buffer it re-reads
+     holds the row above. */
+  if (tms9918->chip == PICO9918_CHIP_F18A)
+    changed |= pico9918_f18a_badge_render((uint16_t)outputLine,
+                                          pico9918_frame_count_impl(PICO9918_INST_ONLY), pixels);
+#endif
+
+  return changed;
 }

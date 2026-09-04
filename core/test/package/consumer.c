@@ -18,8 +18,10 @@
  * runtime chip switch, which only a PICO9918_RUNTIME_CHIP=ON package exports.
  */
 
+#include "overlay/splash.h"
 #include "pico9918.h"
 #include "pico9918_config.h"
+#include "pico9918_frame.h"
 #include "pico9918_util.h"
 
 #include <stdio.h>
@@ -31,6 +33,28 @@ static uint8_t statusReg(PICO9918_INST_ARG uint8_t index)
 {
   pico9918_write_register_value(PICO9918_INST 15, index);
   return pico9918_read_status(PICO9918_INST_ONLY);
+}
+
+/* The F18A badge's expected artwork, as a 64-bit FNV-1a over every pixel of rows 0..13,
+   low byte then high byte so the constant does not depend on this host's endianness.
+   Computed from the ROM art and PICO9918_PIXEL_FROM_RGB12 independently of the library,
+   which is what makes it a check rather than a restatement. */
+#define FNV64_OFFSET 0xcbf29ce484222325ull
+#define FNV64_PRIME  0x00000100000001b3ull
+#define BADGE_DIGEST 0xc0ce60a2a13c9a2dull
+
+#define BADGE_GUARD       2 /* columns past the badge that must stay untouched */
+#define BADGE_BUFFER      (PICO9918_F18A_BADGE_WIDTH + BADGE_GUARD)
+#define BADGE_LINE_PIXELS 640
+
+static uint64_t fnv1aByte(uint64_t h, uint8_t b)
+{
+  return (h ^ b) * FNV64_PRIME;
+}
+
+static void fillPixels(PICO9918_PIXEL_T* pixels, uint32_t count, PICO9918_PIXEL_T value)
+{
+  for (uint32_t i = 0; i < count; ++i) pixels[i] = value;
 }
 #endif
 
@@ -184,6 +208,147 @@ int main(void)
   }
 
   printf("pico9918-core: chip switch honoured, the register file and config port follow it\n");
+
+  /* The F18A's power-on badge. Its geometry macros come from the installed overlay
+     header, so reaching them at all also checks the install rules carry it. */
+  {
+    const PICO9918_PIXEL_T sentinel = 0x0123;
+    PICO9918_PIXEL_T __aligned(4) badge[PICO9918_F18A_BADGE_WIDTH + BADGE_GUARD];
+    uint64_t digest = FNV64_OFFSET;
+
+    for (uint16_t line = 0; line < PICO9918_F18A_BADGE_HEIGHT; ++line)
+    {
+      fillPixels(badge, BADGE_BUFFER, sentinel);
+
+      if (!pico9918_f18a_badge_render(line, 0, badge))
+      {
+        printf("the F18A badge did not draw row %u\n", (unsigned)line);
+        return 1;
+      }
+
+      /* The badge is the left edge of a line the host owns the rest of, so an overrun
+         here is an overrun into the border or the picture. */
+      for (uint32_t g = 0; g < BADGE_GUARD; ++g)
+      {
+        if (badge[PICO9918_F18A_BADGE_WIDTH + g] != sentinel)
+        {
+          printf("the F18A badge drew past column %u on row %u\n",
+                 (unsigned)PICO9918_F18A_BADGE_WIDTH, (unsigned)line);
+          return 1;
+        }
+      }
+
+      for (uint32_t x = 0; x < PICO9918_F18A_BADGE_WIDTH; ++x)
+      {
+        digest = fnv1aByte(digest, (uint8_t)(badge[x] & 0xff));
+        digest = fnv1aByte(digest, (uint8_t)((badge[x] >> 8) & 0xff));
+      }
+    }
+
+    /* Pins the artwork, the palette conversion and the 1bpp packing together. The asset
+       carries no bit-depth macro, so a palette grown past two entries would silently
+       become 2bpp and only this catches it. */
+    if (digest != BADGE_DIGEST)
+    {
+      printf("the F18A badge artwork digest is 0x%016llx, expected 0x%016llx\n",
+             (unsigned long long)digest, (unsigned long long)BADGE_DIGEST);
+      return 1;
+    }
+
+    /* Named, so a digest mismatch has somewhere to start: the margin and the box. */
+    pico9918_f18a_badge_render(0, 0, badge);
+    if (badge[0] != PICO9918_PIXEL_FROM_RGB12(0xb202))
+    {
+      printf("the F18A badge margin is 0x%04x, expected dark green\n", (unsigned)badge[0]);
+      return 1;
+    }
+    pico9918_f18a_badge_render(1, 0, badge);
+    if (badge[2] != PICO9918_PIXEL_FROM_RGB12(0xff0f))
+    {
+      printf("the F18A badge box edge is 0x%04x, expected white\n", (unsigned)badge[2]);
+      return 1;
+    }
+
+    /* Shown for frames 0..383 and never again, and a frame outside that window must
+       leave the buffer alone rather than draw something the host then has to undo. */
+    if (!pico9918_f18a_badge_render(0, PICO9918_F18A_BADGE_FRAMES - 1, badge))
+    {
+      printf("the F18A badge stopped one frame early\n");
+      return 1;
+    }
+
+    fillPixels(badge, BADGE_BUFFER, sentinel);
+    if (pico9918_f18a_badge_render(0, PICO9918_F18A_BADGE_FRAMES, badge) ||
+        badge[0] != sentinel)
+    {
+      printf("the F18A badge outlived frame %u\n", (unsigned)PICO9918_F18A_BADGE_FRAMES);
+      return 1;
+    }
+
+    fillPixels(badge, BADGE_BUFFER, sentinel);
+    if (pico9918_f18a_badge_render(PICO9918_F18A_BADGE_HEIGHT, 0, badge) ||
+        badge[0] != sentinel)
+    {
+      printf("the F18A badge drew below row %u\n", (unsigned)PICO9918_F18A_BADGE_HEIGHT);
+      return 1;
+    }
+
+    /* One badge row per OUTPUT line, odd lines included. An odd line re-reads the
+       buffer rather than re-rendering, and what it holds is the row above, so the badge
+       has to be drawn again there and the call has to say the buffer changed. */
+    {
+      PICO9918_PIXEL_T __aligned(4) out[BADGE_LINE_PIXELS];
+      pico9918_scanline_params_t params = {BADGE_LINE_PIXELS, 240, false, 0};
+
+      pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
+      pico9918_reset(PICO9918_INST_ONLY);
+      pico9918_initialise_gfx_i(PICO9918_INST_ONLY);
+      pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE);
+      /* Otherwise an odd line reports a change because it was dimmed, and the badge's
+         own contribution to that answer would go unchecked. */
+      pico9918_config(PICO9918_INST_ONLY)[PICO9918_CONF_CRT_SCANLINES] = 0;
+
+      for (uint32_t line = 0; line < PICO9918_F18A_BADGE_HEIGHT; ++line)
+      {
+        fillPixels(out, BADGE_LINE_PIXELS, sentinel);
+
+        if (!pico9918_frame_output_line(PICO9918_INST line, &params, out))
+        {
+          printf("output line %u reported no change with the F18A badge on it\n",
+                 (unsigned)line);
+          return 1;
+        }
+
+        fillPixels(badge, BADGE_BUFFER, sentinel);
+        pico9918_f18a_badge_render((uint16_t)line, 0, badge);
+
+        for (uint32_t x = 0; x < PICO9918_F18A_BADGE_WIDTH; ++x)
+        {
+          if (out[x] != badge[x])
+          {
+            printf("output line %u pixel %u is 0x%04x, badge row %u has 0x%04x\n",
+                   (unsigned)line, (unsigned)x, (unsigned)out[x], (unsigned)line,
+                   (unsigned)badge[x]);
+            return 1;
+          }
+        }
+      }
+
+      /* A PICO9918 shows its own splash instead, and that one is not here. */
+      pico9918_set_chip(PICO9918_INST PICO9918_CHIP_PICO9918);
+      fillPixels(out, BADGE_LINE_PIXELS, sentinel);
+      pico9918_frame_output_line(PICO9918_INST 1, &params, out);
+
+      pico9918_f18a_badge_render(1, 0, badge);
+      if (out[2] == badge[2])
+      {
+        printf("a PICO9918 drew the F18A badge\n");
+        return 1;
+      }
+    }
+
+    printf("pico9918-core: the F18A badge is pixel-exact, one row per output line\n");
+  }
 #endif
 
   pico9918_reset(PICO9918_INST_ONLY);

@@ -26,6 +26,7 @@
 #include "impl/platform.h"
 #include "pico9918_build_config.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #ifndef PICO9918_NO_SPLASH
@@ -70,6 +71,34 @@ extern "C"
  */
   void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, uint32_t vPixels,
                             uint32_t vVirtualPixels, PICO9918_PIXEL_T* pixels);
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+
+/** \brief badge columns - must stay a multiple of 8, see splash.c */
+#define PICO9918_F18A_BADGE_WIDTH 56
+/** \brief badge rows, each one OUTPUT line rather than one display line */
+#define PICO9918_F18A_BADGE_HEIGHT 14
+/** \brief frames the badge is shown for, counting from reset */
+#define PICO9918_F18A_BADGE_FRAMES 384
+
+  /**
+ * \brief render the F18A's power-on badge into the scanline buffer
+ *
+ * What PICO9918_CHIP_F18A shows where PICO9918_CHIP_PICO9918 shows its own splash.
+ * Not gated behind PICO9918_NO_SPLASH: that option drops the PICO9918's splash, and
+ * an F18A still has a badge.
+ *
+ * `outputLine` is the host's OUTPUT line, not a display line, so one row of the
+ * badge is one physical scanline. Only a host driving pico9918_frame_output_line
+ * gets it; an interlaced one, which drives pico9918_frame_scanline per field, does
+ * not.
+ *
+ * \return whether it drew, i.e. whether `pixels` changed.
+ */
+  bool pico9918_f18a_badge_render(uint16_t outputLine, uint32_t frameCount,
+                                 PICO9918_PIXEL_T* pixels);
+
+#endif // PICO9918_BUILD_RUNTIME_CHIP
 
 #ifdef __cplusplus
 }
