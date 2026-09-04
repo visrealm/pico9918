@@ -95,7 +95,7 @@ static void __not_in_flash_func(gpioIrqHandler)(void)
   pio_sm_clear_fifos(TMS_PIO, tmsWriteSm);
 
   nextValue = 0;
-  pico9918_frame_reset_int_impl(); // SR0 = 0x1f, INT clear, doneInt = TRUE
+  pico9918_frame_reset_int_impl(); // SR0 = 0, INT clear, doneInt = TRUE
   updateTmsReadAhead();
 
   PICO9918_HOST_SET_INT(pico9918_frame_int_impl());

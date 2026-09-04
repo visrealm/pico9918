@@ -328,6 +328,9 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
   tms9918->palWriteStage0Value = 0;
   tms9918->flash               = 0;
   memset(&TMS_STATUS(tms9918, 0), 0, TMS_STATUS_REGISTERS);
+  /* SR0 has a shadow the frame path merges into, and the interrupt latch resets with it:
+     the register alone leaves the next merge republishing the flags just dropped. */
+  pico9918_frame_reset_int_impl(PICO9918_INST_ONLY);
   /* ID = F18A (0xE0), plus 0x08 for anyone who cares it's not a real one. Which chip
      this is does not reset - see pico9918_set_chip. */
   TMS_STATUS(tms9918, 1)   = PICO9918_SR1_ID(tms9918);
