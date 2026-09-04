@@ -30,3 +30,7 @@ target_link_libraries(consumer PRIVATE pico9918::core)
 # public header, and a declaration whose name mangles and then does not link.
 add_executable(consumer_cpp consumer.cpp)
 target_link_libraries(consumer_cpp PRIVATE pico9918::core)
+
+# bare.c is deliberately not a target here. It exists to be compiled with no build
+# system, which is the only way to test that the generated header rather than this
+# imported target is what tells a consumer the instance ABI. ci.sh package runs it.

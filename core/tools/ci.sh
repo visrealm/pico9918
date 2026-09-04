@@ -181,6 +181,9 @@ docs() {
 
 package() {
   stage=$OUT/stage
+  # Cleared, not added to: a header the install forgot is invisible if the previous
+  # run's copy is still sitting there.
+  rm -rf "$stage"
   configure "$OUT/lib" "$LIBROOT" "-DCMAKE_INSTALL_PREFIX=$stage"
   build "$OUT/lib"
   $CMAKE --install "$OUT/lib" --config "$CONFIG"
@@ -191,6 +194,25 @@ package() {
   build "$OUT/consumer"
   "$(findExe "$OUT/consumer" consumer)"
   "$(findExe "$OUT/consumer" consumer_cpp)"
+
+  # No build system in the path at all, so nothing but the generated header can say
+  # which instance ABI the archive was compiled for. See test/package/bare.c.
+  bare=$OUT/bare
+  rm -rf "$bare"
+  mkdir -p "$bare"
+  # cl's flags in the dash form, not the slash form: MSYS rewrites a leading slash as a
+  # path, so /nologo reached the compiler as C:/Program Files/Git/nologo. -MD because
+  # cl on its own defaults to the static CRT while CMake built the archive against the
+  # dynamic one, and that mismatch is an unresolved __imp_ import, not a warning.
+  if command -v cl > /dev/null 2>&1; then
+    (cd "$bare" && cl -nologo -std:c11 -MD -DPICO9918_STATIC "-I$stage/include/pico9918" \
+      "$LIBROOT/test/package/bare.c" "$stage/lib/pico9918_core.lib" -Fe:bare.exe)
+    "$bare/bare.exe"
+  else
+    ${CC:-cc} -std=c11 -DPICO9918_STATIC "-I$stage/include/pico9918" \
+      "$LIBROOT/test/package/bare.c" "$stage/lib/libpico9918_core.a" -o "$bare/bare"
+    "$bare/bare"
+  fi
 
   (cd "$OUT/lib" && cpack -C "$CONFIG")
   ls -l "$OUT/lib"/pico9918-core-*
