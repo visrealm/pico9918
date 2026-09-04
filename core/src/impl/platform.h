@@ -201,7 +201,8 @@
  *
  * Two library surfaces read it, and BOTH must see the same clock:
  *
- *   - the diagnostics panel's GPU% row (overlay/diag.c), and
+ *   - the diagnostics panel's GPU% row, fed from overlay/diag.c, gpu/gpu.c and
+ *     pico9918_frame.c, and
  *   - the F18A reset/snap TIMER REGISTERS (pico9918.c), which are device
  *     behaviour a host can read back, not diagnostics.
  *

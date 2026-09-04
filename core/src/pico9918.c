@@ -3457,13 +3457,13 @@ void __time_critical_func(pico9918_write_reg_value)(PICO9918_INST_ARG pico9918_r
     {
       uint8_t statReg           = (value & 0x0f);
       TMS_STATUS(tms9918, 0x0F) = statReg; // is this right? or should this be the read-ahead value?
-      if (value & 0x40) tms9918->startTime = time_us_32(); // reset
+      if (value & 0x40) tms9918->startTime = PICO9918_HOST_TIME_US(); // reset
       if (value & 0x20)
-        tms9918->currentTime = time_us_32(); // snap
+        tms9918->currentTime = PICO9918_HOST_TIME_US(); // snap
       else if (value & 0x10)
         tms9918->startTime += (tms9918->stopTime - tms9918->startTime);
       else
-        tms9918->currentTime = tms9918->stopTime = time_us_32();
+        tms9918->currentTime = tms9918->stopTime = PICO9918_HOST_TIME_US();
 
       if (statReg > 3 && statReg < 12)
       {
