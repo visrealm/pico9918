@@ -158,6 +158,12 @@ configure_file(
 target_compile_definitions(${LIBRARY} PUBLIC
   PICO9918_ASSET_PIXEL_SIZE=${PICO9918_ASSET_PIXEL_SIZE})
 
+# PUBLIC, not just this project's CMAKE_C_STANDARD: the public headers assert their
+# pixel width with _Static_assert, so a consumer compiling as C99 has to be raised
+# too. MSVC is where it bites - it takes no /std flag below c11 and rejects the
+# keyword outright, while GCC and Clang accept it as an extension and hide the gap.
+target_compile_features(${LIBRARY} PUBLIC c_std_11)
+
 # PUBLIC for the same reason as PICO9918_SINGLE_INSTANCE below: it changes a size
 # pico9918.h publishes.
 if(PICO9918_TEXT80_8BPP)
