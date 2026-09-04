@@ -701,8 +701,8 @@ int main(void)
 
   printf("\n");
   printf("=========================================\n");
-  printf("  TMS9900 Dual-Core Unit Tests (RP2040)  \n");
-  printf("  ASM core vs C core                     \n");
+  printf("  TMS9900 Dual-Core Unit Tests           \n");
+  printf("  ASM core (%-4s) vs C core              \n", TMS9900_ASM_CORE);
   printf("=========================================\n");
 
   test_data_transfer();

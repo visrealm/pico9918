@@ -1,6 +1,8 @@
-# TMS9900 Dual-Core Unit Tests (RP2040)
+# TMS9900 Dual-Core Unit Tests
 
-Comprehensive micro-test suite that runs identical TMS9900 programs through both the **ARM assembly core** (`run9900` from `thumb9900_m0.S`) and the **portable C core** (`run9900_c` from `tms9900.c`), then compares every register and memory result.
+Comprehensive micro-test suite that runs identical TMS9900 programs through both the **ARM assembly core** (`run9900`) and the **portable C core** (`run9900_c` from `tms9900.c`), then compares every register and memory result.
+
+The assembly core is the one the platform selects, the same way `src/CMakeLists.txt` picks it: `thumb9900_m0.S` on RP2040, `thumb9900_m33.S` otherwise. The two are separate implementations, so a run on one board says nothing about the other - both need flashing. The banner names the core the binary carries.
 
 ## What it tests
 
@@ -45,8 +47,8 @@ Connect via USB serial (115200 baud) or UART. Output format:
 
 ```
 =========================================
-  TMS9900 Dual-Core Unit Tests (RP2040)
-  ASM core vs C core comparison
+  TMS9900 Dual-Core Unit Tests
+  ASM core (m33) vs C core
 =========================================
 
 === Data Transfer ===
