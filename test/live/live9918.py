@@ -72,16 +72,16 @@ XIP_BASE = 0x10000000
 
 # The SWD DP's identity register, which is the only thing on the wire that says
 # which chip is on the probe. `--board` picks an ELF and an openocd target, not a
-# board, and one board is wired up at a time - so nothing else stops a run aimed
-# at the other tier, and programming the wrong image reports success and leaves
-# the chip unreachable until the rescue DP resets its power state machine
-# (`set RESCUE 1` with target/rp2040.cfg).
+# probe - so nothing else stops a run reaching the other tier, and programming the
+# wrong image reports success and leaves the chip unreachable until the rescue DP
+# resets its power state machine (`set RESCUE 1` with target/rp2040.cfg).
 # Both are DP identities, which name ARM (designer 0x477) rather than the vendor:
 # the RP2350's TARGETID names Raspberry Pi (0x927) and is a different register, so
 # a value ending 927 here refuses every board it is asked about.
 DPIDR = {"rp2040": 0x0BC12477, "rp2350": 0x4C013477}
 
 TCL_PORT = 6666
+
 # 20 MHz takes the golden sweep from 57.5 s to 49.2 s, three runs each, with all 96
 # scenes matching at both. Higher does not help, and the reason is worth keeping: a
 # 12KB read costs a flat ~45 ms whatever the clock - 5, 10, 20 and 30 MHz all - so
@@ -90,6 +90,15 @@ TCL_PORT = 6666
 # overrides for a board or a probe that will not hold it.
 SWD_SPEED_KHZ = int(os.environ.get("LIVE9918_SPEED", "20000"))
 TCL_EOF = b"\x1a"
+
+
+def probe_serial(target, override=None):
+    """Which probe to open. With a board on each of two probes, openocd takes the
+    first CMSIS-DAP device that answers, so which tier a run reaches is a coin toss
+    that the DP check above can only catch after the fact. LIVE9918_PROBE_RP2040 and
+    LIVE9918_PROBE_RP2350 name a serial each - `--probe` overrides for a one-off, and
+    with neither set openocd picks as it always has."""
+    return override or os.environ.get("LIVE9918_PROBE_" + target.upper()) or None
 
 # The stored block is the top 4 KB of a 2 MB flash and the pending display block is
 # the sector below it, per CONFIG_FLASH_OFFSET in src/config.c.
@@ -123,23 +132,26 @@ class OpenOcd:
     """openocd's TCL RPC. Bulk transfers go through dump_image/load_image,
     which move a file rather than a list of decimal strings."""
 
-    def __init__(self, target, speed=SWD_SPEED_KHZ):
+    def __init__(self, target, speed=SWD_SPEED_KHZ, serial=None):
         self.proc = None
         self.sock = None
         self.target = target
         self.speed = speed
+        self.serial = serial
         self.log = None
 
     def start(self):
         # openocd logs to stderr, and an unread pipe stops it dead as soon as the
         # OS buffer fills - so it goes to a file we can read back after a failure
         self.log = open(os.path.join(tempfile.gettempdir(), "openocd-live9918.log"), "wb")
-        self.proc = subprocess.Popen(
-            [OPENOCD, "-s", OPENOCD_SCRIPTS,
-             "-f", "interface/cmsis-dap.cfg",
-             "-f", "target/%s.cfg" % self.target,
-             "-c", "adapter speed %d" % self.speed],
-            stdout=self.log, stderr=subprocess.STDOUT)
+        # the serial goes between the two configs: the interface one selects the
+        # driver it applies to, and the target one is what opens the device
+        args = [OPENOCD, "-s", OPENOCD_SCRIPTS, "-f", "interface/cmsis-dap.cfg"]
+        if self.serial:
+            args += ["-c", "adapter serial %s" % self.serial]
+        args += ["-f", "target/%s.cfg" % self.target,
+                 "-c", "adapter speed %d" % self.speed]
+        self.proc = subprocess.Popen(args, stdout=self.log, stderr=subprocess.STDOUT)
         deadline = time.time() + 10
         while time.time() < deadline:
             try:
@@ -196,7 +208,7 @@ class OpenOcd:
 
 
 class Live(VdpAccess):
-    def __init__(self, elf, target=None, verify=True, speed=SWD_SPEED_KHZ, boot=None):
+    def __init__(self, elf, target=None, verify=True, speed=SWD_SPEED_KHZ, boot=None, probe=None):
         self.elf = elf
         # what this run was against, for anything that prints rather than asserts -
         # the desktop backend has no ELF, so nothing may reach for one
@@ -218,7 +230,7 @@ class Live(VdpAccess):
         self.dropped = []
         self.width = PIXELS_X       # until a capture says otherwise
         self._defaultPalette = None
-        self.ocd = OpenOcd(self.target, speed)
+        self.ocd = OpenOcd(self.target, speed, probe_serial(self.target, probe))
 
     def __enter__(self):
         self.ocd.start()
@@ -472,11 +484,13 @@ class Live(VdpAccess):
             raise SystemExit("nothing identified itself on SWD - the probe reported no DP. Check "
                              "it is plugged in and that no other openocd is holding it")
         here = next((t for t, v in DPIDR.items() if v == seen), None)
-        raise SystemExit("%s is a %s image and the board on the probe is %s. One board is wired "
-                         "up at a time, and swapping it takes a person"
+        advice = ("Probe %s is the other tier's" % self.ocd.serial if self.ocd.serial else
+                  "Name the probe for each tier (--probe, or LIVE9918_PROBE_RP2040 / "
+                  "LIVE9918_PROBE_RP2350) - openocd otherwise opens whichever answers first")
+        raise SystemExit("%s is a %s image and the board on the probe is %s. %s"
                          % (os.path.basename(self.elf), self.target,
                             here or "not one (DP identity 0x%08x)" % seen if seen
-                            else "not answering as one"))
+                            else "not answering as one", advice))
 
     def check_image(self):
         """Refuse to read a board running something other than this ELF.
@@ -635,6 +649,9 @@ def board_args(ap):
                     help="run against the in-process library instead of a board - the "
                          "stages that compare pixels, not the ones that measure time")
     ap.add_argument("--elf", default=None)
+    ap.add_argument("--probe", default=None, metavar="SERIAL",
+                    help="CMSIS-DAP serial to open, for a desk with a probe per board; "
+                         "otherwise LIVE9918_PROBE_RP2040 / LIVE9918_PROBE_RP2350")
     ap.add_argument("--clock", type=int, default=None, metavar="N",
                     choices=range(len(CLOCK_PRESET_MHZ)),
                     help="system clock preset, %s - saved and the board rebooted into it, because "
@@ -656,7 +673,8 @@ def open_board(args):
     boot = {k: getattr(args, k, None) for k in ("clock", "clock_tested")}
     return Live(args.elf or default_elf(args.board),
                 verify=not getattr(args, "flash", False),
-                boot={k: v for k, v in boot.items() if v is not None})
+                boot={k: v for k, v in boot.items() if v is not None},
+                probe=getattr(args, "probe", None))
 
 
 def default_elf(board="pro"):
