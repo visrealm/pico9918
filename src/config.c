@@ -295,9 +295,9 @@ bool writeConfig(uint8_t config[CONFIG_BYTES])
   int attempts = 5;
   while (attempts--)
   {
-    flash_range_program(CONFIG_FLASH_OFFSET, (const void*)tms9918->config, 256);
+    flash_range_program(CONFIG_FLASH_OFFSET, config, CONFIG_BYTES);
 
-    if (memcmp(CONFIG_FLASH_ADDR, (const void*)tms9918->config, 256) == 0)
+    if (memcmp(CONFIG_FLASH_ADDR, config, CONFIG_BYTES) == 0)
     {
       success = true;
       break;
