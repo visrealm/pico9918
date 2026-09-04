@@ -1,0 +1,13 @@
+# Blank issues stay enabled on purpose: the two forms cover the common cases, and anything
+# else should not be blocked by them.
+blank_issues_enabled: true
+contact_links:
+  - name: Discussion and general questions
+    url: https://forums.atariage.com/topic/367656-introducing-the-pico9918-a-tms9918a-drop-in-replacement-powered-by-a-pi-pico/
+    about: The AtariAge thread is where news and day-to-day questions live.
+  - name: Documentation
+    url: https://github.com/visrealm/pico9918/wiki
+    about: Hardware setup, firmware, the configurator, supported devices and F18A compatibility.
+  - name: Troubleshooting
+    url: https://github.com/visrealm/pico9918/wiki/Troubleshooting
+    about: No picture, a machine that will not boot, a display change that reverted itself.

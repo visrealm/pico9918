@@ -1,0 +1,144 @@
+name: Bug report
+description: Something is wrong with the firmware, the configurator or a dongle
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before filing, two things are worth trying, because they resolve most reports on their own:
+
+        * Check [Troubleshooting](https://github.com/visrealm/pico9918/wiki/Troubleshooting).
+        * Update to the latest [release](https://github.com/visrealm/pico9918/releases) if you are
+          not on it already.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you see, and what you expected to see instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce it
+      description: |
+        The steps, and how reliably it happens. "Every cold boot" and "once in twenty" point at very
+        different faults.
+    validations:
+      required: true
+
+  - type: input
+    id: software
+    attributes:
+      label: Software that triggers it
+      description: Game, demo or program, if it is specific to one.
+      placeholder: Konami Ping Pong, Buck Rogers Super Game
+
+  - type: input
+    id: machine
+    attributes:
+      label: Host machine
+      description: Make and model.
+      placeholder: TI-99/4A, ColecoVision, Toshiba HX-10
+    validations:
+      required: true
+
+  - type: dropdown
+    id: board
+    attributes:
+      label: PICO9918 board
+      options:
+        - PRO v2.0
+        - v1.3
+        - v1.2
+        - v1.1
+        - v1.0
+        - v0.4
+        - v0.3
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware version
+      description: |
+        Shown on the performance diagnostic overlay, and by the configurator. Please give the exact
+        version rather than "latest".
+      placeholder: v1.2.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: output
+    attributes:
+      label: Video output
+      options:
+        - VGA dongle
+        - Digital A/V (HDMI) dongle
+        - SCART A/V dongle
+        - On-board VGA header (v0.4 to v1.1)
+        - Custom wiring
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device_mode
+    attributes:
+      label: Device mode
+      description: |
+        See
+        https://github.com/visrealm/pico9918/wiki/TMS9918-Family#device-mode-configuration
+      options:
+        - TMS9918A (default)
+        - TMS992xA
+        - TMS9118
+        - TMS912x
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: settings
+    attributes:
+      label: Settings changed from default
+      description: |
+        Clock preset, sprites per scanline, scanline CRT effect, palette, SCART or VGA mode. If you
+        have not changed anything, say so.
+
+  - type: dropdown
+    id: defaults
+    attributes:
+      label: Does it still happen after a reset to defaults?
+      description: |
+        Worth knowing, because it separates a firmware fault from a configuration one. Note that a
+        reset returns device mode to TMS9918A, which some machines need changed back.
+      options:
+        - "Yes, still happens on defaults"
+        - "No, defaults are fine"
+        - Not tried
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostic overlay
+      description: |
+        Turn the performance overlay on in the configurator and paste what it reads, or attach a
+        photo of the screen. It carries the board and firmware version, system clock, per-frame
+        render time, FPS, GPU load and core temperature, which together answer most of what I would
+        otherwise have to ask. See
+        https://github.com/visrealm/pico9918/wiki/Diagnostic-Overlays
+
+  - type: textarea
+    id: extras
+    attributes:
+      label: Photos or video
+      description: |
+        Drag files straight in. For anything visual, a photo or a short clip of the screen is worth
+        more than a description.
