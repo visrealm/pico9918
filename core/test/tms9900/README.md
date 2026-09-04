@@ -13,6 +13,7 @@ Comprehensive micro-test suite that runs identical TMS9900 programs through both
 | Compare & Branch | CI, JEQ, JNE, JGT, loop with counter |
 | Subroutine | BL *Rn / RT (B *R11) |
 | Misc | SWPB, STST, STWP |
+| F18A PIX | BL address off a rounded row stride, the 16KB wrap, and a write to the pixel x selects |
 | Edge Cases | ADD overflow, SUB borrow, SLA overflow, NEG 0x8000, word alignment |
 | BLWP / RTWP | Context save/restore across workspace switch |
 | Stress | Fibonacci(10) iterative loop |

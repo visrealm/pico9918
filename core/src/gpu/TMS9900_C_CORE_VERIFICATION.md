@@ -229,7 +229,7 @@ Each entry is the rule the C core must satisfy, not a suggestion.
 | COC (0x2000) | EQ if `(dst & src) == src`; else clear EQ | ✓ |
 | CZC (0x2400) | EQ if `(dst & src) == 0`; else clear EQ | ✓ |
 | XOR (0x2800) | `dst ^ src`, store, st&=0x1E, set_flags_word | ✓ |
-| XOP/PIX (0x2C00) | Not emulated in C (NOP); assembly has full PIX impl | N/A |
+| XOP/PIX (0x2C00) | BM pattern-name offset; BL address off a rounded-up row stride, wrapped in 16KB, subpixel from x, plus the conditional write and read-back flags | ✓ |
 | MPY (0x3800) | 16×16→32 multiply; high word to dreg, low to dreg+1 | ✓ |
 | DIV (0x3C00) | OV if src ≤ high_word (or src=0); else quotient+remainder | ✓ |
 | LDCR/STCR (0x3000) | CRU not emulated; assembly skips extra word for indexed mode; C decode_operand naturally consumes it (but may spuriously auto-increment in mode 3) | ~✓ |
@@ -310,7 +310,7 @@ Each entry is the rule the C core must satisfy, not a suggestion.
 |------|--------|-------|
 | `cpu->st` type | ✓ | uint16_t in C, byte-sized in assembly; all flag ops produce values ≤ 0xFF |
 | Dead code (`branch_cond`, `src_through_c`) | ✓ | Defined but never called; no impact |
-| XOP/PIX (F18A) | N/A | Not emulated in C; assembly has full implementation |
+| XOP/PIX (F18A) | ✓ | Each core computes the BL address for itself, so the PIX group in `test/tms9900` is what holds the three of them to one answer |
 | LDCR/STCR mode-3 side effect | Minor | C's decode_operand auto-increments register; assembly skips decode entirely. Only matters for CRU ops which aren't used in GPU programs. |
 
 ---
@@ -320,5 +320,5 @@ Each entry is the rule the C core must satisfy, not a suggestion.
 1. **Build/configuration**: verify `PICO9918_GPU_C_CORE` is defined at compile time (`-DPICO9918_GPU_C_CORE=ON`)
 2. **Compiler optimization**: Aggressive inlining or optimization of `static inline` functions may cause unexpected behavior
 3. **Glue code**: an issue in `gpu/gpu.c` or the surrounding infrastructure rather than in the interpreter
-4. **XOP/PIX**: If GPU programs use F18A PIX instructions, they're not implemented in the C core
+4. **XOP/PIX**: the BL address is derived separately in the C core and in each assembly core, so run the PIX group in `test/tms9900` on the board before suspecting the program
 5. **Debug tracing**: Add trace output for first N instructions (PC, inst word, ST after execution) and compare against assembly behavior on real hardware

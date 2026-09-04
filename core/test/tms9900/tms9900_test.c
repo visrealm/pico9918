@@ -187,6 +187,7 @@ static inline void jnc    (uint8_t* b, uint16_t* o, int8_t off) { emit(b,o,(uint
 static inline void coc    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x2000u|((uint16_t)rd<<6)|rs)); }
 static inline void czc    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x2400u|((uint16_t)rd<<6)|rs)); }
 static inline void xor_rr (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x2800u|((uint16_t)rd<<6)|rs)); }
+static inline void pix    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x2C00u|((uint16_t)rd<<6)|rs)); }
 static inline void mpy    (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x3800u|((uint16_t)rd<<6)|rs)); }
 static inline void div_op (uint8_t* b, uint16_t* o, uint8_t rs, uint8_t rd) { emit(b,o,(uint16_t)(0x3C00u|((uint16_t)rd<<6)|rs)); }
 
@@ -570,6 +571,40 @@ static void test_misc(void)
   setup(NULL); load_prog(p,n); run_c();   CHECK_REG("STWP", 0, WP);
 }
 
+/* PIX in BL mode, on the three things a byte-per-four-pixels layer decides:
+   the row stride, which pixel of the byte, and where the address wraps. A
+   width that is not a multiple of four is what separates the stride from the
+   pixel count, so every case here uses one. */
+static void test_pix(void)
+{
+  printf("\n=== F18A PIX (BL) ===\n");
+  uint8_t p[MAX_PROG]; uint16_t n;
+
+  /* Address only: VR35=10 is a stride of 3 bytes, so (x=5,y=3) is byte 10. */
+  printf("  PIX address, VR35=10\n");
+  n=0; li(p,&n,1,0x0503); li(p,&n,2,0x4000); pix(p,&n,1,2); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0x6020]=0; mem[0x6023]=10;
+  run_asm(); CHECK_REG("PIX addr", 2, 0x000A);
+  setup(NULL); load_prog(p,n); mem[0x6020]=0; mem[0x6023]=10;
+  run_c();   CHECK_REG("PIX addr", 2, 0x000A);
+
+  /* VR32=0xFF puts the layer at 0x3FC0, so row 100 leaves 16KB and wraps. */
+  printf("  PIX address wraps at 16KB\n");
+  n=0; li(p,&n,1,0x0064); li(p,&n,2,0x4000); pix(p,&n,1,2); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0x6020]=0xFF; mem[0x6023]=4;
+  run_asm(); CHECK_REG("PIX wrap", 2, 0x0024);
+  setup(NULL); load_prog(p,n); mem[0x6020]=0xFF; mem[0x6023]=4;
+  run_c();   CHECK_REG("PIX wrap", 2, 0x0024);
+
+  /* Colour 3 at x=5 is the second pixel of the byte, whatever the stride. */
+  printf("  PIX write, colour 3 at x=5\n");
+  n=0; li(p,&n,1,0x0503); li(p,&n,2,0x0003); pix(p,&n,1,2); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0x6020]=0; mem[0x6023]=10;
+  run_asm(); CHECK_MEM8("PIX write", 0x000A, 0x30);
+  setup(NULL); load_prog(p,n); mem[0x6020]=0; mem[0x6023]=10;
+  run_c();   CHECK_MEM8("PIX write", 0x000A, 0x30);
+}
+
 static void test_blwp(void)
 {
   printf("\n=== BLWP/RTWP ===\n");
@@ -676,6 +711,7 @@ int main(void)
   test_shifts();
   test_branches();
   test_misc();
+  test_pix();
   test_blwp();
   test_stress();
 

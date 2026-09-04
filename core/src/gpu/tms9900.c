@@ -875,9 +875,10 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
       uint8_t vr35   = cpu->mem[0x6023];
       uint16_t width = (vr35 == 0) ? 256u : (uint16_t)vr35;
 
-      uint16_t p   = (uint16_t)((y * width) + x);
-      uint8_t vr32 = cpu->mem[0x6020];
-      uint16_t a   = (uint16_t)(((uint16_t)vr32 << 6) + (p >> 2));
+      /* Four pixels a byte, so the row stride rounds up, and the address wraps in 16KB. */
+      uint16_t stride = (uint16_t)((width + 3) >> 2);
+      uint8_t vr32    = cpu->mem[0x6020];
+      uint16_t a      = (uint16_t)((((uint16_t)vr32 << 6) + y * stride + (x >> 2)) & 0x3FFF);
 
       if (flags & 0x4000) /* PIX_A: address only */
       {
@@ -885,7 +886,7 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
         break;
       }
 
-      uint8_t s    = (uint8_t)(p & 0x03);
+      uint8_t s    = (uint8_t)(x & 0x03);
       uint8_t b    = cpu->mem[a];
       uint8_t pixv = (uint8_t)((b & pix_mask[s]) >> pix_shift[s]);
 
