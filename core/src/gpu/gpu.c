@@ -458,10 +458,7 @@ void pico9918_gpu_set_clock(PICO9918_INST_ARG uint32_t instructionsPerSecond)
   tms9918->gpuIps   = instructionsPerSecond;
   tms9918->gpuSlice = instructionsPerSecond ? GPU_SLICE_FROM_IPS(instructionsPerSecond, 240u, 60u) : 0u;
 #else
-  /* Refused, not honoured: the hand-written Thumb cores ignore the cap and run a
-     program to completion, so a slice taken inside a bus write could never come back
-     from one waiting on the raster. The builds that have those cores are boards, and a
-     board runs the GPU on a core of its own - there is nothing here to pace. */
+  /* refused, not honoured: a hand-written Thumb core runs to completion */
   (void)tms9918;
   (void)instructionsPerSecond;
 #endif

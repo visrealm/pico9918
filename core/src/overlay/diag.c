@@ -305,10 +305,7 @@ void pico9918_diag_update(PICO9918_INST_ARG uint32_t frameCount)
       uint32_t currentTime = PICO9918_HOST_TIME_US();
 
 #if PICO9918_MODE == PICO9918_MODE_F18A
-      /* Elapsed since the last update. The clock rises, so currentTime MUST be the
-         later reading - reversed, this underflows and the row reads ~0% or exactly
-         100%, never a real figure. Computed once and reused so that a fix cannot
-         correct one copy of the expression and miss the other. */
+      /* currentTime MUST be the later reading: reversed, this underflows and the row reads 0% or 100% */
       uint32_t totalTime = currentTime - lastUpdateTime;
 
       float gpuPct = (pico9918_gpu_time(totalTime) / (float)totalTime) * 100.0f;
@@ -586,15 +583,9 @@ static void renderPalette(PICO9918_INST_ARG int y, uint32_t vVirtualPixels, PICO
     {
       for (int c = 0; c < 16; ++c)
       {
-        /* Kept as the explicit transform rather than reading pico9918_palette_lut,
-           which holds the same low 12 bits but with green replicated into bits
-           15-12 by PICO9918_PIXEL_FROM_RGB12. Proven over all 65536 pram inputs:
-           the low 12 bits always agree, the top nibble differs whenever green is
-           non-zero. That nibble is dead at the pins, but it is LIVE on the
-           RP2040 CRT-dim path - vga.c shifts the whole 32-bit pair right by one
-           UNMASKED, so bit 12 lands in bit 11, blue's MSB, in both halves. The
-           trailing `& 0xfff` here is what keeps it clear; using the LUT would
-           reintroduce the bleed on every dimmed swatch row. */
+        /* WARNING: the trailing `& 0xfff` is load-bearing, so do not swap this for pico9918_palette_lut.
+           The LUT replicates green into bits 15-12, and the RP2040 CRT-dim path shifts the pixel pair
+           right UNMASKED, landing bit 12 in blue's MSB. */
         uint32_t color = tms9918->vram.map.pram[palette * 16 + c] & 0xFF0F;
         color |= (color & 0xf000) >> 8;
         color &= 0xfff;

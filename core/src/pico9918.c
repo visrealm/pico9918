@@ -740,10 +740,7 @@ void PICO9918_IN_FLASH_FUNC(initLookups)(void)
   reversedBitsInit();
   ecm0PaletteInit();
 
-  /* Every instance is configured here, never lazily from the scanline path: one
-     triggered before a lazy init would reach it fires unconfigured. The border
-     fill is the frame module's, so its source word is exported rather than
-     reached for as a static in another TU. */
+  /* every fill is configured here: one triggered before a lazy init reached it would run unconfigured */
   PICO9918_FILL32_INIT(PICO9918_FILL_LINE, &bg);
   PICO9918_FILL32_SET_COUNT(PICO9918_FILL_LINE, TMS9918_PIXELS_X / 4);
 
@@ -836,8 +833,7 @@ static uint32_t __time_critical_func(collectSpriteRows)(PICO9918_INST_ARG uint16
   const uint32_t unlockedMask = -(uint32_t)PICO9918_UNLOCKED(tms9918);
   const uint32_t row30Mode =
     (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) & unlockedMask;
-  /* the first row is YPOS -1, and both the wrap threshold and the row it lands on carry that
-     offset, so the list walks raw YPOS and never adds it */
+  /* the wrap threshold and the row both carry the YPOS -1 offset, so the walk stays in raw YPOS */
   const int32_t realY = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_Y_REAL) ? 0 : 1;
   const int32_t maxY  = (row30Mode ? 0xf0 : 0xe0) - realY;
   const int32_t yAdj  = (int32_t)y - realY;
@@ -898,8 +894,7 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   const uint8_t spriteSizePx       = spriteSize << spriteMag;
   const uint16_t spritePatternAddr = tmsSpritePatternTableAddr(tms9918);
   uint32_t spritesShown            = 0;
-  /* the sprite-number field reads zero unless a fifth sprite latches one into it: the
-     scan counter is parked at zero whenever it is not walking the attribute table */
+  /* the sprite-number field reads zero unless a fifth sprite latches one in */
   uint8_t tempStatus               = 0;
   uint32_t transparentCount        = 0;
 
@@ -1261,8 +1256,7 @@ static inline void tileRowAddr(PICO9918_INST_ARG const uint16_t y, const uint16_
   const uint8_t pattRow = mcm ? (((rawY >> 2) & 0x01) + ((rawY >> 3) & 0x03) * 2) : (y & 0x07);
 
   addr->nameMask = 0xff;
-  /* Y flip is inert in Multicolor for the same reason: the flip lives in the scrolled row, which
-     its pattern address never reads. Zero here rather than a test per tile. */
+  /* Multicolor's pattern address never reads the scrolled row, so Y flip is inert there */
   addr->flipY = mcm ? 0 : (7 - 2 * pattRow);
 
   if (gm2)
@@ -1409,8 +1403,7 @@ static inline void tileLayerAddr(PICO9918_INST_ARG const uint16_t rawY, const Ti
     if (virtY >= maxY)
     {
       virtY -= maxY;
-      /* graphics only: a text row's address is a row count times a column count and never carries
-         the page bit, so the size bit does nothing */
+      /* a text row's address carries no page bit, so the size bit does nothing there */
       swapYPage = !textMode && (TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & config->yPageSwapMask);
     }
 
@@ -1523,9 +1516,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
 #define TEXT40_CELL() \
   { \
     TEXT40_NEXT_CELL() \
-    /* back to the row's own first cell, and no page swap: text has no page size bits. A start \
-         cell past the last one never meets this test, so it reads on into the next row, which is \
-         what hardware's counter does too */ \
+    /* text has no page size bits, so a start cell past the last reads on into the next row */ \
     if (++col == numCols) \
     { \
       col = 0; \
@@ -1545,10 +1536,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
     hi = (uint16_t)(bgWord ^ (diffWord & maskExpandNibbleToWordRev[patt & 0x0f])); \
     if (isTile2) \
     { \
-      /* where this layer draws at all: a zero colour draws nothing. Six bits a cell at a position \
-           that never aligns, rolled into an accumulator and stored when a word fills rather than a \
-           read-modify-write of one word and usually two - the shape the ECM cell below already has. \
-           Every cell rolls, drawn or not, or the position stops tracking */ \
+      /* every cell rolls the six-bit accumulator, drawn or not, or the bit position stops tracking */ \
       const uint32_t bits  = patt >> 2; \
       const uint32_t cover = ((((color >> 4) ? bits : 0) | ((color & 0xf) ? ~bits : 0)) & 0x3f) << 26; \
       if (blend) \
@@ -1576,7 +1564,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
     const uint8_t* pattData = patternTable + name * PATTERN_BYTES + ((color & 0x20) ? flipY : 0); \
     uint32_t pattMask       = (color & 0x10) ? 0 : 0xff; \
     uint32_t cover          = 0; \
-    uint8_t patt[3] = {0}; \
+    uint8_t patt[3]         = {0}; \
     switch (ecm) \
     { \
     case 3: patt[0] = pattData[ecmOffset * 2]; pattMask |= patt[0]; \
@@ -1617,10 +1605,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
     } \
     if (isTile2) \
     { \
-      /* six bits a cell at a position that never aligns: rolled into an accumulator and stored \
-           when a word fills, rather than a read-modify-write of one word and usually two. Every \
-           cell rolls, drawn or not, or the position stops tracking. `cover << 6` is zero, so a \
-           cell that ends exactly on a word boundary needs no test of its own */ \
+      /* every cell rolls the six-bit accumulator, drawn or not, or the bit position stops tracking */ \
       coverAcc |= cover >> coverBit; \
       coverBit += 6; \
       if (coverBit >= 32) \
@@ -1635,15 +1620,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
 
   if (ecm)
   {
-    /* the row reaches its own first cell at most once, so it is two runs rather than a test on
-       every cell - and inside a run nothing carries the row's width or its wrap. One loop with a
-       pointer compare instead is smaller and slower, which is what register pressure costs in this
-       body. A start cell past the last one never wraps at all: it reads on into the next row, as
-       hardware's counter does */
-    /* six bits a cell at a position that never aligns: rolled and stored when a word fills,
-       rather than a read-modify-write of one word and usually two. Declared per shape, not
-       shared: hoisting it kept three values live across both and cost the ECM clone five
-       dropped scanlines on RP2040, where the registers are tightest */
+    /* do not hoist out of the branch: shared, these stay live across both and the ECM row drops rows */
     uint32_t* coverWord = tms9918->layerSelectionMask + (padding >> 5);
     uint32_t coverAcc = 0, coverBit = padding & 0x1f;
 
@@ -1694,10 +1671,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
   }
   else
   {
-    /* six bits a cell at a position that never aligns: rolled and stored when a word fills,
-       rather than a read-modify-write of one word and usually two. Declared per shape, not
-       shared: hoisting it kept three values live across both and cost the ECM clone five
-       dropped scanlines on RP2040, where the registers are tightest */
+    /* do not hoist out of the branch: shared, these stay live across both and the ECM row drops rows */
     uint32_t* coverWord = tms9918->layerSelectionMask + (padding >> 5);
     uint32_t coverAcc = 0, coverBit = padding & 0x1f;
 
@@ -2379,8 +2353,7 @@ PICO9918_INLINE_HOT void renderTileRow(TILE_ROW_PARAMS, const bool isTile2,
 
     if (hpSize)
     {
-      /* the name table just toggles its page bit, but the attribute address gained that bit by
-         addition, so it has to lose it the same way or a carry never comes back */
+      /* the attribute address gained the page bit by addition, so it has to lose it the same way */
       rowNamesAddr ^= 0x400;
       if (attrPerPos) colorTableAddr = (colorTableAddr + ((rowNamesAddr & 0x400) << 1) - 0x400) & VRAM_MASK;
     }
@@ -2444,8 +2417,7 @@ static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG ui
   if (text)
   {
     const uint8_t fixed = (tmsMainFgColor(tms9918) << 4) | tmsMainBgColor(tms9918);
-    /* the attribute table is read even where positions do not index it: ECM1-3 takes it by name
-       and only ECM0 has an fg/bg pair to fall back on */
+    /* ECM1-3 takes the attribute table by name; only ECM0 has an fg/bg pair to fall back on */
     const uint8_t* colors = (attrPerPos || ecm) ? tms9918->vram.bytes + colorTableAddr : &fixed;
     uint8_t* dest         = (config->isTile2 ? tms9918->tileLayer2Buffer : tms9918->tileLayer1Buffer) +
                     (wide ? TEXT80_PADDING_PX : TEXT_PADDING_PX);
@@ -3030,14 +3002,8 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
         tms9918->layerSelectionMask[(end - 1) >> 5] &= ~(0xffffffffu >> (end & 0x1f));
       }
 
-      /* Nothing to arbitrate: no second layer and no bitmap layer, so no tile has anything to rank
-         against. Layer 1's buffer already carries the backdrop where a tile drew nothing and the
-         borders `textRowBorder` wrote, so it *is* the finished line - merging it into another one
-         would copy 256 or 512 bytes to change nothing.
-
-         The fine scroll has to leave it word-aligned. A caller is entitled to read the line a word
-         at a time, and on Cortex-M0+ an unaligned word load is a HardFault rather than a slow one -
-         so a scroll of 3 handed straight out took the RP2040 down, where the RP2350 never noticed. */
+      /* WARNING: the scroll test keeps the handed-out line word-aligned. A caller may read it a
+         word at a time, and on Cortex-M0+ an unaligned word load HardFaults rather than running slow */
       if (tile1Enabled && (!tile2Enabled || blend) && !underLayer && !(t1Scroll & 3) &&
           !(TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL) & PICO9918_R31_BML_ENABLE))
       {
@@ -3223,10 +3189,14 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
     else if (regIndex == PICO9918_REG_FLASH_CONTROL &&
              PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG)) // firmware update
     {
+      // b7      : 0 = idle:   1 = execute
+      // b6      : 0 = verify: 1 = write
+      // b5 - b0 : address to read firmware data (256 byte boundaries)
+      //           reads one UF2 frame (512 bytes)
       if (TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) == 0)
       {
         TMS_STATUS(tms9918, PICO9918_SR_GPU) = 0x80; // set gpu processing flag
-        tms9918->flash         = 1;
+        tms9918->flash                       = 1;
       }
       else
       {

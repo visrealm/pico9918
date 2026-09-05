@@ -1,6 +1,7 @@
 name: Core Portability
 
-# That the library compiles clean under both front ends. The cross-toolchain
+# That the library compiles clean under both front ends and keeps its comment
+# discipline. The cross-toolchain
 # renderer gate here is core-live.yml, which drives the same scenes through
 # test/live/runner.py; visrealm/pico9918-core runs tools/ci.sh suite instead.
 
@@ -35,3 +36,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./core/.github/actions/env
       - run: core/tools/ci.sh warnings
+
+  comments:
+    name: Comment discipline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./core/.github/actions/env
+      - run: core/tools/ci.sh comments

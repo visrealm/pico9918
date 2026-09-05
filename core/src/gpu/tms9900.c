@@ -367,8 +367,7 @@ static inline uint16_t src16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
   /* Assembly: MOVS R4,#0x0E; ANDS R1,R4 - keeps OV/P/bit1, clears C */
   cpu->st &= 0x0E;
   if (count == 0) count = 16;
-  /* Assembly: ORRS R0 = (v<<16)|v, then RORS by count. Lower 16 bits = v rotated right.
-   * Carry = bit(count-1) of v (last bit shifted out). Use 32-bit to avoid shift-by-16 UB. */
+  /* Assembly: ORRS R0 = (v<<16)|v, then RORS by count. 32-bit avoids shift-by-16 UB */
   uint32_t vv    = v;
   uint16_t r     = (uint16_t)((vv >> count) | (vv << (16u - count)));
   uint16_t carry = (uint16_t)((vv >> (count - 1u)) & 1u);

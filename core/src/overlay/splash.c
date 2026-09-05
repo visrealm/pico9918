@@ -75,12 +75,9 @@ void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, u
 
   if (y <= vVirtualPixels)
   {
-    /* INTENTIONAL 16-bit wraparound, and it is the row gate - do not "fix" the
-     * narrowing with a cast or a signed rewrite. logoOffset is signed and goes
-     * negative, so for every row outside the logo band this subtraction wraps to
-     * a large uint16 and the comparison below is false. Only the rows actually
-     * in the band land in 0..splashHeight-1. Compilers may warn here (MSVC
-     * C4244); the truncation is the mechanism, not an accident. */
+    /* WARNING: the 16-bit wraparound is the row gate, so do not "fix" the narrowing with a cast or a
+     * signed rewrite. logoOffset goes negative, so a row outside the logo band wraps to a large
+     * uint16 and fails the test below. MSVC C4244 may fire; the truncation is the mechanism. */
     y -= vBorder + vPixels + logoOffset;
     if (y < splashHeight)
     {

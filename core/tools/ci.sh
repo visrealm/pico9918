@@ -16,7 +16,7 @@
 # it behaves the same whether the library is the repository root or a directory
 # inside one.
 #
-# Usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|doxygen|package|multi|tms9918|chip|python>
+# Usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|comments|doxygen|package|multi|tms9918|chip|python>
 #
 #   goldens   the 18 committed frames, byte-exact
 #   suite     111 scenes, five properties and a GPU program, both line widths
@@ -24,6 +24,7 @@
 #   gpu       the library-paced GPU, and the arming write it runs a program on
 #   gpucore   the GPU's TMS9900, instruction by instruction, on the portable core
 #   warnings  -Wall -Wextra -Werror
+#   comments  a comment inside a function body gets one line, a table, or a tag
 #   doxygen   the docs build, and what it still reports
 #   package   install, then find_package it from a separate project and run it
 #   multi     the library and the consumer, instance threaded through every signature
@@ -153,6 +154,12 @@ warnings() {
   configure "$OUT" "$LIBROOT" -DPICO9918_WERROR=ON -DCMAKE_C_FLAGS=-O2
   build "$OUT"
   echo "no warnings"
+}
+
+# Comment discipline, as a gate rather than a habit. See tools/comment_check.py for
+# the rule and the two ways out of it.
+comments() {
+  "$PY" "$LIBROOT/tools/comment_check.py" "$LIBROOT"
 }
 
 docs() {
@@ -329,6 +336,7 @@ pixels) pixels ;;
 gpu) gpu ;;
 gpucore) gpucore ;;
 warnings) warnings ;;
+comments) comments ;;
 doxygen) docs ;;
 package) package ;;
 multi) multi ;;
@@ -336,7 +344,7 @@ tms9918) tms9918 ;;
 chip) chip ;;
 python) pythonModule ;;
 *)
-  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|doxygen|package|multi|tms9918|chip|python>" >&2
+  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|comments|doxygen|package|multi|tms9918|chip|python>" >&2
   exit 2
   ;;
 esac

@@ -265,8 +265,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
     pico9918_diag_update(PICO9918_INST pico9918_frame_count);
   }
 
-  // here, we catch the case where the last row(s) were
-  // missed and we never raised an interrupt. do it now
+  // a missed last row leaves the end-of-frame interrupt owing
   if (!pico9918_frame_done_int_impl(PICO9918_INST_ONLY))
   {
     pico9918_frame_raise_end_of_frame_int(PICO9918_INST_ONLY);

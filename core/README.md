@@ -323,6 +323,7 @@ tools/ci.sh pixels      both palette LUT layouts and the line geometry, both wid
 tools/ci.sh gpu         the library-paced GPU, and the write that arms a program
 tools/ci.sh gpucore     the GPU's TMS9900, instruction by instruction
 tools/ci.sh warnings    -Wall -Wextra -Werror
+tools/ci.sh comments    a comment in a function body gets one line, a table, or a tag
 tools/ci.sh multi       the instance threaded through every signature
 tools/ci.sh tms9918     PICO9918_MODE=0, its frame against the F18A build's
 tools/ci.sh package     install it, then find_package it from a separate project

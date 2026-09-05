@@ -30,11 +30,9 @@ const pico9918_config_field_t pico9918_config_fields[] = {
   {PICO9918_CONF_DIAG_PERFORMANCE, 1, 0, PENDING_MIRROR_NONE, 0x1000},
   {PICO9918_CONF_DIAG_PALETTE, 1, 0, PENDING_MIRROR_NONE, 0x1000},
   {PICO9918_CONF_DIAG_ADDRESS, 1, 0, PENDING_MIRROR_NONE, 0x1000},
-  // byte 15 was never a declared option, but VR58/59 lets host software write any
-  // byte >= 8, so shipped units may carry residue there. The stamp must be the first
-  // release that CLAIMS the byte, and migrateNewFields compares strictly: stamping an
-  // earlier release leaves a unit already on that version unswept, and residue boots
-  // it into the V9938 render base. This claim ships in 1.3.0.
+  // WARNING: VR58/59 lets a host write any byte >= 8, so shipped units may carry residue in byte 15.
+  // migrateNewFields compares strictly, so the stamp must be the release that first CLAIMS the byte:
+  // an earlier one leaves a unit already on that version unswept, booting on residue.
   {PICO9918_CONF_VDP_BASE, 1, PICO9918_BASE_TMS9918, PENDING_MIRROR_NONE, 0x1300},
 };
 
