@@ -55,7 +55,9 @@
 #define GOLDEN_DIGESTS_PER_LINE 2
 #define GOLDEN_DIGEST_BYTES (GOLDEN_DIGESTS_PER_LINE * 8)
 
-/* STATUS_5S / STATUS_COL come from pico9918_priv.h */
+/* PICO9918_SR0_5S / PICO9918_SR0_COLLISION come from pico9918.h. These two are
+ * observations of what the library reported, not part of the reference model - the
+ * model restates its own bits below and must keep doing so. */
 
 /* Storage for the deterministic clock the golden build injects in place of the
  * library's wall clock. goldenClock.h is force-included into every TU of this
@@ -898,8 +900,8 @@ static void renderScene(const Scene* scene, int* lines5s, int* linesCol)
     uint8_t status = pico9918_scan_line((uint16_t)y);
     memcpy(pixels, pico9918_line_source(), GOLDEN_BYTES_PER_LINE);
     pixels[GOLDEN_BYTES_PER_LINE] = status;
-    if (status & STATUS_5S) ++*lines5s;
-    if (status & STATUS_COL) ++*linesCol;
+    if (status & PICO9918_SR0_5S) ++*lines5s;
+    if (status & PICO9918_SR0_COLLISION) ++*linesCol;
 
     expandLine(pixels, digests[y]);
 
@@ -2892,8 +2894,8 @@ static void frameGeomGroup(void)
  * TMS_R1_INT_ENABLE in pico9918_priv.h spells it the same. */
 #define FRAME_R1_INT_ENABLE 0x20
 
-/* The three SR0 flag bits, restated for the same reason. STATUS_INT / STATUS_5S /
- * STATUS_COL in pico9918_priv.h spell them the same. */
+/* The three SR0 flag bits, restated for the same reason. PICO9918_SR0_INT / _5S /
+ * _COLLISION in pico9918.h spell them the same. */
 #define FRAME_SR0_F   0x80  /* frame interrupt */
 #define FRAME_SR0_5S  0x40  /* fifth sprite */
 #define FRAME_SR0_COL 0x20  /* sprite collision */
@@ -3071,7 +3073,7 @@ static void frameIntGroup(void)
    * 0x85 + 0x40 -> 0x85 is the second DISCRIMINATING case, and the escape that
    * motivated this whole group. The latch holds F with ID 5; the scanline raises
    * 5S. 5S is blocked while F is set, so the latch must not change at all. The
-   * STATUS_COL -> STATUS_5S mutation yields 0xc5 here. */
+   * COL -> 5S mutation yields 0xc5 here. */
   frameIntQuad("int-c-block-5s", 0x85, 0x40);
   /* the converse: COL must get through while F is latched, and the ID must not be
    * touched. 0x9f + 0xe5 -> 0xbf. If COL were gated by F this stays 0x9f. */

@@ -30,7 +30,7 @@ extern "C"
    * \brief merge newly raised status flags into the SR0 latch, publish it, and
    * bring the /INT pin into agreement
    *
-   * tempStatus: flags raised by the scanline just rendered (STATUS_INT / _5S / _COL
+   * tempStatus: flags raised by the scanline just rendered (PICO9918_SR0_INT / _5S / _COL
    *             plus, when 5S is newly set, the sprite number in the low 5 bits)
    *
    * Runs on every active scanline and at the end-of-frame trigger line. The body
@@ -54,7 +54,7 @@ extern "C"
   /**
    * \brief raise this frame's end-of-frame interrupt: latch doneInt, set the SR1
    * vsync bit, trigger the GPU if R50 bit 5 asks for it, consume a pending config
-   * change, then merge STATUS_INT into the SR0 latch
+   * change, then merge PICO9918_SR0_INT into the SR0 latch
    *
    * Unconditional - the caller decides whether the frame still owes an interrupt by
    * testing pico9918_frame_done_int_impl(). Called at the trigger line (from

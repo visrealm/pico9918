@@ -137,7 +137,8 @@ int main(void)
   /* M4 is F18A-only and honoured there even while locked, so the gate is the personality.
      The mode is cached at render time, hence the scan_line before each read. */
   pico9918_write_register_value(PICO9918_INST TMS_REG_0, TMS_R0_MODE_TEXT_80);
-  pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_1,
+                                TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
 
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918A);
   pico9918_scan_line(PICO9918_INST 0);
@@ -169,7 +170,8 @@ int main(void)
   }
   pico9918_write_register_value(PICO9918_INST 0, 0x04);
 
-  pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_1,
+                                TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
   pico9918_scan_line(PICO9918_INST 0);
   if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80)

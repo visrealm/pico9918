@@ -249,16 +249,16 @@ static PICO9918_NOINLINE void vdpRegisterReset(pico9918_t* tms9918)
   tms9918->unlockCount = 0;
   tms9918->lockedMask  = 0x07;
   memset(&TMS_REGISTER(tms9918, TMS_REG_0), 0, TMS_REGISTERS);
-  TMS_REGISTER(tms9918, TMS_REG_1) = 0x40;
-  TMS_REGISTER(tms9918, TMS_REG_3) = 0x10;
-  TMS_REGISTER(tms9918, TMS_REG_4) = 0x01;
-  TMS_REGISTER(tms9918, TMS_REG_5) = 0x0A;
-  TMS_REGISTER(tms9918, TMS_REG_6) = 0x02;
-  TMS_REGISTER(tms9918, TMS_REG_7) = 0xF2;
+  TMS_REGISTER(tms9918, TMS_REG_1)                     = 0x40;
+  TMS_REGISTER(tms9918, TMS_REG_3)                     = 0x10;
+  TMS_REGISTER(tms9918, TMS_REG_4)                     = 0x01;
+  TMS_REGISTER(tms9918, TMS_REG_5)                     = 0x0A;
+  TMS_REGISTER(tms9918, TMS_REG_6)                     = 0x02;
+  TMS_REGISTER(tms9918, TMS_REG_7)                     = 0xF2;
   TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1; // scanline sprites
-  TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC) = 1;               // vram address increment register
-  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SPRITES) = MAX_SPRITES;     // Sprites to process
-  TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_MSB) = 0x40;
+  TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC)         = 1;               // vram address increment register
+  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SPRITES)      = MAX_SPRITES;     // Sprites to process
+  TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_MSB)       = 0x40;
 }
 
 
@@ -306,7 +306,7 @@ PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip
 
   /* Written here as well as in the reset, so a personality chosen after one is not a
      frame late in answering a probe. */
-  TMS_STATUS(tms9918, 1) = PICO9918_SR1_ID(tms9918);
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT) = PICO9918_SR1_ID(tms9918);
 }
 
 /** \brief which chip this instance answers as */
@@ -328,14 +328,14 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
   tms9918->palWriteStage       = 0;
   tms9918->palWriteStage0Value = 0;
   tms9918->flash               = 0;
-  memset(&TMS_STATUS(tms9918, 0), 0, TMS_STATUS_REGISTERS);
+  memset(&TMS_STATUS(tms9918, PICO9918_SR_STATUS), 0, TMS_STATUS_REGISTERS);
   /* SR0 has a shadow the frame path merges into, and the interrupt latch resets with it:
      the register alone leaves the next merge republishing the flags just dropped. */
   pico9918_frame_reset_int_impl(PICO9918_INST_ONLY);
   /* ID = F18A (0xE0), plus 0x08 for anyone who cares it's not a real one. Which chip
      this is does not reset - see pico9918_set_chip. */
-  TMS_STATUS(tms9918, 1)   = PICO9918_SR1_ID(tms9918);
-  TMS_STATUS(tms9918, 14)  = 0x1A; // Version
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT)   = PICO9918_SR1_ID(tms9918);
+  TMS_STATUS(tms9918, PICO9918_SR_VERSION) = 0x1A; // Version
   tms9918->readAheadBuffer = 0;
 
   vdpRegisterReset(tms9918);
@@ -861,7 +861,8 @@ static PICO9918_SECTION_SCRATCH_X(lookup) uint8_t spriteIndices[MAX_SPRITES];
 static uint32_t __time_critical_func(collectSpriteRows)(PICO9918_INST_ARG uint16_t y)
 {
   const uint32_t unlockedMask = -(uint32_t)PICO9918_UNLOCKED(tms9918);
-  const uint32_t row30Mode    = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) & unlockedMask;
+  const uint32_t row30Mode =
+    (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) & unlockedMask;
   /* the first row is YPOS -1, and both the wrap threshold and the row it lands on carry that
      offset, so the list walks raw YPOS and never adds it */
   const int32_t realY = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_Y_REAL) ? 0 : 1;
@@ -938,10 +939,12 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   uint32_t transparentCount        = 0;
 
   // ecm settings
-  const uint32_t ecm            = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_SPRITE) & unlockedMask;
+  const uint32_t ecm =
+    (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_SPRITE) & unlockedMask;
   const uint32_t ecmColorOffset = (ecm == 3) ? 2 : ecm;
   const uint32_t ecmColorMask   = (ecm == 3) ? 0x0e : 0x0f;
-  const uint32_t ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_SPRITE_STRIDE) >> 6);
+  const uint32_t ecmOffset =
+    0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_SPRITE_STRIDE) >> 6);
 
   uint8_t pal = (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_SPRITE_PS) & unlockedMask;
   if (ecm == 1)
@@ -954,7 +957,8 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   }
 
   const uint32_t scanlineSprites = TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES);
-  const uint32_t unlimited       = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_REPORT_MAX) & unlockedMask;
+  const uint32_t unlimited =
+    (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_REPORT_MAX) & unlockedMask;
 
   for (uint32_t n = 0; n < spriteCount; ++n)
   {
@@ -994,9 +998,9 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
     /* have we exceeded the scanline sprite limit? */
     if (++spritesShown > MAX_SCANLINE_SPRITES)
     {
-      if (((tempStatus & STATUS_5S) == 0) && (!unlimited || spritesShown > scanlineSprites))
+      if (((tempStatus & PICO9918_SR0_5S) == 0) && (!unlimited || spritesShown > scanlineSprites))
       {
-        tempStatus |= STATUS_5S | spriteIndices[n];
+        tempStatus |= PICO9918_SR0_5S | spriteIndices[n];
       }
 
       if (spritesShown > scanlineSprites) break;
@@ -1075,7 +1079,7 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
     /* if the result is different, we collided */
     if (validPixels != pattMask)
     {
-      tempStatus |= STATUS_COL;
+      tempStatus |= PICO9918_SR0_COLLISION;
     }
 
     // Render valid pixels to the scanline
@@ -1270,7 +1274,8 @@ __time_critical_func(pico9918_output_sprites)(PICO9918_INST_ARG uint16_t y, uint
 {
   const bool spriteMag = tmsSpriteMag(tms9918);
 
-  if (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS) // double rows (high-res)? still only have low-res sprites
+  if (TMS_REGISTER(tms9918, TMS_REG_0) &
+      TMS_R0_DOUBLE_ROWS) // double rows (high-res)? still only have low-res sprites
     y >>= 1;
 
   const uint32_t spriteCount = collectSpriteRows(PICO9918_INST y);
@@ -1464,8 +1469,9 @@ static inline void tileLayerAddr(PICO9918_INST_ARG const uint16_t rawY, const Ti
     int virtY = y + TMS_REGISTER(tms9918, config->vertScrollReg);
     /* the field wraps at the height actually rendered, which R0's row doubling
        doubles - 384 or 480 rather than 192 or 240 */
-    const int maxY = ((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? (8 * 30) : (8 * 24))
-                     << (bool)(TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS);
+    const int maxY =
+      ((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? (8 * 30) : (8 * 24))
+      << (bool)(TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS);
 
     if (virtY >= maxY)
     {
@@ -1601,7 +1607,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
   {
     ecmColorOffset = (ecm == 3) ? 2 : ecm;
     ecmColorMask   = (ecm == 3) ? 0x0e : 0x0f;
-    ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_TILE_STRIDE) >> 2);
+    ecmOffset = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_TILE_STRIDE) >> 2);
     pal            = (ecm == 1) ? (pal & 0x20) : 0;
   }
 
@@ -2118,7 +2124,8 @@ static EMITTER_NOINLINE void __time_critical_func(text_scan_line)(PICO9918_INST_
   const uint8_t numCols       = wide ? TEXT80_NUM_COLS : TEXT_NUM_COLS;
   const uint8_t nameTableMask = (wide && !PICO9918_UNLOCKED(tms9918)) ? 0x0c : 0x0f;
 
-  const bool attrPerPos = PICO9918_UNLOCKED(tms9918) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_POS_ATTR);
+  const bool attrPerPos =
+    PICO9918_UNLOCKED(tms9918) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_POS_ATTR);
 
   TileRowAddr addr;
   uint16_t rowNamesAddr, colorTableAddr;
@@ -2507,7 +2514,7 @@ PICO9918_INLINE_HOT void renderTileRow(TILE_ROW_PARAMS, const bool isTile2,
   {
     ecmColorOffset = (ecm == 3) ? 2 : ecm;
     ecmColorMask   = (ecm == 3) ? 0x0e : 0x0f;
-    ecmOffset      = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_TILE_STRIDE) >> 2);
+    ecmOffset = 0x800 >> ((TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & PICO9918_R29_TILE_STRIDE) >> 2);
     pal            = (ecm == 1) ? (pal & 0x20) : 0;
   }
 
@@ -2591,14 +2598,16 @@ static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG ui
   const uint8_t textCols = wide ? TEXT80_NUM_COLS : TEXT_NUM_COLS;
 
   /* text takes its colour per cell at ECM0 too; a graphics mode there does not (D6) */
-  const bool attrPerPos = (text || ecm) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_POS_ATTR);
+  const bool attrPerPos =
+    (text || ecm) && (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_POS_ATTR);
 
   TileRowAddr addr;
   uint16_t rowNamesAddr, colorTableAddr;
   tileLayerAddr(PICO9918_INST y, config, text ? textCols : GRAPHICS_NUM_COLS, 0x0f, text, gm2, mcm, attrPerPos,
                 &addr, &rowNamesAddr, &colorTableAddr);
 
-  const uint8_t pal = (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & config->paletteMask) << config->paletteShift;
+  const uint8_t pal = (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & config->paletteMask)
+                      << config->paletteShift;
 
   const bool alwaysOnTop =
     config->priorityReg ? !(TMS_REGISTER(tms9918, config->priorityReg) & config->priorityMask) : false;
@@ -2803,7 +2812,7 @@ static bool __time_critical_func(bitmap_layer_scan_line)(PICO9918_INST_ARG uint1
   /* row stride in bytes, four pixels each, rounded up so every row starts on a byte */
   const uint8_t bmlWidth = TMS_REGISTER(tms9918, PICO9918_REG_BML_WIDTH);
   const uint8_t width    = bmlWidth ? ((bmlWidth + 3) >> 2) : 64;
-  const uint16_t addr = (TMS_REGISTER(tms9918, PICO9918_REG_BML_BASE) << 6) + (y * width);
+  const uint16_t addr    = (TMS_REGISTER(tms9918, PICO9918_REG_BML_BASE) << 6) + (y * width);
 
   return renderBitmapLayer(PICO9918_INST y, !(bmlCtl & 0x20), width, addr, bmlCtl, pixels);
 }
@@ -3311,7 +3320,10 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
      the plain index in both nibbles instead. */
   const uint8_t bgc        = tmsMainBgColor(tms9918);
   const bool packedNibbles = tmsCachedMode == TMS_MODE_TEXT80 && !TEXT80_WIDE_ROW;
-  bg = repeatedPalette(bgc | (packedNibbles ? bgc << 4 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4));
+  bg                       = repeatedPalette(
+    bgc |
+    (packedNibbles ? bgc << 4
+                                         : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4));
 #if PICO9918_TEXT80_8BPP
   /* a wide row is twice the line to fill, and the count is per mode rather than per build */
   PICO9918_FILL32_SET_COUNT(PICO9918_FILL_LINE, pico9918_line_bytes(PICO9918_INST_ONLY) / 4);
@@ -3402,19 +3414,22 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
        VR0. An F18A keeps VR57 reachable, and with M4 set ignores VR8+ rather than aliasing. */
     if ((reg & ~tms9918->lockedMask) != 0x80)
     {
-      if (reg == (0x80 | 0x39) && PICO9918_CAN_UNLOCK(tms9918))
-        regIndex = 0x39;
+      if (reg == (0x80 | PICO9918_REG_UNLOCK) && PICO9918_CAN_UNLOCK(tms9918))
+        regIndex = PICO9918_REG_UNLOCK;
       else if (PICO9918_M4(tms9918))
         return;
     }
 
     TMS_REGISTER(tms9918, regIndex) = value;
-    if (regIndex < 0x0f) return;
+    if (regIndex < PICO9918_REG_STATUS_SELECT) return;
 
-    if ((regIndex == 0x37) || ((regIndex == 0x38) && ((value & 1) == 0)))
+    if ((regIndex == PICO9918_REG_GPU_PC_LSB) ||
+        ((regIndex == PICO9918_REG_GPU_CONTROL) && ((value & PICO9918_R56_GPU_RUN) == 0)))
     {
-      tms9918->gpuAddress = ((TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_MSB) << 8) | TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_LSB)) & 0xFFFE;
-      if (regIndex == 0x37)
+      tms9918->gpuAddress = ((TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_MSB) << 8) |
+                             TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_LSB)) &
+                            0xFFFE;
+      if (regIndex == PICO9918_REG_GPU_PC_LSB)
       {
         TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 0;
         tms9918->gpuStatus          = 0; /* a new program, not a resumed one */
@@ -3424,12 +3439,13 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
         pico9918_gpu_service(PICO9918_INST_ONLY);
       }
     }
-    else if ((regIndex == 0x38) && (value & 1))
+    else if ((regIndex == PICO9918_REG_GPU_CONTROL) && (value & PICO9918_R56_GPU_RUN))
     {
       tms9918->restart = 1;
       pico9918_gpu_service(PICO9918_INST_ONLY);
     }
-    else if (regIndex == 0x3F && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG)) // firmware update
+    else if (regIndex == PICO9918_REG_FLASH_CONTROL &&
+             PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG)) // firmware update
     {
       // b7      : 0 = idle:   1 = execute
       // b6      : 0 = verify: 1 = write
@@ -3437,19 +3453,19 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
       //           reads one UF2 frame (512 bytes)
       if (TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) == 0)
       {
-        TMS_STATUS(tms9918, 2) = 0x80; // set gpu processing flag
+        TMS_STATUS(tms9918, PICO9918_SR_GPU) = 0x80; // set gpu processing flag
         tms9918->flash         = 1;
       }
       else
       {
-        TMS_STATUS(tms9918, 2) = 0x14; // error - busy
+        TMS_STATUS(tms9918, PICO9918_SR_GPU) = 0x14; // error - busy
       }
     }
-    else if (regIndex == 0x1e && value == 0)
+    else if (regIndex == PICO9918_REG_MAX_SCAN_SPRITES && value == 0)
     {
       TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1;
     }
-    else if ((regIndex == 0x32) && (value & 0x80))
+    else if ((regIndex == PICO9918_REG_ENHANCED2) && (value & PICO9918_R50_RESET))
     { // reset all registers?
       vdpRegisterReset(tms9918);
 
@@ -3460,7 +3476,7 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
         tms9918->configVdpDirty = true;
       }
     }
-    else if (regIndex == 0x0F)
+    else if (regIndex == PICO9918_REG_STATUS_SELECT)
     {
       uint8_t statReg           = (value & 0x0f);
       TMS_STATUS(tms9918, 0x0F) = statReg; // is this right? or should this be the read-ahead value?
@@ -3480,26 +3496,28 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
         uint32_t milliQ, milliR;
         PICO9918_DIVMOD_U32(microQ, 1000, milliQ, milliR);
 
-        TMS_STATUS(tms9918, 0x06) = microR & 0x0ff;
-        TMS_STATUS(tms9918, 0x07) = microR >> 8;
-        TMS_STATUS(tms9918, 0x08) = milliR & 0x0ff;
-        TMS_STATUS(tms9918, 0x09) = milliR >> 8;
-        TMS_STATUS(tms9918, 0x0a) = milliQ & 0x00ff;
-        TMS_STATUS(tms9918, 0x0b) = milliQ >> 8;
+        TMS_STATUS(tms9918, PICO9918_SR_MICROS_LSB)  = microR & 0x0ff;
+        TMS_STATUS(tms9918, PICO9918_SR_MICROS_MSB)  = microR >> 8;
+        TMS_STATUS(tms9918, PICO9918_SR_MILLIS_LSB)  = milliR & 0x0ff;
+        TMS_STATUS(tms9918, PICO9918_SR_MILLIS_MSB)  = milliR >> 8;
+        TMS_STATUS(tms9918, PICO9918_SR_SECONDS_LSB) = milliQ & 0x00ff;
+        TMS_STATUS(tms9918, PICO9918_SR_SECONDS_MSB) = milliQ >> 8;
       }
     }
     // SR12 holds the value of the option in VR58 (options)
-    else if (regIndex == 58 && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))
+    else if (regIndex == PICO9918_REG_CONFIG_INDEX && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))
     {
-      TMS_STATUS(tms9918, 12) = tms9918->config[TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX)];
+      const uint8_t option                          = TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX);
+      TMS_STATUS(tms9918, PICO9918_SR_CONFIG_VALUE) = tms9918->config[option];
     }
     // option number in reg 58, value in 59 (options)
-    else if (regIndex == 59 && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG) &&
+    else if (regIndex == PICO9918_REG_CONFIG_VALUE && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG) &&
              TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX) >= 8)
     {
-      tms9918->config[TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX)] = value;
-      TMS_STATUS(tms9918, 12)                    = value;
-      tms9918->configDirty                       = true;
+      const uint8_t option                          = TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX);
+      tms9918->config[option]                       = value;
+      TMS_STATUS(tms9918, PICO9918_SR_CONFIG_VALUE) = value;
+      tms9918->configDirty                          = true;
     }
   }
 }

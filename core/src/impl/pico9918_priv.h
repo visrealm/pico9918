@@ -75,14 +75,6 @@
 #define LAST_SPRITE_YPOS     0xD0
 #define MAX_SCANLINE_SPRITES 4
 
-#define STATUS_INT 0x80
-#define STATUS_5S  0x40
-#define STATUS_COL 0x20
-
-/* SR1's low two bits. The rest of it is the identity byte, which never changes. */
-#define STATUS1_HF    0x01 /* the scanline in R19 was reached. Cleared by reading SR1 */
-#define STATUS1_BLANK 0x02 /* the raster is in blanking */
-
 #define PICO9918_MODE_TMS9918 0
 #define PICO9918_MODE_F18A    1
 
@@ -165,7 +157,8 @@ typedef struct
    renderer ignores every register it admits would be worse than not honouring it. */
 #if PICO9918_MODE == PICO9918_MODE_F18A
 #define PICO9918_UNLOCKED(T)        ((T)->isUnlocked)
-#define PICO9918_UNLOCK_WRITE(R, V) ((R) == (0x80 | 0x39) && ((V) & 0xfc) == 0x1c)
+#define PICO9918_UNLOCK_WRITE(R, V) \
+  ((R) == (0x80 | PICO9918_REG_UNLOCK) && ((V) & 0xfc) == PICO9918_R57_UNLOCK)
 #else
 #define PICO9918_UNLOCKED(T)        false
 #define PICO9918_UNLOCK_WRITE(R, V) false
@@ -432,24 +425,24 @@ PICO9918_INLINE_HOT bool pico9918_interrupt_status_impl(PICO9918_INST_ONLY_ARG);
 
 PICO9918_INLINE_HOT void pico9918_status_read_core(PICO9918_INST_ARG uint8_t readReg, uint8_t readVal)
 {
-  if (readReg == 0)
+  if (readReg == PICO9918_SR_STATUS)
   {
-    readVal &= (STATUS_INT | STATUS_5S | STATUS_COL);
+    readVal &= (PICO9918_SR0_INT | PICO9918_SR0_5S | PICO9918_SR0_COLLISION);
     tms9918->frameStatus &= ~readVal; // Clear only the flags that were set
-    if (readVal & STATUS_5S)          // Was 5th Sprite flag set?
+    if (readVal & PICO9918_SR0_5S)    // Was 5th Sprite flag set?
       tms9918->frameStatus |= 0x1f;   // Set sprite number to 31
-    TMS_STATUS(tms9918, 0) = tms9918->frameStatus;
-    if (readVal & STATUS_INT) // Was Interrupt flag set?
+    TMS_STATUS(tms9918, PICO9918_SR_STATUS) = tms9918->frameStatus;
+    if (readVal & PICO9918_SR0_INT) // Was Interrupt flag set?
     {
       tms9918->frameInt = false;
       PICO9918_HOST_SET_INT(false);
     }
   }
-  else if (readReg == 1)
+  else if (readReg == PICO9918_SR_IDENT)
   {
-    if (readVal & STATUS1_HF)
+    if (readVal & PICO9918_SR1_HF)
     {
-      TMS_STATUS(tms9918, 0x01) &= (uint8_t)~STATUS1_HF;
+      TMS_STATUS(tms9918, PICO9918_SR_IDENT) &= (uint8_t)~PICO9918_SR1_HF;
       /* the frame source may still be asserting, so re-derive rather than clearing */
       const bool stillInt = pico9918_interrupt_status_impl(PICO9918_INST_ONLY);
       if (stillInt != tms9918->frameInt)
@@ -506,7 +499,8 @@ PICO9918_INLINE uint8_t pico9918_read_status_impl(PICO9918_INST_ONLY_ARG)
   tms9918->regWriteStage = 0;
 
   tms9918->palWriteStage = 0;
-  TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= (uint8_t)~PICO9918_R47_DATA_PORT; // reset data port palette mode
+  TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &=
+    (uint8_t)~PICO9918_R47_DATA_PORT; // reset data port palette mode
 
   const uint8_t readReg = TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) & PICO9918_R15_STATUS_NUM;
   const uint8_t readVal = TMS_STATUS(tms9918, readReg);
@@ -519,7 +513,7 @@ PICO9918_INLINE uint8_t pico9918_read_status_impl(PICO9918_INST_ONLY_ARG)
 /** \brief read from the status register without resetting it */
 PICO9918_INLINE_HOT uint8_t pico9918_peek_status_impl(PICO9918_INST_ONLY_ARG)
 {
-  return TMS_STATUS(tms9918, 0);
+  return TMS_STATUS(tms9918, PICO9918_SR_STATUS);
 }
 
 /**
@@ -529,7 +523,8 @@ PICO9918_INLINE_HOT uint8_t pico9918_peek_status_impl(PICO9918_INST_ONLY_ARG)
  */
 PICO9918_INLINE_HOT void pico9918_write_data_impl(PICO9918_INST_ARG uint8_t data)
 {
-  if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) & PICO9918_R47_DATA_PORT) // data port is in palette mode
+  if (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &
+      PICO9918_R47_DATA_PORT) // data port is in palette mode
   {
     if (tms9918->palWriteStage == 0)
     {
@@ -603,16 +598,17 @@ PICO9918_INLINE_HOT uint8_t pico9918_read_data_no_inc_impl(PICO9918_INST_ONLY_AR
  */
 PICO9918_INLINE_HOT bool pico9918_interrupt_status_impl(PICO9918_INST_ONLY_ARG)
 {
-  return ((TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_INT_ENABLE) && (TMS_STATUS(tms9918, 0) & STATUS_INT)) ||
-         (PICO9918_UNLOCKED(tms9918) && (TMS_STATUS(tms9918, 1) & STATUS1_HF) &&
+  return ((TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_INT_ENABLE) &&
+          (TMS_STATUS(tms9918, PICO9918_SR_STATUS) & PICO9918_SR0_INT)) ||
+         (PICO9918_UNLOCKED(tms9918) && (TMS_STATUS(tms9918, PICO9918_SR_IDENT) & PICO9918_SR1_HF) &&
           (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_INT_SCANLINE));
 }
 
 /** \brief raise the interrupt flag in SR0 and the frame shadow */
 PICO9918_INLINE_HOT void pico9918_interrupt_set_impl(PICO9918_INST_ONLY_ARG)
 {
-  tms9918->frameStatus |= STATUS_INT;
-  TMS_STATUS(tms9918, 0) |= STATUS_INT;
+  tms9918->frameStatus |= PICO9918_SR0_INT;
+  TMS_STATUS(tms9918, PICO9918_SR_STATUS) |= PICO9918_SR0_INT;
 }
 
 /**
@@ -625,7 +621,7 @@ PICO9918_INLINE_HOT void pico9918_interrupt_set_impl(PICO9918_INST_ONLY_ARG)
 PICO9918_INLINE_HOT void pico9918_set_status_impl(PICO9918_INST_ARG uint8_t status)
 {
   tms9918->frameStatus   = status;
-  TMS_STATUS(tms9918, 0) = status;
+  TMS_STATUS(tms9918, PICO9918_SR_STATUS) = status;
 }
 
 /* Frame interrupt / status state accessors
@@ -808,7 +804,8 @@ PICO9918_INLINE uint16_t pico9918_frame_map_line_impl(PICO9918_INST_ARG uint16_t
                                                       bool interlaced, uint8_t fieldOrder)
 {
   uint16_t tmsY = y;
-  if (interlaced && (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS)) tmsY = y * 2 + (field ^ fieldOrder);
+  if (interlaced && (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS))
+    tmsY = y * 2 + (field ^ fieldOrder);
   return tmsY;
 }
 
@@ -888,5 +885,5 @@ PICO9918_INLINE bool pico9918_palette_dirty(PICO9918_INST_ONLY_ARG)
      last: a second instance in the same mode would otherwise draw the first one's colours */
   if (pico9918_palette_owner != tms9918) return true;
 #endif
-  return tms9918->palDirty || (TMS_STATUS(tms9918, 2) & 0x80);
+  return tms9918->palDirty || (TMS_STATUS(tms9918, PICO9918_SR_GPU) & 0x80);
 }

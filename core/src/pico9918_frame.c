@@ -87,9 +87,9 @@ void pico9918_frame_update_interrupts(PICO9918_INST_ARG uint8_t tempStatus)
 {
   PICO9918_HOST_ENTER_CRITICAL();
   uint8_t currentStatus = pico9918_frame_status_impl(PICO9918_INST_ONLY);
-  if ((currentStatus & STATUS_INT) == 0)
+  if ((currentStatus & PICO9918_SR0_INT) == 0)
   {
-    if (currentStatus & STATUS_5S)
+    if (currentStatus & PICO9918_SR0_5S)
     {
       // 5S already latched - preserve existing ID, OR in any new flags (INT, 5S, COL)
       currentStatus |= (tempStatus & 0xe0);
@@ -103,7 +103,7 @@ void pico9918_frame_update_interrupts(PICO9918_INST_ARG uint8_t tempStatus)
   {
     // F is set - only allow COL through (per F18A/TMS9918A: COL is not gated by F)
     // 5S is blocked while F is set (per datasheet)
-    currentStatus |= (tempStatus & STATUS_COL);
+    currentStatus |= (tempStatus & PICO9918_SR0_COLLISION);
   }
 
   pico9918_set_status_impl(PICO9918_INST currentStatus);
@@ -120,7 +120,7 @@ void pico9918_frame_porch(PICO9918_INST_ONLY_ARG)
 {
   tms9918->vram.map.blanking = 1;   // V
   tms9918->vram.map.scanline = 255; // F18A value for vsync
-  TMS_STATUS(tms9918, 0x03)  = 255;
+  TMS_STATUS(tms9918, PICO9918_SR_RASTER_LINE) = 255;
 }
 
 /**
@@ -134,7 +134,7 @@ void pico9918_frame_porch(PICO9918_INST_ONLY_ARG)
 void pico9918_frame_raise_end_of_frame_int(PICO9918_INST_ONLY_ARG)
 {
   pico9918_set_frame_done_int_impl(PICO9918_INST true);
-  TMS_STATUS(tms9918, 0x01) |= STATUS1_BLANK;
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT) |= PICO9918_SR1_BLANK;
   if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_GPU_VSYNC)
   {
     pico9918_gpu_trigger(PICO9918_INST_ONLY);
@@ -148,7 +148,7 @@ void pico9918_frame_raise_end_of_frame_int(PICO9918_INST_ONLY_ARG)
     pico9918_diag_config_updated(PICO9918_INST_ONLY);
   }
 
-  pico9918_frame_update_interrupts(PICO9918_INST STATUS_INT);
+  pico9918_frame_update_interrupts(PICO9918_INST PICO9918_SR0_INT);
 }
 
 /** \brief see the header. It takes no display line: the body never reads one. */
@@ -156,7 +156,7 @@ void pico9918_frame_end_of_scanline(PICO9918_INST_ONLY_ARG)
 {
   if (!pico9918_frame_done_int_impl(PICO9918_INST_ONLY))
   {
-    bool droppedFrame = pico9918_frame_status_impl(PICO9918_INST_ONLY) & STATUS_INT;
+    bool droppedFrame = pico9918_frame_status_impl(PICO9918_INST_ONLY) & PICO9918_SR0_INT;
     pico9918_dropped_frames_count += droppedFrame - dropped_frames[pico9918_frame_count & 0xf];
     dropped_frames[pico9918_frame_count & 0xf] = droppedFrame;
 
@@ -203,7 +203,7 @@ pico9918_frame_geometry_t pico9918_frame_geometry(PICO9918_INST_ARG pico9918_fra
   pico9918_v_scale   = display->vPixelScale;
   pico9918_v_virtual = display->vVirtualPixels;
 
-  int baseRows = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? 30 : 24;
+  int baseRows      = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) ? 30 : 24;
   pico9918_v_pixels = baseRows << 3;
   if (yScale > 1 && (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_DOUBLE_ROWS)) pico9918_v_pixels <<= 1;
   pico9918_v_border = (display->vVirtualPixels - pico9918_v_pixels) / 2;
@@ -230,7 +230,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
 {
   ++pico9918_frame_count;
 #if PICO9918_DIAG_GPU_FRAME_COUNTER
-  pico9918_gpu_frame_count += (TMS_STATUS(tms9918, 2) & 0x80) != 0;
+  pico9918_gpu_frame_count += (TMS_STATUS(tms9918, PICO9918_SR_GPU) & 0x80) != 0;
 #endif
 
   /* The slice is per scanline, so it moves with the line count and the refresh. */
@@ -244,7 +244,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
       tempAccum /= 64.0f;
       pico9918_diag_set_temperature(tempAccum);
       uint8_t t4              = (uint8_t)(tempAccum * 4.0f + 0.5f);
-      TMS_STATUS(tms9918, 13) = t4;
+      TMS_STATUS(tms9918, PICO9918_SR_TEMPERATURE) = t4;
       tempAccum               = 0.0f;
     }
   }
@@ -333,8 +333,9 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
      no room for one */
   const bool packedNibbles =
     pico9918_display_mode(PICO9918_INST_ONLY) == TMS_MODE_TEXT80 && lineBytes == TMS9918_PIXELS_X;
-  pico9918_border_bg = pico9918_palette_lut[(pico9918_reg_value(PICO9918_INST TMS_REG_FG_BG_COLOR) & 0x0f) |
-                                  (packedNibbles ? 0 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4)];
+  pico9918_border_bg = pico9918_palette_lut
+    [(pico9918_reg_value(PICO9918_INST TMS_REG_FG_BG_COLOR) & 0x0f) |
+     (packedNibbles ? 0 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4)];
 
   if (y == 0)
   {
@@ -354,7 +355,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
     if ((y >= pico9918_v_border_impl(PICO9918_INST_ONLY) + pico9918_v_pixels_impl(PICO9918_INST_ONLY)))
     {
       tms9918->vram.map.scanline = y - pico9918_v_border_impl(PICO9918_INST_ONLY);
-      TMS_STATUS(tms9918, 0x03)  = tms9918->vram.map.scanline;
+      TMS_STATUS(tms9918, PICO9918_SR_RASTER_LINE) = tms9918->vram.map.scanline;
     }
 
     if (PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY) &&
@@ -398,7 +399,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   y -= pico9918_v_border_impl(PICO9918_INST_ONLY);
   tms9918->vram.map.blanking = 0;
   tms9918->vram.map.scanline = y;
-  TMS_STATUS(tms9918, 0x03)  = y;
+  TMS_STATUS(tms9918, PICO9918_SR_RASTER_LINE) = y;
 
   /*** left border ***/
   PICO9918_FILL32_SET_COUNT(PICO9918_FILL_BORDER, halfHBorder);
@@ -424,14 +425,15 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   PICO9918_LINE_CAPTURE(y, pico9918_v_pixels_impl(PICO9918_INST_ONLY), lineBytes, lineSource);
 
   /*** F18A status register updates ***/
-  TMS_STATUS(tms9918, 0x01) &= (uint8_t)~STATUS1_BLANK;
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT) &= (uint8_t)~PICO9918_SR1_BLANK;
 
   /* The flag latches until the host reads SR1 - it is that read which acknowledges the
      interrupt. It does not touch SR0: the scanline interrupt is its own source, under
      R0's enable, and merging it into the frame flag would make it answer to R1's. */
-  if (tms9918->vram.map.scanline && (TMS_REGISTER(tms9918, PICO9918_REG_HORZ_INT_LINE) == tms9918->vram.map.scanline))
+  if (tms9918->vram.map.scanline &&
+      (TMS_REGISTER(tms9918, PICO9918_REG_HORZ_INT_LINE) == tms9918->vram.map.scanline))
   {
-    TMS_STATUS(tms9918, 0x01) |= STATUS1_HF;
+    TMS_STATUS(tms9918, PICO9918_SR_IDENT) |= PICO9918_SR1_HF;
   }
 
   if (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_GPU_HSYNC)

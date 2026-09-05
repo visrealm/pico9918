@@ -213,6 +213,42 @@ typedef enum
   PICO9918_REG_FLASH_CONTROL    = 63, /**< PICO9918 only: flash operation control */
 } pico9918_register_t;
 
+/**
+ * \brief the status registers, by number and by what each one reports
+ *
+ * Which one a status read returns is selected by the low four bits of R15, so all but
+ * the first need the F18A personality unlocked. The counters are pairs, low byte first.
+ */
+typedef enum
+{
+  PICO9918_SR_STATUS       = 0,  /**< the TMS9918A status: interrupt, 5th sprite, collision, sprite number */
+  PICO9918_SR_IDENT        = 1,  /**< chip identity, blanking, and the scanline interrupt flag */
+  PICO9918_SR_GPU          = 2,  /**< GPU running and its status byte */
+  PICO9918_SR_RASTER_LINE  = 3,  /**< the line currently being drawn */
+  PICO9918_SR_NANOS_LSB    = 4,  /**< nanosecond counter, low byte. Always 0 here: no 10ns source */
+  PICO9918_SR_NANOS_MSB    = 5,  /**< nanosecond counter, high bits. Always 0 here */
+  PICO9918_SR_MICROS_LSB   = 6,  /**< microsecond counter, low byte */
+  PICO9918_SR_MICROS_MSB   = 7,  /**< microsecond counter, high bits */
+  PICO9918_SR_MILLIS_LSB   = 8,  /**< millisecond counter, low byte */
+  PICO9918_SR_MILLIS_MSB   = 9,  /**< millisecond counter, high bits */
+  PICO9918_SR_SECONDS_LSB  = 10, /**< second counter, low byte */
+  PICO9918_SR_SECONDS_MSB  = 11, /**< second counter, high byte */
+  PICO9918_SR_CONFIG_VALUE = 12, /**< PICO9918 only: the configuration byte R58 selected */
+  PICO9918_SR_TEMPERATURE  = 13, /**< PICO9918 only: core temperature, as degrees C times four */
+  PICO9918_SR_VERSION      = 14, /**< the F18A feature level, as major and minor nibbles */
+  PICO9918_SR_REG_VALUE    = 15, /**< the register value latched when the VRAM address was set */
+} pico9918_status_register_t;
+
+/** \brief status register 0 bits. The low five are the sprite number */
+#define PICO9918_SR0_INT        0x80 /**< end of frame reached. Cleared by reading SR0 */
+#define PICO9918_SR0_5S         0x40 /**< more sprites on a line than the limit allows */
+#define PICO9918_SR0_COLLISION  0x20 /**< two sprites overlapped on an opaque pixel */
+#define PICO9918_SR0_SPRITE_NUM 0x1f /**< the fifth sprite's number, or the highest seen */
+
+/** \brief status register 1 bits. The high three are the chip identity */
+#define PICO9918_SR1_HF    0x01 /**< the line in R19 was reached. Cleared by reading SR1 */
+#define PICO9918_SR1_BLANK 0x02 /**< the raster is in blanking */
+
 /** \brief register 0 bits: mode selection and the external VDP input.
  * The three modes register 1 selects are 0 here, so a mode is the pair of writes. */
 #define TMS_R0_MODE_GRAPHICS_I  0x00 /**< Graphics I - no bit of its own in R0 */
@@ -245,10 +281,10 @@ typedef enum
    unlocked, R0's M4 included, and each mask names the field's position, not a value. */
 
 /** \brief register 24 bits: the sub-palette each layer takes */
-#define PICO9918_R24_SPRITE_PS     0x30 /**< sprite palette select */
-#define PICO9918_R24_TILE_PS       0x0f /**< tile palette select, layer 2 high and layer 1 low */
-#define PICO9918_R24_TILE2_PS      0x0c /**< tile layer 2 palette select */
-#define PICO9918_R24_TILE1_PS      0x03 /**< tile layer 1 palette select */
+#define PICO9918_R24_SPRITE_PS 0x30 /**< sprite palette select */
+#define PICO9918_R24_TILE_PS   0x0f /**< tile palette select, layer 2 high and layer 1 low */
+#define PICO9918_R24_TILE2_PS  0x0c /**< tile layer 2 palette select */
+#define PICO9918_R24_TILE1_PS  0x03 /**< tile layer 1 palette select */
 
 /** \brief register 29 fields: scroll page sizes, and the stride between ECM pattern planes */
 #define PICO9918_R29_SPRITE_STRIDE 0xc0 /**< sprite pattern plane stride, 0x800 >> n */
@@ -259,45 +295,45 @@ typedef enum
 #define PICO9918_R29_PAGE1_VERT    0x01 /**< tile layer 1 scrolls down two pages */
 
 /** \brief register 31 bits: the bitmap layer */
-#define PICO9918_R31_BML_ENABLE    0x80 /**< draw the bitmap layer */
-#define PICO9918_R31_BML_PRIORITY  0x40 /**< bitmap layer above the tile layers */
-#define PICO9918_R31_BML_TRANSP    0x20 /**< pixel value 0 is transparent */
-#define PICO9918_R31_BML_FAT       0x10 /**< two bits a pixel, drawn double width */
-#define PICO9918_R31_BML_PS        0x0f /**< bitmap layer palette select */
+#define PICO9918_R31_BML_ENABLE   0x80 /**< draw the bitmap layer */
+#define PICO9918_R31_BML_PRIORITY 0x40 /**< bitmap layer above the tile layers */
+#define PICO9918_R31_BML_TRANSP   0x20 /**< pixel value 0 is transparent */
+#define PICO9918_R31_BML_FAT      0x10 /**< two bits a pixel, drawn double width */
+#define PICO9918_R31_BML_PS       0x0f /**< bitmap layer palette select */
 
 /** \brief register 47 bits: the palette data port */
-#define PICO9918_R47_DATA_PORT     0x80 /**< route data port writes to palette RAM */
-#define PICO9918_R47_AUTO_INC      0x40 /**< step the palette index after each entry */
-#define PICO9918_R47_INDEX         0x3f /**< first palette index to write */
+#define PICO9918_R47_DATA_PORT 0x80 /**< route data port writes to palette RAM */
+#define PICO9918_R47_AUTO_INC  0x40 /**< step the palette index after each entry */
+#define PICO9918_R47_INDEX     0x3f /**< first palette index to write */
 
 /** \brief register 49 bits: tile layer 2, row count, and the enhanced colour modes */
-#define PICO9918_R49_TILE2_ENABLE  0x80 /**< draw tile layer 2 */
-#define PICO9918_R49_ROW30         0x40 /**< 30 rows of tiles rather than 24 */
-#define PICO9918_R49_ECM_TILE      0x30 /**< tile ECM level field */
-#define PICO9918_R49_ECM_TILE_1    0x10 /**< tiles take one bitplane, two colours */
-#define PICO9918_R49_ECM_TILE_2    0x20 /**< tiles take two bitplanes, four colours */
-#define PICO9918_R49_ECM_TILE_3    0x30 /**< tiles take three bitplanes, eight colours */
-#define PICO9918_R49_Y_REAL        0x08 /**< sprite Y is the real row, not row minus one */
-#define PICO9918_R49_ECM_SPRITE    0x03 /**< sprite ECM level field */
-#define PICO9918_R49_ECM_SPRITE_1  0x01 /**< sprites take one bitplane, two colours */
-#define PICO9918_R49_ECM_SPRITE_2  0x02 /**< sprites take two bitplanes, four colours */
-#define PICO9918_R49_ECM_SPRITE_3  0x03 /**< sprites take three bitplanes, eight colours */
+#define PICO9918_R49_TILE2_ENABLE 0x80 /**< draw tile layer 2 */
+#define PICO9918_R49_ROW30        0x40 /**< 30 rows of tiles rather than 24 */
+#define PICO9918_R49_ECM_TILE     0x30 /**< tile ECM level field */
+#define PICO9918_R49_ECM_TILE_1   0x10 /**< tiles take one bitplane, two colours */
+#define PICO9918_R49_ECM_TILE_2   0x20 /**< tiles take two bitplanes, four colours */
+#define PICO9918_R49_ECM_TILE_3   0x30 /**< tiles take three bitplanes, eight colours */
+#define PICO9918_R49_Y_REAL       0x08 /**< sprite Y is the real row, not row minus one */
+#define PICO9918_R49_ECM_SPRITE   0x03 /**< sprite ECM level field */
+#define PICO9918_R49_ECM_SPRITE_1 0x01 /**< sprites take one bitplane, two colours */
+#define PICO9918_R49_ECM_SPRITE_2 0x02 /**< sprites take two bitplanes, four colours */
+#define PICO9918_R49_ECM_SPRITE_3 0x03 /**< sprites take three bitplanes, eight colours */
 
 /** \brief register 50 bits: GPU triggers and the remaining layer controls */
-#define PICO9918_R50_RESET         0x80 /**< reset the VDP */
-#define PICO9918_R50_GPU_HSYNC     0x40 /**< trigger the GPU every scanline */
-#define PICO9918_R50_GPU_VSYNC     0x20 /**< trigger the GPU every frame */
-#define PICO9918_R50_TILE1_OFF     0x10 /**< stop drawing tile layer 1 */
-#define PICO9918_R50_REPORT_MAX    0x08 /**< S0's sprite number reports the highest seen */
-#define PICO9918_R50_VSCANLINES    0x04 /**< F18A only: dim every second raster line */
-#define PICO9918_R50_POS_ATTR      0x02 /**< tile attributes come per position, not per tile */
-#define PICO9918_R50_T2_PRIORITY   0x01 /**< tile layer 2 above tile layer 1 */
+#define PICO9918_R50_RESET       0x80 /**< reset the VDP */
+#define PICO9918_R50_GPU_HSYNC   0x40 /**< trigger the GPU every scanline */
+#define PICO9918_R50_GPU_VSYNC   0x20 /**< trigger the GPU every frame */
+#define PICO9918_R50_TILE1_OFF   0x10 /**< stop drawing tile layer 1 */
+#define PICO9918_R50_REPORT_MAX  0x08 /**< S0's sprite number reports the highest seen */
+#define PICO9918_R50_VSCANLINES  0x04 /**< F18A only: dim every second raster line */
+#define PICO9918_R50_POS_ATTR    0x02 /**< tile attributes come per position, not per tile */
+#define PICO9918_R50_T2_PRIORITY 0x01 /**< tile layer 2 above tile layer 1 */
 
 /** \brief register 56 bit: the GPU trigger */
-#define PICO9918_R56_GPU_RUN       0x01 /**< 1 starts the GPU, 0 loads the PC without starting */
+#define PICO9918_R56_GPU_RUN 0x01 /**< 1 starts the GPU, 0 loads the PC without starting */
 
 /** \brief the value register 57 takes, twice in a row, to unlock */
-#define PICO9918_R57_UNLOCK        0x1c /**< two consecutive writes unlock the F18A personality */
+#define PICO9918_R57_UNLOCK 0x1c /**< two consecutive writes unlock the F18A personality */
 
 /** \brief register 15 bits: the counter controls, and which status register S1 reads */
 #define PICO9918_R15_COUNTER_RESET 0x40 /**< reset the frame/scanline counters */

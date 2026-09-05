@@ -282,7 +282,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
   restart:
 #endif
     TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 1;
-    TMS_STATUS(tms9918, 2) |= 0x80; /* Running */
+    TMS_STATUS(tms9918, PICO9918_SR_GPU) |= 0x80; /* Running */
 
 #ifdef PICO_BUILD
 #if PICO_RP2040
@@ -298,7 +298,8 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
                                 &outOfBudget);
 #else
     (void)budget;
-    lastAddress = run9900(tms9918->vram.bytes, lastAddress, 0xFFFE, &TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL));
+    lastAddress =
+      run9900(tms9918->vram.bytes, lastAddress, 0xFFFE, &TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL));
 #endif
 
 #ifdef PICO_BUILD
@@ -334,7 +335,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
      have, including for a program parked on a self-jump. */
   if (running) return true;
 
-  TMS_STATUS(tms9918, 2) &= ~0x80; /* Stopped */
+  TMS_STATUS(tms9918, PICO9918_SR_GPU) &= ~0x80; /* Stopped */
   TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 0;
   return false;
 }
