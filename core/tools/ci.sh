@@ -24,7 +24,7 @@
 #   gpu       the library-paced GPU, and the arming write it runs a program on
 #   gpucore   the GPU's TMS9900, instruction by instruction, on the portable core
 #   warnings  -Wall -Wextra -Werror
-#   comments  a comment inside a function body gets one line, a table, or a tag
+#   comments  in a function body: one line, a table or a tag, and a blank line above
 #   doxygen   the docs build, and what it still reports
 #   package   install, then find_package it from a separate project and run it
 #   multi     the library and the consumer, instance threaded through every signature
@@ -156,8 +156,10 @@ warnings() {
   echo "no warnings"
 }
 
-# Comment discipline, as a gate rather than a habit. See tools/comment_check.py for
-# the rule and the two ways out of it.
+# Comment discipline, as a gate rather than a habit. See tools/comment_check.py for the
+# two rules and what each of them exempts. The blank-line half is here because
+# clang-format cannot express it: the only blank lines it inserts are around C++ access
+# specifiers and between definition blocks.
 comments() {
   "$PY" "$LIBROOT/tools/comment_check.py" "$LIBROOT"
 }

@@ -287,6 +287,7 @@ void pico9918_diag_set_frame_rate(float frameRateHz)
 void pico9918_diag_update(PICO9918_INST_ARG uint32_t frameCount)
 {
   const uint32_t framesPerUpdate = 1 << 2;
+
   /* read off the count, so a panel's phase cannot depend on which others are enabled */
   const uint32_t phase = frameCount & (framesPerUpdate - 1);
   if (tms9918->config[PICO9918_CONF_DIAG_PERFORMANCE])
@@ -294,6 +295,7 @@ void pico9918_diag_update(PICO9918_INST_ARG uint32_t frameCount)
     if (phase == 0)
     {
       flt2Str((float)(accumulatedFrameTime / framesPerUpdate) / 1000.0f, 3, &frameTimeStr);
+
       /* samples are whole microseconds, but their average resolves far finer */
       if (accumulatedScanlines)
       {
@@ -589,6 +591,7 @@ static void renderPalette(PICO9918_INST_ARG int y, uint32_t vVirtualPixels, PICO
         uint32_t color = tms9918->vram.map.pram[palette * 16 + c] & 0xFF0F;
         color |= (color & 0xf000) >> 8;
         color &= 0xfff;
+
         /* two 16-bit pixels per 32-bit store, so 15 stores cover the 30-pixel swatch */
         color |= color << 16;
         uint32_t* pix32 = (uint32_t*)pixels;

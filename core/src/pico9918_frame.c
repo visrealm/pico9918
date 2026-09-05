@@ -139,6 +139,7 @@ void pico9918_frame_raise_end_of_frame_int(PICO9918_INST_ONLY_ARG)
   if (tms9918->configDirty)
   {
     tms9918->configDirty = false;
+
     /* invokes the config-applied callback, which owns the VGA-side write */
     pico9918_config_apply(PICO9918_INST_ONLY);
     pico9918_diag_config_updated(PICO9918_INST_ONLY);

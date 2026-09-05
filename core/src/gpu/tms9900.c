@@ -234,6 +234,7 @@ static inline uint16_t add16(Tms9900Cpu* cpu, uint16_t a, uint16_t b)
   uint16_t r16 = (uint16_t)res;
   cpu->st &= 0x06; /* preserve only parity bit; clear LGT/AGT/EQ/OV/C */
   if (res & 0x10000) cpu->st |= TMS_ST_C;
+
   /* overflow: sign(a)==sign(b) and sign differs from result */
   if (((a ^ b) & 0x8000) == 0 && ((a ^ r16) & 0x8000)) cpu->st |= TMS_ST_OV;
   set_flags_word(cpu, r16);
@@ -245,8 +246,10 @@ static inline uint16_t sub16(Tms9900Cpu* cpu, uint16_t a, uint16_t b)
   uint32_t res = (uint32_t)a - (uint32_t)b;
   uint16_t r16 = (uint16_t)res;
   cpu->st &= 0x06;
+
   /* Assembly "borrow NOT" convention: carry=1 means no borrow (src==0 or dst>=result) */
   if (b == 0 || a >= r16) cpu->st |= TMS_ST_C;
+
   /* overflow: sign(a)!=sign(b) and sign differs from result */
   if (((a ^ b) & 0x8000) && ((a ^ r16) & 0x8000)) cpu->st |= TMS_ST_OV;
   set_flags_word(cpu, r16);
@@ -269,6 +272,7 @@ static inline uint8_t sub8(Tms9900Cpu* cpu, uint8_t a, uint8_t b)
   uint16_t res = (uint16_t)a - (uint16_t)b;
   uint8_t r8   = (uint8_t)res;
   cpu->st &= 0x06;
+
   /* Assembly "borrow NOT" convention: carry=1 means no borrow (src==0 or dst>=result) */
   if (b == 0 || a >= r8) cpu->st |= TMS_ST_C;
   if (((a ^ b) & 0x80) && ((a ^ r8) & 0x80)) cpu->st |= TMS_ST_OV;
@@ -312,6 +316,7 @@ static inline uint16_t slx16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
   if (count == 0) count = 16;
   uint32_t vv          = (uint32_t)v;
   uint32_t mask_change = 0;
+
   /* detect overflow like assembly: if sign changes during shift */
   for (uint8_t i = 0; i < count; ++i)
   {
@@ -367,6 +372,7 @@ static inline uint16_t src16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
   /* Assembly: MOVS R4,#0x0E; ANDS R1,R4 - keeps OV/P/bit1, clears C */
   cpu->st &= 0x0E;
   if (count == 0) count = 16;
+
   /* Assembly: ORRS R0 = (v<<16)|v, then RORS by count. 32-bit avoids shift-by-16 UB */
   uint32_t vv    = v;
   uint16_t r     = (uint16_t)((vv >> count) | (vv << (16u - count)));
@@ -385,6 +391,7 @@ static inline uint16_t slc16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
   uint32_t vv  = v;
   uint32_t rot = (vv << count) | (vv >> (16 - count));
   uint16_t r   = (uint16_t)rot;
+
   /* Carry = bit just before wrap (count-1) */
   uint16_t carry = (uint16_t)((vv << (count - 1)) & 0x8000u);
   if (carry) cpu->st |= TMS_ST_C;
@@ -512,11 +519,13 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
     uint16_t old_pc = cpu->pc;
     uint16_t old_st = cpu->st;
     cpu->wp         = new_wp;
+
     /* new workspace is always in normal address space (not overflow) */
     wr16(cpu->mem, (uint16_t)(new_wp + 26), old_wp);
     wr16(cpu->mem, (uint16_t)(new_wp + 28), old_pc);
     wr16(cpu->mem, (uint16_t)(new_wp + 30), (uint16_t)old_st << 8); /* ST→high byte, low byte=0 */
     cpu->pc = (uint16_t)((cpu->mem[src_addr + 2] << 8) | cpu->mem[src_addr + 3]) & 0xFFFE;
+
     /* Assembly does NOT clear ST - new context inherits caller's flags */
     break;
   }
@@ -531,6 +540,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   {
     Operand s       = decode_operand(cpu, inst & 0x3F, 0);
     uint16_t x_inst = (s.mode == 0) ? s.val : rd16(cpu->mem, s.addr);
+
     /* Dispatch the fetched instruction (PC is NOT advanced by X itself) */
     uint8_t x_hi = (uint8_t)(x_inst >> 8);
     if (x_hi >= 0x40)
@@ -640,6 +650,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   {
     Operand d  = decode_operand(cpu, inst & 0x3F, 0);
     int16_t sv = (int16_t)d.val;
+
     /* Assembly: ST &= 0x06 (clears C and OV, keeps only P/bit1) */
     cpu->st &= 0x06;
     if (d.val == 0x8000u)
@@ -681,6 +692,7 @@ static inline int handle_branch_group(Tms9900Cpu* cpu, uint16_t inst)
   switch (cond)
   {
   case 0x0: /* JMP - unconditional */
+
     /* Assembly: self-jump (disp==-2, i.e. JMP $) treated as IDLE - exit emulation */
     if (disp == -2)
     {
@@ -725,6 +737,7 @@ static inline int handle_branch_group(Tms9900Cpu* cpu, uint16_t inst)
   case 0xC: /* JOP - parity */
     if (cpu->st & TMS_ST_P) cpu->pc = (cpu->pc + disp) & 0xFFFF;
     break;
+
   /* 0xD=SBO, 0xE=SBZ: CRU ops, NOP */
   case 0xF: /* TB - CRU test, clears EQ */ cpu->st &= ~TMS_ST_EQ; break;
   default: break;
@@ -772,6 +785,7 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
 {
   /* Bits 13:10 identify the instruction group (0x2000>>10=8, 0x2400>>10=9, etc.) */
   uint8_t opcode = (uint8_t)((inst >> 10) & 0xF);
+
   /* Dest register in bits 9:6, source operand in bits 5:0 */
   uint8_t dreg = (inst >> 6) & 0xF;
   Operand src  = decode_operand(cpu, inst & 0x3F, 0);
@@ -931,6 +945,7 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
     }
     else
     { /* RET - read PC from R15+2 (OLD R15), then post-increment R15 by 2 */
+
       /* Assembly: ADD R4,R8; LDR R5,[R4,#2]; ... R15 += 2 */
       uint16_t sp = get_reg(cpu, 15) & 0xFFFE;
       cpu->pc     = rd16(cpu->mem, (uint16_t)(sp + 2)) & 0xFFFE;

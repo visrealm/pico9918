@@ -833,6 +833,7 @@ static uint32_t __time_critical_func(collectSpriteRows)(PICO9918_INST_ARG uint16
   const uint32_t unlockedMask = -(uint32_t)PICO9918_UNLOCKED(tms9918);
   const uint32_t row30Mode =
     (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ROW30) & unlockedMask;
+
   /* the wrap threshold and the row both carry the YPOS -1 offset, so the walk stays in raw YPOS */
   const int32_t realY = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_Y_REAL) ? 0 : 1;
   const int32_t maxY  = (row30Mode ? 0xf0 : 0xe0) - realY;
@@ -894,6 +895,7 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   const uint8_t spriteSizePx       = spriteSize << spriteMag;
   const uint16_t spritePatternAddr = tmsSpritePatternTableAddr(tms9918);
   uint32_t spritesShown            = 0;
+
   /* the sprite-number field reads zero unless a fifth sprite latches one in */
   uint8_t tempStatus               = 0;
   uint32_t transparentCount        = 0;
@@ -1256,6 +1258,7 @@ static inline void tileRowAddr(PICO9918_INST_ARG const uint16_t y, const uint16_
   const uint8_t pattRow = mcm ? (((rawY >> 2) & 0x01) + ((rawY >> 3) & 0x03) * 2) : (y & 0x07);
 
   addr->nameMask = 0xff;
+
   /* Multicolor's pattern address never reads the scrolled row, so Y flip is inert there */
   addr->flipY = mcm ? 0 : (7 - 2 * pattRow);
 
@@ -1403,6 +1406,7 @@ static inline void tileLayerAddr(PICO9918_INST_ARG const uint16_t rawY, const Ti
     if (virtY >= maxY)
     {
       virtY -= maxY;
+
       /* a text row's address carries no page bit, so the size bit does nothing there */
       swapYPage = !textMode && (TMS_REGISTER(tms9918, PICO9918_REG_PAGE_SIZE) & config->yPageSwapMask);
     }
@@ -1491,6 +1495,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
   const uint32_t nameAttrMask = (ecm && !colorStride) ? 0xff : 0;
   const uint32_t spritePriMask = tms9918->scanlineHasSprites ? 0x80 : 0;
   const uint32_t spritePriForced = (isTile2 && alwaysOnTop) ? spritePriMask : 0;
+
   /* the row masks are uint32_t too, so a store through one forces this reload unless it is held */
   const uint32_t clear = transparentPixels[0];
   const int32_t flipY  = addr->flipY;
@@ -2417,6 +2422,7 @@ static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG ui
   if (text)
   {
     const uint8_t fixed = (tmsMainFgColor(tms9918) << 4) | tmsMainBgColor(tms9918);
+
     /* ECM1-3 takes the attribute table by name; only ECM0 has an fg/bg pair to fall back on */
     const uint8_t* colors = (attrPerPos || ecm) ? tms9918->vram.bytes + colorTableAddr : &fixed;
     uint8_t* dest         = (config->isTile2 ? tms9918->tileLayer2Buffer : tms9918->tileLayer1Buffer) +
@@ -2759,6 +2765,7 @@ compositeAlignedBody(PICO9918_INST_ARG uint8_t pixels[TMS9918_PIXELS_X], const i
   for (uint32_t maskWord = 0; maskWord < maskWords; maskWord++)
   {
     uint32_t mask = selectionMask[maskWord];
+
     /* a priority bitmap layer wins over T1 only - T2 still draws over it */
     uint32_t spriteMask = spriteGridWord(maskWord, rowMasks.rowSpriteBits, wide) |
                           (spriteGridWord(maskWord, rowMasks.rowBits, wide) & ~mask);

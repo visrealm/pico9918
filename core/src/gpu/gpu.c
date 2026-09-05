@@ -410,6 +410,7 @@ bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions)
     uint32_t gpuStart = PICO9918_HOST_TIME_US();
     running           = volatileHack(PICO9918_INST instructions);
     gpuTimeUs += PICO9918_HOST_TIME_US() - gpuStart;
+
     /* volatileHack clears it on the way in, so put it back for the next slice */
     if (running) tms9918->restart = 1;
   }
