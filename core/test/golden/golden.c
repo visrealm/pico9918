@@ -2615,10 +2615,10 @@ static const char* frCurrentLabel = "";
 /* The row payload: every value either behaviour produces, in a fixed layout, so
  * one digest covers the whole row and a mismatch is localised by rescanning.
  *
- * Slots 0..8 are the mapping and geometry groups; 9..11 are the interrupt group.
+ * Slots 0..8 are the mapping and geometry groups; 9..12 are the interrupt group.
  * Each group fills only its own slots and leaves the rest zero, so a divergence
  * report points at a value that group actually produced. */
-#define FRAME_ROW_VALUES 12
+#define FRAME_ROW_VALUES 13
 
 typedef struct
 {
@@ -2626,12 +2626,10 @@ typedef struct
 } FrameRow;
 
 static const char* const frameFieldName[FRAME_ROW_VALUES] = {
-  "mappedLine", "vPixelScale", "vVirtualPixels", "vPixels",
-  "vBorder", "triggerScanline", "paramsVPixelScale", "paramsVVirtualPixels",
-  "activeLines",
+  "mappedLine", "vPixelScale", "vVirtualPixels", "vPixels", "vBorder", "triggerScanline", "paramsVPixelScale",
+  "paramsVVirtualPixels", "activeLines",
   /* interrupt group */
-  "frameStatusShadow", "sr0Register", "intPin"
-};
+  "frameStatusShadow", "sr0Register", "intPin", "sr1Register"};
 
 static void frameEmitRow(const FrameRow* cand, const FrameRow* ref)
 {
@@ -2873,8 +2871,12 @@ static void frameGeomGroup(void)
  *                               is not gated by F, but 5S is blocked while F is set and
  *                               the ID must not move
  *
- * /INT is asserted exactly when R1's interrupt-enable bit AND SR0's F are both set, so
- * R1 is a second input and every case is run in both R1 states.
+ * /INT has TWO sources, ORed: the frame source, R1's interrupt-enable bit AND SR0's F;
+ * and the scanline source, R0 bit 4 AND SR1's HF, on an unlocked device only. R1 gates
+ * the first and not the second, which is the whole point of the split - a program using
+ * only the scanline interrupt runs with R1's enable off, and folding the two together
+ * leaves it never interrupting at all. So R1 is a second input to every case, and R0,
+ * SR1 and the lock state are three more.
  *
  * Two things would silently void the coverage:
  *
@@ -2900,6 +2902,11 @@ static void frameGeomGroup(void)
 #define FRAME_SR0_5S  0x40  /* fifth sprite */
 #define FRAME_SR0_COL 0x20  /* sprite collision */
 #define FRAME_SR0_ID  0x1f  /* fifth-sprite number, low five bits */
+
+/* The scanline source's own two bits, restated for the same reason.
+ * TMS_R0_INT_SCANLINE and PICO9918_SR1_HF spell them the same. */
+#define FRAME_R0_INT_SCANLINE 0x10
+#define FRAME_SR1_HF          0x01
 
 /* Independent reference for the merge.
  *
@@ -2950,41 +2957,59 @@ static uint8_t refMergeStatus(uint8_t currentStatus, uint8_t tempStatus)
 
 /* Independent reference for the pin.
  *
- * The library asks it as one fused `&&` over two masked register reads. Here the
- * two conditions are separate named predicates over separate inputs, so a defect
- * that drops one of them, or that reads the pre-merge status instead of the merged
- * one, diverges. */
-static bool refIntPin(uint8_t mergedStatus, uint8_t reg1)
+ * The library asks it as two fused `&&` terms over masked register reads, ORed. Here
+ * every condition is a separate named predicate over a separate input, so a defect that
+ * drops one of them, that reads the pre-merge status instead of the merged one, or that
+ * puts the scanline source behind R1's enable, diverges. Written as the two sources the
+ * F18A documents rather than as one expression, because their gating differs and that
+ * difference is the behaviour being pinned. */
+static bool refIntPin(uint8_t mergedStatus, uint8_t reg1, uint8_t reg0, uint8_t sr1, bool unlocked)
 {
-  const bool interruptsEnabled = (reg1 & FRAME_R1_INT_ENABLE) != 0;
+  const bool frameEnabled     = (reg1 & FRAME_R1_INT_ENABLE) != 0;
   const bool frameFlagLatched = (mergedStatus & FRAME_SR0_F) != 0;
-  return interruptsEnabled && frameFlagLatched;
+
+  const bool scanlineEnabled     = (reg0 & FRAME_R0_INT_SCANLINE) != 0;
+  const bool scanlineFlagLatched = (sr1 & FRAME_SR1_HF) != 0;
+
+  /* the scanline source is the F18A's own, so a locked device has only one source */
+  return (frameEnabled && frameFlagLatched) || (unlocked && scanlineEnabled && scanlineFlagLatched);
 }
 
 /* Force the /INT pin (tms9918->frameInt) to `want` WITHOUT calling the function
  * under test.
  *
  * The only writer of frameInt other than that function is
- * pico9918_frame_sync_int_impl, which drives the pin to `R1_INT_ENABLE && F`. So
- * a temporary R1/SR0 pairing that computes to `want` is installed, the sync is run,
+ * pico9918_frame_sync_int_impl, which drives the pin to the OR of both sources. So
+ * a temporary R1/SR0 pairing that computes to `want` is installed, the scanline source
+ * is silenced so it cannot hold the pin up against a `want` of false, the sync is run,
  * and the caller then writes the row's real precondition over the top - which,
  * having no reconcile hook, leaves the pin where this left it. */
 static void frameIntSetup(bool want)
 {
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT) &= (uint8_t)~FRAME_SR1_HF;
+  TMS_REGISTER(tms9918, TMS_REG_0) &= (uint8_t)~FRAME_R0_INT_SCANLINE;
   TMS_REGISTER(tms9918, TMS_REG_1) = want ? FRAME_R1_INT_ENABLE : 0x00;
   pico9918_set_status_impl(want ? FRAME_SR0_F : 0x00);
   pico9918_frame_sync_int_impl();
 }
 
-/* One row: install the precondition, call the library, digest the consequences. */
-static void frameIntCase(const char* label, uint8_t currentStatus,
-                         uint8_t tempStatus, uint8_t reg1, bool intPinPre)
+/* One row: install the precondition, call the library, digest the consequences.
+ *
+ * The lock state is written as the field rather than run as the VR57 sequence: that
+ * sequence goes through the bus, whose post-write reconcile re-syncs the pin and would
+ * destroy the pre-state the row exists to test. Every other input here is installed
+ * directly for the same reason. */
+static void frameIntCase(const char* label, uint8_t currentStatus, uint8_t tempStatus, uint8_t reg1,
+                         bool intPinPre, uint8_t reg0, uint8_t sr1, bool unlocked)
 {
   frCurrentLabel = label;
 
   /* ---- precondition ---- */
   frameIntSetup(intPinPre);                     /* the pin's pre-state */
-  TMS_REGISTER(tms9918, TMS_REG_1) = reg1;      /* R1, the second input */
+  TMS_REGISTER(tms9918, TMS_REG_1)       = reg1; /* R1, the frame source's enable */
+  TMS_REGISTER(tms9918, TMS_REG_0)       = reg0; /* R0, the scanline source's enable */
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT) = sr1;  /* SR1, the scanline source's flag */
+  tms9918->isUnlocked                    = unlocked;
   pico9918_set_status_impl(currentStatus);     /* the SR0 latch, both copies */
 
   /* ---- the behaviour under test ---- */
@@ -2995,11 +3020,15 @@ static void frameIntCase(const char* label, uint8_t currentStatus,
   cand.v[9]  = pico9918_frame_status_impl();   /* merged SR0, the frame shadow */
   cand.v[10] = TMS_STATUS(tms9918, 0);          /* merged SR0, the register copy */
   cand.v[11] = pico9918_frame_int_impl();      /* the LATCHED /INT pin */
+  cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
 
   const uint8_t expected = refMergeStatus(currentStatus, tempStatus);
-  ref.v[9]  = expected;
-  ref.v[10] = expected;
-  ref.v[11] = refIntPin(expected, reg1);
+  ref.v[9]               = expected;
+  ref.v[10]              = expected;
+  ref.v[11]              = refIntPin(expected, reg1, reg0, sr1, unlocked);
+
+  /* the merge owns SR0 and must not touch SR1: the scanline flag is the read path's */
+  ref.v[12] = sr1;
 
   frameEmitRow(&cand, &ref);
 }
@@ -3034,10 +3063,81 @@ static void frameIntQuad(const char* label, uint8_t currentStatus, uint8_t tempS
       }
       char* stored = frIntLabels[frameRowCount];
       snprintf(stored, sizeof(frIntLabels[0]), "%s-r1%d-pin%d", label, r1, pre);
-      frameIntCase(stored, currentStatus, tempStatus,
-                   (uint8_t)(r1 ? FRAME_R1_INT_ENABLE : 0x00), pre != 0);
+
+      /* unlocked with the scanline source ARMED but unflagged, so every row of the
+         merge group also pins that an armed second source contributes nothing */
+      frameIntCase(stored, currentStatus, tempStatus, (uint8_t)(r1 ? FRAME_R1_INT_ENABLE : 0x00), pre != 0,
+                   FRAME_R0_INT_SCANLINE, 0x00, true);
     }
   }
+}
+
+/* One scanline-source case in both pin pre-states.
+ *
+ * A pair rather than a quad: what varies across this group is the second source's own
+ * three inputs, so R1 and the SR0 latch are given per case rather than swept. Both pin
+ * pre-states still run, for the same reason the merge quads do - it is what makes a
+ * missing sync visible in whichever direction the row moves the pin. */
+static void frameHIntPair(const char* label, uint8_t currentStatus, uint8_t tempStatus, uint8_t reg1,
+                          uint8_t reg0, uint8_t sr1, bool unlocked)
+{
+  for (int pre = 0; pre < 2; ++pre)
+  {
+    if (frameRowCount >= FRAME_MAX_ROWS)
+    {
+      printf("[ERROR] frame: row budget %d exhausted - raise FRAME_MAX_ROWS\n", FRAME_MAX_ROWS);
+      exit(2);
+    }
+
+    char* stored = frIntLabels[frameRowCount];
+    snprintf(stored, sizeof(frIntLabels[0]), "%s-pin%d", label, pre);
+    frameIntCase(stored, currentStatus, tempStatus, reg1, pre != 0, reg0, sr1, unlocked);
+  }
+}
+
+/* One row for the read path, which is a different function: pico9918_read_status.
+ *
+ * Reading SR1 clears HF, and the pin is then RE-DERIVED rather than cleared - a frame
+ * source that is still asserting has to keep it down. Without the clear a latched HF
+ * would hold /INT asserted forever and an ISR that acknowledged would re-enter at once;
+ * without the re-derive, acknowledging a scanline interrupt would drop a frame one the
+ * host had not seen.
+ *
+ * The pin is forced HIGH first, through the R1/SR0 pairing frameIntSetup uses, and the
+ * row's real inputs are written over the top - so the pre-state owes nothing to the
+ * scanline source it is about to withdraw. */
+static void frameHIntReadCase(const char* label, uint8_t currentStatus, uint8_t reg1)
+{
+  frCurrentLabel = label;
+
+  /* ---- precondition: armed, flagged, and the pin already down ---- */
+  frameIntSetup(true);
+  TMS_REGISTER(tms9918, TMS_REG_1)                  = reg1;
+  TMS_REGISTER(tms9918, TMS_REG_0)                  = FRAME_R0_INT_SCANLINE;
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT)            = FRAME_SR1_HF;
+  TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) = PICO9918_SR_IDENT;
+  tms9918->isUnlocked                               = true;
+  pico9918_set_status_impl(currentStatus);
+
+  /* ---- the behaviour under test ---- */
+  const uint8_t got = pico9918_read_status();
+
+  /* ---- the observable consequences ---- */
+  FrameRow cand = {{0}}, ref = {{0}};
+  cand.v[9]  = got;
+  cand.v[10] = TMS_STATUS(tms9918, 0);
+  cand.v[11] = pico9918_frame_int_impl();
+  cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
+
+  /* the CPU sees the flag it is acknowledging, and SR0 is not the register read */
+  ref.v[9]  = FRAME_SR1_HF;
+  ref.v[10] = currentStatus;
+
+  const uint8_t sr1After = (uint8_t)(FRAME_SR1_HF & ~FRAME_SR1_HF);
+  ref.v[11]              = refIntPin(currentStatus, reg1, FRAME_R0_INT_SCANLINE, sr1After, true);
+  ref.v[12]              = sr1After;
+
+  frameEmitRow(&cand, &ref);
 }
 
 static void frameIntGroup(void)
@@ -3105,6 +3205,44 @@ static void frameIntGroup(void)
    * Any defect in the pin decision therefore has nowhere to hide behind a moving
    * status byte. */
   frameIntQuad("int-pin-only", 0x80, 0x00);
+
+  /* ---- the scanline source, which is not the frame source ----
+   *
+   * The escape this sub-group exists for: the scanline interrupt was routed through
+   * SR0's F under R1's enable, so a program that enabled only the scanline interrupt -
+   * R1's enable OFF, which is exactly what such a program does - never interrupted.
+   *
+   * THE case: armed and flagged with the frame source entirely off. The pin must
+   * assert, and R1 being clear is what makes it discriminating. */
+  frameHIntPair("hint-alone", 0x00, 0x00, 0x00, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, true);
+
+  /* the same row with one of the three inputs withdrawn, everything else identical.
+   * The pin must stay low in all three, so none of them can be the one dropped. */
+  frameHIntPair("hint-locked", 0x00, 0x00, 0x00, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, false);
+  frameHIntPair("hint-disarmed", 0x00, 0x00, 0x00, 0x00, FRAME_SR1_HF, true);
+  frameHIntPair("hint-noflag", 0x00, 0x00, 0x00, FRAME_R0_INT_SCANLINE, 0x00, true);
+
+  /* F latched AND R1 off: the frame source is gated off, so the pin can only be the
+   * scanline source's. A fix that put the second source behind R1 as well reads LOW. */
+  frameHIntPair("hint-f-latched-r1off", FRAME_SR0_F, 0x00, 0x00, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, true);
+
+  /* both sources asserting at once, and the merge raising more flags on top. SR1 is
+   * digested on every row, so a merge that clears HF while writing SR0 diverges. */
+  frameHIntPair("hint-both", FRAME_SR0_F, 0xc5, FRAME_R1_INT_ENABLE, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF,
+                true);
+
+  /* the converse: armed but unflagged, the frame source alone raises the pin, so
+   * arming the second source cannot be what suppresses the first. */
+  frameHIntPair("hint-frame-only", 0x00, FRAME_SR0_F, FRAME_R1_INT_ENABLE, FRAME_R0_INT_SCANLINE, 0x00, true);
+
+  /* ---- the read path releases it ----
+   *
+   * The discriminating pair. With no frame source the pin must FALL; with one still
+   * asserting it must STAY, which is the difference between re-deriving the pin and
+   * clearing it. LAST, because these are the only rows that call the read path and
+   * they leave R15 selecting SR1. */
+  frameHIntReadCase("hread-releases", 0x00, 0x00);
+  frameHIntReadCase("hread-frame-holds", FRAME_SR0_F, FRAME_R1_INT_ENABLE);
 }
 
 /* ---- frame artifact I/O ---------------------------------------------------- */
