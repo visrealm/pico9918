@@ -34,8 +34,11 @@
 #include "pico/stdlib.h"
 
 /** \brief GPU config-action callback: the GPU loop clears the requesting key and passes it here */
-static void configActionCallback(uint8_t* config, uint8_t key)
+static void configActionCallback(pico9918_t* tms9918, uint8_t* config, uint8_t key, void* userdata)
 {
+  (void)tms9918;
+  (void)userdata;
+
   switch (key)
   {
     case PICO9918_CONF_SAVE_TO_FLASH: // normal save: changed display fields go to pending
@@ -124,11 +127,11 @@ int __in_flash_func(main)(void)
 
   /* after vgaInit: the hook writes vgaCurrentParams(), and it must be in place
      before core 1 starts consuming configDirty */
-  pico9918_config_set_applied_callback(applyConfigHostEffects);
+  pico9918_config_set_applied_callback(applyConfigHostEffects, NULL);
 
   /* the late config reload the frame module asks for when the display comes up
      after the startup diagnostics screen. Flash I/O, so it stays host-side. */
-  pico9918_frame_set_config_reload_callback(reloadStoredConfig);
+  pico9918_frame_set_config_reload_callback(reloadStoredConfig, NULL);
 
   initTemperature();
 
@@ -154,8 +157,8 @@ int __in_flash_func(main)(void)
   multicore_fifo_push_blocking(0);
 
   pico9918_gpu_init();
-  pico9918_gpu_set_flash_callback(flashSector);
-  pico9918_gpu_set_config_save_callback(configActionCallback);
+  pico9918_gpu_set_flash_callback(flashSector, NULL);
+  pico9918_gpu_set_config_save_callback(configActionCallback, NULL);
 
   pico9918_gpu_loop();
 

@@ -321,6 +321,35 @@ struct pico9918_s
   bool frameInt;       /* current /INT pin state (true = asserted) */
   uint8_t frameStatus; /* SR0 shadow - the latch the frame path merges into */
   bool frameDoneInt;   /* interrupt already raised this frame? */
+
+#if !PICO9918_SINGLE_INSTANCE
+  /* The integration layer's host callbacks, per instance. Absent from the single-instance
+     struct entirely: that build keeps them in file statics, so a board's layout is what it
+     was and the MPU guard's offset assertion above still holds. */
+  struct
+  {
+    pico9918_config_applied_fn fn;
+    void* userdata;
+  } configApplied;
+
+  struct
+  {
+    pico9918_config_reload_fn fn;
+    void* userdata;
+  } configReload;
+
+  struct
+  {
+    pico9918_gpu_flash_fn fn;
+    void* userdata;
+  } gpuFlash;
+
+  struct
+  {
+    pico9918_gpu_config_save_fn fn;
+    void* userdata;
+  } gpuConfigSave;
+#endif
 };
 
 #ifdef PICO_BUILD

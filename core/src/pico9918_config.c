@@ -127,17 +127,35 @@ uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG)
   return tms9918->config;
 }
 
-/* host config-applied hook - see the header for the contract */
-static void (*configAppliedCallback)(void) = NULL;
-
-void pico9918_config_set_applied_callback(void (*cb)(void))
+/* host config-applied hook - see the header for the contract, and pico9918.h for why only
+   the storage differs between the two builds */
+#if PICO9918_SINGLE_INSTANCE
+static struct
 {
-  configAppliedCallback = cb;
+  pico9918_config_applied_fn fn;
+  void* userdata;
+} configApplied;
+#define CONFIG_APPLIED_CB configApplied
+#else
+#define CONFIG_APPLIED_CB tms9918->configApplied
+#endif
+
+void pico9918_config_set_applied_callback(PICO9918_INST_ARG pico9918_config_applied_fn cb, void* userdata)
+{
+  CONFIG_APPLIED_CB.fn       = cb;
+  CONFIG_APPLIED_CB.userdata = userdata;
+}
+
+/* `tms9918` names the parameter in one build and the global instance in the other, so the
+   callback is handed its instance either way */
+static inline void configAppliedFire(PICO9918_INST_ONLY_ARG)
+{
+  if (CONFIG_APPLIED_CB.fn) CONFIG_APPLIED_CB.fn(tms9918, CONFIG_APPLIED_CB.userdata);
 }
 
 void pico9918_config_apply(PICO9918_INST_ONLY_ARG)
 {
-  if (configAppliedCallback) configAppliedCallback();
+  configAppliedFire(PICO9918_INST_ONLY);
 
   if (tms9918->configVdpDirty)
   {

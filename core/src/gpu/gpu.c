@@ -71,17 +71,47 @@ static const uint8_t configActionKeys[] = {PICO9918_CONF_SAVE_TO_FLASH, PICO9918
 /* -------------------------------------------------------------------------
  * Callbacks (registered by the host application)
  * ---------------------------------------------------------------------- */
-static void (*gpu_flash_cb)(void)                   = NULL;
-static void (*gpu_config_save_cb)(uint8_t*, uint8_t) = NULL;
-
-void pico9918_gpu_set_flash_callback(void (*cb)(void))
+/* pico9918.h carries why only the storage differs between the two builds */
+#if PICO9918_SINGLE_INSTANCE
+static struct
 {
-  gpu_flash_cb = cb;
+  pico9918_gpu_flash_fn fn;
+  void* userdata;
+} gpuFlash;
+
+static struct
+{
+  pico9918_gpu_config_save_fn fn;
+  void* userdata;
+} gpuConfigSave;
+#define GPU_FLASH_CB       gpuFlash
+#define GPU_CONFIG_SAVE_CB gpuConfigSave
+#else
+#define GPU_FLASH_CB       tms9918->gpuFlash
+#define GPU_CONFIG_SAVE_CB tms9918->gpuConfigSave
+#endif
+
+void pico9918_gpu_set_flash_callback(PICO9918_INST_ARG pico9918_gpu_flash_fn cb, void* userdata)
+{
+  GPU_FLASH_CB.fn       = cb;
+  GPU_FLASH_CB.userdata = userdata;
 }
 
-void pico9918_gpu_set_config_save_callback(void (*cb)(uint8_t* config, uint8_t key))
+void pico9918_gpu_set_config_save_callback(PICO9918_INST_ARG pico9918_gpu_config_save_fn cb, void* userdata)
 {
-  gpu_config_save_cb = cb;
+  GPU_CONFIG_SAVE_CB.fn       = cb;
+  GPU_CONFIG_SAVE_CB.userdata = userdata;
+}
+
+static inline void gpuFlashFire(PICO9918_INST_ONLY_ARG)
+{
+  if (GPU_FLASH_CB.fn) GPU_FLASH_CB.fn(tms9918, GPU_FLASH_CB.userdata);
+}
+
+static inline void gpuConfigSaveFire(PICO9918_INST_ARG uint8_t key)
+{
+  if (GPU_CONFIG_SAVE_CB.fn)
+    GPU_CONFIG_SAVE_CB.fn(tms9918, tms9918->config, key, GPU_CONFIG_SAVE_CB.userdata);
 }
 
 /* -------------------------------------------------------------------------
@@ -379,7 +409,7 @@ void pico9918_gpu_step(PICO9918_INST_ONLY_ARG)
 
   if (tms9918->flash)
   {
-    if (gpu_flash_cb) gpu_flash_cb();
+    gpuFlashFire(PICO9918_INST_ONLY);
   }
 
   for (int i = 0; i < (int)(sizeof(configActionKeys) / sizeof(configActionKeys[0])); ++i)
@@ -388,7 +418,7 @@ void pico9918_gpu_step(PICO9918_INST_ONLY_ARG)
     if (tms9918->config[key])
     {
       tms9918->config[key] = 0;
-      if (gpu_config_save_cb) gpu_config_save_cb(tms9918->config, key);
+      gpuConfigSaveFire(PICO9918_INST key);
     }
   }
 }
@@ -418,7 +448,7 @@ bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions)
 
   if (tms9918->flash)
   {
-    if (gpu_flash_cb) gpu_flash_cb();
+    gpuFlashFire(PICO9918_INST_ONLY);
   }
 
   for (int i = 0; i < (int)(sizeof(configActionKeys) / sizeof(configActionKeys[0])); ++i)
@@ -427,7 +457,7 @@ bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions)
     if (tms9918->config[key])
     {
       tms9918->config[key] = 0;
-      if (gpu_config_save_cb) gpu_config_save_cb(tms9918->config, key);
+      gpuConfigSaveFire(PICO9918_INST key);
     }
   }
 

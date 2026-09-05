@@ -86,14 +86,14 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES]);
  *  \note  registered with pico9918_config_set_applied_callback(), so it fires from inside
  *         the library's apply; never called directly by the firmware
  */
-void applyConfigHostEffects(void);
+void applyConfigHostEffects(pico9918_t* tms9918, void* userdata);
 
 /** \brief re-read the stored block once the display is finally enabled after the
  *         startup diagnostics screen
  *  \note  registered with pico9918_frame_set_config_reload_callback(); it is flash I/O, so
  *         it cannot expand into a library TU
  */
-void reloadStoredConfig(void);
+void reloadStoredConfig(pico9918_t* tms9918, void* userdata);
 
 /** \brief display-change confirmation state, held in a 4 KB flash block of its own
  *  CONFIRMED -> PENDING (save) -> ARMED (boot) -> CONFIRMED (accepted, or reverted on reboot)

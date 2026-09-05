@@ -210,8 +210,11 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
  *
  * Called FIRST, before any of the VDP-side effects. NULL (the default) means the
  * host has no such effects and nothing is called.
+ *
+ * Registered per instance in a multi-instance build - see pico9918.h for why the two
+ * builds take different shapes.
  */
-void pico9918_config_set_applied_callback(void (*cb)(void));
+void pico9918_config_set_applied_callback(PICO9918_INST_ARG pico9918_config_applied_fn cb, void* userdata);
 
 #ifdef __cplusplus
 }

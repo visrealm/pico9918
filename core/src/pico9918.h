@@ -74,6 +74,17 @@
 #define PICO9918_INST_ONLY     tms9918              /**< pass the instance as the only argument */
 #endif
 
+/* The integration layer's host callbacks - config-applied, config-reload, flash and
+ * config-save - always carry their instance and a `void* userdata`, and their setters
+ * take the instance like every other entry point. One registration shared between two
+ * VDPs cannot say which of them is calling, which forces a host holding two into
+ * globals of its own.
+ *
+ * Only the STORAGE differs by build: per instance where there can be more than one, a
+ * file static where there is exactly one. The types are below, once the instance type
+ * exists to name; each setter is in its own module's header.
+ */
+
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -81,6 +92,12 @@
 /** \brief a VDP instance. Opaque: the layout is private to the library */
 struct pico9918_s;
 typedef struct pico9918_s pico9918_t;
+
+typedef void (*pico9918_config_applied_fn)(pico9918_t* tms9918, void* userdata);
+typedef void (*pico9918_config_reload_fn)(pico9918_t* tms9918, void* userdata);
+typedef void (*pico9918_gpu_flash_fn)(pico9918_t* tms9918, void* userdata);
+typedef void (*pico9918_gpu_config_save_fn)(pico9918_t* tms9918, uint8_t* config, uint8_t key,
+                                            void* userdata);
 
 /** \brief the display modes the VDP can be in, TMS9918A modes and F18A alike */
 typedef enum

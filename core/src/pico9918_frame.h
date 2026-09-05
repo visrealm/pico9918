@@ -290,9 +290,13 @@ extern "C"
    *
    * A host that reads flash here should know it is called from the per-frame
    * path, so the read lands inside a frame and collides with XIP.
+   *
+   * Registered per instance in a multi-instance build - see pico9918.h for why the
+   * two builds take different shapes.
    */
   PICO9918_DLLEXPORT
-  void pico9918_frame_set_config_reload_callback(void (*cb)(void));
+  void pico9918_frame_set_config_reload_callback(PICO9918_INST_ARG pico9918_config_reload_fn cb,
+                                                 void* userdata);
 
 #ifdef __cplusplus
 }

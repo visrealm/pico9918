@@ -26,6 +26,24 @@
 
 #include <stdio.h>
 
+#if !PICO9918_SINGLE_INSTANCE
+/* What the config-applied callback was handed. One recorder for both instances on
+   purpose: the registration is what has to be per instance, not the function. */
+static struct
+{
+  pico9918_t* inst;
+  void* userdata;
+  int calls;
+} appliedSeen;
+
+static void appliedCallback(pico9918_t* tms9918, void* userdata)
+{
+  appliedSeen.inst     = tms9918;
+  appliedSeen.userdata = userdata;
+  ++appliedSeen.calls;
+}
+#endif
+
 #if PICO9918_BUILD_RUNTIME_CHIP
 /* VR15 selects which status register a read returns, so it is how a host reads any of
    them. Above R7, so it needs an unlocked device. */
@@ -435,6 +453,39 @@ int main(void)
     return 1;
   }
   printf("pico9918-core: two instances, lines 0x%02x and 0x%02x\n", firstPixel, secondPixel);
+
+  /* The host callbacks, registered per instance - the reason this mode has them at all.
+     A single shared registration passes the first check and fails the second, because
+     registering on `second` would have overwritten the first instance's. */
+  int firstTag = 0, secondTag = 0;
+  pico9918_config_set_applied_callback(tms9918, appliedCallback, &firstTag);
+  pico9918_config_set_applied_callback(second, appliedCallback, &secondTag);
+
+  pico9918_config_apply(second);
+  if (appliedSeen.calls != 1 || appliedSeen.inst != second || appliedSeen.userdata != &secondTag)
+  {
+    printf("the second instance's config-applied callback did not fire with its own "
+           "instance and userdata\n");
+    return 1;
+  }
+
+  pico9918_config_apply(tms9918);
+  if (appliedSeen.calls != 2 || appliedSeen.inst != tms9918 || appliedSeen.userdata != &firstTag)
+  {
+    printf("registering on one instance disturbed the other's callback\n");
+    return 1;
+  }
+
+  /* and a NULL registration is how a host withdraws one */
+  pico9918_config_set_applied_callback(second, NULL, NULL);
+  pico9918_config_apply(second);
+  if (appliedSeen.calls != 2)
+  {
+    printf("a NULL registration still fired\n");
+    return 1;
+  }
+
+  printf("pico9918-core: host callbacks registered per instance\n");
 
   pico9918_destroy(second);
   pico9918_destroy(PICO9918_INST_ONLY);

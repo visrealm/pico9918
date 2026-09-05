@@ -155,9 +155,12 @@ void pico9918_gpu_reset_time(void);
 /**
  * Register a callback that will be invoked when the GPU wants to flash a sector.
  * Pass NULL to disable.
+ *
+ * Registered per instance in a multi-instance build - see pico9918.h for why the two
+ * builds take different shapes.
  */
 PICO9918_DLLEXPORT
-void pico9918_gpu_set_flash_callback(void (*cb)(void));
+void pico9918_gpu_set_flash_callback(PICO9918_INST_ARG pico9918_gpu_flash_fn cb, void* userdata);
 
 /**
  * Register a callback that will be invoked when the GPU loop detects a config
@@ -166,6 +169,9 @@ void pico9918_gpu_set_flash_callback(void (*cb)(void));
  * cancel - semantics are owned by the host). The key is cleared before the
  * callback is invoked.
  * Pass NULL to disable.
+ *
+ * Registered per instance in a multi-instance build - see pico9918.h for why the two
+ * builds take different shapes.
  */
 PICO9918_DLLEXPORT
-void pico9918_gpu_set_config_save_callback(void (*cb)(uint8_t* config, uint8_t key));
+void pico9918_gpu_set_config_save_callback(PICO9918_INST_ARG pico9918_gpu_config_save_fn cb, void* userdata);

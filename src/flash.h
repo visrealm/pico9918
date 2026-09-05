@@ -14,9 +14,11 @@
 
 #pragma once
 
+#include "pico9918.h" /* pico9918_t, in the signature the GPU's flash callback takes */
+
 /** \brief perform the flash operation VDP register 0x3f selects
  *  \note  bit 7 writes rather than reads, bit 6 selects the firmware UF2 path over
  *         program data, and bits 5-0 are the VRAM page holding the block; progress
  *         and errors are reported in status register 2
  */
-void flashSector(void);
+void flashSector(pico9918_t* tms9918, void* userdata);

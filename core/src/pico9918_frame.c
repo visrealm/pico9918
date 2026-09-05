@@ -53,8 +53,18 @@ uint32_t pico9918_gpu_frame_count = 0;
 #endif
 
 /* Host late-config-reload hook - see the header for the contract, and for why this
-   is a pointer rather than a tier-1 op. */
-static void (*configReloadCallback)(void) = NULL;
+   is a pointer rather than a tier-1 op. pico9918.h carries why only the storage
+   differs between the two builds. */
+#if PICO9918_SINGLE_INSTANCE
+static struct
+{
+  pico9918_config_reload_fn fn;
+  void* userdata;
+} configReload;
+#define CONFIG_RELOAD_CB configReload
+#else
+#define CONFIG_RELOAD_CB tms9918->configReload
+#endif
 
 /* The border colour the border-fill DMA reads. THE SCRATCH PLACEMENT IS
    LOAD-BEARING: `.scratch_y` is one of the RP2040's two single-cycle SRAM banks,
@@ -67,9 +77,15 @@ static void (*configReloadCallback)(void) = NULL;
    globals rather than reached for by an extern at the use site. */
 PICO9918_SECTION_SCRATCH_Y(buffer) uint32_t pico9918_border_bg;
 
-void pico9918_frame_set_config_reload_callback(void (*cb)(void))
+void pico9918_frame_set_config_reload_callback(PICO9918_INST_ARG pico9918_config_reload_fn cb, void* userdata)
 {
-  configReloadCallback = cb;
+  CONFIG_RELOAD_CB.fn       = cb;
+  CONFIG_RELOAD_CB.userdata = userdata;
+}
+
+static inline void configReloadFire(PICO9918_INST_ONLY_ARG)
+{
+  if (CONFIG_RELOAD_CB.fn) CONFIG_RELOAD_CB.fn(tms9918, CONFIG_RELOAD_CB.userdata);
 }
 
 /**
@@ -255,7 +271,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
       if (pico9918_frame_count > PICO9918_FRAME_STARTUP_FRAMES)
       {
         // reset diagnostics and other settings back to defaults
-        if (configReloadCallback) configReloadCallback();
+        configReloadFire(PICO9918_INST_ONLY);
       }
     }
   }

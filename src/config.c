@@ -120,8 +120,9 @@ void updateDispDriver(void)
 }
 
 /** \brief the VGA-side half of "config applied" - see the header */
-void applyConfigHostEffects(void)
+void applyConfigHostEffects(pico9918_t* tms9918, void* userdata)
 {
+  (void)userdata;
   vgaCurrentParams()->scanlines = tms9918->config[PICO9918_CONF_CRT_SCANLINES];
 }
 
@@ -130,8 +131,9 @@ void applyConfigHostEffects(void)
  *         no argument: the block it reloads into is always the live one, and the
  *         library already knows where that is
  */
-void reloadStoredConfig(void)
+void reloadStoredConfig(pico9918_t* tms9918, void* userdata)
 {
+  (void)userdata;
   readConfig(tms9918->config);
 }
 

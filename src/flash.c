@@ -290,8 +290,10 @@ static void doFlashProgramData(void)
 }
 
 /** \brief dispatch to the firmware or program data path, then clear the trigger */
-void __attribute__((noinline)) flashSector(void)
+void __attribute__((noinline)) flashSector(pico9918_t* tms9918, void* userdata)
 {
+  (void)userdata;
+
   if (TMS_REGISTER(tms9918, 0x3f) & 0x40) // write firmware
   {
     doFlashFirmwareSector();
