@@ -27,9 +27,12 @@
 #    lives here. Exempt where a blank line would be wrong rather than merely absent:
 #    a line that is nothing but a brace, which already reads as a break; inside a
 #    backslash-continued macro (a blank line ENDS the macro); after a preprocessor
-#    directive or a case label; mid-initializer; a fallthrough marker, which annotates
-#    the statement it is glued to; and a comment on an `else`, where a blank line would
-#    split the chain.
+#    directive or a case label; mid-initializer; and a fallthrough marker, which
+#    annotates the statement it is glued to.
+#
+#    A comment on an `else` is not exempt. A blank line above one would split the chain,
+#    so the answer is to brace the arm above: the closing brace is then the separator,
+#    and the brace exemption lets it through.
 #
 # Usage: tools/comment_check.py [root]   (default: the library root above this script)
 
@@ -46,7 +49,6 @@ SEPARATOR = re.compile(r" [|:]")
 BRACE = re.compile(r"^(?:.*\{|\};?)$")
 LABEL = re.compile(r"^(?:case\b.*|default\s*):$")
 FALLTHROUGH = re.compile(r"^/[*/]+\s*(?:falls?[ _-]?thr(?:u|ough)|no break)\b", re.I)
-ELSE = re.compile(r"^(?:\}\s*)?else\b")
 
 
 def isTable(run):
@@ -98,10 +100,6 @@ def runs(lines):
 
 def needsBlankLine(lines, start, run):
     if start == 0:
-        return False
-
-    below = lines[start + len(run)].strip() if start + len(run) < len(lines) else ""
-    if ELSE.match(below):     # a blank line would split the if/else chain
         return False
 
     above = lines[start - 1].rstrip()
@@ -169,8 +167,8 @@ def main():
         print()
         print("%d finding(s). One line, or a table, or open it with one of: %s" % (found, " ".join(TAGS)))
         print("And a blank line above, unless the line above is only a brace, continues a macro,")
-        print("is a directive, is a case label, or leaves an initializer or argument list open,")
-        print("or the comment sits on an `else`.")
+        print("is a directive, is a case label, or leaves an initializer or argument list open.")
+        print("Commenting an `else`? Brace the arm above it - the closing brace is the separator.")
         return 1
 
     print("comments: one line, blank line above")

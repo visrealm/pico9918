@@ -126,12 +126,18 @@ static const pico9918_mode_t r1Modes[] = {TMS_MODE_GRAPHICS_I, TMS_MODE_MULTICOL
 static inline pico9918_mode_t tmsMode(pico9918_t* tms9918)
 {
   if (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_MODE_GRAPHICS_II)
+  {
     return TMS_MODE_GRAPHICS_II;
+  }
   /* An F18A honours M4 while still locked, so the test is the personality, not the lock. */
   else if (PICO9918_M4(tms9918))
+  {
     return TMS_MODE_TEXT80;
+  }
   else
+  {
     return r1Modes[(TMS_REGISTER(tms9918, TMS_REG_1) & (TMS_R1_MODE_MULTICOLOR | TMS_R1_MODE_TEXT)) >> 3];
+  }
 }
 
 /** \brief sprite size (8 or 16) */
