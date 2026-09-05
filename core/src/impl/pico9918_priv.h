@@ -136,6 +136,15 @@
    against the V9938's 128K */
 #define PICO9918_CPU_VRAM_MASK(tms) VRAM_MASK
 
+/* R1 bit 7 is the 4K/16K DRAM select, and only a part that drives DRAM has one. An F18A
+   has SRAM, so a MODE=F18A build without the runtime switch is never asked and the
+   transform below folds away entirely. */
+#if PICO9918_MODE == PICO9918_MODE_F18A && !PICO9918_BUILD_RUNTIME_CHIP
+#define PICO9918_VRAM_4K_CHIP(T) false
+#else
+#define PICO9918_VRAM_4K_CHIP(T) PICO9918_HAS(T, PICO9918_FEAT_VRAM_4K)
+#endif
+
 
 typedef struct
 {
@@ -203,6 +212,8 @@ typedef struct
 #define PICO9918_FEAT_UNLOCK  0x01 /* the F18A unlock write is honoured */
 #define PICO9918_FEAT_CONFIG  0x02 /* the VR58/59 config port and R63 firmware update */
 #define PICO9918_FEAT_OVERLAY 0x04 /* the splash and diagnostics overlays */
+#define PICO9918_FEAT_BITMAP  0x08 /* R0 M3 is decoded, so Graphics II exists */
+#define PICO9918_FEAT_VRAM_4K 0x10 /* R1 bit 7 is decoded, so 4K DRAM addressing exists */
 
 #if PICO9918_BUILD_RUNTIME_CHIP
 #if PICO9918_MODE != PICO9918_MODE_F18A
@@ -230,6 +241,11 @@ typedef struct
 #else
 #define TMS_STATUS(T, R) (T->status[R])
 #endif
+
+/* Graphics II is the A in TMS9918A: the pre-A part does not decode R0 M3. Unlike M4 this
+   is not a mode-gated question - every build can be the pre-A part - so PICO9918_HAS
+   alone is the gate, and it folds to a literal true without the runtime switch. */
+#define PICO9918_GM2(T) PICO9918_HAS(T, PICO9918_FEAT_BITMAP)
 
 /* A TMS9918A does not decode R0 bit 2. Build-time as well as runtime: PICO9918_HAS folds
    to true in a MODE=0 archive, so neither may be written as PICO9918_HAS alone. */
@@ -394,6 +410,31 @@ extern pico9918_t* const tms9918;
 #endif
 
 /**
+ * \brief where a CPU-side VRAM access lands
+ *
+ * A part that drives DRAM multiplexes the address as a row and a column, and R1 bit 7
+ * says how wide each half is. At 16K it is seven bits of each and the address is used
+ * raw. At 4K it is six of each, driven into the seven that the 16K DRAMs on the board
+ * still want, which rotates the middle seven bits up one place and leaves the low six
+ * and the top one where they were.
+ *
+ * Only the CPU side. Display fetches take the address the tables name, because an F18A
+ * has no such bit at all and nothing drives a picture out of 4K on a 16K machine.
+ */
+PICO9918_INLINE_HOT uint32_t pico9918_cpu_vram_addr_impl(PICO9918_INST_ARG uint32_t addr)
+{
+  addr &= PICO9918_CPU_VRAM_MASK(tms9918);
+
+  if (PICO9918_VRAM_4K_CHIP(tms9918) && !(TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_RAM_16K))
+  {
+    /* static bits | shifted bits | rotated bit */
+    addr = (addr & 0x203f) | ((addr & 0x0fc0) << 1) | ((addr & 0x1000) >> 6);
+  }
+
+  return addr;
+}
+
+/**
  * \brief set a register from the second byte of a host register write
  *
  * \p regSelect is that byte, not a register number: bit 7 set, the register in the low
@@ -437,7 +478,7 @@ PICO9918_INLINE_HOT void pico9918_write_addr_impl(PICO9918_INST_ARG uint8_t data
       if ((data & 0x40) == 0)
       {
         tms9918->readAheadBuffer =
-          tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)];
+          tms9918->vram.bytes[pico9918_cpu_vram_addr_impl(PICO9918_INST tms9918->currentAddress)];
         tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
       }
     }
@@ -612,7 +653,7 @@ PICO9918_INLINE_HOT void pico9918_write_data_impl(PICO9918_INST_ARG uint8_t data
   {
     tms9918->regWriteStage                                                         = 0;
     tms9918->readAheadBuffer                                                       = data;
-    tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)] = data;
+    tms9918->vram.bytes[pico9918_cpu_vram_addr_impl(PICO9918_INST tms9918->currentAddress)] = data;
     tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
   }
 }
@@ -623,7 +664,8 @@ PICO9918_INLINE_HOT uint8_t pico9918_read_data_impl(PICO9918_INST_ONLY_ARG)
 {
   tms9918->regWriteStage   = 0;
   uint8_t currentValue     = tms9918->readAheadBuffer;
-  tms9918->readAheadBuffer = tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)];
+  tms9918->readAheadBuffer =
+    tms9918->vram.bytes[pico9918_cpu_vram_addr_impl(PICO9918_INST tms9918->currentAddress)];
   tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
   return currentValue;
 }
@@ -631,8 +673,9 @@ PICO9918_INLINE_HOT uint8_t pico9918_read_data_impl(PICO9918_INST_ONLY_ARG)
 /** \brief refill the read-ahead buffer from the current address and return the new value */
 PICO9918_INLINE_HOT uint8_t pico9918_read_ahead_data_impl(PICO9918_INST_ONLY_ARG)
 {
-  tms9918->regWriteStage   = 0;
-  tms9918->readAheadBuffer = tms9918->vram.bytes[(tms9918->currentAddress) & PICO9918_CPU_VRAM_MASK(tms9918)];
+  tms9918->regWriteStage = 0;
+  tms9918->readAheadBuffer =
+    tms9918->vram.bytes[pico9918_cpu_vram_addr_impl(PICO9918_INST tms9918->currentAddress)];
   tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
   return tms9918->readAheadBuffer;
 }

@@ -122,15 +122,20 @@ typedef enum
 /**
  * \brief which chip an instance answers as
  *
- * A strict capability ladder: each personality is the one below it plus what the real
- * hardware adds, so one value orders them all.
+ * A capability ladder: each personality is the one below it plus what the real hardware
+ * adds. TMS9918A is the base every build can be, and the value orders the three above
+ * it - see PICO9918_CHIP_MAX for what the numbering does and does not mean.
  *
+ *   TMS9918   below the base: the pre-A part, which does not decode M3 and so has no
+ *             Graphics II. Everything else is the TMS9918A.
  *   TMS9918A  the base. The unlock write is refused, so the register file stays eight
  *             wide, there is no GPU to start, and the enhanced renderer folds away
- *             exactly as it does on a locked device.
+ *             exactly as it does on a locked device. Drives DRAM, so R1's 4K/16K bit
+ *             moves where a CPU-side access lands.
  *   F18A      unlockable: the full register file, the enhanced modes and the GPU. None
  *             of the PICO9918's own extensions - a real F18A has no config port and no
- *             overlays - and it identifies as a real one in SR1.
+ *             overlays - and it identifies as a real one in SR1. Has SRAM, so R1 bit 7
+ *             means nothing to it.
  *   PICO9918  an F18A plus this board's extensions: the VR58/59 config port, the
  *             firmware-update register, and the splash and diagnostics overlays.
  *
@@ -143,6 +148,7 @@ typedef enum
   PICO9918_CHIP_TMS9918A = 0, /**< a TMS9918A: locked, no GPU, no extensions */
   PICO9918_CHIP_F18A     = 1, /**< an F18A: unlock, enhanced renderer, GPU */
   PICO9918_CHIP_PICO9918 = 2, /**< an F18A plus the PICO9918's own extensions */
+  PICO9918_CHIP_TMS9918  = 3, /**< a pre-A TMS9918: a TMS9918A without Graphics II */
 } pico9918_chip_t;
 
 /**
@@ -152,6 +158,11 @@ typedef enum
  * archive cannot have it at all - it has no 64KB map, no GPU and no enhanced renderer,
  * so nothing above the base is a personality it could honour - and the build is
  * rejected rather than quietly capped.
+ *
+ * TRAP: this bounds capability, not the enum. The values are ABI, so a personality
+ * found later is appended rather than slotted in, and PICO9918_CHIP_TMS9918 is
+ * numbered above the ceiling while sitting below the base. Every build can be it, and
+ * pico9918_set_chip accepts it from any of them.
  */
 #define PICO9918_CHIP_MAX PICO9918_CHIP_PICO9918
 

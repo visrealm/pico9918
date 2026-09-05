@@ -177,6 +177,35 @@ int main(void)
     return 1;
   }
 
+  /* The A in TMS9918A. The pre-A part is numbered above PICO9918_CHIP_MAX and must not
+     clamp back to it, so the personality it reports is half of what this proves - the
+     other half is that M3 selects nothing there and M1/M2 still do. */
+  pico9918_write_register_value(PICO9918_INST TMS_REG_0, TMS_R0_MODE_GRAPHICS_II);
+  pico9918_scan_line(PICO9918_INST 0);
+  if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_GRAPHICS_II)
+  {
+    printf("a TMS9918A with M3 is not in Graphics II: mode %d\n",
+           (int)pico9918_display_mode(PICO9918_INST_ONLY));
+    return 1;
+  }
+
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918);
+  if (pico9918_chip(PICO9918_INST_ONLY) != PICO9918_CHIP_TMS9918)
+  {
+    printf("the pre-A personality clamped to the ladder: chip %d\n", (int)pico9918_chip(PICO9918_INST_ONLY));
+    return 1;
+  }
+
+  pico9918_scan_line(PICO9918_INST 0);
+  if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_GRAPHICS_I)
+  {
+    printf("a pre-A TMS9918 decoded M3: mode %d\n", (int)pico9918_display_mode(PICO9918_INST_ONLY));
+    return 1;
+  }
+
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918A);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_0, TMS_R0_MODE_TEXT_80);
+
   /* Three address bits, so VR8 is VR0 and the write lands. */
   pico9918_write_register_value(PICO9918_INST 0, 0x00);
   pico9918_write_register_value(PICO9918_INST 8, TMS_R0_MODE_GRAPHICS_II);
@@ -225,6 +254,75 @@ int main(void)
     printf("a VR57 write was latched into VR1: VR1 0x%02x\n",
            pico9918_reg_value(PICO9918_INST 1));
     return 1;
+  }
+
+  /* R1 bit 7 clear is 4K DRAM addressing, on Classic99's hardware-confirmed vectors.
+     TRAP: its comment block lists >2240 as landing at >2280, which is the one entry its
+     own math disagrees with - bits 6 to 12 rotate up one, so >2240 goes to >2480 like
+     the other six. No formula produces all seven, and the six confirm the rotate. */
+  {
+    static const struct
+    {
+      uint16_t addr; /* what the guest sets  */
+      uint16_t real; /* where the byte lands */
+    } fourK[] = {
+      {0x1100, 0x0240}, {0x1810, 0x1050}, {0x2210, 0x2410}, {0x2211, 0x2411},
+      {0x2240, 0x2480}, {0x3210, 0x2450}, {0x3810, 0x3050},
+    };
+
+    pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918A);
+
+    for (unsigned i = 0; i < sizeof fourK / sizeof fourK[0]; ++i)
+    {
+      const uint8_t marker = (uint8_t)(0xa0 + i);
+
+      pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_4K);
+      pico9918_set_address_write(PICO9918_INST fourK[i].addr);
+      pico9918_write_data(PICO9918_INST marker);
+
+      if (pico9918_vram_value(PICO9918_INST fourK[i].real) != marker)
+      {
+        printf("a 4K TMS9918A did not put >%04x at >%04x: found 0x%02x, and 0x%02x at >%04x\n", fourK[i].addr,
+               fourK[i].real, pico9918_vram_value(PICO9918_INST fourK[i].real),
+               pico9918_vram_value(PICO9918_INST fourK[i].addr), fourK[i].addr);
+        return 1;
+      }
+
+      /* and the bit is what did it, so the same write at 16K lands where it says */
+      pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K);
+      pico9918_set_address_write(PICO9918_INST fourK[i].real);
+      pico9918_write_data(PICO9918_INST 0);
+      pico9918_set_address_write(PICO9918_INST fourK[i].addr);
+      pico9918_write_data(PICO9918_INST marker);
+
+      if (pico9918_vram_value(PICO9918_INST fourK[i].addr) != marker)
+      {
+        printf("a 16K TMS9918A moved >%04x anyway: found 0x%02x\n", fourK[i].addr,
+               pico9918_vram_value(PICO9918_INST fourK[i].addr));
+        return 1;
+      }
+
+      pico9918_set_address_write(PICO9918_INST fourK[i].addr);
+      pico9918_write_data(PICO9918_INST 0);
+    }
+
+    /* An F18A has SRAM and no such bit, so a personality above the base ignores it. */
+    pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
+    pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_4K);
+    pico9918_set_address_write(PICO9918_INST fourK[0].addr);
+    pico9918_write_data(PICO9918_INST 0x5a);
+
+    if (pico9918_vram_value(PICO9918_INST fourK[0].addr) != 0x5a)
+    {
+      printf("an F18A decoded R1 bit 7: >%04x holds 0x%02x and >%04x holds 0x%02x\n", fourK[0].addr,
+             pico9918_vram_value(PICO9918_INST fourK[0].addr), fourK[0].real,
+             pico9918_vram_value(PICO9918_INST fourK[0].real));
+      return 1;
+    }
+
+    pico9918_set_address_write(PICO9918_INST fourK[0].addr);
+    pico9918_write_data(PICO9918_INST 0);
+    pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K);
   }
 
   printf("pico9918-core: chip switch honoured, the register file and config port follow it\n");

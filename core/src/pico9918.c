@@ -125,7 +125,8 @@ static const pico9918_mode_t r1Modes[] = {TMS_MODE_GRAPHICS_I, TMS_MODE_MULTICOL
 
 static inline pico9918_mode_t tmsMode(pico9918_t* tms9918)
 {
-  if (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_MODE_GRAPHICS_II)
+  /* The pre-A part leaves M3 undecoded, so the bit selects nothing and M1/M2 still do. */
+  if ((TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_MODE_GRAPHICS_II) && PICO9918_GM2(tms9918))
   {
     return TMS_MODE_GRAPHICS_II;
   }
@@ -271,19 +272,18 @@ static uint8_t chipFeatures(pico9918_chip_t chip)
   switch (chip)
   {
     case PICO9918_CHIP_PICO9918:
-      return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_CONFIG | PICO9918_FEAT_OVERLAY;
-    case PICO9918_CHIP_F18A:
-      return PICO9918_FEAT_UNLOCK;
-    default:
-      return 0;
+      return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_CONFIG | PICO9918_FEAT_OVERLAY | PICO9918_FEAT_BITMAP;
+    case PICO9918_CHIP_F18A: return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_BITMAP;
+    case PICO9918_CHIP_TMS9918: return PICO9918_FEAT_VRAM_4K;
+    default: return PICO9918_FEAT_BITMAP | PICO9918_FEAT_VRAM_4K;
   }
 }
 
 /** \brief select which chip this instance answers as */
 PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip)
 {
-  /* unsigned, so a value below the base clamps here too rather than being stored */
-  if ((unsigned)chip > (unsigned)PICO9918_CHIP_MAX)
+  /* unsigned, so a value below the base clamps here too. The pre-A part only numbers above the ceiling */
+  if ((unsigned)chip > (unsigned)PICO9918_CHIP_MAX && chip != PICO9918_CHIP_TMS9918)
   {
     chip = PICO9918_CHIP_MAX;
   }
