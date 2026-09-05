@@ -15,6 +15,34 @@
  *
  * The Impl entries are inline rather than calls because their callers are the host bus
  * handlers and the per-scanline path, where a `bl` is not free.
+ *
+ * A DEBUGGER IS THE SECOND AUDIENCE, and the rule for it is which surface, not which
+ * operation.
+ *
+ * Reads are public because reads are safe. pico9918.h publishes every non-destructive
+ * one - pico9918_peek_status, pico9918_status_value, pico9918_read_data_no_inc,
+ * pico9918_reg_value, pico9918_vram_value, pico9918_gpu_pc - so sampling state on the
+ * guest's own path needs nothing from here and stays on a stable surface. A bridge that
+ * finds itself in this header for a READ has taken a wrong turn rather than made a
+ * judgement call, with one hardware exception: pico9918_reg_value is the guest's view,
+ * so on a locked device it decodes three address bits and reg 30 reads R6. Reading the
+ * physical register behind that is TMS_REGISTER, below.
+ *
+ * WRITES that must not behave like the guest are the reason to be here. Every public
+ * register write goes through the bus and so takes the unlock gate and the locked-mask
+ * aliasing with it - a locked device redirects VR30 to R6 rather than refusing it. A
+ * register editor writing what the operator typed wants `TMS_REGISTER(tms9918, reg) =
+ * value`, which is the whole of the crossing.
+ *
+ * And the invariant that removal established: a PUBLIC entry must not silently write
+ * somewhere other than where its parameter names. The engine below takes the raw select
+ * byte, `0x80 | reg`, and is here rather than published for exactly that reason - typed
+ * as a register enum it turned PICO9918_REG_UNLOCK into a write of R1. Anything moved
+ * out to the public surface has to be honest about its own argument first.
+ *
+ * Nothing here is stable. It is versioned with the library and moves when the library
+ * does, so a tool that reaches in is pinned to a commit. That is the trade, and it is
+ * why anything on the guest's normal path belongs on the public surface instead.
  */
 
 #pragma once

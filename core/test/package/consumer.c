@@ -426,6 +426,43 @@ int main(void)
   printf("pico9918-core: config block reachable, %u bytes, applied both ways\n",
          (unsigned)CONFIG_BYTES);
 
+  /* The status file, read without the side effects of reading it. Two things to prove,
+     because pico9918_read_status has neither: that it INDEXES rather than always
+     answering SR0, and that it leaves the flags alone. */
+  const uint8_t sr1Before = pico9918_status_value(PICO9918_INST PICO9918_SR_IDENT);
+  pico9918_set_status(PICO9918_INST 0x45);
+
+  if (pico9918_status_value(PICO9918_INST PICO9918_SR_STATUS) != 0x45)
+  {
+    printf("status_value did not read SR0 back: 0x%02x\n",
+           pico9918_status_value(PICO9918_INST PICO9918_SR_STATUS));
+    return 1;
+  }
+
+  /* SR1 must not have moved - if this always answered SR0 it would read 0x45 now */
+  if (pico9918_status_value(PICO9918_INST PICO9918_SR_IDENT) != sr1Before)
+  {
+    printf("status_value ignores its register argument\n");
+    return 1;
+  }
+
+  /* twice, unchanged: a destructive read would differ the second time */
+  if (pico9918_status_value(PICO9918_INST PICO9918_SR_STATUS) != 0x45)
+  {
+    printf("status_value cleared what it returned\n");
+    return 1;
+  }
+
+  /* and the destructive read still is destructive, so the two are really different */
+  pico9918_read_status(PICO9918_INST_ONLY);
+  if (pico9918_status_value(PICO9918_INST PICO9918_SR_STATUS) == 0x45)
+  {
+    printf("read_status left the flags standing\n");
+    return 1;
+  }
+
+  printf("pico9918-core: status file readable without clearing it\n");
+
 #if !PICO9918_SINGLE_INSTANCE
   /* Two VDPs at once is what this mode is for, and no other test can check it: every
      harness in the library holds exactly one. Cleared VRAM makes every tile pixel

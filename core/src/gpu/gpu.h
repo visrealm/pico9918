@@ -133,6 +133,18 @@ PICO9918_DLLEXPORT
 bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions);
 
 /**
+ * Where the GPU is: the address the next slice resumes from. The arming address before
+ * it first runs, and the point it reached after a capped slice returns true.
+ *
+ * ODD MEANS NOTHING IS ARMED. A reset parks 0xFFFF here and the engine refuses to start
+ * from an odd address, so a caller polling this reads odd as "no program", not as a
+ * position. An even value is a real address whether or not a program is still running -
+ * use pico9918_gpu_step_n()'s return for that.
+ */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_pc(PICO9918_INST_ONLY_ARG);
+
+/**
  * Return the GPU's CPU time in microseconds.
  * If the GPU is still running (hasn't reported back), returns totalTime.
  *

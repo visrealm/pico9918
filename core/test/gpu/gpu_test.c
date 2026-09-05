@@ -88,9 +88,17 @@ int main(void)
   arm();
   if (result() != 0) fail("no-rate-ran", 0, result());
 
+  /* and armed is where pico9918_gpu_pc says it is, before a single instruction runs */
+  if (pico9918_gpu_pc(PICO9918_INST_ONLY) != PROGRAM_AT)
+    fail("armed-pc", PROGRAM_AT, pico9918_gpu_pc(PICO9918_INST_ONLY));
+
   /* 2. and it is only armed, not lost: the host-driven path still works. */
   pico9918_gpu_step_n(PICO9918_INST 1000);
   if (result() != MARKER) fail("host-driven", MARKER, result());
+
+  /* and it moved: a run leaves the point it reached, not the address it was armed at */
+  if (pico9918_gpu_pc(PICO9918_INST_ONLY) == PROGRAM_AT)
+    fail("pc-did-not-move", 0, pico9918_gpu_pc(PICO9918_INST_ONLY));
 
   /* 3. a rate runs it from inside the arming write, which is the whole point */
   pico9918_gpu_set_clock(PICO9918_INST PICO9918_GPU_IPS_PRO);
@@ -114,11 +122,20 @@ int main(void)
         would arm one are above the eight it admits, so the write is ignored outright,
         and the rate is still set so this is the lock doing it. */
   pico9918_reset(PICO9918_INST_ONLY);
+
+  /* the reset parks an odd address, which is what the header calls "nothing armed" */
+  if ((pico9918_gpu_pc(PICO9918_INST_ONLY) & 1) == 0)
+    fail("reset-pc-even", 1, pico9918_gpu_pc(PICO9918_INST_ONLY));
+
   pico9918_gpu_init(PICO9918_INST_ONLY);
   pico9918_gpu_set_clock(PICO9918_INST PICO9918_GPU_IPS_PRO);
   loadProgram();
   arm();
   if (result() != 0) fail("locked-ran", 0, result());
+
+  /* and the locked arm did not move it: the registers that would are above the eight */
+  if ((pico9918_gpu_pc(PICO9918_INST_ONLY) & 1) == 0)
+    fail("locked-armed-pc", 1, pico9918_gpu_pc(PICO9918_INST_ONLY));
 
   /* 6. and unlocking again brings it back, so nothing above latched */
   unlock();

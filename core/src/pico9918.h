@@ -427,7 +427,25 @@ void pico9918_reset(PICO9918_INST_ONLY_ARG);
 PICO9918_DLLEXPORT
 void pico9918_destroy(PICO9918_INST_ONLY_ARG);
 
-/** \brief write an address (mode = 1) to the tms9918 - the data byte DB0 -> DB7 */
+/**
+ * \brief write an address (mode = 1) to the tms9918 - the data byte DB0 -> DB7
+ *
+ * The port is a two-byte latch, and the SECOND byte says which pair it was: bit 7 set
+ * writes a register, and the first byte was its value; bit 7 clear sets the VRAM
+ * address, low byte first, with bit 14 of the address selecting a write rather than a
+ * read. Both orders put the payload first and the selector second.
+ *
+ * pico9918_util.h already writes both sequences down - pico9918_write_register_value()
+ * and pico9918_set_address_read() / _write(). Prefer them to open-coding a pair: the
+ * order is easy to reverse, and reversing it addresses a different register rather
+ * than failing.
+ *
+ * A pair is not atomic, and the latch is per instance rather than per caller. Inject a
+ * write from outside the guest's own stream while the guest is between its two bytes
+ * and the injected first byte completes the GUEST's pair as its selector, leaving the
+ * injected selector to be read as the next value: both writes land somewhere neither
+ * caller asked for. An out-of-band caller has to know the guest is at rest.
+ */
 PICO9918_DLLEXPORT
 void pico9918_write_addr(PICO9918_INST_ARG uint8_t data);
 
@@ -485,9 +503,30 @@ void pico9918_set_status(PICO9918_INST_ARG uint8_t status);
 PICO9918_DLLEXPORT
 uint8_t pico9918_scan_line(PICO9918_INST_ARG uint16_t y);
 
-/** \brief return a register value */
+/**
+ * \brief return a register value
+ *
+ * The guest's view, so a LOCKED device decodes three address bits and nothing more:
+ * reg 30 reads R6, exactly as a write to it would land on R6. Reading the register a
+ * locked device cannot address is `TMS_REGISTER` on the Impl surface.
+ */
 PICO9918_DLLEXPORT
 uint8_t pico9918_reg_value(PICO9918_INST_ARG pico9918_register_t reg);
+
+/**
+ * \brief return a status register value, without the side effects of reading it
+ *
+ * The whole status file, non-destructively: no flag is cleared, no sprite number is
+ * restored and /INT is left where it is - none of which is true of
+ * pico9918_read_status(), which is the guest's destructive read of whichever register
+ * R15 selects.
+ *
+ * NOT masked the way pico9918_reg_value() is. A locked device has no three-bit status
+ * address to model: R15 is above the registers it admits, so a locked guest can reach
+ * SR0 and nothing else. The mask here is the width of R15's own select field.
+ */
+PICO9918_DLLEXPORT
+uint8_t pico9918_status_value(PICO9918_INST_ARG pico9918_status_register_t reg);
 
 
 /** \brief return a value from vram */

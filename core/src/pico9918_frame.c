@@ -311,7 +311,7 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
  *    still be reading the source word when this line overwrites it. Benign - the
  *    value is the same on all but the frame a background register changes - and
  *    "fixing" it by waiting first adds a per-scanline stall the goldens cannot see;
- *  - the row-30 border test. The `// TODO` below is a recorded, user-ruled won't-fix;
+ *  - the row-30 border test. The `TRAP:` below is a recorded, user-ruled won't-fix;
  *  - the SCART-NTSC negative-border underflow. vBorder is unsigned and row-30 on that
  *    timing makes it 4294967286, so this test sends all 220 lines down the border
  *    path and renders none. Pinned deliberately by the golden frame surface at
@@ -350,7 +350,8 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   PICO9918_FILL32_WAIT(PICO9918_FILL_BORDER);
 
   /*** top and bottom borders ***/
-  // TODO: None of this runs in ROW30 mode
+  // TRAP: none of this runs in ROW30 mode. A ruled won't-fix, not an oversight - see
+  // the note above this function, which lists it among what must not be tidied.
   if (y < pico9918_v_border_impl(PICO9918_INST_ONLY) ||
       y >= (pico9918_v_border_impl(PICO9918_INST_ONLY) + pico9918_v_pixels_impl(PICO9918_INST_ONLY)))
   {

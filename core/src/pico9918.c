@@ -3141,11 +3141,18 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
   return tempStatus;
 }
 
-/** \brief return a register value */
+/** \brief return a register value - see the header for the locked-device aliasing */
 PICO9918_DLLEXPORT
 uint8_t __time_critical_func(pico9918_reg_value)(PICO9918_INST_ARG pico9918_register_t reg)
 {
   return TMS_REGISTER(tms9918, reg & tms9918->lockedMask); // was 0x07
+}
+
+/** \brief return a status register value without the side effects of reading it */
+PICO9918_DLLEXPORT
+uint8_t __time_critical_func(pico9918_status_value)(PICO9918_INST_ARG pico9918_status_register_t reg)
+{
+  return TMS_STATUS(tms9918, reg & PICO9918_R15_STATUS_NUM);
 }
 
 PICO9918_DLLEXPORT

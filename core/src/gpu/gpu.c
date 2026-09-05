@@ -423,6 +423,13 @@ void pico9918_gpu_step(PICO9918_INST_ONLY_ARG)
   }
 }
 
+/** \brief see the header. The address a slice resumes from; odd means not running. */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_pc(PICO9918_INST_ONLY_ARG)
+{
+  return tms9918->gpuAddress;
+}
+
 /*
  * The same pass, but capped, for a host that has only the one thread.
  *
