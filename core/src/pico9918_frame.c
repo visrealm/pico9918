@@ -101,16 +101,12 @@ void pico9918_frame_update_interrupts(PICO9918_INST_ARG uint8_t tempStatus)
   }
   else
   {
-    // F is set - only allow COL through (per F18A/TMS9918A: COL is not gated by F)
-    // 5S is blocked while F is set (per datasheet)
     currentStatus |= (tempStatus & PICO9918_SR0_COLLISION);
   }
 
   pico9918_set_status_impl(PICO9918_INST currentStatus);
   PICO9918_HOST_STATUS_VISIBLE();
 
-  // Ensure interrupt pin state is correct
-  // (in case R1 was modified to enable/disable interrupts)
   pico9918_frame_sync_int_impl(PICO9918_INST_ONLY);
   PICO9918_HOST_EXIT_CRITICAL();
 }
@@ -265,10 +261,6 @@ pico9918_frame_geometry_t pico9918_frame_end(PICO9918_INST_ARG float tempC, floa
 
   if (tms9918->config[PICO9918_CONF_DIAG] && PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY))
   {
-    /* the overlay has no clock of its own, so the host's display timing is pushed
-       right before it recomputes. The dropped-frame and GPU-frame counters need no
-       push: this module owns both AND drives the refresh, so the overlay reads them
-       directly. */
     pico9918_diag_set_frame_rate(frameRateHz);
     pico9918_diag_update(PICO9918_INST pico9918_frame_count);
   }
@@ -328,9 +320,6 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
 
   /* 512 bytes for 80 columns on a board with the 8bpp tier, 256 everywhere else */
   const uint32_t lineBytes = pico9918_line_bytes(PICO9918_INST_ONLY);
-  /* the margin is the backdrop, so it takes tile layer 1's palette select as the
-     picture does, except where 80 columns index the LUT by a pair of nibbles and have
-     no room for one */
   const bool packedNibbles =
     pico9918_display_mode(PICO9918_INST_ONLY) == TMS_MODE_TEXT80 && lineBytes == TMS9918_PIXELS_X;
   pico9918_border_bg = pico9918_palette_lut
@@ -408,9 +397,6 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   /*** main display region ***/
   if (pico9918_palette_dirty(PICO9918_INST_ONLY)) pico9918_palette_regenerate(PICO9918_INST_ONLY);
 
-  /* generate the scanline. The field mapping is an Impl inline so the golden frame
-     surface can drive it directly, as its candidate path. Inlines away; see the
-     accessor. */
   uint16_t tmsY =
     pico9918_frame_map_line_impl(PICO9918_INST y, field, params->interlaced, params->interlacedFieldOrder);
 
@@ -427,9 +413,6 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   /*** F18A status register updates ***/
   TMS_STATUS(tms9918, PICO9918_SR_IDENT) &= (uint8_t)~PICO9918_SR1_BLANK;
 
-  /* The flag latches until the host reads SR1 - it is that read which acknowledges the
-     interrupt. It does not touch SR0: the scanline interrupt is its own source, under
-     R0's enable, and merging it into the frame flag would make it answer to R1's. */
   if (tms9918->vram.map.scanline &&
       (TMS_REGISTER(tms9918, PICO9918_REG_HORZ_INT_LINE) == tms9918->vram.map.scanline))
   {
@@ -458,8 +441,6 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   // right border
   PICO9918_FILL32_TRIGGER(PICO9918_FILL_BORDER, dPixels + halfHBorder + TMS9918_PIXELS_X);
 
-  /* the overlay is part of what the line costs, so it draws before the sample closes.
-     Border lines draw it host-side instead - the banner has to come first there. */
   if (tms9918->config[PICO9918_CONF_DIAG] && PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY))
   {
     PICO9918_FILL32_WAIT(PICO9918_FILL_BORDER);
@@ -504,9 +485,6 @@ bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,
   {
     const uint16_t y = (uint16_t)(outputLine / scale);
 
-    /* The border arm leaves the overlay to the caller so a host can put its own banner
-       under it. With nothing to put there, draw it: the panels span the frame, and the
-       border return is what says which lines were skipped. */
     if (pico9918_frame_scanline(PICO9918_INST y, params, pixels) &&
         tms9918->config[PICO9918_CONF_DIAG] && PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY))
       pico9918_diag_render(PICO9918_INST y, params->vVirtualPixels, pixels);
@@ -517,11 +495,6 @@ bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,
   bool changed = dimLine(PICO9918_INST pixels, params->hVirtualPixels, outputLine) || fresh;
 
 #if PICO9918_BUILD_RUNTIME_CHIP
-  /* An F18A shows its own power-on badge where a PICO9918 shows the splash. Here rather
-     than in the scanline path so each row of it is one OUTPUT line, as the hardware's
-     is, and last so nothing dims it - on an F18A the badge outranks the scanline dim as
-     well as the picture. A repeated line still needs it drawn: the buffer it re-reads
-     holds the row above. */
   if (tms9918->chip == PICO9918_CHIP_F18A)
     changed |= pico9918_f18a_badge_render((uint16_t)outputLine,
                                           pico9918_frame_count_impl(PICO9918_INST_ONLY), pixels);

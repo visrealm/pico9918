@@ -23,8 +23,6 @@ const pico9918_config_field_t pico9918_config_fields[] = {
   {PICO9918_CONF_SCANLINE_SPRITES, 3, 0, PENDING_MIRROR_NONE, 0x1000},
   {PICO9918_CONF_CLOCK_PRESET_ID, 2, 0, PICO9918_CONF_PENDING_CLOCK_PRESET, 0x1000},
   {PICO9918_CONF_SCART_MODE, 1, 0, PICO9918_CONF_PENDING_SCART_MODE, 0x1200},
-  // max/default track the host's VdpDevice enum (pico9918 src/config.h): the
-  // pin-behaviour variant is host policy, so only its range lives here
   {PICO9918_CONF_VDP_DEVICE, 3, 0, PENDING_MIRROR_NONE, 0x1101},
   {PICO9918_CONF_DISP_DRIVER_PREF, 2, 0, PICO9918_CONF_PENDING_DRIVER_PREF, 0x1200}, // 1.2.0
   {PICO9918_CONF_VGA_MODE, 0, 0, PICO9918_CONF_PENDING_VGA_MODE, 0x1200},            // 0=480p60 (only)
@@ -141,12 +139,8 @@ void pico9918_config_set_applied_callback(void (*cb)(void))
 
 void pico9918_config_apply(PICO9918_INST_ONLY_ARG)
 {
-  /* first, so the host's own apply effects land where its former applyConfig()
-     put them: ahead of the VDP-side effects below */
   if (configAppliedCallback) configAppliedCallback();
 
-  /* the rest of the configuration lives in VDP state, which is a running program's
-     to own: seed it at boot and on an explicit reset, not on every option write */
   if (tms9918->configVdpDirty)
   {
     tms9918->configVdpDirty = false;
@@ -171,8 +165,6 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG)
   tms9918->config[PICO9918_CONF_DIAG] = tms9918->config[PICO9918_CONF_DIAG_ADDRESS] || tms9918->config[PICO9918_CONF_DIAG_PALETTE] ||
                                tms9918->config[PICO9918_CONF_DIAG_PERFORMANCE] || tms9918->config[PICO9918_CONF_DIAG_REGISTERS];
 
-  /* The only writer of the render base after construction. The config byte can change
-     under a sanitize or a host write, so the renderer sees it only from here. */
   tms9918->vdpBase = (tms9918->config[PICO9918_CONF_VDP_BASE] == PICO9918_BASE_V9938)
                        ? PICO9918_BASE_V9938
                        : PICO9918_BASE_TMS9918;

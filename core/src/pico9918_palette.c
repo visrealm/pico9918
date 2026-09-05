@@ -57,8 +57,6 @@ PICO9918_NOINLINE void pico9918_palette_regenerate(PICO9918_INST_ONLY_ARG)
   pico9918_palette_owner = tms9918;
 #endif
 
-  /* one build per rebuild - TEXT80 packs two 4-bit indexes per byte, except where the
-     8bpp tier gives it a byte a pixel and the plain six-bit index back */
   const bool pixelsDoubled = pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80 ||
                              pico9918_line_bytes(PICO9918_INST_ONLY) != TMS9918_PIXELS_X;
   const uint16_t* source   = tms9918->vram.map.pram;

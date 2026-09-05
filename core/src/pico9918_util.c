@@ -88,8 +88,6 @@ void pico9918_initialise_gfx_ii(PICO9918_INST_ONLY_ARG)
                                                           TMS_R1_DISP_ACTIVE | TMS_R1_INT_ENABLE);
   pico9918_set_name_table_addr(PICO9918_INST TMS_DEFAULT_VRAM_NAME_ADDRESS);
 
-  /* in Graphics II registers 3 and 4 pick an 8KB half rather than an address:
-     reg3 0x7f/0xff and reg4 0x03/0x07 mean 0x0000/0x2000 */
 
   pico9918_write_register_value(PICO9918_INST TMS_REG_COLOR_TABLE, 0x7f);
   pico9918_write_register_value(PICO9918_INST TMS_REG_PATTERN_TABLE, 0x07);

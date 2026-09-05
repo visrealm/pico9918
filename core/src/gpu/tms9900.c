@@ -166,9 +166,6 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
   switch (o.mode)
   {
   case 0: /* register direct */
-    /* For byte ops, TMS9900 accesses the HIGH byte of the register word.
-       * WP+reg*2 is the high byte in big-endian memory (assembly: LDRB/STRB at [WP+reg*2]).
-       * For word ops, read the full 16-bit word. */
     if (is_byte) o.addr = (uint16_t)wp_addr(cpu, o.reg); /* high byte address */
     o.val = is_byte ? cpu->mem[wp_addr(cpu, o.reg)] : get_reg(cpu, o.reg);
     break;
@@ -185,8 +182,6 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
       ea = offset; /* @address - no register added (assembly: CMP R5,#0; BEQ skip_add) */
     else
       ea = (uint16_t)(get_reg(cpu, o.reg) + offset);
-    /* Assembly word-aligns effective address for word ops (LSRS/LSLS #1);
-       * byte ops use unaligned address. */
     o.addr = is_byte ? ea : (ea & 0xFFFE);
     o.val  = is_byte ? rd8(cpu->mem, o.addr) : rd16(cpu->mem, o.addr);
     break;
@@ -211,8 +206,6 @@ static void store_operand(Tms9900Cpu* cpu, const Operand* o, uint16_t v)
   {
     if (o->is_byte)
     {
-      /* Byte register write: assembly does STRB at WP+reg*2 (high byte of the word).
-       * Only the high byte is updated; low byte is unchanged. */
       cpu->mem[wp_addr(cpu, o->reg)] = (uint8_t)v;
     }
     else
@@ -514,14 +507,8 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   case 0x10: /* BLWP */
   {
     Operand s = decode_operand(cpu, inst & 0x3F, 0);
-    /* Assembly reads [R5,#0] and [R5,#2] directly from the source operand address.
-       * For mode 0, R5 = WP+reg*2, so new_WP = reg[N], new_PC = reg[N+1].
-       * For other modes, R5 is the effective address in memory.
-       * Must use uint32_t - with WP=0xFFFE, registers R1+ are past 0x10000. */
     uint32_t src_addr = (s.mode == 0) ? wp_addr(cpu, inst & 0xF) : (uint32_t)s.addr;
     uint16_t new_wp   = (uint16_t)((cpu->mem[src_addr] << 8) | cpu->mem[src_addr + 1]) & 0xFFFE;
-    /* Assembly saves old context BEFORE reading new PC from [R5,#2].
-       * This matters if new workspace R13-R15 overlaps the BLWP vector. */
     uint16_t old_wp = cpu->wp;
     uint16_t old_pc = cpu->pc;
     uint16_t old_st = cpu->st;
@@ -536,9 +523,6 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0x11: /* B - branch to source operand address */
   {
-    /* Assembly I_B: R3 = R5 - R8. For mode 0, R5 = WP+reg*2 (register's workspace
-       * address), so PC becomes the register's address, not its value.
-       * Must use uint32_t - with WP=0xFFFE, registers R1+ are past 0x10000. */
     Operand s       = decode_operand(cpu, inst & 0x3F, 0);
     uint32_t target = (s.mode == 0) ? wp_addr(cpu, inst & 0xF) : (uint32_t)s.addr;
     cpu->pc         = target & 0xFFFE;
@@ -546,9 +530,6 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0x12: /* X - execute instruction at source */
   {
-    /* Assembly I_X: LDRH R0,[R5,#0]. For mode 0, R5 is the register address,
-       * so [R5,#0] loads the register VALUE which IS the instruction to execute.
-       * For other modes, R5 is the effective address, reading the instruction from memory. */
     Operand s       = decode_operand(cpu, inst & 0x3F, 0);
     uint16_t x_inst = (s.mode == 0) ? s.val : rd16(cpu->mem, s.addr);
     /* Dispatch the fetched instruction (PC is NOT advanced by X itself) */
@@ -583,9 +564,6 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   case 0x14: /* NEG */
   {
     Operand d = decode_operand(cpu, inst & 0x3F, 0);
-    /* Assembly: MOVS R4,#0x06; ANDS R1,R4 (clear C and OV).
-       * If input==0x8000: OV set, no store, flags on 0x8000 (LGT only).
-       * Otherwise: negate, carry if result==0, store, set flags. */
     cpu->st &= 0x06;
     if (d.val == 0x8000u)
     {
@@ -640,8 +618,6 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0x1A: /* BL - branch and link, save PC to R11 */
   {
-    /* Assembly I_BL: R3 = R5 - R8. Same as B - mode 0 uses workspace address.
-       * Must use uint32_t - with WP=0xFFFE, registers R1+ are past 0x10000. */
     Operand s = decode_operand(cpu, inst & 0x3F, 0);
     set_reg(cpu, 11, (uint16_t)cpu->pc);
     uint32_t target = (s.mode == 0) ? wp_addr(cpu, inst & 0xF) : (uint32_t)s.addr;
@@ -677,8 +653,6 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
     {
       uint16_t res = (uint16_t)(0u - d.val);
       store_operand(cpu, &d, res);
-      /* Assembly I_ABS_no_ov: R0 still holds original negative value when
-         * OP_COMP_W is reached - flags are set on the ORIGINAL, not the result */
       set_flags_word(cpu, d.val);
     }
     else
@@ -771,8 +745,6 @@ static inline void handle_cru_single_bit(void) {}
  */
 static inline void handle_shift_rotate(Tms9900Cpu* cpu, uint16_t inst)
 {
-  /* Format V: 0000 oooo cccc rrrr - opcode 11:8, shift count 7:4, register 3:0.
-     8=SRA, 9=SRL, A=SLA, B=SRC, E=SLC. */
   uint8_t sub = (inst >> 8) & 0xF;
   uint8_t count = (inst >> 4) & 0xF;
   uint8_t reg   = inst & 0xF;
@@ -835,21 +807,6 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0xB: /* 0x2C00-0x2FFF: XOP/F18A PIX */
   {
-    /*
-       * PIX flag bits in the dest register value (R4 in assembly):
-       *   Bit 15: M   - Mode (1=BM, 0=BL)
-       *   Bit 14: A   - Address only (return calculated address, skip pixel ops)
-       *   Bit 11: R   - Read back current pixel value into dest reg bits [1:0]
-       *   Bit 10: W   - When set, skip write (write disabled)
-       *   Bit  9: C   - Conditional write (when set, test before writing)
-       *   Bit  8: E   - Equal/Not-equal select (1=not-equal test, 0=equal test)
-       *   Bits[5:4]: PP compare - Pixel pattern for conditional comparison
-       *   Bits[1:0]: PP write   - Pixel pattern value for writing
-       *
-       * Mask and shift lookup (matches MSKSH in assembly):
-       *   mask[s]:  0xC0, 0x30, 0x0C, 0x03
-       *   shift[s]: 6, 4, 2, 0
-       */
     static const uint8_t pix_mask[]  = {0xC0, 0x30, 0x0C, 0x03};
     static const uint8_t pix_shift[] = {6, 4, 2, 0};
 
@@ -965,8 +922,6 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
     /* RET=0x0C00 (bits 6:0 of inst are 0), CALL=0x0C40+ (bit 6 set) */
     if (inst & 0xC0)
     { /* CALL - push PC at OLD R15, pre-decrement R15 by 2, branch to source */
-      /* Assembly I_CALL: R3 = R5 - R8. Same as B - mode 0 uses workspace address.
-         * Must use uint32_t - with WP=0xFFFE, registers R1+ are past 0x10000. */
       Operand s       = decode_operand(cpu, inst & 0x3F, 0);
       uint16_t old_sp = get_reg(cpu, 15) & 0xFFFE;
       uint16_t new_sp = (uint16_t)(old_sp - 2);
@@ -1013,8 +968,6 @@ static inline void handle_two_operand(Tms9900Cpu* cpu, uint16_t inst)
 {
   uint8_t opcode  = (uint8_t)((inst >> 12) & 0xF);
   uint8_t byte_op = opcode & 1; /* odd opcode = byte variant */
-  /* TMS9900 two-operand format: bits 5:0 = source (Ts+S), bits 11:6 = dest (Td+D).
-   * Source must be decoded first to match assembly decode order (PC fetch sequence). */
   Operand src = decode_operand(cpu, (uint8_t)(inst & 0x3F), byte_op);
   Operand dst = decode_operand(cpu, (uint8_t)((inst >> 6) & 0x3F), byte_op);
 

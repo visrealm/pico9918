@@ -228,15 +228,6 @@ void PICO9918_IN_FLASH_FUNC(pico9918_diag_init)(void)
   clear(&sprPattTabStr);
   clear(&outputStr);
 
-  /* NOT reset here, deliberately, and it is worth saying why because it looks
-     like an omission: the four timing accumulators (accumulatedRenderTime,
-     accumulatedFrameTime, accumulatedScanlines, lastUpdateTime).
-
-     They are zero-initialised statics and this function runs exactly once per
-     boot, before any scanline has accumulated, so clearing them would be a
-     provable no-op. A caller that re-primes the module mid-run and needs a
-     known accumulator state must zero them itself; the golden harness does
-     exactly that (see overlayPrimeDiag). */
 }
 
 void pico9918_diag_set_version_info(const char* hwVersion, const char* fwVersion)
@@ -631,12 +622,6 @@ void pico9918_diag_render(PICO9918_INST_ARG uint16_t y, uint32_t vVirtualPixels,
   if (tms9918->config[PICO9918_CONF_DIAG_PALETTE] && (y > ((int)vVirtualPixels - 27)))
     renderPalette(PICO9918_INST y + 2, vVirtualPixels, pixels);
 
-  /* One divide, remainder by multiply-subtract. GCC does NOT merge a `/` and `%`
-   * pair into a single __aeabi_uidivmod on Cortex-M0+ (verified on 15.2: it emits
-   * uidiv AND uidivmod), so the plain pair would cost two calls into the hardware
-   * divider where the divmod_u32u32 this replaced cost one. This form keeps it at
-   * one and stays portable - no SDK helper, no inline asm. Exhaustively identical
-   * to y % 6 over the whole uint16 range. */
   const unsigned diagRow6 = (unsigned)y / 6u;
   int diagRow             = (int)diagRow6;
   int row                 = (int)((unsigned)y - diagRow6 * 6u);
@@ -662,9 +647,6 @@ void pico9918_diag_render(PICO9918_INST_ARG uint16_t y, uint32_t vVirtualPixels,
     }
 
     int xPos = 636 - (PICO9918_DIAG_CHAR_WIDTH * 13);
-    /* unsigned, and one divide (see the /6 note above). diagRow is non-negative
-     * here - it indexes the register tables - so the unsigned form is exact, and
-     * it avoids the signed __aeabi_idiv the int form would emit. */
     const unsigned regTens = (unsigned)diagRow / 10u;
     char buf[]             = "R00:";
     buf[1]                 = '0' + regTens;

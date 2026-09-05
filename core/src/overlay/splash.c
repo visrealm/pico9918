@@ -57,8 +57,6 @@ void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, u
                           uint32_t vVirtualPixels, PICO9918_PIXEL_T* pixels)
 {
 #if PICO9918_NO_SPLASH
-  /* every parameter is unused when the overlay is off, and the library's
-   * warnings-as-errors posture (MSVC /W4 /WX) rejects that */
   (void)y;
   (void)frameCount;
   (void)vBorder;
@@ -86,10 +84,6 @@ void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, u
     y -= vBorder + vPixels + logoOffset;
     if (y < splashHeight)
     {
-      /* the source image is 2bpp, so 4 pixels in a byte
-       * this doesn't need to be overly performant as it only
-       * gets called in the first few seconds of startup (or reset)
-       */
       const int leftBorderPx     = 4;
       const int splashBpp        = 2;
       const int splashPixPerByte = 8 / splashBpp;

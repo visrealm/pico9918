@@ -123,8 +123,6 @@ static void triggerGpuDma(uint8_t* vram)
 {
   uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8000));
   uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8002));
-  /* Both counts are loop counters the engine tests against one, so a zero walks the
-     whole byte before it gets there: 0 is 256, and the largest transfer is the map. */
   const uint32_t widthByte = vram[0x8004];
   uint32_t width           = widthByte ? widthByte : 256;
   uint32_t height          = vram[0x8005] ? vram[0x8005] : 256;
@@ -137,18 +135,12 @@ static void triggerGpuDma(uint8_t* vram)
   uint8_t* srcPtr = vram + srcVramAddr;
   uint8_t* dstPtr = vram + dstVramAddr;
 
-  /* Rows touch when the stride matches the width, which for a 256-wide row is a stride
-     byte of zero - so the comparison is between the bytes, not the counts. */
   const bool contiguous = stride == widthByte;
   const uint32_t rowStep = contiguous ? width : stride;
 
-  /* Going forward, a row is one library call, and rows that touch collapse into a
-     single call over the whole rectangle. */
   const uint32_t run  = contiguous ? width * height : width;
   const uint32_t rows = contiguous ? 1 : height;
 
-  /* The engine's addresses are 16 bits and wrap, which a pointer walk cannot do, so the
-     library calls below only take a transfer whose furthest byte stays inside the map. */
   const uint32_t reach    = (height - 1) * rowStep + width - 1;
   const uint32_t srcReach = srcInc ? reach : 0;
   const bool     inRange  = (dstInc < 0)
@@ -163,9 +155,6 @@ static void triggerGpuDma(uint8_t* vram)
     const uint8_t value = *srcPtr;
     for (uint32_t y = 0; y < rows; ++y, dstPtr += rowStep) memset(dstPtr, value, run);
   }
-  /* Disjoint runs only. A destination overlapping its source ahead of it smears the
-     source along, which is what the byte loop does and what memcpy would not, and one
-     overlapping behind is a copy memcpy is not allowed to make at all. */
   else if (srcInc == 1 && (dstPtr >= srcPtr + run || srcPtr >= dstPtr + run))
   {
     for (uint32_t y = 0; y < rows; ++y, srcPtr += rowStep, dstPtr += rowStep)
@@ -211,9 +200,6 @@ static void PICO9918_IN_FLASH_FUNC(guard)(uint32_t region, void* a, uint32_t byt
 {
   uintptr_t addr = (uintptr_t)a;
 #if PICO_RP2040
-  /* the region is a whole 256-byte page and the range sits at some offset inside it,
-     so the subregions to leave live are the ones that offset actually spans - an SRD
-     built from the length alone would guard the head of the page instead */
   uint32_t base  = addr & (uint)~0xff;
   uint32_t first = (addr - base) >> 5;
   uint32_t last  = (addr + bytes - 1 - base) >> 5;
@@ -306,9 +292,6 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
     mpu_hw->ctrl = 0; /* Turn off memory protection - all models */
 #endif
 
-    /* The run flag still set means the program did not finish - it parked on an
-       IDLE or a self-jump, or a budget ran out. Either way the PC is where to pick
-       it up, but only the budget leaves the program with work still to do. */
     if (TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) & 1)
     {
       tms9918->gpuAddress = lastAddress;
@@ -319,9 +302,6 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
     if (didFault)
     {
       didFault = 0;
-      /* the dma port's parameter bytes sit inside its guarded page, so each one faults
-         ahead of the trigger; with the palette region already down, the fault cannot
-         have been PRAM */
       if (tms9918->vram.bytes[0x8008])
         triggerGpuDma(tms9918->vram.bytes);
       else if (!pico9918_gpu_palette_guard_off)
@@ -330,9 +310,6 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
     }
 #endif
   }
-  /* A budget that ran out leaves a program that is still running, and saying so is
-     the whole point of it. Without one the flags come down exactly as they always
-     have, including for a program parked on a self-jump. */
   if (running) return true;
 
   TMS_STATUS(tms9918, PICO9918_SR_GPU) &= ~0x80; /* Stopped */
