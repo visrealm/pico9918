@@ -3507,14 +3507,16 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
     // SR12 holds the value of the option in VR58 (options)
     else if (regIndex == PICO9918_REG_CONFIG_INDEX && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))
     {
-      const uint8_t option                          = TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX);
+      const uint8_t option = TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX);
+
       TMS_STATUS(tms9918, PICO9918_SR_CONFIG_VALUE) = tms9918->config[option];
     }
     // option number in reg 58, value in 59 (options)
     else if (regIndex == PICO9918_REG_CONFIG_VALUE && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG) &&
              TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX) >= 8)
     {
-      const uint8_t option                          = TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX);
+      const uint8_t option = TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX);
+
       tms9918->config[option]                       = value;
       TMS_STATUS(tms9918, PICO9918_SR_CONFIG_VALUE) = value;
       tms9918->configDirty                          = true;
