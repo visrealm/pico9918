@@ -145,6 +145,48 @@ PICO9918_DLLEXPORT
 uint16_t pico9918_gpu_pc(PICO9918_INST_ONLY_ARG);
 
 /**
+ * \brief a byte of the GPU's address space, without disturbing anything
+ *
+ * What the GPU sees, which is not what the host data port sees: pico9918_vram_value is
+ * the guest's view and stops at 0x3FFF, so it cannot reach GRAM at 0x4000, the palette
+ * at 0x5000, the register and status windows, or the workspace. Disassembly and memory
+ * views want this one.
+ *
+ * The space runs past 0xFFFF. The GPU's workspace pointer is 0xFFFE, so R0 is the last
+ * word of the 64KB map and R1-R15 spill into an overflow above it. Anything beyond the
+ * space reads 0, so a view that walks off the end sees zeroes rather than the instance.
+ */
+PICO9918_DLLEXPORT
+uint8_t pico9918_gpu_mem_value(PICO9918_INST_ARG uint32_t addr);
+
+/** \brief the size of that space, so a memory view knows where to stop */
+PICO9918_DLLEXPORT
+uint32_t pico9918_gpu_mem_size(void);
+
+/**
+ * \brief a GPU workspace register, R0-R15, without disturbing anything
+ *
+ * The workspace is fixed at 0xFFFE and a TMS9900 register is a word there, so this is
+ * the two bytes at 0xFFFE + 2n read big-endian. Only the low four bits of \p reg are
+ * used. Reachable through pico9918_gpu_mem_value() as well; this is here because the
+ * wrap past 0xFFFF is the library's business, not a debugger's.
+ */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_reg_value(PICO9918_INST_ARG uint8_t reg);
+
+/**
+ * \brief the GPU's status register between instructions
+ *
+ * TRAP: maintained only where the library paces the GPU itself. The hand-written Thumb
+ * cores a board builds run a program to completion and keep the status in a local, so
+ * there is no point between instructions for this to describe and it reads whatever it
+ * last held. Where pico9918_gpu_step_n() honours its cap - every desktop build - this
+ * is the status at the point the slice stopped, which is what a single step wants.
+ */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_status(PICO9918_INST_ONLY_ARG);
+
+/**
  * Return the GPU's CPU time in microseconds.
  * If the GPU is still running (hasn't reported back), returns totalTime.
  *

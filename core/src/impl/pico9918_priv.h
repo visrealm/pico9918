@@ -19,14 +19,23 @@
  * A DEBUGGER IS THE SECOND AUDIENCE, and the rule for it is which surface, not which
  * operation.
  *
- * Reads are public because reads are safe. pico9918.h publishes every non-destructive
- * one - pico9918_peek_status, pico9918_status_value, pico9918_read_data_no_inc,
- * pico9918_reg_value, pico9918_vram_value, pico9918_gpu_pc - so sampling state on the
- * guest's own path needs nothing from here and stays on a stable surface. A bridge that
- * finds itself in this header for a READ has taken a wrong turn rather than made a
- * judgement call, with one hardware exception: pico9918_reg_value is the guest's view,
- * so on a locked device it decodes three address bits and reg 30 reads R6. Reading the
- * physical register behind that is TMS_REGISTER, below.
+ * Reads are public because reads are safe, and the published set is meant to be
+ * complete. pico9918.h has the chip - pico9918_peek_status, pico9918_status_value,
+ * pico9918_read_data_no_inc, pico9918_reg_value, pico9918_vram_value - and gpu/gpu.h
+ * has the GPU: pico9918_gpu_pc, pico9918_gpu_mem_value, pico9918_gpu_mem_size,
+ * pico9918_gpu_reg_value, pico9918_gpu_status. A bridge that finds itself in this
+ * header for a READ has taken a wrong turn rather than made a judgement call, and if
+ * something genuinely has no public read then the gap is the bug.
+ *
+ * Two of those pairs look alike and are not:
+ *
+ *   pico9918_vram_value    | the guest's view, so it stops at 0x3FFF
+ *   pico9918_gpu_mem_value | the GPU's, so it reaches GRAM, the palette, the register
+ *                          | and status windows and the workspace above 0xFFFF
+ *   pico9918_reg_value     | VR0-VR63, and the guest's view of them: on a locked device
+ *                          | it decodes three address bits, so reg 30 reads R6. The
+ *                          | physical register behind that is TMS_REGISTER, below
+ *   pico9918_gpu_reg_value | the GPU's own R0-R15, out of its workspace
  *
  * WRITES that must not behave like the guest are the reason to be here. Every public
  * register write goes through the bus and so takes the unlock gate and the locked-mask

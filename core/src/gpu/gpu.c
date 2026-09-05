@@ -430,6 +430,43 @@ uint16_t pico9918_gpu_pc(PICO9918_INST_ONLY_ARG)
   return tms9918->gpuAddress;
 }
 
+/* The GPU's workspace pointer, which gpuRun passes run9900 and nothing changes. */
+#define GPU_WORKSPACE 0xFFFEu
+
+/** \brief see the header. The whole map the GPU addresses, workspace overflow included. */
+PICO9918_DLLEXPORT
+uint32_t pico9918_gpu_mem_size(void)
+{
+  return (uint32_t)sizeof(((pico9918_t*)0)->vram);
+}
+
+/** \brief see the header. A byte of that map, or 0 past the end of it. */
+PICO9918_DLLEXPORT
+uint8_t pico9918_gpu_mem_value(PICO9918_INST_ARG uint32_t addr)
+{
+  if (addr >= pico9918_gpu_mem_size()) return 0;
+
+  /* not vram.bytes: that array stops at 0xFFFF and the workspace overflow is past it */
+  return ((const uint8_t*)&tms9918->vram)[addr];
+}
+
+/** \brief see the header. R0-R15 as words at the fixed workspace. */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_reg_value(PICO9918_INST_ARG uint8_t reg)
+{
+  const uint32_t at = GPU_WORKSPACE + ((uint32_t)(reg & 0x0f) << 1);
+
+  return (uint16_t)((pico9918_gpu_mem_value(PICO9918_INST at) << 8) |
+                    pico9918_gpu_mem_value(PICO9918_INST at + 1));
+}
+
+/** \brief see the header. The status between instructions, where one paces them. */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_status(PICO9918_INST_ONLY_ARG)
+{
+  return tms9918->gpuStatus;
+}
+
 /*
  * The same pass, but capped, for a host that has only the one thread.
  *

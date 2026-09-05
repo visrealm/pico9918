@@ -92,9 +92,37 @@ int main(void)
   if (pico9918_gpu_pc(PICO9918_INST_ONLY) != PROGRAM_AT)
     fail("armed-pc", PROGRAM_AT, pico9918_gpu_pc(PICO9918_INST_ONLY));
 
+  /* and a disassembler can reach the program: the guest's own view stops at 0x3fff, so
+     PROGRAM_AT is in range for both, but only the GPU's reaches past it. */
+  if (pico9918_gpu_mem_value(PICO9918_INST PROGRAM_AT) != 0x02)
+    fail("gpu-mem-program", 0x02, pico9918_gpu_mem_value(PICO9918_INST PROGRAM_AT));
+
+  tms9918->vram.bytes[0x4100] = 0x5a;
+  if (pico9918_gpu_mem_value(PICO9918_INST 0x4100) != 0x5a)
+    fail("gpu-mem-gram", 0x5a, pico9918_gpu_mem_value(PICO9918_INST 0x4100));
+  if (pico9918_vram_value(PICO9918_INST 0x4100) == 0x5a) fail("vram-value-reached-gram", 0, 0x5a);
+
+  /* and it stops where the map does rather than walking into the instance */
+  if (pico9918_gpu_mem_value(PICO9918_INST pico9918_gpu_mem_size()) != 0)
+    fail("gpu-mem-past-end", 0, pico9918_gpu_mem_value(PICO9918_INST pico9918_gpu_mem_size()));
+
   /* 2. and it is only armed, not lost: the host-driven path still works. */
   pico9918_gpu_step_n(PICO9918_INST 1000);
   if (result() != MARKER) fail("host-driven", MARKER, result());
+
+  /* the program left >BEEF in R0, which is the last word of the map, and R1 is above it
+     in the workspace overflow - so reading either through the 16-bit map cannot work */
+  if (pico9918_gpu_reg_value(PICO9918_INST 0) != MARKER)
+    fail("gpu-r0", MARKER, pico9918_gpu_reg_value(PICO9918_INST 0));
+
+  tms9918->vram.map.wrksp[0] = 0x12;
+  tms9918->vram.map.wrksp[1] = 0x34;
+  if (pico9918_gpu_reg_value(PICO9918_INST 1) != 0x1234)
+    fail("gpu-r1", 0x1234, pico9918_gpu_reg_value(PICO9918_INST 1));
+
+  /* IDLE leaves the status the compare before it set, so it is not simply zero */
+  if (pico9918_gpu_status(PICO9918_INST_ONLY) == 0)
+    fail("gpu-status-zero", 1, pico9918_gpu_status(PICO9918_INST_ONLY));
 
   /* and it moved: a run leaves the point it reached, not the address it was armed at */
   if (pico9918_gpu_pc(PICO9918_INST_ONLY) == PROGRAM_AT)
