@@ -1306,16 +1306,28 @@ static inline uint32_t textScrollCell(const uint32_t hscrollPixels)
    inside the first cell is an even number of pixels - a whole byte at four bits a pixel, which is
    what lets that depth place the offset by moving the destination. Both depths and both
    column counts come through here so the emitter and the composite cannot disagree about it. */
-static inline uint32_t textStartCell(const uint32_t hscroll, const bool wide)
+/* Cell in the low half, the pixel within it in the high. One split a layer a line, handed to the
+   emitter whole, so the nine wide bodies below do not each carry a copy of the division. */
+#define TEXT_SCROLL_CELL(s)   ((s) & 0xffffu)
+#define TEXT_SCROLL_OFFSET(s) ((s) >> 16)
+
+static inline uint32_t textScrollSplit(const uint32_t hscroll, const bool wide)
 {
-  return textScrollCell(wide ? hscroll * 2 : hscroll);
+  /* = wide ? hscroll * 2 : hscroll, less the branch a run-time `wide` would cost */
+  const uint32_t h      = hscroll << wide;
+  const uint32_t cell   = textScrollCell(h);
+  const uint32_t offset = h - cell * 6;
+
+  /* LOAD-BEARING: the line is handed out at this offset and a caller may read it a word at a time,
+     which an odd one costs the zero-copy path entirely. Two is the only offset six-pixel cells can
+     leave that a word cannot start on, so it backs up a cell to eight - buffer slack covers it. */
+  if (wide && offset == 2) return (cell ? cell - 1 : TEXT80_NUM_COLS - 1) | (8u << 16);
+  return cell | (offset << 16);
 }
 
 static inline uint32_t textPixelOffset(const uint32_t hscroll, const bool wide)
 {
-  const uint32_t h      = wide ? hscroll * 2 : hscroll;
-  const uint32_t offset = h - textScrollCell(h) * 6;
-  return wide ? (offset & ~1u) : offset;
+  return TEXT_SCROLL_OFFSET(textScrollSplit(hscroll, wide));
 }
 
 static inline int scrollOffset(const uint32_t hscroll, const bool text, const bool wide)
@@ -1494,14 +1506,14 @@ static const uint32_t text80MaskWord[256] = {
 PICO9918_INLINE_HOT void
 renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRowAddr* __restrict addr,
               const uint8_t* __restrict rowColors, const uint32_t colorStride, uint32_t pal,
-              uint8_t* __restrict dest, const uint32_t hscroll, const bool alwaysOnTop,
+              uint8_t* __restrict dest, const uint32_t scroll, const bool alwaysOnTop,
               const uint32_t numCols, const bool isTile2, const uint32_t ecm, const bool blend)
 {
   const uint8_t* __restrict patternTable = addr->pattern;
   const bool wide                        = numCols == TEXT80_NUM_COLS;
   const uint32_t padding     = wide ? TEXT80_PADDING_PX : TEXT_PADDING_PX;
-  const uint32_t startCell   = textStartCell(hscroll, wide);
-  const uint32_t pixelOffset = textPixelOffset(hscroll, wide);
+  const uint32_t startCell   = TEXT_SCROLL_CELL(scroll);
+  const uint32_t pixelOffset = TEXT_SCROLL_OFFSET(scroll);
   const uint32_t numCells    = numCols + (pixelOffset ? 2 : 0);
 
   uint32_t* pix32 = (uint32_t*)PICO9918_ASSUME_ALIGNED(dest, 4);
@@ -1531,6 +1543,7 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
 
   uint8_t lastColor = 0;
   uint32_t bgWord = palette[0], diffWord = 0;
+  uint32_t coverBg = 0, coverDiff = 0;
   uint32_t lo = 0, hi = 0, m0 = 0, m1 = 0;
 
 #define TEXT40_NEXT_CELL() \
@@ -1538,15 +1551,18 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
   const uint8_t color = colors[name & nameAttrMask]; \
   colors += colorStride;
 
-#define TEXT40_CELL() \
+#define TEXT40_CELL(wrapping) \
   { \
     TEXT40_NEXT_CELL() \
-    /* text has no page size bits, so a start cell past the last reads on into the next row */ \
-    if (++col == numCols) \
+    if (wrapping) \
     { \
-      col = 0; \
-      names -= numCols; \
-      colors -= colorWrap; \
+      /* text has no page size bits, so a start cell past the last reads on into the next row */ \
+      if (++col == numCols) \
+      { \
+        col = 0; \
+        names -= numCols; \
+        colors -= colorWrap; \
+      } \
     } \
     const uint32_t patt = patternTable[name * PATTERN_BYTES]; \
     if (color != lastColor) \
@@ -1556,21 +1572,31 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
       bgWord                = palette[bgColor]; \
       diffWord              = bgWord ^ palette[fgColor]; \
       lastColor             = color; \
+      if (isTile2) \
+      { \
+        /* = bgColor ? ~0u : 0u, and that xor the same for fgColor */ \
+        coverBg   = (uint32_t)(-(int32_t)bgColor >> 31); \
+        coverDiff = coverBg ^ (uint32_t)(-(int32_t)fgColor >> 31); \
+      } \
     } \
-    lo = bgWord ^ (diffWord & maskExpandNibbleToWordRev[patt >> 4]); \
-    hi = (uint16_t)(bgWord ^ (diffWord & maskExpandNibbleToWordRev[patt & 0x0f])); \
+    /* 0x0c, not 0x0f: six pixels a cell, so the byte's two spare bits are dropped at the index */ \
+    const uint32_t maskLo = maskExpandNibbleToWordRev[patt >> 4]; \
+    const uint32_t maskHi = maskExpandNibbleToWordRev[patt & 0x0c]; \
+    lo                    = bgWord ^ (diffWord & maskLo); \
+    hi                    = bgWord ^ (diffWord & maskHi); \
     if (isTile2) \
     { \
-      /* every cell rolls the six-bit accumulator, drawn or not, or the bit position stops tracking */ \
-      const uint32_t bits  = patt >> 2; \
-      const uint32_t cover = ((((color >> 4) ? bits : 0) | ((color & 0xf) ? ~bits : 0)) & 0x3f) << 26; \
       if (blend) \
       { \
-        m0 = maskExpandNibbleToWordRev[cover >> 28]; \
-        m1 = maskExpandNibbleToWordRev[(cover >> 24) & 0x0c]; \
+        /* cover has the shape colour does, so it selects through the masks already in hand */ \
+        m0 = coverBg ^ (coverDiff & maskLo); \
+        m1 = coverBg ^ (coverDiff & maskHi); \
       } \
       else \
       { \
+        /* = ((fg ? bits : 0) | (bg ? ~bits : 0)) & 0x3f, off the pair memoised above */ \
+        const uint32_t cover = ((coverBg ^ (coverDiff & (patt >> 2))) & 0x3f) << 26; \
+        /* rolled every cell, drawn or not, or the bit position stops tracking */ \
         coverAcc |= cover >> coverBit; \
         coverBit += 6; \
         if (coverBit >= 32) \
@@ -1669,29 +1695,47 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
 
       names  = rowNames;
       colors = rowColors;
-      run    = remaining;
+      run    = numCols;
     }
 
     if (isTile2) *coverWord |= coverAcc;
   }
   else if (blend)
   {
-    uint32_t* coverWord = tms9918->layerSelectionMask + (padding >> 5);
-    uint32_t coverAcc = 0, coverBit = padding & 0x1f;
+    /* named, not used: the cell macro's other arm still has to compile here */
+    uint32_t* coverWord = tms9918->layerSelectionMask;
+    uint32_t coverAcc = 0, coverBit = 0;
 
-    uint16_t* p = (uint16_t*)dest;
+    uint16_t* p        = (uint16_t*)dest;
+    uint32_t remaining = numCells;
+    uint32_t run       = (startCell < numCols) ? (numCols - startCell) : numCells;
 
-    for (uint32_t tileX = 0; tileX < numCells; ++tileX)
+    while (remaining)
     {
-      TEXT40_CELL();
-      uint32_t d;
-      d    = p[0];
-      p[0] = d ^ ((d ^ lo) & m0);
-      d    = p[1];
-      p[1] = d ^ ((d ^ (lo >> 16)) & (m0 >> 16));
-      d    = p[2];
-      p[2] = d ^ ((d ^ hi) & m1);
-      p += 3;
+      if (run > remaining) run = remaining;
+      remaining -= run;
+
+      while (run--)
+      {
+        TEXT40_CELL(false);
+
+        // a cell covering nothing merges nothing: all three of these are provably no-ops
+        if (m0 | m1)
+        {
+          uint32_t d;
+          d    = p[0];
+          p[0] = d ^ ((d ^ lo) & m0);
+          d    = p[1];
+          p[1] = d ^ ((d ^ (lo >> 16)) & (m0 >> 16));
+          d    = p[2];
+          p[2] = d ^ ((d ^ hi) & m1);
+        }
+        p += 3;
+      }
+
+      names  = rowNames;
+      colors = rowColors;
+      run    = numCols;
     }
   }
   else
@@ -1704,10 +1748,10 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
     {
       uint16_t* pix16 = (uint16_t*)pix32;
 
-      TEXT40_CELL();
+      TEXT40_CELL(true);
       pix32[0] = lo;
       pix16[2] = hi;
-      TEXT40_CELL();
+      TEXT40_CELL(true);
       pix16[3] = lo;
       pix32[2] = (lo >> 16) | (hi << 16);
       pix32 += 3;
@@ -1726,12 +1770,12 @@ renderTextRow(PICO9918_INST_ARG const uint8_t* __restrict rowNames, const TileRo
    RP2040 keeps the blend-in-place emitter below. */
 #define TEXT_ROW_PARAMS \
   PICO9918_INST_ARG const uint8_t *rowNames, const TileRowAddr *addr, const uint8_t *rowColors, \
-    const uint32_t colorStride, const uint32_t pal, uint8_t *dest, const uint32_t hscroll, \
+    const uint32_t colorStride, const uint32_t pal, uint8_t *dest, const uint32_t scroll, \
     const bool alwaysOnTop
 #define TEXT_ROW_CLONE(name, cols, t2, e) \
   static EMITTER_NOINLINE void __time_critical_func(name)(TEXT_ROW_PARAMS) \
   { \
-    renderTextRow(PICO9918_INST rowNames, addr, rowColors, colorStride, pal, dest, hscroll, alwaysOnTop, \
+    renderTextRow(PICO9918_INST rowNames, addr, rowColors, colorStride, pal, dest, scroll, alwaysOnTop, \
                   cols, t2, e, false); \
   }
 
@@ -1766,7 +1810,7 @@ TEXT_ROW_CLONE(text80RowT2Ecm3, TEXT80_NUM_COLS, true, 3)
    attr(0) per tile - so it is a body of its own rather than what the layer always does. */
 static EMITTER_NOINLINE void __time_critical_func(text80RowT2Blend)(TEXT_ROW_PARAMS)
 {
-  renderTextRow(PICO9918_INST rowNames, addr, rowColors, colorStride, pal, dest, hscroll, alwaysOnTop,
+  renderTextRow(PICO9918_INST rowNames, addr, rowColors, colorStride, pal, dest, scroll, alwaysOnTop,
                 TEXT80_NUM_COLS, true, 0, true);
 }
 
@@ -2447,6 +2491,7 @@ static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG ui
     const uint8_t* colors = (attrPerPos || ecm) ? tms9918->vram.bytes + colorTableAddr : &fixed;
     uint8_t* dest         = (config->isTile2 ? tms9918->tileLayer2Buffer : tms9918->tileLayer1Buffer) +
                     (wide ? TEXT80_PADDING_PX : TEXT_PADDING_PX);
+    const uint32_t scroll = textScrollSplit(TMS_REGISTER(tms9918, config->startPattReg), wide);
 
 #if PICO9918_TEXT80_8BPP
     if (blend)
@@ -2454,9 +2499,9 @@ static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG ui
       /* into layer 1's line, at the offset layer 2's own scroll puts it there */
       dest = tms9918->tileLayer1Buffer + TEXT80_PADDING_PX +
              textPixelOffset(TMS_REGISTER(tms9918, PICO9918_REG_T1_HSCROLL), true) -
-             textPixelOffset(TMS_REGISTER(tms9918, PICO9918_REG_T2_HSCROLL), true);
+             TEXT_SCROLL_OFFSET(scroll);
       text80RowT2Blend(PICO9918_INST tms9918->vram.bytes + rowNamesAddr, &addr, colors, attrPerPos, pal,
-                       dest, TMS_REGISTER(tms9918, config->startPattReg), alwaysOnTop);
+                       dest, scroll, alwaysOnTop);
       return;
     }
 #endif
@@ -2465,14 +2510,12 @@ static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG ui
     if (wide)
     {
       text80RowClones[config->isTile2][ecm](PICO9918_INST tms9918->vram.bytes + rowNamesAddr, &addr,
-                                            colors, attrPerPos, pal, dest,
-                                            TMS_REGISTER(tms9918, config->startPattReg), alwaysOnTop);
+                                            colors, attrPerPos, pal, dest, scroll, alwaysOnTop);
       return;
     }
 #endif
     textRowClones[config->isTile2][ecm](PICO9918_INST tms9918->vram.bytes + rowNamesAddr, &addr, colors,
-                                        attrPerPos, pal, dest,
-                                        TMS_REGISTER(tms9918, config->startPattReg), alwaysOnTop);
+                                        attrPerPos, pal, dest, scroll, alwaysOnTop);
     return;
   }
 

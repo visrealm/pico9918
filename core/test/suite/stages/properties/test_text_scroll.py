@@ -33,7 +33,9 @@ BACKDROP = scenes.BACKDROP
 
 # every scroll value that stays inside the ring. At 240 and up the row reads on
 # past its own end, so it is not a cycle of itself
-HSCROLLS = [0, 1, 2, 3, 5, 6, 7, 11, 12, 17, 60, 100, 163, 234, 239]
+# 238 is the last cell of the row: the emitter's first run is then one cell long and
+# everything after it has to wrap a second time, which is its own case
+HSCROLLS = [0, 1, 2, 3, 5, 6, 7, 11, 12, 17, 60, 100, 163, 234, 238, 239]
 
 
 def apply_raw(t, regs, vram, unlocked):
@@ -231,6 +233,9 @@ def run(t):
     m.sweep("t40", "r1b", fails, r1c=100)
     m.sweep("t40-posattr", "r1b", fails, r32=0x02)
     m.sweep("t40-t2-only", "r19", fails, r31=0x80, r32=0x12)
+    # ECM is a second emitter, not a colour depth: it runs the row as its own loop and wraps it
+    # on its own, so the ring has to be asserted of that body too
+    m.sweep("t40-ecm3", "r1b", fails, r31=0x30, r32=0x02)
     # both layers by the same amount: only then is the composite itself a ring.
     # One layer alone moving is the split case below, not a rotation of the picture
     _, control = m.shot(r31=0x80, r32=0x02)
@@ -239,8 +244,8 @@ def run(t):
         m.ring("t40-together", control, got, rows, h, fails)
     m.split(fails, SPLITS)
     m.page_inert(fails)
-    notes.append("40 columns: %d scroll values, four configurations plus the split" % len(HSCROLLS))
-    checks = 4 * len(HSCROLLS) + len(SPLITS)
+    notes.append("40 columns: %d scroll values, five configurations plus the split" % len(HSCROLLS))
+    checks = 5 * len(HSCROLLS) + len(SPLITS)
     if m.dropped:
         notes.append("  %d rows were over budget and left out: %s"
                      % (len(m.dropped), sorted(m.dropped)[:8]))
@@ -249,6 +254,7 @@ def run(t):
     m.sweep("t80", "r1b", fails)                            # two-tone, no colour table at all
     m.sweep("t80-posattr", "r1b", fails, r32=0x02)
     m.sweep("t80-t2-only", "r19", fails, r31=0x80, r32=0x12)
+    m.sweep("t80-ecm3", "r1b", fails, r31=0x30, r32=0x02)
     for extra, tag in ((dict(), "t80-together"), (dict(sparse_t2=True), "t80-sparse")):
         base = dict(r31=0x80, r32=0x02, **extra)
         _, control = m.shot(**base)
@@ -257,8 +263,8 @@ def run(t):
             m.ring(tag, control, got, rows, h, fails)
     m.split(fails, SPLITS)
     m.page_inert(fails)
-    notes.append("80 columns: %d scroll values, five configurations plus the split" % len(HSCROLLS))
-    checks += 5 * len(HSCROLLS) + len(SPLITS)
+    notes.append("80 columns: %d scroll values, six configurations plus the split" % len(HSCROLLS))
+    checks += 6 * len(HSCROLLS) + len(SPLITS)
     if m.dropped:
         notes.append("  %d rows were over budget and left out: %s"
                      % (len(m.dropped), sorted(m.dropped)[:8]))
