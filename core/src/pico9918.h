@@ -133,6 +133,10 @@ typedef enum
  *             overlays - and it identifies as a real one in SR1.
  *   PICO9918  an F18A plus this board's extensions: the VR58/59 config port, the
  *             firmware-update register, and the splash and diagnostics overlays.
+ *   PRO       the RP2350 board: 80-column text at a byte a pixel, which brings the tile
+ *             palette select, ECM and the bitmap layer to TEXT80, and its own splash. It
+ *             answers software the same way a PICO9918 does - SR1 reads 0xE8 for both,
+ *             so nothing probing for the chip can tell the tiers apart.
  *
  * One behaviour runs the other way, because it is a quirk rather than a capability: the
  * two TMS9918s drive DRAM, so R1's 4K/16K bit moves where a CPU-side access lands. The
@@ -144,21 +148,31 @@ typedef enum
  */
 typedef enum
 {
-  PICO9918_CHIP_TMS9918  = 0, /**< a pre-A TMS9918: a TMS9918A without Graphics II */
-  PICO9918_CHIP_TMS9918A = 1, /**< a TMS9918A: locked, no GPU, no extensions */
-  PICO9918_CHIP_F18A     = 2, /**< an F18A: unlock, enhanced renderer, GPU */
-  PICO9918_CHIP_PICO9918 = 3, /**< an F18A plus the PICO9918's own extensions */
+  PICO9918_CHIP_TMS9918      = 0, /**< a pre-A TMS9918: a TMS9918A without Graphics II */
+  PICO9918_CHIP_TMS9918A     = 1, /**< a TMS9918A: locked, no GPU, no extensions */
+  PICO9918_CHIP_F18A         = 2, /**< an F18A: unlock, enhanced renderer, GPU */
+  PICO9918_CHIP_PICO9918     = 3, /**< an F18A plus the PICO9918's own extensions */
+  PICO9918_CHIP_PICO9918_PRO = 4, /**< a PICO9918 PRO: 8bpp 80-column text, its own splash */
 } pico9918_chip_t;
 
 /**
  * \brief the highest personality this build can be, and what a new instance is
  *
- * The switch needs the F18A build, so this is the top of the ladder. A PICO9918_MODE=0
- * archive cannot have it at all - it has no 64KB map, no GPU and no enhanced renderer,
- * so nothing above the base is a personality it could honour - and the build is
- * rejected rather than quietly capped.
+ * The switch needs the F18A build, so a PICO9918_MODE=0 archive cannot have it at all -
+ * it has no 64KB map, no GPU and no enhanced renderer, so nothing above the base is a
+ * personality it could honour - and the build is rejected rather than quietly capped.
+ *
+ * The ceiling is PRO only where the build carries the wide 80-column line, because that
+ * is a buffer width rather than a runtime choice: PICO9918_TEXT80_8BPP doubles the
+ * scanline buffer, so a narrow build has nowhere to put the pixels. Ask for PRO there
+ * and pico9918_set_chip clamps to PICO9918, which is the contract it already states -
+ * read pico9918_chip() back to find out which you got.
  */
+#if PICO9918_BUILD_TEXT80_8BPP
+#define PICO9918_CHIP_MAX PICO9918_CHIP_PICO9918_PRO
+#else
 #define PICO9918_CHIP_MAX PICO9918_CHIP_PICO9918
+#endif
 
 #endif // PICO9918_BUILD_RUNTIME_CHIP
 

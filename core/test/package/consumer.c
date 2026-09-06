@@ -325,6 +325,27 @@ int main(void)
     pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K);
   }
 
+  /* The PRO tier's ceiling is the build's, because PICO9918_TEXT80_8BPP is a buffer width
+     rather than a runtime choice: a narrow build clamps the request to PICO9918 instead of
+     half-honouring it. Either way SR1 must read 0xE8 - a PRO is a PICO9918 to anything
+     probing for the chip, and the test that decides it is a >= that a new tier can slip past. */
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_PICO9918_PRO);
+  if (pico9918_chip(PICO9918_INST_ONLY) != PICO9918_CHIP_MAX)
+  {
+    printf("asking for PRO gave neither PRO nor the ceiling: chip %d\n",
+           (int)pico9918_chip(PICO9918_INST_ONLY));
+    return 1;
+  }
+
+  if (pico9918_status_value(PICO9918_INST PICO9918_SR_IDENT) != 0xE8)
+  {
+    printf("a PRO does not answer SR1 as a PICO9918: 0x%02x\n",
+           pico9918_status_value(PICO9918_INST PICO9918_SR_IDENT));
+    return 1;
+  }
+
+  pico9918_set_chip(PICO9918_INST PICO9918_CHIP_F18A);
+
   printf("pico9918-core: chip switch honoured, the register file and config port follow it\n");
 
   /* The F18A's power-on badge. Its geometry macros come from the installed overlay

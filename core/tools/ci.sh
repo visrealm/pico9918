@@ -307,6 +307,17 @@ chip() {
   configure "$OUT/chip-consumer" "$LIBROOT/test/package" "-DCMAKE_PREFIX_PATH=$stage"
   build "$OUT/chip-consumer"
   "$(findExe "$OUT/chip-consumer" consumer)"
+
+  # Again with the wide line, which is the only build whose ceiling is the PRO tier. Without
+  # it every PICO9918_CHIP_PICO9918_PRO request clamps and the tier is never actually entered.
+  stage=$OUT/chip8-stage
+  configure "$OUT/chip8-lib" "$LIBROOT" -DPICO9918_RUNTIME_CHIP=ON -DPICO9918_TEXT80_8BPP=ON \
+    -DPICO9918_WERROR=ON -DCMAKE_C_FLAGS=-O2 "-DCMAKE_INSTALL_PREFIX=$stage"
+  build "$OUT/chip8-lib"
+  $CMAKE --install "$OUT/chip8-lib" --config "$CONFIG"
+  configure "$OUT/chip8-consumer" "$LIBROOT/test/package" "-DCMAKE_PREFIX_PATH=$stage"
+  build "$OUT/chip8-consumer"
+  "$(findExe "$OUT/chip8-consumer" consumer)"
 }
 
 pythonModule() {

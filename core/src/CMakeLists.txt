@@ -140,6 +140,12 @@ if(PICO9918_RUNTIME_CHIP)
   # PICO9918_NO_SPLASH: that option drops the PICO9918's own splash, and an F18A
   # still shows its badge.
   pico9918_generate_image_source_ram(${LIBRARY} bmp_f18a_badge overlay/res/f18a_badge.png f18aBadge)
+
+  # The PRO tier's splash, for the same reason: a board resolves PICO9918_SPLASH_IMAGE to
+  # the one artwork it ships, and only a build that can switch personality needs both.
+  if(NOT PICO9918_NO_SPLASH)
+    pico9918_generate_image_source_ram(${LIBRARY} bmp_splash_pro overlay/res/splash_pro.png splashPro)
+  endif()
 else()
   set(PICO9918_BUILD_RUNTIME_CHIP 0)
 endif()

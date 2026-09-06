@@ -76,9 +76,11 @@
 #define TEXT_PADDING_PX 8
 #define TEXT80_NUM_COLS 80
 
-/* 80 columns at eight bits a pixel: a board capability, not a chip. It buys the tile palette
-   select, ECM, the bitmap layer and the shared composite in 80-column text, none of which a
-   four-bit line can represent at all. Off unless a board asks for it. */
+/* 80 columns at eight bits a pixel. It buys the tile palette select, ECM, the bitmap layer and
+   the shared composite in 80-column text, none of which a four-bit line can represent at all.
+   Off unless a board asks for it: this is the scanline buffer's width, so it is settled at build
+   time, and it is what decides whether PICO9918_CHIP_PICO9918_PRO is a personality this build
+   can be at all. The tier then chooses within that - see PICO9918_WIDE_T80. */
 #ifndef PICO9918_TEXT80_8BPP
 #define PICO9918_TEXT80_8BPP 0
 #endif
@@ -227,6 +229,7 @@ typedef struct
 #define PICO9918_FEAT_OVERLAY 0x04 /* the splash and diagnostics overlays */
 #define PICO9918_FEAT_BITMAP  0x08 /* R0 M3 is decoded, so Graphics II exists */
 #define PICO9918_FEAT_VRAM_4K 0x10 /* R1 bit 7 is decoded, so 4K DRAM addressing exists */
+#define PICO9918_FEAT_WIDE_T80 0x20 /* 80-column text is a byte a pixel, not a nibble */
 
 #if PICO9918_BUILD_RUNTIME_CHIP
 #if PICO9918_MODE != PICO9918_MODE_F18A
@@ -236,8 +239,12 @@ typedef struct
 /* SR1 is what software probing for an F18A reads: 0xE0 is the F18A ID, and the PICO9918
    sets 0x08 for anyone who cares that it is not a real one. The base personality shares
    the F18A value and never shows it: reaching SR1 needs a write to R15, which is above
-   the eight a locked device admits. */
-#define PICO9918_SR1_ID(T) (((T)->chip == PICO9918_CHIP_PICO9918) ? 0xE8 : 0xE0)
+   the eight a locked device admits.
+
+   TRAP: >=, not ==. A PRO is a PICO9918 to software probing for one, so every
+   personality at or above PICO9918 answers 0xE8 and a tier added above must not fall
+   through to the real-F18A value by being numbered past the test. */
+#define PICO9918_SR1_ID(T) (((T)->chip >= PICO9918_CHIP_PICO9918) ? 0xE8 : 0xE0)
 #else
 #define PICO9918_HAS(T, F) true
 #define PICO9918_SR1_ID(T) 0xE8
@@ -259,6 +266,10 @@ typedef struct
    is not a mode-gated question - every build can be the pre-A part - so PICO9918_HAS
    alone is the gate, and it folds to a literal true without the runtime switch. */
 #define PICO9918_GM2(T) PICO9918_HAS(T, PICO9918_FEAT_BITMAP)
+
+/* The PRO tier's wide 80-column line. Only asked where the build has the buffer for it,
+   so a narrow build never reaches this and a board folds it to a literal true. */
+#define PICO9918_WIDE_T80(T) PICO9918_HAS(T, PICO9918_FEAT_WIDE_T80)
 
 /* A TMS9918A does not decode R0 bit 2. Build-time as well as runtime: PICO9918_HAS folds
    to true in a MODE=0 archive, so neither may be written as PICO9918_HAS alone. */

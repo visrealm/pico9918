@@ -56,7 +56,8 @@ static pico9918_mode_t tmsCachedMode = TMS_MODE_GRAPHICS_I;
    Unlocked only, and that is not a restriction: all four things the tier buys are F18A features that
    need the unlock anyway, so locked 80-column text keeps the packed line and its own emitter. */
 #if PICO9918_TEXT80_8BPP
-#define TEXT80_WIDE_ROW (tmsCachedMode == TMS_MODE_TEXT80 && PICO9918_UNLOCKED(tms9918))
+#define TEXT80_WIDE_ROW \
+  (tmsCachedMode == TMS_MODE_TEXT80 && PICO9918_UNLOCKED(tms9918) && PICO9918_WIDE_T80(tms9918))
 #else
 #define TEXT80_WIDE_ROW false
 #endif
@@ -271,6 +272,9 @@ static uint8_t chipFeatures(pico9918_chip_t chip)
 {
   switch (chip)
   {
+    case PICO9918_CHIP_PICO9918_PRO:
+      return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_CONFIG | PICO9918_FEAT_OVERLAY |
+             PICO9918_FEAT_BITMAP | PICO9918_FEAT_WIDE_T80;
     case PICO9918_CHIP_PICO9918:
       return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_CONFIG | PICO9918_FEAT_OVERLAY | PICO9918_FEAT_BITMAP;
     case PICO9918_CHIP_F18A: return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_BITMAP;
@@ -291,13 +295,19 @@ PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip
   tms9918->chip     = (uint8_t)chip;
   tms9918->features = chipFeatures(chip);
 
+#if !PICO9918_NO_SPLASH
+  pico9918_splash_select_pro(chip == PICO9918_CHIP_PICO9918_PRO);
+#endif
+
+  /* The wide line is a different palette layout, so the tier is a palette change */
+  tms9918->palDirty = 1;
+
   if (!PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK))
   {
     tms9918->isUnlocked         = false;
     tms9918->unlockCount        = 0;
     tms9918->lockedMask         = 0x07;
     TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 0;
-    tms9918->palDirty           = 1; // the 80-column line narrows with it
   }
 
   TMS_STATUS(tms9918, PICO9918_SR_IDENT) = PICO9918_SR1_ID(tms9918);

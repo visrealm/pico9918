@@ -21,6 +21,24 @@
  * carries no per-board #ifdef. */
 #include "overlay/bmp_splash.h"
 
+#if PICO9918_BUILD_RUNTIME_CHIP
+#include "overlay/bmp_splash_pro.h"
+
+/* Which artwork the personality wants. Set from pico9918_set_chip, where everything else
+   derived from the personality is worked out once. File scope like the animation state
+   above it, which is already shared. */
+static bool splashIsPro = false;
+
+/* The band is positioned from SPLASH_HEIGHT at compile time, so the two must agree. */
+PICO9918_STATIC_ASSERT(SPLASHPRO_HEIGHT == SPLASH_HEIGHT,
+                       "the PRO splash is a different height - SPLASH_START_POS assumes one band");
+
+void pico9918_splash_select_pro(bool pro)
+{
+  splashIsPro = pro;
+}
+#endif
+
 #define SPLASH_ENTER_FRAMES 60
 #define SPLASH_HOLD_FRAMES  180
 /* SPLASH_HEIGHT, not the splashHeight const int: this initialises a static, and
@@ -84,9 +102,20 @@ void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, u
       const int leftBorderPx     = 4;
       const int splashBpp        = 2;
       const int splashPixPerByte = 8 / splashBpp;
-      uint8_t* splashPtr         = splash + (y * splashWidth / splashPixPerByte);
 
-      for (int x = leftBorderPx; x < leftBorderPx + splashWidth; x += splashPixPerByte)
+#if PICO9918_BUILD_RUNTIME_CHIP
+      uint8_t* const art          = splashIsPro ? splashPro : splash;
+      const int artWidth          = splashIsPro ? splashProWidth : splashWidth;
+      const PICO9918_PIXEL_T* pal = splashIsPro ? splashPro_pal : splash_pal;
+#else
+      uint8_t* const art          = splash;
+      const int artWidth          = splashWidth;
+      const PICO9918_PIXEL_T* pal = splash_pal;
+#endif
+
+      uint8_t* splashPtr = art + (y * artWidth / splashPixPerByte);
+
+      for (int x = leftBorderPx; x < leftBorderPx + artWidth; x += splashPixPerByte)
       {
         uint8_t c       = *(splashPtr++);
         uint8_t pixMask = 0xc0;
@@ -95,7 +124,7 @@ void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, u
         for (int px = 0; px < 4; ++px, offset -= 2, pixMask >>= 2)
         {
           uint8_t palIndex = (c & pixMask) >> offset;
-          if (palIndex) pixels[x + px] = splash_pal[palIndex];
+          if (palIndex) pixels[x + px] = pal[palIndex];
         }
       }
     }

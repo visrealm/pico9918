@@ -95,6 +95,14 @@ extern "C"
  *
  * \return whether it drew, i.e. whether `pixels` changed.
  */
+  /**
+   * \brief choose the PRO artwork over the PICO9918's
+   *
+   * pico9918_set_chip calls this; a host has no reason to. Only a runtime-chip build
+   * carries both images - a board resolves its one at build time.
+   */
+  void pico9918_splash_select_pro(bool pro);
+
   bool pico9918_f18a_badge_render(uint16_t outputLine, uint32_t frameCount,
                                  PICO9918_PIXEL_T* pixels);
 
