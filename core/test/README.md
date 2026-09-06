@@ -6,7 +6,7 @@ you ran last.
 | Question | Where | What it is | Needs |
 |---|---|---|---|
 | Does the renderer still draw exactly what it drew before? | [`golden/`](golden/) | A C program that dumps every line of fixed scenes byte for byte | A C compiler |
-| Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 111 scenes, five property suites and two TMS9900 GPU programs | A C compiler and Python |
+| Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 111 scenes, six property suites and two TMS9900 GPU programs | A C compiler and Python |
 | Does the post-palette pixel path lay out the way the header says? | [`pixel/`](pixel/) | Both palette LUT layouts and the scanline geometry, at both line widths | A C compiler |
 | Has an armed GPU program run by the time the arming write returns? | [`gpu/`](gpu/) | The rate the library paces the GPU from, and that write | A C compiler |
 | Is the installed package actually usable? | [`package/`](package/) | A separate project that finds the library with `find_package` and calls it | A C compiler |
@@ -27,9 +27,13 @@ the same two-stage address-port writes the firmware performs - so it is the gate
 semantics and the unlock path as much as on pixels. When it fails, it tells you which byte.
 
 `suite/` is **broad coverage, one question per scene**. 111 scenes including VRAM dumps of real
-software, swept across two line-width tiers, plus five property suites that compute the answer
+software, swept across two line-width tiers, plus six property suites that compute the answer
 independently and sweep the whole input space rather than freezing one picture. When it fails, it
 tells you which scene and how many pixels moved.
+
+One of the six is not about pixels at all: `test_gpu_dma` runs the GPU's DMA engine, and it is the
+only thing in either repository that makes a board's DMA trigger fire - `gpu/` below holds the same
+geometry as a host binary with no board build, so it never has.
 
 A change that breaks the renderer usually breaks both. A change that breaks only `golden/` is
 usually about the bus or the palette; one that breaks only `suite/` is usually a mode you were not

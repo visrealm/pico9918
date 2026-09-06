@@ -14,15 +14,17 @@ import suite.stages.freeze as freeze
 import suite.stages.gpu as gpu
 import suite.scenes as scenes
 import suite.stages.properties.test_d4 as test_d4
+import suite.stages.properties.test_gpu_dma as test_gpu_dma
 import suite.stages.properties.test_text80_8bpp as test_text80_8bpp
 import suite.stages.properties.test_text_colour as test_text_colour
 import suite.stages.properties.test_text_ecm as test_text_ecm
 import suite.stages.properties.test_text_scroll as test_text_scroll
 
 # Order matters: d4 first because it inherits whatever VDP state preceded it, and
-# gpu last because a GPU program is the only stage that leaves the VDP set up by
-# something other than this harness.
-RENDERER = ("d4", "freeze", "scroll", "colour", "ecm", "t80-8bpp", "gpu")
+# the two that run a GPU program last, because a program is the only thing here
+# that leaves the VDP set up by something other than this harness. dma before gpu
+# of the two: it takes a second, and gpu can take two minutes.
+RENDERER = ("d4", "freeze", "scroll", "colour", "ecm", "t80-8bpp", "dma", "gpu")
 
 
 def say(formatter):
@@ -57,6 +59,10 @@ def stage_t80_8bpp(t, record, args):
         t, test_text80_8bpp.select(args.filter))
 
 
+def stage_dma(t, record, args):
+    record["properties"]["GPU DMA"] = test_gpu_dma.run(t)
+
+
 def stage_gpu(t, record, args):
     # filtered like the timings rather than through gpu.select, so a run narrowed
     # to scene names runs no program instead of refusing to start
@@ -67,7 +73,7 @@ def stage_gpu(t, record, args):
 
 RUNNERS = {"d4": stage_d4, "freeze": stage_freeze, "scroll": stage_scroll,
            "colour": stage_colour, "ecm": stage_ecm, "t80-8bpp": stage_t80_8bpp,
-           "gpu": stage_gpu}
+           "dma": stage_dma, "gpu": stage_gpu}
 
 
 def verdict(record):
