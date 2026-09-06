@@ -40,15 +40,18 @@ import argparse
 import sys
 
 import suite.outcome as outcome
+import suite.scoreboard as scoreboard
 import suite.stages.gpu as gpu
 from suite.access.backend import backend_args, open_backend
-from suite.access.vdp import VRAM_REGISTERS
 
 # Base VRAM, where the F18A's windowed map and the PICO9918's flat one agree, so a
 # case means the same thing whichever personality is running it. WORK is written
 # whole before every job and read back whole after, so a transfer that strayed
 # outside it would be caught by `reach` below rather than silently ignored.
-PROG, PARAMS = 0x0100, 0x0200
+#
+# All of it inside scoreboard.LOW_VRAM, so the board can show what it is doing
+# while it does it - `scoreboard.start` is given the span and checks.
+PROG, PARAMS = 0x0E00, 0x0E20
 SRC, SRC_MID, DST = 0x1000, 0x1100, 0x1800
 WORK, WORK_LEN = 0x1000, 0x0A00
 SRC_LEN = 0x0400
@@ -142,12 +145,14 @@ def workspace():
                      + bytes(WORK_LEN - SRC_LEN))
 
 
-def check(t, case, fails, notes):
+def check(t, case, board, fails, notes):
     name, src, dst, width, height, stride, params = case
+    board.running(name)
     lo, hi = reach(dst, width, height, stride, params)
     if lo < WORK or hi >= WORK + WORK_LEN:
         fails.append("%s: reaches %04x-%04x, outside the %04x-%04x window this "
                      "compares" % (name, lo, hi, WORK, WORK + WORK_LEN - 1))
+        board.verdict(False)
         return 0
 
     before = workspace()
@@ -174,16 +179,17 @@ def check(t, case, fails, notes):
         i = bad[0]
         fails.append("%s: [%04x] wanted %02x, got %02x (%d byte(s) differ)"
                      % (name, WORK + i, want[i], got[i], len(bad)))
+    board.verdict(not bad)
     return WORK_LEN
 
 
 def run(t):
     fails, notes, checks = [], [], 0
     t.unlock()
-    t.reg(0x01, 0x00)  # display off: this asserts VRAM, and a program owns the screen
-    t.vram(VRAM_REGISTERS, bytes(64))
+    board = scoreboard.start(t, "GPU DMA", (PROG, WORK + WORK_LEN))
     for case in CASES:
-        checks += check(t, case, fails, notes)
+        checks += check(t, case, board, fails, notes)
+    board.summary()
     return outcome.property_result(fails, notes, checks)
 
 

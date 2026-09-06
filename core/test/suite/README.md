@@ -33,6 +33,7 @@ run.py          the entry point: stages, filters, the verdict
 view.py         the scenes in a window, at sixty frames a second
 scenes.py       the scene catalogue - one register file and one whole VRAM image each
 outcome.py      how a property reports what it found
+scoreboard.py   how one shows what it is doing, when it is not a picture
 
 access/         how a VDP is driven and read back
 oracle/         the frozen references, and the comparison against them
