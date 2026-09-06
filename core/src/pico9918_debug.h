@@ -105,6 +105,63 @@ size_t pico9918_debug_read(PICO9918_INST_ARG uint32_t addr, uint8_t* out, size_t
 PICO9918_DLLEXPORT
 size_t pico9918_debug_write(PICO9918_INST_ARG uint32_t addr, const uint8_t* in, size_t len);
 
+/**
+ * \brief a register, as the register file actually holds it
+ *
+ * NOT what pico9918_reg_value() answers, which is the guest's read and folds the number
+ * to three bits on a locked device - so a pane showing R30 there is showing R6. This is
+ * the byte at \p reg. Above 63 returns 0, the file being 64 entries.
+ */
+PICO9918_DLLEXPORT
+uint8_t pico9918_debug_reg(PICO9918_INST_ARG uint8_t reg);
+
+/**
+ * \brief a live palette entry, in host byte order
+ *
+ * PRAM as the renderer reads it, with the big-endian storage undone - so the value is
+ * the 0x0rgb an F18A program wrote, not the byte-swapped word underneath. The F18A
+ * defines the low twelve bits; anything above them is whatever is stored there, because
+ * this is the backing state and a debugger that wrote a raw byte should see it back.
+ *
+ * Above index 63 returns 0, PRAM being 64 entries.
+ */
+PICO9918_DLLEXPORT
+uint16_t pico9918_debug_palette(PICO9918_INST_ARG uint8_t index);
+
+/**
+ * \brief where the next guest access would land
+ *
+ * The host address latch made EFFECTIVE, which is not the counter it is kept in: that
+ * one is 32 bits and runs past the bus width between accesses, and on a 4K chip with
+ * R1's 16K bit clear the machine permutes the address rather than merely masking it. So
+ * a pane wanting "the byte the next read returns" cannot get there with a mask.
+ */
+PICO9918_DLLEXPORT
+uint16_t pico9918_debug_vram_address(PICO9918_INST_ONLY_ARG);
+
+/**
+ * \brief whether a GPU program is waiting to run
+ *
+ * Armed, not executing: a host pacing the GPU itself asks this to find out whether there
+ * is anything to step. Whether a program is still going after a slice is
+ * pico9918_gpu_step_n()'s return, which is a different question.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_debug_gpu_armed(PICO9918_INST_ONLY_ARG);
+
+/**
+ * \brief move the GPU's PC without starting it
+ *
+ * Masked even, the way the register path masks it. Leaves the armed state exactly as it
+ * found it, so this redirects a program that was going to run and does not start one
+ * that was not. Writes neither R54/R55 - which would be a second, visible effect on the
+ * register file - nor the status.
+ *
+ * pico9918_gpu_pc() reads it back.
+ */
+PICO9918_DLLEXPORT
+void pico9918_debug_gpu_set_pc(PICO9918_INST_ARG uint16_t pc);
+
 #ifdef __cplusplus
 }
 #endif

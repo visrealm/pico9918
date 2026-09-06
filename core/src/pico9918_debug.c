@@ -114,3 +114,42 @@ size_t pico9918_debug_write(PICO9918_INST_ARG uint32_t addr, const uint8_t* in, 
 
   return done;
 }
+
+/** \brief see the header. The register file's own byte, not the guest's folded read. */
+PICO9918_DLLEXPORT
+uint8_t pico9918_debug_reg(PICO9918_INST_ARG uint8_t reg)
+{
+  if (reg >= TMS_REGISTERS) return 0;
+
+  return TMS_REGISTER(tms9918, reg);
+}
+
+/** \brief see the header. PRAM with the big-endian storage undone. */
+PICO9918_DLLEXPORT
+uint16_t pico9918_debug_palette(PICO9918_INST_ARG uint8_t index)
+{
+  if (index > PICO9918_R47_INDEX) return 0;
+
+  return __builtin_bswap16(tms9918->vram.map.pram[index]);
+}
+
+/** \brief see the header. The latch as an access would use it, permutation included. */
+PICO9918_DLLEXPORT
+uint16_t pico9918_debug_vram_address(PICO9918_INST_ONLY_ARG)
+{
+  return (uint16_t)pico9918_cpu_vram_addr_impl(PICO9918_INST tms9918->currentAddress);
+}
+
+/** \brief see the header. Whether a program is armed, not whether one is executing. */
+PICO9918_DLLEXPORT
+bool pico9918_debug_gpu_armed(PICO9918_INST_ONLY_ARG)
+{
+  return tms9918->restart != 0;
+}
+
+/** \brief see the header. The PC alone - not the registers it is loaded from, not the run. */
+PICO9918_DLLEXPORT
+void pico9918_debug_gpu_set_pc(PICO9918_INST_ARG uint16_t pc)
+{
+  tms9918->gpuAddress = pc & 0xFFFE;
+}

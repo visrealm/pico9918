@@ -216,6 +216,82 @@ int main(void)
     if (tms9918->palDirty) fail("write-regs-dirtied-palette", 0, 1);
   }
 
+  /* 9. the register read is the file's own byte. R30 on a LOCKED device is the case that
+        matters: the guest's read folds it to three bits and answers R6, and a pane
+        showing that is showing the wrong register with no way to tell. */
+  TMS_REGISTER(tms9918, 6)  = 0x66;
+  TMS_REGISTER(tms9918, 30) = 0x30;
+  if (tms9918->isUnlocked) fail("locked-precondition", 0, 1);
+  if (pico9918_debug_reg(PICO9918_INST 30) != 0x30)
+    fail("reg-locked-30", 0x30, pico9918_debug_reg(PICO9918_INST 30));
+  if (pico9918_reg_value(PICO9918_INST (pico9918_register_t)30) != 0x66)
+    fail("reg-guest-folds", 0x66, pico9918_reg_value(PICO9918_INST (pico9918_register_t)30));
+  if (pico9918_debug_reg(PICO9918_INST 64) != 0) fail("reg-out-of-range", 0, 1);
+
+  /* and it agrees with the same byte through the map, which is the other way to it */
+  if (pico9918_debug_reg(PICO9918_INST 30) != pico9918_gpu_mem_value(PICO9918_INST 0x6000 + 30))
+    fail("reg-vs-map", 0x30, pico9918_gpu_mem_value(PICO9918_INST 0x6000 + 30));
+
+  /* 10. the palette comes back in host order, undoing the big-endian storage - written
+         through the library's own path so the test is not just bswapping its own bswap */
+  tms9918->vram.map.pram[7] = __builtin_bswap16(0x0abc);
+  if (pico9918_debug_palette(PICO9918_INST 7) != 0x0abc)
+    fail("palette-host-order", 0x0abc, pico9918_debug_palette(PICO9918_INST 7));
+  if (pico9918_debug_palette(PICO9918_INST 64) != 0) fail("palette-out-of-range", 0, 1);
+
+  /* and it round-trips with the span write, which is what a palette editor does. The
+     order in the map is the low byte first and it holds R, the second holding GB - so
+     0x0acb is stored 0a cb, not cb 0a. */
+  {
+    const uint8_t entry[2] = {0x0a, 0xcb};
+
+    if (pico9918_debug_write(PICO9918_INST 0x5000 + 7 * 2, entry, sizeof(entry)) != 2)
+      fail("palette-write", 2, 0);
+    if (pico9918_debug_palette(PICO9918_INST 7) != 0x0acb)
+      fail("palette-round-trip", 0x0acb, pico9918_debug_palette(PICO9918_INST 7));
+  }
+
+  /* 11. the address latch is EFFECTIVE. A 4K chip with R1's 16K bit clear permutes the
+         address rather than masking it, so a mask would name a different byte - this is
+         the case the plain mask gets wrong. */
+  tms9918->currentAddress = 0x1234;
+  if (pico9918_debug_vram_address(PICO9918_INST_ONLY) !=
+      (uint16_t)pico9918_cpu_vram_addr_impl(PICO9918_INST 0x1234))
+    fail("vram-addr", pico9918_cpu_vram_addr_impl(PICO9918_INST 0x1234),
+         pico9918_debug_vram_address(PICO9918_INST_ONLY));
+
+  /* and the counter runs past the bus width between accesses, where the raw field is not
+     an address at all */
+  tms9918->currentAddress = 0x1ffff;
+  if (pico9918_debug_vram_address(PICO9918_INST_ONLY) > 0xffff) fail("vram-addr-wide", 0, 1);
+
+  /* 12. the GPU PC moves without the program starting, and without the register file or
+         the armed state moving with it */
+  {
+    const uint8_t r54 = pico9918_debug_reg(PICO9918_INST PICO9918_REG_GPU_PC_MSB);
+    const uint8_t r55 = pico9918_debug_reg(PICO9918_INST PICO9918_REG_GPU_PC_LSB);
+
+    tms9918->restart = 0;
+    pico9918_debug_gpu_set_pc(PICO9918_INST 0x2468);
+    if (pico9918_gpu_pc(PICO9918_INST_ONLY) != 0x2468)
+      fail("set-pc", 0x2468, pico9918_gpu_pc(PICO9918_INST_ONLY));
+    if (pico9918_debug_gpu_armed(PICO9918_INST_ONLY)) fail("set-pc-armed-it", 0, 1);
+    if (pico9918_debug_reg(PICO9918_INST PICO9918_REG_GPU_PC_MSB) != r54) fail("set-pc-r54", r54, 0);
+    if (pico9918_debug_reg(PICO9918_INST PICO9918_REG_GPU_PC_LSB) != r55) fail("set-pc-r55", r55, 0);
+
+    /* odd is masked even, the way the register path masks it */
+    pico9918_debug_gpu_set_pc(PICO9918_INST 0x2469);
+    if (pico9918_gpu_pc(PICO9918_INST_ONLY) != 0x2468)
+      fail("set-pc-odd", 0x2468, pico9918_gpu_pc(PICO9918_INST_ONLY));
+
+    /* and an armed program stays armed - this redirects one, it does not disarm one */
+    tms9918->restart = 1;
+    if (!pico9918_debug_gpu_armed(PICO9918_INST_ONLY)) fail("armed", 1, 0);
+    pico9918_debug_gpu_set_pc(PICO9918_INST 0x1000);
+    if (!pico9918_debug_gpu_armed(PICO9918_INST_ONLY)) fail("set-pc-disarmed-it", 1, 0);
+    tms9918->restart = 0;
+  }
+
   printf("%s: debugger surface, %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
   return failures ? 1 : 0;
 }
