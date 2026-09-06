@@ -112,11 +112,15 @@
 #define LAST_SPRITE_YPOS     0xD0
 #define MAX_SCANLINE_SPRITES 4
 
-#define PICO9918_MODE_TMS9918 0
-#define PICO9918_MODE_F18A    1
+/* What the build carries, which is not what an instance answers as. This one fixes the
+   memory map and which renderer is compiled; pico9918_chip_t picks a personality within
+   it. The base build is a TMS9918A, so a pre-A instance needs the F18A build and the
+   runtime switch - see the #error below. */
+#define PICO9918_MODE_TMS9918A 0
+#define PICO9918_MODE_F18A     1
 
 #ifndef PICO9918_MODE
-#define PICO9918_MODE PICO9918_MODE_TMS9918
+#define PICO9918_MODE PICO9918_MODE_TMS9918A
 #endif
 
 #define BASE_VRAM_SIZE (1 << 14) /* 16kB */

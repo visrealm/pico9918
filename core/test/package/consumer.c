@@ -177,9 +177,9 @@ int main(void)
     return 1;
   }
 
-  /* The A in TMS9918A. The pre-A part is numbered above PICO9918_CHIP_MAX and must not
-     clamp back to it, so the personality it reports is half of what this proves - the
-     other half is that M3 selects nothing there and M1/M2 still do. */
+  /* The A in TMS9918A: M3 selects Graphics II on the base and nothing on the pre-A part,
+     where M1/M2 still do. The bottom of the ladder is zero, so the round trip below also
+     catches a step down being read back as the enum's default rather than as itself. */
   pico9918_write_register_value(PICO9918_INST TMS_REG_0, TMS_R0_MODE_GRAPHICS_II);
   pico9918_scan_line(PICO9918_INST 0);
   if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_GRAPHICS_II)
@@ -192,7 +192,7 @@ int main(void)
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_TMS9918);
   if (pico9918_chip(PICO9918_INST_ONLY) != PICO9918_CHIP_TMS9918)
   {
-    printf("the pre-A personality clamped to the ladder: chip %d\n", (int)pico9918_chip(PICO9918_INST_ONLY));
+    printf("the pre-A personality did not take: chip %d\n", (int)pico9918_chip(PICO9918_INST_ONLY));
     return 1;
   }
 

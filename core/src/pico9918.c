@@ -274,16 +274,16 @@ static uint8_t chipFeatures(pico9918_chip_t chip)
     case PICO9918_CHIP_PICO9918:
       return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_CONFIG | PICO9918_FEAT_OVERLAY | PICO9918_FEAT_BITMAP;
     case PICO9918_CHIP_F18A: return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_BITMAP;
-    case PICO9918_CHIP_TMS9918: return PICO9918_FEAT_VRAM_4K;
-    default: return PICO9918_FEAT_BITMAP | PICO9918_FEAT_VRAM_4K;
+    case PICO9918_CHIP_TMS9918A: return PICO9918_FEAT_BITMAP | PICO9918_FEAT_VRAM_4K;
+    default: return PICO9918_FEAT_VRAM_4K;
   }
 }
 
 /** \brief select which chip this instance answers as */
 PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip)
 {
-  /* unsigned, so a value below the base clamps here too. The pre-A part only numbers above the ceiling */
-  if ((unsigned)chip > (unsigned)PICO9918_CHIP_MAX && chip != PICO9918_CHIP_TMS9918)
+  /* unsigned, so a value below the bottom of the ladder clamps here too rather than being stored */
+  if ((unsigned)chip > (unsigned)PICO9918_CHIP_MAX)
   {
     chip = PICO9918_CHIP_MAX;
   }
