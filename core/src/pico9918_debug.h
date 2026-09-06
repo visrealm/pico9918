@@ -84,6 +84,27 @@ uint32_t pico9918_debug_region(uint32_t addr, uint32_t* end);
 PICO9918_DLLEXPORT
 size_t pico9918_debug_read(PICO9918_INST_ARG uint32_t addr, uint8_t* out, size_t len);
 
+/**
+ * \brief a span of the map, written without the machine noticing
+ *
+ * Copies up to \p len bytes from \p in to \p addr and returns how many landed. A null
+ * \p in, or a \p len of 0, writes nothing and returns 0.
+ *
+ * SHORT AT THE FIRST BYTE IT WILL NOT WRITE, which is the end of the map, the register
+ * window and the status window - the two PICO9918_DEBUG_REGISTERS and
+ * PICO9918_DEBUG_STATUS report. So a bulk loader scrubbing memory cannot start a GPU
+ * program or strand a firmware update, and a caller that wants a register has
+ * pico9918_debug_reg_write, which is a different operation with a different contract.
+ * A run that stops immediately returns 0, which is how a caller tells a refused window
+ * from an accepted one.
+ *
+ * A span landing in PRAM republishes the palette, because the write contract is "no
+ * host-bus side effects" rather than "no effects" - without it a debugger edits the
+ * palette successfully and the picture does not change.
+ */
+PICO9918_DLLEXPORT
+size_t pico9918_debug_write(PICO9918_INST_ARG uint32_t addr, const uint8_t* in, size_t len);
+
 #ifdef __cplusplus
 }
 #endif

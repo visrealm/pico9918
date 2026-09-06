@@ -150,6 +150,72 @@ int main(void)
     if (got != 4) fail("read-short-at-end", 4, (unsigned long)got);
   }
 
+  /* 7. the span write lands in the backing state, and stops at the first byte it will
+        not write rather than skipping it and carrying on */
+  {
+    uint8_t buf[32];
+
+    memset(buf, 0x77, sizeof(buf));
+    if (pico9918_debug_write(PICO9918_INST 0x1000, buf, sizeof(buf)) != sizeof(buf))
+      fail("write-vram", (unsigned long)sizeof(buf), 0);
+    if (((uint8_t*)&tms9918->vram)[0x1000] != 0x77) fail("write-vram-first", 0x77, 0);
+    if (((uint8_t*)&tms9918->vram)[0x101f] != 0x77) fail("write-vram-last", 0x77, 0);
+
+    /* into the register window from below: short at 0x6000, and the file is untouched */
+    ((uint8_t*)&tms9918->vram)[0x6000] = 0x11;
+    if (pico9918_debug_write(PICO9918_INST 0x5ff0, buf, sizeof(buf)) != 0x10)
+      fail("write-into-regs", 0x10, 0);
+    if (((uint8_t*)&tms9918->vram)[0x6000] != 0x11) fail("write-regs-leaked", 0x11, 0x77);
+
+    /* starting inside it: nothing at all, which is how a caller tells it was refused */
+    if (pico9918_debug_write(PICO9918_INST 0x6010, buf, sizeof(buf)) != 0)
+      fail("write-in-regs", 0, 1);
+
+    /* and the status window the same way, from both sides */
+    ((uint8_t*)&tms9918->vram)[0xb000] = 0x22;
+    if (pico9918_debug_write(PICO9918_INST 0xaff0, buf, sizeof(buf)) != 0x10)
+      fail("write-into-status", 0x10, 0);
+    if (((uint8_t*)&tms9918->vram)[0xb000] != 0x22) fail("write-status-leaked", 0x22, 0x77);
+    if (pico9918_debug_write(PICO9918_INST 0xb008, buf, sizeof(buf)) != 0)
+      fail("write-in-status", 0, 1);
+
+    /* a run that crosses two writable regions is NOT short - PRAM abuts plain GRAM and
+       they differ only in what a write there owes afterwards */
+    if (pico9918_debug_write(PICO9918_INST 0x4ff0, buf, sizeof(buf)) != sizeof(buf))
+      fail("write-across-pram", (unsigned long)sizeof(buf), 0);
+
+    /* the edges, same set as the read */
+    if (pico9918_debug_write(PICO9918_INST 0, buf, 0) != 0) fail("write-zero-len", 0, 1);
+    if (pico9918_debug_write(PICO9918_INST 0, NULL, sizeof(buf)) != 0) fail("write-null", 0, 1);
+    if (pico9918_debug_write(PICO9918_INST size, buf, sizeof(buf)) != 0) fail("write-at-end", 0, 1);
+
+    const size_t tail = pico9918_debug_write(PICO9918_INST size - 4, buf, sizeof(buf));
+    if (tail != 4) fail("write-short-at-end", 4, (unsigned long)tail);
+  }
+
+  /* 8. and a write into PRAM leaves the palette owing a republish, or the edit takes and
+        the picture does not change */
+  {
+    const uint8_t entry[2] = {0x0f, 0x0a};
+
+    tms9918->palDirty = 0;
+    if (pico9918_debug_write(PICO9918_INST 0x5000, entry, sizeof(entry)) != sizeof(entry))
+      fail("write-pram", 2, 0);
+    if (!tms9918->palDirty) fail("write-pram-not-dirty", 1, 0);
+
+    /* a write that misses PRAM must NOT raise it, or the flag says nothing */
+    tms9918->palDirty = 0;
+    if (pico9918_debug_write(PICO9918_INST 0x1000, entry, sizeof(entry)) != sizeof(entry))
+      fail("write-vram-again", 2, 0);
+    if (tms9918->palDirty) fail("write-vram-dirtied-palette", 0, 1);
+
+    /* and a refused write raises nothing either, having done nothing */
+    tms9918->palDirty = 0;
+    if (pico9918_debug_write(PICO9918_INST 0x6000, entry, sizeof(entry)) != 0)
+      fail("write-regs-again", 0, 1);
+    if (tms9918->palDirty) fail("write-regs-dirtied-palette", 0, 1);
+  }
+
   printf("%s: debugger surface, %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
   return failures ? 1 : 0;
 }

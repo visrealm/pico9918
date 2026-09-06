@@ -82,3 +82,35 @@ size_t pico9918_debug_read(PICO9918_INST_ARG uint32_t addr, uint8_t* out, size_t
 
   return count;
 }
+
+/** \brief see the header. The same span, writing, stopping at the first byte it will not. */
+PICO9918_DLLEXPORT
+size_t pico9918_debug_write(PICO9918_INST_ARG uint32_t addr, const uint8_t* in, size_t len)
+{
+  size_t done = 0;
+
+  if (!in) return 0;
+
+  /* region at a time: a run may span several, and it stops at the first it may not write */
+  while (done < len)
+  {
+    uint32_t end         = 0;
+    const uint32_t flags = pico9918_debug_region(addr, &end);
+
+    if (!(flags & PICO9918_DEBUG_WRITABLE)) break;
+
+    size_t run = (size_t)(end - addr);
+    if (run > len - done) run = len - done;
+
+    uint8_t* const to = (uint8_t*)&tms9918->vram + addr;
+    for (size_t i = 0; i < run; ++i) to[i] = in[done + i];
+
+    /* the converted copy owes PRAM now, or the edit takes and the picture does not change */
+    if (flags & PICO9918_DEBUG_PALETTE) tms9918->palDirty = 1;
+
+    done += run;
+    addr += (uint32_t)run;
+  }
+
+  return done;
+}
