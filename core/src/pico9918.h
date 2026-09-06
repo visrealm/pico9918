@@ -243,7 +243,7 @@ typedef enum
   PICO9918_REG_GPU_PC_MSB       = 54, /**< GPU program counter, high byte */
   PICO9918_REG_GPU_PC_LSB       = 55, /**< GPU program counter, low byte - writing it also starts the GPU */
   PICO9918_REG_GPU_CONTROL      = 56, /**< GPU load and trigger */
-  PICO9918_REG_UNLOCK           = 57, /**< two consecutive writes of 0x1c unlock the F18A personality */
+  PICO9918_REG_UNLOCK           = 57, /**< 0x1c twice unlocks the F18A personality; any other value locks */
   PICO9918_REG_CONFIG_INDEX     = 58, /**< PICO9918 only: which configuration byte R59 addresses */
   PICO9918_REG_CONFIG_VALUE     = 59, /**< PICO9918 only: the configuration byte R58 selected */
   PICO9918_REG_FLASH_CONTROL    = 63, /**< PICO9918 only: flash operation control */
@@ -369,7 +369,7 @@ typedef enum
 #define PICO9918_R56_GPU_RUN 0x01 /**< 1 starts the GPU, 0 loads the PC without starting */
 
 /** \brief the value register 57 takes, twice in a row, to unlock */
-#define PICO9918_R57_UNLOCK 0x1c /**< two consecutive writes unlock the F18A personality */
+#define PICO9918_R57_UNLOCK 0x1c /**< low two bits ignored; any other value locks again */
 
 /** \brief register 15 bits: the counter controls, and which status register S1 reads */
 #define PICO9918_R15_COUNTER_RESET 0x40 /**< reset the frame/scanline counters */

@@ -3279,31 +3279,31 @@ uint8_t __time_critical_func(pico9918_status_value)(PICO9918_INST_ARG pico9918_s
 PICO9918_DLLEXPORT
 void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8_t reg, uint8_t value)
 {
-  if (PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK) && PICO9918_UNLOCK_WRITE(reg, value))
+  if (PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK) && PICO9918_UNLOCK_REG(reg))
   {
-    TMS_REGISTER(tms9918, PICO9918_REG_UNLOCK) = 0x1c; // Allow this one through even when locked
-    if (++tms9918->unlockCount == 2)
+    /* Recomputed on every write, so a redundant unlock is a no-op and anything else locks */
+    const bool unlockValue = PICO9918_UNLOCK_VALUE(value);
+    const bool unlocked    = unlockValue && tms9918->unlockCount;
+
+    TMS_REGISTER(tms9918, PICO9918_REG_UNLOCK) = value; // through even when locked
+    tms9918->unlockCount                       = unlockValue;
+
+    if (unlocked != tms9918->isUnlocked)
     {
-      tms9918->unlockCount        = 0;
-      tms9918->isUnlocked         = true;
-      tms9918->lockedMask         = 0x3f;
-      TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1; // scanline sprite limit
-      tms9918->palDirty = 1;
+      tms9918->isUnlocked = unlocked;
+      tms9918->lockedMask = unlocked ? 0x3f : 0x07;
+      tms9918->palDirty   = 1;
+      if (unlocked) TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1;
     }
   }
   else
   {
+    /* A write the personality never sees does not disturb the unlock counter either */
+    if (((reg & ~tms9918->lockedMask) != 0x80) && PICO9918_M4(tms9918)) return;
+
     tms9918->unlockCount = 0;
 
-    int regIndex = reg & tms9918->lockedMask; // was 0x07
-
-    if ((reg & ~tms9918->lockedMask) != 0x80)
-    {
-      if (reg == (0x80 | PICO9918_REG_UNLOCK) && PICO9918_CAN_UNLOCK(tms9918))
-        regIndex = PICO9918_REG_UNLOCK;
-      else if (PICO9918_M4(tms9918))
-        return;
-    }
+    const int regIndex = reg & tms9918->lockedMask; // was 0x07
 
     TMS_REGISTER(tms9918, regIndex) = value;
     if (regIndex < PICO9918_REG_STATUS_SELECT) return;

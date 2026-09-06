@@ -89,8 +89,8 @@ class VdpAccess:
         self.write(self.inst + self.off["lockedMask"], b"\x3f")
 
     def lock(self):
-        """Unlocking is sticky until the board resets, so a locked scene has to
-        say so rather than assume it."""
+        """A scene inherits whatever the last one left behind, so a locked scene
+        has to say so rather than assume it."""
         self.write(self.inst + self.off["isUnlocked"], b"\x00")
         self.write(self.inst + self.off["lockedMask"], b"\x07")
 

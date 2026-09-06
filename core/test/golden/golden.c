@@ -3408,6 +3408,48 @@ static bool resetCheck(void)
   return true;
 }
 
+/* The VR57 latch, which is (the last VR57 write was 0x1c) AND (this one is): two writes to
+   get in, a third that changes nothing, and any other value - or any register write between
+   the pair - that puts the device straight back out. A belt-and-braces second unlock is the
+   case worth pinning, because an implementation that reads every VR57 write as a lock turns
+   it into one and masks every extended register write after it down to VR0-VR7. */
+static bool unlockCheck(void)
+{
+  static const struct
+  {
+    uint8_t reg;
+    uint8_t value;
+    bool unlocked;
+    const char* what;
+  } steps[] = {
+    {57, 0x00, false, "a lock write leaves it locked"          },
+    {57, 0x1c, false, "one 0x1c is not enough"                 },
+    {57, 0x1c, true,  "two consecutive 0x1c unlock"            },
+    {57, 0x1c, true,  "a redundant unlock is a no-op"          },
+    {57, 0x00, false, "any other value locks on the spot"      },
+    {57, 0x1c, false, "one 0x1c is not enough"                 },
+    { 1, 0x00, false, "any other register write clears the run"},
+    {57, 0x1c, false, "so that pair is not a consecutive one"  },
+    {57, 0x00, false, "back to a known locked state"           },
+    {57, 0x1f, false, "the low two bits are ignored"           },
+    {57, 0x1f, true,  "so 0x1f unlocks exactly as 0x1c does"   },
+  };
+
+  for (int i = 0; i < (int)(sizeof(steps) / sizeof(steps[0])); ++i)
+  {
+    regWrite(steps[i].reg, steps[i].value);
+    if (PICO9918_UNLOCKED(tms9918) != steps[i].unlocked)
+    {
+      printf("[FAIL] %-19s step %d, R%d = %02x: %s\n", "unlock", i + 1, steps[i].reg, steps[i].value,
+             steps[i].what);
+      return false;
+    }
+  }
+
+  printf("[PASS] %-19s %d VR57 latch steps\n", "unlock", (int)(sizeof(steps) / sizeof(steps[0])));
+  return true;
+}
+
 /* ---------------------------------------------------------------------------
  * Entry point
  * ------------------------------------------------------------------------- */
@@ -3461,6 +3503,9 @@ int main(int argc, char* argv[])
 
   /* after the frame group, which is what leaves the counter above zero */
   if (!resetCheck()) ++failures;
+
+  /* and after that reset, so the latch starts from a locked device */
+  if (!unlockCheck()) ++failures;
 
   if (capture)
   {

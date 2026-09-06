@@ -202,18 +202,20 @@ typedef struct
 #define PICO9918_GPU_BUDGETED 1
 #endif
 
-/* Has the F18A been unlocked, and is this the write that unlocks it? A TMS9918A cannot be,
-   so both are literals there - and graphics_i_scan_line forks on the first exactly once,
-   which is what makes the entire enhanced renderer fold away in that build rather than
-   needing a condition per feature. Honouring an unlock that widens lockedMask while the
-   renderer ignores every register it admits would be worse than not honouring it. */
+/* Has the F18A been unlocked, and is this a write to the register that decides it? A
+   TMS9918A cannot be, so both are literals there - and graphics_i_scan_line forks on the
+   first exactly once, which is what makes the entire enhanced renderer fold away in that
+   build rather than needing a condition per feature. Honouring an unlock that widens
+   lockedMask while the renderer ignores every register it admits would be worse than not
+   honouring it. */
 #if PICO9918_MODE == PICO9918_MODE_F18A
-#define PICO9918_UNLOCKED(T)        ((T)->isUnlocked)
-#define PICO9918_UNLOCK_WRITE(R, V) \
-  ((R) == (0x80 | PICO9918_REG_UNLOCK) && ((V) & 0xfc) == PICO9918_R57_UNLOCK)
+#define PICO9918_UNLOCKED(T)     ((T)->isUnlocked)
+#define PICO9918_UNLOCK_REG(R)   ((R) == (0x80 | PICO9918_REG_UNLOCK))
+#define PICO9918_UNLOCK_VALUE(V) (((V) & 0xfc) == PICO9918_R57_UNLOCK)
 #else
-#define PICO9918_UNLOCKED(T)        false
-#define PICO9918_UNLOCK_WRITE(R, V) false
+#define PICO9918_UNLOCKED(T)     false
+#define PICO9918_UNLOCK_REG(R)   false
+#define PICO9918_UNLOCK_VALUE(V) false
 #endif
 
 /* What a personality answers to. Derived once, in pico9918_set_chip, so each site reads
