@@ -11,10 +11,14 @@ input space, so it fails on a case nobody thought to draw.
     test_text_ecm           ECM depths in text modes
     test_text80_8bpp        the 80-column 8bpp tier's packing
     test_gpu_dma            the GPU DMA engine's geometry, from the VHDL
+    test_tms9900            the GPU's instruction set, run inside the firmware
 
-test_gpu_dma is the odd one: it asserts VRAM rather than pixels, and it is the only
-thing here that reaches the board's DMA trigger, which is an MPU fault on a device
-and a software address compare off one.
+The last two are the odd ones: they assert VRAM rather than pixels, and they are the
+only things here that run a program on the GPU rather than driving the renderer.
+test_gpu_dma is the only thing that reaches the board's DMA trigger, which is an MPU
+fault on a device and a software address compare off one; test_tms9900 is the only
+thing that executes an instruction inside the running firmware, where core/test/tms9900
+reaches the same assembly core only as a UF2 flashed in its place.
 
 Each is runnable alone: `cd core/test && python -m suite.stages.properties.test_d4`.
 Each reports through `suite.outcome`, so a failure reads the same whichever ran.

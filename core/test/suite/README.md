@@ -1,6 +1,6 @@
 # The renderer's suite
 
-111 scenes, six property suites and two TMS9900 GPU programs - one of them 22.9 M
+111 scenes, seven property suites and two TMS9900 GPU programs - one of them 22.9 M
 instructions - each compared against a committed reference. It asserts what the library computes and never what it cost.
 
 ## Running it
@@ -37,7 +37,7 @@ scoreboard.py   how one shows what it is doing, when it is not a picture
 
 access/         how a VDP is driven and read back
 oracle/         the frozen references, and the comparison against them
-stages/         the checks: the eight the renderer owns, and six property suites
+stages/         the checks: the nine the renderer owns, and seven property suites
 data/           what the scenes are made of - the font, the VRAM dumps, the GPU programs
 shim/           the C program the desktop backend talks to, and its build
 ```

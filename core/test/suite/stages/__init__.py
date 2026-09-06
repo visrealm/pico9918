@@ -1,7 +1,7 @@
 """The stages that assert what the renderer computed, and the verdict over them.
 
 Every one of these takes a `VdpAccess` and fills its own key of a record, so the
-same seven run against the shim here and against a board from the firmware
+same nine run against the shim here and against a board from the firmware
 repository - which is the point: the acceptance criteria are the library's, and
 the firmware adds three stages that measure a device rather than replacing these.
 
@@ -19,12 +19,14 @@ import suite.stages.properties.test_text80_8bpp as test_text80_8bpp
 import suite.stages.properties.test_text_colour as test_text_colour
 import suite.stages.properties.test_text_ecm as test_text_ecm
 import suite.stages.properties.test_text_scroll as test_text_scroll
+import suite.stages.properties.test_tms9900 as test_tms9900
 
 # Order matters: d4 first because it inherits whatever VDP state preceded it, and
-# the two that run a GPU program last, because a program is the only thing here
-# that leaves the VDP set up by something other than this harness. dma before gpu
-# of the two: it takes a second, and gpu can take two minutes.
-RENDERER = ("d4", "freeze", "scroll", "colour", "ecm", "t80-8bpp", "dma", "gpu")
+# the three that run a GPU program last, because a program is the only thing here
+# that leaves the VDP set up by something other than this harness. Cheapest of
+# those first: dma takes a second and tms9900 a few, where gpu can take two minutes.
+RENDERER = ("d4", "freeze", "scroll", "colour", "ecm", "t80-8bpp", "dma", "tms9900",
+            "gpu")
 
 
 def say(formatter):
@@ -63,6 +65,10 @@ def stage_dma(t, record, args):
     record["properties"]["GPU DMA"] = test_gpu_dma.run(t)
 
 
+def stage_tms9900(t, record, args):
+    record["properties"]["GPU TMS9900"] = test_tms9900.run(t)
+
+
 def stage_gpu(t, record, args):
     # filtered like the timings rather than through gpu.select, so a run narrowed
     # to scene names runs no program instead of refusing to start
@@ -73,7 +79,7 @@ def stage_gpu(t, record, args):
 
 RUNNERS = {"d4": stage_d4, "freeze": stage_freeze, "scroll": stage_scroll,
            "colour": stage_colour, "ecm": stage_ecm, "t80-8bpp": stage_t80_8bpp,
-           "dma": stage_dma, "gpu": stage_gpu}
+           "dma": stage_dma, "tms9900": stage_tms9900, "gpu": stage_gpu}
 
 
 def verdict(record):

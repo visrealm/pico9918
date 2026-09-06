@@ -23,19 +23,24 @@ runs/           the records, small enough to commit
 reports/        generated pages - not tracked; the records they are made from are
 ```
 
-What is *not* here is the renderer's half: the scenes, the references, the eight stages that assert
+What is *not* here is the renderer's half: the scenes, the references, the nine stages that assert
 what the library computed, and the desktop shim are the library's, under `core/test/suite`. They
 need no board, so a board is not what proves them - CI runs them under four compilers on every
 push, and this harness imports the same package rather than keeping a second copy in step by hand.
 
 That split is also the division of labour. The library owns what the renderer must compute; this
 repository owns the three stages that can only be answered by a device - `diag`, `perf` and
-`perf-panels`, which read microseconds and which lines did not fit. `runner.py` runs all eleven.
+`perf-panels`, which read microseconds and which lines did not fit. `runner.py` runs all twelve.
 
-`dma` sits across that line and is the library's anyway, because what it asserts is arithmetic
-rather than a device. It is still the only stage that fires the board's DMA trigger: the engine is
-one C function everywhere, but reaching it is an MPU fault here and a software address compare on
-the desktop, so running it both ways is a differential test of those two.
+`dma` and `tms9900` sit across that line and are the library's anyway, because what they assert is
+arithmetic rather than a device. Each is still the only way to reach one half of the GPU on a board.
+`dma` fires the DMA trigger: the engine is one C function everywhere, but reaching it is an MPU
+fault here and a software address compare on the desktop. `tms9900` executes instructions: the board
+runs the hand-written Thumb core in `gpu/platform` and the desktop runs the portable C one. The
+library's own `core/test/tms9900` reaches that assembly core too, but only as a UF2 flashed in place
+of the firmware and read over USB serial - so this is the only thing that runs an instruction inside
+the firmware, under the GPU loop and its budget, without a flash. Running either both ways is a
+differential test of the two implementations.
 
 The registry of stages stays explicit in `runner.py` - the order matters, and a suite that derives
 its order from a directory listing has hidden it.
@@ -205,7 +210,7 @@ python runner.py --board 2040 --clock 1        reboot at 302 MHz and measure the
 cmake -S test/live/desktop -B build-live-desktop -G Ninja -DCMAKE_C_FLAGS=-O2
 cmake --build build-live-desktop
 
-python runner.py --desktop                    eight stages, 111 scenes, about a second
+python runner.py --desktop                    nine stages, 111 scenes, about a second
 python freeze.py --desktop                    the goldens alone
 python gpu.py --desktop                       the GPU programs, on the C core
 python web/console.py --desktop               the visualiser, same page

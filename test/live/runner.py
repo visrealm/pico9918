@@ -44,7 +44,7 @@ from suite.stages import RUNNERS as RENDERER_RUNNERS, say, verdict
 # goldens before the timings because a dropped row is the acceptance test and an
 # average is not - there is no point pricing a build that renders the wrong thing.
 STAGES = ("d4", "freeze", "diag", "perf", "perf-panels",
-          "scroll", "colour", "ecm", "t80-8bpp", "dma", "gpu")
+          "scroll", "colour", "ecm", "t80-8bpp", "dma", "tms9900", "gpu")
 
 # What --quick runs: the canary scenes, which drop a line before any average
 # moves, plus the properties, which are cheap and catch what a golden cannot.
