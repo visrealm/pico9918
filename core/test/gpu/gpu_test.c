@@ -349,6 +349,35 @@ int main(void)
   expect("dma-dec-row1-last", 0x18f9, 0x39);
   expect("dma-dec-past", 0x1901, 0x00);
 
+  /* decrementing with a stride of zero cancels the row's own backwards run exactly */
+  dma(0x1100, 0x1900, 4, 3, 0, 0x02);
+  expect("dma-dec-stride0-first", 0x1900, 0x40);
+  expect("dma-dec-stride0-last", 0x18fd, 0x3d);
+  expect("dma-dec-stride0-end", 0x18fc, 0x00);
+  expect("dma-dec-stride0-past", 0x1901, 0x00);
+
+  /* TRAP: the difference is (width - 1) - stride here, so an ordinary stride always makes
+     the pitch negative and only one that underflows walks the rows FORWARDS while each row
+     is still written backwards. 200 with a width of 8 gives (7 - 200) & 0xff = 63, so +56 -
+     the mirror of dma-back-row1 above, which is the same numbers incrementing. */
+  dma(0x1100, 0x1900, 8, 2, 200, 0x02);
+  expect("dma-dec-fwd-row0-first", 0x1900, 0x40);
+  expect("dma-dec-fwd-row0-last", 0x18f9, 0x39);
+  expect("dma-dec-fwd-row1-first", 0x1938, 0x78);
+  expect("dma-dec-fwd-row1-last", 0x1931, 0x71);
+  expect("dma-dec-fwd-gap", 0x1901, 0x00);
+  expect("dma-dec-fwd-not-back", 0x18c8, 0x00);
+
+  /* and its own edge, which is NOT where incrementing turns over: two's complement holds
+     one more negative than positive, so dec flips at 136 where inc flipped at 135 */
+  dma(0x1100, 0x1900, 8, 2, 135, 0x02);
+  expect("dma-dec-edge-back-row1", 0x1879, 0xb9);
+  expect("dma-dec-edge-back-not-forward", 0x1979, 0x00);
+
+  dma(0x1100, 0x1900, 8, 2, 136, 0x02);
+  expect("dma-dec-edge-fwd-row1", 0x1978, 0xb8);
+  expect("dma-dec-edge-fwd-not-back", 0x1878, 0x00);
+
   printf("%s: library-paced GPU, %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
   return failures != 0;
 }
