@@ -192,6 +192,39 @@ probe intermittently reports no F18A at all.
 tiers and the original hardware. A host with a thread to spare can leave the rate at zero
 and run `pico9918_gpu_loop()` on that thread instead, which is what the firmware does.
 
+## Debugging
+
+Build with `-DPICO9918_DEBUG_API=ON` and `pico9918_debug.h` appears: a memory pane, a
+register editor and a disassembler can be written against the public surface instead of
+reaching into `impl/`.
+
+```c
+uint32_t end;
+uint32_t flags = pico9918_debug_region(addr, &end);   /* what is here, and how far */
+
+pico9918_debug_read (tms9918, addr, buf, sizeof(buf));
+pico9918_debug_write(tms9918, addr, buf, sizeof(buf));
+pico9918_debug_reg_write(tms9918, 30, value);         /* R30, not R6 */
+```
+
+None of it disturbs the machine: no address latch moves, no read-ahead is consumed, no
+status is cleared. Two things are worth knowing before you use it.
+
+**The map is the backing state, not the map a GPU program sees.** Every byte appears
+exactly once, the workspace overflow above 0xFFFF included, and it does not re-lay-out
+when the chip personality changes - where a running personality mirrors four windows
+across 4KB each and reads 0 in the holes. `pico9918_gpu_mem_size()` is its size.
+
+**The register write is a store, not the device's write.** `pico9918_write_register_value`
+is a protocol: on a locked device it folds the number to three bits, so asking it for R30
+writes R6, and R55, R56, R50 and R63 each set something in motion. `pico9918_debug_reg_write`
+stores the byte where its number says and reconciles only what the instance needs to stay
+consistent. A span write refuses the register and status windows for the same reason, and
+returns short at their edge, so a bulk load cannot start a GPU program by accident.
+
+Off by default, and a board never turns it on - the option adds a translation unit that a
+firmware build does not compile.
+
 ## Examples
 
 `PICO9918_EXAMPLES=ON` adds these to the library's own build. Each links
@@ -280,6 +313,7 @@ TMS9918A - everything in the F18A rows above needs it.
 | `PICO9918_SINGLE_INSTANCE` | `0` | `1` puts one VDP at a fixed address and drops the instance argument from every call. What the firmware ships |
 | `PICO9918_TEXT80_8BPP` | `OFF` | 80-column text at eight bits a pixel, which is what ECM, palette select and the bitmap layer need there. Doubles the line to 512 bytes |
 | `PICO9918_NO_SPLASH` | `OFF` | drop the splash overlay and its image asset |
+| `PICO9918_DEBUG_API` | `OFF` | `pico9918_debug.h`: the memory map, span read and write, and the register store a debugger wants. Needs `PICO9918_MODE=1` |
 | `PICO9918_EXAMPLES` | `OFF` | build `examples/` |
 | `PICO9918_WERROR` | `OFF` | `-Wall -Wextra -Werror` |
 

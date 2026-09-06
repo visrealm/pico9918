@@ -145,12 +145,18 @@ PICO9918_DLLEXPORT
 uint16_t pico9918_gpu_pc(PICO9918_INST_ONLY_ARG);
 
 /**
- * \brief a byte of the GPU's address space, without disturbing anything
+ * \brief a byte of the instance's memory, without disturbing anything
  *
- * What the GPU sees, which is not what the host data port sees: pico9918_vram_value is
- * the guest's view and stops at 0x3FFF, so it cannot reach GRAM at 0x4000, the palette
- * at 0x5000, the register and status windows, or the workspace. Disassembly and memory
- * views want this one.
+ * The BACKING STATE, not the map a GPU program observes. Those differ: a running
+ * personality mirrors 0x4xxx, 0x5xxx, 0x6xxx and 0x7xxx across 4KB each and answers 0
+ * in the holes, where this is every byte exactly once. It is the view a debugger wants,
+ * because it re-lays-out nothing when the chip personality changes, and the decoded one
+ * is derivable from it.
+ *
+ * Not what the host data port sees either: pico9918_vram_value is the guest's view and
+ * stops at 0x3FFF, so it cannot reach GRAM at 0x4000, the palette at 0x5000, the
+ * register and status windows, or the workspace. Disassembly and memory views want this
+ * one, and pico9918_debug.h has the span form of it where a build asks for that.
  *
  * The space runs past 0xFFFF. The GPU's workspace pointer is 0xFFFE, so R0 is the last
  * word of the 64KB map and R1-R15 spill into an overflow above it. Anything beyond the

@@ -27,21 +27,29 @@
  * header for a READ has taken a wrong turn rather than made a judgement call, and if
  * something genuinely has no public read then the gap is the bug.
  *
+ * pico9918_debug.h is the rest of that set where a build asks for it - the span read and
+ * write, the map itself, the register file's own byte, and the register STORE that used
+ * to be the crossing described below.
+ *
  * Two of those pairs look alike and are not:
  *
  *   pico9918_vram_value    | the guest's view, so it stops at 0x3FFF
- *   pico9918_gpu_mem_value | the GPU's, so it reaches GRAM, the palette, the register
- *                          | and status windows and the workspace above 0xFFFF
+ *   pico9918_gpu_mem_value | the BACKING STATE, not the map a GPU program observes: it
+ *                          | reaches GRAM, the palette, the register and status windows
+ *                          | and the workspace above 0xFFFF, each byte exactly once,
+ *                          | where a running personality mirrors four windows across
+ *                          | 4KB and answers 0 in the holes
  *   pico9918_reg_value     | VR0-VR63, and the guest's view of them: on a locked device
  *                          | it decodes three address bits, so reg 30 reads R6. The
  *                          | physical register behind that is TMS_REGISTER, below
  *   pico9918_gpu_reg_value | the GPU's own R0-R15, out of its workspace
  *
- * WRITES that must not behave like the guest are the reason to be here. Every public
- * register write goes through the bus and so takes the unlock gate and the locked-mask
- * aliasing with it - a locked device redirects VR30 to R6 rather than refusing it. A
- * register editor writing what the operator typed wants `TMS_REGISTER(tms9918, reg) =
- * value`, which is the whole of the crossing.
+ * WRITES that must not behave like the guest were the reason to be here, and the one
+ * that mattered has since been published. Every public register write but that one goes
+ * through the bus and so takes the unlock gate and the locked-mask aliasing with it - a
+ * locked device redirects VR30 to R6 rather than refusing it. A register editor writing
+ * what the operator typed wants pico9918_debug_reg_write, which is `TMS_REGISTER(tms9918,
+ * reg) = value` plus the four things a store still owes the instance.
  *
  * And the invariant that removal established: a PUBLIC entry must not silently write
  * somewhere other than where its parameter names. The engine below takes the raw select
