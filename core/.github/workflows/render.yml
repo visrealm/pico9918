@@ -43,6 +43,14 @@ jobs:
       - uses: ./.github/actions/env
       - run: tools/ci.sh gpucore
 
+  debug:
+    name: Debugger surface
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env
+      - run: tools/ci.sh debug
+
   tms9918:
     name: TMS9918A mode
     runs-on: ubuntu-latest
