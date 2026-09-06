@@ -41,6 +41,21 @@ option(PICO9918_RUNTIME_CHIP "Select the chip personality at runtime" OFF)
 # row and the setter that feeds it appear together or not at all.
 option(PICO9918_DIAG_GPU_FRAME_COUNTER "Include the diag GPU-frames row" OFF)
 
+# Span and map access for a debugger's memory pane, which a host emulator wants and a
+# board has no one to show. OFF is the default in the direction a mistake falls safely:
+# a consumer that forgets to ask gets a link error naming the symbol, where a board that
+# forgot to decline would silently carry flash it must never spend. It needs the F18A
+# build - a MODE=0 archive has no 64KB map to address, no register window and no GPU.
+option(PICO9918_DEBUG_API "Debugger memory, register and GPU access" OFF)
+
+# The test for it, which cannot mean anything without it - so it implies the option
+# rather than being a second thing to remember. Here rather than beside the other test
+# options because src/ reads PICO9918_DEBUG_API when it builds the source list.
+option(PICO9918_DEBUG_TEST "Build the debugger surface test" OFF)
+if (PICO9918_DEBUG_TEST)
+  set(PICO9918_DEBUG_API ON)
+endif()
+
 # The splash PNG, relative to src/overlay/. The host selects the board-
 # appropriate image; the generator emits the canonical `splash*` symbols either
 # way, so no consuming TU needs a per-board #ifdef.
@@ -138,6 +153,11 @@ endif()
 option(PICO9918_GPU_TEST "Build the library-paced GPU test" OFF)
 if (PICO9918_GPU_TEST AND PICO9918_MODE)
   add_subdirectory(test/gpu)
+endif()
+
+# The debugger surface.
+if (PICO9918_DEBUG_TEST)
+  add_subdirectory(test/debug)
 endif()
 
 # The TMS9900 the GPU is, instruction by instruction. A board cross-checks its assembly

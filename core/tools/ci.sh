@@ -141,6 +141,13 @@ gpu() {
   "$(findExe "$OUT-gpu" gpu_test)"
 }
 
+# The debugger surface: the published map, and the span read over it.
+debug() {
+  configure "$OUT-debug" "$LIBROOT" -DPICO9918_DEBUG_TEST=ON -DCMAKE_C_FLAGS=-O2
+  build "$OUT-debug"
+  "$(findExe "$OUT-debug" debug_test)"
+}
+
 # The GPU's instruction set. Named for the core rather than the chip, because a job
 # called tms9900 beside the tms9918 one would be one digit from an unrelated thing.
 gpucore() {
@@ -149,8 +156,10 @@ gpucore() {
   "$(findExe "$OUT-gpucore" tms9900_test)"
 }
 
+# PICO9918_DEBUG_API is on here and nowhere else in this gate's family: it adds a TU, and
+# a source no -Werror build ever compiles is a source with no warning gate at all.
 warnings() {
-  configure "$OUT" "$LIBROOT" -DPICO9918_WERROR=ON -DCMAKE_C_FLAGS=-O2
+  configure "$OUT" "$LIBROOT" -DPICO9918_WERROR=ON -DPICO9918_DEBUG_API=ON -DCMAKE_C_FLAGS=-O2
   build "$OUT"
   echo "no warnings"
 }
@@ -347,6 +356,7 @@ suite) suite ;;
 pixels) pixels ;;
 gpu) gpu ;;
 gpucore) gpucore ;;
+debug) debug ;;
 warnings) warnings ;;
 comments) comments ;;
 doxygen) docs ;;
@@ -356,7 +366,7 @@ tms9918) tms9918 ;;
 chip) chip ;;
 python) pythonModule ;;
 *)
-  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|comments|doxygen|package|multi|tms9918|chip|python>" >&2
+  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|debug|warnings|comments|doxygen|package|multi|tms9918|chip|python>" >&2
   exit 2
   ;;
 esac

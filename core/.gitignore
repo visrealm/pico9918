@@ -18,6 +18,10 @@ mono_crash.*
 
 # Build results
 [Dd]ebug/
+# TRAP: the rule above is Visual Studio's output directory and it swallowed a source
+# directory of that name whole - git never descends into an excluded directory, so the
+# files inside cannot be re-included one at a time. Unexclude the directory itself.
+!test/debug/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/

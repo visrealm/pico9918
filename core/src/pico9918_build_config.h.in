@@ -67,4 +67,14 @@
  */
 #define PICO9918_BUILD_SINGLE_INSTANCE @PICO9918_BUILD_SINGLE_INSTANCE@
 
+/*
+ * Whether the compiled library carries pico9918_debug.h's entry points.
+ *
+ * Purely additive - no instance field, no layout, no calling convention - so unlike the
+ * three above, a disagreement here is a link error rather than silent corruption. It is
+ * recorded anyway so a host can ask at compile time whether the archive it found can
+ * back a memory pane, instead of discovering it at link time or shipping two builds.
+ */
+#define PICO9918_BUILD_DEBUG_API @PICO9918_BUILD_DEBUG_API@
+
 #endif // _PICO9918_BUILD_CONFIG_H

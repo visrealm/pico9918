@@ -46,6 +46,22 @@ if(PICO9918_V9938_BASE)
   endif()
 endif()
 
+# Adds entry points and nothing else - no instance field, no layout change, no calling
+# convention - so a consumer that disagrees gets a link error rather than corruption. The
+# stamp goes in the generated header anyway, because "is this build debuggable" is a
+# question a host wants answered at compile time rather than by a failed link.
+if(PICO9918_DEBUG_API)
+  if(PICO9918_MODE LESS 1)
+    message(FATAL_ERROR
+      "PICO9918_DEBUG_API needs PICO9918_MODE=1: a MODE=0 archive has 16KB of base VRAM and no "
+      "GRAM, register or status window to address, so there is no map for a debugger to walk.")
+  endif()
+  set(PICO9918_BUILD_DEBUG_API 1)
+  list(APPEND PICO9918_SOURCES pico9918_debug.c)
+else()
+  set(PICO9918_BUILD_DEBUG_API 0)
+endif()
+
 add_library(${LIBRARY} STATIC ${PICO9918_SOURCES})
 
 # The GPU's C core mirrors the assembly core's opcode-group structure, helpers
