@@ -36,11 +36,10 @@ if [ -z "$PY" ]; then
 fi
 
 # Pin the interpreter CMake uses instead of letting find_package(Python3) take
-# whichever it meets first. On a Windows runner the MSYS2 shell has the hosted
-# tool cache's python ahead of mingw64's on PATH, and pillow was installed for
-# mingw64's - so the overlay assets refused to configure against an interpreter
-# nobody chose. cygpath because CMake wants a native path, and it only exists
-# where that distinction does.
+# whichever it meets first: on a Windows runner the MSYS2 shell has the hosted
+# tool cache's python ahead of mingw64's on PATH, so which one a job runs and
+# which one CMake finds are two different answers. cygpath because CMake wants a
+# native path, and it only exists where that distinction does.
 PY_PATH=$(command -v "$PY")
 if command -v cygpath > /dev/null 2>&1; then
   PY_PATH=$(cygpath -m "$PY_PATH")

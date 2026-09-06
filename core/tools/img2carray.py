@@ -26,7 +26,149 @@ import sys
 import glob
 import re
 import argparse
-from PIL import Image
+import struct
+import zlib
+
+
+PNG_MAGIC = b'\x89PNG\r\n\x1a\n'
+
+
+class PngPalette:
+    """the PLTE bytes, behind the one accessor the emitters use"""
+
+    def __init__(self, data):
+        self.data = data
+
+    def tobytes(self) -> bytes:
+        return self.data
+
+
+class PngImage:
+    """an indexed PNG, decoded to palette indices with the standard library alone
+
+    Every asset here is colour type 3, bit depth 1 to 8, non-interlaced, which is
+    the corner of PNG that is a page of code: inflate the IDAT, undo the five
+    filter types, unpack the sub-8-bit rows. Anything outside it is refused rather
+    than guessed at - a wrong guess would ship as wrong artwork rather than as an
+    error.
+
+    Exposes only what the emitters below use: width, height, palette and
+    load()[x, y].
+    """
+
+    def __init__(self, path):
+        with open(path, 'rb') as f:
+            data = f.read()
+
+        if data[:8] != PNG_MAGIC:
+            raise SystemExit("img2carray: " + path + " is not a PNG")
+
+        self.width = self.height = self.depth = 0
+        palette = b''
+        compressed = []
+        pos = 8
+
+        while pos + 8 <= len(data):
+            length, kind = struct.unpack('>I4s', data[pos:pos + 8])
+            if pos + 12 + length > len(data):
+                raise SystemExit("img2carray: " + path + " is truncated")
+
+            body = data[pos + 8:pos + 8 + length]
+            stored, = struct.unpack('>I', data[pos + 8 + length:pos + 12 + length])
+            if zlib.crc32(kind + body) != stored:
+                raise SystemExit("img2carray: %s has a corrupt %s chunk"
+                                 % (path, kind.decode('ascii', 'replace')))
+            pos += 12 + length
+
+            if kind == b'IHDR':
+                (self.width, self.height, self.depth, colour,
+                 _compression, _filter, interlace) = struct.unpack('>IIBBBBB', body)
+                if colour != 3:
+                    raise SystemExit(
+                        "img2carray: %s is PNG colour type %d - only indexed (3) is "
+                        "supported. Convert it to an indexed PNG." % (path, colour))
+                if interlace:
+                    raise SystemExit(
+                        "img2carray: %s is interlaced - save it non-interlaced" % path)
+            elif kind == b'PLTE':
+                palette = body
+            elif kind == b'IDAT':
+                compressed.append(body)
+            elif kind == b'IEND':
+                break
+
+        if not self.width or not self.height:
+            raise SystemExit("img2carray: " + path + " has no IHDR")
+
+        self.palette = PngPalette(palette) if palette else None
+        self.rows = self.unfiltered(zlib.decompress(b''.join(compressed)))
+
+    def unfiltered(self, raw) -> list:
+        """undo the per-row filter, returning one bytearray of packed pixels a row
+
+        The filter unit is a whole pixel, which for an indexed image below 8bpp is
+        one byte - never a fraction of one, so `a` is simply the previous byte.
+        """
+        unit = max(1, self.depth // 8)
+        stride = (self.width * self.depth + 7) // 8
+        rows = []
+        prior = bytearray(stride)
+        pos = 0
+
+        for y in range(self.height):
+            if pos + 1 + stride > len(raw):
+                raise SystemExit("img2carray: image data ends at row %d of %d"
+                                 % (y, self.height))
+            kind = raw[pos]
+            line = bytearray(raw[pos + 1:pos + 1 + stride])
+            pos += 1 + stride
+
+            if kind == 1:  # Sub
+                for i in range(unit, stride):
+                    line[i] = (line[i] + line[i - unit]) & 0xff
+            elif kind == 2:  # Up
+                for i in range(stride):
+                    line[i] = (line[i] + prior[i]) & 0xff
+            elif kind == 3:  # Average
+                for i in range(stride):
+                    left = line[i - unit] if i >= unit else 0
+                    line[i] = (line[i] + ((left + prior[i]) >> 1)) & 0xff
+            elif kind == 4:  # Paeth
+                for i in range(stride):
+                    a = line[i - unit] if i >= unit else 0
+                    b = prior[i]
+                    c = prior[i - unit] if i >= unit else 0
+                    p = a + b - c
+                    pa, pb, pc = abs(p - a), abs(p - b), abs(p - c)
+                    if pa <= pb and pa <= pc:
+                        line[i] = (line[i] + a) & 0xff
+                    elif pb <= pc:
+                        line[i] = (line[i] + b) & 0xff
+                    else:
+                        line[i] = (line[i] + c) & 0xff
+            elif kind:
+                raise SystemExit("img2carray: unknown row filter %d" % kind)
+
+            rows.append(line)
+            prior = line
+
+        return rows
+
+    def load(self):
+        """pillow's accessor shape: the object that indexes as [x, y]"""
+        return self
+
+    def __getitem__(self, xy) -> int:
+        x, y = xy
+        row = self.rows[y]
+        if self.depth == 8:
+            return row[x]
+        perByte = 8 // self.depth
+        shift = 8 - self.depth * (x % perByte + 1)
+        return (row[x // perByte] >> shift) & ((1 << self.depth) - 1)
+
+    def close(self) -> None:
+        return
 
 
 def main() -> int:
@@ -311,7 +453,7 @@ def processImageFile(infile, srcOutput, hdrOutput, args, inRam) -> None:
     varName = re.sub('[^0-9a-zA-Z]+', '', args['prefix'] + varName)
 
     try:
-        src = Image.open(infile)
+        src = PngImage(infile)
         pix = src.load()
 
         bpp = 16

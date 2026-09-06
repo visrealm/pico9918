@@ -4,7 +4,7 @@
 Run it with the built module on the path:
 
     PYTHONPATH=<build>/bindings/python python bindings/python/test.py
-    python bindings/python/test.py --png frame.png     # needs pillow
+    python bindings/python/test.py --png frame.png     # dumps the screen
 
 The renderer's own correctness is test/golden and test/suite - byte-exact frames
 against committed ones. Nothing here re-freezes a picture; these are the things
@@ -212,9 +212,34 @@ def test_lifetime():
     print("  ok  allocated blocks stable = %+d" % leaked)
 
 
+def write_png(path, width, height, rgb):
+    """the dumped screen as a truecolour PNG, with the standard library alone
+
+    Filter 0 on every row and nothing else: the point of a dump is to look at the
+    frame, not to compress it well.
+    """
+    def chunk(kind, body):
+        return (len(body).to_bytes(4, 'big') + kind + body
+                + zlib.crc32(kind + body).to_bytes(4, 'big'))
+
+    stride = width * 3
+    raw = bytearray()
+    for y in range(height):
+        raw += b'\x00' + rgb[y * stride:(y + 1) * stride]
+
+    header = (width.to_bytes(4, 'big') + height.to_bytes(4, 'big')
+              + bytes((8, 2, 0, 0, 0)))  # 8bpc, truecolour, no interlace
+
+    with open(path, 'wb') as f:
+        f.write(b'\x89PNG\r\n\x1a\n')
+        f.write(chunk(b'IHDR', header))
+        f.write(chunk(b'IDAT', zlib.compress(bytes(raw), 9)))
+        f.write(chunk(b'IEND', b''))
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--png", help="write the dumped screen here (needs pillow)")
+    ap.add_argument("--png", help="write the dumped screen here as a PNG")
     args = ap.parse_args()
 
     print("pico9918 %s, %d pixels a line, %d bytes a pixel"
@@ -230,8 +255,7 @@ def main():
         test_gpu_interleaved()
 
     if args.png:
-        from PIL import Image
-        Image.frombytes("RGB", (pico9918.PIXELS_X, ROWS), vdp.rgb(ROWS)).save(args.png)
+        write_png(args.png, pico9918.PIXELS_X, ROWS, vdp.rgb(ROWS))
         print("wrote", args.png)
 
     print("PASS")

@@ -9,28 +9,12 @@
 # they all need RAM-resident data. (The firmware's ROM and bindata variants stay
 # in the firmware, where their callers are.)
 #
-# Requires Python 3 with pillow. Resolves the interpreter itself rather than
-# inheriting the host's ${PYTHON}, so the library configures standalone.
-#
-# pillow is checked HERE, at configure time. Finding only the interpreter is not
-# enough: a runner or a fresh consumer machine usually has Python 3 but not
-# pillow, so `find_package(... REQUIRED)` alone passes configure and the build
-# then dies on an "No module named 'PIL'" traceback from inside a codegen step -
-# a confusing place to learn about a missing build dependency.
+# Requires Python 3 and nothing else - the converter decodes the PNGs with zlib
+# from the standard library, so a fresh consumer machine needs no pip install.
+# Resolves the interpreter itself rather than inheriting the host's ${PYTHON}, so
+# the library configures standalone.
 
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
-
-execute_process(
-  COMMAND ${Python3_EXECUTABLE} -c "import PIL"
-  RESULT_VARIABLE PICO9918_PILLOW_MISSING
-  OUTPUT_QUIET ERROR_QUIET)
-
-if(PICO9918_PILLOW_MISSING)
-  message(FATAL_ERROR
-    "The overlay image assets need Python 3 with pillow, and pillow was not "
-    "found for ${Python3_EXECUTABLE}.\n"
-    "  Install it with:  ${Python3_EXECUTABLE} -m pip install pillow")
-endif()
 
 set(PICO9918_IMG_CONV ${CMAKE_CURRENT_LIST_DIR}/tools/img2carray.py)
 

@@ -20,9 +20,6 @@ This document describes how to build the PICO9918 firmware and configurator ROMs
 # https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 # Extract to C:\arm-toolchain\ and add to PATH
 
-# Python dependencies
-pip install pillow
-
 # Install Pico SDK 2.1.1
 git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
 cd pico-sdk
@@ -37,9 +34,6 @@ cd ..
 # Install system dependencies  
 sudo apt-get update
 sudo apt-get install -y build-essential cmake python3 python3-pip git gcc-arm-none-eabi
-
-# Python dependencies
-pip3 install pillow
 
 # Install Pico SDK 2.1.1
 git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
@@ -60,9 +54,6 @@ curl -L "https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads" -o a
 sudo tar -xJf arm-toolchain.tar.xz -C /opt
 echo 'export PATH="/opt/arm-gnu-toolchain-15.2.rel1/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
-
-# Python dependencies (may require --break-system-packages on newer macOS)
-pip3 install pillow
 
 # Install Pico SDK 2.1.1
 git clone -b 2.1.1 --depth 1 https://github.com/raspberrypi/pico-sdk.git pico-sdk
@@ -458,10 +449,9 @@ echo "Patch failed or already applied" # This is normal, firmware will still bui
 ```
 
 **Missing splash/font assets**
-```bash
-# Install pillow for image conversion
-pip install pillow
-```
+
+The converter needs Python 3 and nothing else. Check that CMake found an
+interpreter (`Python3_EXECUTABLE` in the cache) and that it is 3.x.
 
 ### Configurator Issues  
 **Missing tools error**

@@ -21,7 +21,7 @@ The integration layer above it does call back, in four places you register yours
 fires at most once a frame, never from the scanline body, and NULL is the default.
 
 Building the overlay image assets (the splash and the diagnostics font) needs
-**Python 3 with [pillow](https://pypi.org/project/pillow/)** at build time -
+**Python 3** at build time, and nothing beyond the standard library -
 `tools/img2carray.py` turns the PNGs in `src/overlay/res/` into C arrays. The
 emulator core itself links nothing extra.
 

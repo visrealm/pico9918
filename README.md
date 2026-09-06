@@ -196,7 +196,7 @@ Build settings can be overridden with `-D` flags or an optional, git-ignored `pi
 ### Platform-Specific Setup Required
 
 Each platform requires specific toolchain installation:
-- **Windows**: ARM GNU Toolchain 15.2.Rel1, Python with pillow
+- **Windows**: ARM GNU Toolchain 15.2.Rel1, Python 3
 - **Linux**: `build-essential cmake python3 python3-pip git` plus ARM GNU Toolchain 15.2.Rel1
 - **macOS**: Homebrew + ARM GNU Toolchain 15.2.Rel1, may need `--break-system-packages`
 

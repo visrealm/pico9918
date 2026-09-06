@@ -17,7 +17,7 @@ One workflow per thing being proven:
 `docs` and `pages` share a workflow because the artifact is handed between them,
 as do `package` and `release`.
 
-The steps every job repeats - toolchain, Python, pillow - are in
+The steps every job repeats - toolchain and Python - are in
 [`../actions/env`](../actions/env/action.yml).
 
 ## What a green badge does not cover
