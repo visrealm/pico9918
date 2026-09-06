@@ -982,8 +982,8 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
   {
   case 0xC:
   {
-    /* RET=0x0C00 (bits 6:0 of inst are 0), CALL=0x0C40+ (bit 6 set) */
-    if (inst & 0xC0)
+    /* bit 7 alone chooses: RET over >0C00->0C7F, CALL over >0C80->0CFF */
+    if (inst & 0x80)
     { /* CALL - push PC at OLD R15, pre-decrement R15 by 2, branch to source */
       Operand s       = decode_operand(cpu, inst & 0x3F, 0);
       uint16_t old_sp = get_reg(cpu, 15) & 0xFFFE;

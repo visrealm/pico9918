@@ -289,10 +289,17 @@ Each entry is the rule the C core must satisfy, not a suggestion.
 
 | Instruction | Verified Areas | Match |
 |-------------|----------------|-------|
-| RET (0x0C00) | Read PC from R15+2 (new SP), increment R15 by 2 | ✓ |
-| CALL (0x0C40+) | Write PC at OLD R15, decrement R15 by 2, branch to source (mode-0 uses workspace addr) | ✓ |
-| PUSH (0x0D00) | Write value at OLD R15, decrement R15 by 2 | ✓ |
-| POP (0x0F00) | Increment R15 by 2, read value from new R15, store to dest | ✓ |
+| RET (0x0C00-0x0C7F) | Read PC from R15+2 (new SP), increment R15 by 2 | ✓ |
+| CALL (0x0C80-0x0CFF) | Write PC at OLD R15, decrement R15 by 2, branch to source (mode-0 uses workspace addr) | ✓ |
+| PUSH (0x0D00-0x0DFF) | Write value at OLD R15, decrement R15 by 2 | ✓ |
+| POP (0x0F00-0x0FFF) | Increment R15 by 2, read value from new R15, store to dest | ✓ |
+
+The ranges are the part's, not the mnemonics'. `f18a_gpu.vhd` selects this group on
+`ir(5 to 7)` - bits 10:8 - and only the RET/CALL arm reads a further bit, `ir(8)`,
+which is bit 7 because `ir` is declared `(0 to 15)`. So bit 7 alone separates RET from
+CALL, and bit 6 is decoded by nobody: PUSH and POP take Ts/S from `ir(10 to 11)` and
+`ir(12 to 15)` and never look above them. An assembler emits only the canonical forms,
+but a core that narrows these turns a RET into a CALL, which does not fail visibly.
 
 ### Memory Model
 

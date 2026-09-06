@@ -1469,10 +1469,10 @@ JMPTBL:
         .WORD 0     +1, I_SRL    +1, 0     +1, I_SRL    +1, 0     +1, I_SRL    +1, 0     +1, I_SRL    +1, 0     +1, I_SRL    +1, 0     +1, I_SRL    +1, 0     +1, I_SRL    +1, 0     +1, I_SRL    +1   // >0900
         .WORD 0     +1, I_SLA    +1, 0     +1, I_SLA    +1, 0     +1, I_SLA    +1, 0     +1, I_SLA    +1, 0     +1, I_SLA    +1, 0     +1, I_SLA    +1, 0     +1, I_SLA    +1, 0     +1, I_SLA    +1   // >0A00
         .WORD 0     +1, I_SRC    +1, 0     +1, I_SRC    +1, 0     +1, I_SRC    +1, 0     +1, I_SRC    +1, 0     +1, I_SRC    +1, 0     +1, I_SRC    +1, 0     +1, I_SRC    +1, 0     +1, I_SRC    +1   // >0B00
-        .WORD 0     +1, I_RET    +1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1, I_CALL+1, sdecode2a+1, I_CALL+1, sdecode2a+1, 0     +1, start    +1, 0     +1, start    +1   // >0C00
-        .WORD I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1   // >0D00
+        .WORD 0     +1, I_RET    +1, 0     +1, I_RET    +1, 0     +1, I_RET    +1, 0     +1, I_RET    +1, I_CALL+1, sdecode2a+1, I_CALL+1, sdecode2a+1, I_CALL+1, sdecode2a+1, I_CALL+1, sdecode2a+1   // >0C00
+        .WORD I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1, I_PUSH+1, sdecode2a+1   // >0D00
         .WORD 0     +1, I_SLC    +1, 0     +1, I_SLC    +1, 0     +1, I_SLC    +1, 0     +1, I_SLC    +1, 0     +1, I_SLC    +1, 0     +1, I_SLC    +1, 0     +1, I_SLC    +1, 0     +1, I_SLC    +1   // >0E00
-        .WORD I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1, 0     +1, start    +1   // >0F00
+        .WORD I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1, I_POP +1, sdecode2a+1   // >0F00
         .WORD 0     +1, I_JMP    +1, 0     +1, I_JMP    +1, 0     +1, I_JMP    +1, 0     +1, I_JMP    +1, 0     +1, I_JMP    +1, 0     +1, I_JMP    +1, 0     +1, I_JMP    +1, 0     +1, I_JMP    +1   // >1000
         .WORD 0     +1, I_JLT    +1, 0     +1, I_JLT    +1, 0     +1, I_JLT    +1, 0     +1, I_JLT    +1, 0     +1, I_JLT    +1, 0     +1, I_JLT    +1, 0     +1, I_JLT    +1, 0     +1, I_JLT    +1   // >1100
         .WORD 0     +1, I_JLE    +1, 0     +1, I_JLE    +1, 0     +1, I_JLE    +1, 0     +1, I_JLE    +1, 0     +1, I_JLE    +1, 0     +1, I_JLE    +1, 0     +1, I_JLE    +1, 0     +1, I_JLE    +1   // >1200

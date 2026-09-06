@@ -1756,10 +1756,10 @@ JMPTBL: .WORD start    , 0     , start    , 0     , start    , 0     , start    
         .WORD I_SRL    , 0     , I_SRL    , 0     , I_SRL    , 0     , I_SRL    , 0     , I_SRL    , 0     , I_SRL    , 0     , I_SRL    , 0     , I_SRL    , 0        // >0900
         .WORD I_SLA    , 0     , I_SLA    , 0     , I_SLA    , 0     , I_SLA    , 0     , I_SLA    , 0     , I_SLA    , 0     , I_SLA    , 0     , I_SLA    , 0        // >0A00
         .WORD I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0        // >0B00
-        .WORD I_RET    , 0     , start    , 0     , start    , 0     , start    , 0     , sdecode2a, I_CALL, sdecode2a, I_CALL, start    , 0     , start    , 0        // >0C00
-        .WORD sdecode2a, I_PUSH, sdecode2a, I_PUSH, start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0        // >0D00
+        .WORD I_RET    , 0     , I_RET    , 0     , I_RET    , 0     , I_RET    , 0     , sdecode2a, I_CALL, sdecode2a, I_CALL, sdecode2a, I_CALL, sdecode2a, I_CALL   // >0C00
+        .WORD sdecode2a, I_PUSH, sdecode2a, I_PUSH, sdecode2a, I_PUSH, sdecode2a, I_PUSH, sdecode2a, I_PUSH, sdecode2a, I_PUSH, sdecode2a, I_PUSH, sdecode2a, I_PUSH   // >0D00
         .WORD I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0        // >0E00
-        .WORD sdecode2a, I_POP , sdecode2a, I_POP , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0        // >0F00
+        .WORD sdecode2a, I_POP , sdecode2a, I_POP , sdecode2a, I_POP , sdecode2a, I_POP , sdecode2a, I_POP , sdecode2a, I_POP , sdecode2a, I_POP , sdecode2a, I_POP    // >0F00
         .WORD I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0        // >1000
         .WORD I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0        // >1100
         .WORD I_JLE    , 0     , I_JLE    , 0     , I_JLE    , 0     , I_JLE    , 0     , I_JLE    , 0     , I_JLE    , 0     , I_JLE    , 0     , I_JLE    , 0        // >1200
