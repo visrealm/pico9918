@@ -53,6 +53,12 @@ extern "C"
     uint32_t pc;     /* Program counter (uint32_t to handle WP=0xFFFE overflow) */
     uint16_t wp;     /* Workspace pointer */
     uint16_t st;     /* Status register (flag layout matches assembly core) */
+
+    /* Decode memory the way an F18A does: a few small windows above 16KB, each mirrored
+       across its 4KB and most of the space absent. False, which is what tms9900_init
+       leaves, is the PICO9918's own map - 64KB of memory, and what the assembly cores
+       see. Only a build that can answer as a plain F18A ever sets it. */
+    bool f18aMemory;
 #if defined(TMS9900_WATCH_WRITES)
     /*
      * Called after a write to an address the running program chose, or null.

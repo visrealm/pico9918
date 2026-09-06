@@ -113,11 +113,16 @@ static void run_asm(void)
 #endif
 }
 
+/* Which map the next run_c() gets. Only test_decode touches it: everything else asserts
+   what both cores do, which is the flat one an assembly core has no choice about. */
+static bool f18aMemory = false;
+
 static void run_c(void)
 {
   uint8_t r38 = 1;
   Tms9900Cpu cpu;
   tms9900_init(&cpu, mem, &r38, PROG, WP);
+  cpu.f18aMemory = f18aMemory;
   run9900_c(&cpu);
   indepPass = 1;
 }
@@ -908,6 +913,88 @@ static void test_blwp(void)
   CHECK_REG("BLWP/RTWP R0 after return [C]", 0, 0x1111);
 }
 
+/*
+ * The address decode above 16KB, which only the F18A personality has: a PICO9918 backs
+ * the whole 64KB with RAM, so the same programs have to reach plain memory there. The
+ * flat half runs against both cores, because agreeing with the assembly core is the
+ * point of it; the F18A half is the C core's alone, since asking an assembly core for a
+ * decode it does not have would be asserting a difference.
+ */
+static void test_decode_flat(void)
+{
+  printf("\n=== PICO9918 flat memory ===\n");
+  uint8_t p[MAX_PROG]; uint16_t n;
+
+  printf("  above the F18A's GRAM window is memory\n");
+  n=0; li(p,&n,1,0x4800); li(p,&n,2,0xBEEF); mov_ri(p,&n,2,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_MEM16(">4800 [ASM]", 0x4800, 0xBEEF);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_MEM16(">4800 [C]",   0x4800, 0xBEEF);
+
+  printf("  the palette window does not mirror\n");
+  n=0; li(p,&n,1,0x5F82); li(p,&n,2,0x1234); mov_ri(p,&n,2,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_asm(); CHECK_MEM16(">5F82 [ASM]", 0x5F82, 0x1234);
+  setup(NULL); load_prog(p,n); run_c();   CHECK_MEM16(">5F82 [C]",   0x5F82, 0x1234);
+
+  printf("  the scanline byte is writable, and >C000 up is there at all\n");
+  n=0; li(p,&n,1,0x7000); li(p,&n,2,0x0102); mov_ri(p,&n,2,1);
+  li(p,&n,3,0xD000); li(p,&n,4,0x0304); mov_ri(p,&n,4,3); mov_ar(p,&n,0xC010,5);
+  emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0xC010]=0x77; mem[0xC011]=0x88;
+  run_asm(); CHECK_MEM16(">7000 [ASM]", 0x7000, 0x0102);
+  CHECK_MEM16(">D000 [ASM]", 0xD000, 0x0304); CHECK_REG(">C010 [ASM]", 5, 0x7788);
+  setup(NULL); load_prog(p,n); mem[0xC010]=0x77; mem[0xC011]=0x88;
+  run_c();   CHECK_MEM16(">7000 [C]",   0x7000, 0x0102);
+  CHECK_MEM16(">D000 [C]",   0xD000, 0x0304); CHECK_REG(">C010 [C]",   5, 0x7788);
+}
+
+static void test_decode(void)
+{
+  printf("\n=== F18A address decode (C core) ===\n");
+  uint8_t p[MAX_PROG]; uint16_t n;
+  f18aMemory = true;
+
+  printf("  GRAM is 2KB, mirrored\n");
+  n=0; li(p,&n,1,0x4800); li(p,&n,2,0xBEEF); mov_ri(p,&n,2,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_c(); CHECK_MEM16("GRAM >4800", 0x4000, 0xBEEF);
+
+  printf("  palette is 128 bytes, mirrored\n");
+  n=0; li(p,&n,1,0x5F82); li(p,&n,2,0x1234); mov_ri(p,&n,2,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_c(); CHECK_MEM16("palette >5F82", 0x5002, 0x1234);
+
+  printf("  registers are 64, mirrored\n");
+  n=0; li(p,&n,1,0x6F44); li(p,&n,2,0xAA55); mov_ri(p,&n,2,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_c(); CHECK_MEM16("register >6F44", 0x6004, 0xAA55);
+
+  printf("  DMA ports are 16, mirrored\n");
+  n=0; li(p,&n,1,0x8F14); li(p,&n,2,0x0102); mov_ri(p,&n,2,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); run_c(); CHECK_MEM16("DMA >8F14", 0x8004, 0x0102);
+
+  printf("  scanline and blanking are read-only\n");
+  n=0; li(p,&n,1,0x7000); clr(p,&n,2); mov_ri(p,&n,2,1); mov_ir(p,&n,1,3); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0x7000]=0x5A; mem[0x7001]=0xA5;
+  run_c(); CHECK_MEM16("scanline write dropped", 0x7000, 0x5AA5);
+  CHECK_REG("scanline read", 3, 0x5AA5);
+
+  printf("  version reads the byte the host reads from SR14\n");
+  n=0; mov_ar(p,&n,0xA246,2); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0xB00E]=0x1A; run_c(); CHECK_REG("version >A246", 2, 0x1A1A);
+
+  printf("  GPU status is the low seven bits of SR2\n");
+  n=0; li(p,&n,1,0xB000); li(p,&n,2,0x2A3F); mov_ri(p,&n,2,1); emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0xB002]=0x80; run_c();
+  CHECK_MEM8("status >B000 -> SR2", 0xB002, 0xBF);
+  CHECK_MEM8("status left SR0 alone", 0xB000, 0x00);
+
+  printf("  nothing is there above >BFFF\n");
+  n=0; mov_ar(p,&n,0xC010,2); li(p,&n,1,0xD000); li(p,&n,3,0xFFFF); mov_ri(p,&n,3,1);
+  emit(p,&n,IDLE);
+  setup(NULL); load_prog(p,n); mem[0xC010]=0x77; mem[0xC011]=0x88;
+  run_c(); CHECK_REG("read >C010", 2, 0x0000);
+  CHECK_MEM16("write >D000 dropped", 0xD000, 0x0000);
+
+  f18aMemory = false;
+}
+
 static void test_stress(void)
 {
   printf("\n=== Stress: Fibonacci(10)=55 ===\n");
@@ -971,6 +1058,8 @@ int main(void)
   test_misc();
   test_pix();
   test_blwp();
+  test_decode_flat();
+  test_decode();
   test_stress();
 
   printf("\n=========================================\n");
@@ -978,7 +1067,7 @@ int main(void)
   printf("  Results: %d/%d passed  (%d failed)\n", passed, total, failed);
 #else
   printf("  Results: %d/%d passed  (%d failed)\n", indepPassed, indepTotal, indepFailed);
-  printf("  One core, so the %d checks run are each case twice\n", total);
+  printf("  One core, so the %d checks run repeat every case that has an assembly half\n", total);
 #endif
   printf("=========================================\n");
   if (failed == 0)

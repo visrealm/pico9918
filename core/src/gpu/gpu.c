@@ -45,10 +45,11 @@ static void gpuDmaWatch(uint8_t* vram, uint32_t addr);
 #endif
 
 static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t wp, uint8_t* r38,
-                              uint32_t budget, uint16_t* st, bool* outOfBudget)
+                              uint32_t budget, uint16_t* st, bool* outOfBudget, bool f18aMemory)
 {
   Tms9900Cpu cpu;
   tms9900_init(&cpu, mem, r38, pc, wp);
+  cpu.f18aMemory = f18aMemory;
 #if defined(TMS9900_WATCH_WRITES)
   cpu.onWrite = gpuDmaWatch;
 #endif
@@ -311,7 +312,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
 #if PICO9918_GPU_BUDGETED
     lastAddress = run9900Budget(tms9918->vram.bytes, lastAddress, 0xFFFE,
                                 &TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL), budget, &tms9918->gpuStatus,
-                                &outOfBudget);
+                                &outOfBudget, !PICO9918_GPU_FLAT_MEM(tms9918));
 #else
     (void)budget;
     lastAddress =

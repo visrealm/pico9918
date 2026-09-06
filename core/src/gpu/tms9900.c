@@ -15,7 +15,7 @@
  * matches the assembly core (LGT=0x80, AGT=0x40, EQ=0x20, C=0x10, OV=0x08, P=0x04).
  * CRU (LDCR, STCR, SBO, SBZ, TB) and CKON/CKOF/LREX are no-ops in both cores.
  *
- * Memory layout follows the existing GPU glue: a flat 64 KiB byte array that
+ * Memory layout follows the existing GPU glue: a 64 KiB byte array that
  * stores TMS9900 words in big-endian order. The workspace pointer (WP) is a
  * byte address into that array and register access uses big-endian word
  * loads/stores.
@@ -84,35 +84,84 @@ static inline void set_flags_byte(Tms9900Cpu* cpu, uint8_t v)
 }
 
 /*
- * Memory helpers (big-endian words)
+ * Memory helpers (big-endian words), through whichever map the personality has.
+ *
+ * A PICO9918 backs the whole 64KB with RAM, which is what the assembly cores do and what
+ * every accessor below takes first. An F18A does not: only its first 16KB is memory, and
+ * above that each nibble is a window holding a handful of real bytes, mirrored across the
+ * whole 4KB:
+ *
+ *   nibble  window                 size   access
+ *   0-3     VRAM                   16KB   read/write
+ *   4       GRAM                   2KB    read/write
+ *   5       palette                128B   read/write
+ *   6       VDP registers          64B    read/write
+ *   7       scanline, blanking     2B     read-only
+ *   8       DMA ports              16B    read/write
+ *   9       MAC, never built       -      absent
+ *   A       version                1B     read-only, the byte the host reads from SR14
+ *   B       GPU status             1B     write-only, the low seven bits of SR2
+ *   C-F     unimplemented          -      absent
+ *
+ * An absent read gives zero and an absent write is dropped, both as the part does. The
+ * workspace does not come through here: on an F18A the registers are real, so the memory
+ * this core parks them in at >FFFE is a window that answers nothing.
  */
-static inline uint8_t rd8(uint8_t* m, uint16_t a)
+static const uint16_t gpu_window_base[16] = {0x0000, 0x0000, 0x0000, 0x0000, 0x4000, 0x5000, 0x6000, 0x7000,
+                                             0x8000, 0x0000, 0xB00E, 0xB002, 0x0000, 0x0000, 0x0000, 0x0000};
+
+static const uint16_t gpu_window_mask[16] = {0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF, 0x07FF, 0x007F, 0x003F, 0x0001,
+                                             0x000F, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000};
+
+/* which windows answer, by nibble: 0-8 and A read, 0-6, 8 and B write */
+#define GPU_WINDOW_READS  0x05FFu
+#define GPU_WINDOW_WRITES 0x097Fu
+
+static inline uint32_t gpu_addr(uint16_t a)
 {
-  return m[a];
+  const uint32_t w = a >> 12;
+  return gpu_window_base[w] | (a & gpu_window_mask[w]);
 }
 
-static inline void wr8(uint8_t* m, uint16_t a, uint8_t v)
+static inline uint8_t rd8(Tms9900Cpu* cpu, uint16_t a)
 {
-  m[a] = v;
+  if (!cpu->f18aMemory) return cpu->mem[a];
+  if (!((GPU_WINDOW_READS >> (a >> 12)) & 1)) return 0;
+  return cpu->mem[gpu_addr(a)];
 }
 
-static inline uint16_t rd16(uint8_t* m, uint16_t a)
+static inline void wr8(Tms9900Cpu* cpu, uint16_t a, uint8_t v)
 {
-  return (uint16_t)((m[a] << 8) | m[(uint16_t)(a + 1)]);
+  if (!cpu->f18aMemory)
+  {
+    cpu->mem[a] = v;
+    return;
+  }
+  if (!((GPU_WINDOW_WRITES >> (a >> 12)) & 1)) return;
+  const uint32_t at = gpu_addr(a);
+
+  /* bit 7 of SR2 says the GPU is running and stays ours; the program owns the other seven */
+  cpu->mem[at] = (at == 0xB002) ? (uint8_t)((v & 0x7F) | (cpu->mem[at] & 0x80)) : v;
 }
 
-static inline void wr16(uint8_t* m, uint16_t a, uint16_t v)
+static inline uint16_t rd16(Tms9900Cpu* cpu, uint16_t a)
 {
-  m[a]                 = (uint8_t)(v >> 8);
-  m[(uint16_t)(a + 1)] = (uint8_t)(v & 0xFF);
+  return (uint16_t)((rd8(cpu, a) << 8) | rd8(cpu, (uint16_t)(a + 1)));
+}
+
+static inline void wr16(Tms9900Cpu* cpu, uint16_t a, uint16_t v)
+{
+  wr8(cpu, a, (uint8_t)(v >> 8));
+  wr8(cpu, (uint16_t)(a + 1), (uint8_t)(v & 0xFF));
 }
 
 /* Report a write to an address the program chose - see Tms9900Cpu::onWrite, which
-   also carries what this deliberately does not cover. */
+   also carries what this deliberately does not cover. Decoded, so a watcher is
+   written against the one address a window really has. */
 #if defined(TMS9900_WATCH_WRITES)
 static inline void watch_write(Tms9900Cpu* cpu, uint32_t addr)
 {
-  if (cpu->onWrite) cpu->onWrite(cpu->mem, addr);
+  if (cpu->onWrite) cpu->onWrite(cpu->mem, cpu->f18aMemory ? gpu_addr((uint16_t)addr) : addr);
 }
 #else
 #define watch_write(cpu, addr) ((void)0)
@@ -150,10 +199,9 @@ typedef struct Operand
 
 static inline uint16_t fetchw(Tms9900Cpu* cpu)
 {
-  uint32_t a = cpu->pc;
-  uint16_t v = (uint16_t)((cpu->mem[a] << 8) | cpu->mem[a + 1]);
+  uint16_t a = (uint16_t)cpu->pc;
   cpu->pc    = (a + 2) & 0xFFFF;
-  return v;
+  return rd16(cpu, a);
 }
 
 static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
@@ -165,14 +213,14 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
 
   switch (o.mode)
   {
-  case 0: /* register direct */
+  case 0:                                                /* register direct */
     if (is_byte) o.addr = (uint16_t)wp_addr(cpu, o.reg); /* high byte address */
     o.val = is_byte ? cpu->mem[wp_addr(cpu, o.reg)] : get_reg(cpu, o.reg);
     break;
   case 1: /* indirect - assembly word-aligns effective address for word ops */
     o.addr = get_reg(cpu, o.reg);
     if (!is_byte) o.addr &= 0xFFFE;
-    o.val = is_byte ? rd8(cpu->mem, o.addr) : rd16(cpu->mem, o.addr);
+    o.val = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
     break;
   case 2:
   { /* indexed - when reg==0, address is the immediate offset only (absolute) */
@@ -183,7 +231,7 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
     else
       ea = (uint16_t)(get_reg(cpu, o.reg) + offset);
     o.addr = is_byte ? ea : (ea & 0xFFFE);
-    o.val  = is_byte ? rd8(cpu->mem, o.addr) : rd16(cpu->mem, o.addr);
+    o.val  = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
     break;
   }
   case 3:
@@ -193,7 +241,7 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
     uint16_t inc = is_byte ? 1u : 2u;
     set_reg(cpu, o.reg, (uint16_t)(raw + inc));
     o.addr = is_byte ? raw : (raw & 0xFFFE);
-    o.val  = is_byte ? rd8(cpu->mem, o.addr) : rd16(cpu->mem, o.addr);
+    o.val  = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
     break;
   }
   }
@@ -217,11 +265,11 @@ static void store_operand(Tms9900Cpu* cpu, const Operand* o, uint16_t v)
   {
     if (o->is_byte)
     {
-      wr8(cpu->mem, o->addr, (uint8_t)v);
+      wr8(cpu, o->addr, (uint8_t)v);
     }
     else
     {
-      wr16(cpu->mem, o->addr, v);
+      wr16(cpu, o->addr, v);
     }
     watch_write(cpu, o->addr);
   }
@@ -512,19 +560,21 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   {
   case 0x10: /* BLWP */
   {
-    Operand s = decode_operand(cpu, inst & 0x3F, 0);
-    uint32_t src_addr = (s.mode == 0) ? wp_addr(cpu, inst & 0xF) : (uint32_t)s.addr;
-    uint16_t new_wp   = (uint16_t)((cpu->mem[src_addr] << 8) | cpu->mem[src_addr + 1]) & 0xFFFE;
+    Operand s         = decode_operand(cpu, inst & 0x3F, 0);
+    uint32_t src_addr = wp_addr(cpu, inst & 0xF);
+    uint16_t new_wp = (s.mode == 0) ? (uint16_t)((cpu->mem[src_addr] << 8) | cpu->mem[src_addr + 1]) & 0xFFFE
+                                    : rd16(cpu, s.addr) & 0xFFFE;
     uint16_t old_wp = cpu->wp;
     uint16_t old_pc = cpu->pc;
     uint16_t old_st = cpu->st;
     cpu->wp         = new_wp;
 
     /* new workspace is always in normal address space (not overflow) */
-    wr16(cpu->mem, (uint16_t)(new_wp + 26), old_wp);
-    wr16(cpu->mem, (uint16_t)(new_wp + 28), old_pc);
-    wr16(cpu->mem, (uint16_t)(new_wp + 30), (uint16_t)old_st << 8); /* ST→high byte, low byte=0 */
-    cpu->pc = (uint16_t)((cpu->mem[src_addr + 2] << 8) | cpu->mem[src_addr + 3]) & 0xFFFE;
+    wr16(cpu, (uint16_t)(new_wp + 26), old_wp);
+    wr16(cpu, (uint16_t)(new_wp + 28), old_pc);
+    wr16(cpu, (uint16_t)(new_wp + 30), (uint16_t)old_st << 8); /* ST→high byte, low byte=0 */
+    cpu->pc = (s.mode == 0) ? (uint16_t)((cpu->mem[src_addr + 2] << 8) | cpu->mem[src_addr + 3]) & 0xFFFE
+                            : rd16(cpu, (uint16_t)(s.addr + 2)) & 0xFFFE;
 
     /* Assembly does NOT clear ST - new context inherits caller's flags */
     break;
@@ -539,7 +589,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   case 0x12: /* X - execute instruction at source */
   {
     Operand s       = decode_operand(cpu, inst & 0x3F, 0);
-    uint16_t x_inst = (s.mode == 0) ? s.val : rd16(cpu->mem, s.addr);
+    uint16_t x_inst = (s.mode == 0) ? s.val : rd16(cpu, s.addr);
 
     /* Dispatch the fetched instruction (PC is NOT advanced by X itself) */
     uint8_t x_hi = (uint8_t)(x_inst >> 8);
@@ -757,7 +807,7 @@ static inline void handle_cru_single_bit(void) {}
  */
 static inline void handle_shift_rotate(Tms9900Cpu* cpu, uint16_t inst)
 {
-  uint8_t sub = (inst >> 8) & 0xF;
+  uint8_t sub   = (inst >> 8) & 0xF;
   uint8_t count = (inst >> 4) & 0xF;
   uint8_t reg   = inst & 0xF;
   if (count == 0)
@@ -939,7 +989,7 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
       uint16_t old_sp = get_reg(cpu, 15) & 0xFFFE;
       uint16_t new_sp = (uint16_t)(old_sp - 2);
       set_reg(cpu, 15, new_sp);
-      wr16(cpu->mem, old_sp, (uint16_t)cpu->pc); /* write at OLD sp, not new sp */
+      wr16(cpu, old_sp, (uint16_t)cpu->pc); /* write at OLD sp, not new sp */
       uint32_t target = (s.mode == 0) ? wp_addr(cpu, inst & 0xF) : (uint32_t)s.addr;
       cpu->pc         = target & 0xFFFE;
     }
@@ -948,7 +998,7 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
 
       /* Assembly: ADD R4,R8; LDR R5,[R4,#2]; ... R15 += 2 */
       uint16_t sp = get_reg(cpu, 15) & 0xFFFE;
-      cpu->pc     = rd16(cpu->mem, (uint16_t)(sp + 2)) & 0xFFFE;
+      cpu->pc     = rd16(cpu, (uint16_t)(sp + 2)) & 0xFFFE;
       set_reg(cpu, 15, (uint16_t)(sp + 2));
     }
     break;
@@ -959,7 +1009,7 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
     Operand s       = decode_operand(cpu, inst & 0x3F, 0);
     uint16_t old_sp = get_reg(cpu, 15) & 0xFFFE;
     set_reg(cpu, 15, (uint16_t)(old_sp - 2));
-    wr16(cpu->mem, old_sp, s.val);
+    wr16(cpu, old_sp, s.val);
     break;
   }
   case 0xF: /* POP - read from OLD R15+2, increment R15 by 2 */
@@ -969,7 +1019,7 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
     uint16_t old_sp = get_reg(cpu, 15) & 0xFFFE;
     uint16_t new_sp = (uint16_t)(old_sp + 2);
     set_reg(cpu, 15, new_sp);
-    uint16_t v = rd16(cpu->mem, new_sp);
+    uint16_t v = rd16(cpu, new_sp);
     store_operand(cpu, &d, v);
     break;
   }
@@ -982,8 +1032,8 @@ static inline void handle_two_operand(Tms9900Cpu* cpu, uint16_t inst)
 {
   uint8_t opcode  = (uint8_t)((inst >> 12) & 0xF);
   uint8_t byte_op = opcode & 1; /* odd opcode = byte variant */
-  Operand src = decode_operand(cpu, (uint8_t)(inst & 0x3F), byte_op);
-  Operand dst = decode_operand(cpu, (uint8_t)((inst >> 6) & 0x3F), byte_op);
+  Operand src     = decode_operand(cpu, (uint8_t)(inst & 0x3F), byte_op);
+  Operand dst     = decode_operand(cpu, (uint8_t)((inst >> 6) & 0x3F), byte_op);
 
   switch (opcode)
   {
@@ -1080,7 +1130,8 @@ void tms9900_init(Tms9900Cpu* cpu, uint8_t* mem, uint8_t* regx38, uint16_t pc, u
   cpu->regx38 = regx38;
   cpu->pc     = pc;
   cpu->wp     = wp;
-  cpu->st     = 0;
+  cpu->st         = 0;
+  cpu->f18aMemory = false;
 #if defined(TMS9900_WATCH_WRITES)
   cpu->onWrite = NULL;
 #endif

@@ -230,6 +230,7 @@ typedef struct
 #define PICO9918_FEAT_BITMAP  0x08 /* R0 M3 is decoded, so Graphics II exists */
 #define PICO9918_FEAT_VRAM_4K 0x10 /* R1 bit 7 is decoded, so 4K DRAM addressing exists */
 #define PICO9918_FEAT_WIDE_T80 0x20 /* 80-column text is a byte a pixel, not a nibble */
+#define PICO9918_FEAT_GPU_RAM  0x40 /* the GPU's whole 64KB is memory, not the F18A's windows */
 
 #if PICO9918_BUILD_RUNTIME_CHIP
 #if PICO9918_MODE != PICO9918_MODE_F18A
@@ -270,6 +271,10 @@ typedef struct
 /* The PRO tier's wide 80-column line. Only asked where the build has the buffer for it,
    so a narrow build never reaches this and a board folds it to a literal true. */
 #define PICO9918_WIDE_T80(T) PICO9918_HAS(T, PICO9918_FEAT_WIDE_T80)
+
+/* An F18A's GPU reaches a few small windows above 16KB and mirrors each across its 4KB;
+   a PICO9918 backs the whole address space with RAM, which is what the assembly cores do. */
+#define PICO9918_GPU_FLAT_MEM(T) PICO9918_HAS(T, PICO9918_FEAT_GPU_RAM)
 
 /* A TMS9918A does not decode R0 bit 2. Build-time as well as runtime: PICO9918_HAS folds
    to true in a MODE=0 archive, so neither may be written as PICO9918_HAS alone. */

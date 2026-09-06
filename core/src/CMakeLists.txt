@@ -32,7 +32,8 @@ if(PICO9918_MODE GREATER_EQUAL 1)
     list(APPEND PICO9918_SOURCES
       gpu/platform/thumb9900${PICO9918_ASM_SUFFIX}.S)
   else()
-    # Desktop builds (and Pico builds with PICO9918_GPU_C_CORE) use the C core
+    # Desktop builds (and Pico builds with PICO9918_GPU_C_CORE) use the C core. Only it has
+    # the address decode the F18A personality wants; every other one sees the same flat 64KB
     list(APPEND PICO9918_SOURCES
       gpu/tms9900.c)
   endif()
