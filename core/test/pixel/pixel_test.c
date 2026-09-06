@@ -185,6 +185,15 @@ static uint16_t dimmed(uint16_t src)
                     (((src & 0xf00) >> 1) & 0x700));
 }
 
+/* R50 bit 2 is the dim's only owner; a settings block seeds it and never reads back. */
+static void setScanlines(int on)
+{
+  if (on)
+    TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) |= PICO9918_R50_VSCANLINES;
+  else
+    TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) &= (uint8_t)~PICO9918_R50_VSCANLINES;
+}
+
 /* The setting and the output-line parity gate independently. An odd line at scale 2 is a
    dim with no render behind it, so the maths is checkable against a seeded buffer. */
 static void checkDimMaths(void)
@@ -195,7 +204,7 @@ static void checkDimMaths(void)
   pico9918_v_scale = 2;
   for (int on = 0; on < 2; ++on)
   {
-    tms9918->config[PICO9918_CONF_CRT_SCANLINES] = (uint8_t)on;
+    setScanlines(on);
 
     for (uint32_t out = 1; out < 4; out += 2)
     {
@@ -212,7 +221,7 @@ static void checkDimMaths(void)
       }
     }
   }
-  tms9918->config[PICO9918_CONF_CRT_SCANLINES] = 0;
+  setScanlines(0);
 }
 
 /* Double rows: vPixelScale is 1, nothing repeats, and a rule keyed on the repeat index
@@ -226,11 +235,11 @@ static void checkDimScale1(void)
   pico9918_v_scale = 1;
   for (uint32_t out = base; out < base + 4; ++out)
   {
-    tms9918->config[PICO9918_CONF_CRT_SCANLINES] = 0;
+    setScanlines(0);
     pico9918_frame_output_line(PICO9918_INST out, &params, line);
     memcpy(off, line, sizeof(off));
 
-    tms9918->config[PICO9918_CONF_CRT_SCANLINES] = 1;
+    setScanlines(1);
     pico9918_frame_output_line(PICO9918_INST out, &params, line);
 
     for (uint32_t i = 0; i < H_VIRTUAL; ++i)
@@ -243,8 +252,8 @@ static void checkDimScale1(void)
       }
     }
   }
-  tms9918->config[PICO9918_CONF_CRT_SCANLINES] = 0;
-  pico9918_v_scale                             = 2;
+  setScanlines(0);
+  pico9918_v_scale = 2;
 }
 
 int main(void)

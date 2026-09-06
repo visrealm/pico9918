@@ -119,13 +119,6 @@ void updateDispDriver(void)
   tms9918->config[PICO9918_CONF_DISP_DRIVER] = useScart ? (2 - tms9918->config[PICO9918_CONF_SCART_MODE]) : 0;
 }
 
-/** \brief the VGA-side half of "config applied" - see the header */
-void applyConfigHostEffects(pico9918_t* tms9918, void* userdata)
-{
-  (void)userdata;
-  vgaCurrentParams()->scanlines = tms9918->config[PICO9918_CONF_CRT_SCANLINES];
-}
-
 /** \brief the frame module's late-config-reload hook - see the header
  *  \note  a wrapper rather than registering readConfig directly, because the hook takes
  *         no argument: the block it reloads into is always the live one, and the
@@ -151,9 +144,9 @@ bool __in_flash_func(shouldUseScartClock)(void)
 {
   const uint8_t* pendingFlash = PENDING_FLASH_ADDR;
   uint8_t pendingState        = pendingFlash[0];
-  if (pendingState == PENDING_STATE_PENDING || pendingState == PENDING_STATE_ARMED)
+  if (pendingState == PICO9918_PENDING_STATE_PENDING || pendingState == PICO9918_PENDING_STATE_ARMED)
   {
-    uint8_t pref = pendingFlash[1];
+    uint8_t pref = pendingFlash[PICO9918_CONF_PENDING_DRIVER_PREF - PICO9918_CONF_PENDING_STATE];
     if (pref == 1) return false;
     if (pref == 2) return true;
     // AUTO or invalid: fall through
@@ -171,9 +164,9 @@ void readPendingDisplay(PendingDisplay* p)
 {
   memcpy(p, PENDING_FLASH_ADDR, sizeof(*p));
 
-  if (p->state != PENDING_STATE_PENDING && p->state != PENDING_STATE_ARMED)
+  if (p->state != PICO9918_PENDING_STATE_PENDING && p->state != PICO9918_PENDING_STATE_ARMED)
   {
-    p->state = PENDING_STATE_CONFIRMED;
+    p->state = PICO9918_PENDING_STATE_CONFIRMED;
   }
 }
 
@@ -219,30 +212,36 @@ void __in_flash_func(applyPendingDisplay)(uint8_t config[CONFIG_BYTES])
   PendingDisplay p;
   readPendingDisplay(&p);
 
-  if (p.state == PENDING_STATE_PENDING)
+  if (p.state == PICO9918_PENDING_STATE_PENDING)
   {
-    config[PICO9918_CONF_DISP_DRIVER_PREF] = p.dispDriverPref;
-    config[PICO9918_CONF_VGA_MODE]         = p.vgaMode;
-    config[PICO9918_CONF_SCART_MODE]       = p.scartMode;
-    config[PICO9918_CONF_CLOCK_PRESET_ID]  = p.clockPresetId;
+    pico9918_config_pending_restore(config, (const uint8_t*)&p);
 
-    p.state = PENDING_STATE_ARMED;
+    p.state = PICO9918_PENDING_STATE_ARMED;
     writePendingDisplay(&p);
 
     pendingBannerState = PENDING_BANNER_AWAIT_OK;
-    pico9918_config_refresh_pending_mirror(config, PENDING_STATE_ARMED);
+    pico9918_config_refresh_pending_mirror(config, PICO9918_PENDING_STATE_ARMED);
   }
-  else if (p.state == PENDING_STATE_ARMED)
+  else if (p.state == PICO9918_PENDING_STATE_ARMED)
   {
     erasePendingDisplay();
     pendingBannerState = PENDING_BANNER_NONE;
-    pico9918_config_refresh_pending_mirror(config, PENDING_STATE_CONFIRMED);
+    pico9918_config_refresh_pending_mirror(config, PICO9918_PENDING_STATE_CONFIRMED);
   }
   else
   {
     pendingBannerState = PENDING_BANNER_NONE;
-    pico9918_config_refresh_pending_mirror(config, PENDING_STATE_CONFIRMED);
+    pico9918_config_refresh_pending_mirror(config, PICO9918_PENDING_STATE_CONFIRMED);
   }
+}
+
+/** \brief the identity bytes at 0-3, which only this firmware knows */
+static pico9918_config_host_id_t hostId(void)
+{
+  return (pico9918_config_host_id_t){.picoModel = PICO_MODEL,
+                                     .hwVersion = currentHwVersion(),
+                                     .swVersion = PICO9918_SW_VERSION,
+                                     .swPatch   = PICO9918_PATCH_VER};
 }
 
 /** \brief read the configuration from flash, validating, defaulting and migrating it */
@@ -250,26 +249,8 @@ void readConfig(uint8_t config[CONFIG_BYTES])
 {
   memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
 
-  // library owns validation, defaults and per-version migration
-  bool wasReset = false;
-  bool stampVersion = pico9918_config_validate(config,
-                                             config[PICO9918_CONF_PICO_MODEL] == PICO_MODEL,
-                                             PICO9918_SW_VERSION_FULL, &wasReset);
-
-  if (wasReset) // the block was zeroed, so the host identity bytes need restoring
-  {
-    config[PICO9918_CONF_PICO_MODEL] = PICO_MODEL;
-    config[PICO9918_CONF_HW_VERSION] = currentHwVersion();
-  }
-  if (stampVersion)
-  {
-    config[PICO9918_CONF_SW_VERSION]       = PICO9918_SW_VERSION;
-    config[PICO9918_CONF_SW_PATCH_VERSION] = PICO9918_PATCH_VER;
-
-    // forced path, not pending-split: reset/migrated values are not a user
-    // display change
-    config[PICO9918_CONF_SAVE_FORCED] = 1;
-  }
+  // validation, defaults, migration and the identity stamp; SAVE_FORCED asks for the save
+  pico9918_config_validate(config, hostId());
 
   tms9918->configDirty    = true; // so we apply it
   tms9918->configVdpDirty = true;
@@ -280,17 +261,8 @@ bool writeConfig(uint8_t config[CONFIG_BYTES])
 {
   flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
 
-  config[PICO9918_CONF_PICO_MODEL] = PICO_MODEL;
-  config[PICO9918_CONF_HW_VERSION] = currentHwVersion();
-  config[PICO9918_CONF_SW_VERSION] = PICO9918_SW_VERSION;
-
-  // sanity checking the palette 0 always 0, others always alpha 0xf
-  config[PICO9918_CONF_PALETTE_IDX_0]     = 0;
-  config[PICO9918_CONF_PALETTE_IDX_0 + 1] = 0;
-  for (int i = 1; i < 16; ++i)
-  {
-    config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2)] |= 0xf0;
-  }
+  // identity bytes and the marker readConfig() reads back as "initialised"
+  pico9918_config_prepare_save(config, hostId());
 
   bool success = false;
 
@@ -330,13 +302,8 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
 
   bool ok = true;
   // doubles as scratch for the user-chosen values across the writeConfig() call
-  PendingDisplay p = {
-    .state          = PENDING_STATE_PENDING,
-    .dispDriverPref = config[PICO9918_CONF_DISP_DRIVER_PREF],
-    .vgaMode        = config[PICO9918_CONF_VGA_MODE],
-    .scartMode      = config[PICO9918_CONF_SCART_MODE],
-    .clockPresetId  = config[PICO9918_CONF_CLOCK_PRESET_ID],
-  };
+  PendingDisplay p = {.state = PICO9918_PENDING_STATE_PENDING};
+  pico9918_config_pending_capture(config, (uint8_t*)&p);
 
   if (anyTrackedChanged)
   {
@@ -359,11 +326,8 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
   if (anyTrackedChanged)
   {
     // restore user values for the running firmware, then refresh the mirror
-    config[PICO9918_CONF_DISP_DRIVER_PREF] = p.dispDriverPref;
-    config[PICO9918_CONF_VGA_MODE]         = p.vgaMode;
-    config[PICO9918_CONF_SCART_MODE]       = p.scartMode;
-    config[PICO9918_CONF_CLOCK_PRESET_ID]  = p.clockPresetId;
-    pico9918_config_refresh_pending_mirror(config, PENDING_STATE_PENDING);
+    pico9918_config_pending_restore(config, (const uint8_t*)&p);
+    pico9918_config_refresh_pending_mirror(config, PICO9918_PENDING_STATE_PENDING);
     pendingBannerState = PENDING_BANNER_AWAIT_PC; // power cycle to test
   }
 

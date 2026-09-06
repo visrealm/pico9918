@@ -617,9 +617,9 @@
         const PENDING_FLASH_OFFSET = CONFIG_FLASH_OFFSET - 0x1000; // 0x1FE000
         const PENDING_FLASH_ADDR = XIP_BASE + PENDING_FLASH_OFFSET;
         const PENDING_PAYLOAD_BYTES = 256;        // full page (RP2350 requirement)
-        const PENDING_STATE_CONFIRMED = 0xC0;
+        const PICO9918_PENDING_STATE_CONFIRMED = 0xC0;
 
-        // Configuration byte offsets (must match src/config.h)
+        // Configuration byte offsets (must match core/src/pico9918_config.h)
         const PICO9918_CONF_PICO_MODEL = 0;
         const PICO9918_CONF_HW_VERSION = 1;
         const PICO9918_CONF_SW_VERSION = 2;
@@ -1063,14 +1063,14 @@
             return block;
         }
 
-        // Build a CONFIRMED PendingDisplay payload (matches config.h struct
-        // layout: state, dispDriverPref, vgaMode, scartMode, clockPresetId,
-        // then reserved zero bytes). Writing this clears any stale pending
-        // block so the main config's display settings actually boot. The RP2
+        // Build a CONFIRMED PendingDisplay payload. The record is the mirror band
+        // 200-204 in order (state, dispDriverPref, vgaMode, scartMode,
+        // clockPresetId) then reserved zero bytes. Writing this clears any stale
+        // pending block so the main config's display settings actually boot. The RP2
         // bootloader erases the whole 4 KB sector before writing this block.
         function createPendingArray(options) {
             const pending = new Uint8Array(PENDING_PAYLOAD_BYTES);
-            pending[0] = PENDING_STATE_CONFIRMED;
+            pending[0] = PICO9918_PENDING_STATE_CONFIRMED;
             pending[1] = options.dispDriverPref & 0x03;
             pending[2] = options.vgaMode & 0x01;
             pending[3] = options.scartMode & 0x01;

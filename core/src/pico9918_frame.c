@@ -481,7 +481,8 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
 static bool dimLine(PICO9918_INST_ARG PICO9918_PIXEL_T* pixels, uint32_t count,
                     uint32_t outputLine)
 {
-  if (!(outputLine & 1) || !tms9918->config[PICO9918_CONF_CRT_SCANLINES]) return false;
+  if (!(outputLine & 1) || !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_VSCANLINES))
+    return false;
 
   uint32_t* pairs = (uint32_t*)pixels;
   for (uint32_t i = 0; i < count / 2; ++i) pairs[i] = PICO9918_PIXEL_PAIR_DIM(pairs[i]);

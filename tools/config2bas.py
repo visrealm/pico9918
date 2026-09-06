@@ -9,9 +9,9 @@
 #
 # https://github.com/visrealm/pico9918
 #
-# Parses the pico9918_config_option_t enum out of the library's authoritative
-# pico9918_config.h and emits the same names/values as CVBasic constants,
-# so the configurator never re-declares a config byte index.
+# Parses the ABI enums out of the library's authoritative pico9918_config.h and
+# emits the same names/values as CVBasic constants, so the configurator never
+# re-declares a config byte index or a pending state.
 #
 
 import os
@@ -20,24 +20,29 @@ import sys
 import argparse
 
 
-ENUM_RE = re.compile(
-    r"typedef\s+enum\s*\{(?P<body>.*?)\}\s*pico9918_config_option_t\s*;",
-    re.DOTALL)
+# the enums the configurator needs, in emission order
+ENUM_NAMES = ('pico9918_config_option_t', 'pico9918_pending_state_t')
 
 ENTRY_RE = re.compile(
-    r"^\s*(?P<name>PICO9918_CONF_[A-Z0-9_]+)\s*=\s*(?P<expr>[^,/]+?)\s*,?"
+    r"^\s*(?P<name>PICO9918_[A-Z0-9_]+)\s*=\s*(?P<expr>[^,/]+?)\s*,?"
     r"\s*(?://\s*(?P<comment>.*?))?\s*$")
 
 
-def parseEnum(headerText):
+def enumRe(typeName):
+    # [^}] rather than .*?, so searching for the second enum cannot match from
+    # the first one's opening brace and swallow everything between them
+    return re.compile(
+        r"typedef\s+enum\s*\{(?P<body>[^}]*)\}\s*" + typeName + r"\s*;")
+
+
+def parseEnum(headerText, typeName, values):
     """
     return [(name, value, comment)] in declaration order
     """
-    match = ENUM_RE.search(headerText)
+    match = enumRe(typeName).search(headerText)
     if not match:
-        raise ValueError("pico9918_config_option_t enum not found")
+        raise ValueError(typeName + " enum not found")
 
-    values = {}
     entries = []
 
     for line in match.group('body').splitlines():
@@ -96,7 +101,12 @@ def main() -> int:
     args = vars(parser.parse_args())
 
     with open(args['header'], mode='r') as header:
-        entries = parseEnum(header.read())
+        headerText = header.read()
+
+    values = {}
+    entries = []
+    for enumName in ENUM_NAMES:
+        entries += parseEnum(headerText, enumName, values)
 
     writeBas(args['outfile'], args['header'], entries)
 

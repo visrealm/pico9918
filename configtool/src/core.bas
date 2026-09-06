@@ -39,15 +39,10 @@ CONST CONF_STRUCT_LEN = (CONF_HELP + CONF_HELP_LEN)
 CONST CONF_VALUE_LABEL_LEN = 6
 
 ' -------------------------------
-' PICO9918 Config Ids. Generated from the library's authoritative
-' pico9918_config.h by tools/config2bas.py - never declare a PICO9918_CONF_*
-' byte index here.
+' PICO9918 Config Ids and pending states. Generated from the library's
+' authoritative pico9918_config.h by tools/config2bas.py - never declare a
+' PICO9918_CONF_* byte index or a PICO9918_PENDING_STATE_* value here.
 INCLUDE "config-ids.bas"
-
-' must match firmware src/config.h
-CONST PENDING_STATE_CONFIRMED = $C0
-CONST PENDING_STATE_PENDING   = $9E
-CONST PENDING_STATE_ARMED     = $A0
 ' -------------------------------
 
 CONST CONF_MENU_PALETTE     = 251

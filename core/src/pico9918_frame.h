@@ -250,7 +250,7 @@ extern "C"
    * \brief generate one OUTPUT line - the entry for a host that scans out a fixed frame
    *
    * `outputLine` runs 0 to the host's output height (480 for VGA) in every mode, so a host
-   * never sees vPixelScale, double rows, the CRT-scanlines setting or the overlay.
+   * never sees vPixelScale, double rows, the CRT-scanlines dim or the overlay.
    *
    * Returns whether `pixels` changed; false means a host's converted copy still stands.
    * `params->vVirtualPixels` is an output here. Progressive hosts only - an interlaced one

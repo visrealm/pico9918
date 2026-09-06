@@ -81,7 +81,7 @@ fi
 #                           reaching the VGA side while the register bit still gets
 #                           set. Runs once at boot, so tracking it costs nothing.
 #   reloadStoredConfig      a callback BODY the library invokes. Tracking `main`
-#   applyConfigHostEffects  cannot catch a GUTTED CALLEE - the registration still
+#                           cannot catch a GUTTED CALLEE - the registration still
 #                           compiles identically and the call site still executes -
 #                           so every such body needs its own entry. Proven: emptying
 #                           reloadStoredConfig left all other tracked functions
@@ -170,7 +170,7 @@ fi
 FUNCS="tmsScanline pico9918_frame_scanline
        pico9918_frame_update_interrupts pico9918_palette_regenerate tmsEndOfFrame tmsEndOfScanline
        tmsPorch pico9918_frame_porch pico9918_frame_end_of_scanline pico9918_frame_end
-       pico9918_config_apply main reloadStoredConfig applyConfigHostEffects
+       pico9918_config_apply main reloadStoredConfig
        pico9918_scan_line pico9918_diag_render pico9918_diag_render_text pico9918_diag_update
        pico9918_splash_render
        tmsReadIrqHandler tmsWriteIrqHandler gpioIrqHandler dmaIrqHandler

@@ -49,12 +49,12 @@ static void configActionCallback(pico9918_t* tms9918, uint8_t* config, uint8_t k
     case PICO9918_CONF_PENDING_CONFIRM: // user accepted pending change: promote to main
       writeConfig(config);
       erasePendingDisplay();
-      pico9918_config_refresh_pending_mirror(config, PENDING_STATE_CONFIRMED);
+      pico9918_config_refresh_pending_mirror(config, PICO9918_PENDING_STATE_CONFIRMED);
       break;
 
     case PICO9918_CONF_PENDING_CANCEL: // user cancelled: keep this run going, revert on next boot
       erasePendingDisplay();
-      config[PICO9918_CONF_PENDING_STATE] = PENDING_STATE_CONFIRMED;
+      config[PICO9918_CONF_PENDING_STATE] = PICO9918_PENDING_STATE_CONFIRMED;
       break;
   }
 }
@@ -124,10 +124,6 @@ int __in_flash_func(main)(void)
   rendererConfigureVga(&params);
 
   vgaInit(params);
-
-  /* after vgaInit: the hook writes vgaCurrentParams(), and it must be in place
-     before core 1 starts consuming configDirty */
-  pico9918_config_set_applied_callback(applyConfigHostEffects, NULL);
 
   /* the late config reload the frame module asks for when the display comes up
      after the startup diagnostics screen. Flash I/O, so it stays host-side. */

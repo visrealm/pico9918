@@ -302,6 +302,10 @@ PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip
   /* The wide line is a different palette layout, so the tier is a palette change */
   tms9918->palDirty = 1;
 
+  /* the new personality either seeds its effects from the block or lets go of them */
+  tms9918->configDirty    = true;
+  tms9918->configVdpDirty = true;
+
   if (!PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK))
   {
     tms9918->isUnlocked         = false;

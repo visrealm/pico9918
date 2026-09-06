@@ -119,6 +119,32 @@ typedef enum
   PICO9918_CONF_SAVE_TO_FLASH   = 255,
 } pico9918_config_option_t;
 
+/**
+ * \brief PICO9918_CONF_PENDING_STATE values, and the state byte of a host's stored
+ * pending record. A frozen ABI - the configurator reads it out of byte 200
+ *
+ * CONFIRMED -> PENDING (host saves) -> ARMED (host boots with it) -> CONFIRMED
+ * (the user accepts, or the next boot reverts)
+ */
+typedef enum
+{
+  PICO9918_PENDING_STATE_CONFIRMED = 0xC0,
+  PICO9918_PENDING_STATE_PENDING   = 0x9E,
+  PICO9918_PENDING_STATE_ARMED     = 0xA0,
+} pico9918_pending_state_t;
+
+/**
+ * \brief bytes in a pending record: the state, then one slot per tracked field
+ *
+ * LOAD-BEARING: a tracked field's slot is its pendingMirror less
+ * PICO9918_CONF_PENDING_STATE, so a host's stored record and the in-RAM mirror band
+ * are the same layout. pico9918_config_pending_capture() and _restore() are built on
+ * it, as is every tool that writes the record, so claiming a new mirror byte means
+ * naming it here.
+ */
+#define PICO9918_PENDING_RECORD_BYTES \
+  (PICO9918_CONF_PENDING_CLOCK_PRESET - PICO9918_CONF_PENDING_STATE + 1)
+
 /* -------------------------------------------------------------------------
  * Field descriptors
  * -------------------------------------------------------------------------
@@ -176,38 +202,75 @@ uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
  * block therefore renders black. This also sets the initialised marker that
  * pico9918_config_validate() looks for, so a block from here survives it untouched.
  *
- * The identity bytes at 0-3 are left alone here; they are stamped where the personality
- * is known.
+ * The identity bytes at 0-3 are cleared with the rest; pico9918_config_validate() and
+ * pico9918_config_prepare_save() are where a host's own identity is stamped in.
  */
 void pico9918_config_defaults(uint8_t config[CONFIG_BYTES]);
 
 /**
- * \brief validate a config block just read from host storage
+ * \brief the identity bytes at 0-3, which only the host knows
  *
- * currentVerFull is the host's running firmware version, packed as
- * major(4) | minor(4) | patch(8) - the same encoding as introducedIn. It is a
- * parameter, not a macro: the library must never see host version defines.
- *
- * Returns true if the host must stamp currentVerFull into the block and
- * persist it - i.e. the stored version differed (a full reset forces this by
- * treating the stored version as 0).
- *
- * modelMatches lets the host fold its own "is this block mine" test (pico
- * model, etc.) into the same decision. wasReset, when non-NULL, reports
- * whether the block was cleared and defaulted - on that path every byte is
- * zeroed, so the host must re-stamp its own identity bytes.
+ * swVersion is packed major(4) | minor(4) as byte 2 stores it, so the running version
+ * compared against the field table's introducedIn is (swVersion << 8) | swPatch. Host
+ * version numbers arrive here and nowhere else - the library must never see a host's
+ * version defines.
  */
-bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], bool modelMatches, uint16_t currentVerFull,
-                            bool* wasReset);
+typedef struct
+{
+  uint8_t picoModel;
+  uint8_t hwVersion;
+  uint8_t swVersion;
+  uint8_t swPatch;
+} pico9918_config_host_id_t;
+
+/**
+ * \brief validate a config block just read from host storage, and stamp \p id into it
+ *
+ * Resets the block to defaults if it is not this host's, is uninitialised, or holds an
+ * out-of-range field; then defaults the fields introduced since the stored version.
+ * Either way the identity bytes end up at \p id and the command bytes a host persisted
+ * are cleared.
+ *
+ * Returns true if the block changed in a way the host should persist. A host running the
+ * configurator protocol can ignore that: PICO9918_CONF_SAVE_FORCED is set on the same
+ * path, which is the save request its GPU loop already dispatches.
+ */
+bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id);
+
+/**
+ * \brief stamp \p id and the initialised marker into a block about to be persisted
+ *
+ * The marker is how pico9918_config_validate() tells a stored block from an erased one,
+ * so a host that persists a block without this gets a factory reset on its next boot.
+ * Host storage is untouched - this only prepares the bytes.
+ */
+void pico9918_config_prepare_save(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id);
 
 /** \brief copy live tracked fields into the in-RAM pending mirror with the given state */
 void pico9918_config_refresh_pending_mirror(uint8_t config[CONFIG_BYTES], uint8_t state);
 
 /**
+ * \brief copy the live tracked fields into a PICO9918_PENDING_RECORD_BYTES record
+ * \note  record[0], the state, is the caller's - only the field slots are written
+ */
+void pico9918_config_pending_capture(const uint8_t config[CONFIG_BYTES], uint8_t* record);
+
+/** \brief copy a pending record's field slots back over the live config */
+void pico9918_config_pending_restore(uint8_t config[CONFIG_BYTES], const uint8_t* record);
+
+/**
  * \brief apply the config block's VDP-side effects: registers 50 and 30, the
  * palette unpack, and the derived PICO9918_CONF_DIAG summary byte
  *
- * Host-side effects (e.g. the VGA scanlines flag) stay with the host.
+ * A settings block is a PICO9918 thing, so the effects land only on a personality that
+ * has the config port. On an F18A those registers and that palette are the guest's
+ * alone, and a block read from host storage must not touch them.
+ *
+ * What it writes is a power-on default, not an owner: it runs when the block is loaded
+ * and after a reset has cleared the register file, and a later write to register 50 or
+ * 30 stands on every personality.
+ *
+ * Host-side effects stay with the host.
  */
 void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
 
@@ -217,13 +280,14 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
  * Fires from pico9918_config_apply(), which the frame module calls where the
  * configDirty flag is actually consumed - the end-of-frame interrupt, not the
  * scanline body - so it is per-frame at worst and a function pointer is
- * permitted. It exists so the host's own apply effects (writing its VGA
- * scanlines flag from the same config byte the library folds into R50) stay in
- * lockstep with the library's register and palette effects, instead of the host
- * having to watch configDirty itself.
+ * permitted. It exists so a host's own apply effects stay in lockstep with the
+ * library's register and palette effects, instead of the host having to watch
+ * configDirty itself.
  *
- * Called FIRST, before any of the VDP-side effects. NULL (the default) means the
- * host has no such effects and nothing is called.
+ * Called LAST, after the VDP-side effects, and on every personality: a host effect
+ * is the host's to gate, and one derived from a register has to read the value this
+ * call may just have seeded. NULL (the default) means the host has no such effects
+ * and nothing is called.
  *
  * Registered per instance in a multi-instance build - see pico9918.h for why the two
  * builds take different shapes.

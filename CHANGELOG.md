@@ -61,6 +61,8 @@ shared path is faster than the per-mode code it replaced.
 * A palette write from a GPU program is noticed, so the picture takes the new colours.
 * Status register 0 reports a fifth-sprite number of 0 where there is no fifth sprite, rather than
   a constant 31.
+* R50 bit 2 drives the simulated scanlines, so software that asks for the effect gets it. The
+  configurator setting is now the power-on default for that bit rather than a second owner of it.
 
 ## v1.2.0 - 2026-07-12
 

@@ -48,6 +48,26 @@ void pico9918_config_refresh_pending_mirror(uint8_t config[CONFIG_BYTES], uint8_
   }
 }
 
+void pico9918_config_pending_capture(const uint8_t config[CONFIG_BYTES], uint8_t* record)
+{
+  for (size_t i = 0; i < pico9918_config_field_count; ++i)
+  {
+    if (pico9918_config_fields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    record[pico9918_config_fields[i].pendingMirror - PICO9918_CONF_PENDING_STATE] =
+      config[pico9918_config_fields[i].offset];
+  }
+}
+
+void pico9918_config_pending_restore(uint8_t config[CONFIG_BYTES], const uint8_t* record)
+{
+  for (size_t i = 0; i < pico9918_config_field_count; ++i)
+  {
+    if (pico9918_config_fields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    config[pico9918_config_fields[i].offset] =
+      record[pico9918_config_fields[i].pendingMirror - PICO9918_CONF_PENDING_STATE];
+  }
+}
+
 PICO9918_INLINE_HOT uint16_t configStoredVersion(const uint8_t* config)
 {
   return ((uint16_t)config[PICO9918_CONF_SW_VERSION] << 8) | config[PICO9918_CONF_SW_PATCH_VERSION];
@@ -93,22 +113,21 @@ static void migrateNewFields(uint8_t* config, uint16_t storedVer)
   }
 }
 
-bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], bool modelMatches, uint16_t currentVerFull,
-                            bool* wasReset)
+bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id)
 {
   uint16_t storedVer = configStoredVersion(config);
 
-  if (wasReset) *wasReset = false;
-
-  if (!modelMatches || config[PICO9918_CONF_PALETTE_IDX_0] != 0x00 ||
+  if (config[PICO9918_CONF_PICO_MODEL] != id.picoModel || config[PICO9918_CONF_PALETTE_IDX_0] != 0x00 ||
       (config[PICO9918_CONF_PALETTE_IDX_0 + 2] & 0xf0) != 0xf0 || // not initialised
       configOutOfRange(config))
   {
     pico9918_config_defaults(config);
 
-    storedVer = 0; // force version stamp + save by the caller
-    if (wasReset) *wasReset = true;
+    storedVer = 0; // a defaulted block stamps and saves like a version change
   }
+
+  config[PICO9918_CONF_PICO_MODEL] = id.picoModel;
+  config[PICO9918_CONF_HW_VERSION] = id.hwVersion;
 
   // the host persists all 256 bytes; clear command bytes read back from storage
   config[PICO9918_CONF_SAVE_FORCED]     = 0;
@@ -116,10 +135,32 @@ bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], bool modelMatches, u
   config[PICO9918_CONF_PENDING_CONFIRM] = 0;
   config[PICO9918_CONF_SAVE_TO_FLASH]   = 0;
 
-  if (storedVer == currentVerFull) return false;
+  if (storedVer == (((uint16_t)id.swVersion << 8) | id.swPatch)) return false;
 
   migrateNewFields(config, storedVer);
+
+  config[PICO9918_CONF_SW_VERSION]       = id.swVersion;
+  config[PICO9918_CONF_SW_PATCH_VERSION] = id.swPatch;
+
+  /* forced, not pending-split: a migration is not a display change the user chose */
+  config[PICO9918_CONF_SAVE_FORCED] = 1;
   return true;
+}
+
+void pico9918_config_prepare_save(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id)
+{
+  config[PICO9918_CONF_PICO_MODEL]       = id.picoModel;
+  config[PICO9918_CONF_HW_VERSION]       = id.hwVersion;
+  config[PICO9918_CONF_SW_VERSION]       = id.swVersion;
+  config[PICO9918_CONF_SW_PATCH_VERSION] = id.swPatch;
+
+  /* the initialised marker: entry 0 always 0, the rest carrying alpha 0xf */
+  config[PICO9918_CONF_PALETTE_IDX_0]     = 0;
+  config[PICO9918_CONF_PALETTE_IDX_0 + 1] = 0;
+  for (int i = 1; i < 16; ++i)
+  {
+    config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2)] |= 0xf0;
+  }
 }
 
 uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG)
@@ -155,33 +196,46 @@ static inline void configAppliedFire(PICO9918_INST_ONLY_ARG)
 
 void pico9918_config_apply(PICO9918_INST_ONLY_ARG)
 {
-  configAppliedFire(PICO9918_INST_ONLY);
+  /* the overlays are the personality's: panels nothing will draw are not a summary */
+  tms9918->config[PICO9918_CONF_DIAG] =
+    PICO9918_HAS(tms9918, PICO9918_FEAT_OVERLAY) &&
+    (tms9918->config[PICO9918_CONF_DIAG_ADDRESS] || tms9918->config[PICO9918_CONF_DIAG_PALETTE] ||
+     tms9918->config[PICO9918_CONF_DIAG_PERFORMANCE] || tms9918->config[PICO9918_CONF_DIAG_REGISTERS]);
 
-  if (tms9918->configVdpDirty)
+  if (!PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))
   {
+    /* an F18A's registers, palette and render base are not a settings block's */
     tms9918->configVdpDirty = false;
-
-    if (tms9918->config[PICO9918_CONF_CRT_SCANLINES])
-      TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) |= PICO9918_R50_VSCANLINES;
-    else
-      TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) &= (uint8_t)~PICO9918_R50_VSCANLINES;
-
-    TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) =
-      1 << (tms9918->config[PICO9918_CONF_SCANLINE_SPRITES] + 2);
-
-    for (int i = 0; i < 16; ++i)
+    tms9918->vdpBase        = PICO9918_BASE_TMS9918;
+  }
+  else
+  {
+    if (tms9918->configVdpDirty)
     {
-      uint16_t rgb = (tms9918->config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2)] << 8) |
-                     tms9918->config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2) + 1];
-      tms9918->vram.map.pram[i] = __builtin_bswap16(rgb);
+      tms9918->configVdpDirty = false;
+
+      if (tms9918->config[PICO9918_CONF_CRT_SCANLINES])
+        TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) |= PICO9918_R50_VSCANLINES;
+      else
+        TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) &= (uint8_t)~PICO9918_R50_VSCANLINES;
+
+      TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) =
+        1 << (tms9918->config[PICO9918_CONF_SCANLINE_SPRITES] + 2);
+
+      for (int i = 0; i < 16; ++i)
+      {
+        uint16_t rgb = (tms9918->config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2)] << 8) |
+                       tms9918->config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2) + 1];
+        tms9918->vram.map.pram[i] = __builtin_bswap16(rgb);
+      }
+      tms9918->palDirty = 1;
     }
-    tms9918->palDirty = 1;
+
+    tms9918->vdpBase = (tms9918->config[PICO9918_CONF_VDP_BASE] == PICO9918_BASE_V9938)
+                         ? PICO9918_BASE_V9938
+                         : PICO9918_BASE_TMS9918;
   }
 
-  tms9918->config[PICO9918_CONF_DIAG] = tms9918->config[PICO9918_CONF_DIAG_ADDRESS] || tms9918->config[PICO9918_CONF_DIAG_PALETTE] ||
-                               tms9918->config[PICO9918_CONF_DIAG_PERFORMANCE] || tms9918->config[PICO9918_CONF_DIAG_REGISTERS];
-
-  tms9918->vdpBase = (tms9918->config[PICO9918_CONF_VDP_BASE] == PICO9918_BASE_V9938)
-                       ? PICO9918_BASE_V9938
-                       : PICO9918_BASE_TMS9918;
+  /* last, so the host derives its effects from registers this call may just have seeded */
+  configAppliedFire(PICO9918_INST_ONLY);
 }

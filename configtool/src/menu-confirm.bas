@@ -10,7 +10,7 @@
 
 ' Halt or force-update if device firmware is older than the embedded firmware.
 checkFirmwareVersion: PROCEDURE
-    ' (major << 12) | (minor << 8) | patch -- matches PICO9918_SW_VERSION_FULL
+    ' (major << 12) | (minor << 8) | patch -- the introducedIn packing
     #deviceVer   = (verMajor * 4096) + (verMinor * 256) + verPatch
     #embeddedVer = (FIRMWARE_MAJOR_VER * 4096) + (FIRMWARE_MINOR_VER * 256) + FIRMWARE_PATCH_VER
 
@@ -54,7 +54,7 @@ checkPendingDisplayChange: PROCEDURE
     pendingState = VDP_STATUS
     VDP_STATUS_REG0
 
-    IF pendingState <> PENDING_STATE_ARMED THEN RETURN
+    IF pendingState <> PICO9918_PENDING_STATE_ARMED THEN RETURN
 
     DRAW_POPUP_W("Display change OK?", 6, 22)
 

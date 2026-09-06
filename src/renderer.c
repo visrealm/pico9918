@@ -39,16 +39,18 @@ static void tmsEndOfScanline(uint32_t displayLine)
   pico9918_frame_end_of_scanline();
 }
 
-/* Frame housekeeping is the library's. What is left here is the three host seams it
-   cannot own: the temperature sensor, the VGA display timing, and applying the
-   geometry back into the host's own parameter block and trigger register.
+/* Frame housekeeping is the library's. What is left here are the host seams it cannot
+   own: the temperature sensor, the VGA display timing, applying the geometry back into
+   the host's own parameter block and trigger register, and the CRT dim flag the VGA
+   scanline interrupt reads.
 
    The geometry comes back by value rather than through a registered callback: it is
    strictly cheaper, and there is exactly one place to publish it from and one place
    to apply it. */
 static void tmsEndOfFrame(uint32_t frameNumber)
 {
-  VgaParams* params = &vgaCurrentParams()->params;
+  VgaInitParams* vga    = vgaCurrentParams();
+  VgaParams*     params = &vga->params;
 
   pico9918_frame_display_t display = {params->vSyncParams.displayPixels, params->interlaced, params->vPixelScale,
                                   params->vVirtualPixels};
@@ -61,6 +63,9 @@ static void tmsEndOfFrame(uint32_t frameNumber)
      re-test the interlace condition would duplicate the library's ownership rule. */
   params->vPixelScale    = display.vPixelScale;
   params->vVirtualPixels = display.vVirtualPixels;
+
+  // R50 owns the CRT dim, which the config block only seeds; sampled, as a write has no hook
+  vga->scanlines = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_VSCANLINES) != 0;
 
   vgaSetTriggerScanline(geom.triggerScanline);
 }

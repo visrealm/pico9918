@@ -19,10 +19,6 @@
 /** \brief running version, packed major(4) | minor(4) */
 #define PICO9918_SW_VERSION ((PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER)
 
-/** \brief running version, packed major(4) | minor(4) | patch(8) as configFields[].introducedIn stores it */
-#define PICO9918_SW_VERSION_FULL \
-  (((uint16_t)PICO9918_MAJOR_VER << 12) | ((uint16_t)PICO9918_MINOR_VER << 8) | ((uint16_t)PICO9918_PATCH_VER))
-
 /* The config byte layout (the PICO9918_CONF_* indices and CONFIG_BYTES) is owned by the
    library, which is what makes byte 15 - the render base - a single
    declaration rather than two that must agree. See
@@ -82,12 +78,6 @@ bool writeConfig(uint8_t config[CONFIG_BYTES]);
  */
 bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES]);
 
-/** \brief the VGA-side half of "config applied", which the library cannot own
- *  \note  registered with pico9918_config_set_applied_callback(), so it fires from inside
- *         the library's apply; never called directly by the firmware
- */
-void applyConfigHostEffects(pico9918_t* tms9918, void* userdata);
-
 /** \brief re-read the stored block once the display is finally enabled after the
  *         startup diagnostics screen
  *  \note  registered with pico9918_frame_set_config_reload_callback(); it is flash I/O, so
@@ -95,22 +85,17 @@ void applyConfigHostEffects(pico9918_t* tms9918, void* userdata);
  */
 void reloadStoredConfig(pico9918_t* tms9918, void* userdata);
 
-/** \brief display-change confirmation state, held in a 4 KB flash block of its own
- *  CONFIRMED -> PENDING (save) -> ARMED (boot) -> CONFIRMED (accepted, or reverted on reboot)
+/** \brief the 16-byte pending flash slot, holding the display-change confirmation
+ *         state in a 4 KB block of its own; reserved[] must be zero
+ *  \note  state and values[] are the library's pending record, so a tracked field's
+ *         slot is where the mirror band puts it - the configurator writes this slot
+ *         too. See PICO9918_PENDING_RECORD_BYTES
  */
-#define PENDING_STATE_CONFIRMED 0xC0
-#define PENDING_STATE_PENDING   0x9E
-#define PENDING_STATE_ARMED     0xA0
-
-/** \brief the 16-byte pending flash slot; reserved[] must be zero */
 typedef struct
 {
-  uint8_t state; ///< PENDING_STATE_*
-  uint8_t dispDriverPref;
-  uint8_t vgaMode;
-  uint8_t scartMode;
-  uint8_t clockPresetId;
-  uint8_t reserved[11];
+  uint8_t state; ///< PICO9918_PENDING_STATE_*
+  uint8_t values[PICO9918_PENDING_RECORD_BYTES - 1];
+  uint8_t reserved[16 - PICO9918_PENDING_RECORD_BYTES];
 } PendingDisplay;
 
 _Static_assert(sizeof(PendingDisplay) == 16, "PendingDisplay must match the 16-byte flash slot - adjust reserved[]");
