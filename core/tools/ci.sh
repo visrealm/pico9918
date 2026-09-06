@@ -188,7 +188,7 @@ docs() {
   # filling them per member would fight this codebase's comment discipline, so
   # they are a backlog rather than a target.
   total=$(grep -c 'warning:' "$OUT/doxygen.log" || true)
-  public=$(grep -cE 'of file (pico9918|pico9918_util|pico9918_config|pico9918_frame|gpu|diag|splash)\.h' \
+  public=$(grep -cE 'of file (pico9918|pico9918_util|pico9918_config|pico9918_frame|pico9918_debug|gpu|diag|splash)\.h' \
     "$OUT/doxygen.log" || true)
   echo "doxygen: $total undocumented member(s), $public in a header a consumer includes"
   # doc/code is what the Pages job uploads, and it is never committed - a

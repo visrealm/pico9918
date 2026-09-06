@@ -198,12 +198,12 @@ PICO9918_DLLEXPORT
 uint16_t pico9918_gpu_status(PICO9918_INST_ONLY_ARG);
 
 /* ST0-ST5 of pico9918_gpu_status(), the TMS9900's own numbering from the MSB */
-#define PICO9918_GPU_ST_LGT 0x8000 /* logical greater than */
-#define PICO9918_GPU_ST_AGT 0x4000 /* arithmetic greater than */
-#define PICO9918_GPU_ST_EQ  0x2000 /* equal */
-#define PICO9918_GPU_ST_C   0x1000 /* carry */
-#define PICO9918_GPU_ST_OV  0x0800 /* overflow */
-#define PICO9918_GPU_ST_P   0x0400 /* odd parity */
+#define PICO9918_GPU_ST_LGT 0x8000 /**< ST0, logical greater than */
+#define PICO9918_GPU_ST_AGT 0x4000 /**< ST1, arithmetic greater than */
+#define PICO9918_GPU_ST_EQ  0x2000 /**< ST2, equal */
+#define PICO9918_GPU_ST_C   0x1000 /**< ST3, carry */
+#define PICO9918_GPU_ST_OV  0x0800 /**< ST4, overflow */
+#define PICO9918_GPU_ST_P   0x0400 /**< ST5, odd parity */
 
 /**
  * Return the GPU's CPU time in microseconds.

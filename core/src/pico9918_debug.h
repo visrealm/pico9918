@@ -48,11 +48,11 @@ extern "C"
 #endif
 
 /* what pico9918_debug_region() reports about a span */
-#define PICO9918_DEBUG_READABLE  0x01 /* pico9918_debug_read returns real bytes here */
-#define PICO9918_DEBUG_WRITABLE  0x02 /* pico9918_debug_write stores here */
-#define PICO9918_DEBUG_REGISTERS 0x04 /* the register file - pico9918_debug_reg_write */
-#define PICO9918_DEBUG_STATUS    0x08 /* the status file, which the library owns */
-#define PICO9918_DEBUG_PALETTE   0x10 /* PRAM - a write here republishes the palette */
+#define PICO9918_DEBUG_READABLE  0x01 /**< pico9918_debug_read returns real bytes here */
+#define PICO9918_DEBUG_WRITABLE  0x02 /**< pico9918_debug_write stores here */
+#define PICO9918_DEBUG_REGISTERS 0x04 /**< the register file - use pico9918_debug_reg_write */
+#define PICO9918_DEBUG_STATUS    0x08 /**< the status file, which the library owns */
+#define PICO9918_DEBUG_PALETTE   0x10 /**< PRAM - a write here republishes the palette */
 
 /**
  * \brief what the byte at \p addr is, and how far that stays true
