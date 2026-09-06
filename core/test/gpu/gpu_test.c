@@ -266,6 +266,60 @@ int main(void)
   expect("dma-width256-last", DMA_DST + 255, 0x3f);
   expect("dma-width256-past", DMA_DST + 256, 0x00);
 
+  /* and a height of zero is 256 rows of it */
+  dma(DMA_SRC, DMA_DST, 1, 0, 1, 0x00);
+  expect("dma-height256-first", DMA_DST, 0x40);
+  expect("dma-height256-last", DMA_DST + 255, 0x3f);
+  expect("dma-height256-past", DMA_DST + 256, 0x00);
+
+  /* the top of each register: 255 wide by one, then one wide by 255 */
+  dma(DMA_SRC, DMA_DST, 255, 1, 255, 0x00);
+  expect("dma-width255-first", DMA_DST, 0x40);
+  expect("dma-width255-last", DMA_DST + 254, 0x3e);
+  expect("dma-width255-past", DMA_DST + 255, 0x00);
+
+  dma(DMA_SRC, DMA_DST, 1, 255, 1, 0x00);
+  expect("dma-height255-first", DMA_DST, 0x40);
+  expect("dma-height255-last", DMA_DST + 254, 0x3e);
+  expect("dma-height255-past", DMA_DST + 255, 0x00);
+
+  /* a stride under the width steps back into the row just written */
+  dma(DMA_SRC, DMA_DST, 8, 2, 4, 0x00);
+  expect("dma-narrow-kept", DMA_DST + 3, 0x43);
+  expect("dma-narrow-rewritten", DMA_DST + 4, 0x44);
+  expect("dma-narrow-last", DMA_DST + 11, 0x4b);
+  expect("dma-narrow-past", DMA_DST + 12, 0x00);
+
+  /* both parameter bits at once: a fill that decrements */
+  dma(0x1100, 0x1900, 4, 2, 4, 0x03);
+  expect("dma-fill-dec-first", 0x1900, 0x40);
+  expect("dma-fill-dec-row0", 0x18fd, 0x40);
+  expect("dma-fill-dec-row1", 0x18f9, 0x40);
+  expect("dma-fill-dec-past", 0x18f8, 0x00);
+
+  /* LOAD-BEARING: overlapping forwards, so each byte read has already been written. A
+     block copy would answer 40..47 here, which is what makes this the guard on the fast
+     path being taken only where source and destination are disjoint. */
+  dma(DMA_SRC, DMA_SRC + 2, 8, 1, 8, 0x00);
+  expect("dma-overlap-0", DMA_SRC + 2, 0x40);
+  expect("dma-overlap-2", DMA_SRC + 4, 0x40);
+  expect("dma-overlap-7", DMA_SRC + 9, 0x41);
+
+  /* sixteen bits of address, either end */
+  dma(DMA_SRC, 0xfffe, 4, 1, 4, 0x00);
+  expect("dma-dst-wrap-before", 0xffff, 0x41);
+  expect("dma-dst-wrap-after", 0x0000, 0x42);
+  expect("dma-dst-wrap-last", 0x0001, 0x43);
+
+  tms9918->vram.bytes[0xfffe] = 0x11;
+  tms9918->vram.bytes[0xffff] = 0x22;
+  tms9918->vram.bytes[0x0000] = 0x33;
+  tms9918->vram.bytes[0x0001] = 0x44;
+  dma(0xfffe, DMA_DST, 4, 1, 4, 0x00);
+  expect("dma-src-wrap-before", DMA_DST + 1, 0x22);
+  expect("dma-src-wrap-after", DMA_DST + 2, 0x33);
+  expect("dma-src-wrap-last", DMA_DST + 3, 0x44);
+
   /* a fill reads its byte once and strides like a copy */
   dma(DMA_SRC, DMA_DST, 4, 3, 16, 0x01);
   expect("dma-fill-row0", DMA_DST + 3, 0x40);
