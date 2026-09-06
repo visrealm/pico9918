@@ -260,6 +260,15 @@ int main(void)
   expect("dma-back-row1", 0x18c8, 0x08);
   expect("dma-back-not-forward", 0x19c8, 0x00);
 
+  /* either side of where it overflows, which for a width of 8 is a stride of 135 */
+  dma(0x1100, 0x1900, 8, 2, 134, 0x00);
+  expect("dma-edge-fwd-row1", 0x1986, 0xc6);
+  expect("dma-edge-fwd-gap", 0x1985, 0x00);
+
+  dma(0x1100, 0x1900, 8, 2, 135, 0x00);
+  expect("dma-edge-back-row1", 0x1887, 0xc7);
+  expect("dma-edge-back-not-forward", 0x1987, 0x00);
+
   /* a width of zero is 256, and with stride zero the difference wraps to a pitch of 256 */
   dma(DMA_SRC, DMA_DST, 0, 1, 0, 0x00);
   expect("dma-width256-first", DMA_DST, 0x40);
@@ -289,6 +298,12 @@ int main(void)
   expect("dma-narrow-rewritten", DMA_DST + 4, 0x44);
   expect("dma-narrow-last", DMA_DST + 11, 0x4b);
   expect("dma-narrow-past", DMA_DST + 12, 0x00);
+
+  /* only two bits of the parameter byte are decoded, so the other six say nothing */
+  dma(DMA_SRC, DMA_DST, 4, 3, 4, 0xfc);
+  expect("dma-params-spare-first", DMA_DST, 0x40);
+  expect("dma-params-spare-last", DMA_DST + 11, 0x4b);
+  expect("dma-params-spare-past", DMA_DST + 12, 0x00);
 
   /* both parameter bits at once: a fill that decrements */
   dma(0x1100, 0x1900, 4, 2, 4, 0x03);
