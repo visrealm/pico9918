@@ -534,8 +534,9 @@ static inline uint32_t tmsTestRowBitsMaskAligned(const uint32_t xPos, const uint
   return tilePixels & ~(rowBitsMask[xPos >> 5] << (xPos & 0x1f));
 }
 
-// Copy and align bit mask with small pixel offset (0-7)
-static void tmsCopyAlignMask(TileMask dstMask, const TileMask srcMask, int pixelShift)
+/* Out of line on purpose: two calls a line, and inlined it puts a second copy of the whole
+   straight-line word copy into the scanline body, which costs the board more than the call. */
+static PICO9918_NOINLINE void tmsCopyAlignMask(TileMask dstMask, const TileMask srcMask, int pixelShift)
 {
   if (pixelShift == 0)
   {
@@ -2457,8 +2458,14 @@ static void (*const tileRowClones[2][6])(TILE_ROW_PARAMS) = {
   {rowT1Ecm0, rowT1Ecm1, rowT1Ecm2, rowT1Ecm3, rowT1Gm2, rowT1Mcm},
   {rowT2Ecm0, rowT2Ecm1, rowT2Ecm2, rowT2Ecm3, rowT2Gm2, rowT2Mcm}};
 
-/** \brief generate a tile mode scanline for either T1 or T2 layer */
-static void __time_critical_func(f18a_tile_layer_scan_line)(PICO9918_INST_ARG uint16_t y,
+/**
+ * \brief generate a tile mode scanline for either T1 or T2 layer
+ *
+ * Inlined into both callers on purpose, not by the compiler's judgement: only there does `config`
+ * fold to a constant, and every field it reads is otherwise a load on a hot line. It sits near
+ * the size gcc stops at, so a statement added here has twice silently cost the board a layer.
+ */
+PICO9918_INLINE_HOT void f18a_tile_layer_scan_line(PICO9918_INST_ARG uint16_t y,
                                                              const TileLayerConfig* config, const bool blend)
 {
   const uint32_t ecm     = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_TILE) >> 4;

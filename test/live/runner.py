@@ -33,6 +33,7 @@ CORE_TEST = os.path.join(os.path.dirname(os.path.dirname(HERE)), "core", "test")
 for folder in (HERE, CORE_TEST, os.path.join(HERE, "web")):
     sys.path.insert(0, folder)
 import suite.stages.freeze as freeze
+import inlining
 import perf
 import results
 import suite.scenes as scenes
@@ -131,6 +132,11 @@ def main():
         if args.flash:
             t.flash()
             print("programmed %s\n" % t.elf)
+            # said here because this is the moment the image is fresh and about to be
+            # timed: an inlining decision that flipped moves microseconds a line, and
+            # every number below would carry it without saying so. Reported, not fatal -
+            # the run is still worth having, it just needs reading with this in mind.
+            inlining.report(t.elf)
         # after the flash, not before: the board resets into whatever clock preset
         # its stored config holds, and that is the denominator of every number below.
         #
