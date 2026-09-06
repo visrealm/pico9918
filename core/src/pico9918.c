@@ -2512,13 +2512,14 @@ static const uint8_t* lineSource = 0;
  *
  * INLINE: so will be different versions generated, depending on hard-coded (or known at compile-time) arguments
  */
-static inline bool __time_critical_func(renderBitmapLayer)(PICO9918_INST_ARG uint16_t y, bool opaque,
-                                                           const uint8_t width, const uint16_t addr,
-                                                           const uint8_t bmlCtl,
-                                                           uint8_t pixels[TMS9918_PIXELS_X])
+PICO9918_INLINE_HOT bool renderBitmapLayerBody(PICO9918_INST_ARG uint16_t y, bool opaque, const uint8_t width,
+                                               const uint16_t addr, const uint8_t bmlCtl,
+                                               uint8_t pixels[TMS9918_PIXELS_X], const bool wide,
+                                               const bool intoTile1)
 {
-  bool writeMask = bmlCtl & 0x40;
-  underLayer     = !writeMask;
+  // written over T1's own buffer the layer is already above it, so the row mask arbitrates nothing
+  bool writeMask = (bmlCtl & 0x40) && !intoTile1;
+  underLayer     = !(bmlCtl & 0x40);
 
   bool returnVal = true;
 
@@ -2552,8 +2553,17 @@ static inline bool __time_critical_func(renderBitmapLayer)(PICO9918_INST_ARG uin
         if (opaque || color)
         {
           uint8_t finalColour = pal | (color >> colorOffset);
-          pixels[xPos]        = finalColour;
-          pixels[xPos + 1]    = finalColour;
+          if (wide)
+          {
+            const uint16_t pair                 = (uint16_t)(finalColour | (finalColour << 8));
+            *(uint16_t*)(pixels + xPos * 2)     = pair;
+            *(uint16_t*)(pixels + xPos * 2 + 2) = pair;
+          }
+          else
+          {
+            pixels[xPos]     = finalColour;
+            pixels[xPos + 1] = finalColour;
+          }
           currentMask |= maskPixelMask;
         }
         xPos += 2;
@@ -2592,7 +2602,11 @@ static inline bool __time_critical_func(renderBitmapLayer)(PICO9918_INST_ARG uin
         uint8_t color = (data & colorMask);
         if (opaque || color)
         {
-          pixels[xPos] = pal | (color >> colorOffset);
+          const uint8_t v = pal | (color >> colorOffset);
+          if (wide)
+            *(uint16_t*)(pixels + xPos * 2) = (uint16_t)(v | (v << 8));
+          else
+            pixels[xPos] = v;
           currentMask |= maskPixelMask;
         }
         ++xPos;
@@ -2616,10 +2630,30 @@ static inline bool __time_critical_func(renderBitmapLayer)(PICO9918_INST_ARG uin
   return returnVal;
 }
 
+/* One body per line width, for the reason spriteGridWord gives: the layer is on the 256-pixel grid
+   whatever the mode, so a wide row draws each of its pixels twice. The F18A does the same - see the
+   text2 case in f18a_tiles.vhd, which halves the layer's pixel clock rather than repeating it. */
+#if PICO9918_TEXT80_8BPP
+static EMITTER_NOINLINE bool __time_critical_func(renderBitmapLayer80)(
+  PICO9918_INST_ARG uint16_t y, bool opaque, const uint8_t width, const uint16_t addr, const uint8_t bmlCtl,
+  uint8_t pixels[TMS9918_PIXELS_X], const bool intoTile1)
+{
+  return renderBitmapLayerBody(PICO9918_INST y, opaque, width, addr, bmlCtl, pixels, true, intoTile1);
+}
+#endif
+
+static inline bool __time_critical_func(renderBitmapLayer40)(PICO9918_INST_ARG uint16_t y, bool opaque,
+                                                             const uint8_t width, const uint16_t addr,
+                                                             const uint8_t bmlCtl,
+                                                             uint8_t pixels[TMS9918_PIXELS_X])
+{
+  return renderBitmapLayerBody(PICO9918_INST y, opaque, width, addr, bmlCtl, pixels, false, false);
+}
 
 /** \brief generate an F18A bitmap layer scanline */
 static bool __time_critical_func(bitmap_layer_scan_line)(PICO9918_INST_ARG uint16_t y,
-                                                                  uint8_t pixels[TMS9918_PIXELS_X])
+                                                                  uint8_t pixels[TMS9918_PIXELS_X],
+                                                                  const bool intoTile1)
 {
   /* bml enabled? */
   const uint8_t bmlCtl = TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL);
@@ -2637,7 +2671,13 @@ static bool __time_critical_func(bitmap_layer_scan_line)(PICO9918_INST_ARG uint1
   const uint8_t width    = bmlWidth ? ((bmlWidth + 3) >> 2) : 64;
   const uint16_t addr    = (TMS_REGISTER(tms9918, PICO9918_REG_BML_BASE) << 6) + (y * width);
 
-  return renderBitmapLayer(PICO9918_INST y, !(bmlCtl & 0x20), width, addr, bmlCtl, pixels);
+  const bool opaque = !(bmlCtl & 0x20);
+
+#if PICO9918_TEXT80_8BPP
+  if (TEXT80_WIDE_ROW)
+    return renderBitmapLayer80(PICO9918_INST y, opaque, width, addr, bmlCtl, pixels, intoTile1);
+#endif
+  return renderBitmapLayer40(PICO9918_INST y, opaque, width, addr, bmlCtl, pixels);
 }
 
 /* One 32-pixel chunk of the composite, four pixels at a time. Selecting a layer per pixel is a byte
@@ -2982,7 +3022,21 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
     /* the background fill owns pixels[] until it completes */
     PICO9918_FILL32_WAIT(PICO9918_FILL_LINE);
 
-    bool writeMask = bitmap_layer_scan_line(PICO9918_INST y, pixels);
+    const uint8_t bmlCtlReg = TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL);
+
+    /* LOAD-BEARING: drawn over tile layer 1's buffer a priority layer is above T1 by construction,
+       which is what lets the blend and the zero-copy line survive it. Each condition breaks that:
+       an UNDER layer needs per-pixel arbitration, tile 1 off means that buffer is never read, and
+       only a wide row doubles. Relax any of them and the layer is lost or lands under T1. */
+    const bool bmlInTile1 = TEXT80_WIDE_ROW && (bmlCtlReg & PICO9918_R31_BML_ENABLE) &&
+                            (bmlCtlReg & 0x40) &&
+                            !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF);
+
+    bool writeMask = true;
+    if (bmlInTile1)
+      underLayer = false;
+    else
+      writeMask = bitmap_layer_scan_line(PICO9918_INST y, pixels, false);
 
     const uint32_t transparent = underLayer ? 0 : bg;
     transparentPixels[0] = transparentPixels[1] = transparent;
@@ -3001,7 +3055,7 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
 
       const bool blend = wide && tile1Enabled && tile2Enabled &&
                          !((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_TILE) >> 4) &&
-                         !(TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL) & PICO9918_R31_BML_ENABLE);
+                         (bmlInTile1 || !(bmlCtlReg & PICO9918_R31_BML_ENABLE));
 
       if (tile2Enabled && !blend)
       {
@@ -3012,6 +3066,8 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
       if (tile1Enabled)
       {
         f18a_tile1_scan_line(PICO9918_INST y);
+        if (bmlInTile1)
+          bitmap_layer_scan_line(PICO9918_INST y, tms9918->tileLayer1Buffer + t1Scroll, true);
         if (blend) f18a_tile2_scan_line(PICO9918_INST y, true);
         if (textRow)
           textRowBorder(PICO9918_INST t1Scroll, wide ? TEXT80_PADDING_PX : TEXT_PADDING_PX,
@@ -3032,7 +3088,7 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
       /* WARNING: the scroll test keeps the handed-out line word-aligned. A caller may read it a
          word at a time, and on Cortex-M0+ an unaligned word load HardFaults rather than running slow */
       if (tile1Enabled && (!tile2Enabled || blend) && !underLayer && !(t1Scroll & 3) &&
-          !(TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL) & PICO9918_R31_BML_ENABLE))
+          (bmlInTile1 || !(bmlCtlReg & PICO9918_R31_BML_ENABLE)))
       {
         uint8_t* line = tms9918->tileLayer1Buffer + t1Scroll;
 

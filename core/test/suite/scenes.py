@@ -1223,6 +1223,18 @@ def _():
     return text(80, r31=0x80, r32=0x12)
 
 
+@scene("t80-bml-pri-tiles-off", "a priority bitmap layer in 80-column text with BOTH tile layers "
+                                "disabled. A priority layer normally rides tile layer 1's buffer, "
+                                "which is how it stays on the blended path - but with layer 1 off "
+                                "that buffer is never emitted and never read, so the layer has to "
+                                "fall back to being arbitrated in the line itself. Both layers off "
+                                "is what makes the difference visible: leave layer 2 on and it "
+                                "covers the layer either way, which is correct and proves nothing",
+       changes="a bitmap layer in T80 needs the 8bpp tier")
+def _():
+    return text(80, r32=0x12, r1f=0xC0, **BML_GEOM)
+
+
 @scene("t80-hscroll", "both 80-column layers scrolled horizontally by different amounts. The "
                       "offset inside the first cell is only ever 0, 2 or 4 pixels, so "
                       "the emitter backs up whole cells and keeps its three-word store")
