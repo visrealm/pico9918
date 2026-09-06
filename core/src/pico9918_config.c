@@ -62,13 +62,24 @@ static bool configOutOfRange(const uint8_t* config)
   return false;
 }
 
-static void applyConfigDefaults(uint8_t* config)
+void pico9918_config_defaults(uint8_t config[CONFIG_BYTES])
 {
+  memset(config, 0, CONFIG_BYTES);
+
   for (size_t i = 0; i < pico9918_config_field_count; ++i)
   {
     config[pico9918_config_fields[i].offset] = pico9918_config_fields[i].defaultValue;
   }
+
+  /* entry 0 stays zero; the rest carry the 0xf alpha the validator reads as "initialised" */
+  for (int i = 1; i < 16; ++i)
+  {
+    uint16_t rgb                                      = 0xf000 | pico9918_default_palette(i);
+    config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2)]     = rgb >> 8;
+    config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xff;
+  }
 }
+
 
 // apply defaults only for fields introduced after storedVer
 static void migrateNewFields(uint8_t* config, uint16_t storedVer)
@@ -93,18 +104,7 @@ bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], bool modelMatches, u
       (config[PICO9918_CONF_PALETTE_IDX_0 + 2] & 0xf0) != 0xf0 || // not initialised
       configOutOfRange(config))
   {
-    memset(config, 0, CONFIG_BYTES);
-
-    applyConfigDefaults(config);
-
-    config[PICO9918_CONF_PALETTE_IDX_0]     = 0;
-    config[PICO9918_CONF_PALETTE_IDX_0 + 1] = 0;
-    for (int i = 1; i < 16; ++i)
-    {
-      uint16_t rgb                             = 0xf000 | pico9918_default_palette(i);
-      config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2)]     = rgb >> 8;
-      config[PICO9918_CONF_PALETTE_IDX_0 + (i * 2) + 1] = rgb & 0xff;
-    }
+    pico9918_config_defaults(config);
 
     storedVer = 0; // force version stamp + save by the caller
     if (wasReset) *wasReset = true;

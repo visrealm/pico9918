@@ -168,6 +168,20 @@ extern const size_t pico9918_config_field_count;
 uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
 
 /**
+ * \brief write a complete, valid settings block: every field at its default
+ *
+ * What a host wants when it has nothing stored, and the reason it should not simply
+ * zero the block: the field defaults happen to be zero today, but the palette's are
+ * not, and pico9918_config_apply() unpacks those bytes into the live palette. A zeroed
+ * block therefore renders black. This also sets the initialised marker that
+ * pico9918_config_validate() looks for, so a block from here survives it untouched.
+ *
+ * The identity bytes at 0-3 are left alone here; they are stamped where the personality
+ * is known.
+ */
+void pico9918_config_defaults(uint8_t config[CONFIG_BYTES]);
+
+/**
  * \brief validate a config block just read from host storage
  *
  * currentVerFull is the host's running firmware version, packed as
