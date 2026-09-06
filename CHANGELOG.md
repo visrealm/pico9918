@@ -1,18 +1,66 @@
 # Changelog
 
-Every released version of the PICO9918 firmware and configurator. Dates are the release dates on
-[Releases](https://github.com/visrealm/pico9918/releases), where the full notes and installation
-instructions for each version live. For per-version detail, including which configuration setting
-arrived in which version, see
+Every released version of the PICO9918 firmware and configurator, plus the version in development.
+Dates are the release dates on [Releases](https://github.com/visrealm/pico9918/releases), where the
+full notes and installation instructions for each version live. For per-version detail, including
+which configuration setting arrived in which version, see
 [Firmware Version History](https://github.com/visrealm/pico9918/wiki/Firmware-Version-History).
+What is planned beyond the newest entry below is in [ROADMAP.md](ROADMAP.md).
 
 Current firmware works on every official board: v0.3, v0.4 through v1.3, and PRO v2.0. A single
 `.uf2` has carried both the RP2040 and RP2350 images since v1.1.0.
 
-## Unreleased
+## v1.3.0 - unreleased
 
-Work past v1.2.0 lives on branches and is not downloadable. A lite (settings-only) configurator ROM
-for the CreatiVision is planned for v1.2.1.
+Not released yet, and nothing in this section is downloadable. The largest F18A release since F18A
+support arrived. Every display mode now runs through one shared tile pipeline instead of carrying
+its own special case, so features that existed in only some modes exist in all of them, and the
+shared path is faster than the per-mode code it replaced.
+
+### Added
+
+* Tile layer 2, horizontal and vertical scrolling, enhanced colour mode (ECM) and position-based
+  attributes in every display mode, Graphics II, Multicolor and 40-column text included. These
+  previously reached only Graphics I and 80-column text.
+* 80-column text at eight bits a pixel on the PICO9918 PRO, which brings the tile palette select,
+  ECM and the bitmap layer to TEXT80. Four bits a pixel cannot carry them, so this is a PRO
+  capability; the PICO9918 keeps the packed 80-column line.
+* Scanline interrupts as an interrupt source of their own, enabled by R0 bit 4 and latched in
+  status register 1 until the host reads it. They previously borrowed the frame flag and R1's
+  interrupt enable.
+* A `RENDER` row on the performance diagnostic overlay, giving the average per-scanline render time
+  in microseconds beside the frame time. The overlay font has been redrawn.
+
+### Changed
+
+* Faster per-scanline rendering in every display mode, faster GPU execution on the PICO9918 PRO,
+  and GPU block copies that no longer move a byte at a time.
+* The TMS9918A and F18A emulation is now
+  [pico9918-core](https://github.com/visrealm/pico9918-core), published as a library in its own
+  right for emulator authors. The firmware builds the copy in `core/`, so a host and a board run
+  the same renderer. Nothing about the device changes.
+* The resident GPU program image is gone. It is an SPI flash command server and there is no SPI
+  flash here to serve, so four of its five handlers could never do anything and the fifth
+  duplicated the DMA engine. No configurator ROM or released software used it.
+
+### Fixed
+
+* Holes in the tile pipeline: the backdrop and 40-column text take the tile palette select, a text
+  cell above an ECM0 layer draws as the ECM tile it is, and text no longer takes a vertical page
+  swap the hardware never applies.
+* A locked device masks a register write above R7 to three bits and aliases it onto R0-R7, the way
+  a TMS9918A does, instead of ignoring it. Writes are still ignored where R0 bit 2 (M4) is set,
+  which is the F18A's own rule, and it is the aliasing that software setting up 80 columns by
+  writing VR0 through VR15 depends on.
+* The bitmap layer's row stride rounds up, so a layer whose width is not a multiple of four pixels
+  no longer reads each row from the wrong address.
+* GPU DMA: a width or height of 0 means 256, and a transfer running past the end of the 64 KB map
+  wraps into it rather than out of it.
+* The GPU's `PIX` instruction addresses the bitmap layer the way the F18A does, and `SLC` executes
+  with an immediate shift count above 3.
+* A palette write from a GPU program is noticed, so the picture takes the new colours.
+* Status register 0 reports a fifth-sprite number of 0 where there is no fifth sprite, rather than
+  a constant 31.
 
 ## v1.2.0 - 2026-07-12
 
