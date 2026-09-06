@@ -53,13 +53,15 @@ static void unlock(void)
 /*
  *   LI   R0, >BEEF     0200 BEEF
  *   MOV  R0, @>2100    C800 2100
+ *   STST R3            02C3        so the status accessor has something to agree with
  *   IDLE               0340
  *
  * Written straight into VRAM rather than through the host bus, which masks to 16K.
  */
 static void loadProgram(void)
 {
-  static const uint8_t program[] = {0x02, 0x00, 0xbe, 0xef, 0xc8, 0x00, 0x21, 0x00, 0x03, 0x40};
+  static const uint8_t program[] = {0x02, 0x00, 0xbe, 0xef, 0xc8, 0x00,
+                                    0x21, 0x00, 0x02, 0xc3, 0x03, 0x40};
 
   for (unsigned i = 0; i < sizeof(program); ++i) tms9918->vram.bytes[PROGRAM_AT + i] = program[i];
 
@@ -173,9 +175,16 @@ int main(void)
   if (pico9918_gpu_reg_value(PICO9918_INST 1) != 0x1234)
     fail("gpu-r1", 0x1234, pico9918_gpu_reg_value(PICO9918_INST 1));
 
-  /* IDLE leaves the status the compare before it set, so it is not simply zero */
-  if (pico9918_gpu_status(PICO9918_INST_ONLY) == 0)
-    fail("gpu-status-zero", 1, pico9918_gpu_status(PICO9918_INST_ONLY));
+  /* the accessor publishes what STST stored, bit for bit - a non-zero check cannot see
+     the two disagreeing by the eight places the low-byte storage sits at */
+  if (pico9918_gpu_status(PICO9918_INST_ONLY) != pico9918_gpu_reg_value(PICO9918_INST 3))
+    fail("gpu-status-stst", pico9918_gpu_reg_value(PICO9918_INST 3),
+         pico9918_gpu_status(PICO9918_INST_ONLY));
+
+  /* and it is what >BEEF earns from a cleared status: logical greater than alone, since
+     arming zeroed it, MOV keeps only C/OV/P across, and >BEEF is negative and non-zero */
+  if (pico9918_gpu_status(PICO9918_INST_ONLY) != PICO9918_GPU_ST_LGT)
+    fail("gpu-status-flags", PICO9918_GPU_ST_LGT, pico9918_gpu_status(PICO9918_INST_ONLY));
 
   /* and it moved: a run leaves the point it reached, not the address it was armed at */
   if (pico9918_gpu_pc(PICO9918_INST_ONLY) == PROGRAM_AT)

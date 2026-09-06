@@ -177,6 +177,11 @@ uint16_t pico9918_gpu_reg_value(PICO9918_INST_ARG uint8_t reg);
 /**
  * \brief the GPU's status register between instructions
  *
+ * In the architectural bit positions, which is where STST stores them and where a
+ * disassembler or a flag display expects them - use the PICO9918_GPU_ST_* masks. The
+ * cores keep the flags in the low byte internally; this is the only published view and
+ * it agrees with the instruction.
+ *
  * TRAP: maintained only where the library paces the GPU itself. The hand-written Thumb
  * cores a board builds run a program to completion and keep the status in a local, so
  * there is no point between instructions for this to describe and it reads whatever it
@@ -185,6 +190,14 @@ uint16_t pico9918_gpu_reg_value(PICO9918_INST_ARG uint8_t reg);
  */
 PICO9918_DLLEXPORT
 uint16_t pico9918_gpu_status(PICO9918_INST_ONLY_ARG);
+
+/* ST0-ST5 of pico9918_gpu_status(), the TMS9900's own numbering from the MSB */
+#define PICO9918_GPU_ST_LGT 0x8000 /* logical greater than */
+#define PICO9918_GPU_ST_AGT 0x4000 /* arithmetic greater than */
+#define PICO9918_GPU_ST_EQ  0x2000 /* equal */
+#define PICO9918_GPU_ST_C   0x1000 /* carry */
+#define PICO9918_GPU_ST_OV  0x0800 /* overflow */
+#define PICO9918_GPU_ST_P   0x0400 /* odd parity */
 
 /**
  * Return the GPU's CPU time in microseconds.

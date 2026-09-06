@@ -475,7 +475,8 @@ uint16_t pico9918_gpu_reg_value(PICO9918_INST_ARG uint8_t reg)
 PICO9918_DLLEXPORT
 uint16_t pico9918_gpu_status(PICO9918_INST_ONLY_ARG)
 {
-  return tms9918->gpuStatus;
+  /* stored in the cores' low-byte layout, published where STST puts it */
+  return (uint16_t)(tms9918->gpuStatus << 8);
 }
 
 /*
