@@ -137,69 +137,79 @@ void isr_hardfault(void)
    it comes back at the other end, which a pointer walk cannot do and no correct program
    asks for - so this stays out of line rather than unrolling into the caller. */
 static PICO9918_NOINLINE void dmaWrapped(uint8_t* vram, uint32_t src, uint32_t dst,
-                                         uint32_t width, uint32_t height, int32_t advance,
+                                         uint32_t width, uint32_t height, int32_t pitch,
                                          int32_t srcInc, int32_t dstInc)
 {
   uint16_t s = (uint16_t)src;
   uint16_t d = (uint16_t)dst;
   for (uint32_t y = 0; y < height; ++y)
   {
-    for (uint32_t x = 0; x < width; ++x, s += srcInc, d += dstInc) vram[d] = vram[s];
-    s += advance * srcInc;
-    d += advance * dstInc;
+    uint16_t rs = s, rd = d;
+    for (uint32_t x = 0; x < width; ++x, rs += srcInc, rd += dstInc) vram[rd] = vram[rs];
+    if (srcInc) s += (uint16_t)pitch;
+    d += (uint16_t)pitch;
   }
 }
 
 static void triggerGpuDma(uint8_t* vram)
 {
-  uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8000));
-  uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8002));
-  const uint32_t widthByte = vram[0x8004];
-  uint32_t width           = widthByte ? widthByte : 256;
-  uint32_t height          = vram[0x8005] ? vram[0x8005] : 256;
-  uint32_t stride          = vram[0x8006];
-  uint32_t params          = vram[0x8007];
+  const uint32_t srcVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8000));
+  const uint32_t dstVramAddr = __builtin_bswap16(*(uint16_t*)(vram + 0x8002));
 
-  int32_t dstInc = (params & 0x02) ? -1 : 1;
-  int32_t srcInc = (params & 0x01) ? 0 : dstInc;
+  /* zero is 256 in both: the engine loads the register into a counter that stops at one */
+  const uint32_t width  = vram[0x8004] ? vram[0x8004] : 256;
+  const uint32_t height = vram[0x8005] ? vram[0x8005] : 256;
+  const uint32_t stride = vram[0x8006];
+  const uint32_t params = vram[0x8007];
 
-  uint8_t* srcPtr = vram + srcVramAddr;
-  uint8_t* dstPtr = vram + dstVramAddr;
+  const int32_t  dstInc = (params & 0x02) ? -1 : 1;
+  const int32_t  srcInc = (params & 0x01) ? 0 : dstInc;
+  const uint32_t wm1    = width - 1;
 
-  const bool contiguous = stride == widthByte;
-  const uint32_t rowStep = contiguous ? width : stride;
+  /* TRAP: the row pitch is not the stride register, and zero does not mean 256 here. The
+     engine forms one eight-bit signed difference from stride and width, then adds it in
+     place of the last step of every row - so a stride that difference overflows walks the
+     transfer backwards, which caps a usable stride at (width - 1) + 127. */
+  const uint32_t diffByte = ((dstInc < 0) ? wm1 - stride : stride - wm1) & 0xff;
+  const int32_t  diff     = (diffByte & 0x80) ? (int32_t)diffByte - 256 : (int32_t)diffByte;
+  const int32_t  pitch    = (int32_t)wm1 * dstInc + diff;
 
-  const uint32_t run  = contiguous ? width * height : width;
-  const uint32_t rows = contiguous ? 1 : height;
+  /* how far a transfer reaches either side of its start, each axis counting whichever way it runs */
+  const int32_t row  = (int32_t)wm1 * dstInc;
+  const int32_t col  = (int32_t)(height - 1) * pitch;
+  const int32_t back = (row < 0 ? row : 0) + (col < 0 ? col : 0);
+  const int32_t fwd  = (row > 0 ? row : 0) + (col > 0 ? col : 0);
 
-  const uint32_t reach    = (height - 1) * rowStep + width - 1;
-  const uint32_t srcReach = srcInc ? reach : 0;
-  const bool     inRange  = (dstInc < 0)
-                              ? (dstVramAddr >= reach && srcVramAddr >= srcReach)
-                              : (dstVramAddr + reach <= 0xFFFF && srcVramAddr + srcReach <= 0xFFFF);
+  const int32_t dstLo = (int32_t)dstVramAddr + back, dstHi = (int32_t)dstVramAddr + fwd;
+  const int32_t srcLo = (int32_t)srcVramAddr + back, srcHi = (int32_t)srcVramAddr + fwd;
 
-  if (!inRange)
-    dmaWrapped(vram, srcVramAddr, dstVramAddr, width, height,
-               (int32_t)rowStep - (int32_t)width, srcInc, dstInc);
-  else if (srcInc == 0 && dstInc == 1)
+  if (dstLo < 0 || dstHi > 0xFFFF || (srcInc && (srcLo < 0 || srcHi > 0xFFFF)))
   {
-    const uint8_t value = *srcPtr;
-    for (uint32_t y = 0; y < rows; ++y, dstPtr += rowStep) memset(dstPtr, value, run);
+    dmaWrapped(vram, srcVramAddr, dstVramAddr, width, height, pitch, srcInc, dstInc);
   }
-  else if (srcInc == 1 && (dstPtr >= srcPtr + run || srcPtr >= dstPtr + run))
+  else if (srcInc == 0)
   {
-    for (uint32_t y = 0; y < rows; ++y, srcPtr += rowStep, dstPtr += rowStep)
-      memcpy(dstPtr, srcPtr, run);
+    /* a row holds the same bytes from either end, so a fill runs forwards either way */
+    uint8_t*      d     = vram + dstVramAddr - (dstInc < 0 ? wm1 : 0);
+    const uint8_t value = vram[srcVramAddr];
+    for (uint32_t y = 0; y < height; ++y, d += pitch) memset(d, value, width);
+  }
+  else if (dstLo > srcHi || srcLo > dstHi)
+  {
+    /* nothing read is ever written, so the direction the engine took does not show */
+    uint8_t* s = vram + srcVramAddr - (dstInc < 0 ? wm1 : 0);
+    uint8_t* d = vram + dstVramAddr - (dstInc < 0 ? wm1 : 0);
+    for (uint32_t y = 0; y < height; ++y, s += pitch, d += pitch) memcpy(d, s, width);
   }
   else
   {
-    /* Signed, because a stride under the width steps back into the row just written. */
-    const int32_t advance = (int32_t)rowStep - (int32_t)width;
-    for (uint32_t y = 0; y < height; ++y)
+    uint8_t* s = vram + srcVramAddr;
+    uint8_t* d = vram + dstVramAddr;
+    for (uint32_t y = 0; y < height; ++y, s += pitch, d += pitch)
     {
-      for (uint32_t x = 0; x < width; ++x, srcPtr += srcInc, dstPtr += dstInc) *dstPtr = *srcPtr;
-      srcPtr += advance * srcInc;
-      dstPtr += advance * dstInc;
+      uint8_t* rs = s;
+      uint8_t* rd = d;
+      for (uint32_t x = 0; x < width; ++x, rs += srcInc, rd += dstInc) *rd = *rs;
     }
   }
 

@@ -15,6 +15,10 @@
  * self-modifying program and reads its result back within a handful of host cycles, so a
  * host servicing the GPU once a scanline sees the chip only when a scanline boundary
  * happens to fall in between - a real flaky-detection bug in two emulators.
+ *
+ * The last section is the DMA engine, which is here because a program triggering one is
+ * the only way to reach it: the ports it answers to are above the address space a host
+ * can write.
  */
 
 #include "impl/pico9918_priv.h"
@@ -73,6 +77,55 @@ static void arm(void)
 {
   regWrite(0x36, (uint8_t)(PROGRAM_AT >> 8));
   regWrite(0x37, (uint8_t)(PROGRAM_AT & 0xff));
+}
+
+/*
+ *   LI   R1, >8008     0201 8008     the DMA trigger port
+ *   LI   R2, >0100     0202 0100
+ *   MOV  R2, *R1       C442          any write to >8008 starts the transfer
+ *   IDLE               0340
+ *
+ * The registers below it are set by the case rather than by the program: what is under
+ * test is the engine, not a program's ability to load eight bytes.
+ */
+static void loadDmaProgram(void)
+{
+  static const uint8_t program[] = {0x02, 0x01, 0x80, 0x08, 0x02, 0x02,
+                                    0x01, 0x00, 0xc4, 0x42, 0x03, 0x40};
+
+  for (unsigned i = 0; i < sizeof(program); ++i) tms9918->vram.bytes[PROGRAM_AT + i] = program[i];
+}
+
+#define DMA_SRC 0x1000u
+#define DMA_DST 0x1800u
+
+/* One transfer, from a source that is 0x40 counting up. Returns with the destination
+   wherever the engine left it. */
+static void dma(uint32_t src, uint32_t dst, uint8_t width, uint8_t height, uint8_t stride,
+                uint8_t params)
+{
+  for (unsigned i = 0; i < 0x400; ++i)
+  {
+    tms9918->vram.bytes[DMA_SRC + i] = (uint8_t)(0x40 + i);
+    tms9918->vram.bytes[DMA_DST + i] = 0;
+  }
+
+  tms9918->vram.bytes[0x8000] = (uint8_t)(src >> 8);
+  tms9918->vram.bytes[0x8001] = (uint8_t)src;
+  tms9918->vram.bytes[0x8002] = (uint8_t)(dst >> 8);
+  tms9918->vram.bytes[0x8003] = (uint8_t)dst;
+  tms9918->vram.bytes[0x8004] = width;
+  tms9918->vram.bytes[0x8005] = height;
+  tms9918->vram.bytes[0x8006] = stride;
+  tms9918->vram.bytes[0x8007] = params;
+
+  loadDmaProgram();
+  arm();
+}
+
+static void expect(const char* what, uint32_t at, uint8_t wanted)
+{
+  if (tms9918->vram.bytes[at] != wanted) fail(what, wanted, tms9918->vram.bytes[at]);
 }
 
 int main(void)
@@ -176,6 +229,56 @@ int main(void)
   loadProgram();
   arm();
   if (result() != 0) fail("cleared-rate-ran", 0, result());
+
+  /* 8. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
+        says which one it was and therefore which row and column the engine thought it
+        was on. Zero width and height mean 256; stride is a different animal entirely. */
+  unlock();
+  pico9918_gpu_set_clock(PICO9918_INST PICO9918_GPU_IPS_PRO);
+
+  dma(DMA_SRC, DMA_DST, 4, 3, 4, 0x00);
+  expect("dma-run-first", DMA_DST, 0x40);
+  expect("dma-run-last", DMA_DST + 11, 0x4b);
+  expect("dma-run-past", DMA_DST + 12, 0x00);
+
+  dma(DMA_SRC, DMA_DST, 4, 3, 16, 0x00);
+  expect("dma-stride-row0", DMA_DST, 0x40);
+  expect("dma-stride-gap", DMA_DST + 4, 0x00);
+  expect("dma-stride-row1", DMA_DST + 16, 0x50);
+  expect("dma-stride-row2", DMA_DST + 32, 0x60);
+
+  /* stride zero is a pitch of zero, not of 256: every row lands on the one before it */
+  dma(DMA_SRC, DMA_DST, 4, 3, 0, 0x00);
+  expect("dma-stride0-row0", DMA_DST, 0x40);
+  expect("dma-stride0-end", DMA_DST + 4, 0x00);
+  expect("dma-stride0-not256", DMA_DST + 256, 0x00);
+
+  /* and a stride the eight-bit difference overflows walks backwards: 200 with a width of
+     8 is a pitch of -56, not +200 */
+  dma(0x1100, 0x1900, 8, 2, 200, 0x00);
+  expect("dma-back-row0", 0x1900, 0x40);
+  expect("dma-back-row1", 0x18c8, 0x08);
+  expect("dma-back-not-forward", 0x19c8, 0x00);
+
+  /* a width of zero is 256, and with stride zero the difference wraps to a pitch of 256 */
+  dma(DMA_SRC, DMA_DST, 0, 1, 0, 0x00);
+  expect("dma-width256-first", DMA_DST, 0x40);
+  expect("dma-width256-last", DMA_DST + 255, 0x3f);
+  expect("dma-width256-past", DMA_DST + 256, 0x00);
+
+  /* a fill reads its byte once and strides like a copy */
+  dma(DMA_SRC, DMA_DST, 4, 3, 16, 0x01);
+  expect("dma-fill-row0", DMA_DST + 3, 0x40);
+  expect("dma-fill-gap", DMA_DST + 4, 0x00);
+  expect("dma-fill-row2", DMA_DST + 32, 0x40);
+
+  /* decrementing runs both ends backwards, so a row ends below the address it started at */
+  dma(0x1100, 0x1900, 4, 2, 4, 0x02);
+  expect("dma-dec-row0-first", 0x1900, 0x40);
+  expect("dma-dec-row0-last", 0x18fd, 0x3d);
+  expect("dma-dec-row1-first", 0x18fc, 0x3c);
+  expect("dma-dec-row1-last", 0x18f9, 0x39);
+  expect("dma-dec-past", 0x1901, 0x00);
 
   printf("%s: library-paced GPU, %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
   return failures != 0;
