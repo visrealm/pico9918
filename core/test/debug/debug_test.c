@@ -8,11 +8,17 @@
  *
  * https://github.com/visrealm/pico9918-core
  *
- * The map pico9918_debug_region publishes and the span pico9918_debug_read copies out of
- * it. Two things are under test and neither is the copy loop: that the regions land where
- * the union actually puts its fields, and that read and region agree about where each one
- * stops - a pane splitting bulk work on region boundaries has to land on the same bytes
- * the read does, or it silently skips or doubles a run.
+ * What is under test is nowhere near the copy loops. It is that the regions land where the
+ * union actually puts its fields; that region, read and write agree about where each one
+ * stops, since a pane splitting bulk work on those boundaries has to land on the same
+ * bytes the transfer does; and that the register write does the four things it promises
+ * and not a fifth.
+ *
+ * That last one is checked twice. Once case by case - R30 on a locked device landing at
+ * R30 rather than R6, R55 not arming a program, R57 not moving the unlock latch - and
+ * once by snapshotting the whole instance across a write and asserting that exactly two
+ * bytes moved. The second is the one that catches state nobody thought to name, including
+ * state added to pico9918_t after this was written.
  *
  * The edges are here because every one of them is a coin-flip an implementation would
  * otherwise settle silently: zero length, a null buffer, exactly at the end, past it, and
@@ -22,7 +28,9 @@
 #include "impl/pico9918_priv.h"
 #include "pico9918_debug.h"
 
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static int failures;
@@ -290,6 +298,132 @@ int main(void)
     pico9918_debug_gpu_set_pc(PICO9918_INST 0x1000);
     if (!pico9918_debug_gpu_armed(PICO9918_INST_ONLY)) fail("set-pc-disarmed-it", 1, 0);
     tms9918->restart = 0;
+  }
+
+  /* 13. the register write is the physical store. Each case is one postcondition, and
+         the preserved half is checked by snapshotting the instance and diffing it - a
+         list of fields written out by hand is a list that goes stale. */
+  {
+    /* R30 on a LOCKED device: the bug that removed the first attempt at a public
+       register write, and the one a "write R57, check R1" test cannot see */
+    TMS_REGISTER(tms9918, 6) = 0x66;
+    if (tms9918->isUnlocked) fail("write-locked-precondition", 0, 1);
+    if (!pico9918_debug_reg_write(PICO9918_INST 30, 0x3c)) fail("write-reg-30", 1, 0);
+    if (pico9918_debug_reg(PICO9918_INST 30) != 0x3c)
+      fail("write-reg-30-value", 0x3c, pico9918_debug_reg(PICO9918_INST 30));
+    if (pico9918_debug_reg(PICO9918_INST 6) != 0x66)
+      fail("write-reg-30-hit-6", 0x66, pico9918_debug_reg(PICO9918_INST 6));
+
+    /* above the file: nothing happens and it says so */
+    TMS_REGISTER(tms9918, 0) = 0x0d;
+    if (pico9918_debug_reg_write(PICO9918_INST 64, 0xff)) fail("write-reg-64", 0, 1);
+    if (pico9918_debug_reg(PICO9918_INST 0) != 0x0d) fail("write-reg-64-wrapped", 0x0d, 0);
+
+    /* the palette is left owing a republish */
+    tms9918->palDirty = 0;
+    pico9918_debug_reg_write(PICO9918_INST 7, 0x21);
+    if (!tms9918->palDirty) fail("write-reg-not-dirty", 1, 0);
+
+    /* and the cached mode is current WITHOUT a scanline having run, which is the case
+       pico9918_frame.c hits: it reads the mode before it calls the scanline that would
+       refresh it. Both mode registers, since either can change the answer. */
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, 0);
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, TMS_R1_MODE_TEXT | TMS_R1_DISP_ACTIVE);
+    if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT)
+      fail("write-reg-mode-stale", TMS_MODE_TEXT, pico9918_display_mode(PICO9918_INST_ONLY));
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, TMS_R1_DISP_ACTIVE);
+    if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_GRAPHICS_I)
+      fail("write-reg-mode-back", TMS_MODE_GRAPHICS_I, pico9918_display_mode(PICO9918_INST_ONLY));
+
+    /* R0's M4 is honoured while still locked, so it moves the mode from the other side */
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, TMS_R0_MODE_TEXT_80);
+    if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80)
+      fail("write-reg-mode-r0", TMS_MODE_TEXT80, pico9918_display_mode(PICO9918_INST_ONLY));
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, 0);
+
+    /* /INT follows R1's enable at once, rather than at the next active scanline */
+    TMS_STATUS(tms9918, PICO9918_SR_STATUS) |= PICO9918_SR0_INT;
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, TMS_R1_DISP_ACTIVE | TMS_R1_INT_ENABLE);
+    if (!tms9918->frameInt) fail("write-reg-int-not-raised", 1, 0);
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, TMS_R1_DISP_ACTIVE);
+    if (tms9918->frameInt) fail("write-reg-int-not-dropped", 0, 1);
+    TMS_STATUS(tms9918, PICO9918_SR_STATUS) &= (uint8_t)~PICO9918_SR0_INT;
+
+    /* THE UNLOCK LATCH IS PRESERVED. Written once and written twice leave the same byte
+       and the same count, so the byte cannot say which - and typing into a register pane
+       is not the handshake. Both writes must leave a locked device locked. */
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_UNLOCK, 0x1c);
+    if (tms9918->isUnlocked) fail("write-r57-once-unlocked", 0, 1);
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_UNLOCK, 0x1c);
+    if (tms9918->isUnlocked) fail("write-r57-twice-unlocked", 0, 1);
+    if (tms9918->lockedMask != 0x07) fail("write-r57-moved-mask", 0x07, tms9918->lockedMask);
+    if (pico9918_debug_reg(PICO9918_INST PICO9918_REG_UNLOCK) != 0x1c)
+      fail("write-r57-value", 0x1c, pico9918_debug_reg(PICO9918_INST PICO9918_REG_UNLOCK));
+
+    /* and the actions are not taken. R55 arms a program, R56 runs one, R63 begins a
+       firmware update, R50 bit 7 resets the file - through here, none of them do. */
+    pico9918_debug_gpu_set_pc(PICO9918_INST 0x2000);
+    tms9918->restart = 0;
+    tms9918->flash   = 0;
+    TMS_REGISTER(tms9918, 9) = 0x99;
+
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_GPU_PC_LSB, 0x40);
+    if (pico9918_debug_gpu_armed(PICO9918_INST_ONLY)) fail("write-r55-armed", 0, 1);
+    if (pico9918_gpu_pc(PICO9918_INST_ONLY) != 0x2000)
+      fail("write-r55-moved-pc", 0x2000, pico9918_gpu_pc(PICO9918_INST_ONLY));
+
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_GPU_CONTROL, PICO9918_R56_GPU_RUN);
+    if (pico9918_debug_gpu_armed(PICO9918_INST_ONLY)) fail("write-r56-armed", 0, 1);
+
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_FLASH_CONTROL, 0x80);
+    if (tms9918->flash) fail("write-r63-flashed", 0, 1);
+
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_ENHANCED2, PICO9918_R50_RESET);
+    if (pico9918_debug_reg(PICO9918_INST 9) != 0x99)
+      fail("write-r50-reset-file", 0x99, pico9918_debug_reg(PICO9918_INST 9));
+    if (tms9918->configDirty) fail("write-r50-config-dirty", 0, 1);
+
+    /* R30 of zero stays zero: the device folds it to the sprite maximum, this does not */
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_MAX_SCAN_SPRITES, 0);
+    if (pico9918_debug_reg(PICO9918_INST PICO9918_REG_MAX_SCAN_SPRITES) != 0)
+      fail("write-r30-zero-folded", 0,
+           pico9918_debug_reg(PICO9918_INST PICO9918_REG_MAX_SCAN_SPRITES));
+
+    /* R15 does not snap the timers into the status file */
+    TMS_STATUS(tms9918, 0x0f) = 0xee;
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_STATUS_SELECT, 0x45);
+    if (TMS_STATUS(tms9918, 0x0f) != 0xee) fail("write-r15-snapped", 0xee, TMS_STATUS(tms9918, 0x0f));
+  }
+
+  /* 14. and the preserved half, which the cases above cannot cover: every field NOT
+         named in the contract, including the ones nobody thought to name. The whole
+         instance is snapshotted, one neutral register written, and the bytes that moved
+         compared against the two the contract allows. A field added to pico9918_t later
+         and touched here fails this without anyone updating a list. */
+  {
+    uint8_t* const before = malloc(sizeof(pico9918_t));
+    const uint8_t* const live = (const uint8_t*)tms9918;
+    const uint32_t regByte = 0x6000 + 20;
+    const uint32_t dirty   = (uint32_t)offsetof(pico9918_t, palDirty);
+    unsigned moved = 0;
+
+    if (!before) return fail("snapshot-alloc", 1, 0), 1;
+
+    TMS_REGISTER(tms9918, 20) = 0x00;
+    tms9918->palDirty         = 0;
+    memcpy(before, tms9918, sizeof(pico9918_t));
+
+    if (!pico9918_debug_reg_write(PICO9918_INST 20, 0x5e)) fail("snapshot-write", 1, 0);
+
+    for (uint32_t i = 0; i < (uint32_t)sizeof(pico9918_t); ++i)
+    {
+      if (before[i] == live[i]) continue;
+      ++moved;
+      if (i != regByte && i != dirty) fail("write-reg-touched-offset", regByte, i);
+    }
+    if (moved != 2) fail("write-reg-moved-count", 2, moved);
+
+    free(before);
   }
 
   printf("%s: debugger surface, %d failure(s)\n", failures ? "FAIL" : "PASS", failures);

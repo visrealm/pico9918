@@ -124,6 +124,21 @@ uint8_t pico9918_debug_reg(PICO9918_INST_ARG uint8_t reg)
   return TMS_REGISTER(tms9918, reg);
 }
 
+/** \brief see the header. The store itself, plus the four things it owes and nothing else. */
+PICO9918_DLLEXPORT
+bool pico9918_debug_reg_write(PICO9918_INST_ARG uint8_t reg, uint8_t value)
+{
+  if (reg >= TMS_REGISTERS) return false;
+
+  TMS_REGISTER(tms9918, reg) = value;
+
+  tms9918->palDirty = 1;
+  pico9918_debug_sync_mode_impl(PICO9918_INST_ONLY);
+  pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
+
+  return true;
+}
+
 /** \brief see the header. PRAM with the big-endian storage undone. */
 PICO9918_DLLEXPORT
 uint16_t pico9918_debug_palette(PICO9918_INST_ARG uint8_t index)

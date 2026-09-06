@@ -116,6 +116,38 @@ PICO9918_DLLEXPORT
 uint8_t pico9918_debug_reg(PICO9918_INST_ARG uint8_t reg);
 
 /**
+ * \brief a register, stored where its number says, with no device behaviour
+ *
+ * NOT the device's write. pico9918_write_register_value() is a protocol: it folds the
+ * number to three bits on a locked device, so asking it for R30 stores R6; it drops the
+ * write entirely on a locked M4; and R55, R56, R50, R63 and R15 each set something in
+ * motion. A register editor wants none of that - it wants R30 to mean R30.
+ *
+ * So this is the physical store, and its contract is a list rather than a principle.
+ * For \p reg 0-63 it does EXACTLY four things:
+ *
+ *   1. stores \p value at register \p reg - not reg & lockedMask, not reg & 7
+ *   2. marks the palette as owing a republish
+ *   3. synchronizes the cached display mode, which R0 and R1 change
+ *   4. reconciles /INT, because R1's interrupt enable must take effect at once
+ *
+ * Everything else is untouched: the unlock latch, the GPU's address and armed state, the
+ * flash and config-dirty flags, the host address latch, every other register, every
+ * status byte, every config byte. No GPU program starts, no firmware update begins, no
+ * register file resets, no timer snaps.
+ *
+ * The unlock latch is PRESERVED rather than recomputed, and that is deliberate: the
+ * device unlocks on the value arriving TWICE, so the byte stored in R57 does not
+ * determine the state - after one write and after two it is the same byte and the same
+ * count, differing only in the latch. Recomputing it would have to guess. Typing into a
+ * register pane is not performing the handshake, so it does not move it.
+ *
+ * Returns false, changing nothing, for \p reg above 63.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_debug_reg_write(PICO9918_INST_ARG uint8_t reg, uint8_t value);
+
+/**
  * \brief a live palette entry, in host byte order
  *
  * PRAM as the renderer reads it, with the big-endian storage undone - so the value is

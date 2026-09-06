@@ -3429,6 +3429,14 @@ pico9918_mode_t __time_critical_func(pico9918_display_mode)(PICO9918_INST_ONLY_A
   return tmsCachedMode;
 }
 
+#if PICO9918_BUILD_DEBUG_API
+/** \brief see impl/pico9918_priv.h. What the scanline entry does, for a caller between two. */
+void pico9918_debug_sync_mode_impl(PICO9918_INST_ONLY_ARG)
+{
+  tmsCachedMode = tmsMode(tms9918);
+}
+#endif
+
 /**
  * \brief how many bytes of pixels[] this mode fills. Every mode is 256 but unlocked 80-column text on a
  * board with the 8bpp tier, which is 512 - so the palette expansion, the backdrop fill and anything

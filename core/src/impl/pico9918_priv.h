@@ -1003,6 +1003,14 @@ extern const pico9918_t* pico9918_palette_owner;
 
 void pico9918_palette_regenerate(PICO9918_INST_ONLY_ARG);
 
+#if PICO9918_BUILD_DEBUG_API
+/* The mode cache is refreshed on entry to a scanline and read before one by
+ * pico9918_frame.c, so a debug register write landing between the two would leave
+ * pico9918_display_mode answering with the old geometry for a line. In pico9918.c
+ * because the cache and the decode are both file-static there. */
+void pico9918_debug_sync_mode_impl(PICO9918_INST_ONLY_ARG);
+#endif
+
 /* Does the LUT need rebuilding?
  *
  * SR2 bit 7 is F18A-SPECIFIC (the GPU busy flag): the GPU may have written
