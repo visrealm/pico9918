@@ -485,9 +485,9 @@ PICO9918_INLINE_HOT uint32_t pico9918_cpu_vram_addr_impl(PICO9918_INST_ARG uint3
  *
  * \p regSelect is that byte, not a register number: bit 7 set, the register in the low
  * six. The locked-mask aliasing and the M4 rule are both defined on it, which is why it
- * is not a pico9918_register_t. Carries the unlock sequence, the GPU arming writes and
- * the palette rebuild, and deliberately does not reconcile /INT - pico9918_write_addr
- * does that on the way out. Out of line, unlike its neighbours here: it is large, and
+ * is not a pico9918_register_t. Carries the unlock sequence, the GPU arming writes, the
+ * palette rebuild, and the /INT reconcile on the three writes that can change the pin -
+ * R0, R1 and the unlock latch. Out of line, unlike its neighbours here: it is large, and
  * the inline entry below is its only hot caller.
  */
 PICO9918_DLLEXPORT
@@ -972,10 +972,14 @@ PICO9918_INLINE void pico9918_frame_sync_int_impl(PICO9918_INST_ONLY_ARG)
 }
 
 /**
- * \brief CPU-interface entry: called after a register/address write. An R1 interrupt
- * enable/disable must take effect at once - updateInterrupts only runs on active
- * scanlines and at the trigger line, so without this a border-time R1 mask would
+ * \brief bring /INT into agreement after a write that can change the predicate. An R1
+ * interrupt enable/disable must take effect at once - updateInterrupts only runs on
+ * active scanlines and at the trigger line, so without this a border-time R1 mask would
  * leave /INT stuck asserted.
+ *
+ * Called from pico9918_write_reg_value_impl, which is the one place that knows which
+ * register a write actually landed on. A staged first byte and an address set cannot
+ * reach the predicate, so neither pays for this.
  */
 PICO9918_INLINE void pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY_ARG)
 {

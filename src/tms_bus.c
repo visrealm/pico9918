@@ -69,7 +69,6 @@ static void __not_in_flash_func(tmsWriteIrqHandler)(void)
   if (writeVal & 0x01)
   {
     pico9918_write_addr_impl(dataVal);
-    pico9918_write_reconcile_int_impl();
   }
   else
   {

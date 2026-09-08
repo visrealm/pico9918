@@ -385,7 +385,6 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_destroy)(PICO9918_INST_ONL
 PICO9918_DLLEXPORT void __time_critical_func(pico9918_write_addr)(PICO9918_INST_ARG uint8_t data)
 {
   pico9918_write_addr_impl(PICO9918_INST data);
-  pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
 }
 
 /** \brief read from the status register */
@@ -3301,6 +3300,9 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
       tms9918->lockedMask = unlocked ? 0x3f : 0x07;
       tms9918->palDirty   = 1;
       if (unlocked) TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1;
+
+      /* the scanline-interrupt term of the /INT predicate is gated on being unlocked */
+      pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
     }
   }
   else
@@ -3313,7 +3315,14 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
     const int regIndex = reg & tms9918->lockedMask; // was 0x07
 
     TMS_REGISTER(tms9918, regIndex) = value;
-    if (regIndex < PICO9918_REG_STATUS_SELECT) return;
+    if (regIndex < PICO9918_REG_STATUS_SELECT)
+    {
+      /* LOAD-BEARING: R0 and R1 hold the only register bits pico9918_interrupt_status_impl
+       * reads, and regIndex is post-mask - a locked write to R25 lands on R1 and must
+       * reconcile, so testing the byte the host sent would miss it. */
+      if (regIndex <= TMS_REG_1) pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
+      return;
+    }
 
     if ((regIndex == PICO9918_REG_GPU_PC_LSB) ||
         ((regIndex == PICO9918_REG_GPU_CONTROL) && ((value & PICO9918_R56_GPU_RUN) == 0)))
