@@ -18,6 +18,25 @@
 
 .global run9900 // Entry point
 
+// The fetch/dispatch tail, so a handler can fall into it rather than branch back to "start".
+// R10 already carries the table base and Thumb-2 widens a branch that will not reach, so a
+// copy needs nothing arranged for it here.
+.macro  GPU_DISPATCH
+        UXTH R3,R3 // Discard any extra - but allow to flow into register space
+
+        LDRB R0,[R9,#0]
+        LSRS R0,#1
+        BCC  I_IDLE
+
+        LDRH R0,[R8,R3] // Get instruction BYTE|INST (LE format)
+        ADDS R3,#2
+
+        REV16 R6,R0    // R6=INST|BYTE
+        LSRS R2,R6,#5  // Get opcode
+        ADD  R4,R10,R2,LSL #3
+        LDM  R4,{R7,PC} // Get 1st and 2nd branch locations (if it's needed)
+.endm
+
 //.extern F18A_PIX
 
 // *********************************************************************************************
@@ -423,18 +442,16 @@ I_MOV:  STRH R5,[R6,#0]
 OP_COMP_W:
         SXTH R0,R0
         CMP  R0,#0
-        BNE  OP_COMP_W_l
-        ADDS R1,#0x20 // Equal bit
-        B    start
-.align 4
-OP_COMP_W_l:
         BGT  OP_COMP_W_a
+        BEQ  OP_COMP_W_e
         ADDS R1,#0x80 // L >
-        B    start
-.align 4
+        GPU_DISPATCH
 OP_COMP_W_a:
         ADDS R1,#0xC0 // LA >
-        B    start
+        GPU_DISPATCH
+OP_COMP_W_e:
+        ADDS R1,#0x20 // Equal bit
+        GPU_DISPATCH
 // *********************************************************************************************
 //R0 (LE)
 //89ABCDEF01234567
@@ -650,11 +667,11 @@ I_COC:  ANDS R4,R5
         CMP  R4,R5
         BNE  I_COC_ne
         ORRS R1,#0x20 // EQ
-        B    start
+        GPU_DISPATCH
 .align 4
 I_COC_ne:
         ANDS R1,#0xDF // ~EQ
-        B    start
+        GPU_DISPATCH
 // *********************************************************************************************
 .align 4
 I_CZC:  ANDS R4,R5
@@ -695,13 +712,13 @@ I_CI_a:
         BLT  I_CI_e
         ADDS R1,#0x40 // Arith > bit
 I_CI_e:
-        B    start
+        GPU_DISPATCH
 // *********************************************************************************************
 .align 4
 I_MUL:  MULS R4,R5
         REV  R4,R4
         STR  R4,[R6,#0]
-        B    start
+        GPU_DISPATCH
 // *********************************************************************************************
 .align 4
 I_DIV:  LDR  R4,[R6,#0]
@@ -794,13 +811,13 @@ I_RTWP: LDRB R1,[R11,#30] // R15 high byte
 // *********************************************************************************************
 .align 4
 I_B:    SUBS R3,R5,R8 // Normalise
-        B    start
+        GPU_DISPATCH
 // *********************************************************************************************
 .align 4
 I_BL:   REV16 R3,R3
         STRH R3,[R11,#22]
         SUBS R3,R5,R8 // Normalise
-        B    start
+        GPU_DISPATCH
 // *********************************************************************************************
 .align 4
 I_X:    LDRH R0,[R5,#0] // R5=SRCE
@@ -820,7 +837,7 @@ I_SETO: MVN  R0,#0
 .align 4
 I_CLR:  MOVS R0,#0
         STRH R0,[R5,#0]
-        B    start
+        GPU_DISPATCH
 // *********************************************************************************************
 .align 4
 I_SBO: // SBO - Not Implemented
