@@ -354,6 +354,9 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
     tms9918->vram.map.pram[i] = __builtin_bswap16(defaultPalette[i]);
   }
 
+  /* row-30 progressive has no border line, so nothing else invalidates the derived LUT */
+  tms9918->palDirty = 1;
+
   pico9918_frame_reset_count_impl(PICO9918_INST_ONLY);
   pico9918_splash_reset();
 
