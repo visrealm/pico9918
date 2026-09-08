@@ -46,21 +46,9 @@ PICO9918_SECTION_SCRATCH_Y(buffer) static uint32_t bg;
 static PICO9918_SECTION_SCRATCH_X(buffer) uint8_t __aligned(4) scanlineBuffer[SCANLINE_BUFFER_BYTES];
 
 
-/* For a single scanline, we only support a single mode... so let's cache it. Shared between
-   instances: pico9918_scan_line recomputes it from the instance's own registers on entry, and
-   a mismatch there is what marks the shared palette LUT dirty. */
-static pico9918_mode_t tmsCachedMode = TMS_MODE_GRAPHICS_I;
-
-/* Is this row 80 columns at one byte a pixel - twice as wide a line, on two pixel grids?
-   Without the tier it is a literal false, so every count and shift below it folds away.
-   Unlocked only, and that is not a restriction: all four things the tier buys are F18A features that
-   need the unlock anyway, so locked 80-column text keeps the packed line and its own emitter. */
-#if PICO9918_TEXT80_8BPP
-#define TEXT80_WIDE_ROW \
-  (tmsCachedMode == TMS_MODE_TEXT80 && PICO9918_UNLOCKED(tms9918) && PICO9918_WIDE_T80(tms9918))
-#else
-#define TEXT80_WIDE_ROW false
-#endif
+/* Declared on the impl surface, with the TEXT80_WIDE_ROW macro and the inline readers that go
+   with it, so the frame module does not call across the TU boundary for them every line. */
+pico9918_mode_t pico9918_cached_mode = TMS_MODE_GRAPHICS_I;
 
 /* Configured and claimed once, before the host brings up anything that shares the
    DMA. Defined below, next to the tables it fills. */
@@ -169,7 +157,7 @@ static inline uint16_t tmsNameTable2Addr(pico9918_t* tms9918)
 /** \brief color table base address */
 static inline uint16_t tmsColorTableAddr(pico9918_t* tms9918)
 {
-  const uint8_t mask = (tmsCachedMode == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
+  const uint8_t mask = (pico9918_cached_mode == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
 
   return (TMS_REGISTER(tms9918, TMS_REG_COLOR_TABLE) & mask) << 6;
 }
@@ -177,7 +165,7 @@ static inline uint16_t tmsColorTableAddr(pico9918_t* tms9918)
 /** \brief color table base address */
 static inline uint16_t tmsColorTable2Addr(pico9918_t* tms9918)
 {
-  const uint8_t mask = (tmsCachedMode == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
+  const uint8_t mask = (pico9918_cached_mode == TMS_MODE_GRAPHICS_II) ? 0x80 : 0xff;
 
   return (TMS_REGISTER(tms9918, PICO9918_REG_COLOR_TABLE2) & mask) << 6;
 }
@@ -185,7 +173,7 @@ static inline uint16_t tmsColorTable2Addr(pico9918_t* tms9918)
 /** \brief pattern table base address */
 static inline uint16_t tmsPatternTableAddr(pico9918_t* tms9918)
 {
-  const uint8_t mask = (tmsCachedMode == TMS_MODE_GRAPHICS_II) ? 0x04 : 0x07;
+  const uint8_t mask = (pico9918_cached_mode == TMS_MODE_GRAPHICS_II) ? 0x04 : 0x07;
 
   return (TMS_REGISTER(tms9918, TMS_REG_PATTERN_TABLE) & mask) << 11;
 }
@@ -346,7 +334,7 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
   vdpRegisterReset(tms9918);
   TMS_REGISTER(tms9918, TMS_REG_1) = 0x00; // turn display off
   TMS_REGISTER(tms9918, TMS_REG_7) = 0x00;
-  tmsCachedMode               = TMS_MODE_GRAPHICS_I;
+  pico9918_cached_mode               = TMS_MODE_GRAPHICS_I;
 
   // set up default palettes (arm is little-endian, tms9900 is big-endian)
   for (int i = 0; i < sizeof(defaultPalette) / sizeof(uint16_t); ++i)
@@ -1220,7 +1208,7 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
       }
       else // non-ecm single-color sprite
       {
-        if (!wide && tmsCachedMode == TMS_MODE_TEXT80) spriteColor |= spriteColor << 4;
+        if (!wide && pico9918_cached_mode == TMS_MODE_TEXT80) spriteColor |= spriteColor << 4;
 
         while (validPixels)
         {
@@ -2076,7 +2064,7 @@ static inline uint8_t* text80TwoTone(const uint8_t* __restrict names, const uint
 static EMITTER_NOINLINE void __time_critical_func(text_scan_line)(PICO9918_INST_ARG uint16_t y,
                                                                             uint8_t pixels[TMS9918_PIXELS_X])
 {
-  const bool wide             = tmsCachedMode == TMS_MODE_TEXT80;
+  const bool wide             = pico9918_cached_mode == TMS_MODE_TEXT80;
   const uint8_t numCols       = wide ? TEXT80_NUM_COLS : TEXT_NUM_COLS;
   const uint8_t nameTableMask = (wide && !PICO9918_UNLOCKED(tms9918)) ? 0x0c : 0x0f;
 
@@ -2512,10 +2500,10 @@ PICO9918_INLINE_HOT void f18a_tile_layer_scan_line(PICO9918_INST_ARG uint16_t y,
                                                              const TileLayerConfig* config, const bool blend)
 {
   const uint32_t ecm     = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_TILE) >> 4;
-  const bool gm2         = tmsCachedMode == TMS_MODE_GRAPHICS_II;
-  const bool mcm         = tmsCachedMode == TMS_MODE_MULTICOLOR;
+  const bool gm2         = pico9918_cached_mode == TMS_MODE_GRAPHICS_II;
+  const bool mcm         = pico9918_cached_mode == TMS_MODE_MULTICOLOR;
   const bool wide        = TEXT80_WIDE_ROW;
-  const bool text        = wide || tmsCachedMode == TMS_MODE_TEXT;
+  const bool text        = wide || pico9918_cached_mode == TMS_MODE_TEXT;
   const uint8_t textCols = wide ? TEXT80_NUM_COLS : TEXT_NUM_COLS;
 
   /* text takes its colour per cell at ECM0 too; a graphics mode there does not (D6) */
@@ -2599,7 +2587,7 @@ static bool underLayer = false;
    merges into. Where there is nothing to arbitrate it is tile layer 1's own buffer, and the merged
    line is then neither written nor read back - so the caller must ask rather than assume, which
    `pico9918_line_source` is for. */
-static const uint8_t* lineSource = 0;
+const uint8_t* pico9918_cached_line_source = 0;
 /**
  * \brief generate an F18A bitmap layer scanline
  *
@@ -3172,7 +3160,7 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
     if (writeMask) // bitmap layer completely masked it?
     {
       const bool wide         = TEXT80_WIDE_ROW;
-      const bool textRow      = wide || tmsCachedMode == TMS_MODE_TEXT;
+      const bool textRow      = wide || pico9918_cached_mode == TMS_MODE_TEXT;
       const int t1Scroll      = scrollOffset(TMS_REGISTER(tms9918, PICO9918_REG_T1_HSCROLL), textRow, wide);
       const int t2Scroll      = scrollOffset(TMS_REGISTER(tms9918, PICO9918_REG_T2_HSCROLL), textRow, wide);
       const bool tile2Enabled = TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_TILE2_ENABLE;
@@ -3221,7 +3209,7 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
           overlaySpritesOnTile1((uint32_t*)PICO9918_ASSUME_ALIGNED(line, 4),
                                 (const uint32_t*)PICO9918_ASSUME_ALIGNED(pixels, 4), wide);
 
-        lineSource = line;
+        pico9918_cached_line_source = line;
       }
       else if (tile1Enabled)
       {
@@ -3243,8 +3231,8 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
     uint16_t rowNamesAddr    = tmsNameTableAddr(tms9918) + rowOffset;
     uint16_t colorTableAddr  = tmsColorTableAddr(tms9918);
 
-    const bool gm2 = tmsCachedMode == TMS_MODE_GRAPHICS_II;
-    const bool mcm = tmsCachedMode == TMS_MODE_MULTICOLOR;
+    const bool gm2 = pico9918_cached_mode == TMS_MODE_GRAPHICS_II;
+    const bool mcm = pico9918_cached_mode == TMS_MODE_MULTICOLOR;
     TileRowAddr addr;
     tileRowAddr(PICO9918_INST y, y, TMS_REGISTER(tms9918, TMS_REG_COLOR_TABLE), gm2, mcm, &addr,
                 &colorTableAddr);
@@ -3273,14 +3261,14 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
   if (!lookupsReady) initLookups();
 
   pico9918_mode_t currentCachedMode = tmsMode(tms9918);
-  if (currentCachedMode != tmsCachedMode)
+  if (currentCachedMode != pico9918_cached_mode)
   {
-    tmsCachedMode     = currentCachedMode;
-    tms9918->palDirty = 1;
+    pico9918_cached_mode = currentCachedMode;
+    tms9918->palDirty    = 1;
   }
 
   const uint8_t bgc        = tmsMainBgColor(tms9918);
-  const bool packedNibbles = tmsCachedMode == TMS_MODE_TEXT80 && !TEXT80_WIDE_ROW;
+  const bool packedNibbles = pico9918_cached_mode == TMS_MODE_TEXT80 && !TEXT80_WIDE_ROW;
   bg                       = repeatedPalette(
     bgc |
     (packedNibbles ? bgc << 4
@@ -3290,7 +3278,7 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
   PICO9918_FILL32_SET_COUNT(PICO9918_FILL_LINE, pico9918_line_bytes(PICO9918_INST_ONLY) / 4);
 #endif
   PICO9918_FILL32_TRIGGER(PICO9918_FILL_LINE, pixels);
-  lineSource = pixels;
+  pico9918_cached_line_source = pixels;
   underLayer = false;
 
   bool dispActive = (TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_DISP_ACTIVE);
@@ -3309,7 +3297,7 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
 
     PICO9918_FILL32_WAIT(PICO9918_FILL_MASKS);
 
-    switch (tmsCachedMode)
+    switch (pico9918_cached_mode)
     {
     case TMS_MODE_GRAPHICS_I:
     case TMS_MODE_GRAPHICS_II:
@@ -3317,7 +3305,7 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
 
     case TMS_MODE_TEXT:
     case TMS_MODE_TEXT80:
-      if (PICO9918_UNLOCKED(tms9918) && (tmsCachedMode == TMS_MODE_TEXT || TEXT80_WIDE_ROW))
+      if (PICO9918_UNLOCKED(tms9918) && (pico9918_cached_mode == TMS_MODE_TEXT || TEXT80_WIDE_ROW))
       {
         tempStatus = graphics_i_scan_line(PICO9918_INST y, pixels);
         break;
@@ -3510,14 +3498,14 @@ bool __time_critical_func(pico9918_display_enabled)(PICO9918_INST_ONLY_ARG)
 PICO9918_DLLEXPORT
 pico9918_mode_t __time_critical_func(pico9918_display_mode)(PICO9918_INST_ONLY_ARG)
 {
-  return tmsCachedMode;
+  return pico9918_cached_mode;
 }
 
 #if PICO9918_BUILD_DEBUG_API
 /** \brief see impl/pico9918_priv.h. What the scanline entry does, for a caller between two. */
 void pico9918_debug_sync_mode_impl(PICO9918_INST_ONLY_ARG)
 {
-  tmsCachedMode = tmsMode(tms9918);
+  pico9918_cached_mode = tmsMode(tms9918);
 }
 #endif
 
@@ -3540,7 +3528,7 @@ uint32_t __time_critical_func(pico9918_line_bytes)(PICO9918_INST_ONLY_ARG)
 PICO9918_DLLEXPORT
 const uint8_t* __time_critical_func(pico9918_line_source)(PICO9918_INST_ONLY_ARG)
 {
-  return lineSource;
+  return pico9918_cached_line_source;
 }
 
 /** \brief a default palette entry, 0xargb */

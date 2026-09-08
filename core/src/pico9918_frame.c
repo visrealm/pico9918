@@ -335,11 +335,11 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   uint32_t* dPixels = (uint32_t*)pixels;
 
   /* 512 bytes for 80 columns on a board with the 8bpp tier, 256 everywhere else */
-  const uint32_t lineBytes = pico9918_line_bytes(PICO9918_INST_ONLY);
+  const uint32_t lineBytes = pico9918_line_bytes_impl(PICO9918_INST_ONLY);
   const bool packedNibbles =
-    pico9918_display_mode(PICO9918_INST_ONLY) == TMS_MODE_TEXT80 && lineBytes == TMS9918_PIXELS_X;
+    pico9918_display_mode_impl(PICO9918_INST_ONLY) == TMS_MODE_TEXT80 && lineBytes == TMS9918_PIXELS_X;
   pico9918_border_bg = pico9918_palette_lut
-    [(pico9918_reg_value(PICO9918_INST TMS_REG_FG_BG_COLOR) & 0x0f) |
+    [(TMS_REGISTER(tms9918, TMS_REG_FG_BG_COLOR) & 0x0f) |
      (packedNibbles ? 0 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4)];
 
   if (y == 0)
@@ -424,7 +424,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   uint8_t tempStatus  = pico9918_scan_line(PICO9918_INST tmsY);
   renderTime          = PICO9918_HOST_TIME_US() - renderTime;
 
-  const uint8_t* lineSource = pico9918_line_source(PICO9918_INST_ONLY);
+  const uint8_t* lineSource = pico9918_line_source_impl(PICO9918_INST_ONLY);
   PICO9918_LINE_CAPTURE(y, pico9918_v_pixels_impl(PICO9918_INST_ONLY), lineBytes, lineSource);
 
   /*** F18A status register updates ***/

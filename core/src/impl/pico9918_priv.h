@@ -455,6 +455,49 @@ _Static_assert(offsetof(struct pico9918_s, vram) == 0,
 extern pico9918_t* const tms9918;
 #endif
 
+/* The line's own metadata (pico9918.c), on the impl surface because pico9918_frame.c reads all
+ * of it every active line and each public accessor is a real `bl` across the TU boundary.
+ *
+ * Shared between instances, like the palette LUT: pico9918_scan_line sets the mode from the
+ * instance's own registers on entry, and a mismatch there is what marks that LUT dirty.
+ *
+ * TRAP: this block must stay below the tms9918 declaration above. Placed before it, a
+ * single-instance build fails on an identifier that has not been declared yet, and the error
+ * names the inline body rather than the ordering.
+ */
+extern pico9918_mode_t pico9918_cached_mode;
+extern const uint8_t* pico9918_cached_line_source;
+
+/* Is this row 80 columns at one byte a pixel - twice as wide a line, on two pixel grids?
+   Without the tier it is a literal false, so every count and shift below it folds away.
+   Unlocked only, and that is not a restriction: all four things the tier buys are F18A features
+   that need the unlock anyway, so locked 80-column text keeps the packed line and its own
+   emitter. */
+#if PICO9918_TEXT80_8BPP
+#define TEXT80_WIDE_ROW \
+  (pico9918_cached_mode == TMS_MODE_TEXT80 && PICO9918_UNLOCKED(tms9918) && PICO9918_WIDE_T80(tms9918))
+#else
+#define TEXT80_WIDE_ROW false
+#endif
+
+PICO9918_INLINE pico9918_mode_t pico9918_display_mode_impl(PICO9918_INST_ONLY_ARG)
+{
+  (void)tms9918;
+  return pico9918_cached_mode;
+}
+
+PICO9918_INLINE uint32_t pico9918_line_bytes_impl(PICO9918_INST_ONLY_ARG)
+{
+  (void)tms9918;
+  return TEXT80_WIDE_ROW ? SCANLINE_BYTES_MAX : TMS9918_PIXELS_X;
+}
+
+PICO9918_INLINE const uint8_t* pico9918_line_source_impl(PICO9918_INST_ONLY_ARG)
+{
+  (void)tms9918;
+  return pico9918_cached_line_source;
+}
+
 /**
  * \brief where a CPU-side VRAM access lands
  *
