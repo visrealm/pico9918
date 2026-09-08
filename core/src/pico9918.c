@@ -591,6 +591,19 @@ static PICO9918_NOINLINE void tmsCopyAlignMask(TileMask dstMask, const TileMask 
   }
 }
 
+/* The tile2 mask's trip home. Unshifted it is a copy out and straight back, and nothing
+   between the two writes either mask - the row emitters touch layerSelectionMask only on a
+   tile2 pass - so there is nothing to bring home. Under any scroll the round trip nets a
+   shift of -t2Scroll and loses the bits it carries off the end, so it must run.
+
+   The test lives here rather than at the call site because the scanline body is at the size
+   where one more branch in it re-plans the whole function. */
+static PICO9918_NOINLINE void tmsRestoreAlignMask(TileMask dstMask, const TileMask srcMask,
+                                                  int pixelShift, int otherShift)
+{
+  if (pixelShift | otherShift) tmsCopyAlignMask(dstMask, srcMask, pixelShift);
+}
+
 
 /** \brief Test and update the row pixels bit mask. */
 static inline uint32_t tmsTestRowBitsMask(const uint32_t xPos, const uint32_t tilePixels,
@@ -3174,7 +3187,7 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
       }
 
       if (tile2Enabled && !blend)
-        tmsCopyAlignMask(tms9918->layerSelectionMask, tms9918->finalMask, -t1Scroll);
+        tmsRestoreAlignMask(tms9918->layerSelectionMask, tms9918->finalMask, -t1Scroll, t2Scroll);
 
       if (textRow && !blend)
       {
