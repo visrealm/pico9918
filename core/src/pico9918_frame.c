@@ -384,7 +384,7 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
       }
     }
 
-    if (y == pico9918_v_border_impl(PICO9918_INST_ONLY) - 1)
+    if ((y == pico9918_v_border_impl(PICO9918_INST_ONLY) - 1) && pico9918_palette_dirty(PICO9918_INST_ONLY))
     {
       pico9918_palette_regenerate(PICO9918_INST_ONLY);
     }
