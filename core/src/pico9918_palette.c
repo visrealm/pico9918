@@ -38,6 +38,18 @@ typedef uint32_t PICO9918_MAY_ALIAS pico9918_aliasing_u32_t;
 _Static_assert(_Alignof(pico9918_t) >= 4, "palette LUT build requires word alignment");
 _Static_assert(offsetof(pico9918_t, vram.map.pram) % 4 == 0, "palette LUT build must be word aligned");
 
+/*
+ * Raw PRAM as of the last rebuild, and the layout it was built for: 0 means there is no
+ * shadow yet, otherwise pixelsDoubled + 1, so .bss zero-init reads as "rebuild".
+ *
+ * The GPU-busy status bit is a suspicion, not an announcement - a running GPU program
+ * could have written the palette - so it asks for a rebuild on every active line of every
+ * frame the GPU runs on. Comparing the 32 words the rebuild would read costs a fraction of
+ * converting them, and the answer is almost always that nothing changed.
+ */
+static uint32_t paletteShadow[32];
+static uint8_t paletteShadowLayout;
+
 /* Convert two adjacent palette entries as doubled pixels, and return the converted
    pair packed into a word for the paired build below to reuse. */
 static inline uint32_t cachePixelPair(PICO9918_PALETTE_LUT_T* dest, const uint16_t* source)
@@ -52,14 +64,37 @@ static inline uint32_t cachePixelPair(PICO9918_PALETTE_LUT_T* dest, const uint16
 
 PICO9918_NOINLINE void pico9918_palette_regenerate(PICO9918_INST_ONLY_ARG)
 {
+  const bool pixelsDoubled = pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80 ||
+                             pico9918_line_bytes(PICO9918_INST_ONLY) != TMS9918_PIXELS_X;
+  const uint16_t* source   = tms9918->vram.map.pram;
+  const pico9918_aliasing_u32_t* words =
+    (const pico9918_aliasing_u32_t*)PICO9918_ASSUME_ALIGNED(source, 4);
+
+  /* LOAD-BEARING: only the GPU-busy term is overridden here. Every explicit palDirty
+   * setter still forces the rebuild, so a caller that dirties the LUT for a reason the
+   * source words cannot show - a conversion policy change, a reset to the same colours -
+   * keeps the behaviour it had. */
+  if (!tms9918->palDirty && paletteShadowLayout == (uint8_t)(pixelsDoubled + 1)
+#if !PICO9918_SINGLE_INSTANCE
+      && pico9918_palette_owner == tms9918
+#endif
+  )
+  {
+    uint32_t diff = 0;
+    for (int i = 0; i < 32; ++i) diff |= words[i] ^ paletteShadow[i];
+    if (diff == 0) return;
+  }
+
+  /* LOAD-BEARING: the clear precedes every read of PRAM below, shadow included. A GPU
+   * palette write landing after it faults the guard and sets the flag again, so the line
+   * after this one rebuilds; clearing last would swallow that write for good. */
   tms9918->palDirty = 0;
 #if !PICO9918_SINGLE_INSTANCE
   pico9918_palette_owner = tms9918;
 #endif
 
-  const bool pixelsDoubled = pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80 ||
-                             pico9918_line_bytes(PICO9918_INST_ONLY) != TMS9918_PIXELS_X;
-  const uint16_t* source   = tms9918->vram.map.pram;
+  for (int i = 0; i < 32; ++i) paletteShadow[i] = words[i];
+  paletteShadowLayout = (uint8_t)(pixelsDoubled + 1);
 
   if (pixelsDoubled)
   {
