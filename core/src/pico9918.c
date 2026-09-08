@@ -927,9 +927,19 @@ static uint32_t __time_critical_func(collectSpriteRows)(PICO9918_INST_ARG uint16
   return count;
 }
 
-/** \brief Output Sprites to a scanline */
+/** \brief the sprite ECM level, zero on a locked device - the one term a clone can pin */
+static inline uint32_t spriteEcm(PICO9918_INST_ONLY_ARG)
+{
+  return (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_SPRITE) &
+         -(uint32_t)PICO9918_UNLOCKED(tms9918);
+}
+
+/** \brief Output Sprites to a scanline. ecm0 pins the ECM level to zero, which folds the
+ *         plane loop to one pass, the colour shift to nothing and the whole ECM emit arm away.
+ */
 static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG const uint32_t spriteCount,
                                                           const bool spriteMag, const bool wide,
+                                                          const bool ecm0,
                                                           uint8_t pixels[TMS9918_PIXELS_X])
 {
   const uint32_t unlockedMask      = -(uint32_t)PICO9918_UNLOCKED(tms9918);
@@ -948,8 +958,7 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
   uint32_t transparentCount        = 0;
 
   // ecm settings
-  const uint32_t ecm =
-    (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_SPRITE) & unlockedMask;
+  const uint32_t ecm = ecm0 ? 0 : spriteEcm(PICO9918_INST_ONLY);
   const uint32_t ecmColorOffset = (ecm == 3) ? 2 : ecm;
   const uint32_t ecmColorMask   = (ecm == 3) ? 0x0e : 0x0f;
   const uint32_t ecmOffset =
@@ -1269,19 +1278,23 @@ __time_critical_func(pico9918_output_sprites)(PICO9918_INST_ARG uint16_t y, uint
   /* the store width is inside the emit loop, so it rides a clone parameter rather than a test */
   if (TEXT80_WIDE_ROW)
   {
-    return spriteMag ? renderSprites(PICO9918_INST spriteCount, true, true, pixels)
-                     : renderSprites(PICO9918_INST spriteCount, false, true, pixels);
+    return spriteMag ? renderSprites(PICO9918_INST spriteCount, true, true, false, pixels)
+                     : renderSprites(PICO9918_INST spriteCount, false, true, false, pixels);
   }
 #endif
 
   if (spriteMag)
   {
-    return renderSprites(PICO9918_INST spriteCount, true, false, pixels);
+    return renderSprites(PICO9918_INST spriteCount, true, false, false, pixels);
   }
-  else
+
+  /* every locked device and every ECM0 scene lands here, so it earns a clone of its own */
+  if (spriteEcm(PICO9918_INST_ONLY) == 0)
   {
-    return renderSprites(PICO9918_INST spriteCount, false, false, pixels);
+    return renderSprites(PICO9918_INST spriteCount, false, false, true, pixels);
   }
+
+  return renderSprites(PICO9918_INST spriteCount, false, false, false, pixels);
 }
 
 /* What a tile row needs that the mode, rather than the layer, decides. The name and colour
