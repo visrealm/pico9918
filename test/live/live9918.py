@@ -609,7 +609,7 @@ def elf_symbols(elf):
 
 
 TMS_FIELDS = ("isUnlocked", "lockedMask", "palDirty", "config", "configDirty", "vram",
-              "gpuAddress", "restart")
+              "gpuAddress", "restart", "flash")
 CAPTURE_FIELDS = ("request", "frame", "rows", "width", "window", "start", "crc", "seen",
                   "pixels", "skipped", "skippedRows", "lineTimes")
 
