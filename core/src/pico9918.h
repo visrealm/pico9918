@@ -502,15 +502,23 @@ PICO9918_DLLEXPORT
 void pico9918_set_status(PICO9918_INST_ARG uint8_t status);
 
 /**
+ * \brief the widest active line this build renders, in bytes
+ *
+ * From the width the library was COMPILED at, not the includer's flags: an 8bpp
+ * 80-column build renders two bytes a pixel, and a consumer that derived this from its
+ * own flags would get half of what the renderer writes. pico9918_line_bytes() is the
+ * runtime answer for one line; this is the widest any mode here reaches.
+ */
+#define PICO9918_SCANLINE_BYTES_MAX \
+  (PICO9918_BUILD_TEXT80_8BPP ? TMS9918_PIXELS_X * 2 : TMS9918_PIXELS_X)
+
+/**
  * \brief the library's line buffer size - the active pixels plus the eight bytes past
  * them that a fine-h-scrolled tile layer's last quad can reach
  *
- * From the width the library was COMPILED at, not the includer's flags: an 8bpp
- * 80-column build renders two bytes a pixel. pico9918_line_bytes() is the runtime
- * answer for one line; this is the allocation.
+ * The allocation, where PICO9918_SCANLINE_BYTES_MAX is the picture inside it.
  */
-#define PICO9918_SCANLINE_BUFFER_SIZE \
-  ((PICO9918_BUILD_TEXT80_8BPP ? TMS9918_PIXELS_X * 2 : TMS9918_PIXELS_X) + 8)
+#define PICO9918_SCANLINE_BUFFER_SIZE (PICO9918_SCANLINE_BYTES_MAX + 8)
 
 /**
  * \brief generate a scanline

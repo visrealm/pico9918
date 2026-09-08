@@ -105,6 +105,13 @@
 #define TEXT80_PADDING_PX  TEXT_PADDING_PX
 #endif
 
+/* This one is keyed off the library's own compile flag and the published
+   PICO9918_SCANLINE_BYTES_MAX off the value recorded in the archive, which is what a
+   consumer must size against. Inside this build they are the same width, and a vendored
+   build that set only one of the two flags is the way that stops being true. */
+_Static_assert(SCANLINE_BYTES_MAX == PICO9918_SCANLINE_BYTES_MAX,
+               "PICO9918_TEXT80_8BPP disagrees with the archive's PICO9918_BUILD_TEXT80_8BPP");
+
 /* room for the cell a fine scroll uncovers past the picture's far edge */
 #define SCANLINE_BUFFER_BYTES (SCANLINE_BYTES_MAX + 8)
 #define SCANLINE_MASK_WORDS   ((SCANLINE_BUFFER_BYTES + 31) / 32)
@@ -997,12 +1004,18 @@ PICO9918_INLINE void pico9918_frame_reset_int_impl(PICO9918_INST_ONLY_ARG)
  * 256 entries consumed by PICO9918_EXPAND_INDEXED. Regular SRAM, not a scratch
  * bank - placement preserved from the firmware.
  *
- * NO HOST CODE MAY REFERENCE ANY OF THE THREE. They are here, on the
- * library-internal impl surface, because that is where library-internal state
- * belongs and they have in-library consumers: the frame module's scanline reads the
- * LUT and drives both rebuild triggers, and the golden harness drives the same
- * rebuild decision directly (test/golden/golden.c, the post-palette scene surface -
- * which is what makes palDirty observable at all). */
+ * They are here, on the library-internal impl surface, because that is where
+ * library-internal state belongs and they have in-library consumers: the frame module's
+ * scanline reads the LUT and drives both rebuild triggers, and the golden harness drives
+ * the same rebuild decision directly (test/golden/golden.c, the post-palette scene
+ * surface - which is what makes palDirty observable at all).
+ *
+ * HOST CODE MAY REFERENCE THE LUT FOR EXACTLY ONE THING: pointing an RP2040's
+ * interpolators at it, which PICO9918_EXPAND_INIT does. They are per-core state and the
+ * library does not know which core will expand lines, so the call belongs to whoever
+ * starts that core - pico9918's src/palette.c. A library entry point for it would put a
+ * boot-time call in this RAM-resident TU to save a host two lines, and the scanline path
+ * pays for what lands here. */
 extern PICO9918_PALETTE_LUT_T pico9918_palette_lut[256];
 
 #if !PICO9918_SINGLE_INSTANCE

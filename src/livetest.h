@@ -14,7 +14,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "impl/pico9918_priv.h"
+#include "pico9918.h"
 
 /* Test builds only (PICO9918_LIVE_TEST). Reading the buffer over SWD takes far
    longer than a frame, so the host arms `request`, the firmware captures one window
@@ -28,7 +28,7 @@
 #define LIVE_TEST_WINDOW 48
 
 /** \brief widest line any mode on this build renders */
-#define LIVE_TEST_PIXELS_X SCANLINE_BYTES_MAX
+#define LIVE_TEST_PIXELS_X PICO9918_SCANLINE_BYTES_MAX
 
 /** \brief capture a window of pixels */
 #define LIVE_TEST_REQUEST_WINDOW 1
