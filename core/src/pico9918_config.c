@@ -239,3 +239,18 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG)
   /* last, so the host derives its effects from registers this call may just have seeded */
   configAppliedFire(PICO9918_INST_ONLY);
 }
+
+void pico9918_config_schedule_apply(PICO9918_INST_ARG bool applyVdpEffects)
+{
+  tms9918->configDirty = true;
+  if (applyVdpEffects) tms9918->configVdpDirty = true;
+}
+
+void pico9918_config_apply_now(PICO9918_INST_ARG bool applyVdpEffects)
+{
+  if (applyVdpEffects) tms9918->configVdpDirty = true;
+  pico9918_config_apply(PICO9918_INST_ONLY);
+
+  /* the boundary must not apply the same block again */
+  tms9918->configDirty = false;
+}

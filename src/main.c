@@ -14,7 +14,7 @@
 #include "vga.h"
 #include "vga-modes.h"
 
-#include "impl/pico9918_priv.h"
+#include "pico9918_config.h"
 #include "pico9918_frame.h"
 #include "gpu/gpu.h"
 #include "overlay/diag.h"
@@ -99,8 +99,8 @@ int __in_flash_func(main)(void)
   pico9918_init();
   multicore_launch_core1(proc1Entry);
 
-  readConfig(tms9918->config);
-  applyPendingDisplay(tms9918->config);
+  readConfig(pico9918_config());
+  applyPendingDisplay(pico9918_config());
   updateDispDriver();
 
   systemClockApplyConfig();
@@ -110,13 +110,13 @@ int __in_flash_func(main)(void)
   VgaInitParams params = {0};
 #if PICO9918_ENABLE_SCART
   // PICO9918_CONF_DISP_DRIVER: 0=VGA, 1=NTSC, 2=PAL (resolved by updateDispDriver).
-  if (tms9918->config[PICO9918_CONF_DISP_DRIVER] == 0)
+  if (pico9918_config()[PICO9918_CONF_DISP_DRIVER] == 0)
   {
     params.params = vgaGetParams(VGA_640_480_60HZ);
   }
   else
   {
-    params.params = vgaGetParams(tms9918->config[PICO9918_CONF_SCART_MODE] ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ);
+    params.params = vgaGetParams(pico9918_config()[PICO9918_CONF_SCART_MODE] ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ);
   }
 #else
   params.params = vgaGetParams(DISPLAY_MODE);
@@ -145,7 +145,7 @@ int __in_flash_func(main)(void)
   {
     static const char* outputValues[] = {"480P ", "480I ", "576I "};
     static const char* outputUnits[]  = {"@60", "@60", "@50"};
-    uint8_t driver                    = tms9918->config[PICO9918_CONF_DISP_DRIVER];
+    uint8_t driver                    = pico9918_config()[PICO9918_CONF_DISP_DRIVER];
     if (driver > 2) driver = 0;
     pico9918_diag_set_output_name(outputValues[driver], outputUnits[driver]);
   }

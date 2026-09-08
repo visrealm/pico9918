@@ -19,7 +19,7 @@
 #include "overlay/diag.h"
 #include "display.h"
 #include "gpio.h"
-#include "impl/pico9918_priv.h"
+#include "pico9918_config.h"
 
 #include "hardware/clocks.h"
 #include "hardware/vreg.h"
@@ -95,7 +95,7 @@ void systemClockInit(void)
 /** \brief switch to the configured preset if it differs from the running one */
 void systemClockApplyConfig(void)
 {
-  const int configuredPreset = tms9918->config[PICO9918_CONF_CLOCK_PRESET_ID];
+  const int configuredPreset = pico9918_config()[PICO9918_CONF_CLOCK_PRESET_ID];
   if (configuredPreset != clockPresetIndex)
   {
     clockPresetIndex = configuredPreset;
@@ -151,7 +151,7 @@ void __in_flash_func(vdpClocksInit)(void)
 {
 #ifndef PICO9918_NO_CLOCKS
   const Pico9918HardwareVersion hwVersion = currentHwVersion();
-  const VdpClockConfig* config            = &vdpClockConfigs[tms9918->config[PICO9918_CONF_VDP_DEVICE]];
+  const VdpClockConfig* config            = &vdpClockConfigs[pico9918_config()[PICO9918_CONF_VDP_DEVICE]];
   const uint gromClkGpio                  = (hwVersion == HWVer_0_3) ? GPIO_GROMCL_V03 : GPIO_GROMCL;
   const uint cpuClkGpio                   = (hwVersion == HWVer_0_3) ? GPIO_CPUCL_V03 : GPIO_CPUCL;
 

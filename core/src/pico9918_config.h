@@ -275,6 +275,28 @@ void pico9918_config_pending_restore(uint8_t config[CONFIG_BYTES], const uint8_t
 void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
 
 /**
+ * \brief ask for the block to be applied at the next end of frame
+ *
+ * The deferred form, and what a device wants: the apply seeds registers and republishes
+ * the palette, so doing it mid-frame would show on the line being scanned out. \p
+ * applyVdpEffects asks for that reseeding; without it the apply runs its host-side and
+ * derived effects only.
+ *
+ * A host that has no frame boundary to wait for wants pico9918_config_apply_now().
+ */
+void pico9918_config_schedule_apply(PICO9918_INST_ARG bool applyVdpEffects);
+
+/**
+ * \brief apply the block now, and cancel any apply already owed
+ *
+ * For a host that has just written the block itself - a configurator front end, or a
+ * consumer stepping the library a frame at a time - and would rather see the effects
+ * than wait for a boundary it does not have. The deferred request is cleared, so the
+ * next end of frame does not apply the same block a second time.
+ */
+void pico9918_config_apply_now(PICO9918_INST_ARG bool applyVdpEffects);
+
+/**
  * \brief register the host's config-applied hook
  *
  * Fires from pico9918_config_apply(), which the frame module calls where the

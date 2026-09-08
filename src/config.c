@@ -252,8 +252,7 @@ void readConfig(uint8_t config[CONFIG_BYTES])
   // validation, defaults, migration and the identity stamp; SAVE_FORCED asks for the save
   pico9918_config_validate(config, hostId());
 
-  tms9918->configDirty    = true; // so we apply it
-  tms9918->configVdpDirty = true;
+  pico9918_config_schedule_apply(PICO9918_INST true);
 }
 
 /** \brief erase and rewrite the whole config sector, verifying and retrying */
