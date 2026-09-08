@@ -752,6 +752,16 @@ static PICO9918_SECTION_SCRATCH_X(lookup) uint32_t __aligned(4) maskExpandNibble
   0x00000000, 0xff000000, 0x00ff0000, 0xffff0000, 0x0000ff00, 0xff00ff00, 0x00ffff00, 0xffffff00,
   0x000000ff, 0xff0000ff, 0x00ff00ff, 0xffff00ff, 0x0000ffff, 0xff00ffff, 0x00ffffff, 0xffffffff};
 
+/* A 2bpp bitmap-layer nibble as its two pixels, low byte leftmost. Two of these make one
+   source byte's four pixels into one output word, which is the whole point.
+     nibble  pixels      value
+     0b00_00  0, 0       0x0000
+     0b01_10  1, 2       0x0201
+     0b11_11  3, 3       0x0303 */
+static PICO9918_SECTION_SCRATCH_X(lookup) uint16_t __aligned(4) bmlExpand2bpp[16] = {
+  0x0000, 0x0100, 0x0200, 0x0300, 0x0001, 0x0101, 0x0201, 0x0301,
+  0x0002, 0x0102, 0x0202, 0x0302, 0x0003, 0x0103, 0x0203, 0x0303};
+
 bool lookupsReady = false;
 void PICO9918_IN_FLASH_FUNC(initLookups)(void)
 {
@@ -2650,6 +2660,38 @@ PICO9918_INLINE_HOT bool renderBitmapLayerBody(PICO9918_INST_ARG uint16_t y, boo
     uint32_t maskX            = xPos;
 
     uint8_t pal = (bmlCtl & 0xf) << 2;
+
+    if (opaque && !wide && ((xPos & 3) == 0))
+    {
+      /* LOAD-BEARING: an aligned start stays aligned because the layer advances four pixels a
+       * byte and the row is 256 wide, so no word store ever straddles xPos wrapping. That is
+       * what removes the head/tail an unaligned block expansion would need on Cortex-M0+. */
+      const uint32_t palQuad = repeatedPalette(pal);
+      uint32_t* const quadPixels = (uint32_t*)pixels;
+      uint32_t quadOffset        = xPos >> 2;
+
+      for (int xOff = 0; xOff < width; ++xOff)
+      {
+        const uint8_t data = tms9918->vram.bytes[addr + xOff];
+        quadPixels[quadOffset & (TMS9918_PIXELS_X / 4 - 1)] =
+          (bmlExpand2bpp[data >> 4] | ((uint32_t)bmlExpand2bpp[data & 0x0f] << 16)) | palQuad;
+        ++quadOffset;
+      }
+
+      if (writeMask)
+      {
+        /* every pixel is opaque, so a whole group is a full mask and only the tail is partial */
+        uint32_t left = (uint32_t)width * colorCount;
+        while (left >= 32)
+        {
+          tmsTestRowBitsMask(maskX, 0xffffffffu, 32, true, false, false);
+          maskX = (maskX + 32) & 0xff;
+          left -= 32;
+        }
+        if (left) tmsTestRowBitsMask(maskX, ~0u << (32 - left), left, true, false, false);
+      }
+      return returnVal;
+    }
 
     for (int xOff = 0; xOff < width; ++xOff)
     {
