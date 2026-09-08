@@ -104,9 +104,29 @@ void pico9918_gpu_set_config_save_callback(PICO9918_INST_ARG pico9918_gpu_config
   GPU_CONFIG_SAVE_CB.userdata = userdata;
 }
 
+/* SR2, which the flash operation shares with the GPU:
+ *   bit  7   busy
+ *   bits 6-5 retry count
+ *   bits 4-2 result (pico9918_flash_result_t)
+ *   bits 1-0 progress */
+void pico9918_gpu_flash_complete(PICO9918_INST_ARG pico9918_flash_result_t result)
+{
+  TMS_STATUS(tms9918, PICO9918_SR_GPU) =
+    (uint8_t)((TMS_STATUS(tms9918, PICO9918_SR_GPU) & ~0x9c) | ((result & 7) << 2));
+  TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL) = 0;
+}
+
 static inline void gpuFlashFire(PICO9918_INST_ONLY_ARG)
 {
-  if (GPU_FLASH_CB.fn) GPU_FLASH_CB.fn(tms9918, GPU_FLASH_CB.userdata);
+  /* TRAP: taken before dispatch, not after. An erase runs for milliseconds and a
+     request arriving inside one must re-arm rather than be cleared by the completion
+     that follows it. */
+  tms9918->flash = 0;
+
+  if (GPU_FLASH_CB.fn)
+    GPU_FLASH_CB.fn(tms9918, GPU_FLASH_CB.userdata);
+  else
+    pico9918_gpu_flash_complete(PICO9918_INST PICO9918_FLASH_ERR_UNSUPPORTED);
 }
 
 static inline void gpuConfigSaveFire(PICO9918_INST_ARG uint8_t key)

@@ -235,6 +235,35 @@ void pico9918_gpu_reset_time(void);
 PICO9918_DLLEXPORT
 void pico9918_gpu_set_flash_callback(PICO9918_INST_ARG pico9918_gpu_flash_fn cb, void* userdata);
 
+/** \brief what a flash operation finished as, reported in status register 2 */
+typedef enum
+{
+  PICO9918_FLASH_OK              = 0, /**< the operation completed */
+  PICO9918_FLASH_ERR_HEADER      = 1, /**< the staged block is not one this build takes */
+  PICO9918_FLASH_ERR_SEQUENCE    = 2, /**< a block arrived without the one before it */
+  PICO9918_FLASH_ERR_SIZE        = 3, /**< the target is past the region the operation may write */
+  PICO9918_FLASH_ERR_VERIFY      = 4, /**< what was read back is not what was written */
+  PICO9918_FLASH_ERR_UNSUPPORTED = 5, /**< no host is listening - see pico9918_gpu_set_flash_callback */
+  PICO9918_FLASH_ERR_FULL        = 6, /**< no block is free to allocate */
+} pico9918_flash_result_t;
+
+/**
+ * End the flash operation R63 requested, with the result the guest reads back.
+ *
+ * The busy flag is the engine's and a host has no other way to clear it: the palette
+ * rebuild is forced while SR2 bit 7 is set, so an operation left un-ended rebuilds the
+ * lookup table on every active scanline. Call this once per request, from the callback or
+ * later - a host that hands the work to another thread ends it when that finishes, and
+ * the guest polls SR2 until then.
+ *
+ * The pending request itself is already taken before the callback is entered, so a
+ * request arriving during a long erase re-arms rather than being lost here.
+ *
+ * Bits 6-5 (the retry count) and 1-0 (the progress code) are left as they were found.
+ */
+PICO9918_DLLEXPORT
+void pico9918_gpu_flash_complete(PICO9918_INST_ARG pico9918_flash_result_t result);
+
 /**
  * Register a callback that will be invoked when the GPU loop detects a config
  * action request. The callback receives the config array pointer and the

@@ -14,6 +14,7 @@
 
 #include "flash.h"
 
+#include "gpu/gpu.h" /* pico9918_gpu_flash_complete, and the result the guest reads back */
 #include "impl/pico9918_priv.h"
 
 #include "hardware/flash.h"
@@ -51,40 +52,22 @@ typedef struct UF2_Block* UF2_Block_Ptr;
 #define FLASH_STATUS_ERASING    2
 #define FLASH_STATUS_WRITING    3
 
-#define FLASH_ERROR_OK       0
-#define FLASH_ERROR_HEADER   1
-#define FLASH_ERROR_SEQUENCE 2
-#define FLASH_ERROR_SIZE     3
-#define FLASH_ERROR_VERIFY   4
-#define FLASH_ERROR_FULL     6
-
-// Status Reg #2 for flashing status (shared with GPU status)
-// bit  7:   running or not
-// bit  6-5: retry count
-// bits 4-2: error code
-// bits 1-0: status
-
-/** \brief set the error code the host reads back in status register 2 */
-static void setFlashStatusError(uint8_t error)
-{
-  TMS_STATUS(tms9918, 2) = (TMS_STATUS(tms9918, 2) & ~0x1c) | ((error & 7) << 2);
-}
-
-/** \brief set the operation status the host reads back in status register 2 */
+/** \brief set the operation progress the host reads back in status register 2 */
 static void setFlashStatusCode(uint8_t status)
 {
-  TMS_STATUS(tms9918, 2) = (TMS_STATUS(tms9918, 2) & ~0x03) | ((status & 3));
+  TMS_STATUS(tms9918, PICO9918_SR_GPU) =
+    (TMS_STATUS(tms9918, PICO9918_SR_GPU) & ~0x03) | ((status & 3));
 }
 
 static uint32_t lastWriteAddr = 0;
 
 /** \brief validate one UF2 block staged in VRAM and program or read it back */
-static void doFlashFirmwareSector(void)
+static pico9918_flash_result_t doFlashFirmwareSector(void)
 {
   static uint32_t flashing = 0;
 
   // vram address where uf2 block is stored is set in vreg(0x3f)[5:0] (256 byte boundaries)
-  uint8_t flashReg = TMS_REGISTER(tms9918, 0x3f);
+  uint8_t flashReg = TMS_REGISTER(tms9918, PICO9918_REG_FLASH_CONTROL);
 
   const int vramAddr = (flashReg & 0x3f) << 8;
   const bool write   = flashReg & 0x80;
@@ -92,8 +75,6 @@ static void doFlashFirmwareSector(void)
   setFlashStatusCode(FLASH_STATUS_VALIDATING);
 
   UF2_Block_Ptr p = (UF2_Block_Ptr)(tms9918->vram.bytes + vramAddr);
-
-  tms9918->flash = 0;
 
   if ((p->magicStart0 != 0x0A324655) ||                                                                // UF2\n
       (p->magicStart1 != 0x9E5D5157) || (p->magicEnd != 0x0AB16F30) || (p->numBlocks >= 0x00000400) || // 256KB Max
@@ -104,8 +85,7 @@ static void doFlashFirmwareSector(void)
       ((p->targetAddr & 0xFF) != 0) || // Target must be 256 byte aligned
       (p->payloadSize != PAYLOAD))
   { // Only support standard size
-    setFlashStatusError(FLASH_ERROR_HEADER);
-    return;
+    return PICO9918_FLASH_ERR_HEADER;
   }
 
   lastWriteAddr = p->targetAddr & ~(XIP_BASE);
@@ -120,17 +100,15 @@ static void doFlashFirmwareSector(void)
     }
     else if (!flashing)
     {
-      setFlashStatusError(FLASH_ERROR_SEQUENCE);
-      return;
+      return PICO9918_FLASH_ERR_SEQUENCE;
     }
 
     uint32_t a = (p->targetAddr & ~(XIP_BASE));
     uint32_t b = lastWriteAddr >> 12; // Get 4KB block number
     if (b >= 64)
     {
-      setFlashStatusError(FLASH_ERROR_SIZE);
       flashing = 0;
-      return;
+      return PICO9918_FLASH_ERR_SIZE;
     }
 
     setFlashStatusCode(FLASH_STATUS_WRITING);
@@ -146,7 +124,8 @@ static void doFlashFirmwareSector(void)
   {
     flashing = 0;
   }
-  setFlashStatusError(FLASH_ERROR_OK);
+
+  return PICO9918_FLASH_OK;
 }
 
 #define PROGDATA_BLOCK_COUNT  1024       // 256KB
@@ -158,11 +137,9 @@ static void doFlashFirmwareSector(void)
 static uint8_t __uninitialized_ram(sectorBuffer)[0x1000]; // capture a sector before writing
 
 /** \brief read or write one GUID-keyed program data block, staged in VRAM */
-static void doFlashProgramData(void)
+static pico9918_flash_result_t doFlashProgramData(void)
 {
-  tms9918->flash = 0;
-
-  uint8_t flashReg = TMS_REGISTER(tms9918, 0x3f);
+  uint8_t flashReg = TMS_REGISTER(tms9918, PICO9918_REG_FLASH_CONTROL);
 
   // grab vram address. register 0x3f's lowest 6 bits are the MSB of the VRAM address
   const int vramAddr = (flashReg & 0x3f) << 8;
@@ -235,15 +212,13 @@ static void doFlashProgramData(void)
     if (!write) // reading? just set the block id and return
     {
       p[0] = blockIndex;
-      setFlashStatusError(FLASH_ERROR_OK);
-      return;
+      return PICO9918_FLASH_OK;
     }
   }
 
   if (!foundBlock)
   {
-    setFlashStatusError(FLASH_ERROR_FULL);
-    return;
+    return PICO9918_FLASH_ERR_FULL;
   }
 
   // set block index in VRAM
@@ -280,29 +255,20 @@ static void doFlashProgramData(void)
       }
     }
 
-    setFlashStatusError(success ? FLASH_ERROR_OK : FLASH_ERROR_VERIFY);
+    return success ? PICO9918_FLASH_OK : PICO9918_FLASH_ERR_VERIFY;
   }
-  else // read
-  {
-    memcpy(p + 1, addr + 1, 0x100 - sizeof(uint32_t));
-    setFlashStatusError(FLASH_ERROR_OK);
-  }
+
+  memcpy(p + 1, addr + 1, 0x100 - sizeof(uint32_t));
+  return PICO9918_FLASH_OK;
 }
 
-/** \brief dispatch to the firmware or program data path, then clear the trigger */
+/** \brief dispatch to the firmware or program data path, then report what it did */
 void __attribute__((noinline)) flashSector(pico9918_t* tms9918, void* userdata)
 {
   (void)userdata;
 
-  if (TMS_REGISTER(tms9918, 0x3f) & 0x40) // write firmware
-  {
-    doFlashFirmwareSector();
-  }
-  else // read or write program data
-  {
-    doFlashProgramData();
-  }
+  const bool firmware = TMS_REGISTER(tms9918, PICO9918_REG_FLASH_CONTROL) & 0x40;
 
-  TMS_STATUS(tms9918, 2) &= ~0x80; // Stopped
-  TMS_REGISTER(tms9918, 0x38) = 0;
+  pico9918_gpu_flash_complete(PICO9918_INST firmware ? doFlashFirmwareSector()
+                                                     : doFlashProgramData());
 }
