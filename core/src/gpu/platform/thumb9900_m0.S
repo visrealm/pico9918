@@ -20,6 +20,30 @@
 
 #include "pico.h" // For PICO_RP2040
 
+// The fetch/dispatch tail, so a handler can fall into it rather than branch back to "start".
+// R12 carries the table base because ADR only reaches JMPTBL from "start" itself. \idle is
+// I_IDLE, or GPU_IDLE_HOP where a copy sits too far back to reach it in one branch.
+.macro  GPU_DISPATCH idle
+        UXTH R3,R3     // Normalize PC once at top of dispatch
+        MOV  R0,R9
+        LDRB R0,[R0,#0]
+        LSRS R0,#1
+        BCC  99f
+
+        MOV  R0,R8
+        LDRH R0,[R0,R3] // Get instruction BYTE|INST (LE format)
+        ADDS R3,#2
+
+        REV16 R6,R0    // R6=INST|BYTE
+        LSRS R2,R6,#5  // Get opcode
+        LSLS R2,#3     // x8
+        MOV  R4,R12    // Table base
+        ADDS R4,R2
+        LDM  R4,{R4,R7} // Get 1st and 2nd branch location (if it's needed)
+        MOV  PC,R4
+99:     B    \idle
+.endm
+
 //.extern F18A_PIX
 
 // *********************************************************************************************
@@ -491,18 +515,16 @@ I_MOV:  STRH R5,[R6,#0]
 OP_COMP_W:
         SXTH R0,R0
         CMP  R0,#0
-        BNE  OP_COMP_W_l
-        ADDS R1,#0x20 // Equal bit
-        B    start
-.align 4
-OP_COMP_W_l:
         BGT  OP_COMP_W_a
+        BEQ  OP_COMP_W_e
         ADDS R1,#0x80 // L >
-        B    start
-.align 4
+        GPU_DISPATCH GPU_IDLE_HOP
 OP_COMP_W_a:
         ADDS R1,#0xC0 // LA >
-        B    start
+        GPU_DISPATCH GPU_IDLE_HOP
+OP_COMP_W_e:
+        ADDS R1,#0x20 // Equal bit
+        GPU_DISPATCH GPU_IDLE_HOP
 // *********************************************************************************************
 //R0 (LE)
 //89ABCDEF01234567
@@ -742,18 +764,22 @@ PARITY0: // Compare to 0 status result
     .BYTE 0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80, 0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84
     .BYTE 0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84, 0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80
 // *********************************************************************************************
+// The copies above the tables are too far back to branch to I_IDLE, so they come here first
+GPU_IDLE_HOP:
+        B    I_IDLE
+// *********************************************************************************************
 .align 4
 I_COC:  ANDS R4,R5
         CMP  R4,R5
         BNE  I_COC_ne
         MOVS R4,#0x20 // EQ
         ORRS R1,R4
-        B    start
+        GPU_DISPATCH I_IDLE
 .align 4
 I_COC_ne:
         MOVS R4,#0xDF // ~EQ
         ANDS R1,R4
-        B    start
+        GPU_DISPATCH I_IDLE
 // *********************************************************************************************
 .align 4
 I_CZC:  ANDS R4,R5
@@ -800,7 +826,7 @@ I_CI_a:
         BLT  I_CI_e
         ADDS R1,#0x40 // Arith > bit
 I_CI_e:
-        B    start
+        GPU_DISPATCH I_IDLE
 // *********************************************************************************************
 .align 4
 I_MUL:  MULS R4,R5
@@ -808,7 +834,7 @@ I_MUL:  MULS R4,R5
         STRH R4,[R6,#2]
         LSRS R4,16
         STRH R4,[R6,#0]
-        B    start
+        GPU_DISPATCH I_IDLE
 // *********************************************************************************************
 .align 4
 I_DIV:  CMP   R5,R4
@@ -944,7 +970,7 @@ I_RTWP: MOV  R5,R11  // Get address of WP
 .align 4
 I_B:    MOV  R0,R8
         SUBS R3,R5,R0 // Normalise
-        B    start
+        GPU_DISPATCH I_IDLE
 // *********************************************************************************************
 .align 4
 I_BL:   MOV  R2,R11
@@ -952,7 +978,7 @@ I_BL:   MOV  R2,R11
         STRH R3,[R2,#22] // R11
         MOV  R4,R8
         SUBS R3,R5,R4 // Normalise
-        B    start
+        GPU_DISPATCH I_IDLE
 // *********************************************************************************************
 .align 4
 I_X:    LDRH R0,[R5,#0] // R5=SRCE
@@ -973,7 +999,7 @@ I_SETO: MOVS R0,0xFF
 .align 4
 I_CLR:  MOVS R0,#0
         STRH R0,[R5,#0]
-        B    start
+        GPU_DISPATCH I_IDLE
 // *********************************************************************************************
 .align 4
 I_SBO: // SBO - Not Implemented
@@ -1203,6 +1229,7 @@ I_JNE:  LSRS R4,R1,#6 // EQ -> Carry
 // R9 =regx38
 // R10=SPARE
 // R11=WP
+// R12=JMPTBL (set once at entry - an IRQ stacks it, and nothing here calls out to C)
 
 // *********************************************************************************************
 .align 4
@@ -1224,7 +1251,11 @@ run9900:
         ADDS R2,R0
         MOV  R11,R2 // WP
         MOVS R1,#0  // ST=0
+        LDR  R2,=JMPTBL
+        MOV  R12,R2 // Table base, so a copy of the dispatch tail can reach it from anywhere
         B    start
+.align 4
+.ltorg
 // *********************************************************************************************
 .align 4
 dojump: SXTH R0,R0 // R0 now has a signed offset
@@ -1244,7 +1275,7 @@ start:  UXTH R3,R3 // Normalize PC once at top of dispatch
 startX: REV16 R6,R0    // R6=INST|BYTE
         LSRS R2,R6,#5  // Get opcode
         LSLS R2,#3     // x8
-        ADR  R4,JMPTBL // This is just in reach
+        MOV  R4,R12    // Table base
         ADDS R4,R2
         LDM  R4,{R4,R7} // Get 1st and 2nd branch location (if it's needed)
         MOV  PC,R4
