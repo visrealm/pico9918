@@ -1239,6 +1239,10 @@ __time_critical_func(pico9918_output_sprites)(PICO9918_INST_ARG uint16_t y, uint
 
   const uint32_t spriteCount = collectSpriteRows(PICO9918_INST y);
 
+  /* LOAD-BEARING: pico9918_scan_line clears scanlineHasSprites before it dispatches, and
+   * renderSprites would only store that same false back, so nothing is owed on this path. */
+  if (spriteCount == 0) return 0;
+
 #if PICO9918_TEXT80_8BPP
   /* the store width is inside the emit loop, so it rides a clone parameter rather than a test */
   if (TEXT80_WIDE_ROW)
