@@ -70,11 +70,11 @@ extern uint8_t nextValue;
  * update.
  *
  * THE __dmb() PLACEMENT IS ASYMMETRIC ON PURPOSE. In ENTER the barrier comes
- * AFTER both irq_set_enabled(false) calls; in EXIT it comes BEFORE both
- * irq_set_enabled(true) calls. That puts it on the INSIDE edge of the critical
- * window at both ends, which is what stops accesses inside the window from being
- * hoisted above the close or sunk past the re-open. Making this symmetrical
- * leaves one edge unguarded - do not "tidy" it.
+ * AFTER the mask is cleared; in EXIT it comes BEFORE the mask is restored. That
+ * puts it on the INSIDE edge of the critical window at both ends, which is what
+ * stops accesses inside the window from being hoisted above the close or sunk
+ * past the re-open. Making this symmetrical leaves one edge unguarded - do not
+ * "tidy" it.
  *
  * The "memory" clobber inside __dmb() is the load-bearing half: these expand in a
  * library TU where the frame interrupt state is not volatile, so it is the clobber -
@@ -84,18 +84,23 @@ extern uint8_t nextValue;
  * is valid only from core-1 thread context; and it does not mask IO_IRQ_BANK0, so
  * the reset GPIO IRQ can still preempt the window.
  */
+/* Both PIO IRQs are below 32 on either chip, so they share one NVIC bank and one mask.
+   irq_set_enabled is itself a wrapper over this call, so the semantics - including the
+   clear-pending on the way back up - are the SDK's own, at half the calls. */
+#define PICO9918_HOST_IRQ_MASK ((1u << TMS_WRITE_IRQ) | (1u << TMS_READ_IRQ))
+_Static_assert(TMS_WRITE_IRQ < 32 && TMS_READ_IRQ < 32,
+               "PICO9918_HOST_IRQ_MASK is a bank-0 mask; a PIO IRQ above 31 would silently drop out of it");
+
 #define PICO9918_HOST_ENTER_CRITICAL() \
   do { \
-    irq_set_enabled(TMS_WRITE_IRQ, false); \
-    irq_set_enabled(TMS_READ_IRQ, false); \
+    irq_set_mask_enabled(PICO9918_HOST_IRQ_MASK, false); \
     __dmb(); \
   } while (0)
 
 #define PICO9918_HOST_EXIT_CRITICAL() \
   do { \
     __dmb(); \
-    irq_set_enabled(TMS_WRITE_IRQ, true); \
-    irq_set_enabled(TMS_READ_IRQ, true); \
+    irq_set_mask_enabled(PICO9918_HOST_IRQ_MASK, true); \
   } while (0)
 
 
