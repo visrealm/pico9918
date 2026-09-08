@@ -234,12 +234,12 @@ would fail here for a reason unrelated to any real defect.
 
 The buffer is 642 pixels wide, matching the firmware's real `RGB_PIXELS_X` (640
 plus two PIO-autopull guard pixels). That is required, not cosmetic: the banner's
-centring is computed against it in `main.c`, and the palette strip's last swatch
+centring is computed against it in `src/renderer.c`, and the palette strip's last swatch
 reaches pixel 575.
 
 | Group | Rows | Covers |
 |---|---|---|
-| text | 104 | `pico9918_diag_render_text` - the one text path shared by the diag panels and the host's banner, which the banner calls from the hot border path. Both real banner strings at `main.c`'s own centring and colour; the `labelColor`/`valueColor`/`unitsColor` literals; all four rows of the font sheet; the register panel's `(`/`)` bit glyphs; a chained three-call run (the only case that catches a wrong x advance); x == 0; a non-zero y. Every case renders the glyph band plus one row either side, so the row gate's boundaries are pinned in both directions. |
+| text | 104 | `pico9918_diag_render_text` - the one text path shared by the diag panels and the host's banner, which the banner calls from the hot border path. Both real banner strings at `src/renderer.c`'s own centring and colour; the `labelColor`/`valueColor`/`unitsColor` literals; all four rows of the font sheet; the register panel's `(`/`)` bit glyphs; a chained three-call run (the only case that catches a wrong x advance); x == 0; a non-zero y. Every case renders the glyph band plus one row either side, so the row gate's boundaries are pinned in both directions. |
 | splash | 494 | `pico9918_splash_render` driven over frames 0..276 so the enter, hold, exit and reset positions are all pinned by position. Every frame's `y == 0` call is made, because that call is the animation clock. Geometry is the shipping VGA 480p case (vVirtualPixels 240, vPixels 192, vBorder 24). Sampled frames capture the whole bottom border, so the blank rows either side of the band pin the gate. |
 | panels | 1200 | `pico9918_diag_render` over the whole frame, five configurations of `PICO9918_CONF_DIAG_REGISTERS` / `PICO9918_CONF_DIAG_ADDRESS` / `PICO9918_CONF_DIAG_PALETTE`, locked and unlocked. |
 

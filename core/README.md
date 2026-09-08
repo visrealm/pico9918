@@ -17,8 +17,18 @@ and sit inside a desktop emulator unchanged.
 
 The integration layer above it does call back, in four places you register yourself -
 `pico9918_config_set_applied_callback`, `pico9918_frame_set_config_reload_callback`,
-`pico9918_gpu_set_flash_callback` and `pico9918_gpu_set_config_save_callback`. Each
-fires at most once a frame, never from the scanline body, and NULL is the default.
+`pico9918_gpu_set_flash_callback` and `pico9918_gpu_set_config_save_callback`. NULL is
+the default for all four.
+
+**Where they fire depends on who paces the GPU.** With a core or a thread of its own
+running `pico9918_gpu_loop`, as the board has, each fires at most once a frame and never
+from the scanline body. Where the library paces the GPU itself - `pico9918_gpu_set_clock`,
+or any build without the hand-written Thumb core, which is every desktop one - the GPU is
+serviced from inside `pico9918_frame_scanline`, and the flash and config-save callbacks
+are dispatched from that service. So on a desktop host **those two can fire while a
+scanline is being rendered**, and a callback that blocks on a file or a socket stalls
+scan-out for as long as it takes. Do the work elsewhere and answer later: the flash one
+has `pico9918_gpu_flash_complete` for exactly that.
 
 Building the overlay image assets (the splash and the diagnostics font) needs
 **Python 3** at build time, and nothing beyond the standard library -

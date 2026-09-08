@@ -1249,7 +1249,7 @@ _Static_assert(OVERLAY_SPLASH_WIDTH == SPLASH_WIDTH &&
  * two guard pixels for PIO autopull). Matching it exactly is required, not
  * cosmetic, because the widest thing rendered here is addressed against it: the
  * banner's centring is `(RGB_PIXELS_X - len * PICO9918_DIAG_CHAR_WIDTH) / 2`
- * (main.c), so a different width moves every banner pixel, and the register panel
+ * (src/renderer.c), so a different width moves every banner pixel, and the register panel
  * starts at `636 - PICO9918_DIAG_CHAR_WIDTH * 13` and runs to 636. The palette
  * strip reaches furthest: renderPalette writes 32-bit pairs at pair index 32 and
  * advances 16 per swatch for 16 swatches, so its last store lands on pair 287,
@@ -1504,19 +1504,19 @@ static void overlayEmitRow(void)
  * stops rendering).
  *
  * The cases between them cover: the banner as the firmware really calls it
- * (both banner strings, centred by main.c's own formula, at its y of 8, in its
+ * (both banner strings, centred by src/renderer.c's own formula, at its y of 8, in its
  * BANNER_FG); the panel colours labelColor / valueColor / unitsColor, which are
  * the literals the two colour-literal traps were found in; a chained run, which
  * is how every panel row is built and the only thing that catches a wrong x
  * advance; glyphs from all four rows of the font sheet, so a cell-row indexing
  * error cannot hide; and x positions at both ends of the buffer. */
 
-/* main.c's own centring formula, kept textually so a change there is visible as
+/* src/renderer.c's own centring formula, kept textually so a change there is visible as
  * a golden diff here. RGB_PIXELS_X is host-side, hence OVERLAY_PIXELS_X. */
 #define OVERLAY_CENTRE_X(text) \
   ((uint16_t)((OVERLAY_PIXELS_X - (sizeof(text) - 1) * PICO9918_DIAG_CHAR_WIDTH) / 2))
 
-/* main.c's BANNER_FG, likewise: the masked white the banner really uses */
+/* src/renderer.c's BANNER_FG, likewise: the masked white the banner really uses */
 #define OVERLAY_BANNER_FG ((PICO9918_PIXEL_T)(PICO9918_PIXEL_FROM_RGB12(0xff0f) & 0x0fff))
 
 /* the panel colours are exported by the diag TU (labelColor / valueColor /
@@ -1555,7 +1555,7 @@ static void overlayTextCase(const char* label, const char* text, uint16_t x,
 
 static void overlayTextGroup(void)
 {
-  /* the two real banners, exactly as main.c renders them */
+  /* the two real banners, exactly as src/renderer.c renders them */
   overlayTextCase("banner-await-pc", "POWER CYCLE TO TEST NEW CONFIGURATION",
     OVERLAY_CENTRE_X("POWER CYCLE TO TEST NEW CONFIGURATION"), 8, OVERLAY_BANNER_FG);
   overlayTextCase("banner-await-ok", "OPEN CONFIGURATOR TO CONFIRM NEW SETTINGS",
