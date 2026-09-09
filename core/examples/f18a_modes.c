@@ -31,9 +31,7 @@
  * the low ones, so at ECM2 each sub-palette is four of the F18A's 64 colours. Position
  * attributes are what let one repeated tile take a different four in every cell.
  *
- * Requires a library built PICO9918_MODE=1:
- *
- *     cmake -S examples -B build-examples -DPICO9918_MODE=1
+ *     cmake -S examples -B build-examples
  *     cmake --build build-examples
  *     ./build-examples/f18a_modes locked.ppm f18a.ppm
  */

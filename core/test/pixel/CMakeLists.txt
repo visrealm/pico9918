@@ -6,10 +6,6 @@ set(PROGRAM pixel_test)
 add_executable(${PROGRAM} pixel_test.c)
 target_link_libraries(${PROGRAM} PRIVATE pico9918_core)
 
-# Reaches into impl/ for the palette LUT, so it must see the same struct layout
-# the library was compiled with - PICO9918_MODE gates it.
-target_compile_definitions(${PROGRAM} PRIVATE PICO9918_MODE=${PICO9918_MODE})
-
 # CMAKE_BINARY_DIR/src: the generated pico9918_build_config.h the public headers
 # assert against. The dependency that makes it exist first comes from the link
 # above; no add_dependencies is needed.

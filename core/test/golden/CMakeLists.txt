@@ -1,8 +1,8 @@
 # Golden-frame regression harness (desktop only - no Pico SDK).
 #
 # Configure the library root with:
-#   cmake -B build -DPICO9918_GOLDEN=ON -DPICO9918_MODE=1 \
-#         -DPICO9918_SINGLE_INSTANCE=1 -DCMAKE_C_FLAGS=-O2
+#   cmake -B build -DPICO9918_GOLDEN=ON -DPICO9918_SINGLE_INSTANCE=1 \
+#         -DPICO9918_TEXT80_8BPP=OFF -DCMAKE_C_FLAGS=-O2
 #
 # Note: -O2 (or higher) is required.
 
@@ -34,12 +34,8 @@ endforeach()
 add_executable(golden_runner golden.c)
 target_link_libraries(golden_runner PRIVATE pico9918_core)
 
-# The post-palette surfaces reach into impl/ for the palette LUT and the expansion
-# macro, so the harness must see the same struct layout the library was compiled
-# with - PICO9918_MODE gates it.
 target_compile_definitions(golden_runner PRIVATE
-  GOLDEN_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
-  PICO9918_MODE=${PICO9918_MODE})
+  GOLDEN_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 # CMAKE_BINARY_DIR/src: the generated overlay/bmp_font.h and overlay/bmp_splash.h,
 # which the overlay surface reads for the asset geometry it static-asserts against
 # (see the asset note in golden.c). The target-level dependency that makes those

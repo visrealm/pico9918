@@ -1,7 +1,7 @@
 name: Core Package
 
-# That `cmake --install` and CPack produce a consumable archive on every
-# toolchain. Only visrealm/pico9918-core attaches them to a release.
+# That `cmake --install` and CPack produce consumable static and shared archives
+# on every toolchain. Only visrealm/pico9918-core attaches them to a release.
 
 on:
   push:
@@ -49,5 +49,5 @@ jobs:
         with:
           name: pico9918-core-${{ matrix.name }}
           path: |
-            core/build-ci/lib/pico9918-core-*.tar.gz
-            core/build-ci/lib/pico9918-core-*.zip
+            core/build-ci/packages/pico9918-core-*.tar.gz
+            core/build-ci/packages/pico9918-core-*.zip

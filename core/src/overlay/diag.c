@@ -16,10 +16,7 @@
 
 #include "impl/pico9918_priv.h"
 
-/* After pico9918_priv.h, which is where PICO9918_MODE_F18A comes from. */
-#if PICO9918_MODE == PICO9918_MODE_F18A
 #include "gpu/gpu.h"
-#endif
 
 #include <stdbool.h>
 #include <string.h>
@@ -48,9 +45,7 @@ static void clear(IntString* number)
 IntString frameTimeStr             = {0};
 IntString renderTimePerScanlineStr = {0};
 IntString temperatureStr           = {0};
-#if PICO9918_MODE == PICO9918_MODE_F18A
 IntString gpuPctStr                = {0};
-#endif
 IntString clockMhzStr              = {0};
 IntString modeStr                  = {0};
 IntString fpsStr                   = {0};
@@ -207,9 +202,7 @@ void PICO9918_IN_FLASH_FUNC(pico9918_diag_init)(void)
   glyphMaskInit();
 
   clear(&frameTimeStr);
-#if PICO9918_MODE == PICO9918_MODE_F18A
   clear(&gpuPctStr);
-#endif
 #if PICO9918_DIAG_GPU_FRAME_COUNTER
   clear(&gpuFrameStr);
 #endif
@@ -306,14 +299,12 @@ void pico9918_diag_update(PICO9918_INST_ARG uint32_t frameCount)
 
       uint32_t currentTime = PICO9918_HOST_TIME_US();
 
-#if PICO9918_MODE == PICO9918_MODE_F18A
       /* currentTime MUST be the later reading: reversed, this underflows and the row reads 0% or 100% */
       uint32_t totalTime = currentTime - lastUpdateTime;
 
       float gpuPct = (pico9918_gpu_time(totalTime) / (float)totalTime) * 100.0f;
       flt2Str(gpuPct, 4, &gpuPctStr);
       pico9918_gpu_reset_time();
-#endif
 
 #if PICO9918_DIAG_GPU_FRAME_COUNTER
       uint2Str(pico9918_gpu_frame_count, 1, &gpuFrameStr);
@@ -462,12 +453,10 @@ static void diagScanlineRenderTime(uint16_t row, PICO9918_PIXEL_T* pixels)
   renderLeft("RENDER: ", &renderTimePerScanlineStr, "US", row, pixels);
 }
 
-#if PICO9918_MODE == PICO9918_MODE_F18A
 static void diagGpuTime(uint16_t row, PICO9918_PIXEL_T* pixels)
 {
   renderLeft("GPU   : ", &gpuPctStr, "%", row, pixels);
 }
-#endif
 
 #if PICO9918_DIAG_GPU_FRAME_COUNTER
 static void diagGpuFrames(uint16_t row, PICO9918_PIXEL_T* pixels)
@@ -535,9 +524,7 @@ static DiagPtr const performanceDiags[] = {&diagHwVer,
                                            &diagRenderTime,
                                            &diagScanlineRenderTime,
                                            &diagFPS,
-#if PICO9918_MODE == PICO9918_MODE_F18A
                                            &diagGpuTime,
-#endif
 #if PICO9918_DIAG_GPU_FRAME_COUNTER
                                            &diagGpuFrames,
 #endif

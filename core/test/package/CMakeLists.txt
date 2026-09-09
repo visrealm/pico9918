@@ -5,7 +5,7 @@
 #   cmake -S test/package -B <build> -DCMAKE_PREFIX_PATH=<staging>
 #   cmake --build <build>
 #
-# This is what proves the exported package works. A `package` CI job without it
+# This is what proves the exported static and shared packages work. A `package` CI job without it
 # proves only that cpack ran: an install tree can be missing a header, export an
 # absolute source path, or lose a PUBLIC compile definition, and the archive is
 # produced either way.
@@ -22,6 +22,31 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 11)
 
 find_package(pico9918_core CONFIG REQUIRED)
+
+# The package job configures this project once for each linkage. Checking the imported
+# target here catches a shared build exported as static (or one that leaks
+# PICO9918_STATIC to its consumers) before the executable happens to link anyway on a
+# permissive platform.
+option(PICO9918_EXPECT_SHARED "Expect an installed shared pico9918-core target" OFF)
+get_target_property(PICO9918_IMPORTED_TYPE pico9918::core TYPE)
+get_target_property(PICO9918_IMPORTED_DEFS pico9918::core INTERFACE_COMPILE_DEFINITIONS)
+list(FIND PICO9918_IMPORTED_DEFS "PICO9918_STATIC" PICO9918_STATIC_DEF_INDEX)
+
+if(PICO9918_EXPECT_SHARED)
+  if(NOT PICO9918_IMPORTED_TYPE STREQUAL "SHARED_LIBRARY")
+    message(FATAL_ERROR "expected a shared pico9918::core, got ${PICO9918_IMPORTED_TYPE}")
+  endif()
+  if(NOT PICO9918_STATIC_DEF_INDEX EQUAL -1)
+    message(FATAL_ERROR "shared pico9918::core exports PICO9918_STATIC to consumers")
+  endif()
+else()
+  if(NOT PICO9918_IMPORTED_TYPE STREQUAL "STATIC_LIBRARY")
+    message(FATAL_ERROR "expected a static pico9918::core, got ${PICO9918_IMPORTED_TYPE}")
+  endif()
+  if(PICO9918_STATIC_DEF_INDEX EQUAL -1)
+    message(FATAL_ERROR "static pico9918::core does not export PICO9918_STATIC")
+  endif()
+endif()
 
 add_executable(consumer consumer.c)
 target_link_libraries(consumer PRIVATE pico9918::core)

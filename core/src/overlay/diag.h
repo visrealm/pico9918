@@ -66,15 +66,19 @@ extern "C"
 #endif
 
   /** one-time initialisation of the panel value strings */
+  PICO9918_DLLEXPORT
   void pico9918_diag_init(void);
 
   /** rebuild the panel row table - call whenever the PICO9918_CONF_DIAG* bytes change */
+  PICO9918_DLLEXPORT
   void pico9918_diag_config_updated(PICO9918_INST_ONLY_ARG);
 
   /** core temperature, degrees C */
+  PICO9918_DLLEXPORT
   void pico9918_diag_set_temperature(float tempC);
 
   /** system clock, Hz */
+  PICO9918_DLLEXPORT
   void pico9918_diag_set_clock_hz(float clockHz);
 
   /**
@@ -83,6 +87,7 @@ extern "C"
  * frames come from the frame module, which owns that accounting and is read
  * directly.
  */
+  PICO9918_DLLEXPORT
   void pico9918_diag_set_frame_rate(float frameRateHz);
 
   /**
@@ -92,6 +97,7 @@ extern "C"
  * panel buffers, so the caller keeps no lifetime obligation. Either may be NULL
  * to leave that row's current text alone.
  */
+  PICO9918_DLLEXPORT
   void pico9918_diag_set_version_info(const char* hwVersion, const char* fwVersion);
 
   /**
@@ -101,12 +107,15 @@ extern "C"
  * `name` is copied; `units` is retained by pointer, so it must have static
  * storage duration. Either may be NULL to leave that part alone.
  */
+  PICO9918_DLLEXPORT
   void pico9918_diag_set_output_name(const char* name, const char* units);
 
   /** accumulate one scanline's render and total time, in microseconds */
+  PICO9918_DLLEXPORT
   void pico9918_diag_update_render_time(uint32_t renderTime, uint32_t frameTime);
 
   /** recompute the panel values - call once per frame */
+  PICO9918_DLLEXPORT
   void pico9918_diag_update(PICO9918_INST_ARG uint32_t frameCount);
 
   /**
@@ -115,10 +124,12 @@ extern "C"
  * so calls chain. A cell's unlit pixels are darkened, not left untouched.
  * `x` must be a whole number of ink words - cells are written a word at a time.
  */
+  PICO9918_DLLEXPORT
   int pico9918_diag_render_text(uint16_t scanline, const char* text, uint16_t x, uint16_t y, PICO9918_PIXEL_T fg,
-                             PICO9918_PIXEL_T* pixels);
+                               PICO9918_PIXEL_T* pixels);
 
   /** render the diagnostics panels for border row `y` */
+  PICO9918_DLLEXPORT
   void pico9918_diag_render(PICO9918_INST_ARG uint16_t y, uint32_t vVirtualPixels,
                             PICO9918_PIXEL_T* pixels);
 

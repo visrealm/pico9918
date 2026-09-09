@@ -24,6 +24,7 @@
 #define _PICO9918_SPLASH_H
 
 #include "impl/platform.h"
+#include "pico9918.h"
 #include "pico9918_build_config.h"
 
 #include <stdbool.h>
@@ -59,18 +60,21 @@ extern "C"
 #endif
 
   /** restart the splash animation (after... reset) */
+  PICO9918_DLLEXPORT
   void pico9918_splash_reset(void);
 
   /** allow the splash to animate back out - the host calls this once the display
  * has been enabled */
+  PICO9918_DLLEXPORT
   void pico9918_splash_allow_hide(void);
 
   /**
  * render the splash logo into the scanline buffer, if row `y` falls in the
  * logo band. Also advances the animation, on y == 0.
  */
+  PICO9918_DLLEXPORT
   void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, uint32_t vPixels,
-                            uint32_t vVirtualPixels, PICO9918_PIXEL_T* pixels);
+                              uint32_t vVirtualPixels, PICO9918_PIXEL_T* pixels);
 
 #if PICO9918_BUILD_RUNTIME_CHIP
 
@@ -101,8 +105,10 @@ extern "C"
    * pico9918_set_chip calls this; a host has no reason to. Only a runtime-chip build
    * carries both images - a board resolves its one at build time.
    */
+  PICO9918_DLLEXPORT
   void pico9918_splash_select_pro(bool pro);
 
+  PICO9918_DLLEXPORT
   bool pico9918_f18a_badge_render(uint16_t outputLine, uint32_t frameCount,
                                  PICO9918_PIXEL_T* pixels);
 

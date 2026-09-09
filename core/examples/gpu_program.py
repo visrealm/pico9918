@@ -41,13 +41,12 @@ instructions. It is somebody else's program, which is the point - nothing in it 
 written with this library in mind. It never looks at the raster, so it runs the same
 under either shape.
 
-The other thing a host has to get right: the GPU is an F18A feature, so the module
-must be built PICO9918_MODE=1 and the chip must be unlocked. A locked TMS9918A has no
-GPU to run anything on. `pico9918.MODE` reports which build is on the path.
+The other thing a host has to get right: the GPU is an F18A feature, so the chip must
+be unlocked. A locked TMS9918A has no GPU to run anything on.
 
 Build the module, then run this against it:
 
-    cmake -S . -B build -DPICO9918_MODE=1 -DPICO9918_PYTHON_BINDING=ON
+    cmake -S . -B build -DPICO9918_PYTHON_BINDING=ON
     cmake --build build
     PYTHONPATH=build/bindings/python python examples/gpu_program.py mandel.ppm
 
@@ -105,9 +104,6 @@ def main():
     if entry & 1 or entry >= PROGRAM_SPACE:
         sys.exit("%#06x cannot be a start address: the GPU refuses an odd one, and a "
                  "program lives below %#06x" % (entry, PROGRAM_SPACE))
-
-    if not pico9918.MODE:
-        sys.exit("this module was built PICO9918_MODE=0, and a TMS9918A has no GPU")
 
     with open(path, "rb") as f:
         program = f.read(PROGRAM_SPACE - entry)

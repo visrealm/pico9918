@@ -48,12 +48,11 @@
  * It never looks at the raster, so it runs the same under any of the three shapes.
  *
  * The other thing a host has to get right: the GPU is an F18A feature, so the library
- * must be built PICO9918_MODE=1 and the chip must be unlocked. A locked TMS9918A has
- * no GPU to run anything on.
+ * the chip must be unlocked. A locked TMS9918A has no GPU to run anything on.
  *
  * Build it against an installed package:
  *
- *     cmake -S examples -B build-examples -DPICO9918_MODE=1
+ *     cmake -S examples -B build-examples
  *     cmake --build build-examples
  *     ./build-examples/gpu_program mandel.ppm
  *

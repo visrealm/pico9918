@@ -242,17 +242,16 @@ def main():
     ap.add_argument("--png", help="write the dumped screen here as a PNG")
     args = ap.parse_args()
 
-    print("pico9918 %s, %d pixels a line, %d bytes a pixel"
-          % ("F18A" if pico9918.MODE else "TMS9918A", pico9918.PIXELS_X, pico9918.PIXEL_SIZE))
+    print("pico9918, %d pixels a line, %d bytes a pixel"
+          % (pico9918.PIXELS_X, pico9918.PIXEL_SIZE))
 
     vdp = test_render()
     test_bus()
     test_interrupt()
     test_lifetime()
-    if pico9918.MODE:
-        test_unlock()
-        test_gpu()
-        test_gpu_interleaved()
+    test_unlock()
+    test_gpu()
+    test_gpu_interleaved()
 
     if args.png:
         write_png(args.png, pico9918.PIXELS_X, ROWS, vdp.rgb(ROWS))

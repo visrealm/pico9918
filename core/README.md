@@ -6,34 +6,29 @@
 <a href="https://github.com/visrealm/pico9918-core/actions/workflows/docs.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/docs.yml/badge.svg"/></a>
 <a href="https://github.com/visrealm/pico9918-core/actions/workflows/package.yml"><img src="https://github.com/visrealm/pico9918-core/actions/workflows/package.yml/badge.svg"/></a>
 
-TMS9918A / TMS9928A / TMS9929A video display processor emulation with F18A
-enhancements, in C11 with no runtime dependencies.
+`pico9918-core` is the video-chip emulation engine inside the
+[PICO9918](https://github.com/visrealm/pico9918), the RP2040/RP2350 drop-in replacement
+for the TMS9918A family. It is also the library you can put into another emulator: the
+same bus, renderer, F18A GPU and PICO9918 extensions that run on the boards, in C11 with
+no third-party runtime dependencies.
 
-It renders **one scanline at a time** into a buffer you own and allocates nothing per
-line. The bus and renderer never call back into your program: drive `pico9918_write_*`
-and `pico9918_scan_line` and nothing above you runs. That is what lets the same code
-drive the [PICO9918](https://github.com/visrealm/pico9918) at video rate on an RP2040
-and sit inside a desktop emulator unchanged.
+It covers the TMS9918A / TMS9928A / TMS9929A, F18A, PICO9918 and PICO9918 PRO
+personalities. Each VDP instance can choose which chip it answers as; the old
+`vrEmuTms9918` library remains the smaller choice for an emulator that only wants the
+original hardware.
 
-The integration layer above it does call back, in four places you register yourself -
-`pico9918_config_set_applied_callback`, `pico9918_frame_set_config_reload_callback`,
-`pico9918_gpu_set_flash_callback` and `pico9918_gpu_set_config_save_callback`. NULL is
-the default for all four.
+Rendering is **one scanline at a time** into a buffer you own, with nothing allocated
+per line. The bus and renderer never call back into your program: drive
+`pico9918_write_*` and `pico9918_scan_line` and nothing above you runs. That is what lets
+the same code drive a physical PICO9918 at video rate and sit inside a desktop emulator
+unchanged.
 
-**Where they fire depends on who paces the GPU.** With a core or a thread of its own
-running `pico9918_gpu_loop`, as the board has, each fires at most once a frame and never
-from the scanline body. Where the library paces the GPU itself - `pico9918_gpu_set_clock`,
-or any build without the hand-written Thumb core, which is every desktop one - the GPU is
-serviced from inside `pico9918_frame_scanline`, and the flash and config-save callbacks
-are dispatched from that service. So on a desktop host **those two can fire while a
-scanline is being rendered**, and a callback that blocks on a file or a socket stalls
-scan-out for as long as it takes. Do the work elsewhere and answer later: the flash one
-has `pico9918_gpu_flash_complete` for exactly that.
-
-Building the overlay image assets (the splash and the diagnostics font) needs
-**Python 3** at build time, and nothing beyond the standard library -
-`tools/img2carray.py` turns the PNGs in `src/overlay/res/` into C arrays. The
-emulator core itself links nothing extra.
+If you are putting the library into an emulator, start with the
+[emulator integration guide](EMULATOR-INTEGRATION.md).
+It begins with the two guest
+ports and the indexed renderer, then carries the same instance through full-frame
+scan-out, GPU pacing, chip personalities, the PICO9918 configuration protocol and a
+debugger. The rest of this page is the shorter tour and build reference.
 
 ## What it renders
 
@@ -61,7 +56,7 @@ A complete, buildable version of this is [`examples/render_frame.c`](examples/re
 it sets a mode up, fills the tables, renders 192 lines and writes a PPM:
 
 ```
-cmake -S . -B build -DPICO9918_MODE=1 -DPICO9918_EXAMPLES=ON
+cmake -S . -B build -DPICO9918_EXAMPLES=ON
 cmake --build build --target render_frame
 ./build/examples/render_frame frame.ppm
 ```
@@ -101,8 +96,9 @@ int main(void)
   pico9918_write_register_value(tms9918, TMS_REG_1, TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE);
 
   // Nothing is drawn until you ask, and nothing allocates per line. scan_line
-  // renders into an internal buffer and returns the status byte a host would have
-  // read; line_source and line_bytes are how you reach what it drew.
+  // renders into an internal buffer and returns the flags this line raised;
+  // line_source and line_bytes are how you reach what it drew. This picture-only
+  // example ignores the flags. An emulator merges them through the frame layer.
   for (uint16_t y = 0; y < 192; ++y)
   {
     pico9918_scan_line(tms9918, y);
@@ -202,11 +198,29 @@ probe intermittently reports no F18A at all.
 tiers and the original hardware. A host with a thread to spare can leave the rate at zero
 and run `pico9918_gpu_loop()` on that thread instead, which is what the firmware does.
 
+## Host callbacks
+
+The integration layer has four callbacks you can register:
+`pico9918_config_set_applied_callback`, `pico9918_frame_set_config_reload_callback`,
+`pico9918_gpu_set_flash_callback` and `pico9918_gpu_set_config_save_callback`. `NULL` is
+the default for all four.
+
+Where they fire depends on who paces the GPU. With a core or a thread of its own running
+`pico9918_gpu_loop`, as the board has, each fires at most once a frame and never from the
+scanline body. Where the library paces the GPU itself - `pico9918_gpu_set_clock`, or any
+build without the hand-written Thumb core, which is every desktop one - the GPU is
+serviced from inside `pico9918_frame_scanline`, and the flash and config-save callbacks
+are dispatched from that service.
+
+That means those two callbacks can fire while a desktop host is rendering a scanline. A
+callback that blocks on a file or a socket stalls scan-out for as long as it takes. Do
+the work elsewhere and answer later: the flash callback has
+`pico9918_gpu_flash_complete` for exactly that.
+
 ## Debugging
 
-Build with `-DPICO9918_DEBUG_API=ON` and `pico9918_debug.h` appears: a memory pane, a
-register editor and a disassembler can be written against the public surface instead of
-reaching into `impl/`.
+`pico9918_debug.h` lets a memory pane, register editor and disassembler use the public
+surface instead of reaching into `impl/`.
 
 ```c
 uint32_t end;
@@ -232,8 +246,8 @@ stores the byte where its number says and reconciles only what the instance need
 consistent. A span write refuses the register and status windows for the same reason, and
 returns short at their edge, so a bulk load cannot start a GPU program by accident.
 
-Off by default, and a board never turns it on - the option adds a translation unit that a
-firmware build does not compile.
+It is in the normal host build. A board turns it off, and a host that has no debugger can
+do the same with `-DPICO9918_DEBUG_API=OFF`.
 
 ## Examples
 
@@ -248,8 +262,6 @@ installed package: `cmake -S examples -B build-examples -DCMAKE_PREFIX_PATH=<sta
 | [`f18a_modes.c`](examples/f18a_modes.c) | one name table drawn twice, locked and unlocked: ECM2, attributes by screen position, the second tile layer and both scrolls |
 | [`gpu_program.c`](examples/gpu_program.c) | a program loaded into VRAM and run on the F18A's TMS9900, on a thread of its own beside a raster paced to 60Hz |
 
-The last two need `PICO9918_MODE=1` and are skipped without it.
-
 [`gpu_program.py`](examples/gpu_program.py) is the same job the other way round: one
 thread, alternating bounded slices of program with lines of raster. Both shapes are
 real, and which one a host wants is the decision those two files are about - a GPU
@@ -262,7 +274,7 @@ runs waits forever. They run the same two programs, and are worth reading togeth
 read back as palette indices or as RGB.
 
 ```
-cmake -S . -B build -DPICO9918_MODE=1 -DPICO9918_PYTHON_BINDING=ON
+cmake -S . -B build -DPICO9918_PYTHON_BINDING=ON
 cmake --build build
 PYTHONPATH=build/bindings/python python bindings/python/test.py --png frame.png
 ```
@@ -278,9 +290,9 @@ frame = vdp.indices(192)          # one palette index a byte
 
 It needs the default `PICO9918_SINGLE_INSTANCE=0` - a class per VDP is the point of it.
 
-Built `PICO9918_MODE=1`, it carries the F18A's GPU as well. Unlock the chip, put a
-TMS9900 program in VRAM and write its entry address to VR54 and VR55 - the low byte
-last, because writing that one is what starts it:
+It carries the F18A's GPU as well. Unlock the chip, put a TMS9900 program in VRAM and
+write its entry address to VR54 and VR55 - the low byte last, because writing that one
+is what starts it:
 
 ```python
 vdp.gpu_init()
@@ -309,51 +321,31 @@ interleave above is the shape to reach for here.
 
 ## Building
 
-```
-cmake -S . -B build -DPICO9918_MODE=1
+```sh
+cmake -S . -B build
 cmake --build build
 ```
 
-**`-DPICO9918_MODE=1` is what turns the F18A on.** The default build is a plain
-TMS9918A - everything in the F18A rows above needs it.
-
-| option | default | |
-|---|---|---|
-| `PICO9918_MODE` | `0` | `0` is a plain TMS9918A: 16KB of VRAM, no GPU, no unlock, and the enhanced renderer folds away entirely. `1` is the F18A |
-| `PICO9918_SINGLE_INSTANCE` | `0` | `1` puts one VDP at a fixed address and drops the instance argument from every call. What the firmware ships |
-| `PICO9918_TEXT80_8BPP` | `OFF` | 80-column text at eight bits a pixel, which is what ECM, palette select and the bitmap layer need there. Doubles the line to 512 bytes |
-| `PICO9918_NO_SPLASH` | `OFF` | drop the splash overlay and its image asset |
-| `PICO9918_DEBUG_API` | `OFF` | `pico9918_debug.h`: the memory map, span read and write, and the register store a debugger wants. Needs `PICO9918_MODE=1` |
-| `PICO9918_EXAMPLES` | `OFF` | build `examples/` |
-| `PICO9918_WERROR` | `OFF` | `-Wall -Wextra -Werror` |
-
-`PICO9918_SINGLE_INSTANCE` and `PICO9918_TEXT80_8BPP` change the public headers, so
-they reach consumers through the exported target and the generated
-`pico9918_build_config.h`. Size a line buffer with `PICO9918_SCANLINE_BUFFER_SIZE` and
-it will be right for the library you actually linked.
-
-Do not define `PICO9918_SINGLE_INSTANCE` yourself when you include a header from an
-installed library: `pico9918.h` takes it from that generated header, so leaving it alone
-is what guarantees your calls match the archive. Defining it to the wrong value is a
-`#error` rather than a wrong argument list.
-
-## Installing
-
-```
-cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/where/you/want
-cmake --build build
-cmake --install build
-```
-
-then, from another project:
+That is the normal emulator build: multiple instances, runtime chip selection, the PRO
+line width, the debug API, the 64KB map, enhanced renderer and GPU. A new instance starts
+as PICO9918 PRO; call `pico9918_set_chip()` when the emulated machine has something else.
+It exports the same CMake target whether it is vendored or installed:
 
 ```cmake
+# vendored
+add_subdirectory(external/pico9918-core)
+target_link_libraries(app PRIVATE pico9918::core)
+
+# or installed
 find_package(pico9918_core CONFIG REQUIRED)
 target_link_libraries(app PRIVATE pico9918::core)
 ```
 
-`test/package/` is that, as a working project - it is what the `package` CI job builds
-and runs to prove the export.
+Python 3 is needed at build time for the image assets; the library itself has no
+third-party runtime dependencies. See
+[BUILDING.md](BUILDING.md) for
+installation, static and shared libraries, smaller host builds, Python and every
+core-specific CMake setting.
 
 ## Testing
 
@@ -361,16 +353,18 @@ There is no `ctest` target. `tools/ci.sh` is the whole desktop gate, one subcomm
 and it is the same script CI runs:
 
 ```
-tools/ci.sh goldens     the 16 committed frames, byte-exact
-tools/ci.sh suite       111 scenes, five properties and two GPU programs, both widths
+tools/ci.sh goldens     the 18 committed frames, byte-exact
+tools/ci.sh suite       111 scenes, seven properties and two GPU programs, both widths
 tools/ci.sh pixels      both palette LUT layouts and the line geometry, both widths
 tools/ci.sh gpu         the library-paced GPU, and the write that arms a program
 tools/ci.sh gpucore     the GPU's TMS9900, instruction by instruction
+tools/ci.sh debug       the debugger map, span access, registers and GPU controls
 tools/ci.sh warnings    -Wall -Wextra -Werror
 tools/ci.sh comments    in a function body: one line, a table or a tag, blank line above
 tools/ci.sh multi       the instance threaded through every signature
-tools/ci.sh tms9918     PICO9918_MODE=0, its frame against the F18A build's
-tools/ci.sh package     install it, then find_package it from a separate project
+tools/ci.sh tms9918     the runtime TMS9918A personality against a locked F18A
+tools/ci.sh chip        every runtime chip personality, narrow and wide builds
+tools/ci.sh package     install static and shared packages, then consume and run both
 tools/ci.sh python      the Python module against an installed library
 tools/ci.sh doxygen     the API documentation
 ```
@@ -392,8 +386,9 @@ grew out of, to render to an SDL texture.
 This repository is generated: the library is developed at `core/` in
 [visrealm/pico9918](https://github.com/visrealm/pico9918), where a change can be measured
 against a device, and split out from there. Issues and pull requests belong on that
-repository - see [CONTRIBUTING.md](CONTRIBUTING.md), which also covers the one class of
-change that is easier to make here.
+repository - see
+[CONTRIBUTING.md](CONTRIBUTING.md),
+which also covers the one class of change that is easier to make here.
 
 ## License
 

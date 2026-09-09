@@ -14,32 +14,26 @@ else()
   set(PICO9918_ASM_SUFFIX "_m33")
 endif()
 
-# Core sources (always compiled)
+# The PICO9918 core always carries the enhanced renderer and GPU. For a small,
+# base-chip-only emulator, use vrEmuTms9918; a host that wants one library for the
+# whole family selects the personality at runtime.
 set(PICO9918_SOURCES pico9918.c pico9918_util.c pico9918_config.c pico9918_palette.c
                    pico9918_frame.c
-                   overlay/splash.c overlay/diag.c)
+                   overlay/splash.c overlay/diag.c
+                   gpu/gpu.c)
 
-# GPU sources - included when PICO9918_MODE >= 1 (F18A)
-if(NOT DEFINED PICO9918_MODE)
-  set(PICO9918_MODE 0)
-endif()
-
-if(PICO9918_MODE GREATER_EQUAL 1)
+if(PICO9918_PICO_BUILD AND NOT PICO9918_GPU_C_CORE)
+  # Pico builds use the hand-written assembly core.
   list(APPEND PICO9918_SOURCES
-    gpu/gpu.c)
-  if(PICO9918_PICO_BUILD AND NOT PICO9918_GPU_C_CORE)
-    # Pico builds use the hand-written assembly core
-    list(APPEND PICO9918_SOURCES
-      gpu/platform/thumb9900${PICO9918_ASM_SUFFIX}.S)
-  else()
-    # Desktop builds (and Pico builds with PICO9918_GPU_C_CORE) use the C core. Only it has
-    # the address decode the F18A personality wants; every other one sees the same flat 64KB
-    list(APPEND PICO9918_SOURCES
-      gpu/tms9900.c)
-  endif()
+    gpu/platform/thumb9900${PICO9918_ASM_SUFFIX}.S)
+else()
+  # Desktop builds (and Pico builds with PICO9918_GPU_C_CORE) use the C core. Only it has
+  # the address decode the F18A personality wants; every other one sees the same flat 64KB.
+  list(APPEND PICO9918_SOURCES
+    gpu/tms9900.c)
 endif()
 
-# V9938 base scaffold - additive capability of the F18A build. Default OFF.
+# V9938 base scaffold - an additive capability. Default OFF.
 if(PICO9918_V9938_BASE)
   if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/gpu/v9938cmd.c)
     list(APPEND PICO9918_SOURCES gpu/v9938cmd.c)
@@ -51,18 +45,20 @@ endif()
 # stamp goes in the generated header anyway, because "is this build debuggable" is a
 # question a host wants answered at compile time rather than by a failed link.
 if(PICO9918_DEBUG_API)
-  if(PICO9918_MODE LESS 1)
-    message(FATAL_ERROR
-      "PICO9918_DEBUG_API needs PICO9918_MODE=1: a MODE=0 archive has 16KB of base VRAM and no "
-      "GRAM, register or status window to address, so there is no map for a debugger to walk.")
-  endif()
   set(PICO9918_BUILD_DEBUG_API 1)
   list(APPEND PICO9918_SOURCES pico9918_debug.c)
 else()
   set(PICO9918_BUILD_DEBUG_API 0)
 endif()
 
-add_library(${LIBRARY} STATIC ${PICO9918_SOURCES})
+# Desktop builds follow BUILD_SHARED_LIBS. A Pico executable has no dynamic loader, so
+# its in-firmware archive stays static even if a parent project happens to set the
+# standard option globally.
+if(PICO9918_PICO_BUILD)
+  add_library(${LIBRARY} STATIC ${PICO9918_SOURCES})
+else()
+  add_library(${LIBRARY} ${PICO9918_SOURCES})
+endif()
 
 # The GPU's C core mirrors the assembly core's opcode-group structure, helpers
 # the interpreter never reaches included, so it keeps its unused ones.
@@ -75,12 +71,21 @@ endif()
 add_library(pico9918::core ALIAS ${LIBRARY})
 set_target_properties(${LIBRARY} PROPERTIES EXPORT_NAME core)
 
-# PUBLIC, and on the target rather than the directory: on Windows the header
-# declares every entry point __declspec(dllimport) without this, and a consumer
-# that does not see it fails to link on __imp_ symbols. A directory-scoped
-# add_definitions() would reach neither a target in a parent scope nor an
-# installed consumer.
-target_compile_definitions(${LIBRARY} PUBLIC PICO9918_STATIC)
+# Linkage mode. A static Windows consumer must inherit PICO9918_STATIC or the header
+# declares every entry point dllimport. A shared Windows library instead needs the
+# private export spelling while it compiles; its consumers deliberately inherit
+# neither definition and therefore get dllimport. Other desktop platforms export the
+# public symbols without a decoration, and a Pico build is always the static arm.
+if(BUILD_SHARED_LIBS AND NOT PICO9918_PICO_BUILD)
+  if(WIN32)
+    target_compile_definitions(${LIBRARY} PRIVATE PICO9918_COMPILING_DLL)
+  endif()
+  set_target_properties(${LIBRARY} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR})
+else()
+  target_compile_definitions(${LIBRARY} PUBLIC PICO9918_STATIC)
+endif()
 
 # Both install paths: `include/pico9918` so a consumer's existing
 # `#include "pico9918.h"` and `#include "impl/pico9918_priv.h"` resolve against
@@ -145,11 +150,6 @@ endif()
 # carries it - a compile definition would reach the library's TUs and not the
 # consumer's, which is the mismatch that header exists to prevent.
 if(PICO9918_RUNTIME_CHIP)
-  if(PICO9918_MODE LESS 1)
-    message(FATAL_ERROR
-      "PICO9918_RUNTIME_CHIP needs PICO9918_MODE=1: a MODE=0 archive has no 64KB map, no "
-      "GPU and no enhanced renderer, so it has no personality above the base to select.")
-  endif()
   set(PICO9918_BUILD_RUNTIME_CHIP 1)
 
   # The F18A personality's power-on badge artwork, generated only here so a board
@@ -202,9 +202,6 @@ if(PICO9918_TEXT80_8BPP)
   target_compile_definitions(${LIBRARY} PUBLIC PICO9918_TEXT80_8BPP=1)
 endif()
 
-target_compile_definitions(${LIBRARY} PRIVATE
-  PICO9918_MODE=${PICO9918_MODE})
-
 # Single-instance mode changes the public API signatures (pico9918.h). The generated
 # header is what a consumer actually derives it from, so this definition is only for
 # the library's own translation units and for a consumer that states it explicitly -
@@ -232,9 +229,7 @@ if(PICO9918_PICO_BUILD)
   # pico_divider: the F18A timing counters' divmod.
   target_link_libraries(${LIBRARY} PRIVATE pico_stdlib hardware_dma hardware_pio hardware_irq
                                            hardware_interp pico_divider)
-  if(PICO9918_MODE GREATER_EQUAL 1)
-    target_link_libraries(${LIBRARY} PRIVATE hardware_flash)
-  endif()
+  target_link_libraries(${LIBRARY} PRIVATE hardware_flash)
 endif()
 
 

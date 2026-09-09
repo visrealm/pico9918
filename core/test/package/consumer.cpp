@@ -28,8 +28,9 @@
 #include "pico9918_frame.h"
 #include "pico9918_util.h"
 
-#if PICO9918_BUILD_MODE
 #include "gpu/gpu.h"
+#if PICO9918_BUILD_DEBUG_API
+#include "pico9918_debug.h"
 #endif
 
 #include <cstddef>
@@ -71,9 +72,10 @@ int main()
     (const void*)&pico9918_frame_scanline,
     (const void*)&pico9918_diag_init,
     (const void*)&pico9918_splash_reset,
-#if PICO9918_BUILD_MODE
     (const void*)&pico9918_gpu_init,
     (const void*)&pico9918_gpu_loop,
+#if PICO9918_BUILD_DEBUG_API
+    (const void*)&pico9918_debug_region,
 #endif
   };
 

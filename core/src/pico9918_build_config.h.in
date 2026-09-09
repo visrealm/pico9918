@@ -39,21 +39,11 @@
 #define PICO9918_BUILD_TEXT80_8BPP @PICO9918_BUILD_TEXT80_8BPP@
 
 /*
- * Which chip the compiled library is: 0 a TMS9918A, 1 an F18A.
- *
- * A 0 build has no GPU, no unlock and 16KB of VRAM, and the enhanced renderer is not
- * in the archive - so this is what lets a consumer find that out at compile time
- * rather than at link time.
- */
-#define PICO9918_BUILD_MODE @PICO9918_MODE@
-
-/*
  * Whether the compiled library picks its chip personality at runtime.
  *
  * 1 adds two fields to the instance and two entry points to the API, so a consumer
  * that disagreed with the binary would be calling into an ABI the library did not
- * compile. 0 - what a board builds - fixes the personality at whatever the build
- * already is, and every gate that reads it folds to a constant.
+ * compile. 0 - what a board builds - fixes the PICO9918 feature gates at compile time.
  */
 #define PICO9918_BUILD_RUNTIME_CHIP @PICO9918_BUILD_RUNTIME_CHIP@
 
@@ -70,10 +60,11 @@
 /*
  * Whether the compiled library carries pico9918_debug.h's entry points.
  *
- * Purely additive - no instance field, no layout, no calling convention - so unlike the
- * three above, a disagreement here is a link error rather than silent corruption. It is
- * recorded anyway so a host can ask at compile time whether the archive it found can
- * back a memory pane, instead of discovering it at link time or shipping two builds.
+ * Purely additive - no instance field, no layout, no calling convention - so unlike
+ * the ABI and layout choices above, a disagreement here is a link error rather than
+ * silent corruption. It is recorded anyway so a host can ask at compile time whether
+ * the archive it found can back a memory pane, instead of discovering it at link time
+ * or shipping two builds.
  */
 #define PICO9918_BUILD_DEBUG_API @PICO9918_BUILD_DEBUG_API@
 

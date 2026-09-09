@@ -21,14 +21,6 @@
  * layout, so it lives on the privileged surface in impl/pico9918_gpu_priv.h.
  */
 #include "pico9918.h"
-#include "pico9918_build_config.h"
-
-/* Nothing below is built into a TMS9918A library, so including this there would fail at
-   link time with nothing to say why. */
-#if PICO9918_BUILD_MODE == 0
-#error "the GPU is an F18A feature - this library was built PICO9918_MODE=0"
-#endif
-
 /**
  * Initialize the TMS9900 GPU.
  * Must be called after pico9918_init() / pico9918_reset().

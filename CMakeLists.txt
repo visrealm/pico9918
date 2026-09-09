@@ -105,19 +105,20 @@ endif()
 
 add_definitions(-DPICO_BUILD=1)
 add_definitions(-DPICO9918_SINGLE_INSTANCE=1)
-add_definitions(-DPICO9918_MODE=1)
 
-# Also expose mode as a CMake variable for the library's CMakeLists.txt
-set(PICO9918_MODE 1 CACHE STRING "TMS9918 emulation mode (0=TMS9918A, 1=F18A; V9938 is additive via PICO9918_V9938_BASE)")
+# The firmware has one fixed PICO9918, so it does not carry the host's per-instance
+# chip switch or debugger entry points. These seed core's options without preventing
+# an explicit cache choice in a development build.
+set(PICO9918_RUNTIME_CHIP OFF CACHE BOOL "Select the chip personality at runtime")
+set(PICO9918_DEBUG_API OFF CACHE BOOL "Debugger memory, register and GPU access")
 
-# Likewise, so the library stamps the instance mode into its generated header. The
-# definition above reaches the compiler; only the variable reaches that header.
+# The library stamps the calling convention into its generated header.
 set(PICO9918_SINGLE_INSTANCE 1 CACHE BOOL "One implicit VDP instance, dropping the pico9918_t* parameter")
 
-# 80-column text at eight bits a pixel. A board capability rather than a chip, so it stays
-# orthogonal to PICO9918_MODE: it buys the tile palette select, ECM, the bitmap
-# layer and the shared composite there, none of which four bits a pixel can represent. It costs a
-# 512-byte line and twice the palette expansion, which only the RP2350 has the budget for.
+# 80-column text at eight bits a pixel. It buys the tile palette select, ECM, the
+# bitmap layer and the shared composite there, none of which four bits a pixel can
+# represent. It costs a 512-byte line and twice the palette expansion, which only
+# the RP2350 has the budget for.
 if(PICO_PLATFORM STREQUAL "rp2350" OR PICO_BOARD STREQUAL "pico9918pro")
     set(PICO9918_TEXT80_8BPP_DEFAULT ON)
 else()

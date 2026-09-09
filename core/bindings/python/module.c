@@ -46,9 +46,7 @@
 #include "pico9918_frame.h"
 #include "pico9918_util.h"
 
-#if PICO9918_BUILD_MODE
 #include "gpu/gpu.h"
-#endif
 
 #if PICO9918_SINGLE_INSTANCE
 #error "the module is one class per VDP - build the library PICO9918_SINGLE_INSTANCE=0"
@@ -448,8 +446,6 @@ static PyObject* vdpDisplayMode(VdpObject* self, PyObject* Py_UNUSED(ignored))
  * The GPU. Its time accumulator takes no instance - it is process-wide.
  * ---------------------------------------------------------------------- */
 
-#if PICO9918_BUILD_MODE
-
 static PyObject* vdpGpuInit(VdpObject* self, PyObject* Py_UNUSED(ignored))
 {
   pico9918_gpu_init(self->vdp);
@@ -525,8 +521,6 @@ static PyObject* vdpRaster(VdpObject* self, PyObject* args, PyObject* kwds)
   return PyLong_FromUnsignedLong(frames);
 }
 
-#endif /* PICO9918_BUILD_MODE */
-
 /* -------------------------------------------------------------------------
  * The type
  * ---------------------------------------------------------------------- */
@@ -556,7 +550,6 @@ static PyMethodDef vdpMethods[] = {
   VDP_NOARGS("interrupt_set", vdpInterruptSet, NULL),
   VDP_NOARGS("display_enabled", vdpDisplayEnabled, NULL),
   VDP_NOARGS("display_mode", vdpDisplayMode, NULL),
-#if PICO9918_BUILD_MODE
   VDP_NOARGS("gpu_init", vdpGpuInit, NULL),
   VDP_NOARGS("gpu_step", vdpGpuStep, "run the pending GPU program to completion"),
   VDP_KW("gpu_step_n", vdpGpuStepN,
@@ -565,7 +558,6 @@ static PyMethodDef vdpMethods[] = {
          "advance the display raster `lines` lines, returning the frames completed"),
   VDP_KW("gpu_time", vdpGpuTime, NULL),
   VDP_NOARGS("gpu_reset_time", vdpGpuResetTime, NULL),
-#endif
   {NULL, NULL, 0, NULL}};
 
 static PyMemberDef vdpMembers[] = {
@@ -636,7 +628,6 @@ PyMODINIT_FUNC PyInit_pico9918(void)
   if (PyModule_AddIntConstant(module, "SCANLINE_BUFFER_SIZE", PICO9918_SCANLINE_BUFFER_SIZE) < 0) goto failed;
 
   /* what the linked library was compiled as, not what this module asked for */
-  if (PyModule_AddIntConstant(module, "MODE", PICO9918_BUILD_MODE) < 0) goto failed;
   if (PyModule_AddIntConstant(module, "PIXEL_SIZE", PICO9918_BUILD_PIXEL_SIZE) < 0) goto failed;
   if (addObject(module, "TEXT80_8BPP", PyBool_FromLong(PICO9918_BUILD_TEXT80_8BPP)) < 0) goto failed;
 

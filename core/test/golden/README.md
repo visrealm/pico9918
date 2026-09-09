@@ -21,8 +21,7 @@ platform dependencies beyond libc.
 
 ## What the goldens protect
 
-The shipping configuration: `PICO9918_MODE=1` (F18A) with
-`PICO9918_SINGLE_INSTANCE=1`.
+The shipping single-instance calling convention, with the full PICO9918 renderer.
 
 | Scene | Lines | Covers |
 |---|---|---|
@@ -156,7 +155,7 @@ fourteen scene files or bumping `GOLDEN_VERSION`.
 Build (desktop, no Pico SDK), from the library root:
 
 ```
-cmake -B build-desktop -DPICO9918_GOLDEN=ON -DPICO9918_MODE=1 \
+cmake -B build-desktop -DPICO9918_GOLDEN=ON -DPICO9918_TEXT80_8BPP=OFF \
       -DPICO9918_SINGLE_INSTANCE=1 -DCMAKE_C_FLAGS=-O2
 cmake --build build-desktop
 ```

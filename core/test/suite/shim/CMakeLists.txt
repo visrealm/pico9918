@@ -27,17 +27,12 @@ option(LIVE_DESKTOP_TEXT80_8BPP "Build the 8bpp 80-column tier (the PRO's)" OFF)
 add_definitions(-DPICO9918_HOST_OPS_HEADER="liveDesktopOps.h")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-if(LIVE_DESKTOP_TEXT80_8BPP)
-  # The library's own option, seeded before it is added: setting the bare definition
-  # instead would compile the wide line while the generated build-config header still
-  # recorded the narrow one, and PICO9918_SCANLINE_BUFFER_SIZE reads that header.
-  set(PICO9918_TEXT80_8BPP ON CACHE BOOL "" FORCE)
-endif()
+# The library now defaults wide for emulator writers; this harness still makes both
+# tiers explicit because each is compared with a different reference directory.
+set(PICO9918_TEXT80_8BPP ${LIVE_DESKTOP_TEXT80_8BPP} CACHE BOOL "" FORCE)
 
 # The library is the directory three levels up, reached by relative path rather
-# than by an install. Configured the way every desktop gate here configures it -
-# see test/golden/CMakeLists.txt for why the pair is not optional.
-set(PICO9918_MODE 1 CACHE STRING "" FORCE)
+# than by an install. The suite uses the firmware's single-instance calling convention.
 set(PICO9918_SINGLE_INSTANCE 1 CACHE STRING "" FORCE)
 # every scene is a byte compare against a committed frame, so the shim is in the
 # same position as the golden harness: no -march=native
@@ -52,8 +47,6 @@ add_executable(live_shim shim.c)
 find_package(Threads REQUIRED)
 target_link_libraries(live_shim PRIVATE pico9918_core Threads::Threads)
 
-target_compile_definitions(live_shim PRIVATE
-  PICO9918_MODE=${PICO9918_MODE})
 if (MSVC)
   # sscanf, parsing the protocol lines
   target_compile_definitions(live_shim PRIVATE _CRT_SECURE_NO_WARNINGS)

@@ -178,10 +178,10 @@ extern "C"
  * \brief the descriptor table. The host save path reads pendingMirror/max/
  * defaultValue from it
  */
-extern const pico9918_config_field_t pico9918_config_fields[];
+PICO9918_DLLEXPORT_CONST const pico9918_config_field_t pico9918_config_fields[];
 
 /** \brief how many rows pico9918_config_fields has */
-extern const size_t pico9918_config_field_count;
+PICO9918_DLLEXPORT_CONST const size_t pico9918_config_field_count;
 
 /**
  * \brief the instance's CONFIG_BYTES settings block
@@ -191,6 +191,7 @@ extern const size_t pico9918_config_field_count;
  * the host's - the library never reaches storage - and so does the decision to
  * write, since these are settings a user chose rather than VDP state.
  */
+PICO9918_DLLEXPORT
 uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
 
 /**
@@ -205,6 +206,7 @@ uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
  * The identity bytes at 0-3 are cleared with the rest; pico9918_config_validate() and
  * pico9918_config_prepare_save() are where a host's own identity is stamped in.
  */
+PICO9918_DLLEXPORT
 void pico9918_config_defaults(uint8_t config[CONFIG_BYTES]);
 
 /**
@@ -235,6 +237,7 @@ typedef struct
  * configurator protocol can ignore that: PICO9918_CONF_SAVE_FORCED is set on the same
  * path, which is the save request its GPU loop already dispatches.
  */
+PICO9918_DLLEXPORT
 bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id);
 
 /**
@@ -244,18 +247,22 @@ bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host
  * so a host that persists a block without this gets a factory reset on its next boot.
  * Host storage is untouched - this only prepares the bytes.
  */
+PICO9918_DLLEXPORT
 void pico9918_config_prepare_save(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id);
 
 /** \brief copy live tracked fields into the in-RAM pending mirror with the given state */
+PICO9918_DLLEXPORT
 void pico9918_config_refresh_pending_mirror(uint8_t config[CONFIG_BYTES], uint8_t state);
 
 /**
  * \brief copy the live tracked fields into a PICO9918_PENDING_RECORD_BYTES record
  * \note  record[0], the state, is the caller's - only the field slots are written
  */
+PICO9918_DLLEXPORT
 void pico9918_config_pending_capture(const uint8_t config[CONFIG_BYTES], uint8_t* record);
 
 /** \brief copy a pending record's field slots back over the live config */
+PICO9918_DLLEXPORT
 void pico9918_config_pending_restore(uint8_t config[CONFIG_BYTES], const uint8_t* record);
 
 /**
@@ -272,6 +279,7 @@ void pico9918_config_pending_restore(uint8_t config[CONFIG_BYTES], const uint8_t
  *
  * Host-side effects stay with the host.
  */
+PICO9918_DLLEXPORT
 void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
 
 /**
@@ -284,6 +292,7 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
  *
  * A host that has no frame boundary to wait for wants pico9918_config_apply_now().
  */
+PICO9918_DLLEXPORT
 void pico9918_config_schedule_apply(PICO9918_INST_ARG bool applyVdpEffects);
 
 /**
@@ -294,6 +303,7 @@ void pico9918_config_schedule_apply(PICO9918_INST_ARG bool applyVdpEffects);
  * than wait for a boundary it does not have. The deferred request is cleared, so the
  * next end of frame does not apply the same block a second time.
  */
+PICO9918_DLLEXPORT
 void pico9918_config_apply_now(PICO9918_INST_ARG bool applyVdpEffects);
 
 /**
@@ -314,6 +324,7 @@ void pico9918_config_apply_now(PICO9918_INST_ARG bool applyVdpEffects);
  * Registered per instance in a multi-instance build - see pico9918.h for why the two
  * builds take different shapes.
  */
+PICO9918_DLLEXPORT
 void pico9918_config_set_applied_callback(PICO9918_INST_ARG pico9918_config_applied_fn cb, void* userdata);
 
 #ifdef __cplusplus

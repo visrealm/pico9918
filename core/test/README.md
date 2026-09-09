@@ -1,6 +1,6 @@
 # Tests
 
-Six directories, answering six different questions. Pick by the question, not by whichever one
+Seven directories, answering seven different questions. Pick by the question, not by whichever one
 you ran last.
 
 | Question | Where | What it is | Needs |
@@ -9,7 +9,8 @@ you ran last.
 | Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 111 scenes, seven property suites and two TMS9900 GPU programs | A C compiler and Python |
 | Does the post-palette pixel path lay out the way the header says? | [`pixel/`](pixel/) | Both palette LUT layouts and the scanline geometry, at both line widths | A C compiler |
 | Has an armed GPU program run by the time the arming write returns? | [`gpu/`](gpu/) | The rate the library paces the GPU from, and that write | A C compiler |
-| Is the installed package actually usable? | [`package/`](package/) | A separate project that finds the library with `find_package` and calls it | A C compiler |
+| Can a debugger inspect and edit state without driving the guest bus? | [`debug/`](debug/) | Region discovery, span access, register stores and GPU controls | A C compiler |
+| Are the installed static and shared packages actually usable? | [`package/`](package/) | A separate project that finds each library with `find_package` and calls it | A C compiler |
 | Does the TMS9900 GPU core execute correctly? | [`tms9900/`](tms9900/) | Every instruction group, held to the same expected values | A C compiler; a Pico to also run the assembly cores |
 
 Only the assembly cores need hardware, and nothing here needs a PICO9918. That is the point of the

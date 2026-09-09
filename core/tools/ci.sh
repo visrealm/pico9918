@@ -16,24 +16,25 @@
 # it behaves the same whether the library is the repository root or a directory
 # inside one.
 #
-# Usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|warnings|comments|doxygen|package|multi|tms9918|chip|python>
+# Usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|debug|warnings|comments|doxygen|package|multi|tms9918|chip|python>
 #
 #   goldens   the 18 committed frames, byte-exact
-#   suite     111 scenes, five properties and a GPU program, both line widths
+#   suite     111 scenes, seven properties and two GPU programs, both line widths
 #   pixels    both palette LUT layouts and the scanline geometry, both line widths
 #   gpu       the library-paced GPU, and the arming write it runs a program on
 #   gpucore   the GPU's TMS9900, instruction by instruction, on the portable core
+#   debug     the debugger map, span access, registers and GPU controls
 #   warnings  -Wall -Wextra -Werror
 #   comments  in a function body: one line, a table or a tag, and a blank line above
 #   doxygen   the docs build, and what it still reports
-#   package   install, then find_package it from a separate project and run it
+#   package   install static and shared packages, then find_package and run both
 #   multi     the library and the consumer, instance threaded through every signature
-#   tms9918   PICO9918_MODE=0, and the frame it renders against the F18A build's
-#   chip      PICO9918_RUNTIME_CHIP=ON, the only job that compiles the chip switch
+#   tms9918   the runtime TMS9918A personality against a locked F18A frame
+#   chip      every runtime chip personality, both calling conventions and line widths
 #   python    the Python module against an installed library, and what it renders
 #
-# Every job but the last four configures F18A and a single instance, which is what
-# the firmware ships.
+# Most jobs use the firmware's single-instance calling convention. `multi`, part of
+# `chip`, and `python` deliberately use the normal host convention instead.
 #
 # CI_GENERATOR selects a generator (default: CMake's own choice) and CI_CONFIG
 # the configuration. Both generator families work: a single-config one ignores
@@ -52,9 +53,8 @@ OUT=${CI_BUILD_DIR:-$LIBROOT/build-ci}
 CMAKE=${CMAKE:-cmake}
 CONFIG=${CI_CONFIG:-Release}
 
-# What configure() selects. Only multi() and tms9918() change them.
+# Which public calling convention configure() selects. Only multi() changes it.
 INSTANCE=1
-MODE=1
 
 PY=${PYTHON:-}
 if [ -z "$PY" ]; then
@@ -79,11 +79,11 @@ configure() {
   if [ -n "${CI_GENERATOR:-}" ]; then
     $CMAKE -S "$src" -B "$dir" -G "$CI_GENERATOR" -DCMAKE_BUILD_TYPE="$CONFIG" \
       -DPython3_EXECUTABLE="$PY_PATH" \
-      -DPICO9918_MODE=$MODE -DPICO9918_SINGLE_INSTANCE=$INSTANCE "$@"
+      -DPICO9918_SINGLE_INSTANCE=$INSTANCE "$@"
   else
     $CMAKE -S "$src" -B "$dir" -DCMAKE_BUILD_TYPE="$CONFIG" \
       -DPython3_EXECUTABLE="$PY_PATH" \
-      -DPICO9918_MODE=$MODE -DPICO9918_SINGLE_INSTANCE=$INSTANCE "$@"
+      -DPICO9918_SINGLE_INSTANCE=$INSTANCE "$@"
   fi
 }
 
@@ -100,7 +100,8 @@ findExe() {
 }
 
 goldens() {
-  configure "$OUT" "$LIBROOT" -DPICO9918_GOLDEN=ON -DCMAKE_C_FLAGS=-O2
+  configure "$OUT" "$LIBROOT" -DPICO9918_GOLDEN=ON -DPICO9918_TEXT80_8BPP=OFF \
+    -DCMAKE_C_FLAGS=-O2
   build "$OUT"
   "$(findExe "$OUT" golden_runner)"
 }
@@ -156,8 +157,8 @@ gpucore() {
   "$(findExe "$OUT-gpucore" tms9900_test)"
 }
 
-# PICO9918_DEBUG_API is on here and nowhere else in this gate's family: it adds a TU, and
-# a source no -Werror build ever compiles is a source with no warning gate at all.
+# Keep the debug API explicit here even though it is now the host default: this job owns
+# the warning gate for that translation unit if the default changes again.
 warnings() {
   configure "$OUT" "$LIBROOT" -DPICO9918_WERROR=ON -DPICO9918_DEBUG_API=ON -DCMAKE_C_FLAGS=-O2
   build "$OUT"
@@ -196,25 +197,53 @@ docs() {
   [ -f doc/code/index.html ] || { echo "ci.sh: doxygen wrote no doc/code" >&2; exit 1; }
 }
 
-package() {
-  stage=$OUT/stage
+packageVariant() {
+  variant=$1
+  shared=$2
+  variantBuild=$OUT/$variant-lib
+  variantStage=$OUT/$variant-stage
+  variantConsumer=$OUT/$variant-consumer
+
   # Cleared, not added to: a header the install forgot is invisible if the previous
   # run's copy is still sitting there.
-  rm -rf "$stage"
-  configure "$OUT/lib" "$LIBROOT" "-DCMAKE_INSTALL_PREFIX=$stage"
-  build "$OUT/lib"
-  $CMAKE --install "$OUT/lib" --config "$CONFIG"
+  rm -rf "$variantStage"
+  configure "$variantBuild" "$LIBROOT" "-DCMAKE_INSTALL_PREFIX=$variantStage" \
+    -DBUILD_SHARED_LIBS=$shared
+  build "$variantBuild"
+  $CMAKE --install "$variantBuild" --config "$CONFIG"
 
   # The part that actually proves the export: a separate project, finding the
   # installed package rather than the build tree.
-  configure "$OUT/consumer" "$LIBROOT/test/package" "-DCMAKE_PREFIX_PATH=$stage"
-  build "$OUT/consumer"
-  "$(findExe "$OUT/consumer" consumer)"
-  "$(findExe "$OUT/consumer" consumer_cpp)"
+  configure "$variantConsumer" "$LIBROOT/test/package" \
+    "-DCMAKE_PREFIX_PATH=$variantStage" -DPICO9918_EXPECT_SHARED=$shared
+  build "$variantConsumer"
+  # Windows finds the installed DLL in bin; ELF and Mach-O use lib. Build-tree
+  # RPATH normally covers the latter two, but setting the loader paths here makes
+  # this a test of the install tree rather than of a generator's RPATH policy.
+  PATH="$variantStage/bin:$PATH" \
+    LD_LIBRARY_PATH="$variantStage/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+    DYLD_LIBRARY_PATH="$variantStage/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
+    "$(findExe "$variantConsumer" consumer)"
+  PATH="$variantStage/bin:$PATH" \
+    LD_LIBRARY_PATH="$variantStage/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
+    DYLD_LIBRARY_PATH="$variantStage/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}" \
+    "$(findExe "$variantConsumer" consumer_cpp)"
+
+  (cd "$variantBuild" && cpack -C "$CONFIG")
+  cp "$variantBuild"/pico9918-core-* "$packages/"
+}
+
+package() {
+  packages=$OUT/packages
+  rm -rf "$packages"
+  mkdir -p "$packages"
+
+  packageVariant static OFF
 
   # No build system in the path at all, so nothing but the generated header can say
   # which instance ABI the archive was compiled for. See test/package/bare.c.
   bare=$OUT/bare
+  staticStage=$OUT/static-stage
   rm -rf "$bare"
   mkdir -p "$bare"
   # cl's flags in the dash form, not the slash form: MSYS rewrites a leading slash as a
@@ -222,17 +251,17 @@ package() {
   # cl on its own defaults to the static CRT while CMake built the archive against the
   # dynamic one, and that mismatch is an unresolved __imp_ import, not a warning.
   if command -v cl > /dev/null 2>&1; then
-    (cd "$bare" && cl -nologo -std:c11 -MD -DPICO9918_STATIC "-I$stage/include/pico9918" \
-      "$LIBROOT/test/package/bare.c" "$stage/lib/pico9918_core.lib" -Fe:bare.exe)
+    (cd "$bare" && cl -nologo -std:c11 -MD -DPICO9918_STATIC "-I$staticStage/include/pico9918" \
+      "$LIBROOT/test/package/bare.c" "$staticStage/lib/pico9918_core.lib" -Fe:bare.exe)
     "$bare/bare.exe"
   else
-    ${CC:-cc} -std=c11 -DPICO9918_STATIC "-I$stage/include/pico9918" \
-      "$LIBROOT/test/package/bare.c" "$stage/lib/libpico9918_core.a" -o "$bare/bare"
+    ${CC:-cc} -std=c11 -DPICO9918_STATIC "-I$staticStage/include/pico9918" \
+      "$LIBROOT/test/package/bare.c" "$staticStage/lib/libpico9918_core.a" -o "$bare/bare"
     "$bare/bare"
   fi
 
-  (cd "$OUT/lib" && cpack -C "$CONFIG")
-  ls -l "$OUT/lib"/pico9918-core-*
+  packageVariant shared ON
+  ls -l "$packages"/pico9918-core-*
 }
 
 # The instance reaches every emitter as an argument instead of resolving to a
@@ -247,7 +276,8 @@ multi() {
   INSTANCE=0
   # Both line widths: the 8bpp 80-column tier compiles call sites the 256-byte
   # line never reaches.
-  configure "$OUT/multi" "$LIBROOT" -DPICO9918_WERROR=ON -DCMAKE_C_FLAGS=-O2
+  configure "$OUT/multi" "$LIBROOT" -DPICO9918_WERROR=ON \
+    -DPICO9918_TEXT80_8BPP=OFF -DCMAKE_C_FLAGS=-O2
   build "$OUT/multi"
   configure "$OUT/multi-w512" "$LIBROOT" -DPICO9918_WERROR=ON \
     -DPICO9918_TEXT80_8BPP=ON -DCMAKE_C_FLAGS=-O2
@@ -264,31 +294,19 @@ multi() {
   "$(findExe "$OUT/multi-consumer" consumer)"
 }
 
-# PICO9918_MODE=0 is a TMS9918A: 16KB of VRAM, no GPU, and no unlock - and because
-# graphics_i_scan_line forks on the unlock exactly once, that last one folds the whole
-# enhanced renderer away rather than needing a condition per feature.
-#
-# The gate is the example's frame, not a compile. A static archive resolves nothing, so
-# it takes an executable to catch the diag overlay calling GPU timers this mode does not
-# build - and the locked Graphics I path is shared between the two modes, so the frames
-# must match byte for byte. The F18A build in this same job is the reference, which is
-# why there is no committed frame to keep in step.
+# A base personality and a locked enhanced one share the TMS9918A renderer. Compare
+# frames from the same archive so the runtime feature gates, not two build modes, are
+# what this checks.
 tms9918() {
-  for mode in 1 0; do
-    MODE=$mode
-    configure "$OUT/mode$mode" "$LIBROOT" -DPICO9918_WERROR=ON -DPICO9918_EXAMPLES=ON \
-      -DCMAKE_C_FLAGS=-O2
-    build "$OUT/mode$mode"
-    "$(findExe "$OUT/mode$mode" render_frame)" "$OUT/frame-$mode.ppm"
-  done
-  cmp "$OUT/frame-1.ppm" "$OUT/frame-0.ppm"
-  echo "the TMS9918A build renders the locked frame exactly as the F18A build does"
-
-  # the two axes are independent, so their cross-product gets one build
-  MODE=0
-  INSTANCE=0
-  configure "$OUT/mode0-multi" "$LIBROOT" -DPICO9918_WERROR=ON -DCMAKE_C_FLAGS=-O2
-  build "$OUT/mode0-multi"
+  dir=$OUT/tms9918
+  configure "$dir" "$LIBROOT" -DPICO9918_RUNTIME_CHIP=ON -DPICO9918_WERROR=ON \
+    -DPICO9918_EXAMPLES=ON -DPICO9918_TEXT80_8BPP=OFF -DCMAKE_C_FLAGS=-O2
+  build "$dir"
+  renderer=$(findExe "$dir" render_frame)
+  "$renderer" "$OUT/frame-f18a.ppm" f18a
+  "$renderer" "$OUT/frame-tms9918a.ppm" tms9918a
+  cmp "$OUT/frame-f18a.ppm" "$OUT/frame-tms9918a.ppm"
+  echo "the TMS9918A personality renders the locked frame exactly as the F18A does"
 }
 
 # The Python module, built against an INSTALLED library rather than the build tree -
@@ -297,19 +315,18 @@ tms9918() {
 # whole point of a binding and the module refuses to compile the other way.
 # Not named `python`: PY falls back to the bare `python` above, and a shell function of
 # that name is what `command -v "$PY"` finds and what every "$PY" here would then run.
-# The runtime chip switch is off in every other job, so nothing else compiles any of
-# this. Both instance modes, because it adds instance fields and that is where the two
+# Both instance modes, because the switch adds instance fields and that is where the two
 # differ, and then the consumer: the choice travels in the generated header, so the
 # thing worth proving is that a separate project picks it up and gets the entry points.
 chip() {
   configure "$OUT/chip" "$LIBROOT" -DPICO9918_RUNTIME_CHIP=ON -DPICO9918_WERROR=ON \
-    -DCMAKE_C_FLAGS=-O2
+    -DPICO9918_TEXT80_8BPP=OFF -DCMAKE_C_FLAGS=-O2
   build "$OUT/chip"
 
   INSTANCE=0
   stage=$OUT/chip-stage
   configure "$OUT/chip-lib" "$LIBROOT" -DPICO9918_RUNTIME_CHIP=ON -DPICO9918_WERROR=ON \
-    -DCMAKE_C_FLAGS=-O2 "-DCMAKE_INSTALL_PREFIX=$stage"
+    -DPICO9918_TEXT80_8BPP=OFF -DCMAKE_C_FLAGS=-O2 "-DCMAKE_INSTALL_PREFIX=$stage"
   build "$OUT/chip-lib"
   $CMAKE --install "$OUT/chip-lib" --config "$CONFIG"
   configure "$OUT/chip-consumer" "$LIBROOT/test/package" "-DCMAKE_PREFIX_PATH=$stage"

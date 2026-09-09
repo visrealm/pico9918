@@ -1,7 +1,7 @@
 name: Package
 
-# That `cmake --install` and CPack produce a consumable archive on every
-# toolchain, and that a tag turns those archives into a release.
+# That `cmake --install` and CPack produce consumable static and shared archives
+# on every toolchain, and that a tag turns those archives into a release.
 
 on:
   push:
@@ -39,8 +39,8 @@ jobs:
         with:
           name: pico9918-core-${{ matrix.name }}
           path: |
-            build-ci/lib/pico9918-core-*.tar.gz
-            build-ci/lib/pico9918-core-*.zip
+            build-ci/packages/pico9918-core-*.tar.gz
+            build-ci/packages/pico9918-core-*.zip
 
   release:
     name: Attach the archives to the release

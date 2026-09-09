@@ -20,6 +20,8 @@ INPUT                  = docs/mainpage.md \
                          DEBUGGING.md \
                          src \
                          test \
+                         core/BUILDING.md \
+                         core/EMULATOR-INTEGRATION.md \
                          core/src \
                          core/test \
                          core/examples
@@ -107,7 +109,11 @@ PREDEFINED             = __attribute__(x)= \
                          PICO9918_INST_ONLY= \
                          PICO_BUILD=1 \
                          PICO_RP2350=1 \
-                         PICO9918_TEXT80_8BPP=1
+                         PICO9918_TEXT80_8BPP=1 \
+                         PICO9918_BUILD_TEXT80_8BPP=1 \
+                         PICO9918_BUILD_RUNTIME_CHIP=0 \
+                         PICO9918_BUILD_SINGLE_INSTANCE=1 \
+                         PICO9918_BUILD_DEBUG_API=0
 
 # ---------------------------------------------------------------------------
 # Output

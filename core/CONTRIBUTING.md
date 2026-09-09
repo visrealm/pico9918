@@ -37,12 +37,12 @@ does.
 
 Whichever side it is applied on:
 
-    tools/ci.sh goldens     the 16 committed frames, byte-exact
-    tools/ci.sh suite       111 scenes, five properties and two GPU programs, both widths
+    tools/ci.sh goldens     the 18 committed frames, byte-exact
+    tools/ci.sh suite       111 scenes, seven properties and two GPU programs, both widths
     tools/ci.sh warnings    -Wall -Wextra -Werror
     tools/ci.sh multi       the instance threaded through every signature
-    tools/ci.sh tms9918     PICO9918_MODE=0, its frame against the F18A build's
-    tools/ci.sh package     install it, then find_package it from a separate project
+    tools/ci.sh tms9918     the runtime TMS9918A personality against a locked F18A
+    tools/ci.sh package     install static and shared packages, then consume and run both
 
 A change that touches the renderer additionally has to leave the firmware's ARM
 images where they were, or explain the difference: `tools/capture-baselines.sh` in

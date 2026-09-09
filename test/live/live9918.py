@@ -621,7 +621,7 @@ CAPTURE_SIZES = ("lineTimes",)
 
 def struct_offsets(elf):
     """Ask gdb for the field offsets we poke, rather than hardcoding a layout
-    that PICO9918_MODE - or a new capture field - can change underneath
+    that a build option - or a new capture field - can change underneath
     us. Capture fields come back prefixed, so the two structs cannot collide.
 
     A field the build does not have is left out rather than being fatal, so a

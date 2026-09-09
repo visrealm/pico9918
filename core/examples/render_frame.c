@@ -24,7 +24,7 @@
  *
  *     cmake -S examples -B build-examples
  *     cmake --build build-examples
- *     ./build-examples/render_frame frame.ppm
+ *     ./build-examples/render_frame frame.ppm [tms9918|tms9918a|f18a|pico9918|pro]
  */
 
 #include "pico9918.h"
@@ -75,6 +75,31 @@ static int writePpm(const char* path, const uint8_t* rgb)
   return 0;
 }
 
+#if PICO9918_BUILD_RUNTIME_CHIP
+static int selectPersonality(PICO9918_INST_ARG const char* name)
+{
+  pico9918_chip_t chip;
+  if (strcmp(name, "tms9918") == 0)
+    chip = PICO9918_CHIP_TMS9918;
+  else if (strcmp(name, "tms9918a") == 0)
+    chip = PICO9918_CHIP_TMS9918A;
+  else if (strcmp(name, "f18a") == 0)
+    chip = PICO9918_CHIP_F18A;
+  else if (strcmp(name, "pico9918") == 0)
+    chip = PICO9918_CHIP_PICO9918;
+  else if (strcmp(name, "pro") == 0)
+    chip = PICO9918_CHIP_PICO9918_PRO;
+  else
+  {
+    fprintf(stderr, "unknown chip '%s'\n", name);
+    return 1;
+  }
+
+  pico9918_set_chip(PICO9918_INST chip);
+  return 0;
+}
+#endif
+
 int main(int argc, char** argv)
 {
   const char* out = argc > 1 ? argv[1] : "frame.ppm";
@@ -88,6 +113,16 @@ int main(int argc, char** argv)
   if (!tms9918)
   {
     fprintf(stderr, "pico9918_new failed\n");
+    return 1;
+  }
+#endif
+
+#if PICO9918_BUILD_RUNTIME_CHIP
+  if (argc > 2 && selectPersonality(PICO9918_INST argv[2])) return 1;
+#else
+  if (argc > 2)
+  {
+    fprintf(stderr, "this library was built without runtime chip selection\n");
     return 1;
   }
 #endif

@@ -107,7 +107,7 @@ typedef enum
   TMS_MODE_TEXT,
   TMS_MODE_MULTICOLOR,
   TMS_MODE_TEXT80,
-#ifdef PICO9918_V9938_BASE /* V9938 base scaffold (additive to the F18A build) */
+#ifdef PICO9918_V9938_BASE /* V9938 base scaffold (additive to the PICO9918 core) */
   TMS_MODE_V9938_G3,
   TMS_MODE_V9938_G4,
   TMS_MODE_V9938_G5,
@@ -157,10 +157,6 @@ typedef enum
 
 /**
  * \brief the highest personality this build can be, and what a new instance is
- *
- * The switch needs the F18A build, so a PICO9918_MODE=0 archive cannot have it at all -
- * it has no 64KB map, no GPU and no enhanced renderer, so nothing above the base is a
- * personality it could honour - and the build is rejected rather than quietly capped.
  *
  * The ceiling is PRO only where the build carries the wide 80-column line, because that
  * is a buffer width rather than a runtime choice: PICO9918_TEXT80_8BPP doubles the

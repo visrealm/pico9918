@@ -86,9 +86,10 @@
 
 /* 80 columns at eight bits a pixel. It buys the tile palette select, ECM, the bitmap layer and
    the shared composite in 80-column text, none of which a four-bit line can represent at all.
-   Off unless a board asks for it: this is the scanline buffer's width, so it is settled at build
-   time, and it is what decides whether PICO9918_CHIP_PICO9918_PRO is a personality this build
-   can be at all. The tier then chooses within that - see PICO9918_WIDE_T80. */
+   This is the scanline buffer's width, so it is settled at build time, and it is what decides
+   whether PICO9918_CHIP_PICO9918_PRO is a personality this build can be at all. The host default
+   is wide; firmware selects it from the board. The tier then chooses within that - see
+   PICO9918_WIDE_T80. */
 #ifndef PICO9918_TEXT80_8BPP
 #define PICO9918_TEXT80_8BPP 0
 #endif
@@ -129,36 +130,13 @@ _Static_assert(SCANLINE_BYTES_MAX == PICO9918_SCANLINE_BYTES_MAX,
 #define LAST_SPRITE_YPOS     0xD0
 #define MAX_SCANLINE_SPRITES 4
 
-/* What the build carries, which is not what an instance answers as. This one fixes the
-   memory map and which renderer is compiled; pico9918_chip_t picks a personality within
-   it. The base build is a TMS9918A, so a pre-A instance needs the F18A build and the
-   runtime switch - see the #error below. */
-#define PICO9918_MODE_TMS9918A 0
-#define PICO9918_MODE_F18A     1
-
-#ifndef PICO9918_MODE
-#define PICO9918_MODE PICO9918_MODE_TMS9918A
-#endif
-
 #define BASE_VRAM_SIZE (1 << 14) /* 16kB */
+#define VRAM_SIZE      (1 << 16) /* 64kB */
 
-/* The register file is the same width in both modes. Enhanced registers are read outside
-   the unlock gate - the backdrop's R24, the frame module's R19 - and a narrower array makes
-   those reads out of bounds rather than zero, which is what a TMS9918A returns anyway. */
+/* Enhanced registers are read outside the unlock gate - the backdrop's R24, the frame
+   module's R19 - so the mapped register file keeps the full F18A width. */
 #define TMS_REGISTERS        64
 #define TMS_STATUS_REGISTERS 16
-
-/* What the F18A mode buys is the mapping: 64KB of VRAM with the registers, the status file,
-   the palette and the scanline counter visible to the GPU at fixed addresses. */
-#if PICO9918_MODE == PICO9918_MODE_F18A
-#define VRAM_SIZE        (1 << 16) /* 64kB */
-#define MAPPED_REGISTERS 1
-#define MAPPED_STATUS    1
-#else
-#define VRAM_SIZE        BASE_VRAM_SIZE
-#define MAPPED_REGISTERS 0
-#define MAPPED_STATUS    0
-#endif
 
 #define VRAM_MASK (BASE_VRAM_SIZE - 1) /* 0x3fff */
 
@@ -166,20 +144,18 @@ _Static_assert(SCANLINE_BYTES_MAX == PICO9918_SCANLINE_BYTES_MAX,
    against the V9938's 128K */
 #define PICO9918_CPU_VRAM_MASK(tms) VRAM_MASK
 
-/* R1 bit 7 is the 4K/16K DRAM select, and only a part that drives DRAM has one. An F18A
-   has SRAM, so a MODE=F18A build without the runtime switch is never asked and the
-   transform below folds away entirely. */
-#if PICO9918_MODE == PICO9918_MODE_F18A && !PICO9918_BUILD_RUNTIME_CHIP
-#define PICO9918_VRAM_4K_CHIP(T) false
-#else
+/* R1 bit 7 is the 4K/16K DRAM select, and only a part that drives DRAM has one. A
+   fixed PICO9918 build has SRAM, so the transform folds away entirely there. */
+#if PICO9918_BUILD_RUNTIME_CHIP
 #define PICO9918_VRAM_4K_CHIP(T) PICO9918_HAS(T, PICO9918_FEAT_VRAM_4K)
+#else
+#define PICO9918_VRAM_4K_CHIP(T) false
 #endif
 
 
 typedef struct
 {
   uint8_t base[BASE_VRAM_SIZE]; // 0x0000-0x3FFF (16KB)
-#if PICO9918_MODE == PICO9918_MODE_F18A
   /* video ram */
   uint8_t gram1[0x1000]; // 0x4000-0x4fff (4KB) 2x repeated 2KB
   uint16_t pram[0x0800]; // 0x5000-0x5fff (4KB) 32x repeated 128B
@@ -197,14 +173,6 @@ typedef struct
 
   uint8_t gram4[0x5000 - TMS_STATUS_REGISTERS]; // 0xB010-0xFFFF (~20KB)
   uint8_t wrksp[36];                            // 0x10000 overflow for hidden workspace
-#else
-  /* At no address anything can reach: the CPU mask stops the data port at 0x3fff and there
-     is no GPU. The palette is where the renderer reads colour from, so it exists in both
-     modes - here it is simply fixed at what pico9918_reset writes. */
-  uint16_t pram[64];
-  uint8_t scanline;
-  uint8_t blanking;
-#endif
 } pico9918_mem_map_t;
 
 /* Whether a GPU pass can be capped, and so whether the library can pace one itself. The
@@ -217,21 +185,11 @@ typedef struct
 #define PICO9918_GPU_BUDGETED 1
 #endif
 
-/* Has the F18A been unlocked, and is this a write to the register that decides it? A
-   TMS9918A cannot be, so both are literals there - and graphics_i_scan_line forks on the
-   first exactly once, which is what makes the entire enhanced renderer fold away in that
-   build rather than needing a condition per feature. Honouring an unlock that widens
-   lockedMask while the renderer ignores every register it admits would be worse than not
-   honouring it. */
-#if PICO9918_MODE == PICO9918_MODE_F18A
+/* Has the F18A been unlocked, and is this a write to the register that decides it? The
+   runtime personality gate decides whether the write is honoured. */
 #define PICO9918_UNLOCKED(T)     ((T)->isUnlocked)
 #define PICO9918_UNLOCK_REG(R)   ((R) == (0x80 | PICO9918_REG_UNLOCK))
 #define PICO9918_UNLOCK_VALUE(V) (((V) & 0xfc) == PICO9918_R57_UNLOCK)
-#else
-#define PICO9918_UNLOCKED(T)     false
-#define PICO9918_UNLOCK_REG(R)   false
-#define PICO9918_UNLOCK_VALUE(V) false
-#endif
 
 /* What a personality answers to. Derived once, in pico9918_set_chip, so each site reads
    one bit rather than re-deriving the ladder. Only what a personality can be asked to do
@@ -250,9 +208,6 @@ typedef struct
 #define PICO9918_FEAT_GPU_RAM  0x40 /* the GPU's whole 64KB is memory, not the F18A's windows */
 
 #if PICO9918_BUILD_RUNTIME_CHIP
-#if PICO9918_MODE != PICO9918_MODE_F18A
-#error "PICO9918_RUNTIME_CHIP needs the F18A build - a MODE=0 archive has no personality above the base to select"
-#endif
 #define PICO9918_HAS(T, F) (((T)->features & (F)) != 0)
 /* SR1 is what software probing for an F18A reads: 0xE0 is the F18A ID, and the PICO9918
    sets 0x08 for anyone who cares that it is not a real one. The base personality shares
@@ -268,21 +223,11 @@ typedef struct
 #define PICO9918_SR1_ID(T) 0xE8
 #endif
 
-#if MAPPED_REGISTERS
 #define TMS_REGISTER(T, R) (T->vram.map.registers[R])
-#else
-#define TMS_REGISTER(T, R) (T->registers[R])
-#endif
-
-#if MAPPED_STATUS
 #define TMS_STATUS(T, R) (T->vram.map.status[R])
-#else
-#define TMS_STATUS(T, R) (T->status[R])
-#endif
 
-/* Graphics II is the A in TMS9918A: the pre-A part does not decode R0 M3. Unlike M4 this
-   is not a mode-gated question - every build can be the pre-A part - so PICO9918_HAS
-   alone is the gate, and it folds to a literal true without the runtime switch. */
+/* Graphics II is the A in TMS9918A: the pre-A personality does not decode R0 M3.
+   PICO9918_HAS folds to a literal true without the runtime switch. */
 #define PICO9918_GM2(T) PICO9918_HAS(T, PICO9918_FEAT_BITMAP)
 
 /* The PRO tier's wide 80-column line. Only asked where the build has the buffer for it,
@@ -293,16 +238,10 @@ typedef struct
    a PICO9918 backs the whole address space with RAM, which is what the assembly cores do. */
 #define PICO9918_GPU_FLAT_MEM(T) PICO9918_HAS(T, PICO9918_FEAT_GPU_RAM)
 
-/* A TMS9918A does not decode R0 bit 2. Build-time as well as runtime: PICO9918_HAS folds
-   to true in a MODE=0 archive, so neither may be written as PICO9918_HAS alone. */
-#if PICO9918_MODE == PICO9918_MODE_F18A
+/* A TMS9918A does not decode R0 bit 2. */
 #define PICO9918_CAN_UNLOCK(T) PICO9918_HAS(T, PICO9918_FEAT_UNLOCK)
 #define PICO9918_M4(T)                                                                             \
   (PICO9918_CAN_UNLOCK(T) && (TMS_REGISTER(T, TMS_REG_0) & TMS_R0_MODE_TEXT_80))
-#else
-#define PICO9918_CAN_UNLOCK(T) false
-#define PICO9918_M4(T)         false
-#endif
 
 
 /* PRIVATE DATA STRUCTURE
@@ -346,7 +285,7 @@ struct pico9918_s
   volatile uint8_t restart;
   volatile uint8_t flash;
 
-#if PICO9918_MODE == PICO9918_MODE_F18A && PICO9918_GPU_BUDGETED
+#if PICO9918_GPU_BUDGETED
   /* Zero leaves an armed program to whoever else runs it. See pico9918_gpu_set_clock. */
   uint32_t gpuIps;
   uint32_t gpuSlice;
@@ -383,14 +322,6 @@ struct pico9918_s
     bool swapY2Page; /* T2 name-table page swap flag */
     uint8_t* pixels; /* pointer to caller-owned output pixel buffer */
   } scanCtx;
-
-#if !MAPPED_REGISTERS
-  uint8_t registers[TMS_REGISTERS];
-#endif
-
-#if !MAPPED_STATUS
-  uint8_t status[TMS_STATUS_REGISTERS];
-#endif
 
   uint8_t config[256];
   bool configDirty;

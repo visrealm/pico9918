@@ -363,8 +363,9 @@ int main(void)
     /* and the actions are not taken. R55 arms a program, R56 runs one, R63 begins a
        firmware update, R50 bit 7 resets the file - through here, none of them do. */
     pico9918_debug_gpu_set_pc(PICO9918_INST 0x2000);
-    tms9918->restart = 0;
-    tms9918->flash   = 0;
+    tms9918->restart     = 0;
+    tms9918->flash       = 0;
+    tms9918->configDirty = false;
     TMS_REGISTER(tms9918, 9) = 0x99;
 
     pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_GPU_PC_LSB, 0x40);

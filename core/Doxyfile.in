@@ -26,10 +26,13 @@ HTML_OUTPUT            = code
 # ---------------------------------------------------------------------------
 # What to read
 # ---------------------------------------------------------------------------
-# The tests and the examples are read alongside the library: a test nobody can
-# read is a test nobody maintains, and the examples are the shortest statement
+# The guides, tests and examples are read alongside the library: a test nobody
+# can read is a test nobody maintains, and the examples are the shortest statement
 # of how the API is meant to be used.
 INPUT                  = README.md \
+                         BUILDING.md \
+                         EMULATOR-INTEGRATION.md \
+                         CONTRIBUTING.md \
                          src \
                          test \
                          examples
@@ -109,13 +112,17 @@ PREDEFINED             = __attribute__(x)= \
                          EMITTER_NOINLINE= \
                          PICO9918_DLLEXPORT= \
                          PICO9918_DLLEXPORT_CONST= \
-                         PICO9918_SINGLE_INSTANCE=1 \
-                         PICO9918_INST_ARG= \
-                         PICO9918_INST_ONLY_ARG=void \
-                         PICO9918_INST= \
-                         PICO9918_INST_ONLY= \
+                         PICO9918_SINGLE_INSTANCE=0 \
+                         PICO9918_INST_ARG="pico9918_t* tms9918," \
+                         PICO9918_INST_ONLY_ARG="pico9918_t* tms9918" \
+                         PICO9918_INST="tms9918," \
+                         PICO9918_INST_ONLY=tms9918 \
                          PICO_BUILD=1 \
-                         PICO9918_TEXT80_8BPP=1
+                         PICO9918_TEXT80_8BPP=1 \
+                         PICO9918_BUILD_TEXT80_8BPP=1 \
+                         PICO9918_BUILD_RUNTIME_CHIP=1 \
+                         PICO9918_BUILD_SINGLE_INSTANCE=0 \
+                         PICO9918_BUILD_DEBUG_API=1
 
 # ---------------------------------------------------------------------------
 # Output

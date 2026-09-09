@@ -22,31 +22,25 @@ endif()
 # and the shared composite there, none of which four bits a pixel can represent. It
 # doubles the line to 512 bytes, so it changes a size the public header publishes and
 # has to reach consumers. The firmware sets it from the board.
-option(PICO9918_TEXT80_8BPP "80-column text at 8bpp: ECM, palette select and bitmap layer in T80" OFF)
+option(PICO9918_TEXT80_8BPP "80-column text at 8bpp: ECM, palette select and bitmap layer in T80" ON)
 
 # Splash overlay. OFF (the default) still generates the splash asset; ON drops
 # both the asset and its render path, so the image costs nothing in flash.
 option(PICO9918_NO_SPLASH "Omit the splash overlay and its image asset" OFF)
 
 # Which chip an instance answers as, chosen per instance at runtime rather than by
-# this file: a TMS9918A, an F18A, or a PICO9918. OFF is the default and is what a
-# board builds - every gate folds to a constant, the instance carries no extra field
-# and the entry points are not compiled, so a firmware pays nothing for a switch it
-# never throws. A host emulating more than one chip out of one archive turns it on.
-# It needs the F18A build: the personalities above the base are not in a MODE=0
-# archive to select.
-option(PICO9918_RUNTIME_CHIP "Select the chip personality at runtime" OFF)
+# the library build: a TMS9918, TMS9918A, F18A, PICO9918 or PICO9918 PRO. This is
+# what a host normally wants. The firmware turns it off: every gate then folds to a
+# constant, the instance carries no extra field and the entry points are not built.
+option(PICO9918_RUNTIME_CHIP "Select the chip personality at runtime" ON)
 
 # Diagnostics overlay: optional GPU-frames row. The count is host-pushed, so the
 # row and the setter that feeds it appear together or not at all.
 option(PICO9918_DIAG_GPU_FRAME_COUNTER "Include the diag GPU-frames row" OFF)
 
-# Span and map access for a debugger's memory pane, which a host emulator wants and a
-# board has no one to show. OFF is the default in the direction a mistake falls safely:
-# a consumer that forgets to ask gets a link error naming the symbol, where a board that
-# forgot to decline would silently carry flash it must never spend. It needs the F18A
-# build - a MODE=0 archive has no 64KB map to address, no register window and no GPU.
-option(PICO9918_DEBUG_API "Debugger memory, register and GPU access" OFF)
+# Span and map access for a debugger's memory pane. It is part of the normal host
+# surface; the firmware turns it off because a board has no one to show it to.
+option(PICO9918_DEBUG_API "Debugger memory, register and GPU access" ON)
 
 # The test for it, which cannot mean anything without it - so it implies the option
 # rather than being a second thing to remember. Here rather than beside the other test
@@ -67,6 +61,13 @@ endif()
 # in step with the firmware release it is generated from - the firmware's root
 # CMakeLists checks the two agree.
 project(pico9918_core VERSION 1.3.0 LANGUAGES C)
+
+# A top-level desktop build offers CMake's standard static/shared choice. Do not
+# introduce the cache option into a parent that vendors us: if it has a policy, its
+# BUILD_SHARED_LIBS value is still honoured by src/CMakeLists.txt.
+if(PROJECT_IS_TOP_LEVEL)
+  option(BUILD_SHARED_LIBS "Build pico9918-core as a shared library" OFF)
+endif()
 
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
@@ -151,7 +152,7 @@ endif()
 
 # The GPU rate the library paces itself from, and the arming write it runs a program on.
 option(PICO9918_GPU_TEST "Build the library-paced GPU test" OFF)
-if (PICO9918_GPU_TEST AND PICO9918_MODE)
+if (PICO9918_GPU_TEST)
   add_subdirectory(test/gpu)
 endif()
 
@@ -165,7 +166,7 @@ endif()
 # this option is the host's: with no assembly core to compare against, the same cases
 # become the portable core's test - and the portable core is what a host ships.
 option(PICO9918_TMS9900_TEST "Build the TMS9900 instruction tests" OFF)
-if (PICO9918_TMS9900_TEST AND PICO9918_MODE)
+if (PICO9918_TMS9900_TEST)
   add_subdirectory(test/tms9900)
 endif()
 
@@ -218,7 +219,12 @@ if (PROJECT_IS_TOP_LEVEL AND NOT PICO9918_PICO_BUILD)
   set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE)
   set(CPACK_GENERATOR TGZ ZIP)
   # The archive carries a compiled library, so it is per-platform, not portable.
+  if(BUILD_SHARED_LIBS)
+    set(PICO9918_CPACK_LINKAGE_SUFFIX "-shared")
+  else()
+    set(PICO9918_CPACK_LINKAGE_SUFFIX "")
+  endif()
   set(CPACK_PACKAGE_FILE_NAME
-      "pico9918-core-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
+      "pico9918-core-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}${PICO9918_CPACK_LINKAGE_SUFFIX}")
   include(CPack)
 endif()
