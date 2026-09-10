@@ -37,9 +37,8 @@
         REV16 R6,R0    // R6=INST|BYTE
         LSRS R2,R6,#5  // Get opcode
         LSLS R2,#3     // x8
-        MOV  R4,R12    // Table base
-        ADDS R4,R2
-        LDM  R4,{R4,R7} // Get 1st and 2nd branch location (if it's needed)
+        ADD  R2,R12    // Table base - R2 is the address register, and dead after
+        LDM  R2!,{R4,R7} // Get 1st and 2nd branch location (if it's needed)
         MOV  PC,R4
 99:     B    \idle
 .endm
@@ -469,8 +468,7 @@ I_DEC:  LDRH R2,[R5,#0] // R5=SRCE/DEST
         MOVS R4,#0x06 // Get initialised ST
         ANDS R1,R4
 
-        CMP  R2,R0
-        BLO  I_DEC_nc
+        BCC  I_DEC_nc // The SUBS' no-borrow is the guest carry - nothing since writes C
         ADDS R1,#0x10 // Carry bit
 I_DEC_nc:
         LSRS R2,#15
@@ -494,8 +492,7 @@ I_DECT: LDRH R2,[R5,#0] // R5=SRCE/DEST
         MOVS R4,#0x06 // Get initialised ST
         ANDS R1,R4
 
-        CMP  R2,R0
-        BLO  I_DECT_nc
+        BCC  I_DECT_nc // The SUBS' no-borrow is the guest carry - nothing since writes C
         ADDS R1,#0x10 // Carry bit
 I_DECT_nc:
         LSRS R2,#15
@@ -513,14 +510,13 @@ I_MOV:  STRH R5,[R6,#0]
         ANDS R1,R4
 // *********************************************************************************************
 OP_COMP_W:
-        SXTH R0,R0
-        CMP  R0,#0
-        BGT  OP_COMP_W_a
+        LSLS R0,R0,#16 // Discards the upper half and gives the low word's N and Z
+        BMI  OP_COMP_W_n
         BEQ  OP_COMP_W_e
-        ADDS R1,#0x80 // L >
-        GPU_DISPATCH GPU_IDLE_HOP
-OP_COMP_W_a:
         ADDS R1,#0xC0 // LA >
+        GPU_DISPATCH GPU_IDLE_HOP
+OP_COMP_W_n:
+        ADDS R1,#0x80 // L >
         GPU_DISPATCH GPU_IDLE_HOP
 OP_COMP_W_e:
         ADDS R1,#0x20 // Equal bit
@@ -578,11 +574,7 @@ I_S:    LDRH R2,[R6,#0] // R6=DEST
         MOVS R4,#0x06 // Get initialised ST
         ANDS R1,R4
 
-        CMP  R5,#0
-        BEQ  I_S_c // Zero sets Carry
-        CMP  R2,R0
-        BLO  I_S_nc
-I_S_c:
+        BCC  I_S_nc // The SUBS' no-borrow is the guest carry - nothing since writes C
         ADDS R1,#0x10 // Carry bit
 I_S_nc:
         LSRS R5,#15
@@ -647,11 +639,7 @@ I_SB:   LDRB R2,[R6,#0] // R6=DEST
         MOVS R4,#0x02 // Get initialised ST
         ANDS R1,R4
 
-        CMP  R5,#0
-        BEQ  I_SB_c // Zero sets Carry
-        CMP  R2,R0
-        BLO  I_SB_nc
-I_SB_c:
+        BCC  I_SB_nc // The SUBS' no-borrow is the guest carry - nothing since writes C
         ADDS R1,#0x10 // Carry bit
 I_SB_nc:
         LSRS R5,#7
@@ -678,8 +666,8 @@ OP_COMP_B:
 // *********************************************************************************************
 .align 4
 I_C:    LDRH R2,[R6,#0] // R6=DEST
-        REV16 R2,R2
-        REV16 R5,R5
+        REVSH R2,R2 // Signed: 16-bit unsigned order survives sign extension
+        REVSH R5,R5
 
         MOVS R4,#0x1E // Get initialised ST
         ANDS R1,R4
@@ -693,8 +681,6 @@ I_C_l:
         BLO  I_C_a
         ADDS R1,#0x80 // Logic > bit
 I_C_a:
-        SXTH R5,R5
-        SXTH R2,R2
         CMP  R5,R2 // Redo flags
         BLT  I_C_e
         ADDS R1,#0x40 // Arith > bit
@@ -715,8 +701,8 @@ I_CB:   LDRB R2,[R6,#0] // R6=DEST
         BNE  I_CB_l
         ADDS R1,#0x20 // Equal bit
         B    start
-I_CB_l:
 .align 4
+I_CB_l: // Below .align, or the target is the padding rather than the branch
         BLO  I_CB_a
         ADDS R1,#0x80 // Logic > bit
 I_CB_a:
@@ -803,10 +789,10 @@ I_CI:   LSLS R6,R0,#20
         MOV  R2,R8
         LDRH R5,[R2,R3]
         ADDS R3,#2
-        REV16 R5,R5
+        REVSH R5,R5 // Signed: 16-bit unsigned order survives sign extension
 
         LDRH R2,[R6,#0] // R6=DEST
-        REV16 R2,R2
+        REVSH R2,R2
 
         MOVS R4,#0x1E // Get initialised ST
         ANDS R1,R4
@@ -820,8 +806,6 @@ I_CI_l:
         BLO  I_CI_a
         ADDS R1,#0x80 // Logic > bit
 I_CI_a:
-        SXTH R5,R5
-        SXTH R2,R2
         CMP  R2,R5 // Redo flags
         BLT  I_CI_e
         ADDS R1,#0x40 // Arith > bit
@@ -1104,10 +1088,9 @@ COM_S2b_R:
         B    COM_S2b_F2
 .align 4
 COM_S2b_L:
-        MOVS  R2,R3
+        MOV  R2,R8
+        LDRH R2,[R2,R3] // SRCE = (memory [PC + 0] << 8) | memory [PC + 1];
         ADDS R3,#2
-        ADD  R2,R8
-        LDRH R2,[R2,#0] // SRCE = (memory [PC + 0] << 8) | memory [PC + 1];
         REV16 R2,R2
         CMP  R5,#0  // if (S) // Not R0?
         BEQ  COM_S2b_F
@@ -1165,19 +1148,15 @@ I_JMP:  SXTH R0,R0 // R0 now has a signed offset
         ADDS R4,R0,#2 // Does this jump to itself?
         BNE  dojmp2   // Else quit the emulation
 // *********************************************************************************************
-I_IDLE: ADR  R0,RETCODE
-        STR  R3,[R0,#0] // PC
+I_IDLE: MOV  LR,R3 // The PC is the return value, and the caller's LR is on the stack
 
         POP  {R0-R7}
         MOV  R8,R0
         MOV  R9,R1
         MOV  R10,R2
         MOV  R11,R3
-        ADR  R0,RETCODE
-        LDR  R0,[R0,#0]
+        MOV  R0,LR
         POP  {PC}
-.align 4
-RETCODE: .WORD 0
 // *********************************************************************************************
 .align 4
 I_JLT:  MOVS R4,#0x60 // AG|EQ
@@ -1236,9 +1215,7 @@ I_JNE:  LSRS R4,R1,#6 // EQ -> Carry
 .thumb_func
 .type run9900, %function
 run9900:
-        PUSH {LR}
-
-        PUSH {R4-R7} // R7..R4
+        PUSH {R4-R7,LR} // LR, then R7..R4
         MOV  R4,R8
         MOV  R5,R9
         MOV  R6,R10
@@ -1275,9 +1252,8 @@ start:  UXTH R3,R3 // Normalize PC once at top of dispatch
 startX: REV16 R6,R0    // R6=INST|BYTE
         LSRS R2,R6,#5  // Get opcode
         LSLS R2,#3     // x8
-        MOV  R4,R12    // Table base
-        ADDS R4,R2
-        LDM  R4,{R4,R7} // Get 1st and 2nd branch location (if it's needed)
+        ADD  R2,R12    // Table base - R2 is the address register, and dead after
+        LDM  R2!,{R4,R7} // Get 1st and 2nd branch location (if it's needed)
         MOV  PC,R4
 
 // *********************************************************************************************
@@ -1592,15 +1568,11 @@ I_XOP_BL:
         ADD  R3,R8       // Within the 64KB memory area
         LDRB R0,[R3,#3]  // Get VR35
 
-        MOVS R7,R5
-        MOVS R2,#255     // Set up a mask, plus a base for > 255 numbers
-        ANDS R7,R2       // Y
-        CMP  R0,#0       // 0 is special, == 256
-        BNE  I_XOP_BL_M
-        ADDS R0,R2,#1    // 256 - R2 is now free
-I_XOP_BL_M:
-        ADDS R0,#3
-        LSRS R0,#2       // Row stride in bytes, rounded up
+        UXTB R7,R5       // Y
+        SUBS R0,#1       // Rounded stride, and width zero already means 256
+        UXTB R0,R0
+        LSRS R0,#2
+        ADDS R0,#1
         MULS R0,R7       // R7 is now free
         LSRS R7,R5,#10   // x >> 2
         ADDS R0,R7       // R0 = (y * stride) + (x >> 2)
