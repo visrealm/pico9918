@@ -71,6 +71,13 @@ extern "C"
      * call per register write.
      */
     void (*onWrite)(uint8_t* mem, uint32_t addr);
+
+    /* Addresses the watcher wants: it is called only where
+       (addr & onWriteMask) == onWriteMatch, tested on the decoded address. Both
+       zero, which tms9900_init leaves, is every address - a watcher that cares
+       about a few narrows it here rather than being called to say no. */
+    uint32_t onWriteMask;
+    uint32_t onWriteMatch;
 #endif
   } Tms9900Cpu;
 

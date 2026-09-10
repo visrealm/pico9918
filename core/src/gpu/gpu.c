@@ -51,7 +51,9 @@ static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t wp, uint8_t* r
   tms9900_init(&cpu, mem, r38, pc, wp);
   cpu.f18aMemory = f18aMemory;
 #if defined(TMS9900_WATCH_WRITES)
-  cpu.onWrite = gpuDmaWatch;
+  cpu.onWrite      = gpuDmaWatch;
+  cpu.onWriteMask  = ~(uint32_t)0x1F;
+  cpu.onWriteMatch = 0x8000;
 #endif
   cpu.st = *st;
   const uint16_t next = run9900_budget_c(&cpu, budget, outOfBudget);
@@ -244,7 +246,8 @@ static void triggerGpuDma(uint8_t* vram)
  */
 static void gpuDmaWatch(uint8_t* vram, uint32_t addr)
 {
-  if ((addr & ~(uint32_t)0x1F) == 0x8000 && vram[0x8008]) triggerGpuDma(vram);
+  (void)addr; /* onWriteMask/Match already select the port, so only it arrives */
+  if (vram[0x8008]) triggerGpuDma(vram);
 }
 #endif
 

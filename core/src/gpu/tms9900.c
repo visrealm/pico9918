@@ -29,21 +29,70 @@
 #include "tms9900.h"
 
 #include <stddef.h>
+#include <string.h>
+
+/* PICO9918_INLINE_HOT spelled again: this core stays standalone, and platform.h
+   reaches the host-ops header. Plain `inline` would not bind the operand helpers. */
+#if defined(_MSC_VER) && !defined(__clang__)
+#define TMS9900_INLINE_HOT static __forceinline
+#else
+#define TMS9900_INLINE_HOT static inline __attribute__((always_inline))
+#endif
+
+/* Which map the accessors decode for: the CPU's, or a constant when this file is
+   compiled once per personality (TMS9900_PERSONALITY 0/1 + TMS9900_VARIANT_ENTRY). */
+#if defined(TMS9900_PERSONALITY)
+#define F18A_ACTIVE TMS9900_PERSONALITY
+#define run9900_budget_c TMS9900_VARIANT_ENTRY
+#else
+#define F18A_ACTIVE (cpu->f18aMemory)
+#endif
 
 
 /*
- * Parity table for byte operations: P (bit 2) is set when the byte has an odd number
- * of 1-bits. Matches the PARITY table in thumb9900_m0.S.
+ * Everything a byte result says about the status word, by value.
+ *
+ *   bit  set when
+ *   0x80 LGT  the byte is non-zero
+ *   0x40 AGT  the byte is non-zero and positive as a signed value
+ *   0x20 EQ   the byte is zero
+ *   0x04 P    the byte has an odd number of 1-bits
+ *
+ * The P column alone is the PARITY table in thumb9900_m0.S, which is all CB takes.
  */
-static const uint8_t parity_tbl[256] = {
-  0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4,
-  4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0,
-  4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0,
-  0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4,
-  4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0,
-  0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4,
-  0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4,
-  4, 0, 0, 4, 0, 4, 4, 0, 0, 4, 4, 0, 4, 0, 0, 4, 0, 4, 4, 0, 4, 0, 0, 4, 4, 0, 0, 4, 0, 4, 4, 0};
+static const uint8_t byte_flags[256] = {
+  0x20, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC0, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC0, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0xC0, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC0, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0xC0, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC0, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC4, 0xC0, 0xC0, 0xC4, 0xC0, 0xC4, 0xC4, 0xC0,
+  0xC0, 0xC4, 0xC4, 0xC0, 0xC4, 0xC0, 0xC0, 0xC4,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84,
+  0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80};
 
 /*
  * Flag helpers
@@ -70,17 +119,8 @@ static inline void set_flags_word(Tms9900Cpu* cpu, uint16_t v)
 static inline void set_flags_byte(Tms9900Cpu* cpu, uint8_t v)
 {
   /* Assembly OP_COMP_B: sets LGT/AGT/EQ + parity from PARITY table */
-  cpu->st   = (uint16_t)((cpu->st & ~(TMS_ST_LGT | TMS_ST_AGT | TMS_ST_EQ | TMS_ST_P)) | parity_tbl[v]);
-  int8_t sv = (int8_t)v;
-  if (v == 0)
-  {
-    cpu->st |= TMS_ST_EQ;
-    return;
-  }
-  if (sv > 0)
-    cpu->st |= (TMS_ST_LGT | TMS_ST_AGT);
-  else
-    cpu->st |= TMS_ST_LGT;
+  cpu->st = (uint16_t)((cpu->st & ~(TMS_ST_LGT | TMS_ST_AGT | TMS_ST_EQ | TMS_ST_P))
+                       | byte_flags[v]);
 }
 
 /*
@@ -125,14 +165,14 @@ static inline uint32_t gpu_addr(uint16_t a)
 
 static inline uint8_t rd8(Tms9900Cpu* cpu, uint16_t a)
 {
-  if (!cpu->f18aMemory) return cpu->mem[a];
+  if (!F18A_ACTIVE) return cpu->mem[a];
   if (!((GPU_WINDOW_READS >> (a >> 12)) & 1)) return 0;
   return cpu->mem[gpu_addr(a)];
 }
 
 static inline void wr8(Tms9900Cpu* cpu, uint16_t a, uint8_t v)
 {
-  if (!cpu->f18aMemory)
+  if (!F18A_ACTIVE)
   {
     cpu->mem[a] = v;
     return;
@@ -161,7 +201,10 @@ static inline void wr16(Tms9900Cpu* cpu, uint16_t a, uint16_t v)
 #if defined(TMS9900_WATCH_WRITES)
 static inline void watch_write(Tms9900Cpu* cpu, uint32_t addr)
 {
-  if (cpu->onWrite) cpu->onWrite(cpu->mem, cpu->f18aMemory ? gpu_addr((uint16_t)addr) : addr);
+  if (!cpu->onWrite) return;
+
+  const uint32_t at = F18A_ACTIVE ? gpu_addr((uint16_t)addr) : addr;
+  if ((at & cpu->onWriteMask) == cpu->onWriteMatch) cpu->onWrite(cpu->mem, at);
 }
 #else
 #define watch_write(cpu, addr) ((void)0)
@@ -174,17 +217,35 @@ static inline uint32_t wp_addr(Tms9900Cpu* cpu, uint8_t r)
   return (uint32_t)cpu->wp + ((uint32_t)r << 1);
 }
 
+/* TRAP: not a substitute for rd16 - the workspace bypasses F18A translation and may
+   run past 64KB at WP >FFFE. memcpy, not a cast: the address carries no alignment. */
+#if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) \
+  || (defined(_MSC_VER) && !defined(__clang__))
+#define TMS9900_SWAP_WORKSPACE 1
+#endif
+
 static inline uint16_t get_reg(Tms9900Cpu* cpu, uint8_t r)
 {
   uint32_t a = wp_addr(cpu, r);
+#if defined(TMS9900_SWAP_WORKSPACE)
+  uint16_t w;
+  memcpy(&w, cpu->mem + a, sizeof w);
+  return (uint16_t)((w >> 8) | (w << 8));
+#else
   return (uint16_t)((cpu->mem[a] << 8) | cpu->mem[a + 1]);
+#endif
 }
 
 static inline void set_reg(Tms9900Cpu* cpu, uint8_t r, uint16_t v)
 {
-  uint32_t a      = wp_addr(cpu, r);
+  uint32_t a = wp_addr(cpu, r);
+#if defined(TMS9900_SWAP_WORKSPACE)
+  uint16_t w = (uint16_t)((v >> 8) | (v << 8));
+  memcpy(cpu->mem + a, &w, sizeof w);
+#else
   cpu->mem[a]     = (uint8_t)(v >> 8);
   cpu->mem[a + 1] = (uint8_t)(v & 0xFF);
+#endif
 }
 
 /* Operand addressing */
@@ -204,7 +265,10 @@ static inline uint16_t fetchw(Tms9900Cpu* cpu)
   return rd16(cpu, a);
 }
 
-static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
+/* TRAP: `load` must be a literal at every call site - always_inline folds it away,
+   but a runtime value costs a branch per operand. Use decode_operand or decode_addr. */
+TMS9900_INLINE_HOT Operand decode_field(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte,
+                                        int load)
 {
   Operand o = {0};
   o.mode    = (field >> 4) & 0x3;
@@ -215,12 +279,12 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
   {
   case 0:                                                /* register direct */
     if (is_byte) o.addr = (uint16_t)wp_addr(cpu, o.reg); /* high byte address */
-    o.val = is_byte ? cpu->mem[wp_addr(cpu, o.reg)] : get_reg(cpu, o.reg);
+    if (load) o.val = is_byte ? cpu->mem[wp_addr(cpu, o.reg)] : get_reg(cpu, o.reg);
     break;
   case 1: /* indirect - assembly word-aligns effective address for word ops */
     o.addr = get_reg(cpu, o.reg);
     if (!is_byte) o.addr &= 0xFFFE;
-    o.val = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
+    if (load) o.val = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
     break;
   case 2:
   { /* indexed - when reg==0, address is the immediate offset only (absolute) */
@@ -231,7 +295,7 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
     else
       ea = (uint16_t)(get_reg(cpu, o.reg) + offset);
     o.addr = is_byte ? ea : (ea & 0xFFFE);
-    o.val  = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
+    if (load) o.val = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
     break;
   }
   case 3:
@@ -241,14 +305,26 @@ static Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
     uint16_t inc = is_byte ? 1u : 2u;
     set_reg(cpu, o.reg, (uint16_t)(raw + inc));
     o.addr = is_byte ? raw : (raw & 0xFFFE);
-    o.val  = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
+    if (load) o.val = is_byte ? rd8(cpu, o.addr) : rd16(cpu, o.addr);
     break;
   }
   }
   return o;
 }
 
-static void store_operand(Tms9900Cpu* cpu, const Operand* o, uint16_t v)
+TMS9900_INLINE_HOT Operand decode_operand(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
+{
+  return decode_field(cpu, field, is_byte, 1);
+}
+
+/* Addressing only, for a target whose old value the instruction overwrites or
+   ignores. Auto-increment and the indexed extension word still happen here. */
+TMS9900_INLINE_HOT Operand decode_addr(Tms9900Cpu* cpu, uint8_t field, uint8_t is_byte)
+{
+  return decode_field(cpu, field, is_byte, 0);
+}
+
+TMS9900_INLINE_HOT void store_operand(Tms9900Cpu* cpu, const Operand* o, uint16_t v)
 {
   if (o->mode == 0)
   {
@@ -284,7 +360,7 @@ static inline uint16_t add16(Tms9900Cpu* cpu, uint16_t a, uint16_t b)
   if (res & 0x10000) cpu->st |= TMS_ST_C;
 
   /* overflow: sign(a)==sign(b) and sign differs from result */
-  if (((a ^ b) & 0x8000) == 0 && ((a ^ r16) & 0x8000)) cpu->st |= TMS_ST_OV;
+  if ((uint16_t)(~(a ^ b) & (a ^ r16)) & 0x8000) cpu->st |= TMS_ST_OV;
   set_flags_word(cpu, r16);
   return r16;
 }
@@ -295,11 +371,11 @@ static inline uint16_t sub16(Tms9900Cpu* cpu, uint16_t a, uint16_t b)
   uint16_t r16 = (uint16_t)res;
   cpu->st &= 0x06;
 
-  /* Assembly "borrow NOT" convention: carry=1 means no borrow (src==0 or dst>=result) */
-  if (b == 0 || a >= r16) cpu->st |= TMS_ST_C;
+  /* Assembly "borrow NOT": carry=1 is no borrow, which for unsigned is just a >= b */
+  if (a >= b) cpu->st |= TMS_ST_C;
 
   /* overflow: sign(a)!=sign(b) and sign differs from result */
-  if (((a ^ b) & 0x8000) && ((a ^ r16) & 0x8000)) cpu->st |= TMS_ST_OV;
+  if ((uint16_t)((a ^ b) & (a ^ r16)) & 0x8000) cpu->st |= TMS_ST_OV;
   set_flags_word(cpu, r16);
   return r16;
 }
@@ -310,7 +386,7 @@ static inline uint8_t add8(Tms9900Cpu* cpu, uint8_t a, uint8_t b)
   uint8_t r8   = (uint8_t)res;
   cpu->st &= 0x06;
   if (res & 0x100) cpu->st |= TMS_ST_C;
-  if (((a ^ b) & 0x80) == 0 && ((a ^ r8) & 0x80)) cpu->st |= TMS_ST_OV;
+  if ((uint8_t)(~(a ^ b) & (a ^ r8)) & 0x80) cpu->st |= TMS_ST_OV;
   set_flags_byte(cpu, r8);
   return r8;
 }
@@ -321,9 +397,9 @@ static inline uint8_t sub8(Tms9900Cpu* cpu, uint8_t a, uint8_t b)
   uint8_t r8   = (uint8_t)res;
   cpu->st &= 0x06;
 
-  /* Assembly "borrow NOT" convention: carry=1 means no borrow (src==0 or dst>=result) */
-  if (b == 0 || a >= r8) cpu->st |= TMS_ST_C;
-  if (((a ^ b) & 0x80) && ((a ^ r8) & 0x80)) cpu->st |= TMS_ST_OV;
+  /* Assembly "borrow NOT": carry=1 is no borrow, which for unsigned is just a >= b */
+  if (a >= b) cpu->st |= TMS_ST_C;
+  if ((uint8_t)((a ^ b) & (a ^ r8)) & 0x80) cpu->st |= TMS_ST_OV;
   set_flags_byte(cpu, r8);
   return r8;
 }
@@ -347,8 +423,8 @@ static inline void cmp16(Tms9900Cpu* cpu, uint16_t first, uint16_t second)
 
 static inline void cmp8(Tms9900Cpu* cpu, uint8_t src, uint8_t dst)
 {
-  /* Assembly I_CB: preserves C/OV, sets parity of SOURCE, then sets LGT/AGT/EQ */
-  cpu->st = (uint16_t)((cpu->st & 0x1A) | parity_tbl[src]);
+  /* Assembly I_CB: parity of the SOURCE only - the comparison below sets the rest */
+  cpu->st = (uint16_t)((cpu->st & 0x1A) | (byte_flags[src] & TMS_ST_P));
   if (src == dst)
   {
     cpu->st |= TMS_ST_EQ;
@@ -362,19 +438,14 @@ static inline uint16_t slx16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
 {
   cpu->st &= 0x06;
   if (count == 0) count = 16;
-  uint32_t vv          = (uint32_t)v;
-  uint32_t mask_change = 0;
 
-  /* detect overflow like assembly: if sign changes during shift */
-  for (uint8_t i = 0; i < count; ++i)
-  {
-    uint32_t msb = vv & 0x8000;
-    vv <<= 1;
-    if (msb != (vv & 0x8000)) mask_change = 1;
-  }
-  if (vv & 0x10000) cpu->st |= TMS_ST_C;
-  uint16_t r = (uint16_t)vv;
-  if (mask_change) cpu->st |= TMS_ST_OV;
+  /* TRAP: cast to unsigned before shifting - a negative signed left shift is UB.
+     OV is a sign change at any point, which is what the re-extend below tests. */
+  uint32_t wide = (uint32_t)(int32_t)(int16_t)v << count;
+  uint16_t r    = (uint16_t)wide;
+
+  if (wide & 0x10000u) cpu->st |= TMS_ST_C;
+  if (wide != (uint32_t)(int32_t)(int16_t)r) cpu->st |= TMS_ST_OV;
   set_flags_word(cpu, r);
   return r;
 }
@@ -384,15 +455,11 @@ static inline uint16_t sra16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
   /* Assembly: MOVS R4,#0x0E; ANDS R1,R4 - keeps OV/P/bit1, clears C (and LGT/AGT/EQ) */
   cpu->st &= 0x0E;
   if (count == 0) count = 16;
-  int32_t vv     = (int32_t)(int16_t)v;
-  uint16_t carry = 0;
-  for (uint8_t i = 0; i < count; ++i)
-  {
-    carry = (uint16_t)((uint32_t)vv & 1u);
-    vv >>= 1; /* arithmetic right shift on signed preserves sign bit */
-  }
-  if (carry) cpu->st |= TMS_ST_C;
-  uint16_t r = (uint16_t)vv;
+
+  /* Sign extend, then shift unsigned: correct through count 16, no signed-shift rule */
+  uint32_t wide = (uint32_t)(int32_t)(int16_t)v;
+  if ((wide >> (count - 1u)) & 1u) cpu->st |= TMS_ST_C;
+  uint16_t r = (uint16_t)(wide >> count);
   set_flags_word(cpu, r);
   return r;
 }
@@ -402,15 +469,10 @@ static inline uint16_t srl16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
   /* Assembly: MOVS R4,#0x0E; ANDS R1,R4 - keeps OV/P/bit1, clears C */
   cpu->st &= 0x0E;
   if (count == 0) count = 16;
-  uint32_t vv    = v;
-  uint16_t carry = 0;
-  for (uint8_t i = 0; i < count; ++i)
-  {
-    carry = (uint16_t)(vv & 1u);
-    vv >>= 1;
-  }
-  if (carry) cpu->st |= TMS_ST_C;
-  uint16_t r = (uint16_t)vv;
+
+  uint32_t wide = v;
+  if ((wide >> (count - 1u)) & 1u) cpu->st |= TMS_ST_C;
+  uint16_t r = (uint16_t)(wide >> count);
   set_flags_word(cpu, r);
   return r;
 }
@@ -443,23 +505,6 @@ static inline uint16_t slc16(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
   /* Carry = bit just before wrap (count-1) */
   uint16_t carry = (uint16_t)((vv << (count - 1)) & 0x8000u);
   if (carry) cpu->st |= TMS_ST_C;
-  set_flags_word(cpu, r);
-  return r;
-}
-
-static inline uint16_t src_through_c(Tms9900Cpu* cpu, uint16_t v, uint8_t count)
-{
-  cpu->st &= 0x06;
-  if (count == 0) count = 16;
-  uint32_t vv = ((uint32_t)v << 1) | ((cpu->st & TMS_ST_C) ? 1u : 0u);
-  for (uint8_t i = 0; i < count; ++i)
-  {
-    uint32_t c = vv & 1u;
-    vv >>= 1;
-    if (c) vv |= 0x8000u;
-    cpu->st = (cpu->st & ~TMS_ST_C) | (c ? TMS_ST_C : 0);
-  }
-  uint16_t r = (uint16_t)vv;
   set_flags_word(cpu, r);
   return r;
 }
@@ -562,8 +607,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   {
     Operand s         = decode_operand(cpu, inst & 0x3F, 0);
     uint32_t src_addr = wp_addr(cpu, inst & 0xF);
-    uint16_t new_wp = (s.mode == 0) ? (uint16_t)((cpu->mem[src_addr] << 8) | cpu->mem[src_addr + 1]) & 0xFFFE
-                                    : rd16(cpu, s.addr) & 0xFFFE;
+    uint16_t new_wp   = s.val & 0xFFFE; /* the decoder already read it, from either place */
     uint16_t old_wp = cpu->wp;
     uint16_t old_pc = cpu->pc;
     uint16_t old_st = cpu->st;
@@ -581,7 +625,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0x11: /* B - branch to source operand address */
   {
-    Operand s       = decode_operand(cpu, inst & 0x3F, 0);
+    Operand s       = decode_addr(cpu, inst & 0x3F, 0);
     uint32_t target = (s.mode == 0) ? wp_addr(cpu, inst & 0xF) : (uint32_t)s.addr;
     cpu->pc         = target & 0xFFFE;
     break;
@@ -589,7 +633,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   case 0x12: /* X - execute instruction at source */
   {
     Operand s       = decode_operand(cpu, inst & 0x3F, 0);
-    uint16_t x_inst = (s.mode == 0) ? s.val : rd16(cpu, s.addr);
+    uint16_t x_inst = s.val; /* the decoder already read it, from either place */
 
     /* Dispatch the fetched instruction (PC is NOT advanced by X itself) */
     uint8_t x_hi = (uint8_t)(x_inst >> 8);
@@ -616,7 +660,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0x13: /* CLR - no flag update (assembly does not touch ST) */
   {
-    Operand d = decode_operand(cpu, inst & 0x3F, 0);
+    Operand d = decode_addr(cpu, inst & 0x3F, 0);
     store_operand(cpu, &d, 0);
     break;
   }
@@ -677,7 +721,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0x1A: /* BL - branch and link, save PC to R11 */
   {
-    Operand s = decode_operand(cpu, inst & 0x3F, 0);
+    Operand s = decode_addr(cpu, inst & 0x3F, 0);
     set_reg(cpu, 11, (uint16_t)cpu->pc);
     uint32_t target = (s.mode == 0) ? wp_addr(cpu, inst & 0xF) : (uint32_t)s.addr;
     cpu->pc         = target & 0xFFFE;
@@ -692,7 +736,7 @@ static inline void handle_jump_single(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0x1C: /* SETO - no flag update (assembly does not touch ST) */
   {
-    Operand d = decode_operand(cpu, inst & 0x3F, 0);
+    Operand d = decode_addr(cpu, inst & 0x3F, 0);
     store_operand(cpu, &d, 0xFFFF);
     break;
   }
@@ -795,12 +839,6 @@ static inline int handle_branch_group(Tms9900Cpu* cpu, uint16_t inst)
   return 1;
 }
 
-/* Function:  handle_cru_single_bit
- * ----------------------------------------
- * Execute op group 3 (CRU single-bit) - treated as NOP here.
- */
-static inline void handle_cru_single_bit(void) {}
-
 /* Function:  handle_shift_rotate
  * ----------------------------------------
  * Execute op group 4 (shift/rotate).
@@ -870,8 +908,6 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
   }
   case 0xB: /* 0x2C00-0x2FFF: XOP/F18A PIX */
   {
-    static const uint8_t pix_mask[]  = {0xC0, 0x30, 0x0C, 0x03};
-    static const uint8_t pix_shift[] = {6, 4, 2, 0};
 
     uint16_t flags = get_reg(cpu, dreg);
     uint16_t xy    = src.val;
@@ -892,11 +928,10 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
     }
     else /* BL mode */
     {
-      uint8_t vr35   = cpu->mem[0x6023];
-      uint16_t width = (vr35 == 0) ? 256u : (uint16_t)vr35;
+      uint8_t vr35 = cpu->mem[0x6023];
 
-      /* Four pixels a byte, so the row stride rounds up, and the address wraps in 16KB. */
-      uint16_t stride = (uint16_t)((width + 3) >> 2);
+      /* Four pixels a byte, so the stride rounds up; width zero already means 256 */
+      uint16_t stride = (uint16_t)((uint8_t)(vr35 - 1u) >> 2) + 1u;
       uint8_t vr32    = cpu->mem[0x6020];
       uint16_t a      = (uint16_t)((((uint16_t)vr32 << 6) + y * stride + (x >> 2)) & 0x3FFF);
 
@@ -906,9 +941,10 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
         break;
       }
 
-      uint8_t s    = (uint8_t)(x & 0x03);
-      uint8_t b    = cpu->mem[a];
-      uint8_t pixv = (uint8_t)((b & pix_mask[s]) >> pix_shift[s]);
+      unsigned shift = 6u - 2u * (x & 3u);
+      uint8_t mask   = (uint8_t)(3u << shift);
+      uint8_t b      = cpu->mem[a];
+      uint8_t pixv   = (uint8_t)((b >> shift) & 3u);
 
       /* Write logic */
       int do_write = 0;
@@ -935,7 +971,7 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
       if (do_write)
       {
         uint8_t pp_wr = (uint8_t)(flags & 0x03);
-        b             = (uint8_t)((b & ~pix_mask[s]) | (pp_wr << pix_shift[s]));
+        b             = (uint8_t)((b & (uint8_t)~mask) | (pp_wr << shift));
         cpu->mem[a]   = b;
         watch_write(cpu, a);
       }
@@ -958,7 +994,9 @@ static inline void handle_format9(Tms9900Cpu* cpu, uint16_t inst)
   case 0xF: /* 0x3C00 DIV */
   {
     uint32_t dividend = ((uint32_t)get_reg(cpu, dreg) << 16) | get_reg(cpu, (uint8_t)(dreg + 1));
-    if (src.val == 0 || (dividend >> 16) >= src.val)
+
+    /* a zero divisor is covered: every high word is >= it, so this breaks first */
+    if ((dividend >> 16) >= src.val)
     {
       cpu->st |= TMS_ST_OV;
       break;
@@ -985,7 +1023,7 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
     /* bit 7 alone chooses: RET over >0C00->0C7F, CALL over >0C80->0CFF */
     if (inst & 0x80)
     { /* CALL - push PC at OLD R15, pre-decrement R15 by 2, branch to source */
-      Operand s       = decode_operand(cpu, inst & 0x3F, 0);
+      Operand s       = decode_addr(cpu, inst & 0x3F, 0);
       uint16_t old_sp = get_reg(cpu, 15) & 0xFFFE;
       uint16_t new_sp = (uint16_t)(old_sp - 2);
       set_reg(cpu, 15, new_sp);
@@ -1015,7 +1053,7 @@ static inline void handle_f18a_stack(Tms9900Cpu* cpu, uint16_t inst)
   case 0xF: /* POP - read from OLD R15+2, increment R15 by 2 */
   {
     /* Assembly: R4=old_sp; R4+=2 (new_sp); store new_sp as R15; read from mem[new_sp] */
-    Operand d       = decode_operand(cpu, inst & 0x3F, 0);
+    Operand d       = decode_addr(cpu, inst & 0x3F, 0);
     uint16_t old_sp = get_reg(cpu, 15) & 0xFFFE;
     uint16_t new_sp = (uint16_t)(old_sp + 2);
     set_reg(cpu, 15, new_sp);
@@ -1033,7 +1071,28 @@ static inline void handle_two_operand(Tms9900Cpu* cpu, uint16_t inst)
   uint8_t opcode  = (uint8_t)((inst >> 12) & 0xF);
   uint8_t byte_op = opcode & 1; /* odd opcode = byte variant */
   Operand src     = decode_operand(cpu, (uint8_t)(inst & 0x3F), byte_op);
-  Operand dst     = decode_operand(cpu, (uint8_t)((inst >> 6) & 0x3F), byte_op);
+
+  /* MOV and MOVB first: the only two here that never read the old destination */
+  if ((opcode & 0xE) == 0xC)
+  {
+    Operand dst = decode_addr(cpu, (uint8_t)((inst >> 6) & 0x3F), byte_op);
+    if (byte_op)
+    {
+      uint8_t res = (uint8_t)src.val;
+      store_operand(cpu, &dst, res);
+      cpu->st &= 0x1E;
+      set_flags_byte(cpu, res);
+    }
+    else
+    {
+      store_operand(cpu, &dst, src.val);
+      cpu->st &= 0x1E;
+      set_flags_word(cpu, src.val);
+    }
+    return;
+  }
+
+  Operand dst = decode_operand(cpu, (uint8_t)((inst >> 6) & 0x3F), byte_op);
 
   switch (opcode)
   {
@@ -1090,21 +1149,6 @@ static inline void handle_two_operand(Tms9900Cpu* cpu, uint16_t inst)
     store_operand(cpu, &dst, res);
     break;
   }
-  case 0xC: /* MOV - move word */
-  {
-    store_operand(cpu, &dst, src.val);
-    cpu->st &= 0x1E;
-    set_flags_word(cpu, src.val);
-    break;
-  }
-  case 0xD: /* MOVB - move byte */
-  {
-    uint8_t res = (uint8_t)src.val;
-    store_operand(cpu, &dst, res);
-    cpu->st &= 0x1E;
-    set_flags_byte(cpu, res);
-    break;
-  }
   case 0xE: /* SOC - dst |= src (word) */
   {
     uint16_t res = dst.val | src.val;
@@ -1124,6 +1168,8 @@ static inline void handle_two_operand(Tms9900Cpu* cpu, uint16_t inst)
   default: break;
   }
 }
+/* init decodes no memory, so the flat variant carries it for both */
+#if !defined(TMS9900_PERSONALITY) || TMS9900_PERSONALITY == 0
 void tms9900_init(Tms9900Cpu* cpu, uint8_t* mem, uint8_t* regx38, uint16_t pc, uint16_t wp)
 {
   cpu->mem    = mem;
@@ -1133,14 +1179,20 @@ void tms9900_init(Tms9900Cpu* cpu, uint8_t* mem, uint8_t* regx38, uint16_t pc, u
   cpu->st         = 0;
   cpu->f18aMemory = false;
 #if defined(TMS9900_WATCH_WRITES)
-  cpu->onWrite = NULL;
+  cpu->onWrite      = NULL;
+  cpu->onWriteMask  = 0;
+  cpu->onWriteMatch = 0;
 #endif
 }
+#endif /* the flat variant, or an ordinary build */
 
+/* in a variant build the dispatcher owns this, so it can pick a personality too */
+#if !defined(TMS9900_PERSONALITY)
 uint16_t run9900_c(Tms9900Cpu* cpu)
 {
   return run9900_budget_c(cpu, 0, NULL);
 }
+#endif
 
 uint16_t run9900_budget_c(Tms9900Cpu* cpu, uint32_t budget, bool* outOfBudget)
 {
