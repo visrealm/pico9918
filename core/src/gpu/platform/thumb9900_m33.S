@@ -149,8 +149,7 @@ I_SLA_nr0:
 
         // Set Overflow if sign changes
         ADR  R4,I_SLA_M
-        LSLS R7,R2,#2
-        LDR  R7,[R4,R7] // Get correct mask
+        LDR  R7,[R4,R2,LSL #2] // Get correct mask
 
         LSRS R4,R0,#16 // Top bit into Carry
         BCS  I_SLA_neg // Result was not zero
@@ -228,8 +227,7 @@ I_SLC_nr0:
 
         ANDS R1,#0x0E // Get initialised ST
 
-        MOVS R4,#16 // Simulate Rotate Left
-        SUBS R4,R2  // R2 = 1..16, R4 -> 15..0
+        RSB  R4,R2,#16 // Simulate Rotate Left: R2 = 1..16, R4 -> 15..0
         RORS R0,R4
         LSRS R2,R0,#1 // Calculate Carry
         IT   CS
@@ -307,10 +305,11 @@ I_INV:  LDRH R0,[R5,#0] // R5=SRCE/DEST
         B    OP_COMP_W
 // *********************************************************************************************
 .align 4
-I_XOR:  EORS R4,R5 // R4=TEMP, R5=*SRCE
+I_XOR:  LDRH R4,[R6,#0] // TEMP = *DEST
         REV16 R4,R4
+        EOR  R0,R4,R5 // R4=TEMP, R5=*SRCE - the classification wants it unswapped
+        REV16 R4,R0
         STRH R4,[R6,#0] // R6=DEST
-        REV16 R0,R4
         ANDS R1,#0x1E // Get initialised ST
         B    OP_COMP_W
 // *********************************************************************************************
@@ -395,17 +394,16 @@ I_INCT: LDRH R2,[R5,#0] // R5=SRCE/DEST
 .align 4
 I_DEC:  LDRH R2,[R5,#0] // R5=SRCE/DEST
         REV16 R2,R2
+
+        ANDS R1,#0x06 // Get initialised ST
+
         SUBS R4,R2,#1
+        IT   CS
+        ADDCS R1,#0x10 // Carry bit: the SUBS' no-borrow is the guest's
 
         UXTH R0,R4 // Keep a clean copy
         REV16 R4,R4
         STRH R4,[R5,#0]
-
-        ANDS R1,#0x06 // Get initialised ST
-
-        CMP  R2,R0
-        IT   HS
-        ADDHS R1,#0x10 // Carry bit
 
         CMP  R2,#0x8000 // signed overflow iff >8000 -> >7FFF
         IT   EQ
@@ -416,17 +414,15 @@ I_DEC:  LDRH R2,[R5,#0] // R5=SRCE/DEST
 I_DECT: LDRH R2,[R5,#0] // R5=SRCE/DEST
         REV16 R2,R2
 
+        ANDS R1,#0x06 // Get initialised ST
+
         SUBS R4,R2,#2
+        IT   CS
+        ADDCS R1,#0x10 // Carry bit: the SUBS' no-borrow is the guest's
 
         UXTH R0,R4 // Keep a copy
         REV16 R4,R4
         STRH R4,[R5,#0]
-
-        ANDS R1,#0x06 // Get initialised ST
-
-        CMP  R2,R0
-        IT   HS
-        ADDHS R1,#0x10 // Carry bit
 
         BIC  R4,R2,#1
         CMP  R4,#0x8000 // overflow iff operand is >8000 or >8001
@@ -440,14 +436,14 @@ I_MOV:  STRH R5,[R6,#0]
         ANDS R1,#0x1E // Get initialised ST
 // *********************************************************************************************
 OP_COMP_W:
-        SXTH R0,R0
-        CMP  R0,#0
-        BGT  OP_COMP_W_a
+        LSLS R0,R0,#16 // Discards the upper half and gives the low word's N and Z
+OP_COMP_W_F: // For a handler whose R0 already holds the word in 31-16, N and Z live
+        BMI  OP_COMP_W_n
         BEQ  OP_COMP_W_e
-        ADDS R1,#0x80 // L >
-        GPU_DISPATCH
-OP_COMP_W_a:
         ADDS R1,#0xC0 // LA >
+        GPU_DISPATCH
+OP_COMP_W_n:
+        ADDS R1,#0x80 // L >
         GPU_DISPATCH
 OP_COMP_W_e:
         ADDS R1,#0x20 // Equal bit
@@ -463,51 +459,37 @@ I_AI:   UBFX R6,R0,#8,#4
         ADDS R3,#2
 // *********************************************************************************************
 I_A:    LDRH R2,[R6,#0] // R6=DEST
-        REV16 R2,R2
-        REV16 R5,R5
-
-        ADDS R7,R2,R5
+        REV  R2,R2 // The guest word into 31-16, so ARM C and V are the guest's
+        REV  R5,R5
 
         ANDS R1,#0x06 // Get initialised ST
 
-        LSRS R4,R7,#16
-        IT   NE
-        ADDNE R1,#0x10 // Carry bit
-        UXTH R0,R7 // Keep a copy
-        REV16 R7,R7
-        STRH R7,[R6,#0]
+        ADDS R0,R2,R5
+        IT   CS
+        ADDCS R1,#0x10 // Carry bit
+        IT   VS
+        ADDVS R1,#0x08 // Overflow bit
 
-        EOR  R4,R2,R0 // Overflow iff both operands differ from the result
-        EOR  R5,R5,R0
-        AND  R4,R4,R5
-        TST  R4,#0x8000
-        IT   NE
-        ADDNE R1,#0x08 // Overflow bit
-        B    OP_COMP_W
+        REV  R4,R0
+        STRH R4,[R6,#0]
+        B    OP_COMP_W_F
 // *********************************************************************************************
 .align 4
 I_S:    LDRH R2,[R6,#0] // R6=DEST
-        REV16 R2,R2
-        REV16 R5,R5
-
-        SUBS R4,R2,R5
-
-        UXTH R0,R4 // Keep a copy
-        REV16 R4,R4
-        STRH R4,[R6,#0]
+        REV  R2,R2 // The guest word into 31-16, so ARM C and V are the guest's
+        REV  R5,R5
 
         ANDS R1,#0x06 // Get initialised ST
 
-        CMP  R2,R0
-        IT   HS
-        ADDHS R1,#0x10 // Carry bit
-        EOR  R4,R2,R5 // Overflow iff operands differ and the result differs from R2
-        EOR  R5,R2,R0
-        AND  R4,R4,R5
-        TST  R4,#0x8000
-        IT   NE
-        ADDNE R1,#0x08 // Overflow bit
-        B    OP_COMP_W
+        SUBS R0,R2,R5
+        IT   CS
+        ADDCS R1,#0x10 // Carry bit
+        IT   VS
+        ADDVS R1,#0x08 // Overflow bit
+
+        REV  R4,R0
+        STRH R4,[R6,#0]
+        B    OP_COMP_W_F
 // *********************************************************************************************
 .align 4
 I_SZCB: LDRB R0,[R6,#0] // R6=DEST
@@ -547,16 +529,15 @@ I_AB:   LDRB R2,[R6,#0] // R6=DEST
 .align 4
 I_SB:   LDRB R2,[R6,#0] // R6=DEST
 
+        ANDS R1,#0x02 // Get initialised ST
+
         SUBS R4,R2,R5
+        IT   CS
+        ADDCS R1,#0x10 // Carry bit: the SUBS' no-borrow is the guest's
 
         UXTB R0,R4 // Keep a copy
         STRB R4,[R6,#0]
 
-        ANDS R1,#0x02 // Get initialised ST
-
-        CMP  R2,R0
-        IT   HS
-        ADDHS R1,#0x10 // Carry bit
         EOR  R4,R2,R5 // Overflow iff operands differ and the result differs from R2
         EOR  R5,R2,R0
         AND  R4,R4,R5
@@ -578,8 +559,8 @@ OP_COMP_B:
 // *********************************************************************************************
 .align 4
 I_C:    LDRH R2,[R6,#0] // R6=DEST
-        REV16 R2,R2
-        REV16 R5,R5
+        REVSH R2,R2 // Signed: 16-bit unsigned order survives sign extension
+        REVSH R5,R5
 
         ANDS R1,#0x1E // Get initialised ST
 
@@ -592,8 +573,6 @@ I_C_l:
         BLO  I_C_a
         ADDS R1,#0x80 // Logic > bit
 I_C_a:
-        SXTH R5,R5
-        SXTH R2,R2
         CMP  R5,R2 // Redo flags
         BLT  I_C_e
         ADDS R1,#0x40 // Arith > bit
@@ -613,8 +592,8 @@ I_CB:   LDRB R2,[R6,#0] // R6=DEST
         BNE  I_CB_l
         ADDS R1,#0x20 // Equal bit
         B    start
-I_CB_l:
 .align 4
+I_CB_l: // Below .align, or the target is the padding rather than the branch
         BLO  I_CB_a
         ADDS R1,#0x80 // Logic > bit
 I_CB_a:
@@ -663,7 +642,9 @@ PARITY0: // Compare to 0 status result
     .BYTE 0x80, 0x84, 0x84, 0x80, 0x84, 0x80, 0x80, 0x84, 0x84, 0x80, 0x80, 0x84, 0x80, 0x84, 0x84, 0x80
 // *********************************************************************************************
 .align 4
-I_COC:  ANDS R4,R5
+I_COC:  LDRH R4,[R6,#0] // TEMP = *DEST
+        REV16 R4,R4
+        ANDS R4,R5
         CMP  R4,R5
         BNE  I_COC_ne
         ORRS R1,#0x20 // EQ
@@ -674,7 +655,9 @@ I_COC_ne:
         GPU_DISPATCH
 // *********************************************************************************************
 .align 4
-I_CZC:  ANDS R4,R5
+I_CZC:  LDRH R4,[R6,#0] // TEMP = *DEST
+        REV16 R4,R4
+        ANDS R4,R5
         BNE  I_CZC_ne
         ORRS R1,#0x20 // EQ
         B    start
@@ -690,10 +673,10 @@ I_CZC_ne:
 I_CI:   UBFX R6,R0,#8,#4 // Register number
         LDRH R5,[R8,R3]
         ADDS R3,#2
-        REV16 R5,R5
+        REVSH R5,R5 // Signed: 16-bit unsigned order survives sign extension
 
         LDRH R2,[R11,R6,LSL #1]
-        REV16 R2,R2
+        REVSH R2,R2
 
         ANDS R1,#0x1E // Get initialised ST
 
@@ -706,8 +689,6 @@ I_CI_l:
         BLO  I_CI_a
         ADDS R1,#0x80 // Logic > bit
 I_CI_a:
-        SXTH R5,R5
-        SXTH R2,R2
         CMP  R2,R5 // Redo flags
         BLT  I_CI_e
         ADDS R1,#0x40 // Arith > bit
@@ -715,7 +696,9 @@ I_CI_e:
         GPU_DISPATCH
 // *********************************************************************************************
 .align 4
-I_MUL:  MULS R4,R5
+I_MUL:  LDRH R4,[R6,#0] // TEMP = *DEST
+        REV16 R4,R4
+        MULS R4,R5
         REV  R4,R4
         STR  R4,[R6,#0]
         GPU_DISPATCH
@@ -877,9 +860,8 @@ COM_S2a_L:
         LDRH R4,[R11,R5,LSL #1] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R4,R4
         ADD  R2,R4
-        UXTH R2,R2
 COM_S2a_F:
-        BICS R5,R2,#1 // SRCE &= 0xFFFE
+        BIC  R5,R2,#0x10001 // SRCE &= 0xFFFE: an indexed sum only reaches bit 16
         ADD  R5,R8
         MOV  PC,R7
 .align 4
@@ -928,7 +910,6 @@ COM_S2b_L:
         LDRH R4,[R11,R5,LSL #1] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R4,R4
         ADD  R2,R4
-        UXTH R2,R2
         B    COM_S2b_F
 .align 4
 COM_S2b_II:
@@ -943,7 +924,7 @@ COM_S2b_I:
         LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
 COM_S2b_F:
-        BICS R5,R2,#1 // SRCE &= 0xFFFE
+        BIC  R5,R2,#0x10001 // SRCE &= 0xFFFE: an indexed sum only reaches bit 16
         ADD  R5,R8
 COM_S2b_F2:
 // *********************************************************************************************
@@ -951,9 +932,7 @@ COM_S2b_F2:
         ADD  R6,R11,R6,LSL #1 // DEST = WP + D;
         LDRH R5,[R5,#0]
         REV16 R5,R5 // SRCE = (memory [SRCE + 0] << 8) | memory [SRCE + 1];
-        LDRH R4,[R6,#0]
-        REV16 R4,R4 // TEMP = (memory [DEST + 0] << 8) | memory [DEST + 1];
-        MOV  PC,R7
+        MOV  PC,R7 // TEMP is each handler's own: I_DIV reads the whole word instead
 // *********************************************************************************************
 //R0 (LE)
 //89ABCDEF01234567 (Format 9)
@@ -1119,7 +1098,6 @@ COM_S2d_L:
         LDRH R4,[R11,R5,LSL #1] // SRCE += (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R4,R4
         ADD  R2,R4
-        UXTH R2,R2
         B    COM_S2d_F
 .align 4
 COM_S2d_II:
@@ -1134,7 +1112,7 @@ COM_S2d_I:
         LDRH R2,[R11,R5,LSL #1] // SRCE = (memory [WP + 0 + S] << 8) | memory [WP + 1 + S];
         REV16 R2,R2
 COM_S2d_F:
-        BICS R5,R2,#1 // SRCE &= 0xFFFE
+        BIC  R5,R2,#0x10001 // SRCE &= 0xFFFE: an indexed sum only reaches bit 16
         ADD  R5,R8
 COM_S2d_F2:
 // *********************************************************************************************
@@ -1158,9 +1136,8 @@ COM_D2_L:
         LDRH R4,[R11,R6,LSL #1] // DEST += (memory [WP + 0 + D] << 8) | memory [WP + 1 + D];
         REV16 R4,R4
         ADD  R2,R4
-        UXTH R2,R2
 COM_D2_F:
-        BICS R6,R2,#1 // DEST &= 0xFFFE
+        BIC  R6,R2,#0x10001 // DEST &= 0xFFFE: an indexed sum only reaches bit 16
         ADD  R6,R8
         MOV  PC,R7
 .align 4
@@ -1279,6 +1256,8 @@ COM_D1_I:
 // *********************************************************************************************
 .align 4
 I_XOP: // F18A PIX instruction
+        LDRH R4,[R6,#0] // TEMP = *DEST
+        REV16 R4,R4
         LSLS R7,R4,#17  // Move leftmost bit (M) into the Carry flag
         BCC  I_XOP_BL   // Not a BM calculation, goto BL code instead
 
@@ -1312,15 +1291,14 @@ I_XOP_BL: // Return to C code function: F18A_PIX for BL mode
 */
 .align 4
 I_XOP_BL:
-        PUSH {R3}        // Save current PC
+        MOV  R12,R3      // Save current PC - R12 is spare, and an IRQ stacks it
         ADD  R3,R8,#0x6000 // Video registers within the 64KB memory area
         LDRB R0,[R3,#0x23] // Get VR35
 
-        CMP  R0,#0         // 0 is special, == 256
-        IT   EQ
-        MOVEQ R0,#256
-        ADDS R0,#3
-        LSRS R0,#2         // Row stride in bytes, rounded up
+        SUBS R0,#1         // Rounded stride, and width zero already means 256
+        UXTB R0,R0
+        LSRS R0,#2
+        ADDS R0,#1
         UXTB R7,R5         // Y
         MULS R0,R7         // R7 is now free
         ADD  R0,R0,R5,LSR #10 // R0 = (y * stride) + (x >> 2)
@@ -1336,7 +1314,7 @@ I_XOP_BL:
 
         REV16 R2,R2
         STRH R2,[R6,#0]
-        POP  {R3}        // Restore current PC
+        MOV  R3,R12      // Restore current PC
         B    start
 
 .align 4
@@ -1390,13 +1368,11 @@ I_XOP_BL_W:
 I_XOP_BL_NW:
         LSRS R5,R4,#12   // if (R4 & PIX_R)
         BCC  I_XOP_BL_F
-        MOVS R5,#3
-        BICS R4,R5
-        ORRS R4,R0       // R4 = (R4 & ~PIX_PP) | p;
+        BFI  R4,R0,#0,#2 // R4 = (R4 & ~PIX_PP) | p;
         REV16 R4,R4
         STRH R4,[R6,#0]
 I_XOP_BL_F:
-        POP  {R3}        // Restore current PC
+        MOV  R3,R12      // Restore current PC
         B    start
 
 .align 4
