@@ -2279,7 +2279,7 @@ static bool overlayCompare(const char* dataDir)
 #define FRAME_MAGIC   "TMSF"
 /* Its own version, separate from GOLDEN_VERSION and OVERLAY_VERSION - each artifact
  * versions on its own. */
-#define FRAME_VERSION 2
+#define FRAME_VERSION 3
 
 /* Restated rather than reached for: the register BIT is the input to the behaviour
  * under test, not part of it. */
@@ -2618,7 +2618,7 @@ static const char* frCurrentLabel = "";
  * Slots 0..8 are the mapping and geometry groups; 9..12 are the interrupt group.
  * Each group fills only its own slots and leaves the rest zero, so a divergence
  * report points at a value that group actually produced. */
-#define FRAME_ROW_VALUES 13
+#define FRAME_ROW_VALUES 14
 
 typedef struct
 {
@@ -2629,7 +2629,7 @@ static const char* const frameFieldName[FRAME_ROW_VALUES] = {
   "mappedLine", "vPixelScale", "vVirtualPixels", "vPixels", "vBorder", "triggerScanline", "paramsVPixelScale",
   "paramsVVirtualPixels", "activeLines",
   /* interrupt group */
-  "frameStatusShadow", "sr0Register", "intPin", "sr1Register"};
+  "frameStatusShadow", "sr0Register", "intPin", "sr1Register", "lockLatch"};
 
 static void frameEmitRow(const FrameRow* cand, const FrameRow* ref)
 {
@@ -2962,8 +2962,14 @@ static uint8_t refMergeStatus(uint8_t currentStatus, uint8_t tempStatus)
  * drops one of them, that reads the pre-merge status instead of the merged one, or that
  * puts the scanline source behind R1's enable, diverges. Written as the two sources the
  * F18A documents rather than as one expression, because their gating differs and that
- * difference is the behaviour being pinned. */
-static bool refIntPin(uint8_t mergedStatus, uint8_t reg1, uint8_t reg0, uint8_t sr1, bool unlocked)
+ * difference is the behaviour being pinned.
+ *
+ * THE LOCK LATCH IS NOT AN INPUT, which is `f18a_cpu.vhd`'s own shape: the pin is
+ * `(intr_ff and reg1ie) or (horz_ff and reg0ie1)` with no lock term, and a relock leaves
+ * both halves of the scanline source standing. A device that has never unlocked cannot
+ * reach these rows: its locked mask sends a write to register 19 to R3, so nothing ever
+ * sets HF. */
+static bool refIntPin(uint8_t mergedStatus, uint8_t reg1, uint8_t reg0, uint8_t sr1)
 {
   const bool frameEnabled     = (reg1 & FRAME_R1_INT_ENABLE) != 0;
   const bool frameFlagLatched = (mergedStatus & FRAME_SR0_F) != 0;
@@ -2971,8 +2977,7 @@ static bool refIntPin(uint8_t mergedStatus, uint8_t reg1, uint8_t reg0, uint8_t 
   const bool scanlineEnabled     = (reg0 & FRAME_R0_INT_SCANLINE) != 0;
   const bool scanlineFlagLatched = (sr1 & FRAME_SR1_HF) != 0;
 
-  /* the scanline source is the F18A's own, so a locked device has only one source */
-  return (frameEnabled && frameFlagLatched) || (unlocked && scanlineEnabled && scanlineFlagLatched);
+  return (frameEnabled && frameFlagLatched) || (scanlineEnabled && scanlineFlagLatched);
 }
 
 /* Force the /INT pin (tms9918->frameInt) to `want` WITHOUT calling the function
@@ -3021,14 +3026,19 @@ static void frameIntCase(const char* label, uint8_t currentStatus, uint8_t tempS
   cand.v[10] = TMS_STATUS(tms9918, 0);          /* merged SR0, the register copy */
   cand.v[11] = pico9918_frame_int_impl();      /* the LATCHED /INT pin */
   cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
+  cand.v[13] = pico9918_unlocked(PICO9918_INST_ONLY);
 
   const uint8_t expected = refMergeStatus(currentStatus, tempStatus);
   ref.v[9]               = expected;
   ref.v[10]              = expected;
-  ref.v[11]              = refIntPin(expected, reg1, reg0, sr1, unlocked);
+  ref.v[11]              = refIntPin(expected, reg1, reg0, sr1);
 
   /* the merge owns SR0 and must not touch SR1: the scanline flag is the read path's */
   ref.v[12] = sr1;
+
+  /* digested so every row shows its own lock precondition took, which is what stops a
+     row that turns on the latch from passing vacuously */
+  ref.v[13] = unlocked;
 
   frameEmitRow(&cand, &ref);
 }
@@ -3128,14 +3138,133 @@ static void frameHIntReadCase(const char* label, uint8_t currentStatus, uint8_t 
   cand.v[10] = TMS_STATUS(tms9918, 0);
   cand.v[11] = pico9918_frame_int_impl();
   cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
+  cand.v[13] = pico9918_unlocked(PICO9918_INST_ONLY);
 
   /* the CPU sees the flag it is acknowledging, and SR0 is not the register read */
   ref.v[9]  = FRAME_SR1_HF;
   ref.v[10] = currentStatus;
 
   const uint8_t sr1After = (uint8_t)(FRAME_SR1_HF & ~FRAME_SR1_HF);
-  ref.v[11]              = refIntPin(currentStatus, reg1, FRAME_R0_INT_SCANLINE, sr1After, true);
+  ref.v[11]              = refIntPin(currentStatus, reg1, FRAME_R0_INT_SCANLINE, sr1After);
   ref.v[12]              = sr1After;
+  ref.v[13]              = true;
+
+  frameEmitRow(&cand, &ref);
+}
+
+/* The same row for the OTHER read path: SR0's.
+ *
+ * Reading SR0 clears F, and the pin is RE-DERIVED rather than cleared - an unlocked
+ * device whose scanline source is still armed and flagged has to keep it down, or a
+ * host acknowledging the frame interrupt silently loses the scanline one. The latch is
+ * fixed at F alone so the post-read SR0 is decided here rather than reproduced.
+ *
+ * R1's enable is on in every row: without it the frame source could not have raised the
+ * pin, so the row would prove nothing about releasing it. */
+static void frameSr0ReadCase(const char* label, uint8_t reg0, uint8_t sr1, bool unlocked)
+{
+  frCurrentLabel = label;
+
+  /* ---- precondition: F latched, armed, and the pin already down ---- */
+  frameIntSetup(true);
+  TMS_REGISTER(tms9918, TMS_REG_1)                  = FRAME_R1_INT_ENABLE;
+  TMS_REGISTER(tms9918, TMS_REG_0)                  = reg0;
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT)            = sr1;
+  TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) = PICO9918_SR_STATUS;
+  tms9918->isUnlocked                               = unlocked;
+  pico9918_set_status_impl(FRAME_SR0_F);
+
+  /* ---- the behaviour under test ---- */
+  const uint8_t got = pico9918_read_status();
+
+  /* ---- the observable consequences ---- */
+  FrameRow cand = {{0}}, ref = {{0}};
+  cand.v[9]  = got;
+  cand.v[10] = TMS_STATUS(tms9918, 0);
+  cand.v[11] = pico9918_frame_int_impl();
+  cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
+  cand.v[13] = pico9918_unlocked(PICO9918_INST_ONLY);
+
+  /* the CPU sees the flag it is acknowledging; F clears, and no 5S means no ID to
+     restore, so the latch empties */
+  ref.v[9]  = FRAME_SR0_F;
+  ref.v[10] = 0x00;
+
+  ref.v[11] = refIntPin(0x00, FRAME_R1_INT_ENABLE, reg0, sr1);
+
+  /* the SR0 read owns SR0 and must not touch SR1 */
+  ref.v[12] = sr1;
+  ref.v[13] = unlocked;
+
+  frameEmitRow(&cand, &ref);
+}
+
+/* Two rows: SR0's read hands the pin over to the scanline source, then SR1's read is
+ * the only thing left that can release it. Deliberately CONTINUES the state the row
+ * before it left, because the handover is the behaviour, and a row digests one state. */
+static void frameSr0ThenSr1(void)
+{
+  frameSr0ReadCase("sread-scanline-holds", FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, true);
+
+  frCurrentLabel                                    = "sread-then-hread";
+  TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) = PICO9918_SR_IDENT;
+
+  const uint8_t got = pico9918_read_status();
+
+  FrameRow cand = {{0}}, ref = {{0}};
+  cand.v[9]  = got;
+  cand.v[10] = TMS_STATUS(tms9918, 0);
+  cand.v[11] = pico9918_frame_int_impl();
+  cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
+  cand.v[13] = pico9918_unlocked(PICO9918_INST_ONLY);
+
+  ref.v[9]  = FRAME_SR1_HF;
+  ref.v[10] = 0x00;
+  ref.v[11] = refIntPin(0x00, FRAME_R1_INT_ENABLE, FRAME_R0_INT_SCANLINE, 0x00);
+  ref.v[12] = 0x00;
+  ref.v[13] = true;
+
+  frameEmitRow(&cand, &ref);
+}
+
+/* The relock, which is the only way a LOCKED device can have the scanline source armed.
+ *
+ * R19 and R0 bit 4 survive a relock on both parts - only a reset clears them - so the
+ * F18A keeps interrupting on what it armed while unlocked (`f18a_cpu.vhd:617` has no lock
+ * term). This row goes through the BUS rather than the field, because it is the R57 write
+ * path that used to reconcile the pin back down here. */
+static void frameRelockCase(void)
+{
+  frCurrentLabel = "hint-relock-holds";
+
+  /* ---- precondition: unlocked, the scanline source alone asserting ---- */
+  frameIntSetup(false);
+  TMS_REGISTER(tms9918, TMS_REG_1)       = 0x00;
+  TMS_REGISTER(tms9918, TMS_REG_0)       = FRAME_R0_INT_SCANLINE;
+  TMS_STATUS(tms9918, PICO9918_SR_IDENT) = FRAME_SR1_HF;
+  tms9918->isUnlocked                    = true;
+  pico9918_set_status_impl(0x00);
+  pico9918_frame_sync_int_impl();
+
+  /* ---- the behaviour under test: relock, value byte then register select ---- */
+  pico9918_write_addr(0x00);
+  pico9918_write_addr(0x80 | PICO9918_REG_UNLOCK);
+
+  /* ---- the observable consequences ---- */
+  FrameRow cand = {{0}}, ref = {{0}};
+  cand.v[9]  = pico9918_frame_status_impl();
+  cand.v[10] = TMS_STATUS(tms9918, 0);
+  cand.v[11] = pico9918_frame_int_impl();
+  cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
+  cand.v[13] = pico9918_unlocked(PICO9918_INST_ONLY);
+
+  ref.v[9]  = 0x00;
+  ref.v[10] = 0x00;
+  ref.v[11] = refIntPin(0x00, 0x00, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF);
+  ref.v[12] = FRAME_SR1_HF;
+
+  /* the row is only worth anything if the write actually relocked the device */
+  ref.v[13] = false;
 
   frameEmitRow(&cand, &ref);
 }
@@ -3216,11 +3345,16 @@ static void frameIntGroup(void)
    * assert, and R1 being clear is what makes it discriminating. */
   frameHIntPair("hint-alone", 0x00, 0x00, 0x00, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, true);
 
-  /* the same row with one of the three inputs withdrawn, everything else identical.
-   * The pin must stay low in all three, so none of them can be the one dropped. */
-  frameHIntPair("hint-locked", 0x00, 0x00, 0x00, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, false);
+  /* the same row with one of the source's two inputs withdrawn, everything else
+   * identical. The pin must stay low in both, so neither can be the one dropped. */
   frameHIntPair("hint-disarmed", 0x00, 0x00, 0x00, 0x00, FRAME_SR1_HF, true);
   frameHIntPair("hint-noflag", 0x00, 0x00, 0x00, FRAME_R0_INT_SCANLINE, 0x00, true);
+
+  /* and the lock latch is NOT a third input: armed and flagged, a locked device asserts
+   * exactly as an unlocked one does. This is the F18A's shape, and the pin term the
+   * library used to gate on the latch - see refIntPin. frameRelockCase below reaches the
+   * same state the only way a guest can. */
+  frameHIntPair("hint-locked", 0x00, 0x00, 0x00, FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, false);
 
   /* F latched AND R1 off: the frame source is gated off, so the pin can only be the
    * scanline source's. A fix that put the second source behind R1 as well reads LOW. */
@@ -3239,10 +3373,25 @@ static void frameIntGroup(void)
    *
    * The discriminating pair. With no frame source the pin must FALL; with one still
    * asserting it must STAY, which is the difference between re-deriving the pin and
-   * clearing it. LAST, because these are the only rows that call the read path and
-   * they leave R15 selecting SR1. */
+   * clearing it. LAST, with the SR0 rows below, because the read path is what writes
+   * R15 and leaves a status register selected. */
   frameHIntReadCase("hread-releases", 0x00, 0x00);
   frameHIntReadCase("hread-frame-holds", FRAME_SR0_F, FRAME_R1_INT_ENABLE);
+
+  /* ---- and so does the SR0 read ----
+   *
+   * The mirror pair: with the scanline source still asserting the pin must STAY, with
+   * it withdrawn the pin must FALL. Then the three rows that withdraw one of the second
+   * source's inputs at a time, none of which may hold the pin on its own. */
+  frameSr0ThenSr1();
+  frameSr0ReadCase("sread-releases", FRAME_R0_INT_SCANLINE, 0x00, true);
+  frameSr0ReadCase("sread-disarmed", 0x00, FRAME_SR1_HF, true);
+  /* locked, and the scanline source still holds the line across the SR0 read */
+  frameSr0ReadCase("sread-locked", FRAME_R0_INT_SCANLINE, FRAME_SR1_HF, false);
+
+  /* LAST: it is the only row that writes a register through the bus, so it leaves the
+   * unlock counter and the lock latch where a field write cannot put them. */
+  frameRelockCase();
 }
 
 /* ---- frame artifact I/O ---------------------------------------------------- */

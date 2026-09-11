@@ -227,6 +227,16 @@ void pico9918_gpu_reset_time(void);
 PICO9918_DLLEXPORT
 void pico9918_gpu_set_flash_callback(PICO9918_INST_ARG pico9918_gpu_flash_fn cb, void* userdata);
 
+/**
+ * \brief is a flash request outstanding?
+ *
+ * SR2 bit 7 cannot proxy for this: it is also set for a running GPU program. And under
+ * pico9918_gpu_set_clock(0) nothing dispatches the request until the host calls
+ * pico9918_gpu_step_n(), so a host that owns dispatch owns noticing.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_gpu_flash_pending(PICO9918_INST_ONLY_ARG);
+
 /** \brief what a flash operation finished as, reported in status register 2 */
 typedef enum
 {

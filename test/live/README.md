@@ -11,6 +11,7 @@ were spent on the test rather than the firmware.
 
 ```
 live9918.py     the board: SWD, flashing, capture, PNG
+intpin.py       the /INT pin itself, which no scene describes
 perf.py         every scene against the clock
 perflog.py      the perf history, and what moved between two runs
 results.py      what a run leaves behind
@@ -203,6 +204,25 @@ python runner.py --board 2040 --save --report writes runs/ and reports/
 python runner.py --board 2040 --save --report --against 2040-aba934b
 python runner.py --board 2040 --clock 1        reboot at 302 MHz and measure there
 ```
+
+### The /INT pin: `intpin.py`
+
+```
+python intpin.py --board 2040
+python intpin.py --board pro
+```
+
+Not a stage, and not part of a run: a scene is registers plus VRAM, and the interrupt line is
+neither. It arms the scanline source over SWD with **R1's frame enable off**, so whatever follows
+can only be the second source, lets the renderer pass the armed line, and then reads SIO's
+`gpio_out` - the physical pin, not the library's shadow, which would agree with a predicate that
+was never written out. Three checks: armed and unlocked asserts, armed and *relocked* still
+asserts, and the source withdrawn releases.
+
+The middle one is the point. R19 and R0's enable survive a relock on the part, so a relocked F18A
+keeps interrupting on what it armed, and a library that gates the pin on the unlock latch goes
+silent instead - a divergence nothing in the scene suite can see. It runs after a suite rather than
+before, needs the display running, and leaves R0 and R19 clear.
 
 ### Without a board: `--desktop`
 

@@ -86,10 +86,12 @@
 #define PICO9918_NOINLINE __declspec(noinline)
 #define PICO9918_MAY_ALIAS
 #define PICO9918_ASSUME_ALIGNED(ptr, n) (ptr)
+#define PICO9918_ALIGN(n)               __declspec(align(n))
 #else
 #define PICO9918_NOINLINE               __attribute__((noinline))
 #define PICO9918_MAY_ALIAS              __attribute__((may_alias))
 #define PICO9918_ASSUME_ALIGNED(ptr, n) __builtin_assume_aligned((ptr), (n))
+#define PICO9918_ALIGN(n)               __attribute__((aligned(n)))
 #endif
 
 /*
@@ -220,7 +222,11 @@
  * That is why the op is whole-library and not overlay-local: a clock injected
  * for the overlay alone would leave the timer registers on the wall clock, and
  * a test surface covering them would be nondeterministic for a reason that
- * looks like a harness bug. See test/golden/goldenClock.h.
+ * looks like a harness bug.
+ *
+ * To substitute a clock, force-include a header defining this macro into every
+ * TU, the library's and the host's. test/golden/goldenClock.h is the worked
+ * example, wired in core/CMakeLists.txt.
  */
 #ifndef PICO9918_HOST_TIME_US
 #define PICO9918_HOST_TIME_US() time_us_32()

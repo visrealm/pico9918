@@ -105,7 +105,7 @@ recorded as unsupported by choice.
 
 ## v2.0.0 - the V9938
 
-The major version is the new VDP. With the core library already in place, this release adds a base
+The major version is the new VDP. With pico9918-core already in place, this release adds a base
 underneath the F18A the same way the TMS9918A sits there today.
 
 * V9938 as a selectable base: 128 KB VRAM, the `GRAPHIC3` through `GRAPHIC7` renderers, interlace,

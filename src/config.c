@@ -207,7 +207,7 @@ uint8_t pendingDisplayBanner(void)
 }
 
 /** \brief advance the pending state machine: PENDING applies and arms, ARMED reverts and erases */
-void __in_flash_func(applyPendingDisplay)(uint8_t config[CONFIG_BYTES])
+void __in_flash_func(applyPendingDisplay)(uint8_t config[PICO9918_CONFIG_BYTES])
 {
   PendingDisplay p;
   readPendingDisplay(&p);
@@ -245,9 +245,9 @@ static pico9918_config_host_id_t hostId(void)
 }
 
 /** \brief read the configuration from flash, validating, defaulting and migrating it */
-void readConfig(uint8_t config[CONFIG_BYTES])
+void readConfig(uint8_t config[PICO9918_CONFIG_BYTES])
 {
-  memcpy(config, CONFIG_FLASH_ADDR, CONFIG_BYTES);
+  memcpy(config, CONFIG_FLASH_ADDR, PICO9918_CONFIG_BYTES);
 
   // validation, defaults, migration and the identity stamp; SAVE_FORCED asks for the save
   pico9918_config_validate(config, hostId());
@@ -256,7 +256,7 @@ void readConfig(uint8_t config[CONFIG_BYTES])
 }
 
 /** \brief erase and rewrite the whole config sector, verifying and retrying */
-bool writeConfig(uint8_t config[CONFIG_BYTES])
+bool writeConfig(uint8_t config[PICO9918_CONFIG_BYTES])
 {
   flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
 
@@ -268,9 +268,9 @@ bool writeConfig(uint8_t config[CONFIG_BYTES])
   int attempts = 5;
   while (attempts--)
   {
-    flash_range_program(CONFIG_FLASH_OFFSET, config, CONFIG_BYTES);
+    flash_range_program(CONFIG_FLASH_OFFSET, config, PICO9918_CONFIG_BYTES);
 
-    if (memcmp(CONFIG_FLASH_ADDR, config, CONFIG_BYTES) == 0)
+    if (memcmp(CONFIG_FLASH_ADDR, config, PICO9918_CONFIG_BYTES) == 0)
     {
       success = true;
       break;
@@ -283,14 +283,14 @@ bool writeConfig(uint8_t config[CONFIG_BYTES])
 /** \brief PICO9918_CONF_SAVE_TO_FLASH handler: changed tracked fields go to the pending block,
  *         the main config keeps its last-confirmed values
  */
-bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
+bool saveConfigSplitPending(uint8_t config[PICO9918_CONFIG_BYTES])
 {
   const uint8_t* flashConfig = CONFIG_FLASH_ADDR;
   bool anyTrackedChanged     = false;
 
   for (size_t i = 0; i < pico9918_config_field_count; ++i)
   {
-    if (pico9918_config_fields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    if (pico9918_config_fields[i].pendingMirror == PICO9918_PENDING_MIRROR_NONE) continue;
     uint8_t off = pico9918_config_fields[i].offset;
     if (config[off] != flashConfig[off])
     {
@@ -313,7 +313,7 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
     // so an uninitialised block can't invalidate the main config
     for (size_t i = 0; i < pico9918_config_field_count; ++i)
     {
-      if (pico9918_config_fields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+      if (pico9918_config_fields[i].pendingMirror == PICO9918_PENDING_MIRROR_NONE) continue;
       uint8_t off  = pico9918_config_fields[i].offset;
       uint8_t last = flashConfig[off];
       config[off]  = (last > pico9918_config_fields[i].max) ? pico9918_config_fields[i].defaultValue : last;

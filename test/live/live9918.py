@@ -129,7 +129,7 @@ if _TEST not in sys.path:
 
 from suite.oracle import REFERENCE_DIR, golden, reference, reference_dir
 from suite.access.image import png_bytes, rgb_palette, unpack_nibbles, write_png
-from suite.access.vdp import (CAPTURE_ROWS, CONFIG_BYTES, PICO9918_CONF_CLOCK_PRESET_ID,
+from suite.access.vdp import (CAPTURE_ROWS, PICO9918_CONFIG_BYTES, PICO9918_CONF_CLOCK_PRESET_ID,
                  PICO9918_CONF_CLOCK_TESTED, PICO9918_CONF_SAVE_FORCED,
                  PICO9918_CONF_SAVE_TO_FLASH, PIXELS_X, REQUEST_CRC,
                  REQUEST_WINDOW, VRAM_PRAM, VRAM_REGISTERS, VRAM_STATUS,
@@ -565,14 +565,14 @@ class Live(VdpAccess):
         # read it running, like check_image does: only the erase needs the cores
         # stopped, and `resume` would bring back the one openocd has selected
         # rather than the two `halt` took - which stops the display
-        block = bytearray(self.read(CONFIG_FLASH, CONFIG_BYTES))
+        block = bytearray(self.read(CONFIG_FLASH, PICO9918_CONFIG_BYTES))
         # a blank or unreadable sector is the state a board hangs in, and the
         # running copy is the way out of it: readConfig builds a valid block in RAM
         # before handing it to the save that does not finish, so storing that is
         # both the repair and what the firmware was trying to do
         stored = bytes(block[:4]) not in (bytes(4), b"\xff" * 4)
         if not stored:
-            block = bytearray(self.read(self.inst + self.off["config"], CONFIG_BYTES))
+            block = bytearray(self.read(self.inst + self.off["config"], PICO9918_CONFIG_BYTES))
         if stored and all(block[i] == v for i, v in want.items()):
             return False
         for index, value in want.items():

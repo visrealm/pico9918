@@ -52,7 +52,7 @@ instructions, and the numbers are committed.
 ## Style
 
 `.clang-format` is in the repository and is the answer to formatting questions.
-Two things it cannot express, both of which matter here:
+Three things it cannot express, all of which matter here:
 
 - **The hot path takes no new branches.** One branch to route to a separate
   implementation is fine; a condition per feature scattered through the
@@ -60,3 +60,12 @@ Two things it cannot express, both of which matter here:
 - **Comments state what is not evident from the code, and nothing about how the
   code used to be.** A comment describing a change reads as noise the moment the
   change is old.
+- **`PICO9918` is the hardware, `pico9918-core` is this library.** The product
+  name is always capitalised. The library's name is a package identifier, so it
+  is always lowercase and hyphenated, including at the start of a sentence and in
+  a host's UI beside title-cased names like `Classic99`. Never `PICO9918-CORE`,
+  `PICO9918 Core` or `PICO9918core`. `core` on its own never means the library:
+  core 0, the GPU core and the TMS9900 core are all in scope here, so write the
+  name out. Where a hyphen cannot go, it is `pico9918_core` (the CMake project,
+  `find_package`, the library file) or `pico9918::core` (what a consumer links).
+  The C API namespace stays `pico9918_`, not `pico9918_core_`.

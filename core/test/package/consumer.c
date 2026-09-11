@@ -246,6 +246,27 @@ int main(void)
     return 1;
   }
 
+  /* Unlocked, an F18A reaches enhanced colour in 80 columns, so the wide tier gives it a byte a pixel. */
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
+  pico9918_write_register_value(PICO9918_INST PICO9918_REG_UNLOCK, PICO9918_R57_UNLOCK);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_0, TMS_R0_MODE_TEXT_80);
+  pico9918_write_register_value(PICO9918_INST TMS_REG_1,
+                                TMS_R1_RAM_16K | TMS_R1_DISP_ACTIVE | TMS_R1_MODE_TEXT);
+  pico9918_scan_line(PICO9918_INST 0);
+
+  if (pico9918_display_mode(PICO9918_INST_ONLY) != TMS_MODE_TEXT80)
+  {
+    printf("an unlocked F18A refused 80-column text\n");
+    return 1;
+  }
+
+  if (pico9918_line_bytes(PICO9918_INST_ONLY) != PICO9918_SCANLINE_BYTES_MAX)
+  {
+    printf("an unlocked F18A in 80 columns rendered a %u-byte line, expected %u\n",
+           (unsigned)pico9918_line_bytes(PICO9918_INST_ONLY), (unsigned)PICO9918_SCANLINE_BYTES_MAX);
+    return 1;
+  }
+
   /* VR57 stays reachable while locked; three address bits would put it in VR1. */
   pico9918_write_register_value(PICO9918_INST TMS_REG_1, TMS_R1_RAM_16K);
   pico9918_write_register_value(PICO9918_INST 57, 0x00);
@@ -525,7 +546,7 @@ int main(void)
 
   config[PICO9918_CONF_DIAG]           = 0;
   config[PICO9918_CONF_DIAG_REGISTERS] = 1;
-  pico9918_config_apply(PICO9918_INST_ONLY);
+  pico9918_config_apply_now(PICO9918_INST false);
 
   if (!pico9918_config(PICO9918_INST_ONLY)[PICO9918_CONF_DIAG])
   {
@@ -534,7 +555,7 @@ int main(void)
   }
 
   config[PICO9918_CONF_DIAG_REGISTERS] = 0;
-  pico9918_config_apply(PICO9918_INST_ONLY);
+  pico9918_config_apply_now(PICO9918_INST false);
 
   if (pico9918_config(PICO9918_INST_ONLY)[PICO9918_CONF_DIAG])
   {
@@ -543,7 +564,7 @@ int main(void)
   }
 
   printf("pico9918-core: config block reachable, %u bytes, applied both ways\n",
-         (unsigned)CONFIG_BYTES);
+         (unsigned)PICO9918_CONFIG_BYTES);
 
   /* The status file, read without the side effects of reading it. Two things to prove,
      because pico9918_read_status has neither: that it INDEXES rather than always
@@ -617,7 +638,7 @@ int main(void)
   pico9918_config_set_applied_callback(tms9918, appliedCallback, &firstTag);
   pico9918_config_set_applied_callback(second, appliedCallback, &secondTag);
 
-  pico9918_config_apply(second);
+  pico9918_config_apply_now(second, false);
   if (appliedSeen.calls != 1 || appliedSeen.inst != second || appliedSeen.userdata != &secondTag)
   {
     printf("the second instance's config-applied callback did not fire with its own "
@@ -625,7 +646,7 @@ int main(void)
     return 1;
   }
 
-  pico9918_config_apply(tms9918);
+  pico9918_config_apply_now(tms9918, false);
   if (appliedSeen.calls != 2 || appliedSeen.inst != tms9918 || appliedSeen.userdata != &firstTag)
   {
     printf("registering on one instance disturbed the other's callback\n");
@@ -634,7 +655,7 @@ int main(void)
 
   /* and a NULL registration is how a host withdraws one */
   pico9918_config_set_applied_callback(second, NULL, NULL);
-  pico9918_config_apply(second);
+  pico9918_config_apply_now(second, false);
   if (appliedSeen.calls != 2)
   {
     printf("a NULL registration still fired\n");

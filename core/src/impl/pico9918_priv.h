@@ -91,7 +91,9 @@
    is wide; firmware selects it from the board. The tier then chooses within that - see
    PICO9918_WIDE_T80. */
 #ifndef PICO9918_TEXT80_8BPP
-#define PICO9918_TEXT80_8BPP 0
+#define PICO9918_TEXT80_8BPP PICO9918_BUILD_TEXT80_8BPP
+#elif (PICO9918_TEXT80_8BPP != 0) != (PICO9918_BUILD_TEXT80_8BPP != 0)
+#error "PICO9918_TEXT80_8BPP disagrees with the archive - drop it and let pico9918_build_config.h supply it"
 #endif
 
 /* The widest line any mode on this build renders. 80 columns show 480 pixels inside a 512-pixel
@@ -105,13 +107,6 @@
 #define SCANLINE_BYTES_MAX TMS9918_PIXELS_X
 #define TEXT80_PADDING_PX  TEXT_PADDING_PX
 #endif
-
-/* This one is keyed off the library's own compile flag and the published
-   PICO9918_SCANLINE_BYTES_MAX off the value recorded in the archive, which is what a
-   consumer must size against. Inside this build they are the same width, and a vendored
-   build that set only one of the two flags is the way that stops being true. */
-_Static_assert(SCANLINE_BYTES_MAX == PICO9918_SCANLINE_BYTES_MAX,
-               "PICO9918_TEXT80_8BPP disagrees with the archive's PICO9918_BUILD_TEXT80_8BPP");
 
 /* room for the cell a fine scroll uncovers past the picture's far edge */
 #define SCANLINE_BUFFER_BYTES (SCANLINE_BYTES_MAX + 8)
@@ -204,7 +199,7 @@ typedef struct
 #define PICO9918_FEAT_OVERLAY 0x04 /* the splash and diagnostics overlays */
 #define PICO9918_FEAT_BITMAP  0x08 /* R0 M3 is decoded, so Graphics II exists */
 #define PICO9918_FEAT_VRAM_4K 0x10 /* R1 bit 7 is decoded, so 4K DRAM addressing exists */
-#define PICO9918_FEAT_WIDE_T80 0x20 /* 80-column text is a byte a pixel, not a nibble */
+#define PICO9918_FEAT_WIDE_T80 0x20 /* enhanced colour reaches 80-column text, which needs a byte a pixel */
 #define PICO9918_FEAT_GPU_RAM  0x40 /* the GPU's whole 64KB is memory, not the F18A's windows */
 
 #if PICO9918_BUILD_RUNTIME_CHIP
@@ -370,17 +365,21 @@ struct pico9918_s
     pico9918_gpu_config_save_fn fn;
     void* userdata;
   } gpuConfigSave;
+
+  struct
+  {
+    pico9918_interrupt_fn fn;
+    void* userdata;
+  } interrupt;
 #endif
 };
 
-#ifdef PICO_BUILD
-/* MPU guard anchor (see guard() in gpu/gpu.c): the guarded windows are derived
-   from vram's address. At offset zero, and with the instance 256-aligned, both land at the
-   start of their own 256-byte page and neither can cross one. Move vram and that stops
-   being true by construction - restore the layout rather than shift the window. */
+/* Every platform, because two things rest on it: the public PICO9918_MAP_* offsets are
+   offsets from the instance pointer, and the MPU guard anchor (see guard() in gpu/gpu.c)
+   derives its page-aligned windows from vram's address. Restore the layout, never shift
+   either. */
 _Static_assert(offsetof(struct pico9918_s, vram) == 0,
-               "vram offset moved - the GPU MPU guard ranges could cross a page boundary");
-#endif
+               "vram offset moved - PICO9918_MAP_* and the GPU MPU guard ranges both break");
 
 #if PICO9918_SINGLE_INSTANCE
 extern pico9918_t* const tms9918;
@@ -464,7 +463,7 @@ PICO9918_INLINE_HOT uint32_t pico9918_cpu_vram_addr_impl(PICO9918_INST_ARG uint3
  * R0, R1 and the unlock latch. Out of line, unlike its neighbours here: it is large, and
  * the inline entry below is its only hot caller.
  */
-PICO9918_DLLEXPORT
+PICO9918_INTERNAL
 void pico9918_write_reg_value_impl(PICO9918_INST_ARG uint8_t regSelect, uint8_t value);
 
 /**
@@ -536,10 +535,12 @@ PICO9918_INLINE bool pico9918_status_select_active(PICO9918_INST_ONLY_ARG)
  *      number field to 31 (the reset value) - the flag and its ID clear together.
  * SR1: bit 0 is the R#19 line-interrupt flag, clear-on-read.
  */
-/* Defined below, and needed here: reading SR1 clears the scanline flag, which can be the
-   only thing holding /INT down. An ISR that acknowledged and returned with the pin still
-   asserted would re-enter immediately. */
-PICO9918_INLINE_HOT bool pico9918_interrupt_status_impl(PICO9918_INST_ONLY_ARG);
+/* Defined below, and needed here: each read clears one of the two /INT sources, and the
+   pin has to come back from the one that is left rather than be cleared. */
+PICO9918_INLINE void pico9918_frame_sync_int_impl(PICO9918_INST_ONLY_ARG);
+
+/* What the desktop PICO9918_HOST_SET_INT expands to, so it precedes every pin-write site. */
+void pico9918_interrupt_dispatch(PICO9918_INST_ARG bool active);
 
 PICO9918_INLINE_HOT void pico9918_status_read_core(PICO9918_INST_ARG uint8_t readReg, uint8_t readVal)
 {
@@ -550,26 +551,18 @@ PICO9918_INLINE_HOT void pico9918_status_read_core(PICO9918_INST_ARG uint8_t rea
     if (readVal & PICO9918_SR0_5S)    // Was 5th Sprite flag set?
       tms9918->frameStatus |= 0x1f;   // Set sprite number to 31
     TMS_STATUS(tms9918, PICO9918_SR_STATUS) = tms9918->frameStatus;
-    if (readVal & PICO9918_SR0_INT) // Was Interrupt flag set?
-    {
-      tms9918->frameInt = false;
-      PICO9918_HOST_SET_INT(false);
-    }
+    if ((readVal & PICO9918_SR0_INT) == 0) return; // frame source untouched
   }
-  else if (readReg == PICO9918_SR_IDENT)
+  else if (readReg == PICO9918_SR_IDENT && (readVal & PICO9918_SR1_HF))
   {
-    if (readVal & PICO9918_SR1_HF)
-    {
-      TMS_STATUS(tms9918, PICO9918_SR_IDENT) &= (uint8_t)~PICO9918_SR1_HF;
-      /* the frame source may still be asserting, so re-derive rather than clearing */
-      const bool stillInt = pico9918_interrupt_status_impl(PICO9918_INST_ONLY);
-      if (stillInt != tms9918->frameInt)
-      {
-        tms9918->frameInt = stillInt;
-        PICO9918_HOST_SET_INT(stillInt);
-      }
-    }
+    TMS_STATUS(tms9918, PICO9918_SR_IDENT) &= (uint8_t)~PICO9918_SR1_HF;
   }
+  else
+  {
+    return;
+  }
+
+  pico9918_frame_sync_int_impl(PICO9918_INST_ONLY);
 }
 
 /**
@@ -606,11 +599,12 @@ PICO9918_INLINE_HOT void pico9918_status_read_reconcile_impl(PICO9918_INST_ARG u
  *    (INT|5S|COL) flags actually seen set, restoring the number to 31 only when 5S
  *    was among them. That follows the documented register layout: F is
  *    clear-on-read, but SP4-SP0 is a data field, not a flag.
- * 2. On a host that defines PICO9918_HOST_SET_INT, reading SR0 with F set RELEASES
- *    THE /INT LINE and clears the library's interrupt shadow - so every input with
- *    bit 7 set writes the pin. A host running its own /INT plumbing alongside this
- *    call will see an unrequested pin write; such a host should drive the line from
- *    the library's state rather than in parallel with it.
+ * 2. Reading either status register clears its own /INT source and then RE-DERIVES the
+ *    pin from what is left, so the line is released only when the other source is not
+ *    asserting either, and it is written only when the derived state differs from the
+ *    shadow. A host running its own /INT plumbing alongside this call will see an
+ *    unrequested pin write; such a host should drive the line from the library's state
+ *    rather than in parallel with it.
  */
 PICO9918_INLINE uint8_t pico9918_read_status_impl(PICO9918_INST_ONLY_ARG)
 {
@@ -706,21 +700,23 @@ PICO9918_INLINE_HOT uint8_t pico9918_read_data_no_inc_impl(PICO9918_INST_ONLY_AR
   return tms9918->readAheadBuffer;
 }
 
-/** \brief return true if both INT status and INT control set */
 /**
  * \brief whether /INT should be asserted
  *
  * Two independent sources, as on the F18A: the end-of-frame flag under R1's enable, and
  * the scanline flag under R0's. Neither gates the other - a program that wants only the
  * scanline interrupt turns R1's off - so the horizontal source cannot be folded into SR0.
- * The scanline term leads with the flag because it is clear on almost every line, and the
- * whole term folds away in a TMS9918A build, which has no R19 to arm it.
+ *
+ * Neither is gated on being unlocked, which is the hardware's own shape. A device that
+ * has never unlocked cannot arm the scanline source anyway: its locked mask sends a write
+ * to register 19 to R3, R19 stays 0, and the line compare treats 0 as off. One that
+ * unlocked and relocked keeps what it armed, and keeps interrupting on it.
  */
 PICO9918_INLINE_HOT bool pico9918_interrupt_status_impl(PICO9918_INST_ONLY_ARG)
 {
   return ((TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_INT_ENABLE) &&
           (TMS_STATUS(tms9918, PICO9918_SR_STATUS) & PICO9918_SR0_INT)) ||
-         (PICO9918_UNLOCKED(tms9918) && (TMS_STATUS(tms9918, PICO9918_SR_IDENT) & PICO9918_SR1_HF) &&
+         ((TMS_STATUS(tms9918, PICO9918_SR_IDENT) & PICO9918_SR1_HF) &&
           (TMS_REGISTER(tms9918, TMS_REG_0) & TMS_R0_INT_SCANLINE));
 }
 
@@ -1001,6 +997,25 @@ extern const pico9918_t* pico9918_palette_owner;
 #endif
 
 void pico9918_palette_regenerate(PICO9918_INST_ONLY_ARG);
+
+/**
+ * \brief apply the config block's VDP-side effects: registers 50 and 30, the
+ * palette unpack, and the derived PICO9918_CONF_DIAG summary byte
+ *
+ * A settings block is a PICO9918 thing, so the effects land only on a personality that
+ * has the config port. On an F18A those registers and that palette are the guest's
+ * alone, and a block read from host storage must not touch them.
+ *
+ * What it writes is a power-on default, not an owner: it runs when the block is loaded
+ * and after a reset has cleared the register file, and a later write to register 50 or
+ * 30 stands on every personality.
+ *
+ * Host-side effects stay with the host.
+ *
+ * Internal: it leaves configDirty set, so a host reaching it directly gets the block
+ * applied again at the next end of frame. Hosts want apply_now or schedule_apply.
+ */
+void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
 
 #if PICO9918_BUILD_DEBUG_API
 /* The mode cache is refreshed on entry to a scanline and read before one by

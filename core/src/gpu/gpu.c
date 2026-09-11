@@ -100,6 +100,12 @@ void pico9918_gpu_set_flash_callback(PICO9918_INST_ARG pico9918_gpu_flash_fn cb,
   GPU_FLASH_CB.userdata = userdata;
 }
 
+/** \brief see the header. The request itself, which SR2 bit 7 cannot distinguish. */
+bool pico9918_gpu_flash_pending(PICO9918_INST_ONLY_ARG)
+{
+  return tms9918->flash != 0;
+}
+
 void pico9918_gpu_set_config_save_callback(PICO9918_INST_ARG pico9918_gpu_config_save_fn cb, void* userdata)
 {
   GPU_CONFIG_SAVE_CB.fn       = cb;

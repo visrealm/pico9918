@@ -19,50 +19,50 @@
 #include <string.h>
 
 const pico9918_config_field_t pico9918_config_fields[] = {
-  {PICO9918_CONF_CRT_SCANLINES, 1, 0, PENDING_MIRROR_NONE, 0x1000},
-  {PICO9918_CONF_SCANLINE_SPRITES, 3, 0, PENDING_MIRROR_NONE, 0x1000},
+  {PICO9918_CONF_CRT_SCANLINES, 1, 0, PICO9918_PENDING_MIRROR_NONE, 0x1000},
+  {PICO9918_CONF_SCANLINE_SPRITES, 3, 0, PICO9918_PENDING_MIRROR_NONE, 0x1000},
   {PICO9918_CONF_CLOCK_PRESET_ID, 2, 0, PICO9918_CONF_PENDING_CLOCK_PRESET, 0x1000},
   {PICO9918_CONF_SCART_MODE, 1, 0, PICO9918_CONF_PENDING_SCART_MODE, 0x1200},
-  {PICO9918_CONF_VDP_DEVICE, 3, 0, PENDING_MIRROR_NONE, 0x1101},
+  {PICO9918_CONF_VDP_DEVICE, 3, 0, PICO9918_PENDING_MIRROR_NONE, 0x1101},
   {PICO9918_CONF_DISP_DRIVER_PREF, 2, 0, PICO9918_CONF_PENDING_DRIVER_PREF, 0x1200}, // 1.2.0
   {PICO9918_CONF_VGA_MODE, 0, 0, PICO9918_CONF_PENDING_VGA_MODE, 0x1200},            // 0=480p60 (only)
-  {PICO9918_CONF_DIAG_REGISTERS, 1, 0, PENDING_MIRROR_NONE, 0x1000},
-  {PICO9918_CONF_DIAG_PERFORMANCE, 1, 0, PENDING_MIRROR_NONE, 0x1000},
-  {PICO9918_CONF_DIAG_PALETTE, 1, 0, PENDING_MIRROR_NONE, 0x1000},
-  {PICO9918_CONF_DIAG_ADDRESS, 1, 0, PENDING_MIRROR_NONE, 0x1000},
+  {PICO9918_CONF_DIAG_REGISTERS, 1, 0, PICO9918_PENDING_MIRROR_NONE, 0x1000},
+  {PICO9918_CONF_DIAG_PERFORMANCE, 1, 0, PICO9918_PENDING_MIRROR_NONE, 0x1000},
+  {PICO9918_CONF_DIAG_PALETTE, 1, 0, PICO9918_PENDING_MIRROR_NONE, 0x1000},
+  {PICO9918_CONF_DIAG_ADDRESS, 1, 0, PICO9918_PENDING_MIRROR_NONE, 0x1000},
   // WARNING: VR58/59 lets a host write any byte >= 8, so shipped units may carry residue in byte 15.
   // migrateNewFields compares strictly, so the stamp must be the release that first CLAIMS the byte:
   // an earlier one leaves a unit already on that version unswept, booting on residue.
-  {PICO9918_CONF_VDP_BASE, 1, PICO9918_BASE_TMS9918, PENDING_MIRROR_NONE, 0x1300},
+  {PICO9918_CONF_VDP_BASE, 1, PICO9918_BASE_TMS9918, PICO9918_PENDING_MIRROR_NONE, 0x1300},
 };
 
 const size_t pico9918_config_field_count = sizeof(pico9918_config_fields) / sizeof(pico9918_config_fields[0]);
 
-void pico9918_config_refresh_pending_mirror(uint8_t config[CONFIG_BYTES], uint8_t state)
+void pico9918_config_refresh_pending_mirror(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t state)
 {
   config[PICO9918_CONF_PENDING_STATE] = state;
   for (size_t i = 0; i < pico9918_config_field_count; ++i)
   {
-    if (pico9918_config_fields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    if (pico9918_config_fields[i].pendingMirror == PICO9918_PENDING_MIRROR_NONE) continue;
     config[pico9918_config_fields[i].pendingMirror] = config[pico9918_config_fields[i].offset];
   }
 }
 
-void pico9918_config_pending_capture(const uint8_t config[CONFIG_BYTES], uint8_t* record)
+void pico9918_config_pending_capture(const uint8_t config[PICO9918_CONFIG_BYTES], uint8_t* record)
 {
   for (size_t i = 0; i < pico9918_config_field_count; ++i)
   {
-    if (pico9918_config_fields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    if (pico9918_config_fields[i].pendingMirror == PICO9918_PENDING_MIRROR_NONE) continue;
     record[pico9918_config_fields[i].pendingMirror - PICO9918_CONF_PENDING_STATE] =
       config[pico9918_config_fields[i].offset];
   }
 }
 
-void pico9918_config_pending_restore(uint8_t config[CONFIG_BYTES], const uint8_t* record)
+void pico9918_config_pending_restore(uint8_t config[PICO9918_CONFIG_BYTES], const uint8_t* record)
 {
   for (size_t i = 0; i < pico9918_config_field_count; ++i)
   {
-    if (pico9918_config_fields[i].pendingMirror == PENDING_MIRROR_NONE) continue;
+    if (pico9918_config_fields[i].pendingMirror == PICO9918_PENDING_MIRROR_NONE) continue;
     config[pico9918_config_fields[i].offset] =
       record[pico9918_config_fields[i].pendingMirror - PICO9918_CONF_PENDING_STATE];
   }
@@ -82,9 +82,9 @@ static bool configOutOfRange(const uint8_t* config)
   return false;
 }
 
-void pico9918_config_defaults(uint8_t config[CONFIG_BYTES])
+void pico9918_config_defaults(uint8_t config[PICO9918_CONFIG_BYTES])
 {
-  memset(config, 0, CONFIG_BYTES);
+  memset(config, 0, PICO9918_CONFIG_BYTES);
 
   for (size_t i = 0; i < pico9918_config_field_count; ++i)
   {
@@ -113,7 +113,7 @@ static void migrateNewFields(uint8_t* config, uint16_t storedVer)
   }
 }
 
-bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id)
+bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id)
 {
   uint16_t storedVer = configStoredVersion(config);
 
@@ -147,7 +147,7 @@ bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host
   return true;
 }
 
-void pico9918_config_prepare_save(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id)
+void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id)
 {
   config[PICO9918_CONF_PICO_MODEL]       = id.picoModel;
   config[PICO9918_CONF_HW_VERSION]       = id.hwVersion;

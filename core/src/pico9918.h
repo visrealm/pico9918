@@ -30,7 +30,16 @@
 
 #if __EMSCRIPTEN__
 #include <emscripten.h>
-#define PICO9918_DLLEXPORT       EMSCRIPTEN_KEEPALIVE PICO9918_LINKAGE
+/* Opt-in: a blanket KEEPALIVE overrides the host's -sEXPORTED_FUNCTIONS and pins
+   everything those entry points reach, pico9918_gpu_loop's while(1) included. */
+#ifndef PICO9918_WASM_KEEPALIVE
+#define PICO9918_WASM_KEEPALIVE 0
+#endif
+#if PICO9918_WASM_KEEPALIVE
+#define PICO9918_DLLEXPORT EMSCRIPTEN_KEEPALIVE PICO9918_LINKAGE
+#else
+#define PICO9918_DLLEXPORT PICO9918_LINKAGE
+#endif
 #define PICO9918_DLLEXPORT_CONST PICO9918_LINKAGE
 #elif PICO9918_COMPILING_DLL
 #define PICO9918_DLLEXPORT PICO9918_LINKAGE __declspec(dllexport)
@@ -40,6 +49,9 @@
 /** \brief the linkage every public entry point carries - see LINKAGE MODES above */
 #define PICO9918_DLLEXPORT PICO9918_LINKAGE
 #endif
+
+/** \brief cross-TU linkage for what is not public API, so a DLL or wasm build exports none of it */
+#define PICO9918_INTERNAL PICO9918_LINKAGE
 
 #ifndef PICO9918_DLLEXPORT_CONST
 #define PICO9918_DLLEXPORT_CONST PICO9918_DLLEXPORT
@@ -88,6 +100,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 /** \brief a VDP instance. Opaque: the layout is private to the library */
 struct pico9918_s;
@@ -107,7 +120,7 @@ typedef enum
   TMS_MODE_TEXT,
   TMS_MODE_MULTICOLOR,
   TMS_MODE_TEXT80,
-#ifdef PICO9918_V9938_BASE /* V9938 base scaffold (additive to the PICO9918 core) */
+#ifdef PICO9918_V9938_BASE /* V9938 base scaffold (additive to pico9918-core) */
   TMS_MODE_V9938_G3,
   TMS_MODE_V9938_G4,
   TMS_MODE_V9938_G5,
@@ -386,6 +399,10 @@ typedef enum
 PICO9918_DLLEXPORT
 void pico9918_init(void);
 
+/** \brief the implicit instance - the base the PICO9918_MAP_* offsets index */
+PICO9918_DLLEXPORT
+pico9918_t* pico9918_instance(void);
+
 #else
 
 /**
@@ -411,6 +428,30 @@ pico9918_t* pico9918_new(void);
 
 #endif
 
+/**
+ * \brief bytes an instance occupies, for a versioned save/restore
+ *
+ * The layout is private and differs between builds, so a stored snapshot is only
+ * loadable back into a library of the same size and build config.
+ */
+PICO9918_DLLEXPORT
+size_t pico9918_instance_size(void);
+
+/**
+ * \brief is the F18A unlock latch set?
+ *
+ * Neither R57's stored byte nor pico9918_chip() answers this: the latter says "could be
+ * unlocked", so a locked F18A looks like it has a scanline interrupt source.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_unlocked(PICO9918_INST_ONLY_ARG);
+
+/* map window offsets from the instance base. pico9918_debug_region() gives the shape */
+#define PICO9918_MAP_PRAM      0x5000 ///< palette RAM, 64 entries of RGB444
+#define PICO9918_MAP_REGISTERS 0x6000 ///< the register file, VR0-VR63
+#define PICO9918_MAP_SCANLINE  0x7000 ///< the current scanline, then the blanking flag
+#define PICO9918_MAP_STATUS    0xB000 ///< the status registers, SR0-SR15
+
 #if PICO9918_BUILD_RUNTIME_CHIP
 
 /**
@@ -418,8 +459,10 @@ pico9918_t* pico9918_new(void);
  *
  * Clamped to PICO9918_CHIP_MAX, so a request the build cannot honour comes back as the
  * highest it can rather than as a half-honoured one - read pico9918_chip() to find out
- * which you got. Stepping down from an unlocked personality relocks the device, because
- * the register file it would otherwise leave visible is not one a TMS9918A has.
+ * which you got. Stepping down to a personality that CANNOT UNLOCK AT ALL relocks the
+ * device, because the register file it would otherwise leave visible is not one a
+ * TMS9918A has. Stepping between two personalities that can both unlock leaves the latch
+ * alone, so this is not "stepping down relocks" in general - read pico9918_unlocked().
  *
  * A reset preserves it: the personality is the chip on the board, not state the bus can
  * clear. A new instance starts at PICO9918_CHIP_MAX, which is what a consumer that never
@@ -485,9 +528,32 @@ PICO9918_DLLEXPORT
 uint8_t pico9918_read_data_no_inc(PICO9918_INST_ONLY_ARG);
 
 
-/** \brief true if both the INT status and the INT control bit are set */
+/**
+ * \brief true if the device is asserting /INT
+ *
+ * Two independent sources, either sufficient: SR0's frame flag under R1's enable, and
+ * SR1's scanline flag under R0's. Reading one status register clears its own source and
+ * re-derives this, so the pin holds while the other stands.
+ *
+ * Neither source is gated on the F18A unlock, as on the part: a device that relocks keeps
+ * interrupting on a scanline it armed while unlocked. One that has never unlocked cannot
+ * arm that source at all, so it has only the frame one.
+ */
 PICO9918_DLLEXPORT
 bool pico9918_interrupt_status(PICO9918_INST_ONLY_ARG);
+
+/** \brief the host's /INT hook: called whenever the library drives the line */
+typedef void (*pico9918_interrupt_fn)(pico9918_t* instance, bool active, void* userdata);
+
+/**
+ * \brief register the host's /INT hook, so a host need not poll
+ *
+ * Fires on every pin write, not on a level change; a host wanting edges compares against
+ * its own last value. It does NOT fire from pico9918_reset(), whose tail order is the
+ * caller's, so re-derive from pico9918_interrupt_status() after one.
+ */
+PICO9918_DLLEXPORT
+void pico9918_set_interrupt_callback(PICO9918_INST_ARG pico9918_interrupt_fn cb, void* userdata);
 
 /** \brief set the interrupt flag */
 PICO9918_DLLEXPORT
@@ -530,8 +596,9 @@ uint8_t pico9918_scan_line(PICO9918_INST_ARG uint16_t y);
  * \brief return a register value
  *
  * The guest's view, so a LOCKED device decodes three address bits and nothing more:
- * reg 30 reads R6, exactly as a write to it would land on R6. Reading the register a
- * locked device cannot address is `TMS_REGISTER` on the Impl surface.
+ * reg 30 reads R6, exactly as a write to it would land on R6. To read the register a
+ * locked device cannot address - what a debugger or a register pane wants - use
+ * pico9918_debug_reg(), which exists to publish exactly that.
  */
 PICO9918_DLLEXPORT
 uint8_t pico9918_reg_value(PICO9918_INST_ARG pico9918_register_t reg);

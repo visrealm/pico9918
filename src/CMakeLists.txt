@@ -97,7 +97,7 @@ target_link_libraries(${PROGRAM} PUBLIC
         hardware_adc
         hardware_flash
         pico9918-vga
-        pico9918_core)
+        pico9918::core)
 
 # pico9918_core is a portable library (also builds standalone/desktop) so this
 # stays here rather than in its own CMakeLists.txt - see PICO9918_IN_FLASH_FUNC

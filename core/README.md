@@ -381,6 +381,18 @@ used one. This library is its renderer.
 [HBC-56](https://github.com/visrealm/hbc-56) uses `vrEmuTms9918`, the library this one
 grew out of, to render to an SDL texture.
 
+## Versioning
+
+Patch releases carry bug fixes only, minor releases carry backwards-compatible features,
+major releases carry breaking changes. For the library, "breaking" means a public header
+change a consumer has to react to: an entry point removed or re-signatured, a struct a
+host allocates, or a build-time tier changing meaning.
+
+**From 1.3.0 on, a behaviour correction is a version bump as well.** A consumer pins a
+version to get a rendering and bus surface it has tested against, so a change to what the
+emulated chip *does* - a pixel, a status flag, an interrupt edge - is a minor release at
+minimum and never a patch, even when the new behaviour is the more accurate one.
+
 ## Contributing
 
 This repository is generated: the library is developed at `core/` in

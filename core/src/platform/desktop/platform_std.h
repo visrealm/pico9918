@@ -35,16 +35,21 @@
 /*
  * Tier-1 host op: drive the /INT pin.
  *
- * No pin off-target. A host that wants the edge (an emulator raising a CPU IRQ
- * line) pre-defines this before including the library - the same override rule
- * as every other macro here. pico9918_interrupt_status() remains available for
- * hosts that prefer to poll.
+ * No pin off-target, so the default dispatches to whatever
+ * pico9918_set_interrupt_callback() registered and does nothing if that is NULL. A host
+ * can still pre-define this and bypass the registration entirely - the same override rule
+ * as every other macro here - and pico9918_interrupt_status() remains available for hosts
+ * that prefer to poll.
+ *
+ * The identifier is declared in impl/pico9918_priv.h rather than here: this header is
+ * reached before pico9918.h, so the instance type does not exist yet. A macro body only
+ * has to resolve where it expands.
  *
  * The Pico platform header instead requires PICO9918_INT_GPIO and honours an
  * optional PICO9918_INT_ACTIVE_HIGH; neither has meaning off-target.
  */
 #ifndef PICO9918_HOST_SET_INT
-#define PICO9918_HOST_SET_INT(active) ((void)(active))
+#define PICO9918_HOST_SET_INT(active) pico9918_interrupt_dispatch(PICO9918_INST (active))
 #endif
 
 

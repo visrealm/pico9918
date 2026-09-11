@@ -14,7 +14,7 @@ else()
   set(PICO9918_ASM_SUFFIX "_m33")
 endif()
 
-# The PICO9918 core always carries the enhanced renderer and GPU. For a small,
+# pico9918-core always carries the enhanced renderer and GPU. For a small,
 # base-chip-only emulator, use vrEmuTms9918; a host that wants one library for the
 # whole family selects the personality at runtime.
 set(PICO9918_SOURCES pico9918.c pico9918_util.c pico9918_config.c pico9918_palette.c

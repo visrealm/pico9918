@@ -60,7 +60,15 @@
 #include "pico9918.h"
 
 /** \brief size of the config block, in bytes */
-#define CONFIG_BYTES 256
+#define PICO9918_CONFIG_BYTES 256
+
+/**
+ * \brief the first config byte a guest may write through VR58/59
+ *
+ * Below it is the identity/version band the host stamps - see the ABI FREEZE note above.
+ * The register path enforces this same boundary.
+ */
+#define PICO9918_CONFIG_FIRST_SETTABLE 8
 
 /** \brief vdpBase values - the render base selected by PICO9918_CONF_VDP_BASE */
 #define PICO9918_BASE_TMS9918 0x00 /**< the TMS9918A base, which the F18A unlock extends */
@@ -151,11 +159,11 @@ typedef enum
  * Drives validation, defaults, per-version migration, and the pending-block
  * mirror. Adding a field: append one row in pico9918_config.c.
  * Set pendingMirror to
- * PENDING_MIRROR_NONE for fields that don't participate in the display-change
+ * PICO9918_PENDING_MIRROR_NONE for fields that don't participate in the display-change
  * confirmation flow (a host concept - the library only copies the bytes).
  */
 /** \brief pendingMirror value for a field outside the confirmation flow */
-#define PENDING_MIRROR_NONE 0xFF
+#define PICO9918_PENDING_MIRROR_NONE 0xFF
 
 /** \brief one config field's descriptor */
 typedef struct
@@ -163,7 +171,7 @@ typedef struct
   uint8_t offset;        /**< the field's config byte index */
   uint8_t max;           /**< bounds-check is value > max */
   uint8_t defaultValue;  /**< what a reset or a migration writes */
-  uint8_t pendingMirror; /**< PICO9918_CONF_PENDING_* offset, or PENDING_MIRROR_NONE */
+  uint8_t pendingMirror; /**< PICO9918_CONF_PENDING_* offset, or PICO9918_PENDING_MIRROR_NONE */
   uint16_t introducedIn; /**< packed major(4) | minor(4) | patch(8) */
 } pico9918_config_field_t;
 
@@ -184,9 +192,9 @@ PICO9918_DLLEXPORT_CONST const pico9918_config_field_t pico9918_config_fields[];
 PICO9918_DLLEXPORT_CONST const size_t pico9918_config_field_count;
 
 /**
- * \brief the instance's CONFIG_BYTES settings block
+ * \brief the instance's PICO9918_CONFIG_BYTES settings block
  *
- * The same bytes pico9918_config_validate() checks and pico9918_config_apply() acts
+ * The same bytes pico9918_config_validate() checks and pico9918_config_apply_now() acts
  * on, so a host reads its stored block into this and applies it. Persistence stays
  * the host's - the library never reaches storage - and so does the decision to
  * write, since these are settings a user chose rather than VDP state.
@@ -199,7 +207,7 @@ uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
  *
  * What a host wants when it has nothing stored, and the reason it should not simply
  * zero the block: the field defaults happen to be zero today, but the palette's are
- * not, and pico9918_config_apply() unpacks those bytes into the live palette. A zeroed
+ * not, and applying the block unpacks those bytes into the live palette. A zeroed
  * block therefore renders black. This also sets the initialised marker that
  * pico9918_config_validate() looks for, so a block from here survives it untouched.
  *
@@ -207,7 +215,7 @@ uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
  * pico9918_config_prepare_save() are where a host's own identity is stamped in.
  */
 PICO9918_DLLEXPORT
-void pico9918_config_defaults(uint8_t config[CONFIG_BYTES]);
+void pico9918_config_defaults(uint8_t config[PICO9918_CONFIG_BYTES]);
 
 /**
  * \brief the identity bytes at 0-3, which only the host knows
@@ -238,7 +246,7 @@ typedef struct
  * path, which is the save request its GPU loop already dispatches.
  */
 PICO9918_DLLEXPORT
-bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id);
+bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id);
 
 /**
  * \brief stamp \p id and the initialised marker into a block about to be persisted
@@ -248,39 +256,22 @@ bool pico9918_config_validate(uint8_t config[CONFIG_BYTES], pico9918_config_host
  * Host storage is untouched - this only prepares the bytes.
  */
 PICO9918_DLLEXPORT
-void pico9918_config_prepare_save(uint8_t config[CONFIG_BYTES], pico9918_config_host_id_t id);
+void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id);
 
 /** \brief copy live tracked fields into the in-RAM pending mirror with the given state */
 PICO9918_DLLEXPORT
-void pico9918_config_refresh_pending_mirror(uint8_t config[CONFIG_BYTES], uint8_t state);
+void pico9918_config_refresh_pending_mirror(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t state);
 
 /**
  * \brief copy the live tracked fields into a PICO9918_PENDING_RECORD_BYTES record
  * \note  record[0], the state, is the caller's - only the field slots are written
  */
 PICO9918_DLLEXPORT
-void pico9918_config_pending_capture(const uint8_t config[CONFIG_BYTES], uint8_t* record);
+void pico9918_config_pending_capture(const uint8_t config[PICO9918_CONFIG_BYTES], uint8_t* record);
 
 /** \brief copy a pending record's field slots back over the live config */
 PICO9918_DLLEXPORT
-void pico9918_config_pending_restore(uint8_t config[CONFIG_BYTES], const uint8_t* record);
-
-/**
- * \brief apply the config block's VDP-side effects: registers 50 and 30, the
- * palette unpack, and the derived PICO9918_CONF_DIAG summary byte
- *
- * A settings block is a PICO9918 thing, so the effects land only on a personality that
- * has the config port. On an F18A those registers and that palette are the guest's
- * alone, and a block read from host storage must not touch them.
- *
- * What it writes is a power-on default, not an owner: it runs when the block is loaded
- * and after a reset has cleared the register file, and a later write to register 50 or
- * 30 stands on every personality.
- *
- * Host-side effects stay with the host.
- */
-PICO9918_DLLEXPORT
-void pico9918_config_apply(PICO9918_INST_ONLY_ARG);
+void pico9918_config_pending_restore(uint8_t config[PICO9918_CONFIG_BYTES], const uint8_t* record);
 
 /**
  * \brief ask for the block to be applied at the next end of frame
@@ -302,6 +293,9 @@ void pico9918_config_schedule_apply(PICO9918_INST_ARG bool applyVdpEffects);
  * consumer stepping the library a frame at a time - and would rather see the effects
  * than wait for a boundary it does not have. The deferred request is cleared, so the
  * next end of frame does not apply the same block a second time.
+ *
+ * Also where a host lands after pico9918_set_chip(), which schedules an apply rather than
+ * performing one.
  */
 PICO9918_DLLEXPORT
 void pico9918_config_apply_now(PICO9918_INST_ARG bool applyVdpEffects);
@@ -309,7 +303,7 @@ void pico9918_config_apply_now(PICO9918_INST_ARG bool applyVdpEffects);
 /**
  * \brief register the host's config-applied hook
  *
- * Fires from pico9918_config_apply(), which the frame module calls where the
+ * Fires from the apply itself, which the frame module reaches where the
  * configDirty flag is actually consumed - the end-of-frame interrupt, not the
  * scanline body - so it is per-frame at worst and a function pointer is
  * permitted. It exists so a host's own apply effects stay in lockstep with the

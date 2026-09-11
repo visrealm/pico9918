@@ -212,11 +212,30 @@ extern "C"
    */
   typedef struct
   {
-    uint16_t hVirtualPixels; /**< full scanline width, guard pixels excluded */
+    uint16_t hVirtualPixels; /**< full scanline width; exactly this many pixels are written */
     uint16_t vVirtualPixels; /**< virtual lines per field */
     bool interlaced;              /**< the host's mode is interlaced */
     uint8_t interlacedFieldOrder; /**< 0 or 1: XOR'd with the field number */
   } pico9918_scanline_params_t;
+
+  /**
+   * \brief declare a scanline buffer of the right width and alignment
+   *
+   * There are no guard pixels: exactly hVirtualPixels are written, never one more. The
+   * overrun a fine horizontal scroll uncovers lands in the library's own indexed buffer
+   * (PICO9918_SCANLINE_BUFFER_SIZE, in index bytes) and never reaches this one. The
+   * alignment is required, not advisory - the fills and the expansion address it as
+   * uint32_t.
+   */
+#define PICO9918_FRAME_LINE_BUFFER(name, hVirtualPixels) \
+  PICO9918_ALIGN(4) PICO9918_PIXEL_T name[hVirtualPixels]
+
+  /** \brief the geometry constraints above as a compile error. Compile-time widths only */
+#define PICO9918_FRAME_ASSERT_GEOMETRY(hVirtualPixels)                                      \
+  PICO9918_STATIC_ASSERT((hVirtualPixels) >= TMS9918_PIXELS_X * 2,                          \
+                         "hVirtualPixels underflows the half-border count");                \
+  PICO9918_STATIC_ASSERT((hVirtualPixels) % 4 == 0,                                         \
+                         "hVirtualPixels must be a multiple of 4 to tile the line exactly")
 
   /**
    * \brief generate one display scanline: border fill or active render, the F18A
@@ -255,6 +274,16 @@ extern "C"
    * Returns whether `pixels` changed; false means a host's converted copy still stands.
    * `params->vVirtualPixels` is an output here. Progressive hosts only - an interlaced one
    * drives pico9918_frame_scanline per field.
+   *
+   * This renders a line and nothing else. Four things around it stay the host's:
+   *
+   *   trigger  pico9918_frame_end_of_scanline() at geometry.triggerScanline
+   *   porch    pico9918_frame_porch() at params->vVirtualPixels
+   *   wrap     pico9918_frame_end() at the field's total lines, which include the porch
+   *   cadence  re-derive output rows per call from the vPixelScale it returns
+   *
+   * Skip the trigger and the interrupt still arrives, from the end-of-frame fallback, a
+   * porch late.
    */
   PICO9918_DLLEXPORT
   bool pico9918_frame_output_line(PICO9918_INST_ARG uint32_t outputLine,
@@ -271,6 +300,19 @@ extern "C"
   {
     const uint32_t p = (uint32_t)pixel;
     return ((p & 0x00f) * 0x11u) << 16 | (((p >> 4) & 0x00f) * 0x11u) << 8 | ((p >> 8) & 0x00f) * 0x11u;
+  }
+
+  /**
+   * \brief one pixel as 0xAABBGGRR: the bytes a little-endian RGBA surface reads as R,G,B,A
+   *
+   * rgb888's 0x00RRGGBB stored as a word lands B,G,R,0 there instead, which is a silent
+   * red/blue swap. Alpha is opaque.
+   */
+  static inline uint32_t pico9918_pixel_rgba(PICO9918_PIXEL_T pixel)
+  {
+    const uint32_t p = (uint32_t)pixel;
+    return 0xff000000u | (((p >> 8) & 0x00f) * 0x11u) << 16 | (((p >> 4) & 0x00f) * 0x11u) << 8 |
+           ((p & 0x00f) * 0x11u);
   }
 
   /**

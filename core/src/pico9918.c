@@ -85,6 +85,12 @@ void __time_critical_func(pico9918_init)(void)
   pico9918_reset(PICO9918_INST_ONLY);
 }
 
+/** \brief see the header. The same pointer every implicit-instance entry point uses. */
+PICO9918_DLLEXPORT pico9918_t* pico9918_instance(void)
+{
+  return tms9918;
+}
+
 #else
 
 #include <stdlib.h>
@@ -107,6 +113,54 @@ PICO9918_DLLEXPORT pico9918_t* pico9918_new(void)
 }
 
 #endif
+
+/** \brief see the header. What a versioned save/restore copies from the instance base. */
+PICO9918_DLLEXPORT size_t pico9918_instance_size(void)
+{
+  return sizeof(pico9918_t);
+}
+
+/** \brief see the header. The latch itself, not the personality that could set it. */
+PICO9918_DLLEXPORT bool pico9918_unlocked(PICO9918_INST_ONLY_ARG)
+{
+  return PICO9918_UNLOCKED(tms9918);
+}
+
+/* host /INT hook - see the header for the contract; only the storage differs by build */
+#if PICO9918_SINGLE_INSTANCE
+static struct
+{
+  pico9918_interrupt_fn fn;
+  void* userdata;
+} interruptCb;
+#define INTERRUPT_CB interruptCb
+#else
+#define INTERRUPT_CB tms9918->interrupt
+#endif
+
+PICO9918_DLLEXPORT void pico9918_set_interrupt_callback(PICO9918_INST_ARG pico9918_interrupt_fn cb,
+                                                        void* userdata)
+{
+  INTERRUPT_CB.fn       = cb;
+  INTERRUPT_CB.userdata = userdata;
+}
+
+/** \brief see impl. What the desktop PICO9918_HOST_SET_INT expands to. */
+void pico9918_interrupt_dispatch(PICO9918_INST_ARG bool active)
+{
+  if (INTERRUPT_CB.fn) INTERRUPT_CB.fn(tms9918, active, INTERRUPT_CB.userdata);
+}
+
+/* Here rather than beside the macros: pico9918.h reaches neither PICO9918_STATIC_ASSERT
+   nor the private map type. */
+PICO9918_STATIC_ASSERT(offsetof(pico9918_mem_map_t, pram) == PICO9918_MAP_PRAM,
+                       "PICO9918_MAP_PRAM does not match the memory map");
+PICO9918_STATIC_ASSERT(offsetof(pico9918_mem_map_t, registers) == PICO9918_MAP_REGISTERS,
+                       "PICO9918_MAP_REGISTERS does not match the memory map");
+PICO9918_STATIC_ASSERT(offsetof(pico9918_mem_map_t, scanline) == PICO9918_MAP_SCANLINE,
+                       "PICO9918_MAP_SCANLINE does not match the memory map");
+PICO9918_STATIC_ASSERT(offsetof(pico9918_mem_map_t, status) == PICO9918_MAP_STATUS,
+                       "PICO9918_MAP_STATUS does not match the memory map");
 
 
 static const pico9918_mode_t r1Modes[] = {TMS_MODE_GRAPHICS_I, TMS_MODE_MULTICOLOR, TMS_MODE_TEXT,
@@ -266,7 +320,7 @@ static uint8_t chipFeatures(pico9918_chip_t chip)
     case PICO9918_CHIP_PICO9918:
       return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_CONFIG | PICO9918_FEAT_OVERLAY |
              PICO9918_FEAT_BITMAP | PICO9918_FEAT_GPU_RAM;
-    case PICO9918_CHIP_F18A: return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_BITMAP;
+    case PICO9918_CHIP_F18A: return PICO9918_FEAT_UNLOCK | PICO9918_FEAT_BITMAP | PICO9918_FEAT_WIDE_T80;
     case PICO9918_CHIP_TMS9918A: return PICO9918_FEAT_BITMAP | PICO9918_FEAT_VRAM_4K;
     default: return PICO9918_FEAT_VRAM_4K;
   }
@@ -3338,7 +3392,7 @@ uint8_t __time_critical_func(pico9918_status_value)(PICO9918_INST_ARG pico9918_s
   return TMS_STATUS(tms9918, reg & PICO9918_R15_STATUS_NUM);
 }
 
-PICO9918_DLLEXPORT
+PICO9918_INTERNAL
 void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8_t reg, uint8_t value)
 {
   if (PICO9918_HAS(tms9918, PICO9918_FEAT_UNLOCK) && PICO9918_UNLOCK_REG(reg))
@@ -3356,9 +3410,6 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
       tms9918->lockedMask = unlocked ? 0x3f : 0x07;
       tms9918->palDirty   = 1;
       if (unlocked) TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1;
-
-      /* the scanline-interrupt term of the /INT predicate is gated on being unlocked */
-      pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
     }
   }
   else
@@ -3468,7 +3519,7 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
     }
     // option number in reg 58, value in 59 (options)
     else if (regIndex == PICO9918_REG_CONFIG_VALUE && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG) &&
-             TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX) >= 8)
+             TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX) >= PICO9918_CONFIG_FIRST_SETTABLE)
     {
       const uint8_t option = TMS_REGISTER(tms9918, PICO9918_REG_CONFIG_INDEX);
 

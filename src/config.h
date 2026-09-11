@@ -19,7 +19,7 @@
 /** \brief running version, packed major(4) | minor(4) */
 #define PICO9918_SW_VERSION ((PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER)
 
-/* The config byte layout (the PICO9918_CONF_* indices and CONFIG_BYTES) is owned by the
+/* The config byte layout (the PICO9918_CONF_* indices and PICO9918_CONFIG_BYTES) is owned by the
    library, which is what makes byte 15 - the render base - a single
    declaration rather than two that must agree. See
    core/src/pico9918_config.h */
@@ -68,15 +68,15 @@ bool shouldUseScartClock(void);
 /** \brief read the configuration from flash, resetting to defaults if it fails
  *         validation and defaulting fields introduced since the stored version
  */
-void readConfig(uint8_t config[CONFIG_BYTES]);
+void readConfig(uint8_t config[PICO9918_CONFIG_BYTES]);
 
 /** \brief erase and rewrite the whole config sector, verifying and retrying */
-bool writeConfig(uint8_t config[CONFIG_BYTES]);
+bool writeConfig(uint8_t config[PICO9918_CONFIG_BYTES]);
 
 /** \brief PICO9918_CONF_SAVE_TO_FLASH handler: changed display fields go to the pending block,
  *         the main config keeps its last-confirmed values
  */
-bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES]);
+bool saveConfigSplitPending(uint8_t config[PICO9918_CONFIG_BYTES]);
 
 /** \brief re-read the stored block once the display is finally enabled after the
  *         startup diagnostics screen
@@ -112,7 +112,7 @@ bool erasePendingDisplay(void);
 /** \brief advance the pending state machine, after readConfig(): PENDING applies to
  *         \p config and becomes ARMED, ARMED reverts and erases
  */
-void applyPendingDisplay(uint8_t config[CONFIG_BYTES]);
+void applyPendingDisplay(uint8_t config[PICO9918_CONFIG_BYTES]);
 
 #define PENDING_BANNER_NONE     0 ///< no banner
 #define PENDING_BANNER_AWAIT_PC 1 ///< saved pending; awaiting a power cycle to test it

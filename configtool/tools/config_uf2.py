@@ -29,7 +29,7 @@ FAMILY_ID_RP2350 = 0xe48bff59
 CONFIG_FLASH_OFFSET = 0x1FF000  # Top 4KB of 2MB flash
 XIP_BASE = 0x10000000
 CONFIG_FLASH_ADDR = XIP_BASE + CONFIG_FLASH_OFFSET
-CONFIG_BYTES = 256
+PICO9918_CONFIG_BYTES = 256
 
 # Configuration byte offsets (from config.h)
 # Bytes 0-7 are not settable - generated at runtime by firmware
@@ -86,7 +86,7 @@ def create_default_config(pico_model=PICO_MODEL_RP2040,
     Note: PICO_MODEL and DISP_DRIVER must match the target hardware for the
     config to pass validation. HW_VERSION and SW_VERSION will be updated by firmware.
     """
-    config = bytearray(CONFIG_BYTES)
+    config = bytearray(PICO9918_CONFIG_BYTES)
 
     # Set fields needed for validation to pass
     config[PICO9918_CONF_PICO_MODEL] = pico_model

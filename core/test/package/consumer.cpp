@@ -59,7 +59,7 @@ int main()
     std::printf("config block or descriptor table missing\n");
     return 1;
   }
-  pico9918_config_apply(PICO9918_INST_ONLY);
+  pico9918_config_apply_now(PICO9918_INST false);
 
   /* pico9918_util.h - exported entry points and an exported table, past the inline
      helpers that would link even unguarded. */
