@@ -128,18 +128,39 @@ int main(void)
     check("v0.3 is not the RP2040", PICO9918_MODEL_RP2040, config[PICO9918_CONF_PICO_MODEL]);
   }
 
-  /* 5. a block belonging to another model is not this one's to keep */
+  /* 5. a tier toggle corrects the identity and keeps the settings. One stored block has to
+        survive it, or a host offering both loses the user's settings on every switch. */
   {
     pico9918_config_defaults(config);
     pico9918_config_prepare_save(config, HW_V2_X);
     config[PICO9918_CONF_CRT_SCANLINES] = 1;
 
-    check("foreign block kept", 1, pico9918_config_validate(config, HW_V1_X));
-    check("foreign block not reset", 0, config[PICO9918_CONF_CRT_SCANLINES]);
-    check("foreign block kept its model", PICO9918_MODEL_RP2040, config[PICO9918_CONF_PICO_MODEL]);
+    check("tier toggle asked to be persisted", 0, pico9918_config_validate(config, HW_V1_X));
+    check("tier toggle lost a setting", 1, config[PICO9918_CONF_CRT_SCANLINES]);
+    check("tier toggle left the model", PICO9918_MODEL_RP2040, config[PICO9918_CONF_PICO_MODEL]);
+    check("tier toggle left the revision", HW_V1_X, config[PICO9918_CONF_HW_VERSION]);
   }
 
-  /* 6. a command byte read back from storage is not a command */
+  /* 6. junk is still junk: the marker and the range checks are what reset a block */
+  {
+    pico9918_config_defaults(config);
+    pico9918_config_prepare_save(config, HW_V1_X);
+    config[PICO9918_CONF_CRT_SCANLINES] = 1;
+    config[PICO9918_CONF_SCANLINE_SPRITES] = 0xff;
+
+    check("out-of-range block kept", 1, pico9918_config_validate(config, HW_V1_X));
+    check("out-of-range block not reset", 0, config[PICO9918_CONF_CRT_SCANLINES]);
+
+    pico9918_config_defaults(config);
+    pico9918_config_prepare_save(config, HW_V1_X);
+    config[PICO9918_CONF_CRT_SCANLINES]      = 1;
+    config[PICO9918_CONF_PALETTE_IDX_0 + 2] &= 0x0f;
+
+    check("uninitialised block kept", 1, pico9918_config_validate(config, HW_V1_X));
+    check("uninitialised block not reset", 0, config[PICO9918_CONF_CRT_SCANLINES]);
+  }
+
+  /* 7. a command byte read back from storage is not a command */
   {
     pico9918_config_defaults(config);
     pico9918_config_prepare_save(config, HW_V1_X);
@@ -149,6 +170,23 @@ int main(void)
     pico9918_config_validate(config, HW_V1_X);
     check("stored save command survived", 0, config[PICO9918_CONF_SAVE_TO_FLASH]);
     check("stored confirm command survived", 0, config[PICO9918_CONF_PENDING_CONFIRM]);
+  }
+
+  /* 8. no field may be stamped later than the build that carries it. A firmware upgrade
+        never writes the settings block, so migration is the only thing that brings a new
+        field to its default - and one stamped ahead of this version passes that test on
+        every boot, re-defaulting itself and discarding whatever the user chose. */
+  {
+    const uint16_t running =
+      ((uint16_t)PICO9918_BUILD_SW_VERSION << 8) | PICO9918_BUILD_SW_PATCH;
+
+    for (size_t i = 0; i < pico9918_config_field_count; ++i)
+    {
+      if (pico9918_config_fields[i].introducedIn <= running) continue;
+      ++failures;
+      printf("  FAIL byte %u is stamped %04x, ahead of this build's %04x\n",
+             pico9918_config_fields[i].offset, pico9918_config_fields[i].introducedIn, running);
+    }
   }
 
   printf("%s: config validation, defaults and migration, %d failure(s)\n",

@@ -234,10 +234,14 @@ void pico9918_config_defaults(uint8_t config[PICO9918_CONFIG_BYTES]);
 /**
  * \brief validate a config block just read from host storage, and stamp its identity
  *
- * Resets the block to defaults if it belongs to another model, is uninitialised, or holds
- * an out-of-range field; then defaults the fields introduced since the stored version.
- * Either way the identity bytes end up describing this build and the command bytes a host
- * persisted are cleared.
+ * Resets the block to defaults if it is uninitialised or holds an out-of-range field; then
+ * defaults the fields introduced since the stored version. Either way the identity bytes
+ * end up describing this build and the command bytes a host persisted are cleared.
+ *
+ * A block carrying another model's identity is NOT reset. The byte layout is the same on
+ * both, so the identity is corrected and the settings kept - which is what lets a host
+ * offering a runtime tier switch keep one stored block across it, instead of the user
+ * losing their settings on every toggle.
  *
  * Three of the four identity bytes are this library's own: the version pair is the version
  * it was compiled at, which is the only number the field table's introducedIn can be
@@ -263,6 +267,10 @@ bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwV
  * so a host that persists a block without this gets a factory reset on its next boot.
  * Host storage is untouched - this only prepares the bytes. \p hwVersion is encoded as
  * pico9918_config_validate() describes.
+ *
+ * The command bytes are cleared here too, including the forced-save one
+ * pico9918_config_validate() raises: a command is a request to the run that made it, never
+ * a stored setting. A host does not need to clear them itself before persisting.
  */
 PICO9918_DLLEXPORT
 void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwVersion);

@@ -83,12 +83,13 @@ def create_default_config(pico_model=PICO_MODEL_RP2040,
     """
     Create a default configuration array (256 bytes)
 
-    Note: PICO_MODEL and DISP_DRIVER must match the target hardware for the
-    config to pass validation. HW_VERSION and SW_VERSION will be updated by firmware.
+    Note: the firmware restamps PICO_MODEL, HW_VERSION and SW_VERSION from the board
+    it boots on, and recomputes DISP_DRIVER from DISP_DRIVER_PREF plus dongle
+    detection, so none of them has to match the target here.
     """
     config = bytearray(PICO9918_CONFIG_BYTES)
 
-    # Set fields needed for validation to pass
+    # Restamped by the firmware on boot; set so the block names the intended target
     config[PICO9918_CONF_PICO_MODEL] = pico_model
     config[PICO9918_CONF_DISP_DRIVER] = disp_driver
 

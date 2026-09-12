@@ -991,7 +991,7 @@
         function createConfigArray(options, picoModel, hwVersion) {
             const config = new Uint8Array(CONFIG_BYTES);
 
-            // Set hardware fields for validation
+            // Restamped by the firmware from the board it boots on
             config[PICO9918_CONF_PICO_MODEL] = picoModel;
             config[PICO9918_CONF_HW_VERSION] = hwVersion;
             // PICO9918_CONF_DISP_DRIVER is recomputed by the firmware on boot from

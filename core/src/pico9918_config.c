@@ -129,7 +129,7 @@ bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwV
   const uint8_t picoModel = configPicoModel(hwVersion);
   uint16_t storedVer      = configStoredVersion(config);
 
-  if (config[PICO9918_CONF_PICO_MODEL] != picoModel || config[PICO9918_CONF_PALETTE_IDX_0] != 0x00 ||
+  if (config[PICO9918_CONF_PALETTE_IDX_0] != 0x00 ||
       (config[PICO9918_CONF_PALETTE_IDX_0 + 2] & 0xf0) != 0xf0 || // not initialised
       configOutOfRange(config))
   {
@@ -165,6 +165,12 @@ void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t
   config[PICO9918_CONF_HW_VERSION]       = hwVersion;
   config[PICO9918_CONF_SW_VERSION]       = PICO9918_BUILD_SW_VERSION;
   config[PICO9918_CONF_SW_PATCH_VERSION] = PICO9918_BUILD_SW_PATCH;
+
+  /* a command is a request to the run that made it, never a stored setting */
+  config[PICO9918_CONF_SAVE_FORCED]     = 0;
+  config[PICO9918_CONF_PENDING_CANCEL]  = 0;
+  config[PICO9918_CONF_PENDING_CONFIRM] = 0;
+  config[PICO9918_CONF_SAVE_TO_FLASH]   = 0;
 
   /* the initialised marker: entry 0 always 0, the rest carrying alpha 0xf */
   config[PICO9918_CONF_PALETTE_IDX_0]     = 0;

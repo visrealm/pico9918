@@ -481,9 +481,6 @@ pico9918_config_apply_now(vdp, true);
 
 if (changed)
 {
-  /* validate() raised the forced-save action for the callback path. This host is
-     saving it directly, so do not persist the command along with the settings. */
-  config[PICO9918_CONF_SAVE_FORCED] = 0;
   pico9918_config_prepare_save(config, emulated_hardware_version);
   save_exactly_256_bytes(config);
 }
@@ -508,6 +505,20 @@ the resulting bytes ought to be persisted.
 `pico9918_config_apply_now(vdp, true)` seeds R50, R30, the first sixteen palette entries
 and the render base where the selected personality has the PICO9918 config feature. It
 does not keep ownership of those registers: later guest writes win.
+
+This and `pico9918_set_chip()` may be called in either order. Selecting a personality that
+has no settings block - an F18A or either TMS9918 - takes R30 to that chip's own scanline
+sprite limit, because a TMS9918A has no register to raise it with and must not inherit a
+PICO9918's. Selecting one that does have a block leaves R30 to the block, so a later apply
+is not needed to undo the step.
+
+The palette goes the same way, and deliberately. The sixteen entries in the block are the
+PICO9918's power-on palette, not a preference that follows the user from chip to chip: a
+TMS9918A personality shows the colours a TMS9918A has, and an F18A its own. Selecting the
+PICO9918 first and then stepping down does leave those entries in place, because nothing
+clears them - but that is a side effect, not a supported way to carry a palette onto a
+lesser chip, and it does not carry R30 with it. A host that wants one palette everywhere
+owns that choice and should write the entries itself.
 
 ### Settings changed while running
 
