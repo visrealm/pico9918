@@ -467,6 +467,11 @@ bool pico9918_unlocked(PICO9918_INST_ONLY_ARG);
  * A reset preserves it: the personality is the chip on the board, not state the bus can
  * clear. A new instance starts at PICO9918_CHIP_MAX, which is what a consumer that never
  * calls this keeps.
+ *
+ * Stepping to a personality that has no settings block also takes R30 to that chip's own
+ * scanline sprite limit - four on a TMS9918 or TMS9918A, which have no register to raise
+ * it with. One that HAS a settings block keeps whatever the block last applied, so this
+ * and pico9918_config_apply_now() may be called in either order.
  */
 PICO9918_DLLEXPORT
 void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip);

@@ -338,8 +338,11 @@ PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip
   tms9918->chip     = (uint8_t)chip;
   tms9918->features = chipFeatures(chip);
 
-  /* the new chip's own limit - a PICO9918's configured value must not survive a step down */
-  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = PICO9918_SCAN_SPRITE_LIMIT(tms9918);
+  /* only a personality with no settings block takes its limit here - the block owns VR30 */
+  if (!PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))
+  {
+    TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = PICO9918_SCAN_SPRITE_LIMIT(tms9918);
+  }
 
 #if !PICO9918_NO_SPLASH
   pico9918_splash_select_pro(chip == PICO9918_CHIP_PICO9918_PRO);
@@ -3354,6 +3357,14 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
 
     PICO9918_FILL32_WAIT(PICO9918_FILL_MASKS);
 
+    /* WARNING: the unreachable modes are deliberately not named, and there is no default.
+       Either one makes the compiler stop assuming the value is in range, and it pays for a
+       bounds check on every scanline. Suppressed rather than silenced so a consumer
+       building these sources is not the one who sees it. */
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
+#endif
     switch (pico9918_cached_mode)
     {
     case TMS_MODE_GRAPHICS_I:
@@ -3372,6 +3383,9 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
       if (PICO9918_UNLOCKED(tms9918)) tempStatus = pico9918_output_sprites(PICO9918_INST y, pixels);
       break;
     }
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   }
 
   /* pixels[] must be complete, and owned by nobody, when we return */
