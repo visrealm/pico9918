@@ -20,9 +20,11 @@
  * Nothing else may declare a PICO9918_CONF_* byte index. If a new byte is needed, it
  * is claimed here and nowhere else.
  *
- * This header must stay free of host dependencies - no PICO9918_* macros, no
- * board headers, no SDK includes. Version numbers are host-owned and always
- * arrive as parameters, never as compile-time macros.
+ * This header must stay free of host dependencies - no firmware headers, no board
+ * headers, no SDK includes. The version a block is stamped with is this library's
+ * own, from the generated pico9918_build_config.h, because it is compared against
+ * the field table below and the two must come from one build. Only the board
+ * revision, which nothing here can measure, arrives as a parameter.
  *
  * -------------------------------------------------------------------------
  * ABI FREEZE
@@ -73,6 +75,18 @@
 /** \brief vdpBase values - the render base selected by PICO9918_CONF_VDP_BASE */
 #define PICO9918_BASE_TMS9918 0x00 /**< the TMS9918A base, which the F18A unlock extends */
 #define PICO9918_BASE_V9938   0x01 /**< the V9938 base */
+
+/**
+ * \brief PICO9918_CONF_PICO_MODEL values, derived from the board revision
+ *
+ * A frozen ABI, and load-bearing beyond a label: the configurator selects which firmware
+ * image to flash from this byte, so a wrong value offers a unit the wrong image.
+ */
+typedef enum
+{
+  PICO9918_MODEL_RP2040 = 1,
+  PICO9918_MODEL_RP2350 = 2,
+} pico9918_config_model_t;
 
 /** \brief every claimed config byte, by index. The values are a frozen ABI */
 typedef enum
@@ -212,51 +226,46 @@ uint8_t* pico9918_config(PICO9918_INST_ONLY_ARG);
  * pico9918_config_validate() looks for, so a block from here survives it untouched.
  *
  * The identity bytes at 0-3 are cleared with the rest; pico9918_config_validate() and
- * pico9918_config_prepare_save() are where a host's own identity is stamped in.
+ * pico9918_config_prepare_save() are where they are stamped back in.
  */
 PICO9918_DLLEXPORT
 void pico9918_config_defaults(uint8_t config[PICO9918_CONFIG_BYTES]);
 
 /**
- * \brief the identity bytes at 0-3, which only the host knows
+ * \brief validate a config block just read from host storage, and stamp its identity
  *
- * swVersion is packed major(4) | minor(4) as byte 2 stores it, so the running version
- * compared against the field table's introducedIn is (swVersion << 8) | swPatch. Host
- * version numbers arrive here and nowhere else - the library must never see a host's
- * version defines.
- */
-typedef struct
-{
-  uint8_t picoModel;
-  uint8_t hwVersion;
-  uint8_t swVersion;
-  uint8_t swPatch;
-} pico9918_config_host_id_t;
-
-/**
- * \brief validate a config block just read from host storage, and stamp \p id into it
+ * Resets the block to defaults if it belongs to another model, is uninitialised, or holds
+ * an out-of-range field; then defaults the fields introduced since the stored version.
+ * Either way the identity bytes end up describing this build and the command bytes a host
+ * persisted are cleared.
  *
- * Resets the block to defaults if it is not this host's, is uninitialised, or holds an
- * out-of-range field; then defaults the fields introduced since the stored version.
- * Either way the identity bytes end up at \p id and the command bytes a host persisted
- * are cleared.
+ * Three of the four identity bytes are this library's own: the version pair is the version
+ * it was compiled at, which is the only number the field table's introducedIn can be
+ * compared against, and the model follows \p hwVersion. Passing them in is what let a host
+ * one release behind leave the fields added since at whatever the stored block held.
+ *
+ * \p hwVersion is the board revision, which only a host can measure - byte 1 as the
+ * configurator decodes it, major in the high nibble and minor in the low
+ * (0x03, 0x10, 0x20). A major of 2 or above is the PRO tier, and that is what byte 0 is
+ * derived from, so a value outside this encoding stamps the wrong model.
  *
  * Returns true if the block changed in a way the host should persist. A host running the
  * configurator protocol can ignore that: PICO9918_CONF_SAVE_FORCED is set on the same
  * path, which is the save request its GPU loop already dispatches.
  */
 PICO9918_DLLEXPORT
-bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id);
+bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwVersion);
 
 /**
- * \brief stamp \p id and the initialised marker into a block about to be persisted
+ * \brief stamp the identity and the initialised marker into a block about to be persisted
  *
  * The marker is how pico9918_config_validate() tells a stored block from an erased one,
  * so a host that persists a block without this gets a factory reset on its next boot.
- * Host storage is untouched - this only prepares the bytes.
+ * Host storage is untouched - this only prepares the bytes. \p hwVersion is encoded as
+ * pico9918_config_validate() describes.
  */
 PICO9918_DLLEXPORT
-void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id);
+void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwVersion);
 
 /** \brief copy live tracked fields into the in-RAM pending mirror with the given state */
 PICO9918_DLLEXPORT

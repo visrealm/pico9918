@@ -476,14 +476,7 @@ uint8_t *config = pico9918_config(vdp);
 if (!load_exactly_256_bytes(config))
   pico9918_config_defaults(config);
 
-pico9918_config_host_id_t id = {
-  .picoModel = emulated_model,
-  .hwVersion = emulated_hardware_version,
-  .swVersion = 0x13, /* packed major/minor */
-  .swPatch = 0
-};
-
-bool changed = pico9918_config_validate(config, id);
+bool changed = pico9918_config_validate(config, emulated_hardware_version);
 pico9918_config_apply_now(vdp, true);
 
 if (changed)
@@ -491,15 +484,26 @@ if (changed)
   /* validate() raised the forced-save action for the callback path. This host is
      saving it directly, so do not persist the command along with the settings. */
   config[PICO9918_CONF_SAVE_FORCED] = 0;
-  pico9918_config_prepare_save(config, id);
+  pico9918_config_prepare_save(config, emulated_hardware_version);
   save_exactly_256_bytes(config);
 }
 ```
 
-Use identity values belonging to the device the emulator claims to be, and keep them
-stable across runs. Validation stamps them into the block, clears stored command bytes,
-resets a foreign or damaged block, and defaults fields introduced after its stored
-version. Its return means the resulting bytes ought to be persisted.
+The board revision is the only identity byte a host supplies, because it is the only one
+the library cannot know. Pass the revision belonging to the device the emulator claims to
+be, keep it stable across runs, and use the encoding the configurator decodes: major in
+the high nibble, minor in the low - `0x03`, `0x10` or `0x20` for a v0.3, v1.x or v2.x
+board. Byte 0, the MCU the configurator picks a firmware image by, is derived from it: a
+major of 2 or above is the PRO tier on the RP2350.
+
+The version pair is the library's own, from the build it was compiled at. That is
+deliberate: it is compared against the field table that decides which settings a firmware
+upgrade re-defaults, and a caller naming a different version leaves the fields added
+since at whatever the stored block held.
+
+Validation stamps all four bytes, clears stored command bytes, resets a foreign or
+damaged block, and defaults fields introduced after its stored version. Its return means
+the resulting bytes ought to be persisted.
 
 `pico9918_config_apply_now(vdp, true)` seeds R50, R30, the first sixteen palette entries
 and the render base where the selected personality has the PICO9918 config feature. It

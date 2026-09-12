@@ -58,6 +58,18 @@
 #define PICO9918_BUILD_SINGLE_INSTANCE @PICO9918_BUILD_SINGLE_INSTANCE@
 
 /*
+ * This library's own version, as the two bytes a settings block is stamped with.
+ *
+ * PICO9918_BUILD_SW_VERSION packs major and minor into a nibble each; the patch is a
+ * whole byte. Together they are what pico9918_config_validate() compares against the
+ * field table's introducedIn, which is why the number has to come from the build that
+ * carries the table rather than from whoever is calling: a caller one release behind
+ * leaves the fields added since at whatever the stored block held.
+ */
+#define PICO9918_BUILD_SW_VERSION @PICO9918_BUILD_SW_VERSION@
+#define PICO9918_BUILD_SW_PATCH   @PICO9918_BUILD_SW_PATCH@
+
+/*
  * Whether the compiled library carries pico9918_debug.h's entry points.
  *
  * Purely additive - no instance field, no layout, no calling convention - so unlike

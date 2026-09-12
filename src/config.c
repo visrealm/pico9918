@@ -26,12 +26,6 @@
 
 #include <string.h>
 
-#if PICO_RP2040
-#define PICO_MODEL 1
-#elif PICO_RP2350
-#define PICO_MODEL 2
-#endif
-
 /* VdpDevice is host policy (pin behaviour), so the library's field table carries
    only byte 12's range as literals. Keep the two in step. */
 _Static_assert(VDP_DEVICE_COUNT - 1 == 3,
@@ -235,33 +229,28 @@ void __in_flash_func(applyPendingDisplay)(uint8_t config[PICO9918_CONFIG_BYTES])
   }
 }
 
-/** \brief the identity bytes at 0-3, which only this firmware knows */
-static pico9918_config_host_id_t hostId(void)
-{
-  return (pico9918_config_host_id_t){.picoModel = PICO_MODEL,
-                                     .hwVersion = currentHwVersion(),
-                                     .swVersion = PICO9918_SW_VERSION,
-                                     .swPatch   = PICO9918_PATCH_VER};
-}
-
 /** \brief read the configuration from flash, validating, defaulting and migrating it */
 void readConfig(uint8_t config[PICO9918_CONFIG_BYTES])
 {
   memcpy(config, CONFIG_FLASH_ADDR, PICO9918_CONFIG_BYTES);
 
   // validation, defaults, migration and the identity stamp; SAVE_FORCED asks for the save
-  pico9918_config_validate(config, hostId());
+  pico9918_config_validate(config, currentHwVersion());
 
   pico9918_config_schedule_apply(PICO9918_INST true);
 }
 
-/** \brief erase and rewrite the whole config sector, verifying and retrying */
-bool writeConfig(uint8_t config[PICO9918_CONFIG_BYTES])
+/** \brief erase and rewrite the whole config sector, verifying and retrying
+ *
+ * noinline: a sector erase and program is milliseconds, so a copy folded into each
+ * caller buys nothing and costs the space twice over.
+ */
+bool __attribute__((noinline)) writeConfig(uint8_t config[PICO9918_CONFIG_BYTES])
 {
   flash_range_erase(CONFIG_FLASH_OFFSET, 0x1000);
 
   // identity bytes and the marker readConfig() reads back as "initialised"
-  pico9918_config_prepare_save(config, hostId());
+  pico9918_config_prepare_save(config, currentHwVersion());
 
   bool success = false;
 

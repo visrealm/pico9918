@@ -343,17 +343,14 @@ else()
         set(PICO9918_SPLASH_IMAGE res/splash.png)
     endif()
 
-    add_subdirectory(core)
-
     # The library carries its own version, because a published library must. It is
     # generated from this repository, so the two are one release - and a silent
-    # divergence would ship a package whose version means nothing.
+    # divergence would ship a package whose version means nothing. core compares it
+    # against its own project() version and warns.
     set(PICO9918_CORE_EXPECTED_VER
         "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
-    if(NOT pico9918_core_VERSION VERSION_EQUAL PICO9918_CORE_EXPECTED_VER)
-        message(WARNING "core/CMakeLists.txt says ${pico9918_core_VERSION}, this firmware is "
-                        "${PICO9918_CORE_EXPECTED_VER} - bump the library's project() version too")
-    endif()
+
+    add_subdirectory(core)
 
     add_subdirectory(src)
     add_subdirectory(test)

@@ -62,6 +62,15 @@ endif()
 # CMakeLists checks the two agree.
 project(pico9918_core VERSION 1.3.0 LANGUAGES C)
 
+# Set by a parent generating this library from the same release. Checked here because
+# project() sets pico9918_core_VERSION in this scope only: a parent reads an empty
+# string, while its own variables reach us wherever in the tree it adds us from.
+if(DEFINED PICO9918_CORE_EXPECTED_VER
+   AND NOT PROJECT_VERSION VERSION_EQUAL PICO9918_CORE_EXPECTED_VER)
+  message(WARNING "core/CMakeLists.txt says ${PROJECT_VERSION}, the parent is "
+                  "${PICO9918_CORE_EXPECTED_VER} - bump the library's project() version too")
+endif()
+
 # A top-level desktop build offers CMake's standard static/shared choice. Do not
 # introduce the cache option into a parent that vendors us: if it has a policy, its
 # BUILD_SHARED_LIBS value is still honoured by src/CMakeLists.txt.
@@ -148,6 +157,14 @@ endif()
 option(PICO9918_PIXEL_TEST "Build the post-palette pixel-path test" OFF)
 if (PICO9918_PIXEL_TEST)
   add_subdirectory(test/pixel)
+endif()
+
+# The settings block's validation, defaults and per-version migration. The migration is
+# driven by this library's own descriptor table, so only a test built against it can say
+# whether a stored block is swept correctly.
+option(PICO9918_CONFIG_TEST "Build the config validation and migration test" OFF)
+if (PICO9918_CONFIG_TEST)
+  add_subdirectory(test/config)
 endif()
 
 # The GPU rate the library paces itself from, and the arming write it runs a program on.

@@ -73,6 +73,17 @@ PICO9918_INLINE_HOT uint16_t configStoredVersion(const uint8_t* config)
   return ((uint16_t)config[PICO9918_CONF_SW_VERSION] << 8) | config[PICO9918_CONF_SW_PATCH_VERSION];
 }
 
+/* This build's version in the packing the block stores, so one comparison serves both the
+   stored version and the field table's introducedIn. */
+#define CONFIG_RUNNING_VERSION (((uint16_t)PICO9918_BUILD_SW_VERSION << 8) | PICO9918_BUILD_SW_PATCH)
+
+/* Board revision major 2 and up is the PRO tier, which is the RP2350 - see the encoding
+   pico9918_config_validate() documents. */
+static uint8_t configPicoModel(uint8_t hwVersion)
+{
+  return hwVersion >= 0x20 ? PICO9918_MODEL_RP2350 : PICO9918_MODEL_RP2040;
+}
+
 static bool configOutOfRange(const uint8_t* config)
 {
   for (size_t i = 0; i < pico9918_config_field_count; ++i)
@@ -113,11 +124,12 @@ static void migrateNewFields(uint8_t* config, uint16_t storedVer)
   }
 }
 
-bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id)
+bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwVersion)
 {
-  uint16_t storedVer = configStoredVersion(config);
+  const uint8_t picoModel = configPicoModel(hwVersion);
+  uint16_t storedVer      = configStoredVersion(config);
 
-  if (config[PICO9918_CONF_PICO_MODEL] != id.picoModel || config[PICO9918_CONF_PALETTE_IDX_0] != 0x00 ||
+  if (config[PICO9918_CONF_PICO_MODEL] != picoModel || config[PICO9918_CONF_PALETTE_IDX_0] != 0x00 ||
       (config[PICO9918_CONF_PALETTE_IDX_0 + 2] & 0xf0) != 0xf0 || // not initialised
       configOutOfRange(config))
   {
@@ -126,8 +138,8 @@ bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_co
     storedVer = 0; // a defaulted block stamps and saves like a version change
   }
 
-  config[PICO9918_CONF_PICO_MODEL] = id.picoModel;
-  config[PICO9918_CONF_HW_VERSION] = id.hwVersion;
+  config[PICO9918_CONF_PICO_MODEL] = picoModel;
+  config[PICO9918_CONF_HW_VERSION] = hwVersion;
 
   // the host persists all 256 bytes; clear command bytes read back from storage
   config[PICO9918_CONF_SAVE_FORCED]     = 0;
@@ -135,24 +147,24 @@ bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_co
   config[PICO9918_CONF_PENDING_CONFIRM] = 0;
   config[PICO9918_CONF_SAVE_TO_FLASH]   = 0;
 
-  if (storedVer == (((uint16_t)id.swVersion << 8) | id.swPatch)) return false;
+  if (storedVer == CONFIG_RUNNING_VERSION) return false;
 
   migrateNewFields(config, storedVer);
 
-  config[PICO9918_CONF_SW_VERSION]       = id.swVersion;
-  config[PICO9918_CONF_SW_PATCH_VERSION] = id.swPatch;
+  config[PICO9918_CONF_SW_VERSION]       = PICO9918_BUILD_SW_VERSION;
+  config[PICO9918_CONF_SW_PATCH_VERSION] = PICO9918_BUILD_SW_PATCH;
 
   /* forced, not pending-split: a migration is not a display change the user chose */
   config[PICO9918_CONF_SAVE_FORCED] = 1;
   return true;
 }
 
-void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], pico9918_config_host_id_t id)
+void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwVersion)
 {
-  config[PICO9918_CONF_PICO_MODEL]       = id.picoModel;
-  config[PICO9918_CONF_HW_VERSION]       = id.hwVersion;
-  config[PICO9918_CONF_SW_VERSION]       = id.swVersion;
-  config[PICO9918_CONF_SW_PATCH_VERSION] = id.swPatch;
+  config[PICO9918_CONF_PICO_MODEL]       = configPicoModel(hwVersion);
+  config[PICO9918_CONF_HW_VERSION]       = hwVersion;
+  config[PICO9918_CONF_SW_VERSION]       = PICO9918_BUILD_SW_VERSION;
+  config[PICO9918_CONF_SW_PATCH_VERSION] = PICO9918_BUILD_SW_PATCH;
 
   /* the initialised marker: entry 0 always 0, the rest carrying alpha 0xf */
   config[PICO9918_CONF_PALETTE_IDX_0]     = 0;

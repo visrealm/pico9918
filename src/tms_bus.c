@@ -142,5 +142,4 @@ void tmsBusInit(void)
     gpio_set_irq_enabled(GPIO_RESET, GPIO_IRQ_EDGE_FALL, true);
     irq_set_enabled(IO_IRQ_BANK0, true);
   }
-  tms9918->config[PICO9918_CONF_HW_VERSION] = hwVersion;
 }

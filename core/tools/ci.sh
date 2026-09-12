@@ -135,6 +135,13 @@ pixels() {
   done
 }
 
+# The settings block: what a stored one is swept against is this build's own version.
+config() {
+  configure "$OUT-config" "$LIBROOT" -DPICO9918_CONFIG_TEST=ON -DCMAKE_C_FLAGS=-O2
+  build "$OUT-config"
+  "$(findExe "$OUT-config" config_test)"
+}
+
 # The GPU rate: an armed program has to have run before the arming write returns.
 gpu() {
   configure "$OUT-gpu" "$LIBROOT" -DPICO9918_GPU_TEST=ON -DCMAKE_C_FLAGS=-O2
@@ -371,6 +378,7 @@ case ${1:-} in
 goldens) goldens ;;
 suite) suite ;;
 pixels) pixels ;;
+config) config ;;
 gpu) gpu ;;
 gpucore) gpucore ;;
 debug) debug ;;
@@ -383,7 +391,7 @@ tms9918) tms9918 ;;
 chip) chip ;;
 python) pythonModule ;;
 *)
-  echo "usage: tools/ci.sh <goldens|suite|pixels|gpu|gpucore|debug|warnings|comments|doxygen|package|multi|tms9918|chip|python>" >&2
+  echo "usage: tools/ci.sh <goldens|suite|pixels|config|gpu|gpucore|debug|warnings|comments|doxygen|package|multi|tms9918|chip|python>" >&2
   exit 2
   ;;
 esac

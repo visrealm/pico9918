@@ -16,9 +16,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-/** \brief running version, packed major(4) | minor(4) */
-#define PICO9918_SW_VERSION ((PICO9918_MAJOR_VER << 4) | PICO9918_MINOR_VER)
-
 /* The config byte layout (the PICO9918_CONF_* indices and PICO9918_CONFIG_BYTES) is owned by the
    library, which is what makes byte 15 - the render base - a single
    declaration rather than two that must agree. See

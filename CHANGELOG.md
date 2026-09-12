@@ -42,6 +42,10 @@ shared path is faster than the per-mode code it replaced.
 * The resident GPU program image is gone. It is an SPI flash command server and there is no SPI
   flash here to serve, so four of its five handlers could never do anything and the fifth
   duplicated the DMA engine. No configurator ROM or released software used it.
+* Validating and saving a settings block takes the board revision alone, where it used to take a
+  four-byte identity a host filled in. Three of those four bytes were facts the library already
+  held: it stamps its own version, and the MCU follows the revision. Nothing about a board's
+  stored settings changes, but the call and its struct do.
 
 ### Fixed
 
@@ -63,6 +67,10 @@ shared path is faster than the per-mode code it replaced.
   a constant 31.
 * R50 bit 2 drives the simulated scanlines, so software that asks for the effect gets it. The
   configurator setting is now the power-on default for that bit rather than a second owner of it.
+* A stored settings block is swept against the version of the emulation that reads it, so a
+  setting introduced by a release always arrives at its default. Where the block and the caller
+  agreed on an older version the sweep was skipped entirely, and the setting kept whatever bytes
+  happened to be there - on that boot and every later one.
 
 ## v1.2.0 - 2026-07-12
 

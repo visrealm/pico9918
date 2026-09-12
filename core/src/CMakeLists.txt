@@ -167,6 +167,20 @@ else()
   set(PICO9918_BUILD_RUNTIME_CHIP 0)
 endif()
 
+# The version a settings block is stamped with, and what its stored version is compared
+# against. Checked here rather than asserted in C: these are CMake variables, and a packed
+# byte cannot show the overlap anyway - 1.16 packs exactly as 1.0 does.
+if(PROJECT_VERSION_MAJOR GREATER 15 OR PROJECT_VERSION_MINOR GREATER 15
+   OR PROJECT_VERSION_PATCH GREATER 255)
+  message(FATAL_ERROR
+    "pico9918-core ${PROJECT_VERSION} does not fit the stored identity: PICO9918_CONF_SW_VERSION "
+    "is one nibble each for major and minor, PICO9918_CONF_SW_PATCH_VERSION one byte. Widening "
+    "them is a config-block ABI migration, not a version bump.")
+endif()
+math(EXPR PICO9918_BUILD_SW_VERSION "(${PROJECT_VERSION_MAJOR} << 4) | ${PROJECT_VERSION_MINOR}"
+     OUTPUT_FORMAT HEXADECIMAL)
+set(PICO9918_BUILD_SW_PATCH ${PROJECT_VERSION_PATCH})
+
 # The most dangerous of the lot: it changes the calling convention of nearly every
 # public entry point, and C symbols carry no argument types, so a consumer that
 # disagrees links cleanly and then passes arguments the library never expects.
