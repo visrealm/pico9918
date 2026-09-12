@@ -238,6 +238,12 @@ typedef struct
 #define PICO9918_M4(T)                                                                             \
   (PICO9918_CAN_UNLOCK(T) && (TMS_REGISTER(T, TMS_REG_0) & TMS_R0_MODE_TEXT_80))
 
+/* What VR30 resets to. A chip that cannot unlock has no VR30 to raise it with, so four a
+   line is the hardware's own limit; MAX_SPRITES - 1 is the F18A's "no limit" value, which
+   its jumper also selects. Folds to that in a fixed-chip build. */
+#define PICO9918_SCAN_SPRITE_LIMIT(T)                                                              \
+  (PICO9918_CAN_UNLOCK(T) ? (MAX_SPRITES - 1) : MAX_SCANLINE_SPRITES)
+
 
 /* PRIVATE DATA STRUCTURE
   * ---------------------- */

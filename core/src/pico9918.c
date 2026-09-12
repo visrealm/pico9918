@@ -300,7 +300,7 @@ static PICO9918_NOINLINE void vdpRegisterReset(pico9918_t* tms9918)
   TMS_REGISTER(tms9918, TMS_REG_5)                     = 0x0A;
   TMS_REGISTER(tms9918, TMS_REG_6)                     = 0x02;
   TMS_REGISTER(tms9918, TMS_REG_7)                     = 0xF2;
-  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1; // scanline sprites
+  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = PICO9918_SCAN_SPRITE_LIMIT(tms9918);
   TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC)         = 1;               // vram address increment register
   TMS_REGISTER(tms9918, PICO9918_REG_MAX_SPRITES)      = MAX_SPRITES;     // Sprites to process
   TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_MSB)       = 0x40;
@@ -337,6 +337,9 @@ PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip
 
   tms9918->chip     = (uint8_t)chip;
   tms9918->features = chipFeatures(chip);
+
+  /* the new chip's own limit - a PICO9918's configured value must not survive a step down */
+  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = PICO9918_SCAN_SPRITE_LIMIT(tms9918);
 
 #if !PICO9918_NO_SPLASH
   pico9918_splash_select_pro(chip == PICO9918_CHIP_PICO9918_PRO);
