@@ -34,3 +34,10 @@ docs/package-lock.json
 # Generated API documentation. CI builds it and publishes it; it is never
 # committed, so a regeneration cannot show up as a thousand-file diff.
 /doc/
+
+# The debug probe is its own repo - visrealm/pico9918-probe, a fork of
+# raspberrypi/debugprobe. Nothing here builds against it, so a checkout beside
+# the firmware is a convenience; ignored so 157 MB of upstream tree cannot be
+# swept into a public repo by a stray `git add`.
+/tools/debugprobe/
+/build-debugprobe-*/
