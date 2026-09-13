@@ -24,6 +24,7 @@ or import it and drive a scene:
 
 import argparse
 import glob
+import json
 import os
 import re
 import socket
@@ -107,6 +108,49 @@ def probe_serial(target, override=None):
     LIVE9918_PROBE_RP2350 name a serial each - `--probe` overrides for a one-off, and
     with neither set openocd picks as it always has."""
     return override or os.environ.get("LIVE9918_PROBE_" + target.upper()) or None
+
+
+def probe_cdc(override=None):
+    """The host-bus probe's CDC port, as `COM10` or `COM10:manual`. That probe gates
+    SWD on an explicit arm, and refuses DAP_Connect until it has one - so an un-armed
+    probe reports a failed connect, which reads exactly like bad wiring. Naming the
+    port here turns that into one arm the harness does for itself. LIVE9918_PROBE_CDC
+    sets it; with neither that nor `--probe-cdc`, nothing here runs at all."""
+    value = override or os.environ.get("LIVE9918_PROBE_CDC") or None
+    if not value:
+        return None
+    port, _, mode = value.partition(":")
+    return port, (mode or "switch").lower()
+
+
+def arm_probe(port, mode):
+    """Arm the probe if it is not already, and say what it is holding. Idempotent
+    by asking first: a second ARM is refused rather than ignored, so sending one
+    blind cannot tell a live fixture from a broken one."""
+    try:
+        import serial
+    except ImportError:
+        raise SystemExit(
+            "LIVE9918_PROBE_CDC names %s, but pyserial is not installed. Either install "
+            "it, or arm the probe by hand first:\n"
+            "  python tools/debugprobe/host/pico9918_probe.py --port %s arm %s" % (port, port, mode))
+    with serial.Serial(port, 115200, timeout=3) as link:
+        link.dtr = True     # the probe's CDC task drops everything until DTR is asserted
+        link.reset_input_buffer()
+        state = _probe_cmd(link, 1, "STATE")
+        if not state.get("armed"):
+            if not _probe_cmd(link, 2, "ARM " + mode.upper()).get("ok"):
+                raise SystemExit("probe on %s refused ARM %s" % (port, mode))
+            state = _probe_cmd(link, 3, "STATE")
+        return state
+
+
+def _probe_cmd(link, request_id, command):
+    link.write(("%d %s\n" % (request_id, command)).encode())
+    reply = link.readline().decode(errors="replace").strip()
+    if not reply:
+        raise SystemExit("probe did not answer %r - is it the host-bus firmware?" % command)
+    return json.loads(reply)
 
 # The stored block is the top 4 KB of a 2 MB flash and the pending display block is
 # the sector below it, per CONFIG_FLASH_OFFSET in src/config.c.
@@ -219,7 +263,8 @@ class OpenOcd:
 
 
 class Live(VdpAccess):
-    def __init__(self, elf, target=None, verify=True, speed=SWD_SPEED_KHZ, boot=None, probe=None):
+    def __init__(self, elf, target=None, verify=True, speed=SWD_SPEED_KHZ, boot=None, probe=None,
+                 cdc=None):
         self.elf = elf
         # what this run was against, for anything that prints rather than asserts -
         # the desktop backend has no ELF, so nothing may reach for one
@@ -230,6 +275,12 @@ class Live(VdpAccess):
         self.sym = elf_symbols(elf)
         self.inst = self.sym["tms9918Inst"]
         self.capture_addr = self.sym.get("liveTestCapture")
+        # Said here rather than at the first capture: a production ELF carries every
+        # field struct_offsets checks, so nothing else notices until a stage asks for
+        # a capture offset and dies on a bare KeyError a long way from the cause.
+        if self.capture_addr is None:
+            raise SystemExit("%s has no liveTestCapture - this is not a live-test build "
+                             "(configure with -DPICO9918_LIVE_TEST=ON)" % self.label)
         self.off = struct_offsets(elf)
         # The VDP address space starts at the instance's `vram` union, NOT at the
         # instance. Scalar fields sit ahead of it, so a scene written to `inst`
@@ -242,8 +293,14 @@ class Live(VdpAccess):
         self.width = PIXELS_X       # until a capture says otherwise
         self._defaultPalette = None
         self.ocd = OpenOcd(self.target, speed, probe_serial(self.target, probe))
+        self.cdc = probe_cdc(cdc)
 
     def __enter__(self):
+        # before openocd opens the probe: an un-armed host-bus probe answers
+        # DAP_Connect with a failure, and openocd reports that as a dead target
+        if self.cdc:
+            state = arm_probe(*self.cdc)
+            print("probe: armed, %s power" % ("switched" if state.get("switched") else "manual"))
         self.ocd.start()
         # a `with` never runs __exit__ for a body that failed to start, so openocd
         # outlives the run that launched it and holds the probe against the next one
@@ -663,6 +720,9 @@ def board_args(ap):
     ap.add_argument("--probe", default=None, metavar="SERIAL",
                     help="CMSIS-DAP serial to open, for a desk with a probe per board; "
                          "otherwise LIVE9918_PROBE_RP2040 / LIVE9918_PROBE_RP2350")
+    ap.add_argument("--probe-cdc", default=None, metavar="PORT",
+                    help="the host-bus probe's CDC port, as COM10 or COM10:manual - armed "
+                         "before openocd opens it; otherwise LIVE9918_PROBE_CDC")
     ap.add_argument("--clock", type=int, default=None, metavar="N",
                     choices=range(len(CLOCK_PRESET_MHZ)),
                     help="system clock preset, %s - saved and the board rebooted into it, because "
@@ -685,7 +745,8 @@ def open_board(args):
     return Live(args.elf or default_elf(args.board),
                 verify=not getattr(args, "flash", False),
                 boot={k: v for k, v in boot.items() if v is not None},
-                probe=getattr(args, "probe", None))
+                probe=getattr(args, "probe", None),
+                cdc=getattr(args, "probe_cdc", None))
 
 
 def default_elf(board="pro"):

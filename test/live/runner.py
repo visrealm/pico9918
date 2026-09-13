@@ -167,7 +167,7 @@ def main():
     # a systematic shift is the one regression class no golden and no assembly extract
     # can see, so it belongs in the verdict rather than in a report a reader may not
     # open. Resolved before saving, so it cannot resolve to this run.
-    last_tag = results.latest(args.board)
+    last_tag = results.latest(args.board, like=record["run"])
     record["drift"] = results.drift(record, results.load(last_tag) if last_tag else None,
                                    last_tag)
     if record["drift"]:
@@ -179,7 +179,7 @@ def main():
     # resolve --against before saving, so `last` cannot resolve to this run
     against, against_tag = None, None
     if args.against == "last":
-        against_tag = results.latest(args.board)
+        against_tag = results.latest(args.board, like=record["run"])
         against = results.load(against_tag) if against_tag else None
         print("against: %s" % (against_tag or "nothing saved for this board yet"))
     elif args.against:

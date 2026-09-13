@@ -107,7 +107,8 @@ def main():
         record = results.load(args.record)
         against = None
         if args.against == "last":
-            tag = results.latest(record["run"]["board"], exclude=stem(args.record))
+            tag = results.latest(record["run"]["board"], exclude=stem(args.record),
+                                 like=record["run"])
             against = results.load(tag) if tag else None
             if not against:
                 print("nothing saved for this board to compare against")

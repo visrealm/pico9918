@@ -266,10 +266,35 @@ def available():
     return [f[:-5] for f in os.listdir(RUNS_DIR) if f.endswith(".json")]
 
 
-def latest(board, exclude=None):
+def comparable(run, was):
+    """Whether a delta between two runs measures the change rather than the rig.
+    A different clock or a different set of build options moves every scene.
+
+    Options are compared key by key. An option ADDED since the older record is
+    absent there rather than set differently, so comparing the two dicts whole
+    severed every record from every earlier one the day an OFF-by-default flag
+    landed - which is every record before PICO9918_CONFIG_TEST existed. A key
+    only one side knows is ignored while it is off, and disqualifies while it
+    is on, because then it really did build something else."""
+    if run.get("clock_hz") != was.get("clock_hz"):
+        return False
+    now, then = run.get("options") or {}, was.get("options") or {}
+    for key in set(now) | set(then):
+        if key in now and key in then:
+            if now[key] != then[key]:
+                return False
+        elif (now[key] if key in now else then[key]) not in ("OFF", ""):
+            return False
+    return True
+
+
+def latest(board, exclude=None, like=None):
     """The newest record for this board, which is what `--against last` means.
     Records for the other board are skipped rather than reported: their timing
     delta measures the hardware, which is not what an automatic baseline is for.
+    `like` is this run's own `run` block, and extends that same refusal to a
+    record whose clock or options differ - without it one run at an unusual
+    preset becomes the baseline every later run is refused against.
     Name both records to `--compare` to read that one deliberately."""
     best = None
     for tag in available():
@@ -280,6 +305,8 @@ def latest(board, exclude=None):
         except (OSError, ValueError, SystemExit):
             continue
         if run["board"] != board:
+            continue
+        if like is not None and not comparable(like, run):
             continue
         if best is None or run["date"] > best[1]["date"]:
             best = (tag, run)
@@ -306,7 +333,7 @@ def drift(record, before, tag=None):
     if not before:
         return None
     run, was = record["run"], before["run"]
-    if run.get("clock_hz") != was.get("clock_hz") or run.get("options") != was.get("options"):
+    if not comparable(run, was):
         return None
     now = record.get("perf", {}).get("one", {})
     then = before.get("perf", {}).get("one", {})
