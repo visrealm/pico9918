@@ -46,7 +46,9 @@ thinking about.
 
 ## What is not here
 
-Anything that measures time, and anything that needs a PICO9918. A scanline's cost is a property of
-a device - its clock, its flash, its DMA - so the timing stages live with the firmware that runs on
-one, in the firmware repository's `test/live/`. That harness imports [`suite/`](suite/) rather than
-keeping a copy, and adds the three stages only a board can answer.
+Anything that measures time, anything that needs a PICO9918, and anything that needs a host on the
+other end of the bus. A scanline's cost is a property of a device - its clock, its flash, its DMA -
+so the timing stages live with the firmware that runs on one, in the firmware repository's
+`test/live/`. That harness imports [`suite/`](suite/) rather than keeping a copy, and adds the four
+stages only a board can answer: `hostbus`, which drives the socket through a probe that is a host bus
+driver as well as a debug probe, and `diag`, `perf` and `perf-panels`, which read microseconds.

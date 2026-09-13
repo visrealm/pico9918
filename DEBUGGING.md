@@ -18,7 +18,7 @@ plugged in.
 | What does the suite look like *while it runs*? | **`view.py`** - a window at 60fps, desktop only; or the console's **Run the suite**, for a board | `test/live/` |
 | Does the whole chain look right - palette, VGA timing, SCART? | An eye, or a capture device | - |
 | Does the host bus respond at all? | **Bus test-bed** - a second Pico standing in for the host CPU | `test/host/` |
-| ...and does it hold up under real timing, at what limits? | **[pico9918-probe](https://github.com/visrealm/pico9918-probe)** - a CMSIS-DAP probe that also drives the bus as a host, sweeping setup, pulse, hold and sample position | its own repo |
+| ...and does it hold up under real timing, at what limits? | **`runner.py --only hostbus`** - twenty-eight groups driven through [pico9918-probe](https://github.com/visrealm/pico9918-probe), which is a CMSIS-DAP probe and a host at once, sweeping setup, pulse, hold and sample position | `test/live/` |
 | Is a freshly assembled board wired correctly? | **QC loopback** | `test/qc/` |
 
 **Start with `runner.py`.** It runs every stage in one openocd session in the order that works,
@@ -277,14 +277,16 @@ D4 took four photograph rounds; as an assertion it takes seconds and checks all 
 
 ## What is missing {#what-is-missing}
 
-- **The host bus, in an automated run.** Everything above bypasses it: the live harness writes
-  memory, the bench ROM drives the VDP through a host that is assumed to work.
-  [pico9918-probe](https://github.com/visrealm/pico9918-probe) drives the bus as a host and sweeps its
-  timing; the phantom-read defect in `src/tms9918.pio` is the class of thing only it can see. The gap
-  is the join: `runner.py` uses that probe for SWD alone, so no stage asserts anything about the bus
-  and a regression there does not fail a normal run. It cannot see rendered pixels either, so it
-  complements the live harness rather than replacing it. See `HARDWARE.md` - in the build workspace
-  above this repo, not in it - before touching that area.
+- **A picture written through the socket.** The bus itself is no longer the gap: `hostbus` runs first
+  in every normal run, driving the socket through
+  [pico9918-probe](https://github.com/visrealm/pico9918-probe), which is the same board `runner.py`
+  already used for SWD, so one probe is the debugger and the host at once. The conformance and
+  rejection groups fail a run; the capability sweeps are recorded and compared against the previous
+  record, so a limit that moves is reported without a nanosecond failing anything. The phantom-read
+  defect in `src/tms9918.pio` is the class of thing only it can see. What is still missing is the
+  join between the two halves: a scene is applied over SWD, so the 111 pictures never test the path a
+  byte takes from the socket, and `hostbus` asserts that path without ever rendering from it. See
+  `HARDWARE.md` - in the build workspace above this repo, not in it - before touching that area.
 - **Everything after the index buffer.** `renderer.c`'s palette expansion, VGA timing and SCART are
   only checked by eye today. A capture device would automate that end of the chain.
 - **Sprites at 8bpp.** `reference-w512/` holds one sprite scene against the 4bpp set's eleven: ECM
@@ -292,6 +294,11 @@ D4 took four photograph rounds; as an assertion it takes seconds and checks all 
 - **The GPU, past the instruction core.** `gpu.py` runs a real program - Tursi's F18A GPU
   Mandelbrot, credited in `test/live/gpu-programs/README.md` - on both cores now: the Thumb one on
   a board, `run9900_c` on the desktop, against one shared reference. So the instruction set, the
-  `>6000` register window, the `>FFFE` workspace and the restart handshake are gated. What is still ungated is the rest of the glue: the DMA port at `>8000`, the palette guard's
-  fault path, the config-action callbacks and the flash request. Each needs a program written for
-  it, and the DMA port and the palette guard need an MPU, so they only exist on a board.
+  `>6000` register window, the `>FFFE` workspace and the restart handshake are gated. The DMA port at
+  `>8000` is gated too, by the `dma` stage: a GPU program stages eight parameter bytes and writes the
+  trigger, which is an MPU fault on a board and a software address compare on the desktop, so running
+  it both ways is a differential test of the two routes to one engine. What is still ungated is the
+  rest of the glue: the palette guard's fault path, which that stage walks through incidentally on
+  every parameter store without asserting anything about it, the config-action callbacks and the
+  flash request. Each needs a program written for it, and the palette guard needs an MPU, so it only
+  exists on a board.

@@ -30,8 +30,9 @@ need no board, so a board is not what proves them - CI runs them under four comp
 push, and this harness imports the same package rather than keeping a second copy in step by hand.
 
 That split is also the division of labour. The library owns what the renderer must compute; this
-repository owns the three stages that can only be answered by a device - `diag`, `perf` and
-`perf-panels`, which read microseconds and which lines did not fit. `runner.py` runs all twelve.
+repository owns the four stages that can only be answered by a device - `hostbus`, which drives the
+socket a real machine drives, and `diag`, `perf` and `perf-panels`, which read microseconds and
+which lines did not fit. `runner.py` runs all thirteen.
 
 `dma` and `tms9900` sit across that line and are the library's anyway, because what they assert is
 arithmetic rather than a device. Each is still the only way to reach one half of the GPU on a board.
@@ -832,14 +833,22 @@ last row still hold the previous scene's numbers; read only the rows the current
 ## What it does not cover
 
 The indices are the renderer's output, not the display's. Everything after them - the palette
-expansion in `renderer.c`, VGA timing, SCART - needs a capture device or an eye. And nothing here
-touches the host bus: the PIO interface, `/CSW` timing and the read-ahead are the one part of the
-system this harness deliberately bypasses.
+expansion in `renderer.c`, VGA timing, SCART - needs a capture device or an eye.
 
-The [PICO9918 debug probe](https://github.com/visrealm/pico9918-probe) covers that gap. It is a Pico 2
-that is a CMSIS-DAP probe and a host bus driver at once, so it can be the probe a run here uses *and*
-drive the bus the way a TI-99 or a ColecoVision would. The defect it found in `src/tms9918.pio` shows
-what the difference is worth: the read PIO debounced the falling edge of `/CSR` but took a single
-sample as release, so a brief HIGH inside an asserted strobe started a second read - eight intended
-reads advancing the address pointer to twelve. Nothing in this directory can see that, because nothing
-here issues a read cycle at all.
+The host bus was the other gap and is not one any more. The `hostbus` stage drives the socket the way
+a TI-99 or a ColecoVision does, through the
+[PICO9918 debug probe](https://github.com/visrealm/pico9918-probe): a Pico 2 that is a CMSIS-DAP probe
+and a bus driver at once, so one board is both the probe a run uses *and* the host it answers. The
+defect it found in `src/tms9918.pio` shows what the difference is worth: the read PIO debounced the
+falling edge of `/CSR` but took a single sample as release, so a brief HIGH inside an asserted strobe
+started a second read - eight intended reads advancing the address pointer to twelve. Nothing else
+here can see that, because nothing else issues a read cycle at all.
+
+What remains SWD-only is every *other* stage. A scene is written into the instance over the debug
+port, so the 111 pictures prove what the renderer computes and say nothing about how a byte reaches
+VRAM from a socket. `hostbus` asserts that path on its own instead - a 16 KiB write and read back byte
+for byte, the address latch, the read-ahead, the wrap at the 16 KiB boundary - which covers the transfer
+without ever rendering from it. Applying a scene over the bus and capturing it over SWD would close
+the seam between the two halves. It is not written, and it would be a hybrid rather than a third
+`VdpAccess` backend: a socket reaches VRAM, the registers and the status byte, and nothing else, so
+`unlock`, `conf`, `default_palette` and `capture` have no route over the bus at all.
