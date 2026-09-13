@@ -354,6 +354,66 @@ def drift(record, before, tag=None):
             "systematic": abs(mean) >= DRIFT_US and agree >= DRIFT_AGREE}
 
 
+def sweep_drift(record, before):
+    """How the host bus capability limits moved against an earlier record.
+
+    `stage_hostbus` has always said the sweeps are recorded and drift-reported, but
+    only the recording half was ever written, so a read floor that crept back to
+    where it sat before the read-ahead work would have shown up nowhere: the numbers
+    were in every record and nothing compared two of them.
+
+    Still decides nothing, for `period_limit`'s reason - the datasheet's own interval
+    is twenty times looser than anything measured here, so a moved limit is a metric
+    and failing a run on one would be crying wolf. `clean_from` is the metric because
+    it is the figure each sweep is named for: the tightest timing that still moves
+    every byte, or the widest excursion still turned away.
+
+    A move smaller than the sweep can resolve is not a finding, and printing those
+    beside a real one is how a reader learns to skip the line. Each sweep states its
+    own resolution twice over: the grid its rows sit on, and the width of its
+    degraded band, which is how sharply the limit lands at all. The read period is
+    the case that needs the second - it is a race against the renderer rather than a
+    timing edge, so it wanders 20 ns between runs of identical firmware while the
+    write period, which has no prefetch to starve, repeats to the grid."""
+    if not before:
+        return None
+    if not comparable(record["run"], before["run"]):
+        return None
+    now = (record.get("hostbus") or {}).get("sweeps") or {}
+    then = (before.get("hostbus") or {}).get("sweeps") or {}
+    moved = {}
+    for name in sorted(set(now) & set(then)):
+        was, thenFloor = limit_of(then[name])
+        is_, nowFloor = limit_of(now[name])
+        if was is None or is_ is None:
+            continue
+        if abs(is_ - was) <= max([f for f in (thenFloor, nowFloor) if f] or [0]):
+            continue
+        moved[name] = {"was": was, "now": is_, "ns": round(is_ - was, 3)}
+    return moved or None
+
+
+def limit_of(entry):
+    """A sweep's headline figure and the smallest move worth believing in it.
+
+    Returns (None, None) for a control group: those report themselves as they go and
+    are stored as bare rows, so only an entry carrying limits has a figure to compare.
+    Both halves of the floor come off the record rather than a table: the grid,
+    because the period sweeps escalate their divider when a board is slow, and the
+    degraded band, because how far a sweep runs between its last clean timing and its
+    first dead one is that sweep saying how sharply it resolves."""
+    if not isinstance(entry, dict):
+        return None, None
+    limits = entry.get("limits") or {}
+    clean, dead = limits.get("clean_from"), limits.get("rejected_below")
+    points = sorted({row["ns"] for row in entry.get("rows") or [] if "ns" in row})
+    steps = [b - a for a, b in zip(points, points[1:]) if b > a]
+    floor = min(steps) if steps else 0
+    if clean is not None and dead is not None:
+        floor = max(floor, clean - dead)
+    return clean, floor
+
+
 def save(record, path=None, suffix=None):
     path = path or path_for(record, suffix)
     os.makedirs(os.path.dirname(path), exist_ok=True)

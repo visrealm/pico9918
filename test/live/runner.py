@@ -208,6 +208,13 @@ def main():
         print("drift: %+.2f us mean render against %s (%d scenes, %d slower, %d faster)"
               % (record["drift"]["mean_us"], last_tag, record["drift"]["scenes"],
                  record["drift"]["worse"], record["drift"]["better"]))
+    if record.get("hostbus") is not None:
+        moved = results.sweep_drift(record, results.load(last_tag) if last_tag else None)
+        record["hostbus"]["drift"] = moved
+        for name in sorted(moved or {}):
+            entry = moved[name]
+            print("  host bus %s: %g -> %g ns (%+g)"
+                  % (name, entry["was"], entry["now"], entry["ns"]))
     problems = verdict(record)
 
     # resolve --against before saving, so `last` cannot resolve to this run
