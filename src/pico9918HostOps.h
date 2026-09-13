@@ -91,16 +91,37 @@ extern uint8_t nextValue;
 _Static_assert(TMS_WRITE_IRQ < 32 && TMS_READ_IRQ < 32,
                "PICO9918_HOST_IRQ_MASK is a bank-0 mask; a PIO IRQ above 31 would silently drop out of it");
 
+/* LOAD-BEARING: these are `irq_set_mask_enabled`'s own register writes, inlined,
+   clear-pending and all. The window they open is the sustained read floor - a host
+   read taken inside it gets no read-ahead refill, so the next one repeats a byte -
+   and the call overhead was a quarter of it. Keep them equivalent to the SDK's
+   RP2040 and RP2350 paths; the static assert above is what keeps the mask one word. */
+#if PICO_RP2040
+#define PICO9918_HOST_IRQ_SUSPEND() (nvic_hw->icer = PICO9918_HOST_IRQ_MASK)
+#define PICO9918_HOST_IRQ_RESUME() \
+  do { \
+    nvic_hw->icpr = PICO9918_HOST_IRQ_MASK; \
+    nvic_hw->iser = PICO9918_HOST_IRQ_MASK; \
+  } while (0)
+#else
+#define PICO9918_HOST_IRQ_SUSPEND() (nvic_hw->icer[0] = PICO9918_HOST_IRQ_MASK)
+#define PICO9918_HOST_IRQ_RESUME() \
+  do { \
+    nvic_hw->icpr[0] = PICO9918_HOST_IRQ_MASK; \
+    nvic_hw->iser[0] = PICO9918_HOST_IRQ_MASK; \
+  } while (0)
+#endif
+
 #define PICO9918_HOST_ENTER_CRITICAL() \
   do { \
-    irq_set_mask_enabled(PICO9918_HOST_IRQ_MASK, false); \
+    PICO9918_HOST_IRQ_SUSPEND(); \
     __dmb(); \
   } while (0)
 
 #define PICO9918_HOST_EXIT_CRITICAL() \
   do { \
     __dmb(); \
-    irq_set_mask_enabled(PICO9918_HOST_IRQ_MASK, true); \
+    PICO9918_HOST_IRQ_RESUME(); \
   } while (0)
 
 
