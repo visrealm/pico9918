@@ -19,6 +19,7 @@
 #include "overlay/splash.h"
 #include "tms9918.pio.h"
 #include "impl/pico9918_priv.h"
+#include "xip.h"
 
 #include "hardware/pio.h"
 #include "hardware/clocks.h"
@@ -105,7 +106,7 @@ static void __not_in_flash_func(gpioIrqHandler)(void)
 }
 
 /** \brief start the read and write state machines and hook up their IRQ handlers */
-void tmsBusInit(void)
+void __in_flash_func(tmsBusInit)(void)
 {
   irq_set_exclusive_handler(TMS_WRITE_IRQ, tmsWriteIrqHandler);
   irq_set_enabled(TMS_WRITE_IRQ, true);
@@ -134,9 +135,15 @@ void tmsBusInit(void)
   sm_config_set_out_shift(&readPioConfig, true, false, 32);
   sm_config_set_clkdiv(&readPioConfig, (float)clock_get_hz(clk_sys) / TMS_PIO_HZ);
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
+
+  // TRAP: seeds x, but not via pio_set_y's shift-in loop, which leaves the value in
+  // the ISR with the counter full. tmsRead needs the ISR empty when it samples MODE.
+  pio_sm_put(TMS_PIO, tmsReadSm, 0x000000ff);
+  pio_sm_exec(TMS_PIO, tmsReadSm, pio_encode_pull(false, true));
+  pio_sm_exec(TMS_PIO, tmsReadSm, pio_encode_mov(pio_x, pio_osr));
+
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
   pio_set_irq1_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);
-  pio_sm_put(TMS_PIO, tmsReadSm, 0x000000ff);
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
   if (hwVersion != HWVer_0_3)

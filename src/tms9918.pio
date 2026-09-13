@@ -35,23 +35,18 @@
 .program tmsRead
 .define public CSR_PIN 26
 
-  pull block
-  mov x, osr        ; ensure we have a valid fifo value in x
+; TRAP: `pull noblock` on an empty fifo copies x into osr, so tmsBusInit must
+; seed x before this runs.
 
 .wrap_target
 waitRelease:
   mov osr, null       ; change CD0-7 pindirs to inputs
   wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive)
-  out pindirs, 8
-
   ; Require a stable HIGH before re-arming. A brief HIGH excursion while
   ; /CSR remains asserted must not become a second read.
-  nop           [7]
-  jmp pin released
+  out pindirs, 8 [8]
+  jmp pin pullLoop
   jmp waitRelease
-
-released:
-  mov isr, null
 
 pullLoop:
   pull noblock      ; continuously empty the tx fifo
@@ -84,6 +79,11 @@ endPart:
 ;            state at CSW going low in the high 16-bits
 ;            state at CSW going high in the low 16-bits
 ;
+;            LOAD-BEARING: MODE is sampled one cycle after the falling edge.
+;            th(WL-A) guarantees it for only 30 ns, so any delay before that
+;            sample lands outside the window and control writes reach the data
+;            port. The confirm delay belongs after it, never before.
+;
 ; fifo isr   0b|x|m|w|r|xxxx|dddddddd|x|m|w|r|xxxx|dddddddd|
 ;              | |o|r|e|    |  CD0-7 | | | | |    |  CD0-7 |
 ;              | |d|i|a|    | ignore | | | | |    |        |
@@ -93,8 +93,10 @@ endPart:
 .program tmsWrite
 .define public CSW_PIN 27
 
-  wait 0 gpio CSW_PIN [7]   ; wait for CSW to go active (low)
-  in pins, 16               ; grab the initial (mode) state
+waitStart:
+  wait 0 gpio CSW_PIN       ; wait for CSW to go active (low)
+  mov y, pins         [7]   ; grab the initial (mode) state, one cycle after the edge
+  jmp pin waitStart         ; CSW back HIGH already: a glitch, not a cycle
 pollWriteLoop:
   mov x, pins               ; continuously grab pin state
   jmp pin captureWrite      ; and wait for csw high
@@ -104,5 +106,6 @@ captureWrite:
   jmp pin confirmed         ; if CSW still HIGH, it's stable
   jmp pollWriteLoop         ; if CSW bounced back LOW, retry
 confirmed:
+  in y, 16                  ; MODE, as it was at the falling edge
   in x, 16                  ; grab the final state (CSW confirmed stable HIGH)
 .wrap
