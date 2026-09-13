@@ -98,29 +98,51 @@ static inline void configReloadFire(PICO9918_INST_ONLY_ARG)
  *    it. Each branch differs in what it lets through and what it preserves;
  *  - the status publish (PICO9918_HOST_STATUS_VISIBLE) happens BEFORE the pin sync,
  *    so a host CPU that takes the interrupt cannot read a stale status.
+ *
+ * A scanline that changes neither SR0 nor the pin skips all three. That is an
+ * equivalence rather than an approximation: set_status writes both SR0 copies, which
+ * every writer in the library keeps in lockstep, so rewriting the value already there
+ * changes neither; sync_int already compares against the latched pin, and the guard's
+ * second term is exactly its own test; and the published word moves only with SR0 or
+ * with the read-ahead byte, which belongs to the host's bus handlers and is published
+ * by them after every access. A host that latches SR0 behind the library's back -
+ * pico9918_set_status(), say - therefore owns its own publish; the frame path no
+ * longer covers for it on the next scanline.
  */
+
+/** \brief the three-way SR0 merge, alone: what the latch becomes, with no side effects */
+static inline uint8_t frameMergeStatus(uint8_t currentStatus, uint8_t tempStatus)
+{
+  if (currentStatus & PICO9918_SR0_INT)
+  {
+    return (uint8_t)(currentStatus | (tempStatus & PICO9918_SR0_COLLISION));
+  }
+  if (currentStatus & PICO9918_SR0_5S)
+  {
+    // 5S already latched - preserve existing ID, OR in any new flags (INT, 5S, COL)
+    return (uint8_t)(currentStatus | (tempStatus & 0xe0));
+  }
+  return (uint8_t)((currentStatus & 0xe0) | tempStatus);
+}
+
 void pico9918_frame_update_interrupts(PICO9918_INST_ARG uint8_t tempStatus)
 {
-  PICO9918_HOST_ENTER_CRITICAL();
-  uint8_t currentStatus = pico9918_frame_status_impl(PICO9918_INST_ONLY);
-  if ((currentStatus & PICO9918_SR0_INT) == 0)
+  /* LOAD-BEARING: tested BEFORE the critical section, never inside it. That window's
+     length is the host's sustained read floor, so a scanline with nothing to publish
+     must not open one at all. Unmasked is sound because the only concurrent writer is
+     the host's status-read handler, which clears and syncs for itself. */
+  const uint8_t seenStatus = pico9918_frame_status_impl(PICO9918_INST_ONLY);
+  if (frameMergeStatus(seenStatus, tempStatus) == seenStatus &&
+      pico9918_interrupt_status_impl(PICO9918_INST_ONLY) == pico9918_frame_int_impl(PICO9918_INST_ONLY))
   {
-    if (currentStatus & PICO9918_SR0_5S)
-    {
-      // 5S already latched - preserve existing ID, OR in any new flags (INT, 5S, COL)
-      currentStatus |= (tempStatus & 0xe0);
-    }
-    else
-    {
-      currentStatus = (currentStatus & 0xe0) | tempStatus;
-    }
-  }
-  else
-  {
-    currentStatus |= (tempStatus & PICO9918_SR0_COLLISION);
+    return;
   }
 
-  pico9918_set_status_impl(PICO9918_INST currentStatus);
+  PICO9918_HOST_ENTER_CRITICAL();
+  const uint8_t currentStatus = pico9918_frame_status_impl(PICO9918_INST_ONLY);
+  const uint8_t mergedStatus  = frameMergeStatus(currentStatus, tempStatus);
+
+  pico9918_set_status_impl(PICO9918_INST mergedStatus);
   PICO9918_HOST_STATUS_VISIBLE();
 
   pico9918_frame_sync_int_impl(PICO9918_INST_ONLY);

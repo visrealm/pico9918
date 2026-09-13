@@ -66,6 +66,10 @@
  * in the harness, because the library must carry no test state. */
 uint32_t goldenClockNow = 0;
 
+/* goldenHostOps.h's recording of PICO9918_HOST_STATUS_VISIBLE(); see that header. */
+uint8_t  goldenPublishedStatus = 0;
+uint32_t goldenPublishCount    = 0;
+
 /* ---------------------------------------------------------------------------
  * Deterministic pseudo-random source (numerical recipes LCG)
  * ------------------------------------------------------------------------- */
@@ -2615,10 +2619,10 @@ static const char* frCurrentLabel = "";
 /* The row payload: every value either behaviour produces, in a fixed layout, so
  * one digest covers the whole row and a mismatch is localised by rescanning.
  *
- * Slots 0..8 are the mapping and geometry groups; 9..12 are the interrupt group.
+ * Slots 0..8 are the mapping and geometry groups; 9..14 are the interrupt group.
  * Each group fills only its own slots and leaves the rest zero, so a divergence
  * report points at a value that group actually produced. */
-#define FRAME_ROW_VALUES 14
+#define FRAME_ROW_VALUES 15
 
 typedef struct
 {
@@ -2629,7 +2633,7 @@ static const char* const frameFieldName[FRAME_ROW_VALUES] = {
   "mappedLine", "vPixelScale", "vVirtualPixels", "vPixels", "vBorder", "triggerScanline", "paramsVPixelScale",
   "paramsVVirtualPixels", "activeLines",
   /* interrupt group */
-  "frameStatusShadow", "sr0Register", "intPin", "sr1Register", "lockLatch"};
+  "frameStatusShadow", "sr0Register", "intPin", "sr1Register", "lockLatch", "publishedStatus"};
 
 static void frameEmitRow(const FrameRow* cand, const FrameRow* ref)
 {
@@ -3016,6 +3020,7 @@ static void frameIntCase(const char* label, uint8_t currentStatus, uint8_t tempS
   TMS_STATUS(tms9918, PICO9918_SR_IDENT) = sr1;  /* SR1, the scanline source's flag */
   tms9918->isUnlocked                    = unlocked;
   pico9918_set_status_impl(currentStatus);     /* the SR0 latch, both copies */
+  goldenPublishReset(currentStatus);           /* ...and the host was told, as on a device */
 
   /* ---- the behaviour under test ---- */
   pico9918_frame_update_interrupts(tempStatus);
@@ -3027,11 +3032,18 @@ static void frameIntCase(const char* label, uint8_t currentStatus, uint8_t tempS
   cand.v[11] = pico9918_frame_int_impl();      /* the LATCHED /INT pin */
   cand.v[12] = TMS_STATUS(tms9918, PICO9918_SR_IDENT);
   cand.v[13] = pico9918_unlocked(PICO9918_INST_ONLY);
+  cand.v[14] = goldenPublishedStatus;           /* the last SR0 handed to the host */
 
   const uint8_t expected = refMergeStatus(currentStatus, tempStatus);
   ref.v[9]               = expected;
   ref.v[10]              = expected;
   ref.v[11]              = refIntPin(expected, reg1, reg0, sr1);
+
+  /* The host's view must not be STALE - not that it was refreshed a particular
+     number of times. A publish the merge skips is correct exactly when the value
+     the host already holds is the merged one, so the reference is the merged SR0
+     either way and a wrongly skipped publish shows up as the pre-state. */
+  ref.v[14] = expected;
 
   /* the merge owns SR0 and must not touch SR1: the scanline flag is the read path's */
   ref.v[12] = sr1;
@@ -3334,6 +3346,18 @@ static void frameIntGroup(void)
    * Any defect in the pin decision therefore has nowhere to hide behind a moving
    * status byte. */
   frameIntQuad("int-pin-only", 0x80, 0x00);
+  /* The quiet scanline, which is nearly every scanline: nothing latched, nothing
+   * raised, and in two of the quad's four rows the pin already agrees as well - so
+   * the whole call is a no-op. The case the table had no row for, and the one the
+   * device spends its time in. It is the row that says a merge which takes a
+   * shortcut when there is nothing to do still leaves SR0, the pin and the host's
+   * published view exactly where they were. */
+  frameIntQuad("int-b-quiet", 0x00, 0x00);
+  /* B with an incumbent ID and nothing raised: `(cur & 0xe0) | temp` must CLEAR the
+   * low five bits, so unlike the row above this one is not a no-op - 0x1f -> 0x00.
+   * The pair is deliberate: they differ only in the incumbent ID, so a shortcut
+   * that keys on tempStatus alone passes the first and fails here. */
+  frameIntQuad("int-b-drop-id", 0x1f, 0x00);
 
   /* ---- the scanline source, which is not the frame source ----
    *
