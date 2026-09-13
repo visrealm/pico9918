@@ -56,6 +56,12 @@ SRC, SRC_MID, DST = 0x1000, 0x1100, 0x1800
 WORK, WORK_LEN = 0x1000, 0x0A00
 SRC_LEN = 0x0400
 
+# The trigger word the program writes last, in the port window rather than in VRAM.
+# It is the only thing that starts a transfer and triggerGpuDma clears it, so finding
+# it set before a job is finding a transfer nobody asked for - one staged from
+# half-written parameters, which reaches wherever those happened to point.
+TRIGGER = 0x8008
+
 # LI R0,PARAMS / LI R1,>8000 / LI R2,8 / MOVB *R0+,*R1+ / DEC R2 / JNE -3 /
 # LI R1,>8008 / LI R2,>0100 / MOVB R2,*R1 / IDLE. The last MOVB is the trigger: it
 # is the store the MPU guards, and everything above it only stages the arguments.
@@ -145,6 +151,28 @@ def workspace():
                      + bytes(WORK_LEN - SRC_LEN))
 
 
+def diagnose(before, got, bad):
+    """Which part of the window moved. A job that never ran, a workspace write that
+    never landed and a wrong transfer all fail on one byte's address alone, and the
+    source region is the one place the three disagree.
+
+    Every workspace byte carries its own offset, so a short run of wrong bytes also
+    names the address the engine really read from - which is the difference between
+    a transfer with the wrong parameters and one that never happened."""
+    if bytes(got) == bytes(before):
+        return ", window untouched - the job never ran"
+    in_src = sum(1 for i in bad if i < SRC_LEN)
+    if in_src == len(bad):
+        return ", all in the source - the workspace never landed"
+    if in_src:
+        return ", %d of them in the source" % in_src
+
+    if len(bad) <= 16:
+        return ", read from source +%s" % " +".join(
+            "%02x" % ((got[i] - 0x40) & 0xff) for i in bad)
+    return ""
+
+
 def check(t, case, board, fails, notes):
     name, src, dst, width, height, stride, params = case
     board.running(name)
@@ -155,13 +183,27 @@ def check(t, case, board, fails, notes):
         board.verdict(False)
         return 0
 
+    raised = len(fails)
     before = workspace()
     t.vram(WORK, bytes(before))
     t.vram(PARAMS, bytes((src >> 8, src & 0xff, dst >> 8, dst & 0xff,
                           width, height, stride, params)))
     t.vram(PROG, PROGRAM)
 
-    gpu.spin(t, JOB)
+    stale = t.read(t.vdp + TRIGGER, 2)
+    if stale[0] or stale[1]:
+        fails.append("%s: the trigger was %02x%02x before this job started, so the "
+                     "transfer that follows is not this case's"
+                     % (name, stale[0], stale[1]))
+
+    try:
+        us, _, _ = gpu.spin(t, JOB)
+    except TimeoutError as e:
+        # recorded like the gpu stage records one, and for its reason: a job that will
+        # not stop is one case's failure, not grounds to lose the whole run's record
+        fails.append("%s: the job did not stop - %s" % (name, e))
+        board.verdict(False)
+        return 0
 
     want = bytearray(0x10000)
     want[WORK:WORK + WORK_LEN] = before
@@ -171,15 +213,17 @@ def check(t, case, board, fails, notes):
 
     _, h, _, diff, pitch = geometry(width, height, stride, params)
     bad = [i for i in range(WORK_LEN) if want[i] != got[i]]
-    notes.append("%-22s w=%-3d h=%-3d stride=%-3d %s  diff=%+4d pitch=%+4d  %s"
+    notes.append("%-22s w=%-3d h=%-3d stride=%-3d %s  diff=%+4d pitch=%+4d  "
+                 "%5d us  %s"
                  % (name, width, height, stride, "dec" if params & 0x02 else "inc",
-                    diff, pitch,
+                    diff, pitch, us,
                     "OK" if not bad else "%d byte(s) wrong" % len(bad)))
     if bad:
         i = bad[0]
-        fails.append("%s: [%04x] wanted %02x, got %02x (%d byte(s) differ)"
-                     % (name, WORK + i, want[i], got[i], len(bad)))
-    board.verdict(not bad)
+        fails.append("%s: [%04x] wanted %02x, got %02x (%d byte(s) differ%s)"
+                     % (name, WORK + i, want[i], got[i], len(bad),
+                        diagnose(before, got, bad)))
+    board.verdict(len(fails) == raised)
     return WORK_LEN
 
 
