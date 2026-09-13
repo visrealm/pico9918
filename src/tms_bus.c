@@ -108,6 +108,10 @@ static void __not_in_flash_func(gpioIrqHandler)(void)
 /** \brief start the read and write state machines and hook up their IRQ handlers */
 void __in_flash_func(tmsBusInit)(void)
 {
+  /* LOAD-BEARING: both host IRQs stay at one priority. Equal priority never preempts,
+     on either core, and that is the whole of what makes these two handlers mutually
+     atomic: a read taken inside a write, between the data store and the read-ahead
+     refill below it, would have its refill overwritten by the write's stale one. */
   irq_set_exclusive_handler(TMS_WRITE_IRQ, tmsWriteIrqHandler);
   irq_set_enabled(TMS_WRITE_IRQ, true);
 
