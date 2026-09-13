@@ -162,6 +162,21 @@ openocd -s <sdk>/openocd/0.12.0+dev/scripts -f interface/cmsis-dap.cfg \
 python live9918.py flash ../../build-live/pico9918/src/pico9918-v1-3-0-live.elf
 ```
 
+### Which probe answers
+
+openocd opens the first CMSIS-DAP device that answers, so with a probe per tier on the desk, which
+board a run reaches is a coin toss that the chip check above only catches after the fact. Name them
+instead: `LIVE9918_PROBE_RP2040` and `LIVE9918_PROBE_RP2350` hold a serial each, and `--probe`
+overrides for a one-off. `LIVE9918_SPEED` sets the SWD clock for a probe that will not hold the
+default 20 MHz - a flying-wire fixture runs happily at `LIVE9918_SPEED=10000` and costs almost
+nothing, for the reason `SWD_SPEED_KHZ` records: the wire is not the bottleneck.
+
+The [PICO9918 debug probe](https://github.com/visrealm/pico9918-probe) needs one thing more. It gates
+SWD on being armed and answers `DAP_Connect` with a failure until it is, so an un-armed one looks
+exactly like a dead target. `--probe-cdc COM10`, or `LIVE9918_PROBE_CDC`, hands the harness that
+probe's USB serial port and it arms for itself; append `:manual` when the target is powered by its
+VBUS jumper rather than the probe's switched supply.
+
 ### The bench harness
 
 The board under test sits in a **ZIF socket** on a carrier board rather than in a console. There is
@@ -190,7 +205,9 @@ second mode line (`gpio.c`, "Mode 1 (V9938)") and has no TMS9918A pin of its own
 
 > **This rig deliberately cannot test the host interface.** Nothing drives the bus, so the PIO
 > interface, `/CSW` timing and the read-ahead are untested by everything here - see "What it does
-> not cover" below, and `../host/` for the tool that does exercise them.
+> not cover" below, `../host/` for the on-board tool, and the
+> [PICO9918 debug probe](https://github.com/visrealm/pico9918-probe) for the fixture that drives the
+> bus as a host.
 
 ## Use
 
@@ -817,4 +834,12 @@ last row still hold the previous scene's numbers; read only the rows the current
 The indices are the renderer's output, not the display's. Everything after them - the palette
 expansion in `renderer.c`, VGA timing, SCART - needs a capture device or an eye. And nothing here
 touches the host bus: the PIO interface, `/CSW` timing and the read-ahead are the one part of the
-system this harness deliberately bypasses, which is what a Pico-based bus test-bed would be for.
+system this harness deliberately bypasses.
+
+The [PICO9918 debug probe](https://github.com/visrealm/pico9918-probe) covers that gap. It is a Pico 2
+that is a CMSIS-DAP probe and a host bus driver at once, so it can be the probe a run here uses *and*
+drive the bus the way a TI-99 or a ColecoVision would. The defect it found in `src/tms9918.pio` shows
+what the difference is worth: the read PIO debounced the falling edge of `/CSR` but took a single
+sample as release, so a brief HIGH inside an asserted strobe started a second read - eight intended
+reads advancing the address pointer to twelve. Nothing in this directory can see that, because nothing
+here issues a read cycle at all.

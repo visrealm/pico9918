@@ -17,7 +17,8 @@ plugged in.
 | What does a scene actually *look* like? | **`web/console.py`** - a grid in a browser, click to put it on the board | `test/live/` |
 | What does the suite look like *while it runs*? | **`view.py`** - a window at 60fps, desktop only; or the console's **Run the suite**, for a board | `test/live/` |
 | Does the whole chain look right - palette, VGA timing, SCART? | An eye, or a capture device | - |
-| Does the host bus behave? | **Bus test-bed** - a second Pico standing in for the host CPU | `test/host/` |
+| Does the host bus respond at all? | **Bus test-bed** - a second Pico standing in for the host CPU | `test/host/` |
+| ...and does it hold up under real timing, at what limits? | **[pico9918-probe](https://github.com/visrealm/pico9918-probe)** - a CMSIS-DAP probe that also drives the bus as a host, sweeping setup, pulse, hold and sample position | its own repo |
 | Is a freshly assembled board wired correctly? | **QC loopback** | `test/qc/` |
 
 **Start with `runner.py`.** It runs every stage in one openocd session in the order that works,
@@ -276,12 +277,14 @@ D4 took four photograph rounds; as an assertion it takes seconds and checks all 
 
 ## What is missing {#what-is-missing}
 
-- **The host bus.** Everything above bypasses it: the live harness writes memory, the bench ROM
-  drives the VDP through a host that is assumed to work. The PIO interface, `/CSW` timing and the
-  read-ahead are unverified by any of it. A Pico-based test-bed presenting a TMS9918 bus is the
-  right tool, and it cannot see rendered pixels, so it complements the live harness rather than
-  replacing it. See `HARDWARE.md` - in the build workspace above this repo, not in it - before
-  touching that area.
+- **The host bus, in an automated run.** Everything above bypasses it: the live harness writes
+  memory, the bench ROM drives the VDP through a host that is assumed to work.
+  [pico9918-probe](https://github.com/visrealm/pico9918-probe) drives the bus as a host and sweeps its
+  timing; the phantom-read defect in `src/tms9918.pio` is the class of thing only it can see. The gap
+  is the join: `runner.py` uses that probe for SWD alone, so no stage asserts anything about the bus
+  and a regression there does not fail a normal run. It cannot see rendered pixels either, so it
+  complements the live harness rather than replacing it. See `HARDWARE.md` - in the build workspace
+  above this repo, not in it - before touching that area.
 - **Everything after the index buffer.** `renderer.c`'s palette expansion, VGA timing and SCART are
   only checked by eye today. A capture device would automate that end of the chain.
 - **Sprites at 8bpp.** `reference-w512/` holds one sprite scene against the 4bpp set's eleven: ECM

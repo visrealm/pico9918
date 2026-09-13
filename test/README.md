@@ -1,16 +1,22 @@
 # Tests
 
-Four directories, answering four different questions. Most wasted effort on this project has come
-from reaching for the wrong one - judging pixel alignment from a photograph, or trying to measure
-performance with an instrumented build - so pick by the question, not by whatever is already
-plugged in.
+Four directories and one fixture of its own, answering five different questions. Most wasted effort
+on this project has come from reaching for the wrong one - judging pixel alignment from a photograph,
+or trying to measure performance with an instrumented build - so pick by the question, not by
+whatever is already plugged in.
 
 | Question | Where | What it is |
 |---|---|---|
 | Did the renderer draw the right pixels, and did every scanline fit? | [`live/`](live/) | A Python harness driving the board over a debug probe |
 | What does a scanline cost on a shipping build, driven by a real host? | [`bench/`](bench/) | A cartridge ROM of fixed scenes, read off the diag overlay |
 | Does the board talk to a host at all? | [`host/`](host/) | A second Pico pretending to be the host CPU |
+| Does the host bus hold up under real timing, and where does it break? | [pico9918-probe](https://github.com/visrealm/pico9918-probe) | A Pico 2 that is a CMSIS-DAP probe and a host bus driver at once |
 | Was this board assembled correctly? | [`qc/`](qc/) | A loopback wiring test, flashed instead of the firmware |
+
+The last two bus rows are easy to confuse. `host/` answers *yes or no* - it is flashed onto a second
+Pico and tells you the interface responds. The probe answers *how far* - it varies setup, pulse, hold
+and sample position to find where transfers start failing, and it found a phantom-read defect in
+`src/tms9918.pio` that nothing else on this list could see.
 
 `live/` covers both halves of the first question. It compares pixels against a frozen reference
 *and* reads the per-scanline timers, because on this project those are one question: an over-budget
