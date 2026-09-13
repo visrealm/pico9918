@@ -97,13 +97,17 @@ int __in_flash_func(main)(void)
   systemClockInit();
 
   pico9918_init();
-  multicore_launch_core1(proc1Entry);
 
   readConfig(pico9918_config());
   applyPendingDisplay(pico9918_config());
   updateDispDriver();
 
+  // LOAD-BEARING: the system clock must reach its configured preset before core 1
+  // launches. tmsBusInit derives the host PIO divider from clk_sys, so a launch
+  // ahead of this races the change and can pin the host bus to the wrong rate.
   systemClockApplyConfig();
+  multicore_launch_core1(proc1Entry);
+
   vdpClocksInit();
   paletteInit();
 

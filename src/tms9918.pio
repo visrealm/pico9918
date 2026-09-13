@@ -39,9 +39,18 @@
   mov x, osr        ; ensure we have a valid fifo value in x
 
 .wrap_target
+waitRelease:
   mov osr, null       ; change CD0-7 pindirs to inputs
-  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive) 
+  wait 1 gpio CSR_PIN ; wait for CSR to go high (inactive)
   out pindirs, 8
+
+  ; Require a stable HIGH before re-arming. A brief HIGH excursion while
+  ; /CSR remains asserted must not become a second read.
+  nop           [7]
+  jmp pin released
+  jmp waitRelease
+
+released:
   mov isr, null
 
 pullLoop:

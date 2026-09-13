@@ -30,7 +30,7 @@
 #define TMS_CPUCLK_FREQ_HZ  (TMS_CRYSTAL_FREQ_HZ / 3.0f)
 #define TMS_CLK_OFF         0.0f
 
-#define CLOCK_PIO pio1
+#define CLOCK_PIO pio0
 
 /** \brief one system clock preset: the PLL and dividers to reach it, and the core voltage it needs */
 typedef struct

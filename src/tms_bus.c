@@ -21,8 +21,11 @@
 #include "impl/pico9918_priv.h"
 
 #include "hardware/pio.h"
+#include "hardware/clocks.h"
 #include "hardware/sync.h"
 #include "pico/stdlib.h"
+
+#define TMS_PIO_HZ 252000000.0f
 
 /* TMS_PIO, the two IRQs, the state-machine indices and the three tier-1 ops come
    from pico9918HostOps.h, which the library's platform dispatch header pulls in -
@@ -115,7 +118,7 @@ void tmsBusInit(void)
   sm_config_set_in_pins(&writePioConfig, GPIO_CD7);
   sm_config_set_in_shift(&writePioConfig, false, true, 32);
   sm_config_set_jmp_pin(&writePioConfig, GPIO_CSW);
-  sm_config_set_clkdiv(&writePioConfig, 1.0f);
+  sm_config_set_clkdiv(&writePioConfig, (float)clock_get_hz(clk_sys) / TMS_PIO_HZ);
   pio_sm_init(TMS_PIO, tmsWriteSm, tmsWriteProgram, &writePioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsWriteSm, true);
   pio_set_irq0_source_enabled(TMS_PIO, pis_sm0_rx_fifo_not_empty, true);
@@ -129,7 +132,7 @@ void tmsBusInit(void)
   sm_config_set_out_pins(&readPioConfig, GPIO_CD7, 8);
   sm_config_set_in_shift(&readPioConfig, false, false, 32);
   sm_config_set_out_shift(&readPioConfig, true, false, 32);
-  sm_config_set_clkdiv(&readPioConfig, 1.0f);
+  sm_config_set_clkdiv(&readPioConfig, (float)clock_get_hz(clk_sys) / TMS_PIO_HZ);
   pio_sm_init(TMS_PIO, tmsReadSm, tmsReadProgram, &readPioConfig);
   pio_sm_set_enabled(TMS_PIO, tmsReadSm, true);
   pio_set_irq1_source_enabled(TMS_PIO, pis_sm1_rx_fifo_not_empty, true);

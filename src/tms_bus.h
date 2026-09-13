@@ -18,6 +18,6 @@
 
 /** \brief  start the read and write state machines, plus the host reset IRQ on
  *          hardware later than v0.3
- *  \note   both run on pio1 with clkdiv 1.0, so the PIO clock is the system clock
+ *  \note   both run on pio1 at a fixed 252 MHz across system-clock presets
  */
 void tmsBusInit(void);
