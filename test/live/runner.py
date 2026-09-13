@@ -33,17 +33,21 @@ CORE_TEST = os.path.join(os.path.dirname(os.path.dirname(HERE)), "core", "test")
 for folder in (HERE, CORE_TEST, os.path.join(HERE, "web")):
     sys.path.insert(0, folder)
 import suite.stages.freeze as freeze
+import hostbus
 import inlining
 import perf
+import probe
 import results
 import suite.scenes as scenes
 from live9918 import board_args, open_board
 from suite.stages import RUNNERS as RENDERER_RUNNERS, say, verdict
 
-# Order matters twice over: d4 first because it inherits board state, and the
-# goldens before the timings because a dropped row is the acceptance test and an
-# average is not - there is no point pricing a build that renders the wrong thing.
-STAGES = ("d4", "freeze", "diag", "perf", "perf-panels",
+# Order matters three times over: hostbus first because it is destructive to VRAM
+# and the register file and `d4` blanks both itself rather than inheriting them;
+# d4 next because it inherits board state; and the goldens before the timings
+# because a dropped row is the acceptance test and an average is not - there is no
+# point pricing a build that renders the wrong thing.
+STAGES = ("hostbus", "d4", "freeze", "diag", "perf", "perf-panels",
           "scroll", "colour", "ecm", "t80-8bpp", "dma", "tms9900", "gpu")
 
 # What --quick runs: the canary scenes, which drop a line before any average
@@ -57,9 +61,31 @@ QUICK = ("d4", "freeze", "scroll", "colour", "ecm")
 # reporting PC microseconds as if they were a board's.
 TIMED = ("diag", "perf", "perf-panels")
 
+# Needs a second instrument as well as a board: the probe drives the host bus, and
+# without one there is nothing to drive it with. Dropped rather than failed, so a
+# desk without the fixture runs everything else without a spelling change.
+FIXTURE = ("hostbus",)
+
 # The renderer's stages are the library's and are defined once, in
 # core/test/suite/stages/. These three are this repository's: they measure a
 # device, and a microsecond off a PC is not a smaller version of one.
+
+
+def stage_hostbus(t, record, args):
+    """The bus, driven as a host drives it.
+
+    Two kinds of answer come back from one pass. The pass/fail half lands in
+    `properties`, so the verdict already fails a run on it the way it fails on a
+    golden; the sweeps land in `hostbus`, where they are recorded and drift-reported
+    but never fail, because a rejection threshold moving by a nanosecond is a metric
+    and a phantom write is a defect.
+    """
+    with probe.opened(probe.spec(getattr(args, "probe_cdc", None))) as p:
+        result = hostbus.run(p)
+        record["hostbus"] = {"rig": hostbus.rig(p), "sweeps": result.pop("sweeps", {})}
+    record["properties"]["host bus"] = result
+    for note in result["notes"]:
+        print("   " + note)
 
 
 def stage_diag(t, record, args):
@@ -75,8 +101,8 @@ def stage_perf_panels(t, record, args):
     record["perf"]["all"] = perf.run(t, perf_names(args), panels=True, progress=say(perf.line))
 
 
-RUNNERS = dict(RENDERER_RUNNERS, **{"diag": stage_diag, "perf": stage_perf,
-                                    "perf-panels": stage_perf_panels})
+RUNNERS = dict(RENDERER_RUNNERS, **{"hostbus": stage_hostbus, "diag": stage_diag,
+                                    "perf": stage_perf, "perf-panels": stage_perf_panels})
 
 
 def perf_names(args):
@@ -102,6 +128,14 @@ def chosen(args):
         if timed:
             print("desktop: skipping %s - the device measures time, this does not\n"
                   % ", ".join(timed))
+    # The fixture stages need a probe as well as a board, and a desktop run has
+    # neither. Said once, with the reason, rather than failing inside the stage.
+    if getattr(args, "desktop", False) or not probe.spec(getattr(args, "probe_cdc", None)):
+        missing = [s for s in stages if s in FIXTURE]
+        stages = [s for s in stages if s not in FIXTURE]
+        if missing:
+            print("skipping %s - no host-bus probe; set LIVE9918_PROBE_CDC or pass "
+                  "--probe-cdc\n" % ", ".join(missing))
     return stages
 
 

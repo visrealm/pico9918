@@ -1,0 +1,3025 @@
+{
+ "checks": 21690,
+ "failures": [
+  "th(WL-A) at minimum: MODE released at the datasheet minimum and the control write did not reach the control port (read 20, expected 77)"
+ ],
+ "notes": [
+  "walking ones and zeros: 16 patterns",
+  "address-line separation: 15 addresses",
+  "16 KiB wrap at 0x3FFF",
+  "read-ahead: prefetch served, stale prefetch discarded",
+  "register write does not move the VRAM pointer",
+  "control-latch interruption: 4 shapes, all matching the F18A's flip-flop",
+  "status read leaves the VRAM pointer alone",
+  "16 KiB write and read back, byte for byte",
+  "  MODE moved inside the strobe for 3 cycles: th(WL-A) and tsu(A-RL) both reachable",
+  "conformance: 8 worst-legal cycles at 5 ns per tick, all exact",
+  "/CSW LOW excursion, must not start a write: 5ns:64/64, 10ns:64/64, 15ns:64/64, 20ns:64/64, 25ns:64/64, 30ns:64/64, 35ns:64/64, 40ns:64/64, 45ns:64/64, 50ns:64/64, 55ns:64/64, 60ns:64/64",
+  "/CSW HIGH excursion, must not end a write: 25ns:0/24, 30ns:0/24, 35ns:0/24, 40ns:0/24, 45ns:19/24, 50ns:24/24, 55ns:24/24, 60ns:24/24, 65ns:24/24, 70ns:24/24, 75ns:24/24, 80ns:24/24",
+  "/CSR LOW excursion, must not start a read: 25ns:0/24, 30ns:0/24, 35ns:0/24, 40ns:11/24, 45ns:17/24, 50ns:24/24, 55ns:24/24, 60ns:24/24, 65ns:24/24, 70ns:24/24, 75ns:24/24, 80ns:24/24",
+  "/CSR HIGH excursion, must not re-arm the read: 25ns:0/24, 30ns:0/24, 35ns:0/24, 40ns:5/24, 45ns:24/24, 50ns:24/24, 55ns:24/24, 60ns:24/24, 65ns:24/24, 70ns:24/24, 75ns:24/24, 80ns:24/24",
+  "  drive  2 mA slow: 35ns:0/32, 40ns:3/32, 45ns:32/32, 50ns:32/32",
+  "  drive 12 mA fast: 35ns:0/32, 40ns:6/32, 45ns:32/32, 50ns:32/32",
+  "  p50 moves -0.3 ns between 2 mA slow and 12 mA fast - within a tick, so the offset is not edge rate",
+  "MODE must be held 35 ns after /CSW falls for a control write to reach the control port, against the 30 ns a host may assume",
+  "  25ns:0/8, 30ns:1/8, 35ns:8/8, 40ns:8/8",
+  "  that is 5 ns outside the datasheet, so a host releasing MODE at the guaranteed minimum puts its control write on the data port",
+  "read data valid from 110 ns after /CSR falls, p50 105 ns",
+  "  95ns:0/8, 100ns:0/8, 105ns:4/8, 110ns:8/8, 115ns:8/8, 120ns:7/8, 125ns:8/8, 130ns:8/8",
+  "write data sample, by 25 ns presence window (ns from /CSW rising):",
+  "  -25ns:8/8",
+  "  the sample lands between -25 and +0 ns of the rising edge, which is one window: the event floor is the resolution",
+  "  so the data may appear as late as -25 ns and vanish as early as +0 ns: 75 ns of margin on tsu(D-WH), 30 ns on th(WH-D)",
+  "minimum read strobe width: clean from 150 ns, 75% of the 200 ns a host may assume",
+  "  125ns:0/8, 130ns:0/8, 135ns:7/8, 140ns:0/8, 145ns:0/8, 150ns:8/8, 155ns:8/8, 160ns:8/8",
+  "  bytes lost: 125ns:99.12%, 130ns:46.01%, 135ns:0.00%, 140ns:1.86%, 145ns:0.19%, 150ns:0, 155ns:0, 160ns:0",
+  "  too few lossy points to say how the tail falls off",
+  "minimum write strobe width: clean from 30 ns, 15% of the 200 ns a host may assume",
+  "  30ns:8/8, 35ns:8/8, 40ns:8/8",
+  "  bytes lost: 30ns:0, 35ns:0, 40ns:0",
+  "  too few lossy points to say how the tail falls off",
+  "minimum inter-access read recovery: clean from 60 ns",
+  "  55ns:0/8, 60ns:8/8, 65ns:8/8, 70ns:8/8",
+  "  bytes lost: 55ns:98.67%, 60ns:0, 65ns:0, 70ns:0",
+  "  too few lossy points to say how the tail falls off",
+  "minimum inter-access write recovery: clean from 55 ns",
+  "  55ns:8/8, 60ns:8/8, 65ns:8/8",
+  "  bytes lost: 55ns:0, 60ns:0, 65ns:0",
+  "  too few lossy points to say how the tail falls off",
+  "minimum sustained read period over 4096 bytes: clean from 850 ns, 11% of the 8000 ns a host may assume",
+  "  625ns:1/6, 630ns:1/6, 635ns:1/6, 640ns:1/6, 645ns:1/6, 650ns:0/6, 655ns:1/6, 660ns:1/6, 665ns:1/6, 670ns:1/6, 675ns:0/6, 680ns:1/6, 685ns:1/6, 690ns:1/6, 695ns:0/6, 700ns:1/6, 705ns:1/6, 710ns:1/6, 715ns:0/6, 720ns:1/6, 725ns:0/6, 730ns:1/6, 735ns:0/6, 740ns:1/6, 745ns:1/6, 750ns:0/6, 755ns:1/6, 760ns:2/6, 765ns:0/6, 770ns:1/6, 775ns:1/6, 780ns:0/6, 785ns:1/6, 790ns:1/6, 795ns:1/6, 800ns:1/6, 805ns:1/6, 810ns:0/6, 815ns:2/6, 820ns:3/6, 825ns:3/6, 830ns:2/6, 835ns:4/6, 840ns:5/6, 845ns:4/6, 850ns:6/6, 855ns:6/6, 860ns:6/6",
+  "  bytes lost: 625ns:0.60%, 630ns:0.61%, 635ns:0.60%, 640ns:0.57%, 645ns:0.71%, 650ns:0.64%, 655ns:0.46%, 660ns:0.44%, 665ns:0.42%, 670ns:0.38%, 675ns:0.51%, 680ns:0.38%, 685ns:0.38%, 690ns:0.31%, 695ns:0.33%, 700ns:0.35%, 705ns:0.37%, 710ns:0.38%, 715ns:0.35%, 720ns:0.24%, 725ns:0.25%, 730ns:0.23%, 735ns:0.23%, 740ns:0.17%, 745ns:0.18%, 750ns:0.21%, 755ns:0.17%, 760ns:0.12%, 765ns:0.26%, 770ns:0.12%, 775ns:0.11%, 780ns:0.13%, 785ns:0.05%, 790ns:0.12%, 795ns:0.07%, 800ns:0.07%, 805ns:0.07%, 810ns:0.06%, 815ns:0.05%, 820ns:0.03%, 825ns:0.02%, 830ns:0.02%, 835ns:0.01%, 840ns:0.00%, 845ns:0.01%, 850ns:0, 855ns:0, 860ns:0",
+  "  the loss rate falls tenfold every 130 ns of extra period, from 0.60% at 625 ns to nothing by 850 ns - a smooth tail, so it is the worst case of the target's own response rather than a fixed interruption",
+  "  at the edge that is 205 ns setup, 390 ns strobe, 215 ns recovery, 1.2 MB/s",
+  "minimum sustained write period over 4096 bytes: clean from 405 ns, 5% of the 8000 ns a host may assume",
+  "  395ns:0/6, 400ns:0/6, 405ns:6/6, 410ns:6/6, 415ns:6/6",
+  "  bytes lost: 395ns:95.19%, 400ns:90.79%, 405ns:0, 410ns:0, 415ns:0",
+  "  too few lossy points to say how the tail falls off",
+  "  at the edge that is 105 ns setup, 190 ns strobe, 110 ns recovery, 2.5 MB/s",
+  "minimum alternating read/write period, per access: clean from 382.5 ns",
+  "  372.5ns:0/6, 377.5ns:0/6, 382.5ns:6/6, 387.5ns:6/6, 392.5ns:6/6",
+  "  bytes lost: 372.5ns:49.90%, 377.5ns:46.52%, 382.5ns:0, 387.5ns:0, 392.5ns:0",
+  "  too few lossy points to say how the tail falls off",
+  "  512 pairs per run, so the transceiver turns around 1024 times without a command between any two of them",
+  "  reads return the right byte only from 1042.5 ns per access, 2.7x the 382.5 ns at which the accesses merely all count - a host that alternates and looks at what comes back is held to the slower of the two",
+  "sustained read floor by burst length:",
+  "     16 bytes: clean from 605 ns   = 10 us for the whole burst, over 32 tries",
+  "     64 bytes: clean from 840 ns   = 54 us for the whole burst, over 32 tries",
+  "    256 bytes: clean from 810 ns   = 207 us for the whole burst, over 16 tries",
+  "   1024 bytes: clean from 830 ns   = 850 us for the whole burst, over 4 tries",
+  "   4096 bytes: clean from 835 ns   = 3420 us for the whole burst, over 3 tries",
+  "  16384 bytes: clean from 855 ns   = 14008 us for the whole burst, over 3 tries",
+  "  the shortest burst goes 41% faster than the longest, so the headline number is the worst case rather than the only one",
+  "sustained write floor by burst length:",
+  "     16 bytes: clean from 285 ns   = 5 us for the whole burst, over 32 tries",
+  "     64 bytes: clean from 380 ns   = 24 us for the whole burst, over 32 tries",
+  "    256 bytes: clean from 400 ns   = 102 us for the whole burst, over 16 tries",
+  "   1024 bytes: clean from 405 ns   = 415 us for the whole burst, over 4 tries",
+  "   4096 bytes: clean from 405 ns   = 1659 us for the whole burst, over 3 tries",
+  "  16384 bytes: clean from 410 ns   = 6717 us for the whole burst, over 3 tries",
+  "  the shortest burst goes 44% faster than the longest, so the headline number is the worst case rather than the only one",
+  "read floor and loss by display state, probed at 585 ns per access:",
+  "  blanked      clean from 795 ns    0/8 bursts perfect, 0.74% of bytes lost",
+  "  graphics I   clean from 840 ns    1/8 bursts perfect, 0.55% of bytes lost",
+  "  graphics II  clean from 840 ns    1/8 bursts perfect, 0.68% of bytes lost",
+  "  multicolour  clean from 855 ns    0/8 bursts perfect, 0.70% of bytes lost",
+  "  text         clean from 855 ns    2/8 bursts perfect, 0.58% of bytes lost",
+  "  the dearest display state loses 1.3x what the blanked one does - so the renderer is not what sets it, and the recurring cost is somewhere else entirely",
+  "  z80 4MHz OTIR        5250 ns access,   620 ns strobe, 190 B/ms both ways, 6.2x the 840 ns read floor - Tatung Einstein, the machine the read fix came from",
+  "  z80 4MHz OUTI        4000 ns access,   620 ns strobe, 250 B/ms both ways, 4.8x the 840 ns read floor - unrolled, the fastest a stock 4 MHz Z80 manages",
+  "  z80 3.58MHz OUTI     4470 ns access,   690 ns strobe, 224 B/ms both ways, 5.3x the 840 ns read floor - ColecoVision, MSX, NABU",
+  "  z80 8MHz OUTI        2000 ns access,   310 ns strobe, 500 B/ms both ways, 2.4x the 840 ns read floor - an accelerated Z80, past any stock machine",
+  "  tms9900 3MHz         5330 ns access,   660 ns strobe, 188 B/ms both ways, 6.3x the 840 ns read floor - TI-99/4A, two clock cycles of strobe",
+  "host profiles: 40 verified bursts across 5 machines' tightest loops",
+  "  cross-check: data valid 125 ns after /CSR falls, the transfer engine samples 15 ns before the rise, so the shortest strobe should be 140 ns and measures 150 ns - +10 ns, which is what the second read of a burst costs over the first",
+  "  glitch-write-start rejected up to -, always taken from 5 ns, p50 -",
+  "                     REJECTS NOTHING: taken at 5 ns, the narrowest the probe can make, so the threshold is below the instrument rather than low",
+  "  glitch-write-end   rejected up to 40 ns, always taken from 50 ns, p50 43.2 ns",
+  "  glitch-read-start  rejected up to 35 ns, always taken from 50 ns, p50 40.8 ns",
+  "  glitch-read-end    rejected up to 35 ns, always taken from 45 ns, p50 41.8 ns",
+  "  mode-window        clean from 35 ns, highest loss at 30 ns, dead below 25 ns",
+  "  read-window        clean from 125 ns, highest loss at 120 ns, dead below 100 ns",
+  "  read-strobe        clean from 150 ns, highest loss at 145 ns, dead below 145 ns",
+  "  write-strobe       clean from 30 ns, highest loss at -, dead below -",
+  "                     AT THE INSTRUMENT: already works at 30 ns, the tightest the probe can drive, so the real limit is below the fixture",
+  "  read-recovery      clean from 60 ns, highest loss at 55 ns, dead below 55 ns",
+  "  write-recovery     clean from 55 ns, highest loss at -, dead below -",
+  "                     AT THE INSTRUMENT: already works at 55 ns, the tightest the probe can drive, so the real limit is below the fixture",
+  "  read-period        clean from 850 ns, highest loss at 845 ns, dead below 810 ns",
+  "  write-period       clean from 405 ns, highest loss at 400 ns, dead below 400 ns",
+  "  alternation        clean from 382.5 ns, highest loss at 377.5 ns, dead below 377.5 ns"
+ ],
+ "ok": false,
+ "rig": {
+  "board": "pico2-pico9918",
+  "clock_hz": 200000000,
+  "firmware": "debugprobe-v2.3.1-6-g99f1f1d-dirty",
+  "max_bytes": 256,
+  "max_events": 64,
+  "protocol": 2,
+  "swclk_hz": 0,
+  "tick_ns": 5,
+  "trace_words": 1024
+ },
+ "sweeps": {
+  "alternation": {
+   "limits": {
+    "clean_from": 382.5,
+    "degrades_at": 377.5,
+    "p50": 380.0,
+    "rejected_below": 377.5,
+    "taken_from": 382.5
+   },
+   "rows": [
+    {
+     "bytes": 6144,
+     "errors": 3066,
+     "hits": 0,
+     "ns": 372.5,
+     "trials": 6
+    },
+    {
+     "bytes": 6144,
+     "errors": 2858,
+     "hits": 0,
+     "ns": 377.5,
+     "trials": 6
+    },
+    {
+     "bytes": 6144,
+     "errors": 0,
+     "hits": 6,
+     "ns": 382.5,
+     "trials": 6
+    },
+    {
+     "bytes": 6144,
+     "errors": 0,
+     "hits": 6,
+     "ns": 387.5,
+     "trials": 6
+    },
+    {
+     "bytes": 6144,
+     "errors": 0,
+     "hits": 6,
+     "ns": 392.5,
+     "trials": 6
+    }
+   ]
+  },
+  "display": [
+   {
+    "clean_ns": 795,
+    "leg": "blanked",
+    "r0": 0,
+    "r1": 128,
+    "rows": [
+     {
+      "bytes": 32768,
+      "errors": 244,
+      "hits": 0,
+      "ns": 585,
+      "trials": 8
+     }
+    ]
+   },
+   {
+    "clean_ns": 840,
+    "leg": "graphics I",
+    "r0": 0,
+    "r1": 192,
+    "rows": [
+     {
+      "bytes": 32768,
+      "errors": 181,
+      "hits": 1,
+      "ns": 585,
+      "trials": 8
+     }
+    ]
+   },
+   {
+    "clean_ns": 840,
+    "leg": "graphics II",
+    "r0": 2,
+    "r1": 192,
+    "rows": [
+     {
+      "bytes": 32768,
+      "errors": 222,
+      "hits": 1,
+      "ns": 585,
+      "trials": 8
+     }
+    ]
+   },
+   {
+    "clean_ns": 855,
+    "leg": "multicolour",
+    "r0": 0,
+    "r1": 200,
+    "rows": [
+     {
+      "bytes": 32768,
+      "errors": 230,
+      "hits": 0,
+      "ns": 585,
+      "trials": 8
+     }
+    ]
+   },
+   {
+    "clean_ns": 855,
+    "leg": "text",
+    "r0": 0,
+    "r1": 208,
+    "rows": [
+     {
+      "bytes": 32768,
+      "errors": 189,
+      "hits": 2,
+      "ns": 585,
+      "trials": 8
+     }
+    ]
+   }
+  ],
+  "drive": [
+   {
+    "fast": false,
+    "limits": {
+     "clean_from": 45,
+     "degrades_at": 40,
+     "p50": 42.2,
+     "rejected_below": 35,
+     "taken_from": 45
+    },
+    "ma": 2,
+    "rows": [
+     {
+      "hits": 0,
+      "ns": 35,
+      "trials": 32
+     },
+     {
+      "hits": 3,
+      "ns": 40,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 45,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 50,
+      "trials": 32
+     }
+    ]
+   },
+   {
+    "fast": true,
+    "limits": {
+     "clean_from": 45,
+     "degrades_at": 40,
+     "p50": 41.9,
+     "rejected_below": 35,
+     "taken_from": 45
+    },
+    "ma": 12,
+    "rows": [
+     {
+      "hits": 0,
+      "ns": 35,
+      "trials": 32
+     },
+     {
+      "hits": 6,
+      "ns": 40,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 45,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 50,
+      "trials": 32
+     }
+    ]
+   }
+  ],
+  "glitch-read-end": {
+   "limits": {
+    "clean_from": 45,
+    "degrades_at": 40,
+    "p50": 41.8,
+    "rejected_below": 35,
+    "taken_from": 45
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 30,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 35,
+     "trials": 24
+    },
+    {
+     "hits": 5,
+     "ns": 40,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 45,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 50,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 55,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 60,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 65,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 70,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 75,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 80,
+     "trials": 24
+    }
+   ]
+  },
+  "glitch-read-start": {
+   "limits": {
+    "clean_from": 50,
+    "degrades_at": 45,
+    "p50": 40.8,
+    "rejected_below": 35,
+    "taken_from": 50
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 30,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 35,
+     "trials": 24
+    },
+    {
+     "hits": 11,
+     "ns": 40,
+     "trials": 24
+    },
+    {
+     "hits": 17,
+     "ns": 45,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 50,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 55,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 60,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 65,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 70,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 75,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 80,
+     "trials": 24
+    }
+   ]
+  },
+  "glitch-write-end": {
+   "limits": {
+    "clean_from": 50,
+    "degrades_at": 45,
+    "p50": 43.2,
+    "rejected_below": 40,
+    "taken_from": 50
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 30,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 35,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 40,
+     "trials": 24
+    },
+    {
+     "hits": 19,
+     "ns": 45,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 50,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 55,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 60,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 65,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 70,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 75,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 80,
+     "trials": 24
+    }
+   ]
+  },
+  "glitch-write-start": {
+   "limits": {
+    "clean_from": 5,
+    "degrades_at": null,
+    "p50": null,
+    "rejected_below": null,
+    "taken_from": 5
+   },
+   "rows": [
+    {
+     "hits": 64,
+     "ns": 5,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 10,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 15,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 20,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 25,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 30,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 35,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 40,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 45,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 50,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 55,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 60,
+     "trials": 64
+    }
+   ]
+  },
+  "mode-window": {
+   "limits": {
+    "clean_from": 35,
+    "degrades_at": 30,
+    "p50": 32.1,
+    "rejected_below": 25,
+    "taken_from": 35
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 8
+    },
+    {
+     "hits": 1,
+     "ns": 30,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 35,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 40,
+     "trials": 8
+    }
+   ]
+  },
+  "read-burst": [
+   {
+    "bytes": 16,
+    "clean_ns": 605,
+    "leg": "16 bytes",
+    "repeat": 32,
+    "rows": [
+     {
+      "hits": 5,
+      "ns": 605,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 64,
+    "clean_ns": 840,
+    "leg": "64 bytes",
+    "repeat": 32,
+    "rows": [
+     {
+      "hits": 7,
+      "ns": 840,
+      "trials": 10
+     }
+    ]
+   },
+   {
+    "bytes": 256,
+    "clean_ns": 810,
+    "leg": "256 bytes",
+    "repeat": 16,
+    "rows": [
+     {
+      "hits": 6,
+      "ns": 810,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 1024,
+    "clean_ns": 830,
+    "leg": "1024 bytes",
+    "repeat": 4,
+    "rows": [
+     {
+      "hits": 5,
+      "ns": 830,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 4096,
+    "clean_ns": 835,
+    "leg": "4096 bytes",
+    "repeat": 3,
+    "rows": [
+     {
+      "hits": 4,
+      "ns": 835,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 16384,
+    "clean_ns": 855,
+    "leg": "16384 bytes",
+    "repeat": 3,
+    "rows": [
+     {
+      "hits": 7,
+      "ns": 855,
+      "trials": 11
+     }
+    ]
+   }
+  ],
+  "read-period": {
+   "limits": {
+    "clean_from": 850,
+    "degrades_at": 845,
+    "p50": 820.0,
+    "rejected_below": 810,
+    "taken_from": 850
+   },
+   "rows": [
+    {
+     "bytes": 24576,
+     "errors": 147,
+     "hits": 1,
+     "ns": 625,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 151,
+     "hits": 1,
+     "ns": 630,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 147,
+     "hits": 1,
+     "ns": 635,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 140,
+     "hits": 1,
+     "ns": 640,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 174,
+     "hits": 1,
+     "ns": 645,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 158,
+     "hits": 0,
+     "ns": 650,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 112,
+     "hits": 1,
+     "ns": 655,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 108,
+     "hits": 1,
+     "ns": 660,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 104,
+     "hits": 1,
+     "ns": 665,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 94,
+     "hits": 1,
+     "ns": 670,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 125,
+     "hits": 0,
+     "ns": 675,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 94,
+     "hits": 1,
+     "ns": 680,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 94,
+     "hits": 1,
+     "ns": 685,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 75,
+     "hits": 1,
+     "ns": 690,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 82,
+     "hits": 0,
+     "ns": 695,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 86,
+     "hits": 1,
+     "ns": 700,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 91,
+     "hits": 1,
+     "ns": 705,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 93,
+     "hits": 1,
+     "ns": 710,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 86,
+     "hits": 0,
+     "ns": 715,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 60,
+     "hits": 1,
+     "ns": 720,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 62,
+     "hits": 0,
+     "ns": 725,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 57,
+     "hits": 1,
+     "ns": 730,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 56,
+     "hits": 0,
+     "ns": 735,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 43,
+     "hits": 1,
+     "ns": 740,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 45,
+     "hits": 1,
+     "ns": 745,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 52,
+     "hits": 0,
+     "ns": 750,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 43,
+     "hits": 1,
+     "ns": 755,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 29,
+     "hits": 2,
+     "ns": 760,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 63,
+     "hits": 0,
+     "ns": 765,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 29,
+     "hits": 1,
+     "ns": 770,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 26,
+     "hits": 1,
+     "ns": 775,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 33,
+     "hits": 0,
+     "ns": 780,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 13,
+     "hits": 1,
+     "ns": 785,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 30,
+     "hits": 1,
+     "ns": 790,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 16,
+     "hits": 1,
+     "ns": 795,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 17,
+     "hits": 1,
+     "ns": 800,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 16,
+     "hits": 1,
+     "ns": 805,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 14,
+     "hits": 0,
+     "ns": 810,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 13,
+     "hits": 2,
+     "ns": 815,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 7,
+     "hits": 3,
+     "ns": 820,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 6,
+     "hits": 3,
+     "ns": 825,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 4,
+     "hits": 2,
+     "ns": 830,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 2,
+     "hits": 4,
+     "ns": 835,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 1,
+     "hits": 5,
+     "ns": 840,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 2,
+     "hits": 4,
+     "ns": 845,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 0,
+     "hits": 6,
+     "ns": 850,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 0,
+     "hits": 6,
+     "ns": 855,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 0,
+     "hits": 6,
+     "ns": 860,
+     "trials": 6
+    }
+   ]
+  },
+  "read-recovery": {
+   "limits": {
+    "clean_from": 60,
+    "degrades_at": 55,
+    "p50": 57.5,
+    "rejected_below": 55,
+    "taken_from": 60
+   },
+   "rows": [
+    {
+     "bytes": 32768,
+     "errors": 32333,
+     "hits": 0,
+     "ns": 55,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 60,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 65,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 70,
+     "trials": 8
+    }
+   ]
+  },
+  "read-strobe": {
+   "limits": {
+    "clean_from": 150,
+    "degrades_at": 145,
+    "p50": 132.9,
+    "rejected_below": 145,
+    "taken_from": 150
+   },
+   "rows": [
+    {
+     "bytes": 32768,
+     "errors": 32481,
+     "hits": 0,
+     "ns": 125,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 15077,
+     "hits": 0,
+     "ns": 130,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 1,
+     "hits": 7,
+     "ns": 135,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 609,
+     "hits": 0,
+     "ns": 140,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 63,
+     "hits": 0,
+     "ns": 145,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 150,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 155,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 160,
+     "trials": 8
+    }
+   ]
+  },
+  "read-window": {
+   "limits": {
+    "clean_from": 125,
+    "degrades_at": 120,
+    "p50": 105.0,
+    "rejected_below": 100,
+    "taken_from": 110
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 20,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 30,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 35,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 40,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 45,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 50,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 55,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 60,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 65,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 70,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 75,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 80,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 85,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 90,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 95,
+     "trials": 8
+    },
+    {
+     "hits": 0,
+     "ns": 100,
+     "trials": 8
+    },
+    {
+     "hits": 4,
+     "ns": 105,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 110,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 115,
+     "trials": 8
+    },
+    {
+     "hits": 7,
+     "ns": 120,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 125,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 130,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 135,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 140,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 145,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 150,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 155,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 160,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 165,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 170,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 175,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 180,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 185,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 190,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 195,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 200,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 205,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 210,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 215,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 220,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 225,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 230,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 235,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 240,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 245,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 250,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 255,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 260,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 265,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 270,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 275,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 280,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 285,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 290,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 295,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 300,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 305,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 310,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 315,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 320,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 325,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 330,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 335,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 340,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 345,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 350,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 355,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 360,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 365,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 370,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 375,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 380,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 385,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 390,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 395,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 400,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 405,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 410,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 415,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 420,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 425,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 430,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 435,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 440,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 445,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 450,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 455,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 460,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 465,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 470,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 475,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 480,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 485,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 490,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 495,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 500,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 505,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 510,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 515,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 520,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 525,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 530,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 535,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 540,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 545,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 550,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 555,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 560,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 565,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 570,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 575,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 580,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 585,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 590,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 595,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 600,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 605,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 610,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 615,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 620,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 625,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 630,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 635,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 640,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 645,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 650,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 655,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 660,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 665,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 670,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 675,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 680,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 685,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 690,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 695,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 700,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 705,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 710,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 715,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 720,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 725,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 730,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 735,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 740,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 745,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 750,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 755,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 760,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 765,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 770,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 775,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 780,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 785,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 790,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 795,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 800,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 805,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 810,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 815,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 820,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 825,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 830,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 835,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 840,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 845,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 850,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 855,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 860,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 865,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 870,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 875,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 880,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 885,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 890,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 895,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 900,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 905,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 910,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 915,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 920,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 925,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 930,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 935,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 940,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 945,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 950,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 955,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 960,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 965,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 970,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 975,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 980,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 985,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 990,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 995,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1000,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1005,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1010,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1015,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1020,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1025,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1030,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1035,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1040,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1045,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1050,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1055,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1060,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1065,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1070,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1075,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1080,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1085,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1090,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1095,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1100,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1105,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1110,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1115,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1120,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1125,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1130,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1135,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1140,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1145,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1150,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1155,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1160,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1165,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1170,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1175,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1180,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1185,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1190,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1195,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1200,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1205,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1210,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1215,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1220,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1225,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1230,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1235,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1240,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1245,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1250,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1255,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1260,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1265,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1270,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1275,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1280,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1285,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1290,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1295,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1300,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1305,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1310,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1315,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1320,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1325,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1330,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1335,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1340,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1345,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1350,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1355,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1360,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1365,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1370,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1375,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1380,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1385,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1390,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1395,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1400,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1405,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1410,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1415,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1420,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1425,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1430,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1435,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1440,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1445,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1450,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1455,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1460,
+     "trials": 8
+    },
+    {
+     "hits": 8,
+     "ns": 1465,
+     "trials": 8
+    }
+   ]
+  },
+  "write-burst": [
+   {
+    "bytes": 16,
+    "clean_ns": 285,
+    "leg": "16 bytes",
+    "repeat": 32,
+    "rows": [
+     {
+      "hits": 7,
+      "ns": 285,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 64,
+    "clean_ns": 380,
+    "leg": "64 bytes",
+    "repeat": 32,
+    "rows": [
+     {
+      "hits": 5,
+      "ns": 380,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 256,
+    "clean_ns": 400,
+    "leg": "256 bytes",
+    "repeat": 16,
+    "rows": [
+     {
+      "hits": 7,
+      "ns": 400,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 1024,
+    "clean_ns": 405,
+    "leg": "1024 bytes",
+    "repeat": 4,
+    "rows": [
+     {
+      "hits": 8,
+      "ns": 405,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 4096,
+    "clean_ns": 405,
+    "leg": "4096 bytes",
+    "repeat": 3,
+    "rows": [
+     {
+      "hits": 8,
+      "ns": 405,
+      "trials": 11
+     }
+    ]
+   },
+   {
+    "bytes": 16384,
+    "clean_ns": 410,
+    "leg": "16384 bytes",
+    "repeat": 3,
+    "rows": [
+     {
+      "hits": 7,
+      "ns": 410,
+      "trials": 11
+     }
+    ]
+   }
+  ],
+  "write-period": {
+   "limits": {
+    "clean_from": 405,
+    "degrades_at": 400,
+    "p50": 402.5,
+    "rejected_below": 400,
+    "taken_from": 405
+   },
+   "rows": [
+    {
+     "bytes": 24576,
+     "errors": 23393,
+     "hits": 0,
+     "ns": 395,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 22313,
+     "hits": 0,
+     "ns": 400,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 0,
+     "hits": 6,
+     "ns": 405,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 0,
+     "hits": 6,
+     "ns": 410,
+     "trials": 6
+    },
+    {
+     "bytes": 24576,
+     "errors": 0,
+     "hits": 6,
+     "ns": 415,
+     "trials": 6
+    }
+   ]
+  },
+  "write-recovery": {
+   "limits": {
+    "clean_from": 55,
+    "degrades_at": null,
+    "p50": null,
+    "rejected_below": null,
+    "taken_from": 55
+   },
+   "rows": [
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 55,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 60,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 65,
+     "trials": 8
+    }
+   ]
+  },
+  "write-strobe": {
+   "limits": {
+    "clean_from": 30,
+    "degrades_at": null,
+    "p50": null,
+    "rejected_below": null,
+    "taken_from": 30
+   },
+   "rows": [
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 30,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 35,
+     "trials": 8
+    },
+    {
+     "bytes": 32768,
+     "errors": 0,
+     "hits": 8,
+     "ns": 40,
+     "trials": 8
+    }
+   ]
+  },
+  "write-window": [
+   {
+    "leg": "capture instant",
+    "limits": {
+     "clean_from": null,
+     "degrades_at": 75,
+     "p50": -37.5,
+     "rejected_below": 75,
+     "taken_from": -25
+    },
+    "rows": [
+     {
+      "hits": 0,
+      "ns": -175,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -170,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -165,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -160,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -155,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -150,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -145,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -140,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -135,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -130,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -125,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -120,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -115,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -110,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -105,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -100,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -95,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -90,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -85,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -80,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -75,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -70,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -65,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -60,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -55,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": -50,
+      "trials": 8
+     },
+     {
+      "hits": 8,
+      "ns": -25,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 0,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 25,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 30,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 35,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 40,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 45,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 50,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 55,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 60,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 65,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 70,
+      "trials": 8
+     },
+     {
+      "hits": 0,
+      "ns": 75,
+      "trials": 8
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -226,7 +226,8 @@ def new(board, elf, clock_hz=None):
     """An empty record. Stages fill their own key and leave the others absent, so
     a partial run is readable as a partial run rather than as a run of zeros."""
     return {"schema": SCHEMA, "run": metadata(board, elf, clock_hz),
-            "freeze": {}, "perf": {}, "properties": {}, "gpu": {}, "scenes": {}}
+            "freeze": {}, "perf": {}, "properties": {}, "gpu": {}, "hostbus": {},
+            "scenes": {}}
 
 
 def scenes_touched(record):

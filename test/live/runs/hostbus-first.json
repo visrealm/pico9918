@@ -1,0 +1,381 @@
+{
+ "checks": 18320,
+ "failures": [],
+ "notes": [
+  "walking ones and zeros: 16 patterns",
+  "address-line separation: 15 addresses",
+  "16 KiB wrap at 0x3FFF",
+  "read-ahead: prefetch served, stale prefetch discarded",
+  "register write does not move the VRAM pointer",
+  "control-latch interruption: 4 shapes, all matching the F18A's flip-flop",
+  "status read leaves the VRAM pointer alone",
+  "16 KiB write and read back, byte for byte",
+  "conformance: 5 worst-legal cycles at 5 ns per tick, all exact",
+  "  th(WL-A) and tsu(A-RL) are NOT tested: both need MODE to move inside an asserted strobe, which the probe's validator refuses",
+  "/CSW LOW excursion, must not start a write: 5ns:64/64, 10ns:64/64, 15ns:64/64, 20ns:64/64, 25ns:64/64, 30ns:64/64, 35ns:64/64, 40ns:64/64, 45ns:64/64, 50ns:64/64, 55ns:64/64, 60ns:64/64",
+  "/CSW HIGH excursion, must not end a write: 25ns:0/24, 30ns:0/24, 35ns:0/24, 40ns:0/24, 45ns:15/24, 50ns:24/24, 55ns:24/24, 60ns:24/24, 65ns:24/24, 70ns:24/24, 75ns:24/24, 80ns:24/24",
+  "/CSR LOW excursion, must not start a read: 25ns:0/24, 30ns:0/24, 35ns:0/24, 40ns:7/24, 45ns:18/24, 50ns:24/24, 55ns:24/24, 60ns:24/24, 65ns:24/24, 70ns:24/24, 75ns:24/24, 80ns:24/24",
+  "/CSR HIGH excursion, must not re-arm the read: 25ns:0/24, 30ns:0/24, 35ns:0/24, 40ns:6/24, 45ns:24/24, 50ns:24/24, 55ns:24/24, 60ns:24/24, 65ns:24/24, 70ns:24/24, 75ns:24/24, 80ns:24/24",
+  "  drive  2 mA slow: 35ns:0/32, 40ns:6/32, 45ns:32/32, 50ns:32/32",
+  "  drive 12 mA fast: 35ns:0/32, 40ns:6/32, 45ns:32/32, 50ns:32/32",
+  "  p50 moves +0.0 ns between 2 mA slow and 12 mA fast - within a tick, so the offset is not edge rate",
+  "  glitch-write-start rejected up to -, always taken from 5 ns, p50 -",
+  "  glitch-write-end   rejected up to 40 ns, always taken from 50 ns, p50 44 ns",
+  "  glitch-read-start  rejected up to 35 ns, always taken from 50 ns, p50 42.3 ns",
+  "  glitch-read-end    rejected up to 35 ns, always taken from 45 ns, p50 41.7 ns"
+ ],
+ "ok": true,
+ "rig": {
+  "board": "pico2-pico9918",
+  "clock_hz": 200000000,
+  "firmware": "debugprobe-v2.3.1-6-g99f1f1d-dirty",
+  "max_bytes": 256,
+  "max_events": 64,
+  "protocol": 2,
+  "swclk_hz": 0,
+  "tick_ns": 5,
+  "trace_words": 1024
+ },
+ "sweeps": {
+  "drive": [
+   {
+    "fast": false,
+    "limits": {
+     "p50": 41.9,
+     "rejected_below": 35,
+     "taken_from": 45
+    },
+    "ma": 2,
+    "rows": [
+     {
+      "hits": 0,
+      "ns": 35,
+      "trials": 32
+     },
+     {
+      "hits": 6,
+      "ns": 40,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 45,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 50,
+      "trials": 32
+     }
+    ]
+   },
+   {
+    "fast": true,
+    "limits": {
+     "p50": 41.9,
+     "rejected_below": 35,
+     "taken_from": 45
+    },
+    "ma": 12,
+    "rows": [
+     {
+      "hits": 0,
+      "ns": 35,
+      "trials": 32
+     },
+     {
+      "hits": 6,
+      "ns": 40,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 45,
+      "trials": 32
+     },
+     {
+      "hits": 32,
+      "ns": 50,
+      "trials": 32
+     }
+    ]
+   }
+  ],
+  "glitch-read-end": {
+   "limits": {
+    "p50": 41.7,
+    "rejected_below": 35,
+    "taken_from": 45
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 30,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 35,
+     "trials": 24
+    },
+    {
+     "hits": 6,
+     "ns": 40,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 45,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 50,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 55,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 60,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 65,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 70,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 75,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 80,
+     "trials": 24
+    }
+   ]
+  },
+  "glitch-read-start": {
+   "limits": {
+    "p50": 42.3,
+    "rejected_below": 35,
+    "taken_from": 50
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 30,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 35,
+     "trials": 24
+    },
+    {
+     "hits": 7,
+     "ns": 40,
+     "trials": 24
+    },
+    {
+     "hits": 18,
+     "ns": 45,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 50,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 55,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 60,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 65,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 70,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 75,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 80,
+     "trials": 24
+    }
+   ]
+  },
+  "glitch-write-end": {
+   "limits": {
+    "p50": 44.0,
+    "rejected_below": 40,
+    "taken_from": 50
+   },
+   "rows": [
+    {
+     "hits": 0,
+     "ns": 25,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 30,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 35,
+     "trials": 24
+    },
+    {
+     "hits": 0,
+     "ns": 40,
+     "trials": 24
+    },
+    {
+     "hits": 15,
+     "ns": 45,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 50,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 55,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 60,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 65,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 70,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 75,
+     "trials": 24
+    },
+    {
+     "hits": 24,
+     "ns": 80,
+     "trials": 24
+    }
+   ]
+  },
+  "glitch-write-start": {
+   "limits": {
+    "p50": null,
+    "rejected_below": null,
+    "taken_from": 5
+   },
+   "rows": [
+    {
+     "hits": 64,
+     "ns": 5,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 10,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 15,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 20,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 25,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 30,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 35,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 40,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 45,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 50,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 55,
+     "trials": 64
+    },
+    {
+     "hits": 64,
+     "ns": 60,
+     "trials": 64
+    }
+   ]
+  }
+ }
+}
