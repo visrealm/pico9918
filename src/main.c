@@ -30,6 +30,7 @@
 #include "xip.h"
 #include "tms_bus.h"
 
+#include "hardware/clocks.h"
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
 
@@ -137,9 +138,9 @@ int __in_flash_func(main)(void)
 
   pico9918_diag_init();
 
-  /* Version identity and the OUTPUT-row label are host policy - only the host knows
-     its board revisions, its firmware version and which timings its PICO9918_CONF_DISP_DRIVER
-     encoding names - so the already-chosen strings are pushed. */
+  /* LOAD-BEARING: pico9918_diag_init() clears every diag string, so these host-policy pushes
+     must follow it. Board revision, firmware version, the timings PICO9918_CONF_DISP_DRIVER
+     names and the clock the host chose are all things only the host knows. */
 #if PICO_RP2350
   pico9918_diag_set_version_info("V2.0+", PICO9918_VERSION);
 #else
@@ -153,6 +154,8 @@ int __in_flash_func(main)(void)
     if (driver > 2) driver = 0;
     pico9918_diag_set_output_name(outputValues[driver], outputUnits[driver]);
   }
+
+  pico9918_diag_set_clock_hz((float)clock_get_hz(clk_sys));
 
   multicore_fifo_push_blocking(0);
 

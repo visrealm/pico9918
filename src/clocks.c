@@ -16,7 +16,6 @@
 #include "clocks.pio.h"
 #include "config.h"
 #include "xip.h"
-#include "overlay/diag.h"
 #include "display.h"
 #include "gpio.h"
 #include "pico9918_config.h"
@@ -112,7 +111,6 @@ static void __in_flash_func(updateClock)(uint pioSm, float freqHz)
   float clockDiv = ((float)clockPresets[clockPresetIndex].clockHz) / (freqHz * 2.0f);
   pio_sm_set_clkdiv(CLOCK_PIO, pioSm, clockDiv);
   pio_sm_set_enabled(CLOCK_PIO, pioSm, true);
-  pico9918_diag_set_clock_hz(clockPresets[clockPresetIndex].clockHz);
 }
 
 /** \brief load the clock program once, then run it on pioSm driving gpio at freqHz */
