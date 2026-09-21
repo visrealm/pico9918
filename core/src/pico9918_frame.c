@@ -360,9 +360,11 @@ bool __time_critical_func(pico9918_frame_scanline)(PICO9918_INST_ARG uint16_t y,
   const uint32_t lineBytes = pico9918_line_bytes_impl(PICO9918_INST_ONLY);
   const bool packedNibbles =
     pico9918_display_mode_impl(PICO9918_INST_ONLY) == TMS_MODE_TEXT80 && lineBytes == TMS9918_PIXELS_X;
-  pico9918_border_bg = pico9918_palette_lut
+
+  /* LOAD-BEARING: PRAM, not the LUT, which no top border has rebuilt yet. */
+  pico9918_border_bg = PICO9918_PIXEL_PAIR(PICO9918_PIXEL_FROM_RGB12(tms9918->vram.map.pram
     [(TMS_REGISTER(tms9918, TMS_REG_FG_BG_COLOR) & 0x0f) |
-     (packedNibbles ? 0 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4)];
+     (packedNibbles ? 0 : (TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_SELECT) & PICO9918_R24_TILE1_PS) << 4)]));
 
   if (y == 0)
   {

@@ -256,6 +256,62 @@ static void checkDimScale1(void)
   pico9918_v_scale = 2;
 }
 
+/* A backdrop repainted in the blank, which the top border needs before any active
+   line of the frame has run. Nothing else here renders a border line. */
+static void checkVblankBackdrop(void)
+{
+  regWrite(0, 0x00); /* graphics I */
+  regWrite(1, 0xc0);
+  regWrite(7, 0x05); /* backdrop is palette entry 5 */
+  regWrite(24, 0x00);
+  renderLines(0, 240);
+
+  tms9918->vram.map.pram[5] = 0x0f8f;
+  tms9918->palDirty         = 1;
+
+  renderLines(0, 1);
+
+  const uint16_t got = (uint16_t)(pico9918_border_bg & 0xffff);
+  if (got != want(5)) fail("vblank-backdrop", 0, want(5), got);
+}
+
+/* A GPU fade: off a board the write announces nothing, so this one sets no flag
+   either. Checked against the indexes rendered, so the whole picture has to follow. */
+static void checkGpuFade(void)
+{
+  unlock();
+  regWrite(0, 0x00); /* graphics I */
+  regWrite(1, 0xc0);
+  regWrite(2, 0x00); /* name table    0x0000 */
+  regWrite(3, 0x80); /* colour table  0x2000 */
+  regWrite(4, 0x01); /* pattern table 0x0800 */
+  regWrite(7, 0x01);
+  regWrite(24, 0x00);
+
+  uint8_t* const vram = tms9918->vram.map.base;
+  for (int i = 0; i < 0x300; ++i) vram[i] = (uint8_t)i;
+  for (int i = 0; i < 0x800; ++i) vram[0x800 + i] = 0xaa;
+  for (int i = 0; i < 0x20; ++i) vram[0x2000 + i] = (uint8_t)(((i + 1) << 4) | ((i + 2) & 0x0f));
+
+  renderLines(0, 240);
+
+  for (int i = 0; i < 64; ++i) tms9918->vram.map.pram[i] = (uint16_t)(0x0f00 | (i * 0x11));
+
+  const uint16_t y = activeLine();
+  renderLines(y, y + 1);
+
+  const uint8_t* const source = pico9918_line_source_impl(PICO9918_INST_ONLY);
+  for (unsigned x = 0; x < TMS9918_PIXELS_X; ++x)
+  {
+    const uint16_t wanted = want(source[x]);
+    if (line[H_BORDER + x * 2] != wanted)
+    {
+      fail("gpu-fade", x, wanted, line[H_BORDER + x * 2]);
+      break;
+    }
+  }
+}
+
 int main(void)
 {
   const int tier = PICO9918_BUILD_TEXT80_8BPP;
@@ -295,6 +351,12 @@ int main(void)
   /* 4. and the CRT-scanline dim a host applies to the repeat of each line */
   checkDimMaths();
   checkDimScale1();
+
+  /* 5. and the border's own colour, which no active line is involved in */
+  checkVblankBackdrop();
+
+  /* 6. and a whole palette moved by something that announces nothing */
+  checkGpuFade();
 
   printf("%s: post-palette pixel path, %s 8bpp tier, %d failure(s)\n", failures ? "FAIL" : "PASS",
          tier ? "with" : "without", failures);

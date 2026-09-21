@@ -1044,5 +1044,10 @@ PICO9918_INLINE bool pico9918_palette_dirty(PICO9918_INST_ONLY_ARG)
      last: a second instance in the same mode would otherwise draw the first one's colours */
   if (pico9918_palette_owner != tms9918) return true;
 #endif
+#ifdef PICO_BUILD
   return tms9918->palDirty || (TMS_STATUS(tms9918, PICO9918_SR_GPU) & 0x80);
+#else
+  /* No MPU palette guard off a board (gpu.h), so a GPU write announces itself nowhere. */
+  return true;
+#endif
 }
