@@ -665,7 +665,15 @@ derived mode, palette and interrupt state needed to keep the instance coherent.
 asking it for R30 reads the R6 alias. That is useful in a bus trace and wrong in a
 64-register editor.
 
-Use `pico9918_status_value()` to show any status register without clearing it.
+Use `pico9918_status_value()` to show any status register without clearing it, and
+`pico9918_debug_status_write()` to edit one. Nothing else reaches SR1-SR15: the span
+write refuses the status window, and the device sets these as consequences rather than
+on request. It is the same kind of store as the register writer -- no flag is cleared
+and no sprite number is restored -- with two things it must do to stay coherent: SR0 is
+latched in two places, so both move, and SR0 and SR1 are terms in the /INT predicate, so
+the pin is reconciled. What it cannot do is pin a derived byte down; the machine rewrites
+SR1's blanking bits, SR2, SR3, the SR4-SR11 counters and SR13 as it runs.
+
 `pico9918_debug_vram_address()` gives the effective next guest address, including the
 4K DRAM address permutation. Neither belongs on the guest bus.
 

@@ -148,6 +148,34 @@ PICO9918_DLLEXPORT
 bool pico9918_debug_reg_write(PICO9918_INST_ARG uint8_t reg, uint8_t value);
 
 /**
+ * \brief a status byte, stored where its number says, with no device behaviour
+ *
+ * The write side of pico9918_status_value(), which is the whole file read without
+ * clearing anything. Nothing else can reach SR1-SR15: the span write refuses the status
+ * window by contract, pico9918_debug_reg_write() is the other file, and the device's own
+ * paths set these as consequences rather than on request.
+ *
+ * For \p reg 0-15 it does EXACTLY three things:
+ *
+ *   1. stores \p value at status register \p reg
+ *   2. keeps SR0's shadow in step, SR0 being latched in two places
+ *   3. reconciles /INT, SR0 and SR1 being two of the four terms that decide it
+ *
+ * The shadow is not an implementation detail a caller could skip: the frame path merges
+ * into it and publishes the result, so a write that moved only the published byte would
+ * be undone by the next frame with the old flags coming back with it.
+ *
+ * Nothing is cleared, no sprite number is restored and no read is simulated - a status
+ * editor is not the guest's destructive read. What it cannot do is make a derived byte
+ * stay put: the machine rewrites SR1's blanking bits, SR2, SR3, the SR4-SR11 counters and
+ * SR13 as it runs, so an edit to one of those lasts until the next line draws.
+ *
+ * Returns false, changing nothing, for \p reg above 15.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_debug_status_write(PICO9918_INST_ARG uint8_t reg, uint8_t value);
+
+/**
  * \brief a live palette entry, in host byte order
  *
  * PRAM as the renderer reads it, with the big-endian storage undone - so the value is

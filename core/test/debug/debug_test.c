@@ -593,6 +593,85 @@ int main(void)
   }
 #endif
 
+  /* 16. the status write is the physical store too, but SR0 is latched in two places and
+         SR0/SR1 decide /INT, so "physical store" is three postconditions rather than one.
+         The last case is section 14's diff again, on the register that owes nothing. */
+  {
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, 0);
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, TMS_R1_DISP_ACTIVE);
+    pico9918_debug_status_write(PICO9918_INST PICO9918_SR_STATUS, 0);
+
+    for (uint8_t sr = 0; sr < 16; ++sr)
+    {
+      if (!pico9918_debug_status_write(PICO9918_INST sr, (uint8_t)(0xa0 + sr)))
+        fail("status-write-refused", sr, 0);
+    }
+    for (uint8_t sr = 0; sr < 16; ++sr)
+    {
+      if (pico9918_status_value(PICO9918_INST sr) != (uint8_t)(0xa0 + sr))
+        fail("status-write-value", (uint8_t)(0xa0 + sr), pico9918_status_value(PICO9918_INST sr));
+    }
+
+    /* above the file: nothing happens and it says so. SR15 is the neighbour it would
+       wrap onto, the number being masked everywhere else in this API. */
+    if (pico9918_debug_status_write(PICO9918_INST 16, 0x11)) fail("status-write-16", 0, 1);
+    if (pico9918_status_value(PICO9918_INST 15) != 0xaf)
+      fail("status-write-16-wrapped", 0xaf, pico9918_status_value(PICO9918_INST 15));
+
+    /* SR0'S SHADOW. The frame path merges into it and publishes the result, so a write
+       that moved only the published byte survives until the guest's next read and is
+       then replaced by the value that was there before the edit. */
+    pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_STATUS_SELECT, 0);
+    tms9918->frameStatus = 0x1f;
+    pico9918_debug_status_write(PICO9918_INST PICO9918_SR_STATUS, PICO9918_SR0_COLLISION);
+    if (tms9918->frameStatus != PICO9918_SR0_COLLISION)
+      fail("status-write-shadow", PICO9918_SR0_COLLISION, tms9918->frameStatus);
+    if (pico9918_read_status(PICO9918_INST_ONLY) != PICO9918_SR0_COLLISION)
+      fail("status-write-guest-read", PICO9918_SR0_COLLISION, pico9918_read_status(PICO9918_INST_ONLY));
+    if (pico9918_status_value(PICO9918_INST PICO9918_SR_STATUS) != 0)
+      fail("status-write-shadow-stale", 0, pico9918_status_value(PICO9918_INST PICO9918_SR_STATUS));
+
+    /* /INT follows from this side as well, which is the same predicate section 13 drives
+       from the register side. Both of its status terms, since either alone decides it. */
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, TMS_R1_DISP_ACTIVE | TMS_R1_INT_ENABLE);
+    pico9918_debug_status_write(PICO9918_INST PICO9918_SR_STATUS, PICO9918_SR0_INT);
+    if (!tms9918->frameInt) fail("status-write-int-not-raised", 1, 0);
+    pico9918_debug_status_write(PICO9918_INST PICO9918_SR_STATUS, 0);
+    if (tms9918->frameInt) fail("status-write-int-not-dropped", 0, 1);
+
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, TMS_R0_INT_SCANLINE);
+    pico9918_debug_status_write(PICO9918_INST PICO9918_SR_IDENT, PICO9918_SR1_HF);
+    if (!tms9918->frameInt) fail("status-write-hf-not-raised", 1, 0);
+    pico9918_debug_status_write(PICO9918_INST PICO9918_SR_IDENT, 0);
+    if (tms9918->frameInt) fail("status-write-hf-not-dropped", 0, 1);
+    pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, 0);
+
+    /* and nothing else moves: one byte for a status register that is neither of those */
+    {
+      uint8_t* const before     = malloc(sizeof(pico9918_t));
+      const uint8_t* const live = (const uint8_t*)tms9918;
+      const uint32_t statusByte = 0xB000 + PICO9918_SR_SECONDS_LSB;
+      unsigned moved            = 0;
+
+      if (!before) return fail("status-snapshot-alloc", 1, 0), 1;
+
+      pico9918_debug_status_write(PICO9918_INST PICO9918_SR_SECONDS_LSB, 0x00);
+      memcpy(before, tms9918, sizeof(pico9918_t));
+
+      pico9918_debug_status_write(PICO9918_INST PICO9918_SR_SECONDS_LSB, 0x71);
+
+      for (uint32_t i = 0; i < (uint32_t)sizeof(pico9918_t); ++i)
+      {
+        if (before[i] == live[i]) continue;
+        ++moved;
+        if (i != statusByte) fail("status-write-touched-offset", statusByte, i);
+      }
+      if (moved != 1) fail("status-write-moved-count", 1, moved);
+
+      free(before);
+    }
+  }
+
   printf("%s: debugger surface, %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
   return failures ? 1 : 0;
 }

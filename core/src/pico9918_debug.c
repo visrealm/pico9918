@@ -139,6 +139,26 @@ bool pico9918_debug_reg_write(PICO9918_INST_ARG uint8_t reg, uint8_t value)
   return true;
 }
 
+/** \brief see the header. The store, the shadow SR0 also lives in, and the pin. */
+PICO9918_DLLEXPORT
+bool pico9918_debug_status_write(PICO9918_INST_ARG uint8_t reg, uint8_t value)
+{
+  if (reg >= TMS_STATUS_REGISTERS) return false;
+
+  if (reg == PICO9918_SR_STATUS)
+  {
+    pico9918_set_status_impl(PICO9918_INST value);
+  }
+  else
+  {
+    TMS_STATUS(tms9918, reg) = value;
+  }
+
+  pico9918_write_reconcile_int_impl(PICO9918_INST_ONLY);
+
+  return true;
+}
+
 /** \brief see the header. PRAM with the big-endian storage undone. */
 PICO9918_DLLEXPORT
 uint16_t pico9918_debug_palette(PICO9918_INST_ARG uint8_t index)
