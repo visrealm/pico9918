@@ -737,6 +737,37 @@ agree on one, and it must not re-enter the library: it runs inside the interpret
 where the GPU's registers and status are in a context that is only written back when the
 slice returns. Read the machine through the accessors afterwards.
 
+That last point is why a break should be **recorded** in the callback and acted on once
+the slice has returned. A debugger that repaints its panes from inside will show the PC
+and the status the slice started from, not the ones it broke on, and it will read the
+registers out of the workspace the slice started from -- so after a mid-slice `LWPI` the
+values are live but the sixteen words are the wrong ones.
+
+If you leave the GPU's pacing to the library -- an automatic clock, or
+`pico9918_gpu_step_n()` from your own frame loop -- there is no call of your own to hang
+a breakpoint list from, and taking over pacing to get one changes the timing of the
+machine you are trying to watch. Build with `PICO9918_STEP_CALLBACK=ON` (the default, and
+it implies the debug API) and arm the same callback on the instance instead:
+
+```c
+pico9918_debug_set_step_callback(vdp, at_breakpoint, dbg);
+```
+
+Every slice consults it, whichever entry drove it -- the arming register write, a
+scanline, the dedicated loop. A callback passed to `pico9918_debug_gpu_step_n()` wins for
+that call, so a pane pacing its own slice does not fight it. Null disarms, and
+`pico9918_debug_step_callback()` reads the armed pair back, so a pane that wants the
+machine to itself for a moment can put the other one back afterwards.
+
+A reset does not clear it: the host armed it, the guest did not, and a program resetting
+the VDP is often the thing being debugged. A new instance starts with none, so arm it
+where you create one.
+
+Resuming needs one thing from the host. The slice stops **on** the instruction that
+broke, not after it, so the next slice offers that same PC to the callback again. Skip it
+once on the first instruction after a break, or the machine never gets past its first GPU
+breakpoint.
+
 **Read and write breakpoints are not served by this.** Between instructions is too early
 to know what the next one touches and too late to see what the last one did, so a host
 that wants them has to decode the instruction itself. Reporting them from inside the

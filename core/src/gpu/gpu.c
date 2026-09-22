@@ -40,6 +40,10 @@
 #include "pico9918_debug.h" /* pico9918_debug_gpu_step_n, defined here for the hook */
 #endif
 
+#if PICO9918_BUILD_STEP_CALLBACK && !(PICO9918_BUILD_DEBUG_API && defined(TMS9900_STEP_HOOK))
+#error "PICO9918_BUILD_STEP_CALLBACK needs PICO9918_DEBUG_API and the interpreter's step hook"
+#endif
+
 #if !PICO9918_GPU_BUDGETED
 /* run9900() implemented in platform/thumb9900_{m0,m33}.S */
 extern uint16_t run9900(uint8_t* memory, uint16_t pc, uint16_t wp, uint8_t* regx38);
@@ -49,23 +53,53 @@ static void gpuDmaWatch(uint8_t* vram, uint32_t addr);
 #endif
 
 #if PICO9918_BUILD_DEBUG_API && defined(TMS9900_STEP_HOOK)
+/* What one slice runs under. It carries the instance because the two sources below do not */
+typedef struct
+{
+  pico9918_gpu_step_fn fn;
+  void* userdata;
+  pico9918_t* inst;
+} gpu_step_ctx_t;
+
 /* Live for one pico9918_debug_gpu_step_n call, which is what lets a breakpoint list be
    an argument to a run rather than a pair of fields on every instance. */
 static struct
 {
   pico9918_gpu_step_fn fn;
   void* userdata;
-  pico9918_t* inst;
 } gpuStep;
 
 static bool gpuStepHook(Tms9900Cpu* cpu)
 {
-  return gpuStep.fn(gpuStep.inst, (uint16_t)cpu->pc, gpuStep.userdata);
+  const gpu_step_ctx_t* const ctx = (const gpu_step_ctx_t*)cpu->onStepData;
+
+  return ctx->fn(ctx->inst, (uint16_t)cpu->pc, ctx->userdata);
+}
+
+/* The call's callback wins over the instance's, so a pane pacing its own slice does not
+   fight the standing one. A slice the LIBRARY paced can only ever have the instance's,
+   having no call of its own to carry one. */
+static bool gpuStepResolve(PICO9918_INST_ARG gpu_step_ctx_t* out)
+{
+  out->inst     = tms9918;
+  out->fn       = gpuStep.fn;
+  out->userdata = gpuStep.userdata;
+
+#if PICO9918_BUILD_STEP_CALLBACK
+  if (!out->fn)
+  {
+    out->fn       = tms9918->stepFn;
+    out->userdata = tms9918->stepUserdata;
+  }
+#endif
+
+  return out->fn != NULL;
 }
 #endif
 
-static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t* wp, uint8_t* r38,
-                              uint32_t budget, uint16_t* st, bool* outOfBudget, bool f18aMemory)
+static uint16_t run9900Budget(PICO9918_INST_ARG uint8_t* mem, uint16_t pc, uint16_t* wp,
+                              uint8_t* r38, uint32_t budget, uint16_t* st, bool* outOfBudget,
+                              bool f18aMemory)
 {
   Tms9900Cpu cpu;
   tms9900_init(&cpu, mem, r38, pc, *wp);
@@ -76,7 +110,13 @@ static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t* wp, uint8_t* 
   cpu.onWriteMatch = 0x8000;
 #endif
 #if PICO9918_BUILD_DEBUG_API && defined(TMS9900_STEP_HOOK)
-  if (gpuStep.fn) cpu.onStep = gpuStepHook;
+  /* a local, so a nested or concurrent slice cannot take this one's callback with it */
+  gpu_step_ctx_t ctx;
+  if (gpuStepResolve(PICO9918_INST &ctx))
+  {
+    cpu.onStepData = &ctx;
+    cpu.onStep     = gpuStepHook;
+  }
 #endif
   cpu.st = *st;
   const uint16_t next = run9900_budget_c(&cpu, budget, outOfBudget);
@@ -378,7 +418,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
 #endif /* PICO_BUILD */
 
 #if PICO9918_GPU_BUDGETED
-    lastAddress = run9900Budget(tms9918->vram.bytes, lastAddress, &tms9918->gpuWp,
+    lastAddress = run9900Budget(PICO9918_INST tms9918->vram.bytes, lastAddress, &tms9918->gpuWp,
                                 &TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL), budget, &tms9918->gpuStatus,
                                 &outOfBudget, !PICO9918_GPU_FLAT_MEM(tms9918));
 #else
@@ -601,7 +641,6 @@ bool pico9918_debug_gpu_step_n(PICO9918_INST_ARG uint32_t instructions, pico9918
 #if defined(TMS9900_STEP_HOOK)
   gpuStep.fn       = cb;
   gpuStep.userdata = userdata;
-  gpuStep.inst     = tms9918;
 
   const bool running = pico9918_gpu_step_n(PICO9918_INST instructions);
 

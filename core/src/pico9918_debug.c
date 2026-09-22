@@ -240,3 +240,24 @@ bool pico9918_debug_gpu_set_wp(PICO9918_INST_ARG uint16_t wp)
   return false;
 #endif
 }
+
+#if PICO9918_BUILD_STEP_CALLBACK
+
+/** \brief see the header. Armed on the instance, so a library-paced slice sees it too. */
+PICO9918_DLLEXPORT
+void pico9918_debug_set_step_callback(PICO9918_INST_ARG pico9918_gpu_step_fn cb, void* userdata)
+{
+  tms9918->stepFn       = cb;
+  tms9918->stepUserdata = userdata;
+}
+
+/** \brief see the header. The armed pair, so a caller can put it back and not just count it. */
+PICO9918_DLLEXPORT
+pico9918_gpu_step_fn pico9918_debug_step_callback(PICO9918_INST_ARG void** userdata)
+{
+  if (userdata) *userdata = tms9918->stepUserdata;
+
+  return tms9918->stepFn;
+}
+
+#endif

@@ -59,6 +59,14 @@ else()
   set(PICO9918_BUILD_LAYER_MASK 0)
 endif()
 
+# Moves the instance too, and needs the interpreter hook below, which a Pico build has
+# no core to take - so a board reads 0 here whatever the option says.
+if(PICO9918_STEP_CALLBACK AND NOT PICO9918_PICO_BUILD)
+  set(PICO9918_BUILD_STEP_CALLBACK 1)
+else()
+  set(PICO9918_BUILD_STEP_CALLBACK 0)
+endif()
+
 # Desktop builds follow BUILD_SHARED_LIBS. A Pico executable has no dynamic loader, so
 # its in-firmware archive stays static even if a parent project happens to set the
 # standard option globally.
@@ -138,10 +146,12 @@ if(PICO9918_DIAG_GPU_FRAME_COUNTER)
   target_compile_definitions(${LIBRARY} PUBLIC PICO9918_DIAG_GPU_FRAME_COUNTER=1)
 endif()
 
-# The interpreter's per-instruction hook, which only pico9918_debug_gpu_step_n calls.
-# PRIVATE because it widens Tms9900Cpu, which nothing outside the library names, and off
-# for a Pico build because a board has no debugger to step from and the assembly core
-# has no instruction boundary to offer one.
+# The interpreter's per-instruction hook, behind pico9918_debug_gpu_step_n and the
+# instance callback. PRIVATE because it widens Tms9900Cpu, which nothing outside the
+# library names, and off for a Pico build because a board has no debugger to step from
+# and the assembly core has no instruction boundary to offer one. A build with
+# PICO9918_BUILD_STEP_CALLBACK and not this fails in gpu.c rather than storing a
+# callback nothing calls.
 if(PICO9918_DEBUG_API AND NOT PICO9918_PICO_BUILD)
   target_compile_definitions(${LIBRARY} PRIVATE TMS9900_STEP_HOOK=1)
 endif()

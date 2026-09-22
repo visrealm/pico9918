@@ -90,4 +90,14 @@
  */
 #define PICO9918_BUILD_LAYER_MASK @PICO9918_BUILD_LAYER_MASK@
 
+/*
+ * Whether pico9918_debug_set_step_callback() exists.
+ *
+ * Instance fields again, and the same consequence for a consumer that disagrees. A host
+ * that vendors the sources rather than the CMake also reads this to find out whether the
+ * interpreter hook it depends on was compiled, which is otherwise a private define it
+ * cannot see.
+ */
+#define PICO9918_BUILD_STEP_CALLBACK @PICO9918_BUILD_STEP_CALLBACK@
+
 #endif // _PICO9918_BUILD_CONFIG_H

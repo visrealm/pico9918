@@ -329,6 +329,12 @@ struct pico9918_s
   uint32_t suppress; /* PICO9918_SUPPRESS_* - read through PICO9918_DRAWS */
 #endif
 
+#if PICO9918_BUILD_STEP_CALLBACK
+  /* Survives a reset - a guest resetting the VDP must not disarm the debugger. */
+  pico9918_gpu_step_fn stepFn;
+  void* stepUserdata;
+#endif
+
   uint32_t startTime;
   uint32_t stopTime;
   uint32_t currentTime;

@@ -60,6 +60,14 @@ if (PICO9918_LAYER_MASK)
   set(PICO9918_DEBUG_API ON)
 endif()
 
+# A breakpoint callback on the instance, for a host that lets the library pace the GPU.
+# Separate for the same reason as the option above: it adds instance fields, where the
+# rest of PICO9918_DEBUG_API adds only entry points. The firmware turns it off beside it.
+option(PICO9918_STEP_CALLBACK "Instance-armed GPU breakpoint callback" ON)
+if (PICO9918_STEP_CALLBACK)
+  set(PICO9918_DEBUG_API ON)
+endif()
+
 # The splash PNG, relative to src/overlay/. The host selects the board-
 # appropriate image; the generator emits the canonical `splash*` symbols either
 # way, so no consuming TU needs a per-board #ifdef.

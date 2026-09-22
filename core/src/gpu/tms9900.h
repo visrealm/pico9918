@@ -91,6 +91,9 @@ extern "C"
      * resumes where it left off.
      */
     bool (*onStep)(struct Tms9900Cpu* cpu);
+
+    /* Handed back to onStep untouched. The glue puts this run's context here. */
+    void* onStepData;
 #endif
   } Tms9900Cpu;
 

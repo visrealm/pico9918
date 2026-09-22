@@ -112,6 +112,7 @@ add_definitions(-DPICO9918_SINGLE_INSTANCE=1)
 set(PICO9918_RUNTIME_CHIP OFF CACHE BOOL "Select the chip personality at runtime")
 set(PICO9918_DEBUG_API OFF CACHE BOOL "Debugger memory, register and GPU access")
 set(PICO9918_LAYER_MASK OFF CACHE BOOL "Render-time layer suppression for a debugger")
+set(PICO9918_STEP_CALLBACK OFF CACHE BOOL "Instance-armed GPU breakpoint callback")
 
 # The library stamps the calling convention into its generated header.
 set(PICO9918_SINGLE_INSTANCE 1 CACHE BOOL "One implicit VDP instance, dropping the pico9918_t* parameter")

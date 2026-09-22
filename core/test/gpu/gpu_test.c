@@ -191,6 +191,22 @@ static bool stepWatch(pico9918_t* vdp, uint16_t pc, void* userdata)
   return pc != stepStopAt;
 }
 
+#if PICO9918_BUILD_STEP_CALLBACK
+static uint16_t armedPc[8];
+static unsigned armedCalls;
+static uint16_t armedStopAt;
+static unsigned armedWrongArgs;
+
+static bool armedWatch(pico9918_t* vdp, uint16_t pc, void* userdata)
+{
+  if (vdp != tms9918 || userdata != &armedStopAt) ++armedWrongArgs;
+  if (armedCalls < 8) armedPc[armedCalls] = pc;
+  ++armedCalls;
+
+  return pc != armedStopAt;
+}
+#endif
+
 int main(void)
 {
   pico9918_init();
@@ -445,6 +461,91 @@ int main(void)
   if (pico9918_debug_gpu_step_n(PICO9918_INST 0, NULL, NULL)) fail("step-cb-null-running", 0, 1);
   if (stepCalls) fail("step-cb-null-called", 0, stepCalls);
   if (result() != MARKER) fail("step-cb-null-ran", MARKER, result());
+
+#if PICO9918_BUILD_STEP_CALLBACK
+  /* 10b. the same watch armed on the instance, which is what a host that leaves the
+          pacing to the library has instead of a call of its own to pass one to. */
+  armedCalls     = 0;
+  armedStopAt    = 0xffff;
+  armedWrongArgs = 0;
+  void* armedData = NULL;
+  pico9918_debug_set_step_callback(PICO9918_INST armedWatch, &armedStopAt);
+  if (pico9918_debug_step_callback(PICO9918_INST &armedData) != armedWatch)
+    fail("armed-cb-readback", 1, 0);
+  if (armedData != &armedStopAt) fail("armed-cb-readback-data", 1, 0);
+
+  loadProgram();
+  arm();
+  pico9918_gpu_step_n(PICO9918_INST 0);
+  if (armedWrongArgs) fail("armed-cb-args", 0, armedWrongArgs);
+  if (armedCalls != 4) fail("armed-cb-count", 4, armedCalls);
+  if (result() != MARKER) fail("armed-cb-ran", MARKER, result());
+
+  /* breaking from it stops the slice the same way, with the PC on the instruction that
+     did not run and its store not made */
+  armedCalls  = 0;
+  armedStopAt = PROGRAM_AT + 4;
+  loadProgram();
+  arm();
+  if (!pico9918_gpu_step_n(PICO9918_INST 0)) fail("armed-cb-break-stopped", 1, 0);
+  if (armedCalls != 2) fail("armed-cb-break-count", 2, armedCalls);
+  if (pico9918_gpu_pc(PICO9918_INST_ONLY) != PROGRAM_AT + 4)
+    fail("armed-cb-break-pc", PROGRAM_AT + 4, pico9918_gpu_pc(PICO9918_INST_ONLY));
+  if (result() != 0) fail("armed-cb-break-early", 0, result());
+
+  /* RESUMING RE-OFFERS THE ADDRESS THAT BROKE. The slice stopped on that instruction
+     rather than after it, so a host that does not skip its own breakpoint once never
+     gets past the first one - which is the contract EMULATOR-INTEGRATION.md states. */
+  armedCalls = 0;
+  if (!pico9918_gpu_step_n(PICO9918_INST 0)) fail("armed-cb-rebreak-stopped", 1, 0);
+  if (armedCalls != 1) fail("armed-cb-rebreak-count", 1, armedCalls);
+  if (armedPc[0] != PROGRAM_AT + 4) fail("armed-cb-rebreak-pc", PROGRAM_AT + 4, armedPc[0]);
+  if (result() != 0) fail("armed-cb-rebreak-early", 0, result());
+
+  /* and moving it on is all the host owes: the same resume then finishes the program */
+  armedCalls  = 0;
+  armedStopAt = 0xffff;
+  if (pico9918_gpu_step_n(PICO9918_INST 0)) fail("armed-cb-rebreak-resume-running", 0, 1);
+  if (armedCalls != 3) fail("armed-cb-rebreak-resume-count", 3, armedCalls);
+  if (result() != MARKER) fail("armed-cb-rebreak-resume-ran", MARKER, result());
+
+  /* and the case the per-call callback cannot reach at all: the run the library starts
+     from inside the arming write */
+  armedCalls  = 0;
+  armedStopAt = 0xffff;
+  pico9918_gpu_set_clock(PICO9918_INST PICO9918_GPU_IPS_PRO);
+  loadProgram();
+  arm();
+  if (armedCalls != 4) fail("armed-cb-clocked-count", 4, armedCalls);
+  if (result() != MARKER) fail("armed-cb-clocked-ran", MARKER, result());
+  pico9918_gpu_set_clock(PICO9918_INST 0);
+
+  /* a reset is the guest's to make and the callback is the host's, so it survives one */
+  pico9918_reset(PICO9918_INST_ONLY);
+  if (pico9918_debug_step_callback(PICO9918_INST NULL) != armedWatch) fail("armed-cb-reset", 1, 0);
+
+  /* a call that brings its own wins, so one pane's stepping is not the other's */
+  unlock();
+  armedCalls = 0;
+  stepCalls  = 0;
+  stepStopAt = 0xffff;
+  loadProgram();
+  arm();
+  if (pico9918_debug_gpu_step_n(PICO9918_INST 0, stepWatch, &stepStopAt))
+    fail("armed-cb-override-running", 0, 1);
+  if (stepCalls != 4) fail("armed-cb-override-count", 4, stepCalls);
+  if (armedCalls) fail("armed-cb-override-leaked", 0, armedCalls);
+
+  pico9918_debug_set_step_callback(PICO9918_INST NULL, NULL);
+  if (pico9918_debug_step_callback(PICO9918_INST NULL)) fail("armed-cb-disarm", 0, 1);
+
+  armedCalls = 0;
+  loadProgram();
+  arm();
+  pico9918_gpu_step_n(PICO9918_INST 0);
+  if (armedCalls) fail("armed-cb-disarmed-called", 0, armedCalls);
+  if (result() != MARKER) fail("armed-cb-disarmed-ran", MARKER, result());
+#endif
 
   /* 11. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
         says which one it was and therefore which row and column the engine thought it

@@ -322,6 +322,43 @@ PICO9918_DLLEXPORT
 bool pico9918_debug_gpu_step_n(PICO9918_INST_ARG uint32_t instructions, pico9918_gpu_step_fn cb,
                                void* userdata);
 
+#if PICO9918_BUILD_STEP_CALLBACK
+
+/**
+ * \brief the same look at every instruction, for slices the host does not pace
+ *
+ * An emulator that leaves the GPU's pacing to the library - pico9918_gpu_step_n() from
+ * its own frame loop, or a scanline handler that runs it - has no call of its own to
+ * hang a breakpoint list from, and would have to take over pacing to get one, which is
+ * the one thing a debugger must not change about the machine it is watching. This arms
+ * the callback on the INSTANCE instead, and every slice consults it, whichever entry
+ * drove it.
+ *
+ * Same contract as pico9918_debug_gpu_step_n()'s \p cb in every other respect: called
+ * before the fetch with the PC it will come from, false stops the slice with the PC kept,
+ * and it must not re-enter the library. Null disarms.
+ *
+ * A callback passed to pico9918_debug_gpu_step_n() wins for that call, so a pane that
+ * paces its own slice is not fighting whatever the main debugger armed.
+ *
+ * A reset does not clear it. The host armed it, not the guest, and a program resetting
+ * the VDP is often the thing being debugged.
+ */
+PICO9918_DLLEXPORT
+void pico9918_debug_set_step_callback(PICO9918_INST_ARG pico9918_gpu_step_fn cb, void* userdata);
+
+/**
+ * \brief the callback pico9918_debug_set_step_callback() last armed, or null
+ *
+ * Both halves of it: \p userdata, where it is not null, receives what was armed beside
+ * the function, so a caller can put the pair back afterwards rather than only ask whether
+ * there is one.
+ */
+PICO9918_DLLEXPORT
+pico9918_gpu_step_fn pico9918_debug_step_callback(PICO9918_INST_ARG void** userdata);
+
+#endif // PICO9918_BUILD_STEP_CALLBACK
+
 #ifdef __cplusplus
 }
 #endif

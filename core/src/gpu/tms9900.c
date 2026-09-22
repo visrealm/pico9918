@@ -1184,7 +1184,8 @@ void tms9900_init(Tms9900Cpu* cpu, uint8_t* mem, uint8_t* regx38, uint16_t pc, u
   cpu->onWriteMatch = 0;
 #endif
 #if defined(TMS9900_STEP_HOOK)
-  cpu->onStep = NULL;
+  cpu->onStep     = NULL;
+  cpu->onStepData = NULL;
 #endif
 }
 #endif /* the flat variant, or an ordinary build */

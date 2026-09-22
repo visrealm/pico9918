@@ -92,7 +92,8 @@ the emulator target.
 | `PICO9918_NO_SPLASH` | `OFF` | drops the splash overlay and its image asset |
 | `PICO9918_SPLASH_IMAGE` | `res/splash.png` | chooses the PNG generated into the splash asset, relative to `src/overlay/` |
 | `PICO9918_DEBUG_API` | `ON` | builds `pico9918_debug.h`: the memory map, span read and write, register store and GPU controls a debugger wants |
-| `PICO9918_LAYER_MASK` | `ON` | render-time layer suppression for a debugger's Layers menu; also enables `PICO9918_DEBUG_API`. The only debugger option that adds an instance field, so it is stamped separately and a board turns it off |
+| `PICO9918_LAYER_MASK` | `ON` | render-time layer suppression for a debugger's Layers menu; also enables `PICO9918_DEBUG_API`. Adds an instance field, so it is stamped separately and a board turns it off |
+| `PICO9918_STEP_CALLBACK` | `ON` | `pico9918_debug_set_step_callback()`: a GPU breakpoint callback armed on the instance, for a host that leaves the pacing to the library; also enables `PICO9918_DEBUG_API`. Adds instance fields, stamped separately, off for a board |
 | `PICO9918_DIAG_GPU_FRAME_COUNTER` | `OFF` | adds the optional GPU-frames row and its host-pushed counter to the diagnostics overlay |
 | `PICO9918_EXAMPLES` | `OFF` | builds the programs in `examples/` against the same public target a consumer uses |
 | `PICO9918_PYTHON_BINDING` | `OFF` | builds the CPython extension and makes the static library position-independent |
