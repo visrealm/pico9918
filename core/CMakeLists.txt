@@ -42,11 +42,12 @@ option(PICO9918_DIAG_GPU_FRAME_COUNTER "Include the diag GPU-frames row" OFF)
 # surface; the firmware turns it off because a board has no one to show it to.
 option(PICO9918_DEBUG_API "Debugger memory, register and GPU access" ON)
 
-# The test for it, which cannot mean anything without it - so it implies the option
+# The tests for it, which cannot mean anything without it - so they imply the option
 # rather than being a second thing to remember. Here rather than beside the other test
 # options because src/ reads PICO9918_DEBUG_API when it builds the source list.
 option(PICO9918_DEBUG_TEST "Build the debugger surface test" OFF)
-if (PICO9918_DEBUG_TEST)
+option(PICO9918_GPU_TEST "Build the library-paced GPU test" OFF)
+if (PICO9918_DEBUG_TEST OR PICO9918_GPU_TEST)
   set(PICO9918_DEBUG_API ON)
 endif()
 
@@ -179,7 +180,6 @@ if (PICO9918_CONFIG_TEST)
 endif()
 
 # The GPU rate the library paces itself from, and the arming write it runs a program on.
-option(PICO9918_GPU_TEST "Build the library-paced GPU test" OFF)
 if (PICO9918_GPU_TEST)
   add_subdirectory(test/gpu)
 endif()

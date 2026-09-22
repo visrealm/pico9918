@@ -139,7 +139,7 @@ These select the repository's own test programs. They are not library features:
 | `PICO9918_GOLDEN` | `OFF` | the committed golden-frame regression harness; also enables portable code generation |
 | `PICO9918_DEBUG_TEST` | `OFF` | the debugger surface test; also enables `PICO9918_DEBUG_API` |
 | `PICO9918_PIXEL_TEST` | `OFF` | the post-palette pixel path and line-geometry test |
-| `PICO9918_GPU_TEST` | `OFF` | the library-paced GPU test |
+| `PICO9918_GPU_TEST` | `OFF` | the library-paced GPU test; also enables `PICO9918_DEBUG_API` |
 | `PICO9918_TMS9900_TEST` | `OFF` | the portable GPU core's instruction tests |
 
 The ordinary CMake settings - `BUILD_SHARED_LIBS`, `CMAKE_BUILD_TYPE`,

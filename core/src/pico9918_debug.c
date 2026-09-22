@@ -186,3 +186,37 @@ void pico9918_debug_gpu_set_pc(PICO9918_INST_ARG uint16_t pc)
 {
   tms9918->gpuAddress = pc & 0xFFFE;
 }
+
+/** \brief see the header. The word pico9918_gpu_reg_value() reads, at the live workspace. */
+PICO9918_DLLEXPORT
+void pico9918_debug_gpu_set_reg_value(PICO9918_INST_ARG uint8_t reg, uint16_t value)
+{
+  uint8_t* at = (uint8_t*)&tms9918->vram + pico9918_gpu_wp(PICO9918_INST_ONLY) + ((uint32_t)(reg & 0x0f) << 1);
+
+  at[0] = (uint8_t)(value >> 8);
+  at[1] = (uint8_t)value;
+}
+
+/** \brief see the header. The inverse of what pico9918_gpu_status() publishes. */
+PICO9918_DLLEXPORT
+void pico9918_debug_gpu_set_status(PICO9918_INST_ARG uint16_t st)
+{
+  tms9918->gpuStatus = (uint16_t)(st >> 8);
+}
+
+/** \brief see the header. The workspace, plus the start reset it has to call off. */
+PICO9918_DLLEXPORT
+bool pico9918_debug_gpu_set_wp(PICO9918_INST_ARG uint16_t wp)
+{
+#if PICO9918_GPU_BUDGETED
+  tms9918->gpuWp = wp;
+
+  /* TRAP: without this the slice puts >FFFE back on the way in and the value never runs */
+  if (tms9918->restart) tms9918->restart = PICO9918_GPU_RESUMING;
+
+  return true;
+#else
+  (void)wp;
+  return false;
+#endif
+}

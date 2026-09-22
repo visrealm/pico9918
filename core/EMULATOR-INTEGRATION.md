@@ -674,13 +674,30 @@ Use `pico9918_status_value()` to show any status register without clearing it.
 The read side needed by a TMS9900 view is public even without the rest of the debug API:
 
 - `pico9918_gpu_pc()` -- the next instruction address;
-- `pico9918_gpu_reg_value()` -- R0-R15 through the fixed workspace;
+- `pico9918_gpu_wp()` -- where the sixteen registers currently are;
+- `pico9918_gpu_reg_value()` -- R0-R15, read through that workspace;
 - `pico9918_gpu_status()` -- ST in architectural bit positions;
 - `pico9918_gpu_mem_value()` and `_mem_size()` -- the backing map.
+
+The workspace is 0xfffe until a program moves it with `LWPI`, and a register pane that
+assumes the fixed address shows the wrong sixteen words after that. It is only tracked
+where the library paces the GPU, which is every desktop build.
 
 With the debug API, use the span read for disassembly and
 `pico9918_debug_gpu_set_pc()` to move the PC without arming or disarming the program.
 `pico9918_debug_gpu_armed()` says whether a trigger is waiting to run.
+
+The pane edits with `pico9918_debug_gpu_set_reg_value()`,
+`pico9918_debug_gpu_set_status()` and `pico9918_debug_gpu_set_wp()`, each the exact
+inverse of the reader above it. Nothing is re-derived: a status edit stands until an
+instruction writes a flag, and a register edit is a word in memory at the live
+workspace.
+
+`pico9918_debug_gpu_set_wp()` also calls off the workspace reset that a program's first
+slice performs, because otherwise the value would be stored, read back and then
+discarded on the way in. That applies to the armed run only; arming the next program
+starts it at 0xfffe as the hardware does. It returns false on a build whose GPU runs to
+completion and therefore has no workspace to move, which no desktop build is.
 
 For single stepping, the debugger must own GPU pacing: leave the automatic clock at
 zero and do not run the dedicated loop, then call `pico9918_gpu_step_n(vdp, 1)` while an

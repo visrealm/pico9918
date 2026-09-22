@@ -23,6 +23,7 @@
 
 #include "impl/pico9918_priv.h"
 #include "gpu/gpu.h"
+#include "pico9918_debug.h"
 
 #include <stdio.h>
 
@@ -115,6 +116,33 @@ static void loadWorkspaceProgram(void)
   tms9918->vram.bytes[NEW_WP + 1] = 0;
   tms9918->vram.map.wrksp[0]      = 0;
   tms9918->vram.bytes[PICO9918_GPU_WORKSPACE] = 0;
+}
+
+/*
+ *   MOV  R0, @>2100    C800 2100     R0 is the caller's to set, not the program's
+ *   IDLE               0340
+ */
+static void loadEchoProgram(void)
+{
+  static const uint8_t program[] = {0xc8, 0x00, 0x21, 0x00, 0x03, 0x40};
+
+  for (unsigned i = 0; i < sizeof(program); ++i) tms9918->vram.bytes[PROGRAM_AT + i] = program[i];
+
+  tms9918->vram.bytes[RESULT_AT]                  = 0;
+  tms9918->vram.bytes[RESULT_AT + 1]              = 0;
+  tms9918->vram.bytes[PICO9918_GPU_WORKSPACE]     = 0;
+  tms9918->vram.bytes[PICO9918_GPU_WORKSPACE + 1] = 0;
+}
+
+/*
+ *   STST R3            02C3          nothing above it, so R3 is what the caller wrote
+ *   IDLE               0340
+ */
+static void loadStatusProgram(void)
+{
+  static const uint8_t program[] = {0x02, 0xc3, 0x03, 0x40};
+
+  for (unsigned i = 0; i < sizeof(program); ++i) tms9918->vram.bytes[PROGRAM_AT + i] = program[i];
 }
 
 #define DMA_SRC 0x1000u
@@ -293,7 +321,62 @@ int main(void)
   if (pico9918_gpu_wp(PICO9918_INST_ONLY) != PICO9918_GPU_WORKSPACE)
     fail("wp-new-program", PICO9918_GPU_WORKSPACE, pico9918_gpu_wp(PICO9918_INST_ONLY));
 
-  /* 9. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
+  /* 9. the writers, which are what make a GPU pane editable. Each is checked through the
+        reader it mirrors and then through a program, because a value that is stored and
+        read back and then dropped on the way into the slice looks exactly like success. */
+  loadWorkspaceProgram();
+  arm();
+  while (pico9918_gpu_step_n(PICO9918_INST 1)) { }
+
+  pico9918_debug_gpu_set_reg_value(PICO9918_INST 3, 0x1234);
+  if (pico9918_gpu_reg_value(PICO9918_INST 3) != 0x1234)
+    fail("set-reg", 0x1234, pico9918_gpu_reg_value(PICO9918_INST 3));
+  expect("set-reg-hi", NEW_WP + 6, 0x12);
+  expect("set-reg-lo", NEW_WP + 7, 0x34);
+
+  pico9918_debug_gpu_set_reg_value(PICO9918_INST 0x13, 0x5678);
+  if (pico9918_gpu_reg_value(PICO9918_INST 3) != 0x5678)
+    fail("set-reg-masked", 0x5678, pico9918_gpu_reg_value(PICO9918_INST 3));
+
+  if (!pico9918_debug_gpu_set_wp(PICO9918_INST PICO9918_GPU_WORKSPACE)) fail("set-wp-kept", 1, 0);
+
+  pico9918_debug_gpu_set_reg_value(PICO9918_INST 15, MARKER);
+  if (pico9918_gpu_reg_value(PICO9918_INST 15) != MARKER)
+    fail("set-reg-overflow", MARKER, pico9918_gpu_reg_value(PICO9918_INST 15));
+  expect("set-reg-overflow-hi", PICO9918_GPU_WORKSPACE + 30, MARKER >> 8);
+
+  pico9918_debug_gpu_set_status(PICO9918_INST PICO9918_GPU_ST_EQ | PICO9918_GPU_ST_C);
+  if (pico9918_gpu_status(PICO9918_INST_ONLY) != (PICO9918_GPU_ST_EQ | PICO9918_GPU_ST_C))
+    fail("set-status", PICO9918_GPU_ST_EQ | PICO9918_GPU_ST_C, pico9918_gpu_status(PICO9918_INST_ONLY));
+
+  pico9918_debug_gpu_set_status(PICO9918_INST PICO9918_GPU_ST_OV | 0x00ff);
+  if (pico9918_gpu_status(PICO9918_INST_ONLY) != PICO9918_GPU_ST_OV)
+    fail("set-status-low-dropped", PICO9918_GPU_ST_OV, pico9918_gpu_status(PICO9918_INST_ONLY));
+
+  loadStatusProgram();
+  arm();
+  pico9918_debug_gpu_set_status(PICO9918_INST PICO9918_GPU_ST_LGT | PICO9918_GPU_ST_P);
+  while (pico9918_gpu_step_n(PICO9918_INST 1)) { }
+  if (pico9918_gpu_reg_value(PICO9918_INST 3) != (PICO9918_GPU_ST_LGT | PICO9918_GPU_ST_P))
+    fail("set-status-ran", PICO9918_GPU_ST_LGT | PICO9918_GPU_ST_P,
+         pico9918_gpu_reg_value(PICO9918_INST 3));
+
+  loadEchoProgram();
+  arm();
+  if (!pico9918_debug_gpu_set_wp(PICO9918_INST NEW_WP)) fail("set-wp-armed", 1, 0);
+  if (pico9918_gpu_wp(PICO9918_INST_ONLY) != NEW_WP)
+    fail("set-wp-readback", NEW_WP, pico9918_gpu_wp(PICO9918_INST_ONLY));
+
+  pico9918_debug_gpu_set_reg_value(PICO9918_INST 0, MARKER);
+  while (pico9918_gpu_step_n(PICO9918_INST 1)) { }
+  if (result() != MARKER) fail("set-wp-ran", MARKER, result());
+  expect("set-wp-not-start", PICO9918_GPU_WORKSPACE, 0);
+
+  arm();
+  if (pico9918_gpu_wp(PICO9918_INST_ONLY) != PICO9918_GPU_WORKSPACE)
+    fail("set-wp-rearmed", PICO9918_GPU_WORKSPACE, pico9918_gpu_wp(PICO9918_INST_ONLY));
+
+  /* 10. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
         says which one it was and therefore which row and column the engine thought it
         was on. Zero width and height mean 256; stride is a different animal entirely. */
   unlock();

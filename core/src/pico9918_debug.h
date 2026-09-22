@@ -224,6 +224,51 @@ uint32_t pico9918_debug_suppress(PICO9918_INST_ONLY_ARG);
 PICO9918_DLLEXPORT
 void pico9918_debug_gpu_set_pc(PICO9918_INST_ARG uint16_t pc);
 
+/**
+ * \brief type into the GPU's R0-R15
+ *
+ * The write pico9918_gpu_reg_value() reads back: a big-endian word at
+ * pico9918_gpu_wp() + 2n, with only the low four bits of \p reg used. No workspace can
+ * put a register out of reach, the space carrying enough overflow above 0xFFFF for R15
+ * of the highest one, so there is nothing here to refuse.
+ */
+PICO9918_DLLEXPORT
+void pico9918_debug_gpu_set_reg_value(PICO9918_INST_ARG uint8_t reg, uint16_t value);
+
+/**
+ * \brief type into the GPU's status register
+ *
+ * Takes the architectural positions pico9918_gpu_status() publishes and the
+ * PICO9918_GPU_ST_* masks name, so a flag display can write back what it showed. The
+ * cores keep the six flags in a byte, so the low half of \p st has nowhere to go and is
+ * dropped - which is what pico9918_gpu_status() already says by never setting it.
+ *
+ * Nothing re-derives the flags, so an edit stands until the next instruction that writes
+ * one. Meaningful only where the library paces the GPU; see pico9918_gpu_status().
+ */
+PICO9918_DLLEXPORT
+void pico9918_debug_gpu_set_status(PICO9918_INST_ARG uint16_t st);
+
+/**
+ * \brief move the GPU's workspace, the way an LWPI would
+ *
+ * Takes the program's registers with it: pico9918_gpu_reg_value() and
+ * pico9918_debug_gpu_set_reg_value() both answer at the new place immediately, and a
+ * slice that resumes carries it.
+ *
+ * ALSO SUPPRESSES THE START RESET. A program that has been armed but has not run yet is
+ * about to have its workspace put back to 0xFFFE, which would discard this. Setting it
+ * says the host owns the starting state, so the reset is skipped - for this run only.
+ * Arming another program restores it. Nothing else about the armed state moves, exactly
+ * as with pico9918_debug_gpu_set_pc().
+ *
+ * Returns false, changing nothing, on a build whose GPU runs to completion and therefore
+ * keeps no workspace between instructions - the TRAP in pico9918_gpu_wp(). A desktop
+ * build is never that build.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_debug_gpu_set_wp(PICO9918_INST_ARG uint16_t wp);
+
 #ifdef __cplusplus
 }
 #endif
