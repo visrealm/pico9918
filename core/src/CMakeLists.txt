@@ -138,6 +138,14 @@ if(PICO9918_DIAG_GPU_FRAME_COUNTER)
   target_compile_definitions(${LIBRARY} PUBLIC PICO9918_DIAG_GPU_FRAME_COUNTER=1)
 endif()
 
+# The interpreter's per-instruction hook, which only pico9918_debug_gpu_step_n calls.
+# PRIVATE because it widens Tms9900Cpu, which nothing outside the library names, and off
+# for a Pico build because a board has no debugger to step from and the assembly core
+# has no instruction boundary to offer one.
+if(PICO9918_DEBUG_API AND NOT PICO9918_PICO_BUILD)
+  target_compile_definitions(${LIBRARY} PRIVATE TMS9900_STEP_HOOK=1)
+endif()
+
 # Stamp the pixel width the assets were built with, PUBLIC so consumers inherit
 # it and the generated headers' _Static_assert can catch a policy mismatch. The
 # arrays live inside the library while the declarations are included by consumers,

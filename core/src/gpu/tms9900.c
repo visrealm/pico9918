@@ -1183,6 +1183,9 @@ void tms9900_init(Tms9900Cpu* cpu, uint8_t* mem, uint8_t* regx38, uint16_t pc, u
   cpu->onWriteMask  = 0;
   cpu->onWriteMatch = 0;
 #endif
+#if defined(TMS9900_STEP_HOOK)
+  cpu->onStep = NULL;
+#endif
 }
 #endif /* the flat variant, or an ordinary build */
 
@@ -1205,6 +1208,13 @@ uint16_t run9900_budget_c(Tms9900Cpu* cpu, uint32_t budget, bool* outOfBudget)
       if (outOfBudget) *outOfBudget = true;
       return cpu->pc;
     }
+#if defined(TMS9900_STEP_HOOK)
+    if (cpu->onStep && !cpu->onStep(cpu))
+    {
+      if (outOfBudget) *outOfBudget = true;
+      return cpu->pc;
+    }
+#endif
     uint16_t inst = fetchw(cpu);
     uint8_t op_hi = (uint8_t)(inst >> 8); /* top byte of instruction */
 

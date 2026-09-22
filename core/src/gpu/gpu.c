@@ -36,12 +36,32 @@
 #include "tms9900.h"
 #include "impl/platform.h" /* PICO9918_HOST_TIME_US */
 
+#if PICO9918_BUILD_DEBUG_API
+#include "pico9918_debug.h" /* pico9918_debug_gpu_step_n, defined here for the hook */
+#endif
+
 #if !PICO9918_GPU_BUDGETED
 /* run9900() implemented in platform/thumb9900_{m0,m33}.S */
 extern uint16_t run9900(uint8_t* memory, uint16_t pc, uint16_t wp, uint8_t* regx38);
 #else
 #if defined(TMS9900_WATCH_WRITES)
 static void gpuDmaWatch(uint8_t* vram, uint32_t addr);
+#endif
+
+#if PICO9918_BUILD_DEBUG_API && defined(TMS9900_STEP_HOOK)
+/* Live for one pico9918_debug_gpu_step_n call, which is what lets a breakpoint list be
+   an argument to a run rather than a pair of fields on every instance. */
+static struct
+{
+  pico9918_gpu_step_fn fn;
+  void* userdata;
+  pico9918_t* inst;
+} gpuStep;
+
+static bool gpuStepHook(Tms9900Cpu* cpu)
+{
+  return gpuStep.fn(gpuStep.inst, (uint16_t)cpu->pc, gpuStep.userdata);
+}
 #endif
 
 static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t* wp, uint8_t* r38,
@@ -54,6 +74,9 @@ static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t* wp, uint8_t* 
   cpu.onWrite      = gpuDmaWatch;
   cpu.onWriteMask  = ~(uint32_t)0x1F;
   cpu.onWriteMatch = 0x8000;
+#endif
+#if PICO9918_BUILD_DEBUG_API && defined(TMS9900_STEP_HOOK)
+  if (gpuStep.fn) cpu.onStep = gpuStepHook;
 #endif
   cpu.st = *st;
   const uint16_t next = run9900_budget_c(&cpu, budget, outOfBudget);
@@ -567,6 +590,33 @@ bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions)
 
   return running;
 }
+
+#if PICO9918_BUILD_DEBUG_API
+
+/** \brief see pico9918_debug.h. The same slice, watched between instructions. */
+PICO9918_DLLEXPORT
+bool pico9918_debug_gpu_step_n(PICO9918_INST_ARG uint32_t instructions, pico9918_gpu_step_fn cb,
+                               void* userdata)
+{
+#if defined(TMS9900_STEP_HOOK)
+  gpuStep.fn       = cb;
+  gpuStep.userdata = userdata;
+  gpuStep.inst     = tms9918;
+
+  const bool running = pico9918_gpu_step_n(PICO9918_INST instructions);
+
+  gpuStep.fn = NULL;
+
+  return running;
+#else
+  (void)cb;
+  (void)userdata;
+
+  return pico9918_gpu_step_n(PICO9918_INST instructions);
+#endif
+}
+
+#endif
 
 /*
  * GPU main loop - runs indefinitely, call from a dedicated core/thread.

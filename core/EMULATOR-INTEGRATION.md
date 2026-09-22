@@ -713,11 +713,49 @@ armed program is stopped in your scheduler. The portable C core honours that one
 instruction budget. The hand-written Pico cores run to completion and do not expose an
 instruction boundary, but those are not used by a normal desktop build.
 
-There is no breakpoint callback hidden in the API. Breakpoints belong in the host
-scheduler: budget the GPU, inspect its PC between slices, and stop calling it when the
-address matches. `pico9918_debug_gpu_set_pc()` deliberately does not arm a stopped GPU;
-starting one is device behaviour and should go through the guest register path if a
-debugger explicitly asks to perform it.
+For breakpoints, `pico9918_debug_gpu_step_n()` is the same slice with a callback the
+interpreter makes before each instruction, carrying the PC it is about to fetch from:
+
+```c
+static bool at_breakpoint(pico9918_t* vdp, uint16_t pc, void* userdata)
+{
+  return !bp_hit((host_dbg*)userdata, pc);  /* false stops the slice here */
+}
+
+while (pico9918_debug_gpu_step_n(vdp, 20000, at_breakpoint, dbg))
+  service_the_rest_of_the_machine();
+```
+
+A false return stops exactly as an exhausted budget does, so the call returns true, the
+PC stays on the instruction that did not run, and the next call resumes there. Run the
+host's whole breakpoint list from inside that callback rather than looping on a budget
+of one: a budget of one pays the entry cost -- time accounting, a CPU context rebuilt on
+the stack, the run flags, the flash and config service -- for every instruction.
+
+The callback belongs to the call rather than to the instance, so two panes need not
+agree on one, and it must not re-enter the library: it runs inside the interpreter,
+where the GPU's registers and status are in a context that is only written back when the
+slice returns. Read the machine through the accessors afterwards.
+
+**Read and write breakpoints are not served by this.** Between instructions is too early
+to know what the next one touches and too late to see what the last one did, so a host
+that wants them has to decode the instruction itself. Reporting them from inside the
+interpreter is a separate change that has not been made.
+
+`pico9918_debug_gpu_set_pc()` deliberately does not arm a stopped GPU; starting one is
+device behaviour and should go through the guest register path if a debugger explicitly
+asks to perform it.
+
+One thing host pacing does cost: the library normally runs a slice **from the arming
+register write**, so that software probing for an F18A -- write a tiny program, read its
+answer a few instructions later -- finds one. With the clock at zero nothing runs until
+the host next steps, and the answer is not there yet. Step the GPU from the bus adapter
+after a register write as well as once a scanline. The failure mode is a game
+intermittently deciding no F18A is fitted, which looks nothing like a pacing problem.
+
+A program armed while the debugger is stopped stays armed: `pico9918_debug_gpu_armed()`
+reads a flag, not a queue, so repeated triggers do not accumulate and nothing is lost by
+not stepping.
 
 Run debugger reads and writes on the emulation thread, or stop that thread first. The
 calls are non-invasive to the emulated machine, not magically atomic against a renderer

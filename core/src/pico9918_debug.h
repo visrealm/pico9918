@@ -297,6 +297,31 @@ void pico9918_debug_gpu_set_status(PICO9918_INST_ARG uint16_t st);
 PICO9918_DLLEXPORT
 bool pico9918_debug_gpu_set_wp(PICO9918_INST_ARG uint16_t wp);
 
+/**
+ * \brief pico9918_gpu_step_n() with a look at every instruction before it runs
+ *
+ * \p cb is called with the PC the next instruction will be fetched from, before the
+ * fetch, and returning false stops the slice there. That is the same stop an exhausted
+ * budget makes: the PC is kept, this returns true, and the next call carries on from the
+ * instruction that was not run. Null \p cb is exactly pico9918_gpu_step_n().
+ *
+ * WHAT IT CANNOT SERVE IS A READ OR WRITE BREAKPOINT. Between instructions is too early
+ * to know what the next one will touch and too late to catch what the last one did, so a
+ * host wanting those has to decode the instruction itself. Reporting them is a separate
+ * change inside the interpreter that has not been made.
+ *
+ * The callback is this call's, not the instance's, so two debuggers or two panes do not
+ * have to agree on one. It must not re-enter the library: it is called from inside the
+ * interpreter, with the GPU's registers and status in a CPU context that is only written
+ * back when the run returns. Read the machine through the accessors after the slice.
+ *
+ * On a build whose GPU runs to completion the callback is never called, this being the
+ * build whose cap pico9918_gpu_step_n() also cannot honour. No desktop build is that one.
+ */
+PICO9918_DLLEXPORT
+bool pico9918_debug_gpu_step_n(PICO9918_INST_ARG uint32_t instructions, pico9918_gpu_step_fn cb,
+                               void* userdata);
+
 #ifdef __cplusplus
 }
 #endif

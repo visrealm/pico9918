@@ -111,6 +111,7 @@ typedef void (*pico9918_config_reload_fn)(pico9918_t* tms9918, void* userdata);
 typedef void (*pico9918_gpu_flash_fn)(pico9918_t* tms9918, void* userdata);
 typedef void (*pico9918_gpu_config_save_fn)(pico9918_t* tms9918, uint8_t* config, uint8_t key,
                                             void* userdata);
+typedef bool (*pico9918_gpu_step_fn)(pico9918_t* tms9918, uint16_t pc, void* userdata);
 
 /** \brief the display modes the VDP can be in, TMS9918A modes and F18A alike */
 typedef enum

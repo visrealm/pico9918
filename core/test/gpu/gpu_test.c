@@ -177,6 +177,20 @@ static void expect(const char* what, uint32_t at, uint8_t wanted)
   if (tms9918->vram.bytes[at] != wanted) fail(what, wanted, tms9918->vram.bytes[at]);
 }
 
+static uint16_t stepPc[8];
+static unsigned stepCalls;
+static uint16_t stepStopAt;
+static unsigned stepWrongArgs;
+
+static bool stepWatch(pico9918_t* vdp, uint16_t pc, void* userdata)
+{
+  if (vdp != tms9918 || userdata != &stepStopAt) ++stepWrongArgs;
+  if (stepCalls < 8) stepPc[stepCalls] = pc;
+  ++stepCalls;
+
+  return pc != stepStopAt;
+}
+
 int main(void)
 {
   pico9918_init();
@@ -376,7 +390,63 @@ int main(void)
   if (pico9918_gpu_wp(PICO9918_INST_ONLY) != PICO9918_GPU_WORKSPACE)
     fail("set-wp-rearmed", PICO9918_GPU_WORKSPACE, pico9918_gpu_wp(PICO9918_INST_ONLY));
 
-  /* 10. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
+  /* 10. the step callback. Four instructions with known addresses, so the count, the
+         order and the address a break stops on are all one program. */
+  stepCalls     = 0;
+  stepWrongArgs = 0;
+  stepStopAt    = 0xffff;
+  loadProgram();
+  arm();
+
+  if (pico9918_debug_gpu_step_n(PICO9918_INST 0, stepWatch, &stepStopAt))
+    fail("step-cb-still-running", 0, 1);
+  if (stepWrongArgs) fail("step-cb-args", 0, stepWrongArgs);
+  if (stepCalls != 4) fail("step-cb-count", 4, stepCalls);
+  if (stepPc[0] != PROGRAM_AT) fail("step-cb-pc0", PROGRAM_AT, stepPc[0]);
+  if (stepPc[1] != PROGRAM_AT + 4) fail("step-cb-pc1", PROGRAM_AT + 4, stepPc[1]);
+  if (stepPc[2] != PROGRAM_AT + 8) fail("step-cb-pc2", PROGRAM_AT + 8, stepPc[2]);
+  if (stepPc[3] != PROGRAM_AT + 10) fail("step-cb-pc3", PROGRAM_AT + 10, stepPc[3]);
+  if (result() != MARKER) fail("step-cb-ran", MARKER, result());
+
+  /* stopping on the MOV: the PC left behind is the address broken on rather than the one
+     after it, and the store that instruction would have made has not happened */
+  stepCalls  = 0;
+  stepStopAt = PROGRAM_AT + 4;
+  loadProgram();
+  arm();
+
+  if (!pico9918_debug_gpu_step_n(PICO9918_INST 0, stepWatch, &stepStopAt))
+    fail("step-cb-break-stopped", 1, 0);
+  if (stepCalls != 2) fail("step-cb-break-count", 2, stepCalls);
+  if (pico9918_gpu_pc(PICO9918_INST_ONLY) != PROGRAM_AT + 4)
+    fail("step-cb-break-pc", PROGRAM_AT + 4, pico9918_gpu_pc(PICO9918_INST_ONLY));
+  if (result() != 0) fail("step-cb-break-early", 0, result());
+
+  /* and the resume starts at the instruction that did not run, not the one after it */
+  stepCalls  = 0;
+  stepStopAt = 0xffff;
+
+  if (pico9918_debug_gpu_step_n(PICO9918_INST 0, stepWatch, &stepStopAt))
+    fail("step-cb-resume-running", 0, 1);
+  if (stepCalls != 3) fail("step-cb-resume-count", 3, stepCalls);
+  if (result() != MARKER) fail("step-cb-resume-ran", MARKER, result());
+
+  /* the callback is the call's, not the instance's: neither the plain entry nor a null
+     one may reach the last callback a debugger happened to pass */
+  stepCalls = 0;
+  loadProgram();
+  arm();
+  pico9918_gpu_step_n(PICO9918_INST 0);
+  if (stepCalls) fail("step-cb-persisted", 0, stepCalls);
+  if (result() != MARKER) fail("step-cb-plain-ran", MARKER, result());
+
+  loadProgram();
+  arm();
+  if (pico9918_debug_gpu_step_n(PICO9918_INST 0, NULL, NULL)) fail("step-cb-null-running", 0, 1);
+  if (stepCalls) fail("step-cb-null-called", 0, stepCalls);
+  if (result() != MARKER) fail("step-cb-null-ran", MARKER, result());
+
+  /* 11. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
         says which one it was and therefore which row and column the engine thought it
         was on. Zero width and height mean 256; stride is a different animal entirely. */
   unlock();

@@ -46,6 +46,10 @@ extern "C"
 #define TMS9900_WATCH_WRITES 1
 #endif
 
+/* TMS9900_STEP_HOOK is the build's to define, not this header's: it is there for
+   pico9918_debug.h's stepping entry and nothing else, and it widens this struct, so a
+   build without a debugger must not carry it. src/CMakeLists.txt sets it. */
+
   typedef struct Tms9900Cpu
   {
     uint8_t* mem;    /* Pointer to memory backing the CPU */
@@ -78,6 +82,15 @@ extern "C"
        about a few narrows it here rather than being called to say no. */
     uint32_t onWriteMask;
     uint32_t onWriteMatch;
+#endif
+#if defined(TMS9900_STEP_HOOK)
+    /*
+     * Called before each instruction is fetched, with the PC it will come from, or
+     * null. Returning false stops the run there and is indistinguishable to the core
+     * from an exhausted budget: the PC is kept and outOfBudget is set, so the caller
+     * resumes where it left off.
+     */
+    bool (*onStep)(struct Tms9900Cpu* cpu);
 #endif
   } Tms9900Cpu;
 
