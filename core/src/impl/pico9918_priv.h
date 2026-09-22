@@ -248,6 +248,16 @@ typedef struct
 #define PICO9918_SCAN_SPRITE_LIMIT(T)                                                              \
   (PICO9918_CAN_UNLOCK(T) ? (MAX_SPRITES - 1) : MAX_SCANLINE_SPRITES)
 
+#if PICO9918_BUILD_LAYER_MASK
+#define PICO9918_DRAWS(T, BIT)             (((T)->suppress & (BIT)) == 0)
+#define PICO9918_SUPPRESSED(T, BIT)        (((T)->suppress & (BIT)) != 0)
+#define PICO9918_LAYER_SUB(T, BIT, SUB, V) (((T)->suppress & (BIT)) ? (uint32_t)(SUB) : (uint32_t)(V))
+#else
+#define PICO9918_DRAWS(T, BIT)             1
+#define PICO9918_SUPPRESSED(T, BIT)        0
+#define PICO9918_LAYER_SUB(T, BIT, SUB, V) ((uint32_t)(V))
+#endif
+
 
 /* PRIVATE DATA STRUCTURE
   * ---------------------- */
@@ -314,6 +324,10 @@ struct pico9918_s
 #endif
 
   bool scanlineHasSprites;
+
+#if PICO9918_BUILD_LAYER_MASK
+  uint32_t suppress; /* PICO9918_SUPPRESS_* - read through PICO9918_DRAWS */
+#endif
 
   uint32_t startTime;
   uint32_t stopTime;

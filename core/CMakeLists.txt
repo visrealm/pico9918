@@ -50,6 +50,15 @@ if (PICO9918_DEBUG_TEST)
   set(PICO9918_DEBUG_API ON)
 endif()
 
+# Render-time layer suppression for a host's Layers menu. Its own option rather than part
+# of PICO9918_DEBUG_API because it is the one debugger feature that adds an instance
+# field, and that option's whole argument for being a link error instead of silent
+# corruption is that it does not. The firmware turns this off beside it.
+option(PICO9918_LAYER_MASK "Render-time layer suppression for a debugger" ON)
+if (PICO9918_LAYER_MASK)
+  set(PICO9918_DEBUG_API ON)
+endif()
+
 # The splash PNG, relative to src/overlay/. The host selects the board-
 # appropriate image; the generator emits the canonical `splash*` symbols either
 # way, so no consuming TU needs a per-board #ifdef.

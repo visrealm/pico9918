@@ -623,6 +623,36 @@ Palette RAM is writable. A write there republishes the palette so the next rende
 the edit. `pico9918_debug_palette()` reads one live entry as the `0x0rgb` value a person
 wants to see rather than the byte-swapped backing word.
 
+### Turning layers off
+
+A debugger's Layers menu is a view over the renderer, not a device state. Build with
+`PICO9918_LAYER_MASK=ON` (the default, and it implies the debug API) and set a mask of
+what to keep off the picture:
+
+```c
+pico9918_debug_set_suppress(vdp, PICO9918_SUPPRESS_SPRITES | PICO9918_SUPPRESS_TILE2);
+```
+
+Every bit suppresses something, blanking included, so there is no bit whose sense has to
+be remembered the other way round. Clearing the mask brings the frame straight back; no
+register is touched, and a guest reset does not clear it, because the user's choice of
+what to look at is not the emulated machine's business.
+
+The set is the core's own, not a TMS9918A's. `PICO9918_SUPPRESS_TILE2` and
+`PICO9918_SUPPRESS_BITMAP` have no counterpart on a plain TMS9918A, and
+`PICO9918_SUPPRESS_GM2_COLOUR` and `_GM2_PATTERN` only mean anything on a locked device:
+an unlocked F18A has per-tile and per-position ECM attributes rather than a colour table
+to leave out. Ask `pico9918_unlocked()` and grey those two.
+
+**Suppressing sprites does not change the status file.** A sprite whose pixels never
+reach the line still reports its collision and its part in the fifth-sprite flag, because
+a user looking behind the sprite layer must not change what the program running on the
+emulated machine sees. The same goes for every other bit: nothing a guest can read moves.
+
+A mask bit the linked library does not implement is stored rather than dropped, so a host
+built against a newer header can write one and read `pico9918_debug_suppress()` back to
+see what took.
+
 ### Registers and status
 
 Use `pico9918_debug_reg()` for the physical 64-byte register file and

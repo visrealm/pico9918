@@ -181,6 +181,36 @@ uint16_t pico9918_debug_vram_address(PICO9918_INST_ONLY_ARG);
 PICO9918_DLLEXPORT
 bool pico9918_debug_gpu_armed(PICO9918_INST_ONLY_ARG);
 
+#if PICO9918_BUILD_LAYER_MASK
+
+/**
+ * \brief keep layers off the picture without touching the registers that drew them
+ *
+ * The PICO9918_SUPPRESS_* bits are in pico9918.h, beside the register bits they override,
+ * because the renderer reads them and it does not include this header.
+ *
+ * A view, not a device state: nothing a guest can read changes, and the same frame comes
+ * back the moment the mask is cleared. That extends to the status file, which is the
+ * whole difficulty with suppressing sprites - SR0's collision and fifth-sprite bits are
+ * still reported for a sprite whose pixels never reach the line, because a user looking
+ * behind the sprite layer must not change what the program sees.
+ *
+ * The two Graphics II bits mean nothing on an unlocked device. ECM attributes are per
+ * tile and per position, so there is no colour table to leave out; ask
+ * pico9918_unlocked() and grey them.
+ *
+ * Bits this build does not define are stored and returned unchanged, so a host written
+ * against a later header can write a mask and read it back to find out what took.
+ */
+PICO9918_DLLEXPORT
+void pico9918_debug_set_suppress(PICO9918_INST_ARG uint32_t mask);
+
+/** \brief the mask pico9918_debug_set_suppress() last stored */
+PICO9918_DLLEXPORT
+uint32_t pico9918_debug_suppress(PICO9918_INST_ONLY_ARG);
+
+#endif // PICO9918_BUILD_LAYER_MASK
+
 /**
  * \brief move the GPU's PC without starting it
  *

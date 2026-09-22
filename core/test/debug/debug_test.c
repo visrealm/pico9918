@@ -50,6 +50,110 @@ static void expectRegion(const char* what, uint32_t addr, uint32_t wantFlags, ui
   if (end != wantEnd) fail(what, wantEnd, end);
 }
 
+#if PICO9918_BUILD_LAYER_MASK
+
+static const uint8_t solidRow[8] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+
+static void fillPattern(uint32_t at, uint32_t bytes, uint8_t seed)
+{
+  for (uint32_t i = 0; i < bytes; ++i)
+  {
+    const uint8_t byte = (uint8_t)(seed + i * 37u);
+    pico9918_debug_write(PICO9918_INST at + i, &byte, 1);
+  }
+}
+
+/* locked Graphics II, where the colour and pattern tables are separable at all */
+static void sceneLockedGm2(void)
+{
+  fillPattern(0x0000, 0x1800, 0x5a); /* pattern pages */
+  fillPattern(0x2000, 0x1800, 0xc3); /* colour pages */
+  fillPattern(0x3800, 0x0300, 0x11); /* names */
+
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, 0x02);
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, 0xe0);
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_NAME_TABLE, 0x0e);
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_COLOR_TABLE, 0xff);
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_PATTERN_TABLE, 0x03);
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_FG_BG_COLOR, 0x01);
+}
+
+static void unlock(void)
+{
+  tms9918->isUnlocked = true;
+  tms9918->lockedMask = 0x3f;
+}
+
+/* the same content with the display bit clear, which is the only state blanking changes */
+static void sceneBlanked(void)
+{
+  sceneLockedGm2();
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_1, 0xa0);
+}
+
+/* tile layer 2 alone: tile 1 off at the register, so only the mask's own bit is in play */
+static void sceneTile2Only(void)
+{
+  sceneLockedGm2();
+  unlock();
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, 0x00);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_ENHANCED1, PICO9918_R49_TILE2_ENABLE);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_ENHANCED2, PICO9918_R50_TILE1_OFF);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_NAME_TABLE2, 0x0f);
+}
+
+/* the bitmap layer alone, over a backdrop both tile layers have been turned off at */
+static void sceneBmlOnly(void)
+{
+  sceneLockedGm2();
+  unlock();
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_0, 0x00);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_ENHANCED2, PICO9918_R50_TILE1_OFF);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_BML_CONTROL, PICO9918_R31_BML_ENABLE);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_BML_BASE, 0x40);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_BML_WIDTH, 0);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_BML_HEIGHT, 192);
+  pico9918_debug_reg_write(PICO9918_INST PICO9918_REG_BML_TOP_ROW, 0);
+}
+
+/* six sprites overlapping on one line: enough to latch collision and the fifth together */
+static void sceneSprites(void)
+{
+  sceneLockedGm2();
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_SPRITE_ATTR_TABLE, 0x70);
+  pico9918_debug_reg_write(PICO9918_INST TMS_REG_SPRITE_PATT_TABLE, 0x00);
+  pico9918_debug_write(PICO9918_INST 0x0000, solidRow, sizeof(solidRow));
+
+  for (unsigned i = 0; i < 6; ++i)
+  {
+    const uint8_t attr[4] = {16, (uint8_t)(20 + i * 4), 0, 0x0f};
+    pico9918_debug_write(PICO9918_INST 0x3800 + i * 4, attr, sizeof(attr));
+  }
+  pico9918_debug_write(PICO9918_INST 0x3818, solidRow, 1);
+}
+
+/* one line of a scene under one mask, as a digest. The reset is inside; the mask is set
+   after it, because a reset does not clear one. */
+static uint32_t suppressDigest(uint32_t mask, void (*scene)(void), uint16_t y, uint8_t* status)
+{
+  uint32_t digest = 2166136261u;
+  uint8_t got;
+
+  pico9918_reset(PICO9918_INST_ONLY);
+  scene();
+  pico9918_debug_set_suppress(PICO9918_INST mask);
+
+  got = pico9918_scan_line(PICO9918_INST y);
+  if (status) *status = got;
+
+  for (uint32_t i = 0; i < pico9918_line_bytes(PICO9918_INST_ONLY); ++i)
+    digest = (digest ^ pico9918_line_source(PICO9918_INST_ONLY)[i]) * 16777619u;
+
+  return digest;
+}
+
+#endif
+
 int main(void)
 {
   const uint32_t size = pico9918_gpu_mem_size();
@@ -426,6 +530,68 @@ int main(void)
 
     free(before);
   }
+
+#if PICO9918_BUILD_LAYER_MASK
+  /* 15. suppression is a view over the renderer: nothing suppressed must not change the
+         picture, and something suppressed must not change what a guest can read. SR0's
+         collision and fifth-sprite bits are the hard half of the second. */
+  {
+    /* each bit in a scene built so that layer, and nothing else, is what it can remove */
+    static const struct
+    {
+      const char* name;
+      uint32_t bit;
+      void (*scene)(void);
+    } cases[] = {
+      {"tile1",       PICO9918_SUPPRESS_TILE1,       sceneLockedGm2},
+      {"gm2-colour",  PICO9918_SUPPRESS_GM2_COLOUR,  sceneLockedGm2},
+      {"gm2-pattern", PICO9918_SUPPRESS_GM2_PATTERN, sceneLockedGm2},
+      {"blanking",    PICO9918_SUPPRESS_BLANKING,    sceneBlanked  },
+      {"tile2",       PICO9918_SUPPRESS_TILE2,       sceneTile2Only},
+      {"bitmap",      PICO9918_SUPPRESS_BITMAP,      sceneBmlOnly  },
+      {"sprites",     PICO9918_SUPPRESS_SPRITES,     sceneSprites  },
+    };
+    uint32_t gm2[3];
+    uint8_t spriteStatus[2];
+
+    for (unsigned i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
+    {
+      const uint32_t plain = suppressDigest(0, cases[i].scene, 20, NULL);
+
+      if (suppressDigest(0, cases[i].scene, 20, NULL) != plain)
+        fail("suppress-scene-unstable", plain, suppressDigest(0, cases[i].scene, 20, NULL));
+      if (suppressDigest(cases[i].bit, cases[i].scene, 20, NULL) == plain)
+        fail(cases[i].name, 0, plain);
+    }
+
+    /* the Graphics II pair share an emitter, so only this would notice them transposed */
+    gm2[0] = suppressDigest(0, sceneLockedGm2, 20, NULL);
+    gm2[1] = suppressDigest(PICO9918_SUPPRESS_GM2_COLOUR, sceneLockedGm2, 20, NULL);
+    gm2[2] = suppressDigest(PICO9918_SUPPRESS_GM2_PATTERN, sceneLockedGm2, 20, NULL);
+    if (gm2[1] == gm2[2]) fail("suppress-gm2-transposed", gm2[1], gm2[2]);
+
+    /* blanking suppressed has to give back the picture the display bit would have */
+    if (suppressDigest(PICO9918_SUPPRESS_BLANKING, sceneBlanked, 20, NULL) != gm2[0])
+      fail("suppress-blanking-differs", gm2[0],
+           suppressDigest(PICO9918_SUPPRESS_BLANKING, sceneBlanked, 20, NULL));
+
+    /* the sprite layer is the one whose suppression must not reach the status file */
+    suppressDigest(0, sceneSprites, 20, &spriteStatus[0]);
+    suppressDigest(PICO9918_SUPPRESS_SPRITES, sceneSprites, 20, &spriteStatus[1]);
+
+    if ((spriteStatus[0] & (PICO9918_SR0_COLLISION | PICO9918_SR0_5S)) !=
+        (PICO9918_SR0_COLLISION | PICO9918_SR0_5S))
+      fail("suppress-scene-no-status", PICO9918_SR0_COLLISION | PICO9918_SR0_5S, spriteStatus[0]);
+    if (spriteStatus[0] != spriteStatus[1])
+      fail("suppress-sprites-moved-status", spriteStatus[0], spriteStatus[1]);
+
+    pico9918_debug_set_suppress(PICO9918_INST 0x80000000u);
+    if (pico9918_debug_suppress(PICO9918_INST_ONLY) != 0x80000000u)
+      fail("suppress-unknown-bit", 0x80000000u, pico9918_debug_suppress(PICO9918_INST_ONLY));
+
+    pico9918_debug_set_suppress(PICO9918_INST 0);
+  }
+#endif
 
   printf("%s: debugger surface, %d failure(s)\n", failures ? "FAIL" : "PASS", failures);
   return failures ? 1 : 0;

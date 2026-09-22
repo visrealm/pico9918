@@ -452,6 +452,17 @@ bool pico9918_unlocked(PICO9918_INST_ONLY_ARG);
 #define PICO9918_MAP_SCANLINE  0x7000 ///< the current scanline, then the blanking flag
 #define PICO9918_MAP_STATUS    0xB000 ///< the status registers, SR0-SR15
 
+#if PICO9918_BUILD_LAYER_MASK
+/* what pico9918_debug_set_suppress() keeps off the picture. Every bit suppresses */
+#define PICO9918_SUPPRESS_SPRITES     0x01 ///< sprite pixels, in every mode and ECM depth
+#define PICO9918_SUPPRESS_TILE1       0x02 ///< tile layer 1, text rows included
+#define PICO9918_SUPPRESS_TILE2       0x04 ///< tile layer 2
+#define PICO9918_SUPPRESS_BITMAP      0x08 ///< the F18A bitmap layer
+#define PICO9918_SUPPRESS_GM2_COLOUR  0x10 ///< locked Graphics II: ignore the colour table
+#define PICO9918_SUPPRESS_GM2_PATTERN 0x20 ///< locked Graphics II: ignore the pattern table
+#define PICO9918_SUPPRESS_BLANKING    0x40 ///< draw the active display though R1 bit 6 says blank
+#endif
+
 #if PICO9918_BUILD_RUNTIME_CHIP
 
 /**

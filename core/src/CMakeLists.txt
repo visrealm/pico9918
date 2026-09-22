@@ -51,6 +51,14 @@ else()
   set(PICO9918_BUILD_DEBUG_API 0)
 endif()
 
+# Unlike the option above this one does move the instance, so the stamp is what a
+# consumer sizing a buffer from pico9918_instance_size() has to agree with.
+if(PICO9918_LAYER_MASK)
+  set(PICO9918_BUILD_LAYER_MASK 1)
+else()
+  set(PICO9918_BUILD_LAYER_MASK 0)
+endif()
+
 # Desktop builds follow BUILD_SHARED_LIBS. A Pico executable has no dynamic loader, so
 # its in-firmware archive stays static even if a parent project happens to set the
 # standard option globally.

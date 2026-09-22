@@ -1142,8 +1142,10 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
       tempStatus |= PICO9918_SR0_COLLISION;
     }
 
-    // Render valid pixels to the scanline
-    if (ecm || (spriteColor != TMS_TRANSPARENT))
+    /* LOAD-BEARING: a suppressed sprite takes the transparent arm rather than skipping,
+       which is what leaves the collision and fifth-sprite bits above it reported. */
+    if (PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_SPRITES) &&
+        (ecm || (spriteColor != TMS_TRANSPARENT)))
     {
       hasSprites = true;
       spriteColor |= pal;
@@ -2402,6 +2404,11 @@ renderTileRowLocked(PICO9918_INST_ARG uint16_t rowNamesAddr, uint16_t colorTable
   uint8_t lastPattIdx    = 0;
   uint32_t pattByte      = mcm ? 0xf0 : (uint8_t)pattTableRow[0];
   uint32_t lastColorByte = mcm ? (uint8_t)pattTableRow[0] : tms9918->vram.bytes[colorTableAddr];
+  if (gm2)
+  {
+    lastColorByte = PICO9918_LAYER_SUB(tms9918, PICO9918_SUPPRESS_GM2_COLOUR, 0xf1, lastColorByte);
+    pattByte      = PICO9918_LAYER_SUB(tms9918, PICO9918_SUPPRESS_GM2_PATTERN, 0xff, pattByte);
+  }
   uint32_t fgbg[2];
   lockedFgBg(PICO9918_INST fgbg, pal, lastColorByte);
 
@@ -2414,10 +2421,15 @@ renderTileRowLocked(PICO9918_INST_ARG uint16_t rowNamesAddr, uint16_t colorTable
     {
       lastPattIdx = pattIdx;
       pattOffset  = lastPattIdx * PATTERN_BYTES;
-      const uint32_t colorByte =
+      uint32_t colorByte =
         mcm ? pattTableRow[pattOffset]
             : tms9918->vram.bytes[colorTableAddr + (gm2 ? pattOffset : (pattIdx >> 3))];
       if (!mcm) pattByte = (uint8_t)pattTableRow[pattOffset];
+      if (gm2)
+      {
+        colorByte = PICO9918_LAYER_SUB(tms9918, PICO9918_SUPPRESS_GM2_COLOUR, 0xf1, colorByte);
+        pattByte  = PICO9918_LAYER_SUB(tms9918, PICO9918_SUPPRESS_GM2_PATTERN, 0xff, pattByte);
+      }
       if (lastColorByte != colorByte)
       {
         lastColorByte = colorByte;
@@ -2830,7 +2842,7 @@ static bool __time_critical_func(bitmap_layer_scan_line)(PICO9918_INST_ARG uint1
 {
   /* bml enabled? */
   const uint8_t bmlCtl = TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL);
-  if (!(bmlCtl & 0x80)) return true;
+  if (!(bmlCtl & 0x80) || !PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_BITMAP)) return true;
 
   /* bml on this scanline? */
   const uint8_t top = TMS_REGISTER(tms9918, PICO9918_REG_BML_TOP_ROW);
@@ -3203,7 +3215,9 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
        only a wide row doubles. Relax any of them and the layer is lost or lands under T1. */
     const bool bmlInTile1 = TEXT80_WIDE_ROW && (bmlCtlReg & PICO9918_R31_BML_ENABLE) &&
                             (bmlCtlReg & 0x40) &&
-                            !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF);
+                            !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF) &&
+                            PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE1) &&
+                            PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_BITMAP);
 
     bool writeMask = true;
     if (bmlInTile1)
@@ -3223,8 +3237,10 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
       const bool textRow      = wide || pico9918_cached_mode == TMS_MODE_TEXT;
       const int t1Scroll      = scrollOffset(TMS_REGISTER(tms9918, PICO9918_REG_T1_HSCROLL), textRow, wide);
       const int t2Scroll      = scrollOffset(TMS_REGISTER(tms9918, PICO9918_REG_T2_HSCROLL), textRow, wide);
-      const bool tile2Enabled = TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_TILE2_ENABLE;
-      const bool tile1Enabled = !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF);
+      const bool tile2Enabled = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_TILE2_ENABLE) &&
+                                PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE2);
+      const bool tile1Enabled = !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF) &&
+                                PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE1);
 
       const bool blend = wide && tile1Enabled && tile2Enabled &&
                          !((TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_ECM_TILE) >> 4) &&
@@ -3299,12 +3315,15 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
 
     PICO9918_FILL32_WAIT(PICO9918_FILL_LINE);
 
-    if (gm2)
-      rowLockedGm2(PICO9918_INST rowNamesAddr, colorTableAddr, 0, 0, pixels, &addr);
-    else if (mcm)
-      rowLockedMcm(PICO9918_INST rowNamesAddr, colorTableAddr, 0, 0, pixels, &addr);
-    else
-      rowLockedGm1(PICO9918_INST rowNamesAddr, colorTableAddr, 0, 0, pixels, &addr);
+    if (PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE1))
+    {
+      if (gm2)
+        rowLockedGm2(PICO9918_INST rowNamesAddr, colorTableAddr, 0, 0, pixels, &addr);
+      else if (mcm)
+        rowLockedMcm(PICO9918_INST rowNamesAddr, colorTableAddr, 0, 0, pixels, &addr);
+      else
+        rowLockedGm1(PICO9918_INST rowNamesAddr, colorTableAddr, 0, 0, pixels, &addr);
+    }
 
     tempStatus = pico9918_output_sprites(PICO9918_INST y, pixels);
   }
@@ -3341,7 +3360,8 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
   pico9918_cached_line_source = pixels;
   underLayer = false;
 
-  bool dispActive = (TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_DISP_ACTIVE);
+  bool dispActive = (TMS_REGISTER(tms9918, TMS_REG_1) & TMS_R1_DISP_ACTIVE) ||
+                    PICO9918_SUPPRESSED(tms9918, PICO9918_SUPPRESS_BLANKING);
 
   if (dispActive)
   {
@@ -3379,7 +3399,7 @@ PICO9918_DLLEXPORT uint8_t __time_critical_func(pico9918_scan_line)(PICO9918_INS
         break;
       }
 
-      text_scan_line(PICO9918_INST y, pixels);
+      if (PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE1)) text_scan_line(PICO9918_INST y, pixels);
       if (PICO9918_UNLOCKED(tms9918)) tempStatus = pico9918_output_sprites(PICO9918_INST y, pixels);
       break;
     }

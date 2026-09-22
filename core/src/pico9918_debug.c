@@ -162,6 +162,24 @@ bool pico9918_debug_gpu_armed(PICO9918_INST_ONLY_ARG)
   return tms9918->restart != 0;
 }
 
+#if PICO9918_BUILD_LAYER_MASK
+
+/** \brief see the header. A view over the renderer, stored whole so a host can read it back. */
+PICO9918_DLLEXPORT
+void pico9918_debug_set_suppress(PICO9918_INST_ARG uint32_t mask)
+{
+  tms9918->suppress = mask;
+}
+
+/** \brief see the header. What was stored, including bits this build does not act on. */
+PICO9918_DLLEXPORT
+uint32_t pico9918_debug_suppress(PICO9918_INST_ONLY_ARG)
+{
+  return tms9918->suppress;
+}
+
+#endif
+
 /** \brief see the header. The PC alone - not the registers it is loaded from, not the run. */
 PICO9918_DLLEXPORT
 void pico9918_debug_gpu_set_pc(PICO9918_INST_ARG uint16_t pc)

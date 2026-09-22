@@ -80,4 +80,14 @@
  */
 #define PICO9918_BUILD_DEBUG_API @PICO9918_BUILD_DEBUG_API@
 
+/*
+ * Whether the compiled library can suppress a layer at render time.
+ *
+ * The one debugger feature that is not purely additive: it puts a word on the instance,
+ * so a consumer that disagreed would size a placed buffer or a stored snapshot to a
+ * different struct than the archive writes. A board builds 0, where every suppression
+ * test folds to "draw it" and the field does not exist.
+ */
+#define PICO9918_BUILD_LAYER_MASK @PICO9918_BUILD_LAYER_MASK@
+
 #endif // _PICO9918_BUILD_CONFIG_H
