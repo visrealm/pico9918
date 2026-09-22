@@ -180,6 +180,10 @@ typedef struct
 #define PICO9918_GPU_BUDGETED 1
 #endif
 
+#define PICO9918_GPU_WORKSPACE 0xFFFEu
+
+#define PICO9918_GPU_RESUMING 2u
+
 /* Has the F18A been unlocked, and is this a write to the register that decides it? The
    runtime personality gate decides whether the write is honoured. */
 #define PICO9918_UNLOCKED(T)     ((T)->isUnlocked)
@@ -290,6 +294,7 @@ struct pico9918_s
   /* Zero leaves an armed program to whoever else runs it. See pico9918_gpu_set_clock. */
   uint32_t gpuIps;
   uint32_t gpuSlice;
+  uint16_t gpuWp;
 #endif
 
   /* palette writes are done in two stages too */

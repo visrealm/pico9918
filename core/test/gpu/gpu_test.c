@@ -98,6 +98,25 @@ static void loadDmaProgram(void)
   for (unsigned i = 0; i < sizeof(program); ++i) tms9918->vram.bytes[PROGRAM_AT + i] = program[i];
 }
 
+#define NEW_WP 0x2800u
+
+/*
+ *   LWPI >2800        02E0 2800
+ *   LI   R0, >BEEF    0200 BEEF     lands at >2800, which is R0 of the new workspace
+ *   IDLE              0340
+ */
+static void loadWorkspaceProgram(void)
+{
+  static const uint8_t program[] = {0x02, 0xe0, 0x28, 0x00, 0x02, 0x00, 0xbe, 0xef, 0x03, 0x40};
+
+  for (unsigned i = 0; i < sizeof(program); ++i) tms9918->vram.bytes[PROGRAM_AT + i] = program[i];
+
+  tms9918->vram.bytes[NEW_WP]     = 0;
+  tms9918->vram.bytes[NEW_WP + 1] = 0;
+  tms9918->vram.map.wrksp[0]      = 0;
+  tms9918->vram.bytes[PICO9918_GPU_WORKSPACE] = 0;
+}
+
 #define DMA_SRC 0x1000u
 #define DMA_DST 0x1800u
 
@@ -239,7 +258,42 @@ int main(void)
   arm();
   if (result() != 0) fail("cleared-rate-ran", 0, result());
 
-  /* 8. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
+  /* 8. a workspace the program moved has to survive the slice that stopped after it.
+        Both legs run the same three instructions; the stepped one stops between every
+        pair, which is the only place the workspace can be dropped. */
+  for (int stepped = 0; stepped < 2; ++stepped)
+  {
+    const char* leg = stepped ? "wp-stepped" : "wp-one-slice";
+
+    loadWorkspaceProgram();
+    arm();
+
+    if (pico9918_gpu_wp(PICO9918_INST_ONLY) != PICO9918_GPU_WORKSPACE)
+      fail("wp-armed", PICO9918_GPU_WORKSPACE, pico9918_gpu_wp(PICO9918_INST_ONLY));
+
+    if (stepped)
+      while (pico9918_gpu_step_n(PICO9918_INST 1)) { }
+    else
+      pico9918_gpu_step_n(PICO9918_INST 1000);
+
+    if (pico9918_gpu_wp(PICO9918_INST_ONLY) != NEW_WP)
+      fail(leg, NEW_WP, pico9918_gpu_wp(PICO9918_INST_ONLY));
+
+    expect(stepped ? "wp-stepped-r0-hi" : "wp-one-slice-r0-hi", NEW_WP, MARKER >> 8);
+    expect(stepped ? "wp-stepped-r0-lo" : "wp-one-slice-r0-lo", NEW_WP + 1, MARKER & 0xff);
+    expect(stepped ? "wp-stepped-not-start" : "wp-one-slice-not-start", PICO9918_GPU_WORKSPACE, 0);
+
+    if (pico9918_gpu_reg_value(PICO9918_INST 0) != MARKER)
+      fail(stepped ? "wp-stepped-reg" : "wp-one-slice-reg", MARKER,
+           pico9918_gpu_reg_value(PICO9918_INST 0));
+  }
+
+  loadProgram();
+  arm();
+  if (pico9918_gpu_wp(PICO9918_INST_ONLY) != PICO9918_GPU_WORKSPACE)
+    fail("wp-new-program", PICO9918_GPU_WORKSPACE, pico9918_gpu_wp(PICO9918_INST_ONLY));
+
+  /* 9. the DMA engine's geometry. The source is 0x40 counting up, so where a byte landed
         says which one it was and therefore which row and column the engine thought it
         was on. Zero width and height mean 256; stride is a different animal entirely. */
   unlock();

@@ -162,12 +162,26 @@ PICO9918_DLLEXPORT
 uint32_t pico9918_gpu_mem_size(void);
 
 /**
+ * \brief where this program's sixteen registers are
+ *
+ * 0xFFFE unless the program moved it with LWPI, which puts R0 at the last word of the
+ * 64KB map and R1-R15 in the overflow above it. A real F18A has no LWPI and no
+ * workspace pointer - its registers are a register file - so on that personality this
+ * only ever answers 0xFFFE.
+ *
+ * TRAP: a build whose GPU runs to completion cannot stop between instructions, so it
+ * keeps no workspace and this answers the starting value whatever the program did.
+ */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_wp(PICO9918_INST_ONLY_ARG);
+
+/**
  * \brief a GPU workspace register, R0-R15, without disturbing anything
  *
- * The workspace is fixed at 0xFFFE and a TMS9900 register is a word there, so this is
- * the two bytes at 0xFFFE + 2n read big-endian. Only the low four bits of \p reg are
- * used. Reachable through pico9918_gpu_mem_value() as well; this is here because the
- * wrap past 0xFFFF is the library's business, not a debugger's.
+ * A TMS9900 register is a word at the workspace, so this is the two bytes at
+ * pico9918_gpu_wp() + 2n read big-endian. Only the low four bits of \p reg are used.
+ * Reachable through pico9918_gpu_mem_value() as well; this is here because the wrap
+ * past 0xFFFF is the library's business, not a debugger's.
  */
 PICO9918_DLLEXPORT
 uint16_t pico9918_gpu_reg_value(PICO9918_INST_ARG uint8_t reg);

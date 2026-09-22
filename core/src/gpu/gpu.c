@@ -44,11 +44,11 @@ extern uint16_t run9900(uint8_t* memory, uint16_t pc, uint16_t wp, uint8_t* regx
 static void gpuDmaWatch(uint8_t* vram, uint32_t addr);
 #endif
 
-static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t wp, uint8_t* r38,
+static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t* wp, uint8_t* r38,
                               uint32_t budget, uint16_t* st, bool* outOfBudget, bool f18aMemory)
 {
   Tms9900Cpu cpu;
-  tms9900_init(&cpu, mem, r38, pc, wp);
+  tms9900_init(&cpu, mem, r38, pc, *wp);
   cpu.f18aMemory = f18aMemory;
 #if defined(TMS9900_WATCH_WRITES)
   cpu.onWrite      = gpuDmaWatch;
@@ -58,6 +58,7 @@ static uint16_t run9900Budget(uint8_t* mem, uint16_t pc, uint16_t wp, uint8_t* r
   cpu.st = *st;
   const uint16_t next = run9900_budget_c(&cpu, budget, outOfBudget);
   *st                 = cpu.st;
+  *wp                 = cpu.wp;
   return next;
 }
 #endif
@@ -329,6 +330,11 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
 {
   bool running     = false;
   bool outOfBudget = false;
+#if PICO9918_GPU_BUDGETED
+  /* TRAP: keying this off the arming register write instead leaks a workspace into the
+     next program, because everything else that sets restart also means "start". */
+  tms9918->gpuWp = pico9918_gpu_wp(PICO9918_INST_ONLY);
+#endif
   tms9918->restart = 0;
   if ((tms9918->gpuAddress & 1) == 0) /* Odd addresses crash the RP2040 */
   {
@@ -349,7 +355,7 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
 #endif /* PICO_BUILD */
 
 #if PICO9918_GPU_BUDGETED
-    lastAddress = run9900Budget(tms9918->vram.bytes, lastAddress, 0xFFFE,
+    lastAddress = run9900Budget(tms9918->vram.bytes, lastAddress, &tms9918->gpuWp,
                                 &TMS_REGISTER(tms9918, PICO9918_REG_GPU_CONTROL), budget, &tms9918->gpuStatus,
                                 &outOfBudget, !PICO9918_GPU_FLAT_MEM(tms9918));
 #else
@@ -402,6 +408,9 @@ void pico9918_gpu_init(PICO9918_INST_ONLY_ARG)
 #endif
   guard(0, &(tms9918->vram.bytes[0x8000]), 32);
   guard(1, tms9918->vram.map.pram, 64 * sizeof(*tms9918->vram.map.pram));
+#endif
+#if PICO9918_GPU_BUDGETED
+  tms9918->gpuWp = PICO9918_GPU_WORKSPACE;
 #endif
 }
 
@@ -470,8 +479,18 @@ uint16_t pico9918_gpu_pc(PICO9918_INST_ONLY_ARG)
   return tms9918->gpuAddress;
 }
 
-/* The GPU's workspace pointer, which gpuRun passes run9900 and nothing changes. */
-#define GPU_WORKSPACE 0xFFFEu
+/** \brief see the header. Where the registers are now, which LWPI can have moved. */
+PICO9918_DLLEXPORT
+uint16_t pico9918_gpu_wp(PICO9918_INST_ONLY_ARG)
+{
+#if PICO9918_GPU_BUDGETED
+  const uint8_t armed = tms9918->restart;
+
+  return (armed && armed != PICO9918_GPU_RESUMING) ? PICO9918_GPU_WORKSPACE : tms9918->gpuWp;
+#else
+  return PICO9918_GPU_WORKSPACE;
+#endif
+}
 
 /** \brief see the header. The whole map the GPU addresses, workspace overflow included. */
 PICO9918_DLLEXPORT
@@ -490,11 +509,11 @@ uint8_t pico9918_gpu_mem_value(PICO9918_INST_ARG uint32_t addr)
   return ((const uint8_t*)&tms9918->vram)[addr];
 }
 
-/** \brief see the header. R0-R15 as words at the fixed workspace. */
+/** \brief see the header. R0-R15 as words at the workspace the program is using. */
 PICO9918_DLLEXPORT
 uint16_t pico9918_gpu_reg_value(PICO9918_INST_ARG uint8_t reg)
 {
-  const uint32_t at = GPU_WORKSPACE + ((uint32_t)(reg & 0x0f) << 1);
+  const uint32_t at = pico9918_gpu_wp(PICO9918_INST_ONLY) + ((uint32_t)(reg & 0x0f) << 1);
 
   return (uint16_t)((pico9918_gpu_mem_value(PICO9918_INST at) << 8) |
                     pico9918_gpu_mem_value(PICO9918_INST at + 1));
@@ -527,7 +546,7 @@ bool pico9918_gpu_step_n(PICO9918_INST_ARG uint32_t instructions)
     gpuTimeUs += PICO9918_HOST_TIME_US() - gpuStart;
 
     /* volatileHack clears it on the way in, so put it back for the next slice */
-    if (running) tms9918->restart = 1;
+    if (running) tms9918->restart = PICO9918_GPU_RESUMING;
   }
   reportedBack = !running;
 
