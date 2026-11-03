@@ -37,7 +37,7 @@ typedef enum
   CONF_CRT_SCANLINES    = 8,
   CONF_SCANLINE_SPRITES = 9,
   CONF_CLOCK_PRESET_ID  = 10,
-  CONF_SCART_MODE       = 11,  // 0 = PAL 576i (default), 1 = NTSC 480i
+  CONF_SCART_MODE       = 11,  // 0 = PAL 576i (default), 1 = NTSC 480i, 2 = PAL 288p, 3 = NTSC 240p
   CONF_VDP_DEVICE       = 12,
   CONF_DISP_DRIVER_PREF = 13,  // 0 = AUTO (detect dongle), 1 = force VGA, 2 = force SCART
   CONF_VGA_MODE         = 14,  // 0 = 480p60 (extensible)

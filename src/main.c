@@ -468,7 +468,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   }
 
 #if PICO9918_ENABLE_SCART
-  const int yScale = vgaCurrentParams()->params.interlaced ? 1 : 2;
+  const int yScale = vgaCurrentParams()->params.compositeSync ? 1 : 2;
 #else
   const int yScale = DISPLAY_YSCALE;
 #endif
@@ -638,7 +638,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
 
     /* generate the scanline */
     uint16_t tmsY = y;
-    if (params->interlaced && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS))
+    if (params->compositeSync && (TMS_REGISTER(tms9918, 0) & R0_DOUBLE_ROWS))
       tmsY = y * 2 + (field ^ params->interlacedFieldOrder);
     uint32_t renderTime  = time_us_32();
     uint8_t tempStatus = vrEmuTms9918ScanLine(tmsY, tmsScanlineBuffer);
@@ -874,8 +874,7 @@ int main(void)
   }
   else
   {
-    params.params = vgaGetParams(tms9918->config[CONF_SCART_MODE]
-      ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ);
+    params.params = vgaGetParams(RGBS_PAL_720_576i_50HZ + tms9918->config[CONF_SCART_MODE]);
   }
 #else
   params.params = vgaGetParams(DISPLAY_MODE);

@@ -113,14 +113,15 @@ bool isScartConnected()
 
 /*
  * update CONF_DISP_DRIVER from CONF_DISP_DRIVER_PREF + dongle detection
- *   pref: 0=AUTO, 1=VGA, 2=SCART  ->  driver: 0=VGA, 1=NTSC, 2=PAL
+ *   pref: 0=AUTO, 1=VGA, 2=SCART  ->  driver: 0=VGA, 1=NTSC, 2=PAL, 3=NTSC 240p, 4=PAL 288p
  */
 void updateDispDriver()
 {
   uint8_t pref = tms9918->config[CONF_DISP_DRIVER_PREF];
   bool useScart = (pref == 2) || (pref == 0 && isScartConnected());
+  uint8_t scartMode = tms9918->config[CONF_SCART_MODE];
   tms9918->config[CONF_DISP_DRIVER] = useScart
-    ? (2 - tms9918->config[CONF_SCART_MODE]) : 0;
+    ? (2 - (scartMode & 1)) + (scartMode & 2) : 0;
 }
 
 /*
@@ -128,7 +129,7 @@ void updateDispDriver()
  */
 void applyConfig()
 {
-  vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES];
+  vgaCurrentParams()->scanlines = tms9918->config[CONF_CRT_SCANLINES] && !vgaCurrentParams()->params.compositeSync;
 
   if (tms9918->config[CONF_CRT_SCANLINES])
     TMS_REGISTER(tms9918, 50) |= 0x04;
@@ -244,7 +245,7 @@ static const ConfigField configFields[] =
   { CONF_CRT_SCANLINES,    1,                    0,            PENDING_MIRROR_NONE,       0x1000 },
   { CONF_SCANLINE_SPRITES, 3,                    0,            PENDING_MIRROR_NONE,       0x1000 },
   { CONF_CLOCK_PRESET_ID,  2,                    0,            CONF_PENDING_CLOCK_PRESET, 0x1000 },
-  { CONF_SCART_MODE,       1,                    0,            CONF_PENDING_SCART_MODE,   0x1200 },
+  { CONF_SCART_MODE,       3,                    0,            CONF_PENDING_SCART_MODE,   0x1200 },
   { CONF_VDP_DEVICE,       VDP_DEVICE_COUNT - 1, VDP_TMS9918A, PENDING_MIRROR_NONE,       0x1101 },
   { CONF_DISP_DRIVER_PREF, 2,                    0,            CONF_PENDING_DRIVER_PREF,  0x1200 },  // 1.2.0
   { CONF_VGA_MODE,         0,                    0,            CONF_PENDING_VGA_MODE,     0x1200 },  // 0=480p60 (only)

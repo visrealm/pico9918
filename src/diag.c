@@ -62,8 +62,8 @@ IntString hwVerStr = {0};
 IntString fwVerStr = {0};
 IntString outputStr = {0};
 
-static const char *outputValues[] = {"480P ", "480I ", "576I "};
-static const char *outputUnits[]  = {"@60", "@60", "@50"};
+static const char *outputValues[] = {"480P ", "480I ", "576I ", "240P ", "288P "};
+static const char *outputUnits[]  = {"@60", "@60", "@50", "@60", "@50"};
 
 IntString nameTabStr = {0};
 IntString colorTabStr = {0};
@@ -180,7 +180,7 @@ void initDiagnostics()
   clear(&outputStr);
 
   uint8_t driver = tms9918->config[CONF_DISP_DRIVER];
-  if (driver > 2) driver = 0;
+  if (driver > 4) driver = 0;
   strcpy(outputStr.digits, outputValues[driver]);
 
   Pico9918HardwareVersion hwVersion = currentHwVersion();
@@ -407,7 +407,7 @@ static void diagTemp(uint16_t row, uint16_t* pixels)
 static void diagOutput(uint16_t row, uint16_t* pixels)
 {
   uint8_t driver = tms9918->config[CONF_DISP_DRIVER];
-  if (driver > 2) driver = 0;
+  if (driver > 4) driver = 0;
   renderLeft("OUTPUT: ", &outputStr, outputUnits[driver], row, pixels);
 }
 

@@ -24,6 +24,8 @@ typedef enum
 #endif
   RGBS_PAL_720_576i_50HZ,
   RGBS_NTSC_720_480i_60HZ,
+  RGBS_PAL_720_288p_50HZ,
+  RGBS_NTSC_720_240p_60HZ,
 } VgaMode;
 
 

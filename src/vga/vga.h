@@ -77,8 +77,8 @@ typedef struct
   float pioClocksPerPixel;
   float pioClocksPerScaledPixel;
   float frameRateHz;                          // effective frame rate (e.g. 60, 50)
-  bool interlaced;
-  uint8_t interlacedFieldOrder;             // 0 or 1: XOR'd with field number for double-row mapping
+  bool compositeSync;
+  uint8_t interlacedFieldOrder;            // 0 or 1: XOR'd with field number for double-row mapping
   uint8_t numFields;                        // 1 = progressive, 2 = interlaced
   uint8_t hPixelScale;
   uint8_t vPixelScale;
