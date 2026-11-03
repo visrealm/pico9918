@@ -1,4 +1,4 @@
 [submodule "submodules/vrEmuTms9918"]
 	path = submodules/vrEmuTms9918
-	url = https://github.com/visrealm/pico9918_core_priv.git
+	url = https://github.com/visrealm/vrEmuTms9918.git
 	branch = .
