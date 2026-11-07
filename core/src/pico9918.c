@@ -3521,8 +3521,7 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
     }
     else if (regIndex == PICO9918_REG_STATUS_SELECT)
     {
-      uint8_t statReg           = (value & 0x0f);
-      TMS_STATUS(tms9918, 0x0F) = statReg; // is this right? or should this be the read-ahead value?
+      const uint8_t statReg = value & 0x0f;
       if (value & 0x40) tms9918->startTime = PICO9918_HOST_TIME_US(); // reset
       if (value & 0x20)
         tms9918->currentTime = PICO9918_HOST_TIME_US(); // snap

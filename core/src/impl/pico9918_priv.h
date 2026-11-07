@@ -529,6 +529,7 @@ PICO9918_INLINE_HOT void pico9918_write_addr_impl(PICO9918_INST_ARG uint8_t data
       {
         tms9918->readAheadBuffer =
           tms9918->vram.bytes[pico9918_cpu_vram_addr_impl(PICO9918_INST tms9918->currentAddress)];
+        TMS_STATUS(tms9918, PICO9918_SR_REG_VALUE) = TMS_REGISTER(tms9918, data & 0x3f);
         tms9918->currentAddress += (int8_t)TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC); // increment register
       }
     }
