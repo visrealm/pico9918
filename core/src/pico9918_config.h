@@ -106,7 +106,7 @@ typedef enum
   PICO9918_CONF_CRT_SCANLINES    = 8,
   PICO9918_CONF_SCANLINE_SPRITES = 9,
   PICO9918_CONF_CLOCK_PRESET_ID  = 10,
-  PICO9918_CONF_SCART_MODE       = 11, // 0 = PAL 576i (default), 1 = NTSC 480i
+  PICO9918_CONF_SCART_MODE       = 11, // 0 = PAL 576i (default), 1 = NTSC 480i, 2 = PAL 288p, 3 = NTSC 240p
   PICO9918_CONF_VDP_DEVICE       = 12, // emulated host-clock variant (GROMCLK/CPUCLK pins)
   PICO9918_CONF_DISP_DRIVER_PREF = 13, // 0 = AUTO (detect dongle), 1 = force VGA, 2 = force SCART
   PICO9918_CONF_VGA_MODE         = 14, // 0 = 480p60 (extensible)

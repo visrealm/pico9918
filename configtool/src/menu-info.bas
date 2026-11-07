@@ -72,6 +72,12 @@ deviceInfoMenu: PROCEDURE
     ELSEIF optValue = 2 THEN
         PRINT AT #addr, "RGBs PAL"
         PRINT AT #addr + 32, "576i 50Hz"
+    ELSEIF optValue = 3 THEN
+        PRINT AT #addr, "RGBs NTSC"
+        PRINT AT #addr + 32, "240p 60Hz"
+    ELSEIF optValue = 4 THEN
+        PRINT AT #addr, "RGBs PAL"
+        PRINT AT #addr + 32, "288p 50Hz"
     ELSE
         PRINT AT #addr, "VGA/HDMI"
         PRINT AT #addr + 32, "480p 60Hz"

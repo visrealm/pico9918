@@ -52,7 +52,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   VgaInitParams* vga    = vgaCurrentParams();
   VgaParams*     params = &vga->params;
 
-  pico9918_frame_display_t display = {params->vSyncParams.displayPixels, params->interlaced, params->vPixelScale,
+  pico9918_frame_display_t display = {params->vSyncParams.displayPixels, params->compositeSync, params->vPixelScale,
                                   params->vVirtualPixels};
 
   pico9918_frame_geometry_t geom = pico9918_frame_end(coreTemperatureC(), params->frameRateHz, &display);
@@ -65,7 +65,8 @@ static void tmsEndOfFrame(uint32_t frameNumber)
   params->vVirtualPixels = display.vVirtualPixels;
 
   // R50 owns the CRT dim, which the config block only seeds; sampled, as a write has no hook
-  vga->scanlines = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_VSCANLINES) != 0;
+  vga->scanlines = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_VSCANLINES) &&
+                   !(PICO9918_ENABLE_SCART && params->compositeSync);
 
   vgaSetTriggerScanline(geom.triggerScanline);
 }
@@ -87,7 +88,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
 static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uint16_t* pixels)
 {
   const pico9918_scanline_params_t scanlineParams = {params->hVirtualPixels, params->vVirtualPixels,
-                                                 params->interlaced, params->interlacedFieldOrder};
+                                                 params->compositeSync, params->interlacedFieldOrder};
 
   if (!pico9918_frame_scanline(y, &scanlineParams, pixels)) return;
 

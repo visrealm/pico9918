@@ -110,7 +110,8 @@ void updateDispDriver(void)
 {
   uint8_t pref                      = tms9918->config[PICO9918_CONF_DISP_DRIVER_PREF];
   bool useScart                     = (pref == 2) || (pref == 0 && isScartConnected());
-  tms9918->config[PICO9918_CONF_DISP_DRIVER] = useScart ? (2 - tms9918->config[PICO9918_CONF_SCART_MODE]) : 0;
+  uint8_t scartMode                 = tms9918->config[PICO9918_CONF_SCART_MODE];
+  tms9918->config[PICO9918_CONF_DISP_DRIVER] = useScart ? (2 - (scartMode & 1)) + (scartMode & 2) : 0;
 }
 
 /** \brief the frame module's late-config-reload hook - see the header

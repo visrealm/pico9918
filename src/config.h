@@ -51,7 +51,7 @@ bool detectScartDongle(void);
 /** \brief true if a SCART dongle was detected at boot */
 bool isScartConnected(void);
 
-/** \brief derive PICO9918_CONF_DISP_DRIVER (0=VGA, 1=NTSC, 2=PAL) from PICO9918_CONF_DISP_DRIVER_PREF
+/** \brief derive PICO9918_CONF_DISP_DRIVER (0=VGA, 1=NTSC, 2=PAL, 3=NTSC 240p, 4=PAL 288p) from PICO9918_CONF_DISP_DRIVER_PREF
  *         (0=AUTO, 1=VGA, 2=SCART) and dongle detection
  */
 void updateDispDriver(void);

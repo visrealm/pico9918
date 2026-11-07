@@ -114,14 +114,14 @@ int __in_flash_func(main)(void)
 
   VgaInitParams params = {0};
 #if PICO9918_ENABLE_SCART
-  // PICO9918_CONF_DISP_DRIVER: 0=VGA, 1=NTSC, 2=PAL (resolved by updateDispDriver).
+  // PICO9918_CONF_DISP_DRIVER: 0=VGA, 1=NTSC, 2=PAL, 3=NTSC 240p, 4=PAL 288p (resolved by updateDispDriver).
   if (pico9918_config()[PICO9918_CONF_DISP_DRIVER] == 0)
   {
     params.params = vgaGetParams(VGA_640_480_60HZ);
   }
   else
   {
-    params.params = vgaGetParams(pico9918_config()[PICO9918_CONF_SCART_MODE] ? RGBS_NTSC_720_480i_60HZ : RGBS_PAL_720_576i_50HZ);
+    params.params = vgaGetParams(RGBS_PAL_720_576i_50HZ + pico9918_config()[PICO9918_CONF_SCART_MODE]);
   }
 #else
   params.params = vgaGetParams(DISPLAY_MODE);
@@ -148,10 +148,10 @@ int __in_flash_func(main)(void)
 #endif
 
   {
-    static const char* outputValues[] = {"480P ", "480I ", "576I "};
-    static const char* outputUnits[]  = {"@60", "@60", "@50"};
+    static const char* outputValues[] = {"480P ", "480I ", "576I ", "240P ", "288P "};
+    static const char* outputUnits[]  = {"@60", "@60", "@50", "@60", "@50"};
     uint8_t driver                    = pico9918_config()[PICO9918_CONF_DISP_DRIVER];
-    if (driver > 2) driver = 0;
+    if (driver > 4) driver = 0;
     pico9918_diag_set_output_name(outputValues[driver], outputUnits[driver]);
   }
 

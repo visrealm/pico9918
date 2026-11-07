@@ -506,6 +506,8 @@
                     <select id="scartMode" name="scartMode">
                         <option value="0" selected>576i @ 50Hz (PAL)</option>
                         <option value="1">480i @ 60Hz (NTSC)</option>
+                        <option value="2">288p @ 50Hz (PAL)</option>
+                        <option value="3">240p @ 60Hz (NTSC)</option>
                     </select>
                 </div>
             </div>
@@ -630,7 +632,7 @@
         const PICO9918_CONF_CRT_SCANLINES = 8;
         const PICO9918_CONF_SCANLINE_SPRITES = 9;
         const PICO9918_CONF_CLOCK_PRESET_ID = 10;
-        const PICO9918_CONF_SCART_MODE = 11;        // 0 = PAL 576i, 1 = NTSC 480i
+        const PICO9918_CONF_SCART_MODE = 11;        // 0 = PAL 576i, 1 = NTSC 480i, 2 = PAL 288p, 3 = NTSC 240p
         const PICO9918_CONF_VDP_DEVICE = 12;
         const PICO9918_CONF_DISP_DRIVER_PREF = 13;  // 0 = AUTO, 1 = force VGA, 2 = force SCART
         const PICO9918_CONF_VGA_MODE = 14;          // 0 = 480p60 (only valid value currently)
@@ -902,7 +904,7 @@
             const vgaModeNames = ['480p @ 60Hz'];
             const vgaModeName = vgaModeNames[config.vgaMode] || '480p @ 60Hz';
 
-            const scartModeNames = ['576i @ 50Hz (PAL)', '480i @ 60Hz (NTSC)'];
+            const scartModeNames = ['576i @ 50Hz (PAL)', '480i @ 60Hz (NTSC)', '288p @ 50Hz (PAL)', '240p @ 60Hz (NTSC)'];
             const scartModeName = scartModeNames[config.scartMode] || '576i @ 50Hz (PAL)';
 
             const diagnostics = [
@@ -1006,7 +1008,7 @@
             config[PICO9918_CONF_CRT_SCANLINES] = options.scanlines ? 1 : 0;
             config[PICO9918_CONF_SCANLINE_SPRITES] = options.scanlineSprites & 0x03;
             config[PICO9918_CONF_CLOCK_PRESET_ID] = options.clockPreset & 0x03;
-            config[PICO9918_CONF_SCART_MODE] = options.scartMode & 0x01;
+            config[PICO9918_CONF_SCART_MODE] = options.scartMode & 0x03;
             config[PICO9918_CONF_VDP_DEVICE] = options.vdpDevice & 0x03;
             config[PICO9918_CONF_DISP_DRIVER_PREF] = options.dispDriverPref & 0x03;
             config[PICO9918_CONF_VGA_MODE] = options.vgaMode & 0x01;
@@ -1073,7 +1075,7 @@
             pending[0] = PICO9918_PENDING_STATE_CONFIRMED;
             pending[1] = options.dispDriverPref & 0x03;
             pending[2] = options.vgaMode & 0x01;
-            pending[3] = options.scartMode & 0x01;
+            pending[3] = options.scartMode & 0x03;
             pending[4] = options.clockPreset & 0x03;
             // pending[5..15] remain zero (reserved)
             return pending;
