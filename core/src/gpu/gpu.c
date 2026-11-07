@@ -465,6 +465,8 @@ static PICO9918_NOINLINE bool volatileHack(PICO9918_INST_ARG uint32_t budget)
  */
 void pico9918_gpu_init(PICO9918_INST_ONLY_ARG)
 {
+  /* TRAP: the instance is uninitialised RAM, and this must precede guard(0) or it faults */
+  memset(&tms9918->vram.bytes[0x8000], 0, 32);
 #ifdef PICO_BUILD
 #if !PICO_RP2040
   mpu_hw->mair[0] = 0x44; /* normal non-cacheable, so a guarded read stays an ordinary load */
