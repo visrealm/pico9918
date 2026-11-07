@@ -101,6 +101,9 @@ bool shouldUseScartClock();
 /* read configuration data from flash */
 void readConfig(uint8_t config[CONFIG_BYTES]);
 
+/* re-read configuration after boot, keeping any pending display change */
+void reloadConfig(uint8_t config[CONFIG_BYTES]);
+
 /* write configuration data to flash */
 bool writeConfig(uint8_t config[CONFIG_BYTES]);
 

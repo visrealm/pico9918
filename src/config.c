@@ -267,6 +267,14 @@ void refreshPendingMirror(uint8_t config[CONFIG_BYTES], uint8_t state)
   }
 }
 
+static void overlayPendingDisplay(uint8_t config[CONFIG_BYTES], const PendingDisplay *p)
+{
+  config[CONF_DISP_DRIVER_PREF] = p->dispDriverPref;
+  config[CONF_VGA_MODE]         = p->vgaMode;
+  config[CONF_SCART_MODE]       = p->scartMode;
+  config[CONF_CLOCK_PRESET_ID]  = p->clockPresetId;
+}
+
 // call after readConfig(): PENDING -> apply + ARMED, ARMED -> revert + erase
 void applyPendingDisplay(uint8_t config[CONFIG_BYTES])
 {
@@ -275,10 +283,7 @@ void applyPendingDisplay(uint8_t config[CONFIG_BYTES])
 
   if (p.state == PENDING_STATE_PENDING)
   {
-    config[CONF_DISP_DRIVER_PREF] = p.dispDriverPref;
-    config[CONF_VGA_MODE]         = p.vgaMode;
-    config[CONF_SCART_MODE]       = p.scartMode;
-    config[CONF_CLOCK_PRESET_ID]  = p.clockPresetId;
+    overlayPendingDisplay(config, &p);
 
     p.state = PENDING_STATE_ARMED;
     writePendingDisplay(&p);
@@ -387,6 +392,16 @@ void readConfig(uint8_t config[CONFIG_BYTES])
   tms9918->configDirty = true;  // so we apply it
 }
 
+void reloadConfig(uint8_t config[CONFIG_BYTES])
+{
+  PendingDisplay p;
+  readPendingDisplay(&p);
+  readConfig(config);
+  if (p.state != PENDING_STATE_CONFIRMED)
+    overlayPendingDisplay(config, &p);
+  refreshPendingMirror(config, p.state);
+}
+
 /*
  * write configuration to flash
  */
@@ -475,10 +490,7 @@ bool saveConfigSplitPending(uint8_t config[CONFIG_BYTES])
   if (anyTrackedChanged)
   {
     // restore user values for the running firmware, then refresh the mirror
-    config[CONF_DISP_DRIVER_PREF] = p.dispDriverPref;
-    config[CONF_VGA_MODE]         = p.vgaMode;
-    config[CONF_SCART_MODE]       = p.scartMode;
-    config[CONF_CLOCK_PRESET_ID]  = p.clockPresetId;
+    overlayPendingDisplay(config, &p);
     refreshPendingMirror(config, PENDING_STATE_PENDING);
     pendingBannerState = PENDING_BANNER_AWAIT_PC;   // power cycle to test
   }

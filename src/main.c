@@ -215,7 +215,7 @@ void __not_in_flash_func(gpioIrqHandler)()
 
   vrEmuTms9918Reset();  // resets palette to factory
 
-  readConfig(tms9918->config);  // re-load config palette
+  reloadConfig(tms9918->config);  // re-load config palette
 
   irq_clear(TMS_WRITE_IRQ);
   irq_clear(TMS_READ_IRQ);
@@ -450,7 +450,7 @@ static void tmsEndOfFrame(uint32_t frameNumber)
       if (frameCount > SHOW_DIAGNOSTICS_FRAMES)
       {
         // reset diganostics and other settings back to defaults
-        readConfig(tms9918->config);
+        reloadConfig(tms9918->config);
       }
     }
   }
