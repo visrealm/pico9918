@@ -68,7 +68,7 @@ readStatus:
   out pins, 8       ; output the status byte
   mov isr, x        ; make this status value available
 endPart:
-  in pins, 1        ; push CSR, CSW and MODE back through fifo
+  in y, 1           ; TRAP: the MODE acted on above, never a fresh sample
   push              ; push ^^^ back to cpu to process
 .wrap
 

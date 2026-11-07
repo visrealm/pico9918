@@ -339,6 +339,7 @@ CSR_LOW = 0x200 | (1 << 11)
 CSW_LOW = 0x100 | (1 << 11)
 MODE_IDLE = IDLE | (1 << 10)
 MODE_CSW_LOW = CSW_LOW | (1 << 10)
+MODE_CSR_LOW = CSR_LOW | (1 << 10)
 DRIVEN = 0xFF << 12
 
 
@@ -683,6 +684,38 @@ def mode_hold(p, failures, notes):
     checks += 1
     notes.append("  MODE moved inside the strobe for %d cycles: th(WL-A) and tsu(A-RL) "
                  "both reachable" % checks)
+    return checks
+
+
+def mode_flip(p, failures, notes, trials=8):
+    """MODE falling inside a status read: the read the board reports is the one it drove.
+
+    A read is decided from one MODE sample, and its side effects must follow that
+    same decision. MODE drops at a swept offset and stays low, and at every offset
+    the byte left on the bus and the pointer's movement have to agree - status
+    driven means the read-ahead stayed put, data driven means it advanced.
+    """
+    data, nxt = 0x5a, 0x5b
+    p.vram_write(COUNTER, bytes((data, nxt)))
+    strobe, checks, drove_status = 60, 0, []
+    for at in range(EVENT_FLOOR_TICKS, 41):
+        status_count = 0
+        for _ in range(trials):
+            p.set_address(COUNTER)
+            got = bytes.fromhex(events(p, [(MODE_IDLE, 40), (MODE_CSR_LOW, at),
+                                           (CSR_LOW, strobe - at), (IDLE, 260),
+                                           (IDLE, 260)])["data"])
+            drove_data = got[2] == data
+            advanced = p.read_port(PORT_DATA, 1)[0] == nxt
+            status_count += not drove_data
+            checks += 1
+            if drove_data != advanced:
+                failures.append("MODE fell %g ns into a status read: the bus showed %s "
+                                "and the read-ahead %s" % (at * p.tick_ns,
+                                "data" if drove_data else "status (%02x)" % got[2],
+                                "advanced" if advanced else "did not advance"))
+        drove_status.append("%gns:%d/%d" % (at * p.tick_ns, status_count, trials))
+    notes.append("MODE falling inside a status read, status driven: " + ", ".join(drove_status))
     return checks
 
 
@@ -1544,6 +1577,7 @@ GROUPS = {
     "glitch-read-start": glitch_read_start,
     "glitch-read-end": glitch_read_end,
     "conformance": conformance,
+    "mode-flip": mode_flip,
     "drive": drive_control,
     "mode-window": mode_window,
     "read-window": read_window,
@@ -1566,7 +1600,7 @@ GROUPS = {
 # leaves the probe holding a timing other than its safe one, and because the
 # STRESS engine they ride writes over all of VRAM.
 ORDER = ("walking", "address", "wrap", "readahead", "register", "latch", "status",
-         "palette-port", "phantom", "conformance", "glitch-write-start", "glitch-write-end",
+         "palette-port", "phantom", "conformance", "mode-flip", "glitch-write-start", "glitch-write-end",
          "glitch-read-start", "glitch-read-end", "drive",
          "mode-window", "read-window", "write-window", "read-strobe", "write-strobe",
          "read-recovery", "write-recovery", "read-period", "write-period", "alternation",
