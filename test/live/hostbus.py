@@ -244,6 +244,25 @@ def status_pointer(p, failures, notes):
     return 2
 
 
+def status_palette_port(p, failures, notes):
+    """A status read returns the data port to VRAM, even halfway through a palette entry."""
+    p.vram_write(SCRATCH, bytes((0x93,)))
+    p.register(57, 0x1c)
+    p.register(57, 0x1c)
+    p.register(47, 0xc0)
+    p.write_port(PORT_DATA, bytes((0x0f,)))
+    p.status()
+    p.vram_write(SCRATCH, bytes((0x6c,)))
+    p.register(47, 0x00)
+    p.register(57, 0x00)
+    got = p.vram_read(SCRATCH, 1)
+    if got != bytes((0x6c,)):
+        failures.append("status read left the data port in palette mode: VRAM read %s, "
+                        "expected 6c" % got.hex())
+    notes.append("status read returns the data port from palette mode to VRAM")
+    return 1
+
+
 # -- Group E: what the firmware must reject -------------------------------
 
 # Where the glitch sweeps work, clear of the patterns above.
@@ -1519,6 +1538,7 @@ GROUPS = {
     "register": register_vs_address,
     "latch": latch_matrix,
     "status": status_pointer,
+    "palette-port": status_palette_port,
     "glitch-write-start": glitch_write_start,
     "glitch-write-end": glitch_write_end,
     "glitch-read-start": glitch_read_start,
@@ -1546,7 +1566,7 @@ GROUPS = {
 # leaves the probe holding a timing other than its safe one, and because the
 # STRESS engine they ride writes over all of VRAM.
 ORDER = ("walking", "address", "wrap", "readahead", "register", "latch", "status",
-         "phantom", "conformance", "glitch-write-start", "glitch-write-end",
+         "palette-port", "phantom", "conformance", "glitch-write-start", "glitch-write-end",
          "glitch-read-start", "glitch-read-end", "drive",
          "mode-window", "read-window", "write-window", "read-strobe", "write-strobe",
          "read-recovery", "write-recovery", "read-period", "write-period", "alternation",

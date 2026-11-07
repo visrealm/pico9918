@@ -597,6 +597,13 @@ PICO9918_INLINE_HOT void pico9918_status_read_core(PICO9918_INST_ARG uint8_t rea
   pico9918_frame_sync_int_impl(PICO9918_INST_ONLY);
 }
 
+PICO9918_INLINE_HOT void pico9918_reset_access_flags_impl(PICO9918_INST_ONLY_ARG)
+{
+  tms9918->regWriteStage = 0;
+  tms9918->palWriteStage = 0;
+  TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &= (uint8_t)~PICO9918_R47_DATA_PORT;
+}
+
 /**
  * \brief CPU-interface entry: the host's read-ahead already handed the CPU a value, so
  * this only applies the read's side effects. The host supplies both the value the
@@ -604,7 +611,7 @@ PICO9918_INLINE_HOT void pico9918_status_read_core(PICO9918_INST_ARG uint8_t rea
  */
 PICO9918_INLINE_HOT void pico9918_status_read_reconcile_impl(PICO9918_INST_ARG uint8_t readReg, uint8_t readVal)
 {
-  tms9918->regWriteStage = 0;
+  pico9918_reset_access_flags_impl(PICO9918_INST_ONLY);
 
   if (!pico9918_status_select_active(PICO9918_INST_ONLY)) readReg = 0;
 
@@ -614,9 +621,7 @@ PICO9918_INLINE_HOT void pico9918_status_read_reconcile_impl(PICO9918_INST_ARG u
 /**
  * \brief read from the status register
  *
- * Emulator-facing entry: fetches the value itself, then runs the same core. It
- * additionally resets the data-port palette staging, which the CPU-interface
- * path never did (that port is written through a different host seam).
+ * Emulator-facing entry: fetches the value itself, then runs the same core.
  *
  * PICO9918_INLINE, not PICO9918_INLINE_HOT. The core it calls reaches
  * PICO9918_HOST_SET_INT, which on Pico is an SDK `static inline` gpio_put, and a
@@ -640,11 +645,7 @@ PICO9918_INLINE_HOT void pico9918_status_read_reconcile_impl(PICO9918_INST_ARG u
  */
 PICO9918_INLINE uint8_t pico9918_read_status_impl(PICO9918_INST_ONLY_ARG)
 {
-  tms9918->regWriteStage = 0;
-
-  tms9918->palWriteStage = 0;
-  TMS_REGISTER(tms9918, PICO9918_REG_PALETTE_CONTROL) &=
-    (uint8_t)~PICO9918_R47_DATA_PORT; // reset data port palette mode
+  pico9918_reset_access_flags_impl(PICO9918_INST_ONLY);
 
   const uint8_t readReg = TMS_REGISTER(tms9918, PICO9918_REG_STATUS_SELECT) & PICO9918_R15_STATUS_NUM;
   const uint8_t readVal = TMS_STATUS(tms9918, readReg);
