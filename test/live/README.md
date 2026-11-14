@@ -13,6 +13,7 @@ were spent on the test rather than the firmware.
 live9918.py     the board: SWD, flashing, capture, PNG
 intpin.py       the /INT pin itself, which no scene describes
 busflash.py     firmware update over the host bus, for a board with no SWD
+pendingflow.py  the display-change confirmation flow, across host resets and power cycles
 perf.py         every scene against the clock
 perflog.py      the perf history, and what moved between two runs
 results.py      what a run leaves behind
@@ -260,6 +261,25 @@ past it a failure leaves only BOOTSEL.
 `--write` verifies by reading every block back through the same handshake, and does it after a
 power cycle so that the new firmware is the one answering. That needs `switch` power; on `manual`
 it says so, and `--verify` finishes the job once the board has been cycled by hand.
+
+### Display-change confirmation: `pendingflow.py`
+
+```
+python pendingflow.py --port COM10
+```
+
+A display or clock change does not go straight into the stored settings. Saving it writes a pending
+block; the next power-up applies it and marks it ARMED; the configurator then asks whether the
+picture is fine and confirms it, or the boot after reverts it. A host reset can land at any point in
+that, and must not lose the change. This walks the flow over the bus the way the configurator does -
+save, host reset, power cycle, host reset, confirm, host reset, power cycle - and after each step
+reads back the pending state (config byte 200), the field and its mirror. It changes the SCART mode,
+which is tracked but changes nothing on a VGA board, then walks the original value back the same way,
+so a passing run leaves the stored settings as it found them.
+
+It runs on any firmware, live-test build or not, and needs `switch` power for the power cycles. A
+host reset that drops the change reads back CONFIRMED with the old value, which is what firmware
+without the fix does at both reset steps.
 
 ### Without a board: `--desktop`
 
