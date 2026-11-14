@@ -57,13 +57,13 @@ if(NOT DEFINED PICO9918_MINOR_VER)
     set(PICO9918_MINOR_VER 2)
 endif()
 if(NOT DEFINED PICO9918_PATCH_VER)
-    set(PICO9918_PATCH_VER 1)
+    set(PICO9918_PATCH_VER 2)
 endif()
 # Optional artifact suffix (e.g. "a1", "alpha1", "rc2"). When non-empty, this
 # overrides the git branch name in generated artifact filenames. Setting it to an
 # empty string is a valid choice (use the branch name), so we guard on DEFINED.
 if(NOT DEFINED PICO9918_VERSION_SUFFIX)
-    set(PICO9918_VERSION_SUFFIX "")
+    set(PICO9918_VERSION_SUFFIX "a1")
 endif()
 
 # Common helpers must follow the version vars above and precede visrealm_*.
