@@ -204,7 +204,7 @@ add_cvbasic_target(creativision "--creativision" "-rom16" "pico9918conf-${VERSIO
 add_cvbasic_target(sg1000 "--sg1000" "" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.sg" "SG-1000/SC-3000")
 
 # Master target to build all platforms
-add_custom_target(configurator_all DEPENDS ti99 ti99_lite coleco coleco_lite msx_asc16 msx_asc16_lite msx_konami msx_konami_lite nabu sg1000)
+add_custom_target(configurator_all DEPENDS ti99 ti99_lite coleco coleco_lite msx_asc16 msx_asc16_lite msx_konami msx_konami_lite nabu creativision sg1000)
 
 # Print build information
 message(STATUS "PICO9918 Configurator CMake Configuration")
