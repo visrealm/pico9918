@@ -75,8 +75,8 @@ bool writeConfig(uint8_t config[PICO9918_CONFIG_BYTES]);
  */
 bool saveConfigSplitPending(uint8_t config[PICO9918_CONFIG_BYTES]);
 
-/** \brief re-read the stored block once the display is finally enabled after the
- *         startup diagnostics screen
+/** \brief re-read the stored block after a host reset, or once the display is finally
+ *         enabled after the startup diagnostics screen, keeping any pending display change
  *  \note  registered with pico9918_frame_set_config_reload_callback(); it is flash I/O, so
  *         it cannot expand into a library TU
  */

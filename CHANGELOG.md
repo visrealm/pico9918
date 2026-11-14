@@ -82,6 +82,8 @@ shared path is faster than the per-mode code it replaced.
   latches it, rather than the status number R15 last selected.
 * The GPU DMA registers power up zeroed, so a cold boot can no longer fire a stray transfer.
 * The diagnostic clock row shows the clock the board is actually running.
+* A display or clock change waiting for confirmation survives a host reset, so the configurator
+  can still confirm it.
 * Status register 0 reports a fifth-sprite number of 0 where there is no fifth sprite, rather than
   a constant 31.
 * R50 bit 2 drives the simulated scanlines, so software that asks for the effect gets it. The

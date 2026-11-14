@@ -90,7 +90,7 @@ static void __not_in_flash_func(gpioIrqHandler)(void)
   PICO9918_HOST_ENTER_CRITICAL();
 
   pico9918_reset();
-  readConfig(tms9918->config);
+  reloadStoredConfig(tms9918, NULL);
 
   irq_clear(TMS_WRITE_IRQ);
   irq_clear(TMS_READ_IRQ);

@@ -119,10 +119,14 @@ void updateDispDriver(void)
  *         no argument: the block it reloads into is always the live one, and the
  *         library already knows where that is
  */
-void reloadStoredConfig(pico9918_t* tms9918, void* userdata)
+void __in_flash_func(reloadStoredConfig)(pico9918_t* tms9918, void* userdata)
 {
   (void)userdata;
+  PendingDisplay p;
+  readPendingDisplay(&p);
   readConfig(tms9918->config);
+  if (p.state != PICO9918_PENDING_STATE_CONFIRMED) pico9918_config_pending_restore(tms9918->config, (const uint8_t*)&p);
+  pico9918_config_refresh_pending_mirror(tms9918->config, p.state);
 }
 
 #define CONFIG_FLASH_OFFSET (0x200000 - 0x1000) ///< in the top 4kB of a 2MB flash
