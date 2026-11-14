@@ -11,8 +11,36 @@ Current firmware works on every official board: v0.3, v0.4 through v1.3, and PRO
 
 ## Unreleased
 
-Work past v1.2.0 lives on branches and is not downloadable. A lite (settings-only) configurator ROM
-for the CreatiVision is planned for v1.2.1.
+Work past v1.2.1 lives on branches and is not downloadable.
+
+## v1.2.1 - 2026-11-14
+
+Host bus timing and compatibility, and progressive SCART modes.
+
+### Added
+
+* Progressive SCART modes: NTSC 240p @ 60 Hz and PAL 288p @ 50 Hz, matching the non-interlaced
+  output of the original TMS9918A.
+* Single-target configurator builds, carrying firmware for only one board.
+
+### Changed
+
+* Host interface timing: `MODE` is sampled on the `/CSW` falling edge and the sampled value is acted
+  on, glitches on `/CSW` are rejected before a write cycle is accepted, and the read bus is driven
+  earlier.
+* The host interface runs at a fixed PIO rate, independent of the system clock.
+* CRT scanlines are no longer applied to SCART output.
+* GPU performance improvements on the PICO9918 PRO.
+
+### Fixed
+
+* A display or clock change made in the configurator could be lost after a host reset, before it
+  was confirmed.
+* Reading any status register now exits data port palette mode.
+* Tile attribute address in position-based tile attribute mode.
+* Bitmap layer row stride and 14-bit address wrap now match the F18A, as does the GPU `PIX`
+  instruction's bitmap layer addressing.
+* GPU `SLC` with an immediate shift count above 3.
 
 ## v1.2.0 - 2026-07-12
 
