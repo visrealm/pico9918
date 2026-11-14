@@ -325,8 +325,7 @@ static uint32_t refLut[256];
  *
  *   DOUBLED  entries 0..63, each the pram entry's pixel repeated in both
  *            halves of the word.
- *   PAIRED   entries 0..15 doubled (an index < 16 still means one colour),
- *            then 16..255 where the byte is two 4-bit indexes: the high
+ *   PAIRED   entries 0..255, each byte two 4-bit indexes: the high
  *            nibble's colour in the low half of the word, the low nibble's in
  *            the high half. Little-endian storage puts the low half at the
  *            lower address, so the HIGH nibble is the left-hand pixel.
@@ -350,9 +349,8 @@ static void refRegenerate(bool paired)
   for (int i = 0; i < 16; ++i)
   {
     pal[i] = refPixel(pram[i]);
-    refLut[i] = (uint32_t)pal[i] | ((uint32_t)pal[i] << 16);
   }
-  for (int j = 16; j < 256; ++j)
+  for (int j = 0; j < 256; ++j)
   {
     refLut[j] = ((uint32_t)pal[j & 0x0f] << 16) | pal[j >> 4];
   }

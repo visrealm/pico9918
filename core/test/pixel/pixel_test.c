@@ -107,10 +107,6 @@ static void checkLineBytes(const char* stage, uint32_t wanted)
  * mode that doubles stores one entry per output pair; a wide 80-column row indexes
  * the same entries with a whole byte and takes one half. So every one of the 64
  * palette addresses must carry its own colour, twice.
- *
- * Indexes 0-15 come out right under EITHER layout - a nibble-pair build writes them
- * first - so a check that stopped there would pass on the wrong LUT. It is 16-63, the
- * palette SELECT the 8bpp tier exists to provide, that tells the two apart.
  */
 static void checkDoubledLayout(const char* stage)
 {
@@ -127,15 +123,14 @@ static void checkDoubledLayout(const char* stage)
  * DIFFERENT colours. The high nibble is the left pixel and lands in the LOW half of
  * the word, which is where a little-endian pair writer puts the earlier pixel.
  *
- * Entries below 16 are the exception: an index under 16 still means one colour, so
- * they are doubled like any other mode's. Same rule the golden reference states.
+ * TRAP: entries below 16 are pairs too, colour 0 on the left - not one colour doubled.
  */
 static void checkPackedLayout(const char* stage)
 {
   for (unsigned index = 0; index < 256; ++index)
   {
-    const int high = index < 16 ? (int)index : (int)(index >> 4);
-    const int low  = index < 16 ? (int)index : (int)(index & 0x0f);
+    const int high = (int)(index >> 4);
+    const int low  = (int)(index & 0x0f);
 
     const uint32_t entry = pico9918_palette_lut[index];
     if ((uint16_t)entry != want(high)) fail(stage, index, want(high), (uint16_t)entry);

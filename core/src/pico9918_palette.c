@@ -50,16 +50,14 @@ _Static_assert(offsetof(pico9918_t, vram.map.pram) % 4 == 0, "palette LUT build 
 static uint32_t paletteShadow[32];
 static uint8_t paletteShadowLayout;
 
-/* Convert two adjacent palette entries as doubled pixels, and return the converted
-   pair packed into a word for the paired build below to reuse. */
-static inline uint32_t cachePixelPair(PICO9918_PALETTE_LUT_T* dest, const uint16_t* source)
+/* Convert two adjacent palette entries as doubled pixels. */
+static inline void cachePixelPair(PICO9918_PALETTE_LUT_T* dest, const uint16_t* source)
 {
   const pico9918_aliasing_u32_t* alignedSource =
     (const pico9918_aliasing_u32_t*)PICO9918_ASSUME_ALIGNED(source, 4);
   const uint32_t packed                 = PICO9918_PIXEL_FROM_RGB12_PAIR(*alignedSource);
   dest[0]                               = PICO9918_PIXEL_PAIR(PICO9918_LOW16(packed));
   dest[1]                               = PICO9918_PIXEL_PAIR(packed >> 16);
-  return packed;
 }
 
 PICO9918_NOINLINE void pico9918_palette_regenerate(PICO9918_INST_ONLY_ARG)
@@ -111,11 +109,10 @@ PICO9918_NOINLINE void pico9918_palette_regenerate(PICO9918_INST_ONLY_ARG)
     uint16_t __aligned(4) tmpPal[16];
     for (int i = 0; i < 16; i += 2)
     {
-      const uint32_t packed     = cachePixelPair(pico9918_palette_lut + i, source + i);
       pico9918_aliasing_u32_t* dest    = (pico9918_aliasing_u32_t*)PICO9918_ASSUME_ALIGNED(tmpPal + i, 4);
-      *dest                     = packed;
+      *dest                     = PICO9918_PIXEL_FROM_RGB12_PAIR(words[i >> 1]);
     }
-    for (int high = 1; high < 16; ++high)
+    for (int high = 0; high < 16; ++high)
     {
       const uint32_t highPixel      = tmpPal[high];
       PICO9918_PALETTE_LUT_T* dest    = pico9918_palette_lut + (high << 4);
