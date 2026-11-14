@@ -200,7 +200,7 @@ add_cvbasic_target(msx_asc16_lite "--msx" "-DNO_UPGRADE=1" "pico9918conf-${VERSI
 add_cvbasic_target(msx_konami "--msx" "-konami" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_konami.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_konami.rom" "MSX Konami")
 add_cvbasic_target(msx_konami_lite "--msx" "-konami;-DNO_UPGRADE=1" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_konami_lite.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_msx_konami_lite.rom" "MSX Konami Lite")
 add_cvbasic_target(nabu "--nabu" "" "pico9918conf-${VERSION_WITH_OUTPUT}_nabu.asm" "pico9918conf-${VERSION_WITH_OUTPUT}.nabu" "NABU")
-add_cvbasic_target(creativision "--creativision" "-rom16" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.bin" "CreatiVision")
+add_cvbasic_target(creativision "--creativision" """pico9918conf-${VERSION_WITH_OUTPUT}_crv.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_crv.bin" "CreatiVision")
 add_cvbasic_target(sg1000 "--sg1000" "" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.asm" "pico9918conf-${VERSION_WITH_OUTPUT}_sg1000.sg" "SG-1000/SC-3000")
 
 # Master target to build all platforms
