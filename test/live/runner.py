@@ -151,7 +151,7 @@ def main():
                     help="restrict the scene stages to those that drop a line first")
     ap.add_argument("--flash", action="store_true", help="program the board first")
     ap.add_argument("--save", metavar="SUFFIX", nargs="?", const="", default=None,
-                    help="write the record to runs/<board>-<commit>[-SUFFIX].json")
+                    help="write the record to <board>-<commit>[-SUFFIX].json in LIVE9918_RUNS, or test/live/runs")
     ap.add_argument("--report", metavar="PATH", nargs="?", const="", default=None,
                     help="also write an HTML report; defaults to reports/<record name>.html")
     ap.add_argument("--against", metavar="TAG",
@@ -178,7 +178,9 @@ def main():
         # than cosmetic: `results.latest` picks a drift baseline by board, so calling
         # it "pro" would let a run with no timings at all become the baseline for one
         # that has them.
-        record = results.new("desktop" if args.desktop else args.board, t.elf, t.clock_hz())
+        record = results.new("desktop" if args.desktop else args.board, t.elf, t.clock_hz(),
+                             None if args.desktop else t.hw_version(),
+                             None if args.desktop else t.ocd.serial)
         print("%s\n" % results.describe(record))
         for stage in stages:
             print("== %s" % stage)

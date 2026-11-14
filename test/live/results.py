@@ -42,7 +42,9 @@ SCHEMA = 3
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-RUNS_DIR = os.path.join(HERE, "runs")
+RELEASE_DIR = os.path.join(HERE, "runs")
+RUNS_DIR = os.environ.get("LIVE9918_RUNS") or RELEASE_DIR
+SEARCH_DIRS = [RUNS_DIR] + ([RELEASE_DIR] if RUNS_DIR != RELEASE_DIR else [])
 
 # The sections this project actually argues about, in load order: what stays in
 # flash, then what lives in SRAM. RESUME.md quotes `.text` and `.scratch_x`
@@ -187,26 +189,49 @@ def toolchain(elf):
     return "; ".join(seen) or None
 
 
-def metadata(board, elf, clock_hz=None):
+PATCH_LIMIT = 256 * 1024
+
+
+def patch_of_tree():
+    """The uncommitted change a dirty run measured. The records' own directory is
+    left out, since deleting or adding a record changes nothing that runs, and a
+    patch past PATCH_LIMIT - regenerated goldens, say - is replaced by its stat so
+    one wide edit cannot make every record of a session megabytes long."""
+    spec = ["--", ".", ":(exclude)test/live/runs"]
+    patch = _git("diff", "HEAD", *spec)
+    if len(patch) > PATCH_LIMIT:
+        patch = ("diff of %d bytes, past the %d byte limit; stat only\n" % (len(patch), PATCH_LIMIT)
+                 + _git("diff", "HEAD", "--stat", *spec))
+    return patch + "\n"
+
+
+def metadata(board, elf, clock_hz=None, hw_version=None, probe=None):
     """Everything needed to say what produced a number, and therefore everything
     two records need before a comparison between them means anything.
 
     `dirty` matters as much as `commit`: a reading taken over uncommitted edits is
-    not a reading of that commit, and nothing else in the record can tell. The
-    clock matters the same way - the budget assumes the 252 MHz floor and a user
-    can clock up, so two sets of numbers could differ by a third and read as a
-    regression."""
+    not a reading of that commit, and nothing else in the record can tell, so a
+    dirty run also carries its `patch`. The clock matters the same way - the budget
+    assumes the 252 MHz floor and a user can clock up, so two sets of numbers could
+    differ by a third and read as a regression. `sha` outlives `commit` once a
+    branch is squashed or rebased, and `hw_version` and `probe` say which physical
+    board answered, since host bus timing follows the board revision."""
     cache = cmake_cache(elf)
+    dirty = bool(_git("status", "--porcelain", "--untracked-files=no"))
     return {
-        "date": datetime.datetime.now().replace(microsecond=0).isoformat(),
+        "date": datetime.datetime.now().astimezone().replace(microsecond=0).isoformat(),
         "board": board,
+        "hw_version": hw_version,
+        "probe": probe,
         "version": firmware_version(elf),
         "commit": _git("rev-parse", "--short", "HEAD"),
+        "sha": _git("rev-parse", "HEAD"),
         "subject": _git("log", "-1", "--format=%s"),
         "branch": _git("rev-parse", "--abbrev-ref", "HEAD"),
-        "dirty": bool(_git("status", "--porcelain", "--untracked-files=no")),
+        "dirty": dirty,
+        "patch": patch_of_tree() if dirty else None,
         "elf": os.path.relpath(elf, ROOT).replace("\\", "/") if elf else None,
-        "elf_built": (datetime.datetime.fromtimestamp(os.path.getmtime(elf))
+        "elf_built": (datetime.datetime.fromtimestamp(os.path.getmtime(elf)).astimezone()
                       .replace(microsecond=0).isoformat()) if elf and os.path.exists(elf) else None,
         "clock_hz": clock_hz,
         # the two numbers every reading is judged against, stamped rather than
@@ -222,10 +247,10 @@ def metadata(board, elf, clock_hz=None):
     }
 
 
-def new(board, elf, clock_hz=None):
+def new(board, elf, clock_hz=None, hw_version=None, probe=None):
     """An empty record. Stages fill their own key and leave the others absent, so
     a partial run is readable as a partial run rather than as a run of zeros."""
-    return {"schema": SCHEMA, "run": metadata(board, elf, clock_hz),
+    return {"schema": SCHEMA, "run": metadata(board, elf, clock_hz, hw_version, probe),
             "freeze": {}, "perf": {}, "properties": {}, "gpu": {}, "hostbus": {},
             "scenes": {}}
 
@@ -251,20 +276,34 @@ def path_for(record, suffix=None):
 
 
 def resolve(tag):
-    """A tag names a file in runs/, a bare filename or a path - whichever the
-    caller had to hand."""
-    for candidate in (tag, os.path.join(RUNS_DIR, tag),
-                      os.path.join(RUNS_DIR, tag + ".json")):
+    """A tag names a record in LIVE9918_RUNS or runs/, a bare filename or a path -
+    whichever the caller had to hand."""
+    candidates = [tag]
+    for directory in SEARCH_DIRS:
+        candidates += [os.path.join(directory, tag), os.path.join(directory, tag + ".json")]
+    for candidate in candidates:
         if os.path.isfile(candidate):
             return candidate
-    raise SystemExit("no run record called %r - runs/ holds %s"
-                     % (tag, ", ".join(sorted(available())) or "nothing yet"))
+    raise SystemExit("no run record called %r - %s hold %s"
+                     % (tag, " and ".join(SEARCH_DIRS), ", ".join(sorted(available())) or "nothing yet"))
 
 
 def available():
-    if not os.path.isdir(RUNS_DIR):
-        return []
-    return [f[:-5] for f in os.listdir(RUNS_DIR) if f.endswith(".json")]
+    tags = set()
+    for directory in SEARCH_DIRS:
+        if os.path.isdir(directory):
+            tags |= {f[:-5] for f in os.listdir(directory) if f.endswith(".json")}
+    return sorted(tags)
+
+
+def instant(run):
+    """When a run started, comparable across records. A date with no offset is the
+    harness machine's local time, which is what every record before the offset was
+    stamped means, so it is read through that zone's own daylight saving rules."""
+    date = run.get("date")
+    if not date:
+        return datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
+    return datetime.datetime.fromisoformat(date).astimezone(datetime.timezone.utc)
 
 
 def comparable(run, was):
@@ -309,7 +348,7 @@ def latest(board, exclude=None, like=None):
             continue
         if like is not None and not comparable(like, run):
             continue
-        if best is None or run["date"] > best[1]["date"]:
+        if best is None or instant(run) > instant(best[1]):
             best = (tag, run)
     return best[0] if best else None
 
@@ -415,6 +454,8 @@ def limit_of(entry):
 
 
 def save(record, path=None, suffix=None):
+    if suffix:
+        record["run"]["label"] = suffix
     path = path or path_for(record, suffix)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:

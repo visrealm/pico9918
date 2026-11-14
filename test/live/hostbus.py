@@ -35,6 +35,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import probe as probe_module
+import results
 from probe import PORT_CONTROL, PORT_DATA, Probe, ProbeError, spec
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
@@ -1726,7 +1727,7 @@ def main():
     ap.add_argument("--only", nargs="*", default=None, help=" ".join(ORDER))
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--save", default=None, metavar="TAG",
-                    help="write the result to test/live/runs/hostbus-TAG.json")
+                    help="write the result to hostbus-TAG.json in LIVE9918_RUNS, or test/live/runs")
     args = ap.parse_args()
     if args.list:
         for name in ORDER:
@@ -1739,8 +1740,8 @@ def main():
         result = run(p, args.only)
         result["rig"] = rig(p)
     if args.save:
-        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "runs",
-                            "hostbus-%s.json" % args.save)
+        path = os.path.join(results.RUNS_DIR, "hostbus-%s.json" % args.save)
+        os.makedirs(results.RUNS_DIR, exist_ok=True)
         with open(path, "w") as f:
             json.dump(result, f, indent=1, sort_keys=True)
         print("saved %s" % path)

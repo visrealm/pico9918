@@ -22,7 +22,7 @@ ci.sh           both desktop tiers, for CI
 
 history/        the perf record over time, and the page that plots it
 web/            the two browser tools; nothing here is needed to run the tests
-runs/           the records, small enough to commit
+runs/           the records of released firmware; every other run goes to LIVE9918_RUNS
 reports/        generated pages - not tracked; the records they are made from are
 ```
 
@@ -220,7 +220,7 @@ second mode line (`gpio.c`, "Mode 1 (V9938)") and has no TMS9918A pin of its own
 python runner.py --board 2040                 every stage, one record
 python runner.py --board 2040 --quick         canaries and properties, minutes faster
 python runner.py --board 2040 --only freeze perf
-python runner.py --board 2040 --save --report writes runs/ and reports/
+python runner.py --board 2040 --save --report writes a record and a page in reports/
 python runner.py --board 2040 --save --report --against 2040-aba934b
 python runner.py --board 2040 --clock 1        reboot at 302 MHz and measure there
 ```
@@ -374,24 +374,31 @@ Everything in one session is what makes the rig cheap enough to run every iterat
 first, but nothing depends on that: stage order cannot fix order-dependence, because the state a
 stage inherits comes from the previous *run*, so each property sets its own up (see Properties).
 
-**The run leaves a record, not just a verdict.** `runs/<board>-<commit>.json` holds every scene's
-state, the rows it dropped, what it cost and what each property asserted - stamped with the commit,
-the branch, whether the tree was dirty, the board, the firmware version, the **clock read off the
-board**, the toolchain version, every `PICO9918_*` option the ELF was configured with and its
-section sizes. That is what a saved control was missing: a bare `{scene: {render, line}}` cannot say
-what produced it, so it goes stale silently. The record is small enough to commit, so a comparison
-can reach back through the branch rather than only to whatever is on this disk.
+**The run leaves a record, not just a verdict.** `<board>-<commit>.json` holds every scene's state,
+the rows it dropped, what it cost and what each property asserted - stamped with the commit and its
+full sha, the branch, whether the tree was dirty and the patch that made it so, the board, the
+revision the firmware detected and the probe that reached it, the firmware version, the **clock read
+off the board**, the toolchain version, every `PICO9918_*` option the ELF was configured with and its
+section sizes, the `--save` label, and the date with its UTC offset. That is what a saved control
+was missing: a bare `{scene: {render, line}}` cannot say what produced it, so it goes stale
+silently.
+
+**Where records live.** A run saves into `LIVE9918_RUNS` when it is set, and into `runs/` when it is
+not. Every lookup - `--against`, `last`, the perf log and the history - searches `LIVE9918_RUNS`
+first and then `runs/`. The working set belongs in its own repository, cloned once beside the
+workspace and named by `LIVE9918_RUNS`, so every worktree writes to one place and committing a record
+publishes nothing. `runs/` here keeps only full-suite, clean-tree records of released firmware, one
+per board per release, so a fresh clone can still compare against what shipped.
 
 **New fields are additive, and old records stay readable.** A record written before a field existed
 simply does not carry it, and the page leaves that row out rather than printing a dash against every
 old run. Anything added to the record has to work that way: read it if it is there, say nothing if
 it is not, and never make an older record unreadable.
 
-> **Deleting a committed record dirties the tree, and the next run says so.** Records are tracked,
-> so `rm runs/*.json` is a pending deletion and every run taken before it is committed stamps
-> `dirty` - which is correct, and misleading if what you wanted was a clean baseline. Commit the
-> removal first. Ordinary runs need no cleanup at all: each writes `<board>-<commit>.json`, a new
-> untracked file, which does not count as dirt.
+> **Deleting a committed record dirties the tree, and the next run says so.** The release records
+> in `runs/` are tracked, so removing one is a pending deletion and every run taken before it is
+> committed stamps `dirty`. Commit the removal first. A new record is an untracked file, which does
+> not count as dirt.
 
 **A dropped row fails the run with the overlay off; with every panel on it does not.** Overlay-off is
 the renderer's own cost, which is the budget that matters. Overlay-on is the overlay's cost, which

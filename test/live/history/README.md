@@ -9,10 +9,10 @@ Neither the ELF store nor the manifest is in this repository: both are large and
 machine-local. **Building them is no longer scripted** - the sweep that produced
 them walked a submodule path this layout does not have, so it was retired rather
 than left to rot. The measurements it produced are committed and remain valid; see
-`perf-history.jsonl` and the records in `test/live/runs/`.
+`perf-history.jsonl` and the run records (`LIVE9918_RUNS`, or `test/live/runs/`).
 
 `series.sh <pro|2040>` is the half that still runs: it flashes each stored sample
-and saves a record per point into `test/live/runs/`. It derives its paths from the
+and saves a record per point, wherever the runner saves. It derives its paths from the
 repository's own location, expecting the ELF store beside it, and accepts
 overrides:
 

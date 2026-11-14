@@ -524,6 +524,12 @@ class Live(VdpAccess):
             return None
         return hz if 100_000_000 <= hz <= 600_000_000 else None
 
+    def hw_version(self):
+        """The board revision the firmware detected at boot, as `major.minor` out of
+        config byte 1, so a record says which revision's bus timing it measured."""
+        value = self.read(self.inst + self.off["config"] + 1, 1)[0]
+        return "%d.%d" % (value >> 4, value & 15) if value else None
+
     def flash(self):
         # openocd answers a failed `program` with the error text rather than by
         # closing the connection, so ignoring the reply reports a flash that never
