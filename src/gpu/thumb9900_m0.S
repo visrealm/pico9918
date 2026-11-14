@@ -1568,14 +1568,20 @@ I_XOP_BL:
         BNE  I_XOP_BL_M
         ADDS R0,R2,#1    // 256 - R2 is now free
 I_XOP_BL_M:
+        ADDS R0,#3
+        LSRS R0,#2       // Row stride in bytes, rounded up
         MULS R0,R7       // R7 is now free
-        LSRS R5,R5,#8    // X
-        ADDS R0,R5       // R0 = p = (y * vregs [35]) + x; - R5 is now free
+        LSRS R7,R5,#10   // x >> 2
+        ADDS R0,R7       // R0 = (y * stride) + (x >> 2)
 
         LDRB R2,[R3,#0]  // Get VR32 - R3 is now free
         LSLS R2,#6
-        LSRS R5,R0,#2
-        ADDS R2,R5       // R2 = a = (vregs [32] << 6) + (p >> 2);
+        ADDS R2,R0       // R2 = a = (vregs [32] << 6) + offset
+        LSLS R2,#18
+        LSRS R2,#18      // Address wraps within the 16KB of VRAM
+
+        LSLS R0,R5,#22
+        LSRS R0,#30      // R0 = s = x & 0x03
 
         LSRS R5,R4,#15   // if (R4 & PIX_A) - PIX_A into Carry
         BCC  I_XOP_BL_P  // Clear = Process Bits, else just store address result..
@@ -1587,8 +1593,6 @@ I_XOP_BL_M:
 
 .align 4
 I_XOP_BL_P:
-        LSLS R0,#30
-        LSRS R0,#30      // R0 = s = p & 0x03;
         ADD  R2,R8       // Within the 64KB memory area
         LDRB R3,[R2,#0]  // R3 = b = mem [a];
         ADR  R7,MSKSH
@@ -1754,7 +1758,7 @@ JMPTBL: .WORD start    , 0     , start    , 0     , start    , 0     , start    
         .WORD I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0     , I_SRC    , 0        // >0B00
         .WORD I_RET    , 0     , start    , 0     , start    , 0     , start    , 0     , sdecode2a, I_CALL, sdecode2a, I_CALL, start    , 0     , start    , 0        // >0C00
         .WORD sdecode2a, I_PUSH, sdecode2a, I_PUSH, start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0        // >0D00
-        .WORD I_SLC    , 0     , I_SLC    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0        // >0E00
+        .WORD I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0     , I_SLC    , 0        // >0E00
         .WORD sdecode2a, I_POP , sdecode2a, I_POP , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0     , start    , 0        // >0F00
         .WORD I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0     , I_JMP    , 0        // >1000
         .WORD I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0     , I_JLT    , 0        // >1100
