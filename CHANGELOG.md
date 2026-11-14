@@ -30,6 +30,10 @@ shared path is faster than the per-mode code it replaced.
   interrupt enable.
 * A `RENDER` row on the performance diagnostic overlay, giving the average per-scanline render time
   in microseconds beside the frame time. The overlay font has been redrawn.
+* SCART 288p @ 50 Hz and 240p @ 60 Hz, progressive modes beside 576i and 480i, selectable in both
+  configurators.
+* A debugger interface in pico9918-core: hide a layer without the guest noticing, edit the GPU's
+  registers and the status registers, and run the GPU to a breakpoint.
 
 ### Changed
 
@@ -46,6 +50,11 @@ shared path is faster than the per-mode code it replaced.
   four-byte identity a host filled in. Three of those four bytes were facts the library already
   held: it stamps its own version, and the MCU follows the revision. Nothing about a board's
   stored settings changes, but the call and its struct do.
+* A settings block made for the other board model is kept and re-stamped rather than reset to
+  defaults.
+* The host bus interface runs at the same speed on every clock preset, and sustains faster
+  back-to-back reads: a scanline with nothing new to display no longer holds the bus off.
+* The configurator ROM is sized to the firmware it carries rather than fixed at 256 KB.
 
 ### Fixed
 
@@ -62,7 +71,16 @@ shared path is faster than the per-mode code it replaced.
   wraps into it rather than out of it.
 * The GPU's `PIX` instruction addresses the bitmap layer the way the F18A does, and `SLC` executes
   with an immediate shift count above 3.
-* A palette write from a GPU program is noticed, so the picture takes the new colours.
+* A palette write from a GPU program is noticed, so the picture takes the new colours, and the
+  border follows a palette change straight away.
+* A brief HIGH on /CSR during a read no longer counts as a second read, a /CSW glitch shorter than
+  35 ns is ignored, and MODE is sampled at the /CSW edge.
+* A status read can no longer be handled as a data read when MODE changes late in the cycle.
+* A status read on the host bus leaves palette data-port mode, as on the F18A.
+* Status register 15 returns the value of the register a read-address write names, as the F18A
+  latches it, rather than the status number R15 last selected.
+* The GPU DMA registers power up zeroed, so a cold boot can no longer fire a stray transfer.
+* The diagnostic clock row shows the clock the board is actually running.
 * Status register 0 reports a fifth-sprite number of 0 where there is no fifth sprite, rather than
   a constant 31.
 * R50 bit 2 drives the simulated scanlines, so software that asks for the effect gets it. The
