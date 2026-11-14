@@ -53,14 +53,14 @@ pullLoop:
   mov x, osr        ; since we want the latest value
   jmp pin pullLoop
 
-  nop           [7] ; ~32 ns debounce delay for CSR settling (covers typical bounce)
-  jmp pin pullLoop  ; if CSR bounced back HIGH, go back to waiting (debounce recovery)
-  
+  ; TRAP: drive before the settle. U5 turns toward the host on the /CSR edge, so
+  ; any later leaves it relaying an undriven input onto the host bus.
+  out pindirs, 8
+  out pins, 8   [6] ; data byte; with the line above, ~32 ns of CSR settling
+  jmp pin waitRelease ; CSR bounced back HIGH: release the bus and re-arm
+
   in pins, 1        ; read MODE pin (debounce verified, CSR is stable LOW)
   mov y, isr        ; y contains MODE state
-  
-  out pindirs, 8    ; set up CD0-7 as outputs
-  out pins, 8       ; output data byte
 
   jmp !y, endPart ; still 1? loop, otherwise, let's read
 
