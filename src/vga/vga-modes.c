@@ -28,17 +28,19 @@ typedef struct {
 
 
 /*
- * Interlaced extension parameters (PAL/NTSC only)
+ * Composite sync extension parameters (PAL/NTSC only)
  */
 typedef struct {
+  uint8_t numFields;
   uint8_t interlacedFieldOrder;
   uint8_t shortPulsePixels;
   VgaFieldParams fields[VGA_MAX_FIELDS];
-} VgaModeInterlaced;
+} VgaModeScart;
 
-#define VGA_MODE_COUNT (RGBS_NTSC_720_480i_60HZ + 1)
-#define INTERLACED_MODE_COUNT (RGBS_NTSC_720_480i_60HZ - RGBS_PAL_720_576i_50HZ + 1)
-#define FIRST_INTERLACED_MODE RGBS_PAL_720_576i_50HZ
+#define VGA_MODE_COUNT (RGBS_NTSC_720_240p_60HZ + 1)
+#define VGA_BASE_MODE_COUNT (RGBS_NTSC_720_480i_60HZ + 1)
+#define FIRST_SCART_MODE RGBS_PAL_720_576i_50HZ
+#define SCART_MODE_COUNT (VGA_MODE_COUNT - FIRST_SCART_MODE)
 
 // References:
 // http://tinyvga.com/vga-timing/640x480@60Hz
@@ -47,7 +49,7 @@ typedef struct {
 // http://tinyvga.com/vga-timing/1024x768@60Hz
 // http://tinyvga.com/vga-timing/1280x1024@60Hz
 
-static const VgaModeBase vgaModeBase[VGA_MODE_COUNT] = {
+static const VgaModeBase vgaModeBase[VGA_BASE_MODE_COUNT] = {
   [VGA_640_480_60HZ] = {
     .pixelClockKHz = 25175,
     .hSyncParams = {
@@ -188,15 +190,16 @@ static const VgaModeBase vgaModeBase[VGA_MODE_COUNT] = {
 };
 
 /*
- * Interlaced mode extensions
- * Indexed by (mode - FIRST_INTERLACED_MODE)
+ * Composite sync mode extensions
+ * Indexed by (mode - FIRST_SCART_MODE)
  *
  * All DMA transfers are 4 words (one full line = 2 half-lines).
  * EQ (short sync) pulse: ~2us
  * LS (long sync) pulse: halfLine - EQ (derived automatically)
  */
-static const VgaModeInterlaced vgaModeInterlaced[INTERLACED_MODE_COUNT] = {
-  [RGBS_PAL_720_576i_50HZ - FIRST_INTERLACED_MODE] = {
+static const VgaModeScart vgaModeScart[SCART_MODE_COUNT] = {
+  [RGBS_PAL_720_576i_50HZ - FIRST_SCART_MODE] = {
+    .numFields = 2,
     // PAL: field 0 is lower raster position
     .interlacedFieldOrder = 1,
     // EQ pulse: 2us = 27 pixels at 13.5MHz
@@ -233,7 +236,8 @@ static const VgaModeInterlaced vgaModeInterlaced[INTERLACED_MODE_COUNT] = {
     }
   },
 
-  [RGBS_NTSC_720_480i_60HZ - FIRST_INTERLACED_MODE] = {
+  [RGBS_NTSC_720_480i_60HZ - FIRST_SCART_MODE] = {
+    .numFields = 2,
     .interlacedFieldOrder = 0,
     // EQ pulse: 2.3us = 31 pixels at 13.5MHz
     .shortPulsePixels = 31,
@@ -268,6 +272,38 @@ static const VgaModeInterlaced vgaModeInterlaced[INTERLACED_MODE_COUNT] = {
       },
     }
   },
+
+  [RGBS_PAL_720_288p_50HZ - FIRST_SCART_MODE] = {
+    .numFields = 1,
+    .shortPulsePixels = 27,
+    .fields = {
+      [0] = {
+        .vsyncLines     = 5,
+        .vsyncPattern   = { VSYNC_LSLS, VSYNC_LSLS, VSYNC_LSEQ, VSYNC_EQEQ, VSYNC_EQEQ },
+        .porchLines     = 31,
+        .activeLines    = 268,
+        .trailingLines  = 8,
+        .trailingPattern = { VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_EQEQ, VSYNC_EQEQ },
+        .totalLines     = 312
+      },
+    }
+  },
+
+  [RGBS_NTSC_720_240p_60HZ - FIRST_SCART_MODE] = {
+    .numFields = 1,
+    .shortPulsePixels = 31,
+    .fields = {
+      [0] = {
+        .vsyncLines     = 6,
+        .vsyncPattern   = { VSYNC_LSLS, VSYNC_LSLS, VSYNC_LSLS, VSYNC_EQEQ, VSYNC_EQEQ, VSYNC_EQEQ },
+        .porchLines     = 25,
+        .activeLines    = 220,
+        .trailingLines  = 11,
+        .trailingPattern = { VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_PORCH, VSYNC_EQEQ, VSYNC_EQEQ, VSYNC_EQEQ },
+        .totalLines     = 262
+      },
+    }
+  },
 };
 
 /*
@@ -280,17 +316,17 @@ VgaParams vgaGetParams(VgaMode mode)
   if (mode >= VGA_MODE_COUNT)
     return params;
 
-  const VgaModeBase* base = &vgaModeBase[mode];
+  const VgaModeBase* base = &vgaModeBase[mode < VGA_BASE_MODE_COUNT ? mode : FIRST_SCART_MODE + ((mode - FIRST_SCART_MODE) & 1)];
   params.pixelClockKHz = base->pixelClockKHz;
   params.hSyncParams   = base->hSyncParams;
   params.vSyncParams   = base->vSyncParams;
   params.frameRateHz   = base->frameRateHz;
 
-  if (mode >= FIRST_INTERLACED_MODE)
+  if (mode >= FIRST_SCART_MODE)
   {
-    const VgaModeInterlaced* ilc = &vgaModeInterlaced[mode - FIRST_INTERLACED_MODE];
-    params.interlaced          = true;
-    params.numFields           = 2;
+    const VgaModeScart* ilc = &vgaModeScart[mode - FIRST_SCART_MODE];
+    params.compositeSync       = true;
+    params.numFields           = ilc->numFields;
     params.interlacedFieldOrder = ilc->interlacedFieldOrder;
     params.shortPulsePixels    = ilc->shortPulsePixels;
     memcpy(params.fields, ilc->fields, sizeof(ilc->fields));

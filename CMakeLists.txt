@@ -57,7 +57,7 @@ if(NOT DEFINED PICO9918_MINOR_VER)
     set(PICO9918_MINOR_VER 2)
 endif()
 if(NOT DEFINED PICO9918_PATCH_VER)
-    set(PICO9918_PATCH_VER 0)
+    set(PICO9918_PATCH_VER 1)
 endif()
 # Optional artifact suffix (e.g. "a1", "alpha1", "rc2"). When non-empty, this
 # overrides the git branch name in generated artifact filenames. Setting it to an

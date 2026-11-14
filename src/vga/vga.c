@@ -166,7 +166,7 @@ static bool buildSyncData()
   const uint32_t vSyncOn = vgaParams.params.vSyncParams.syncHigh << vga_sync_WORD_VSYNC_OFFSET;
 
 #if PICO9918_ENABLE_SCART
-  const bool combinedSync = vgaParams.params.interlaced;
+  const bool combinedSync = vgaParams.params.compositeSync;
 #else
   const bool combinedSync = false;
 #endif
@@ -213,7 +213,7 @@ static bool buildSyncData()
 
   // Interlaced: full-line vsync buffers (4 words = 2 half-lines = 64us).
   // Pulse widths from halfLineSync config; guard period fills the remainder of each half-line.
-  if (vgaParams.params.interlaced)
+  if (vgaParams.params.compositeSync)
   {
     const uint32_t cLow  = HonVoff;   // csync asserted (low)
     const uint32_t cHigh = HoffVoff;  // csync idle (high)
@@ -298,7 +298,7 @@ static void vgaInitSync()
 
   // setup the dma channel and set it going
   // setup the dma channel and set it going
-  uint32_t* syncInitBuf = vgaParams.params.interlaced ? syncDataLsLs : syncDataSync;
+  uint32_t* syncInitBuf = vgaParams.params.compositeSync ? syncDataLsLs : syncDataSync;
   dma_channel_configure(syncDmaChan, &syncDmaChanConfig, &VGA_PIO->txf[SYNC_SM], syncInitBuf, 4, false);
   dma_channel_set_irq0_enabled(syncDmaChan, true);
 }
@@ -380,7 +380,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
   {
     dma_hw->ints0 = syncDmaChanMask;
 
-    if (vgaParams.params.interlaced)
+    if (vgaParams.params.compositeSync)
     {
       const VgaFieldParams* field = &vgaParams.params.fields[currentField];
 
@@ -388,7 +388,7 @@ static void __isr __time_critical_func(dmaIrqHandler)(void)
       {
         currentLine = 0;
         currentDisplayLine = 0;
-        currentField ^= 1;
+        currentField ^= vgaParams.params.numFields - 1;
         field = &vgaParams.params.fields[currentField];
       }
 

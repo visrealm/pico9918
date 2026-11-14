@@ -13,23 +13,6 @@ features, major releases carry breaking changes. For firmware, "breaking" means 
 change or a hardware behaviour change that would surprise a user. **The config layout cannot change
 on a patch release**: a release that claims a new config byte is a minor at minimum.
 
-## v1.2.1 - host bus timing and compatibility
-
-A maintenance release, focused on the host interface. Several reports of intermittent failures on
-specific machines trace back to how the write cycle is entered and when `MODE` is sampled.
-
-* Reject glitches on the `/CSW` falling edge before accepting a write cycle.
-* Sample `MODE` at the `/CSW` falling edge rather than after it, and act on the sampled value
-  rather than re-reading the pin.
-* Drive the read bus before the settling check, and shorten the write entry window.
-* Pin the host interface to a fixed PIO rate, independent of the system clock, and move the clock
-  state machines to `pio0`.
-* Reset palette mode on a status read.
-* Correct the position-based tile attribute address.
-* Build a configurator for a single target rather than always both, halving ROM size where only one
-  board is in use.
-* Lite (settings-only) configurator ROM for the CreatiVision.
-
 ## v1.3.0 - the tile pipeline rewrite, and pico9918-core
 
 The largest F18A release since F18A support landed. Every display mode now runs through one
@@ -122,6 +105,8 @@ Wanted, but not assigned to a version.
 
 * Extract the VGA driver into a standalone repository shared with `pico-56`, which currently
   carries a diverged fork.
+* Lite (settings-only) configurator ROM for the CreatiVision, which needs to fit a 16 KB
+  cartridge.
 * Expose a real-time clock through PICO9918 registers ([#67](https://github.com/visrealm/pico9918/issues/67)).
 * Sega Master System Mode 4 ([#61](https://github.com/visrealm/pico9918/issues/61)).
 * Symbols, footprints and 3D renders for incorporating the PICO9918 into new designs

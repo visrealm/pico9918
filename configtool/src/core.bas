@@ -53,7 +53,7 @@ CONST CONF_DISP_DRIVER      = 5
 CONST CONF_CRT_SCANLINES    = 8         ' 0 (off) or 1 (on)
 CONST CONF_SCANLINE_SPRITES = 9         ' 0 - 3 where value = (1 << (x + 2))
 CONST CONF_CLOCK_PRESET_ID  = 10        ' 0 - 2 see ClockSettings in main.c
-CONST CONF_SCART_MODE       = 11        ' 0 = PAL 576i, 1 = NTSC 480i
+CONST CONF_SCART_MODE       = 11        ' 0 = PAL 576i, 1 = NTSC 480i, 2 = PAL 288p, 3 = NTSC 240p
 CONST CONF_DISP_DRIVER_PREF = 13        ' 0 = AUTO, 1 = force VGA, 2 = force SCART
 CONST CONF_VGA_MODE         = 14        ' 0 = 480p60 (extensible)
 CONST CONF_DIAG             = 16
