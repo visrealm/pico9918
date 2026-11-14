@@ -12,6 +12,7 @@ were spent on the test rather than the firmware.
 ```
 live9918.py     the board: SWD, flashing, capture, PNG
 intpin.py       the /INT pin itself, which no scene describes
+busflash.py     firmware update over the host bus, for a board with no SWD
 perf.py         every scene against the clock
 perflog.py      the perf history, and what moved between two runs
 results.py      what a run leaves behind
@@ -241,6 +242,24 @@ The middle one is the point. R19 and R0's enable survive a relock on the part, s
 keeps interrupting on what it armed, and a library that gates the pin on the unlock latch goes
 silent instead - a divergence nothing in the scene suite can see. It runs after a suite rather than
 before, needs the display running, and leaves R0 and R19 clear.
+
+### Firmware over the bus: `busflash.py`
+
+```
+python busflash.py --port COM10                                  what is in the socket
+python busflash.py --port COM10 --uf2 pico9918-....uf2 --write   flash, power-cycle, verify
+python busflash.py --port COM10 --uf2 pico9918-....uf2 --verify
+```
+
+A board in the host-bus probe's socket needs no SWD header to be updated: this does what the
+configurator does, through the same VR63 / SR2 handshake, so it reaches any firmware that a
+configurator could. It reads the board's model before sending anything and refuses an image built
+for the other chip - the firmware would refuse it too, but block 0 is the one that erases, and
+past it a failure leaves only BOOTSEL.
+
+`--write` verifies by reading every block back through the same handshake, and does it after a
+power cycle so that the new firmware is the one answering. That needs `switch` power; on `manual`
+it says so, and `--verify` finishes the job once the board has been cycled by hand.
 
 ### Without a board: `--desktop`
 
