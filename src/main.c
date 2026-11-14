@@ -501,6 +501,7 @@ void renderDiag(int y, uint16_t *pixels)
  * cache color lookup from color index to BGR16
  */
 uint32_t __aligned(4) pram [256];
+static uint8_t bgIndexScale;
 
 
 static __attribute__((noinline))  void generateRgbCache()
@@ -510,6 +511,7 @@ static __attribute__((noinline))  void generateRgbCache()
   tms9918->palDirty = 0;
 
   const bool pixelsDoubled = vrEmuTms9918DisplayMode(tms9918) != TMS_MODE_TEXT80;
+  bgIndexScale = pixelsDoubled ? 0x01 : 0x11;
   if (pixelsDoubled)
   {
     for (int i = 0; i < 64; i += 8)
@@ -531,9 +533,8 @@ static __attribute__((noinline))  void generateRgbCache()
     {
       data = tms9918->vram.map.pram [i] & 0xFF0F;
       tmpPal[i] = data | ((data >> 12) << 4);
-      pram[i] = tmpPal[i] * 0x10001;
     }
-    for (int j = 16; j < 256; ++j)
+    for (int j = 0; j < 256; ++j)
     {
       pram[j] = (tmpPal[j & 0xf] << 16) | (tmpPal[j >> 4] & 0xffff);
     }
@@ -552,7 +553,7 @@ static void __time_critical_func(tmsScanline)(uint16_t y, VgaParams* params, uin
   y = y & 0x0fff;  // virtual line within the field (0..N-1)
 
   uint32_t* dPixels = (uint32_t*)pixels;
-  bg = pram[vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f];
+  bg = pram[(vrEmuTms9918RegValue(TMS_REG_FG_BG_COLOR) & 0x0f) * bgIndexScale];
 
   if (y == 0)
   {
