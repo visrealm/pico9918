@@ -57,7 +57,6 @@ shared path is faster than the per-mode code it replaced.
 * The configurator ROM is sized to the firmware it carries rather than fixed at 256 KB.
 * A read drives the data bus as soon as /CSR falls, so the bus transceiver never relays an
   undriven input to the host. Read data is valid about 40 ns sooner.
-* The CreatiVision settings-only configurator builds again, as a 32 KB ROM.
 
 ### Fixed
 
