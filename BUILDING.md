@@ -248,14 +248,14 @@ cmake --build . --target configurator_all
 ```
 
 ### Configurator Targets
-- **`configurator_all`**: `ti99`, `coleco`, `msx_asc16`, `msx_konami`, each with its `_lite` variant, plus `nabu` and `sg1000`
+- **`configurator_all`**: `ti99`, `coleco`, `msx_asc16`, `msx_konami`, each with its `_lite` variant, plus `nabu`, `creativision` and `sg1000`
 - **`ti99`** / **`ti99_lite`**: TI-99/4A ROM (8KB banks)
 - **`coleco`** / **`coleco_lite`**: ColecoVision ROM (16KB banks)
 - **`msx_asc16`** / **`msx_asc16_lite`**: MSX ASCII16 mapper ROM
 - **`msx_konami`** / **`msx_konami_lite`**: MSX Konami mapper ROM
 - **`nabu`**: NABU computer ROM
 - **`sg1000`**: SG-1000/SC-3000 ROM
-- **`creativision`**: CreatiVision ROM. Currently does not assemble - the image overruns its 16KB ROM, so it is excluded from `configurator_all` rather than failing every build.
+- **`creativision`**: CreatiVision ROM (32KB, settings only)
 
 The `_lite` variants are built with `NO_UPGRADE`, which drops the firmware-update
 path and the embedded firmware image with it.
@@ -307,7 +307,7 @@ cmake .. -DBUILD_TOOLS_FROM_SOURCE=OFF
 | MSX Konami | 16KB | `.rom` | GASM80 | Konami mapper |
 | NABU | None | `.nabu` | GASM80 | NABU computer |
 | SG-1000/SC-3000 | None | `.sg` | GASM80 | No banking, so no firmware upgrade |
-| CreatiVision | None | `.bin` | GASM80 | Overruns its 16KB ROM; not built by `configurator_all` |
+| CreatiVision | None | `.bin` | GASM80 | 32KB ROM; no banking, so no firmware upgrade |
 
 ## Combined Build (Recommended)
 
