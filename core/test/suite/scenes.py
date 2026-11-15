@@ -96,8 +96,8 @@ BACKDROP = 4         # dark blue: nothing else in the library draws it
 
 # a 64x32 bitmap at (8, 32), which is 512 bytes at 2bpp - the largest that fits
 BML_GEOM = dict(r21=8, r22=32, r23=64, r24=32)
-# and the full-width case, where the layer covers the line and the tiles are
-# skipped entirely by bitmap_layer_scan_line's return
+# and the full-width case, where the layer covers the line and, with layer 2 off,
+# the tiles are skipped entirely by bitmap_layer_scan_line's return
 BML_FULL = dict(r21=0, r22=64, r23=0, r24=8)
 
 
@@ -814,9 +814,23 @@ def _():
     return r, left_edge_sprites(v), unlocked
 
 
-@scene("gm1-sprites", "sprites over both tile layers, ECM0")
+@scene("gm1-sprites", "sprites against both tile layers, ECM0 - with R50 bit 0 clear, layer 2 "
+                      "has no attribute byte and is still above them")
 def _():
     return gm1(tile2=True, sprites=True)
+
+
+@scene("gm1-sprites-t2-pri", "sprites over both tile layers, ECM0 - R50 bit 0 set, so layer 2 "
+                             "drops below them")
+def _():
+    return gm1(tile2=True, sprites=True, r32=0x01)
+
+
+@scene("gm1-sprites-scroll", "ECM0 layer 2 over sprites with both layers finely scrolled - the "
+                             "left-edge tile gm1-priority-scroll covers for ECM1-3")
+def _():
+    r, v, unlocked = gm1(tile2=True, sprites=True, r1b=4, r19=4)
+    return r, left_edge_sprites(v), unlocked
 
 
 @scene("gm1-palette", "palette select for layer 1, layer 2 and sprites at once")
@@ -887,9 +901,16 @@ def _():
     return gm1(tile2=True, sprites=True, r1f=0xF0, **BML_GEOM)
 
 
-@scene("gm1-bml-full", "full-width opaque priority bitmap - the tile pass is skipped")
+@scene("gm1-bml-full", "full-width opaque priority bitmap - it hides layer 1, and layer 2 still "
+                       "draws over it")
 def _():
     return gm1(tile2=True, sprites=True, r1f=0xC0, **BML_FULL)
+
+
+@scene("gm1-bml-full-t1", "full-width opaque priority bitmap with layer 2 off - the tile pass is "
+                          "skipped")
+def _():
+    return gm1(sprites=True, r1f=0xC0, **BML_FULL)
 
 
 # ---- GM2 -----------------------------------------------------------------

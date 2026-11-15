@@ -354,7 +354,7 @@ and it is the same script CI runs:
 
 ```
 tools/ci.sh goldens     the 18 committed frames, byte-exact
-tools/ci.sh suite       111 scenes, seven properties and two GPU programs, both widths
+tools/ci.sh suite       115 scenes, seven properties and two GPU programs, both widths
 tools/ci.sh pixels      both palette LUT layouts and the line geometry, both widths
 tools/ci.sh gpu         the library-paced GPU, and the write that arms a program
 tools/ci.sh gpucore     the GPU's TMS9900, instruction by instruction

@@ -652,6 +652,14 @@ static PICO9918_NOINLINE void tmsRestoreAlignMask(TileMask dstMask, const TileMa
   if (pixelShift | otherShift) tmsCopyAlignMask(dstMask, srcMask, pixelShift);
 }
 
+static inline uint32_t tile2OverSprites(PICO9918_INST_ARG const bool wide)
+{
+  return (wide || pico9918_cached_mode == TMS_MODE_TEXT ||
+          (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_T2_PRIORITY))
+           ? 0
+           : 0xffffffffu;
+}
+
 
 /** \brief Test and update the row pixels bit mask. */
 static inline uint32_t tmsTestRowBitsMask(const uint32_t xPos, const uint32_t tilePixels,
@@ -2665,22 +2673,26 @@ const uint8_t* pico9918_cached_line_source = 0;
  *
  * INLINE: so will be different versions generated, depending on hard-coded (or known at compile-time) arguments
  */
-PICO9918_INLINE_HOT bool renderBitmapLayerBody(PICO9918_INST_ARG uint16_t y, bool opaque, const uint8_t width,
-                                               const uint16_t addr, const uint8_t bmlCtl,
-                                               uint8_t pixels[TMS9918_PIXELS_X], const bool wide,
-                                               const bool intoTile1)
+#define BML_SHOWS_T1    0x01
+#define BML_SHOWS_T2    0x02
+#define BML_SHOWS_TILES (BML_SHOWS_T1 | BML_SHOWS_T2)
+
+PICO9918_INLINE_HOT uint8_t renderBitmapLayerBody(PICO9918_INST_ARG uint16_t y, bool opaque, const uint8_t width,
+                                                  const uint16_t addr, const uint8_t bmlCtl,
+                                                  uint8_t pixels[TMS9918_PIXELS_X], const bool wide,
+                                                  const bool intoTile1)
 {
   // written over T1's own buffer the layer is already above it, so the row mask arbitrates nothing
   bool writeMask = (bmlCtl & 0x40) && !intoTile1;
   underLayer     = !(bmlCtl & 0x40);
 
-  bool returnVal = true;
+  uint8_t returnVal = BML_SHOWS_TILES;
 
   if (writeMask && opaque && (width == 64))
   {
     for (int i = 0; i < TMS9918_PIXELS_X / 32; ++i) rowMasks.rowBits[i] = -1;
     writeMask = false;
-    returnVal = false;
+    returnVal = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_TILE2_ENABLE) ? BML_SHOWS_T2 : 0;
   }
 
   uint32_t currentMask = 0;
@@ -2819,7 +2831,7 @@ PICO9918_INLINE_HOT bool renderBitmapLayerBody(PICO9918_INST_ARG uint16_t y, boo
    whatever the mode, so a wide row draws each of its pixels twice. The F18A does the same - see the
    text2 case in f18a_tiles.vhd, which halves the layer's pixel clock rather than repeating it. */
 #if PICO9918_TEXT80_8BPP
-static EMITTER_NOINLINE bool __time_critical_func(renderBitmapLayer80)(
+static EMITTER_NOINLINE uint8_t __time_critical_func(renderBitmapLayer80)(
   PICO9918_INST_ARG uint16_t y, bool opaque, const uint8_t width, const uint16_t addr, const uint8_t bmlCtl,
   uint8_t pixels[TMS9918_PIXELS_X], const bool intoTile1)
 {
@@ -2827,29 +2839,29 @@ static EMITTER_NOINLINE bool __time_critical_func(renderBitmapLayer80)(
 }
 #endif
 
-static inline bool __time_critical_func(renderBitmapLayer40)(PICO9918_INST_ARG uint16_t y, bool opaque,
-                                                             const uint8_t width, const uint16_t addr,
-                                                             const uint8_t bmlCtl,
-                                                             uint8_t pixels[TMS9918_PIXELS_X])
+static inline uint8_t __time_critical_func(renderBitmapLayer40)(PICO9918_INST_ARG uint16_t y, bool opaque,
+                                                                const uint8_t width, const uint16_t addr,
+                                                                const uint8_t bmlCtl,
+                                                                uint8_t pixels[TMS9918_PIXELS_X])
 {
   return renderBitmapLayerBody(PICO9918_INST y, opaque, width, addr, bmlCtl, pixels, false, false);
 }
 
 /** \brief generate an F18A bitmap layer scanline */
-static bool __time_critical_func(bitmap_layer_scan_line)(PICO9918_INST_ARG uint16_t y,
-                                                                  uint8_t pixels[TMS9918_PIXELS_X],
-                                                                  const bool intoTile1)
+static uint8_t __time_critical_func(bitmap_layer_scan_line)(PICO9918_INST_ARG uint16_t y,
+                                                                     uint8_t pixels[TMS9918_PIXELS_X],
+                                                                     const bool intoTile1)
 {
   /* bml enabled? */
   const uint8_t bmlCtl = TMS_REGISTER(tms9918, PICO9918_REG_BML_CONTROL);
-  if (!(bmlCtl & 0x80) || !PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_BITMAP)) return true;
+  if (!(bmlCtl & 0x80) || !PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_BITMAP)) return BML_SHOWS_TILES;
 
   /* bml on this scanline? */
   const uint8_t top = TMS_REGISTER(tms9918, PICO9918_REG_BML_TOP_ROW);
-  if (top > y) return true;
+  if (top > y) return BML_SHOWS_TILES;
 
   y -= top;
-  if (y >= TMS_REGISTER(tms9918, PICO9918_REG_BML_HEIGHT)) return true;
+  if (y >= TMS_REGISTER(tms9918, PICO9918_REG_BML_HEIGHT)) return BML_SHOWS_TILES;
 
   /* row stride in bytes, four pixels each, rounded up so every row starts on a byte */
   const uint8_t bmlWidth = TMS_REGISTER(tms9918, PICO9918_REG_BML_WIDTH);
@@ -3000,6 +3012,7 @@ compositeAlignedBody(PICO9918_INST_ARG uint8_t pixels[TMS9918_PIXELS_X], const i
   uint8_t* layer2          = tms9918->tileLayer2Buffer + t2Scroll;
   uint32_t* selectionMask  = tms9918->layerSelectionMask;
   const uint32_t maskWords = (wide ? SCANLINE_BYTES_MAX : TMS9918_PIXELS_X) / 32;
+  const uint32_t t2Over    = tile2OverSprites(PICO9918_INST wide);
 
 
   const bool wordAligned    = ((t1Scroll | t2Scroll) & 3) == 0;
@@ -3012,7 +3025,7 @@ compositeAlignedBody(PICO9918_INST_ARG uint8_t pixels[TMS9918_PIXELS_X], const i
     uint32_t mask = selectionMask[maskWord];
 
     /* a priority bitmap layer wins over T1 only - T2 still draws over it */
-    uint32_t spriteMask = spriteGridWord(maskWord, rowMasks.rowSpriteBits, wide) |
+    uint32_t spriteMask = (spriteGridWord(maskWord, rowMasks.rowSpriteBits, wide) & ~(mask & t2Over)) |
                           (spriteGridWord(maskWord, rowMasks.rowBits, wide) & ~mask);
 
     if (spriteMask == 0xffffffffu)
@@ -3143,11 +3156,12 @@ __time_critical_func(compositeTile2OnlyBuffer)(PICO9918_INST_ARG uint8_t pixels[
 {
   const uint8_t* layer2    = tms9918->tileLayer2Buffer + t2Scroll;
   const uint32_t maskWords = (wide ? SCANLINE_BYTES_MAX : TMS9918_PIXELS_X) / 32;
+  const uint32_t t2Over    = tile2OverSprites(PICO9918_INST wide);
 
   for (uint32_t maskWord = 0; maskWord < maskWords; ++maskWord)
   {
-    uint32_t mask =
-      tms9918->layerSelectionMask[maskWord] & ~spriteGridWord(maskWord, rowMasks.rowSpriteBits, wide);
+    uint32_t mask = tms9918->layerSelectionMask[maskWord] &
+                    ~(spriteGridWord(maskWord, rowMasks.rowSpriteBits, wide) & ~t2Over);
 
     if (!mask) /* nothing of layer 2 reaches the screen here */
     {
@@ -3219,11 +3233,11 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
                             PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE1) &&
                             PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_BITMAP);
 
-    bool writeMask = true;
+    uint8_t tileLayers = BML_SHOWS_TILES;
     if (bmlInTile1)
       underLayer = false;
     else
-      writeMask = bitmap_layer_scan_line(PICO9918_INST y, pixels, false);
+      tileLayers = bitmap_layer_scan_line(PICO9918_INST y, pixels, false);
 
     const uint32_t transparent = underLayer ? 0 : bg;
     transparentPixels[0] = transparentPixels[1] = transparent;
@@ -3231,7 +3245,7 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
 
     tempStatus = pico9918_output_sprites(PICO9918_INST y, pixels);
 
-    if (writeMask) // bitmap layer completely masked it?
+    if (tileLayers)
     {
       const bool wide         = TEXT80_WIDE_ROW;
       const bool textRow      = wide || pico9918_cached_mode == TMS_MODE_TEXT;
@@ -3239,7 +3253,8 @@ static uint8_t __time_critical_func(graphics_i_scan_line)(PICO9918_INST_ARG uint
       const int t2Scroll      = scrollOffset(TMS_REGISTER(tms9918, PICO9918_REG_T2_HSCROLL), textRow, wide);
       const bool tile2Enabled = (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED1) & PICO9918_R49_TILE2_ENABLE) &&
                                 PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE2);
-      const bool tile1Enabled = !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF) &&
+      const bool tile1Enabled = (tileLayers & BML_SHOWS_T1) &&
+                                !(TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_TILE1_OFF) &&
                                 PICO9918_DRAWS(tms9918, PICO9918_SUPPRESS_TILE1);
 
       const bool blend = wide && tile1Enabled && tile2Enabled &&

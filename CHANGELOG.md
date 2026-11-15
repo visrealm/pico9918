@@ -79,6 +79,10 @@ shared path is faster than the per-mode code it replaced.
   35 ns is ignored, and MODE is sampled at the /CSW edge.
 * A status read can no longer be handled as a data read when MODE changes late in the cycle.
 * A status read on the host bus leaves palette data-port mode, as on the F18A.
+* With R50 bit 0 clear, its power-on value, ECM0 tile layer 2 covers sprites as on the F18A, where
+  sprites used to show through it.
+* A full-width opaque priority bitmap layer no longer hides tile layer 2, which the F18A draws over
+  it.
 * Status register 15 returns the value of the register a read-address write names, as the F18A
   latches it, rather than the status number R15 last selected.
 * The GPU DMA registers power up zeroed, so a cold boot can no longer fire a stray transfer.

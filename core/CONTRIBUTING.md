@@ -7,7 +7,7 @@ the next publish overwrites it.
 
 That is not bureaucracy. Every scanline this code renders has a time budget on an
 RP2040 running at video rate, and the only place a change can be measured against
-a real device - and against the goldens, the 111-scene suite and the ARM
+a real device - and against the goldens, the 115-scene suite and the ARM
 disassembly baselines - is the firmware repository. A change that is correct and
 20 instructions slower is a regression that only shows up there.
 
@@ -38,7 +38,7 @@ does.
 Whichever side it is applied on:
 
     tools/ci.sh goldens     the 18 committed frames, byte-exact
-    tools/ci.sh suite       111 scenes, seven properties and two GPU programs, both widths
+    tools/ci.sh suite       115 scenes, seven properties and two GPU programs, both widths
     tools/ci.sh warnings    -Wall -Wextra -Werror
     tools/ci.sh multi       the instance threaded through every signature
     tools/ci.sh tms9918     the runtime TMS9918A personality against a locked F18A

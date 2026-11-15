@@ -4,7 +4,7 @@
 The whole suite is written against `VdpAccess` and nothing below it. Two backends
 implement it - a board over SWD and an in-process library behind a pipe - and a
 scene, a golden and a property cannot tell which one they are driving. That is
-what makes the same 111 scenes a gate for the library on a desktop and a gate for
+what makes the same 115 scenes a gate for the library on a desktop and a gate for
 the firmware on hardware.
 """
 

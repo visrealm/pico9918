@@ -6,7 +6,7 @@ you ran last.
 | Question | Where | What it is | Needs |
 |---|---|---|---|
 | Does the renderer still draw exactly what it drew before? | [`golden/`](golden/) | A C program that dumps every line of fixed scenes byte for byte | A C compiler |
-| Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 111 scenes, seven property suites and two TMS9900 GPU programs | A C compiler and Python |
+| Does it draw the right thing across every mode, scene and rule? | [`suite/`](suite/) | 115 scenes, seven property suites and two TMS9900 GPU programs | A C compiler and Python |
 | Does the post-palette pixel path lay out the way the header says? | [`pixel/`](pixel/) | Both palette LUT layouts and the scanline geometry, at both line widths | A C compiler |
 | Has an armed GPU program run by the time the arming write returns? | [`gpu/`](gpu/) | The rate the library paces the GPU from, and that write | A C compiler |
 | Can a debugger inspect and edit state without driving the guest bus? | [`debug/`](debug/) | Region discovery, span access, register stores and GPU controls | A C compiler |
@@ -27,7 +27,7 @@ surface, and a read-back of all 64 palette registers. Everything goes through th
 the same two-stage address-port writes the firmware performs - so it is the gate on register
 semantics and the unlock path as much as on pixels. When it fails, it tells you which byte.
 
-`suite/` is **broad coverage, one question per scene**. 111 scenes including VRAM dumps of real
+`suite/` is **broad coverage, one question per scene**. 115 scenes including VRAM dumps of real
 software, swept across two line-width tiers, plus seven property suites that compute the answer
 independently and sweep the whole input space rather than freezing one picture. When it fails, it
 tells you which scene and how many pixels moved.

@@ -1,6 +1,6 @@
 # The renderer's suite
 
-111 scenes, seven property suites and two TMS9900 GPU programs - one of them 22.9 M
+115 scenes, seven property suites and two TMS9900 GPU programs - one of them 22.9 M
 instructions - each compared against a committed reference. It asserts what the library computes and never what it cost.
 
 ## Running it
