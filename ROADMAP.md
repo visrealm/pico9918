@@ -13,23 +13,6 @@ features, major releases carry breaking changes. For firmware, "breaking" means 
 change or a hardware behaviour change that would surprise a user. **The config layout cannot change
 on a patch release**: a release that claims a new config byte is a minor at minimum.
 
-## v1.2.1 - host bus timing and compatibility
-
-A maintenance release, focused on the host interface. Several reports of intermittent failures on
-specific machines trace back to how the write cycle is entered and when `MODE` is sampled.
-
-* Reject glitches on the `/CSW` falling edge before accepting a write cycle.
-* Sample `MODE` at the `/CSW` falling edge rather than after it, and act on the sampled value
-  rather than re-reading the pin.
-* Drive the read bus before the settling check, and shorten the write entry window.
-* Pin the host interface to a fixed PIO rate, independent of the system clock, and move the clock
-  state machines to `pio0`.
-* Reset palette mode on a status read.
-* Correct the position-based tile attribute address.
-* Build a configurator for a single target rather than always both, halving ROM size where only one
-  board is in use.
-* Lite (settings-only) configurator ROM for the CreatiVision.
-
 ## v1.3.0 - the tile pipeline rewrite, and pico9918-core
 
 The largest F18A release since F18A support landed. Every display mode now runs through one
@@ -86,17 +69,14 @@ Close the remaining gaps where PICO9918 does not match real F18A behaviour, so t
 software runs unmodified. The display-mode gaps were largely closed by the pipeline work in
 v1.3.0; what is left is register semantics, status and the GPU.
 
-* S15 returns the value of a register addressed by a read setup, reconstructed rather than
-  returned raw. That is the only register read-back path the hardware offers.
-* Locked writes above R7 are masked to three bits rather than ignored, and a non-unlock write
-  to R57 re-locks.
+* S15 reconstructs each register from the bits the hardware stores, rather than returning the
+  stored byte. That is the only register read-back path the hardware offers.
 * R30 is stored as the five bits the hardware has, and R30 = 0 restores the configured default
   rather than a fixed 31.
-* R50 bit 2 (simulated scanlines) is acted on, and R7's power-on default matches.
+* R7's power-on default matches.
 * The timing counters sample correctly and no longer corrupt the start time.
-* Tile layer 2 and tile-layer-1 disable stop being gated away on the 4bpp tier.
-* Drop the resident GPU program image, which cannot function without the SPI flash the F18A
-  had, and whose reachable handlers write into the status register the host polls.
+* Tile layer 2 and tile-layer-1 disable work in plain two-tone 80-column text on the 4bpp tier,
+  not only with position-based attributes.
 * Correct the GPU's DMA trigger clear, which zeroes a byte it should leave alone.
 
 Not in scope: the GPU's 7-bit user status at `0xB000` is on hold, and several F18A GPU
@@ -122,6 +102,8 @@ Wanted, but not assigned to a version.
 
 * Extract the VGA driver into a standalone repository shared with `pico-56`, which currently
   carries a diverged fork.
+* Lite (settings-only) configurator ROM for the CreatiVision, which needs to fit a 16 KB
+  cartridge.
 * Expose a real-time clock through PICO9918 registers ([#67](https://github.com/visrealm/pico9918/issues/67)).
 * Sega Master System Mode 4 ([#61](https://github.com/visrealm/pico9918/issues/61)).
 * Symbols, footprints and 3D renders for incorporating the PICO9918 into new designs

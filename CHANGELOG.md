@@ -30,8 +30,6 @@ shared path is faster than the per-mode code it replaced.
   interrupt enable.
 * A `RENDER` row on the performance diagnostic overlay, giving the average per-scanline render time
   in microseconds beside the frame time. The overlay font has been redrawn.
-* SCART 288p @ 50 Hz and 240p @ 60 Hz, progressive modes beside 576i and 480i, selectable in both
-  configurators.
 * A debugger interface in pico9918-core: hide a layer without the guest noticing, edit the GPU's
   registers and the status registers, and run the GPU to a breakpoint.
 * Pre-release builds say so: the splash, the diagnostic `FWVER` row, picotool and the
@@ -55,8 +53,8 @@ shared path is faster than the per-mode code it replaced.
   stored settings changes, but the call and its struct do.
 * A settings block made for the other board model is kept and re-stamped rather than reset to
   defaults.
-* The host bus interface runs at the same speed on every clock preset, and sustains faster
-  back-to-back reads: a scanline with nothing new to display no longer holds the bus off.
+* The host bus interface sustains faster back-to-back reads: a scanline with nothing new to display
+  no longer holds the bus off.
 * The configurator ROM is sized to the firmware it carries rather than fixed at 256 KB.
 * A read drives the data bus as soon as /CSR falls, so the bus transceiver never relays an
   undriven input to the host. Read data is valid about 40 ns sooner.
@@ -70,18 +68,11 @@ shared path is faster than the per-mode code it replaced.
   a TMS9918A does, instead of ignoring it. Writes are still ignored where R0 bit 2 (M4) is set,
   which is the F18A's own rule, and it is the aliasing that software setting up 80 columns by
   writing VR0 through VR15 depends on.
-* The bitmap layer's row stride rounds up, so a layer whose width is not a multiple of four pixels
-  no longer reads each row from the wrong address.
 * GPU DMA: a width or height of 0 means 256, and a transfer running past the end of the 64 KB map
   wraps into it rather than out of it.
-* The GPU's `PIX` instruction addresses the bitmap layer the way the F18A does, and `SLC` executes
-  with an immediate shift count above 3.
 * A palette write from a GPU program is noticed, so the picture takes the new colours, and the
   border follows a palette change straight away.
-* A brief HIGH on /CSR during a read no longer counts as a second read, a /CSW glitch shorter than
-  35 ns is ignored, and MODE is sampled at the /CSW edge.
-* A status read can no longer be handled as a data read when MODE changes late in the cycle.
-* A status read on the host bus leaves palette data-port mode, as on the F18A.
+* A brief HIGH on /CSR during a read no longer counts as a second read.
 * With R50 bit 0 clear, its power-on value, ECM0 tile layer 2 covers sprites as on the F18A, where
   sprites used to show through it.
 * A full-width opaque priority bitmap layer no longer hides tile layer 2, which the F18A draws over
@@ -90,8 +81,6 @@ shared path is faster than the per-mode code it replaced.
   latches it, rather than the status number R15 last selected.
 * The GPU DMA registers power up zeroed, so a cold boot can no longer fire a stray transfer.
 * The diagnostic clock row shows the clock the board is actually running.
-* A display or clock change waiting for confirmation survives a host reset, so the configurator
-  can still confirm it.
 * Status register 0 reports a fifth-sprite number of 0 where there is no fifth sprite, rather than
   a constant 31.
 * R50 bit 2 drives the simulated scanlines, so software that asks for the effect gets it. The
@@ -104,6 +93,35 @@ shared path is faster than the per-mode code it replaced.
   that raises it belongs to the F18A and above, but every chip was answering to it, so a fifth
   sprite on a line was drawn where the real one drops it - and a PICO9918's own sprite setting
   followed it there.
+
+## v1.2.1 - 2026-11-14
+
+Host bus timing and compatibility, and progressive SCART modes.
+
+### Added
+
+* Progressive SCART modes: NTSC 240p @ 60 Hz and PAL 288p @ 50 Hz, matching the non-interlaced
+  output of the original TMS9918A.
+* Single-target configurator builds, carrying firmware for only one board.
+
+### Changed
+
+* Host interface timing: `MODE` is sampled on the `/CSW` falling edge and the sampled value is acted
+  on, glitches on `/CSW` are rejected before a write cycle is accepted, and the read bus is driven
+  earlier.
+* The host interface runs at a fixed PIO rate, independent of the system clock.
+* CRT scanlines are no longer applied to SCART output.
+* GPU performance improvements on the PICO9918 PRO.
+
+### Fixed
+
+* A display or clock change made in the configurator could be lost after a host reset, before it
+  was confirmed.
+* Reading any status register now exits data port palette mode.
+* Tile attribute address in position-based tile attribute mode.
+* Bitmap layer row stride and 14-bit address wrap now match the F18A, as does the GPU `PIX`
+  instruction's bitmap layer addressing.
+* GPU `SLC` with an immediate shift count above 3.
 
 ## v1.2.0 - 2026-07-12
 
