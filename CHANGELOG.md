@@ -34,6 +34,9 @@ shared path is faster than the per-mode code it replaced.
   configurators.
 * A debugger interface in pico9918-core: hide a layer without the guest noticing, edit the GPU's
   registers and the status registers, and run the GPU to a breakpoint.
+* Pre-release builds say so: the splash, the diagnostic `FWVER` row, picotool and the
+  configurator's device information all show the alpha, beta or rc number. Final releases look
+  exactly as before.
 
 ### Changed
 

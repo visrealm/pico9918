@@ -28,7 +28,7 @@ target_sources(${PROGRAM} PRIVATE
 )
 
 pico_set_program_name(${PROGRAM} "pico9918")
-pico_set_program_version(${PROGRAM} ${PICO9918_VERSION})
+pico_set_program_version(${PROGRAM} ${PICO9918_VERSION_FULL})
 pico_set_program_description(${PROGRAM} "PICO9918 VDP")
 pico_set_program_url(${PROGRAM} "https://github.com/visrealm/pico9918")
 
@@ -72,7 +72,7 @@ target_compile_definitions(${PROGRAM} PRIVATE
     PICO9918_DIAG=$<BOOL:${PICO9918_DIAG}>
     PICO9918_GPU_FRAME_COUNTER=$<BOOL:${PICO9918_GPU_FRAME_COUNTER}>
     PICO9918_COLD_IN_FLASH=$<BOOL:${PICO9918_COLD_IN_FLASH}>
-    PICO9918_VERSION="${PICO9918_VERSION}"
+    PICO9918_VERSION_SHORT="${PICO9918_VERSION_SHORT}"
     PICO9918_MAJOR_VER=${PICO9918_MAJOR_VER}
     PICO9918_MINOR_VER=${PICO9918_MINOR_VER}
     PICO9918_PATCH_VER=${PICO9918_PATCH_VER}

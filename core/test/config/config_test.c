@@ -189,6 +189,31 @@ int main(void)
     }
   }
 
+  /* 9. the pre-release byte is stamped on every path and never compared */
+  {
+    const uint8_t foreign = PICO9918_BUILD_SW_PRERELEASE ^ 0x41;
+    uint8_t before[PICO9918_CONFIG_BYTES];
+
+    pico9918_config_defaults(config);
+    pico9918_config_prepare_save(config, HW_V1_X);
+    check("save left the pre-release unstamped", PICO9918_BUILD_SW_PRERELEASE,
+          config[PICO9918_CONF_SW_PRERELEASE]);
+
+    config[PICO9918_CONF_SW_PRERELEASE] = foreign;
+    memcpy(before, config, sizeof(config));
+    before[PICO9918_CONF_SW_PRERELEASE] = PICO9918_BUILD_SW_PRERELEASE;
+    check("a foreign pre-release migrated", 0, pico9918_config_validate(config, HW_V1_X));
+    check("a foreign pre-release survived validate", PICO9918_BUILD_SW_PRERELEASE,
+          config[PICO9918_CONF_SW_PRERELEASE]);
+    check("a foreign pre-release changed another byte", 0, memcmp(before, config, sizeof(config)) != 0);
+
+    storedAt(config, 1, 2, 0);
+    config[PICO9918_CONF_SW_PRERELEASE] = foreign;
+    check("an upgrade from a pre-release did not migrate", 1, pico9918_config_validate(config, HW_V1_X));
+    check("an upgrade left the pre-release unstamped", PICO9918_BUILD_SW_PRERELEASE,
+          config[PICO9918_CONF_SW_PRERELEASE]);
+  }
+
   printf("%s: config validation, defaults and migration, %d failure(s)\n",
          failures ? "FAIL" : "PASS", failures);
   return failures != 0;

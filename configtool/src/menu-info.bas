@@ -62,6 +62,16 @@ deviceInfoMenu: PROCEDURE
     VDP_REG(58) = PICO9918_CONF_SW_PATCH_VERSION
     tmpPatch = VDP_STATUS
     PRINT AT #addr + 64, "v", tmpMajor, ".", tmpMinor, ".", tmpPatch
+    VDP_REG(58) = PICO9918_CONF_SW_PRERELEASE
+    optValue = VDP_STATUS
+    IF optValue >= $60 THEN
+        PRINT "r"
+    ELSEIF optValue >= $40 THEN
+        PRINT "b"
+    ELSEIF optValue THEN
+        PRINT "a"
+    END IF
+    IF optValue THEN PRINT optValue AND $1f
 
     VDP_REG(58) = PICO9918_CONF_DISP_DRIVER
     optValue = VDP_STATUS

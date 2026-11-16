@@ -70,6 +70,13 @@
 #define PICO9918_BUILD_SW_PATCH   @PICO9918_BUILD_SW_PATCH@
 
 /*
+ * The pre-release this build is, as PICO9918_CONF_SW_PRERELEASE stores it, and as the
+ * splash prints it. 0 and "" for a final release. A label only: nothing compares it.
+ */
+#define PICO9918_BUILD_SW_PRERELEASE     @PICO9918_BUILD_SW_PRERELEASE@
+#define PICO9918_BUILD_PRERELEASE_STRING "@PICO9918_BUILD_PRERELEASE_STRING@"
+
+/*
  * Whether the compiled library carries pico9918_debug.h's entry points.
  *
  * Purely additive - no instance field, no layout, no calling convention - so unlike

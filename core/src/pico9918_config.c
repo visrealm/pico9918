@@ -138,8 +138,9 @@ bool pico9918_config_validate(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t hwV
     storedVer = 0; // a defaulted block stamps and saves like a version change
   }
 
-  config[PICO9918_CONF_PICO_MODEL] = picoModel;
-  config[PICO9918_CONF_HW_VERSION] = hwVersion;
+  config[PICO9918_CONF_PICO_MODEL]    = picoModel;
+  config[PICO9918_CONF_HW_VERSION]    = hwVersion;
+  config[PICO9918_CONF_SW_PRERELEASE] = PICO9918_BUILD_SW_PRERELEASE;
 
   // the host persists all 256 bytes; clear command bytes read back from storage
   config[PICO9918_CONF_SAVE_FORCED]     = 0;
@@ -165,6 +166,7 @@ void pico9918_config_prepare_save(uint8_t config[PICO9918_CONFIG_BYTES], uint8_t
   config[PICO9918_CONF_HW_VERSION]       = hwVersion;
   config[PICO9918_CONF_SW_VERSION]       = PICO9918_BUILD_SW_VERSION;
   config[PICO9918_CONF_SW_PATCH_VERSION] = PICO9918_BUILD_SW_PATCH;
+  config[PICO9918_CONF_SW_PRERELEASE]    = PICO9918_BUILD_SW_PRERELEASE;
 
   /* a command is a request to the run that made it, never a stored setting */
   config[PICO9918_CONF_SAVE_FORCED]     = 0;

@@ -35,11 +35,14 @@
  *
  *   0-6, 8-14, 16-20, 128-160, 200-204, 252-255
  *
- * Free for future claims: 7, 15 (claimed below), 21-127, 161-199, 205-245.
+ * Free for future claims: 7 and 15 (both claimed below), 21-127, 161-199, 205-245.
  *
- * Byte 7 is deliberately left unused: it falls in the "not settable via
- * registers" identity/version band (0-6) that the configurator may treat as
- * reserved, and the firmware's version-match load path does not clear it.
+ * Byte 7 is the last byte below PICO9918_CONFIG_FIRST_SETTABLE, and that one
+ * compare on a host config write is all that makes 0-7 a band the host cannot
+ * write. The next identity byte claims a band from the free pool and widens that
+ * guard to refuse it. Released firmware let a host write those bytes, so a block
+ * may hold residue there; migration defaults a newly claimed field on any block
+ * stamped before it, as it does for PICO9918_CONF_VDP_BASE.
  *
  * -------------------------------------------------------------------------
  * CONFIGURATOR MENU-SENTINEL BAND: 246-255
@@ -99,8 +102,7 @@ typedef enum
   PICO9918_CONF_CLOCK_TESTED     = 4,
   PICO9918_CONF_DISP_DRIVER      = 5,
   PICO9918_CONF_FLASH_STATUS     = 6,
-
-  // 7: free (see ABI FREEZE note above)
+  PICO9918_CONF_SW_PRERELEASE    = 7, // 0 = final, else stage(3) | number(5): alpha 1, beta 2, rc 3. Never compared
 
   // settable via registers
   PICO9918_CONF_CRT_SCANLINES    = 8,

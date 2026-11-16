@@ -121,6 +121,25 @@ cmake .. -DPICO9918_DIAG=ON
 - **`PICO9918_COLD_IN_FLASH`** (ON/OFF, default ON): Keep boot-only code and data resident in flash (XIP) rather than copying it to RAM, buying back SRAM. See `src/xip.h` for what may not live there.
 - **`PICO9918_GPU_FRAME_COUNTER`** (OFF/ON): Enable the GPU frame counter, which adds a row to the diagnostic performance panel.
 - **`PICO9918_LIVE_TEST`** (OFF/ON): Test builds only - the SWD live capture buffer used by `test/live/`. It costs about a microsecond a line, so timing readings from such a build are not valid. See [DEBUGGING.md](DEBUGGING.md).
+- **`PICO9918_PRERELEASE`** (empty, `alphaN`, `betaN` or `rcN`, N 1-31): Marks a pre-release. See [Cutting a Pre-release](#cutting-a-pre-release).
+
+#### Cutting a Pre-release
+
+```bash
+cmake .. -DPICO9918_BUILD_COMBINED=ON -DPICO9918_PRERELEASE=beta1
+```
+
+The artifacts are named `...-v1-3-0-beta1...`, the splash shows `BETA 1` beside the logo, the
+diagnostic `FWVER` row shows `1.3.0 B1`, picotool reports `1.3.0-beta1`, and config byte 7 carries
+the stage so the configurator can show it. Nothing compares that byte: a pre-release and the final
+release of the same version are the same version to the settings migration and to the
+configurator's upgrade check.
+
+So **the config layout freezes at the first pre-release of a version.** A field claimed after
+beta1 carries the release's version, which beta units are already stamped with, so they would
+never default it. If a field cannot wait, the notes for that pre-release tell testers to reset
+their settings. The final release is unaffected: every released unit migrates from an earlier
+version.
 
 #### Configuration Examples
 ```bash

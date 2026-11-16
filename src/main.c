@@ -142,9 +142,9 @@ int __in_flash_func(main)(void)
      must follow it. Board revision, firmware version, the timings PICO9918_CONF_DISP_DRIVER
      names and the clock the host chose are all things only the host knows. */
 #if PICO_RP2350
-  pico9918_diag_set_version_info("V2.0+", PICO9918_VERSION);
+  pico9918_diag_set_version_info("V2.0+", PICO9918_VERSION_SHORT);
 #else
-  pico9918_diag_set_version_info(currentHwVersion() == HWVer_0_3 ? "V0.3" : "V1.0+", PICO9918_VERSION);
+  pico9918_diag_set_version_info(currentHwVersion() == HWVer_0_3 ? "V0.3" : "V1.0+", PICO9918_VERSION_SHORT);
 #endif
 
   {

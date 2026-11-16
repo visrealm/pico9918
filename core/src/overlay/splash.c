@@ -12,6 +12,10 @@
 
 #include "splash.h"
 
+#if PICO9918_BUILD_SW_PRERELEASE
+#include "diag.h"
+#endif
+
 #include <stdbool.h>
 
 #if !PICO9918_NO_SPLASH
@@ -127,6 +131,22 @@ void pico9918_splash_render(uint16_t y, uint32_t frameCount, uint32_t vBorder, u
           if (palIndex) pixels[x + px] = pal[palIndex];
         }
       }
+
+#if PICO9918_BUILD_SW_PRERELEASE
+      const int badgeX   = leftBorderPx + artWidth + 6;
+      const int badgeTop = splashHeight - PICO9918_DIAG_CHAR_HEIGHT - 2;
+      if (y >= badgeTop)
+      {
+        const int badgeEnd = badgeX + (int)(sizeof(PICO9918_BUILD_PRERELEASE_STRING) - 1) * PICO9918_DIAG_CHAR_WIDTH + 4;
+        pico9918_diag_render_text(y, PICO9918_BUILD_PRERELEASE_STRING, badgeX + 2, badgeTop + 1, pal[2], pixels);
+
+        /* the text renderer darkens every unlit cell pixel, so the fill goes on after it */
+        for (int x = badgeX; x < badgeEnd; ++x)
+        {
+          if (pixels[x] != pal[2]) pixels[x] = PICO9918_PIXEL_FROM_RGB12(0x600f);
+        }
+      }
+#endif
     }
   }
 #endif

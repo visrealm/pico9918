@@ -207,6 +207,21 @@ math(EXPR PICO9918_BUILD_SW_VERSION "(${PROJECT_VERSION_MAJOR} << 4) | ${PROJECT
      OUTPUT_FORMAT HEXADECIMAL)
 set(PICO9918_BUILD_SW_PATCH ${PROJECT_VERSION_PATCH})
 
+if(PICO9918_PRERELEASE STREQUAL "")
+  set(PICO9918_BUILD_SW_PRERELEASE 0)
+  set(PICO9918_BUILD_PRERELEASE_STRING "")
+elseif(PICO9918_PRERELEASE MATCHES "^(alpha|beta|rc)([1-9]|[12][0-9]|3[01])$")
+  set(_stageName ${CMAKE_MATCH_1})
+  set(_stageNumber ${CMAKE_MATCH_2})
+  set(_stages alpha beta rc)
+  list(FIND _stages ${_stageName} _stage)
+  math(EXPR PICO9918_BUILD_SW_PRERELEASE "((${_stage} + 1) << 5) | ${_stageNumber}" OUTPUT_FORMAT HEXADECIMAL)
+  string(TOUPPER "${_stageName} ${_stageNumber}" PICO9918_BUILD_PRERELEASE_STRING)
+else()
+  message(FATAL_ERROR
+    "PICO9918_PRERELEASE is '${PICO9918_PRERELEASE}': it must be empty, or alphaN, betaN or rcN with N 1-31.")
+endif()
+
 # The most dangerous of the lot: it changes the calling convention of nearly every
 # public entry point, and C symbols carry no argument types, so a consumer that
 # disagrees links cleanly and then passes arguments the library never expects.

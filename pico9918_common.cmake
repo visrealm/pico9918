@@ -1,8 +1,9 @@
 # pico9918_common.cmake - shared Python, version, and artifact-suffix helpers.
 #
 # Inputs (set BEFORE include): PICO9918_{MAJOR,MINOR,PATCH}_VER and optional
-# PICO9918_VERSION_SUFFIX (overrides git branch in artifact names).
+# PICO9918_VERSION_SUFFIX (overrides git branch in artifact names) and PICO9918_PRERELEASE.
 # Outputs: PYTHON, PICO9918_GIT_BRANCH, PICO9918_VERSION, PICO9918_VERSION_STR,
+# PICO9918_VERSION_FULL (1.3.0-beta1), PICO9918_VERSION_SHORT (1.3.0 B1),
 # PICO9918_BRANCH_STR, function pico9918_compute_binary_suffix().
 
 # Resolve Python to a real interpreter. On Windows, bare "python3" on PATH is
@@ -24,6 +25,15 @@ endif()
 
 set(PICO9918_VERSION "${PICO9918_MAJOR_VER}.${PICO9918_MINOR_VER}.${PICO9918_PATCH_VER}")
 string(REPLACE "." "-" PICO9918_VERSION_STR "${PICO9918_VERSION}")
+
+set(PICO9918_VERSION_FULL "${PICO9918_VERSION}")
+set(PICO9918_VERSION_SHORT "${PICO9918_VERSION}")
+if (NOT "${PICO9918_PRERELEASE}" STREQUAL "")
+  set(PICO9918_VERSION_FULL "${PICO9918_VERSION}-${PICO9918_PRERELEASE}")
+  string(REGEX REPLACE "^(.)[a-z]*([0-9]+)$" "\\1\\2" _preShort "${PICO9918_PRERELEASE}")
+  string(TOUPPER "${_preShort}" _preShort)
+  set(PICO9918_VERSION_SHORT "${PICO9918_VERSION} ${_preShort}")
+endif()
 
 execute_process(
   COMMAND git symbolic-ref --short HEAD

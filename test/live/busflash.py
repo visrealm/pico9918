@@ -75,8 +75,10 @@ def identify(p, wait_s=0):
     model, hw, sw, patch = (config(p, i) for i in range(4))
     if model not in FAMILY:
         raise SystemExit("unknown Pico model %d" % model)
-    print("PICO9918 %s  hw v%d.%d  firmware v%d.%d.%d"
-          % (MODEL[model], hw >> 4, hw & 15, sw >> 4, sw & 15, patch))
+    pre = config(p, 7)
+    stage = ("", "-alpha", "-beta", "-rc")[pre >> 5 & 3] + (str(pre & 31) if pre else "")
+    print("PICO9918 %s  hw v%d.%d  firmware v%d.%d.%d%s"
+          % (MODEL[model], hw >> 4, hw & 15, sw >> 4, sw & 15, patch, stage))
     return model
 
 

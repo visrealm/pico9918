@@ -63,7 +63,7 @@ endif()
 # overrides the git branch name in generated artifact filenames. Setting it to an
 # empty string is a valid choice (use the branch name), so we guard on DEFINED.
 if(NOT DEFINED PICO9918_VERSION_SUFFIX)
-    set(PICO9918_VERSION_SUFFIX "")
+    set(PICO9918_VERSION_SUFFIX "${PICO9918_PRERELEASE}")
 endif()
 
 # Common helpers must follow the version vars above and precede visrealm_*.
@@ -257,6 +257,7 @@ if(PICO9918_BUILD_COMBINED)
         -DPICO9918_NO_CLOCKS=${PICO9918_NO_CLOCKS}
         -DPICO9918_INT_ACTIVE_HIGH=${PICO9918_INT_ACTIVE_HIGH}
         -DPICO9918_VERSION_SUFFIX=${PICO9918_VERSION_SUFFIX}
+        -DPICO9918_PRERELEASE=${PICO9918_PRERELEASE}
         -DPICO_SDK_FETCH_FROM_GIT=${PICO_SDK_FETCH_FROM_GIT}
         -DPICO_SDK_FETCH_FROM_GIT_TAG=${PICO_SDK_FETCH_FROM_GIT_TAG}
     )
@@ -321,6 +322,7 @@ if(PICO9918_BUILD_COMBINED)
             -DPICO9918_OUTPUT_STR=${PICO9918_OUTPUT_STR}
             -DPICO9918_GIT_BRANCH=${PICO9918_GIT_BRANCH}
             -DPICO9918_VERSION_SUFFIX=${PICO9918_VERSION_SUFFIX}
+            -DPICO9918_PRERELEASE=${PICO9918_PRERELEASE}
         BUILD_COMMAND ${CMAKE_COMMAND} --build . --target configurator_all
         INSTALL_COMMAND ""
         BUILD_ALWAYS TRUE

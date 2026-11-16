@@ -137,9 +137,11 @@ pixels() {
 
 # The settings block: what a stored one is swept against is this build's own version.
 config() {
-  configure "$OUT-config" "$LIBROOT" -DPICO9918_CONFIG_TEST=ON -DCMAKE_C_FLAGS=-O2
-  build "$OUT-config"
-  "$(findExe "$OUT-config" config_test)"
+  for pre in "" beta1; do
+    configure "$OUT-config$pre" "$LIBROOT" -DPICO9918_CONFIG_TEST=ON -DPICO9918_PRERELEASE=$pre -DCMAKE_C_FLAGS=-O2
+    build "$OUT-config$pre"
+    "$(findExe "$OUT-config$pre" config_test)"
+  done
 }
 
 # The GPU rate: an armed program has to have run before the arming write returns.
