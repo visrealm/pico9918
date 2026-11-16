@@ -305,7 +305,7 @@ static void triggerGpuDma(uint8_t* vram)
     }
   }
 
-  *(uint16_t*)(vram + 0x8008) = 0;
+  vram[0x8008] = 0;
 }
 
 #if defined(TMS9900_WATCH_WRITES)
