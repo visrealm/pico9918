@@ -93,6 +93,12 @@ shared path is faster than the per-mode code it replaced.
   that raises it belongs to the F18A and above, but every chip was answering to it, so a fifth
   sprite on a line was drawn where the real one drops it - and a PICO9918's own sprite setting
   followed it there.
+* R30 holds the five bits the F18A has, and 31 lifts the scanline sprite limit, so 32 sprites
+  share a line rather than 31. A write of 0 still restores no limit.
+* A register reset through R50 leaves R7 at 0x1F, as the F18A does.
+* The elapsed-time counter in status registers 6-11 counts only while R15 bit 4 is set, holds its
+  count while stopped, and changes the status registers only on a snapshot. Stopping it used to
+  take a snapshot, and restarting it lost the count.
 
 ## v1.2.1 - 2026-11-14
 

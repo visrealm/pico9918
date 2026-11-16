@@ -77,7 +77,9 @@ pico9918_t* const tms9918 = &tms9918Inst;
 PICO9918_DLLEXPORT
 void __time_critical_func(pico9918_init)(void)
 {
-  tms9918->vdpBase = PICO9918_BASE_TMS9918;
+  tms9918->vdpBase        = PICO9918_BASE_TMS9918;
+  tms9918->counterRunning = false;
+  tms9918->counterBase    = 0;
 #if PICO9918_BUILD_RUNTIME_CHIP
   pico9918_set_chip(PICO9918_INST PICO9918_CHIP_MAX);
 #endif
@@ -287,6 +289,11 @@ static const uint16_t defaultPalette[] = {
   0x0000, 0xF555, 0xF000, 0xF00A, 0xF000, 0xF0A0, 0xF000, 0xF0AA, 0xF000, 0xFA00, 0xF000, 0xFA0A, 0xF000,
   0xFA50, 0xF000, 0xFFFF};
 
+static inline uint32_t counterValue(const pico9918_t* tms9918, uint32_t now)
+{
+  return tms9918->counterRunning ? now - tms9918->counterBase : tms9918->counterBase;
+}
+
 static PICO9918_NOINLINE void vdpRegisterReset(pico9918_t* tms9918)
 {
   tms9918->isUnlocked  = false;
@@ -299,11 +306,15 @@ static PICO9918_NOINLINE void vdpRegisterReset(pico9918_t* tms9918)
   TMS_REGISTER(tms9918, TMS_REG_4)                     = 0x01;
   TMS_REGISTER(tms9918, TMS_REG_5)                     = 0x0A;
   TMS_REGISTER(tms9918, TMS_REG_6)                     = 0x02;
-  TMS_REGISTER(tms9918, TMS_REG_7)                     = 0xF2;
+  TMS_REGISTER(tms9918, TMS_REG_7)                     = 0x1F;
   TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = PICO9918_SCAN_SPRITE_LIMIT(tms9918);
   TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC)         = 1;               // vram address increment register
   TMS_REGISTER(tms9918, PICO9918_REG_MAX_SPRITES)      = MAX_SPRITES;     // Sprites to process
   TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_MSB)       = 0x40;
+
+  /* R15 is now clear, so the counter holds where it is */
+  tms9918->counterBase    = counterValue(tms9918, PICO9918_HOST_TIME_US());
+  tms9918->counterRunning = false;
 }
 
 
@@ -1030,7 +1041,9 @@ static inline uint8_t __time_critical_func(renderSprites)(PICO9918_INST_ARG cons
     pal = 0;
   }
 
-  const uint32_t scanlineSprites = TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES);
+  /* 31 is the F18A's "no limit", and lifts the bound past any sprite count */
+  const uint32_t scanlineSprites = TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) |
+                                   ((TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) + 1) & 0x20);
   const uint32_t unlimited =
     (TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) & PICO9918_R50_REPORT_MAX) & unlockedMask;
 
@@ -3519,9 +3532,10 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
         TMS_STATUS(tms9918, PICO9918_SR_GPU) = 0x14; // error - busy
       }
     }
-    else if (regIndex == PICO9918_REG_MAX_SCAN_SPRITES && value == 0)
+    else if (regIndex == PICO9918_REG_MAX_SCAN_SPRITES)
     {
-      TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = MAX_SPRITES - 1;
+      value &= 0x1f;
+      TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = value ? value : MAX_SPRITES - 1;
     }
     else if ((regIndex == PICO9918_REG_ENHANCED2) && (value & PICO9918_R50_RESET))
     { // reset all registers?
@@ -3536,20 +3550,14 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
     }
     else if (regIndex == PICO9918_REG_STATUS_SELECT)
     {
-      const uint8_t statReg = value & 0x0f;
-      if (value & 0x40) tms9918->startTime = PICO9918_HOST_TIME_US(); // reset
-      if (value & 0x20)
-        tms9918->currentTime = PICO9918_HOST_TIME_US(); // snap
-      else if (value & 0x10)
-        tms9918->startTime += (tms9918->stopTime - tms9918->startTime);
-      else
-        tms9918->currentTime = tms9918->stopTime = PICO9918_HOST_TIME_US();
+      const uint32_t now = PICO9918_HOST_TIME_US();
+      const bool run     = value & PICO9918_R15_COUNTER_EN;
+      uint32_t count     = counterValue(tms9918, now);
 
-      if (statReg > 3 && statReg < 12)
+      if (value & PICO9918_R15_COUNTER_SNAP)
       {
-        uint32_t elapsed = tms9918->currentTime - tms9918->startTime;
         uint32_t microQ, microR;
-        PICO9918_DIVMOD_U32(elapsed, 1000, microQ, microR);
+        PICO9918_DIVMOD_U32(count, 1000, microQ, microR);
         uint32_t milliQ, milliR;
         PICO9918_DIVMOD_U32(microQ, 1000, milliQ, milliR);
 
@@ -3560,6 +3568,12 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
         TMS_STATUS(tms9918, PICO9918_SR_SECONDS_LSB) = milliQ & 0x00ff;
         TMS_STATUS(tms9918, PICO9918_SR_SECONDS_MSB) = milliQ >> 8;
       }
+
+      /* TRAP: a reset with the counter stopped is lost, as on the F18A */
+      if (run && (value & PICO9918_R15_COUNTER_RESET)) count = 0;
+
+      tms9918->counterBase    = run ? now - count : count;
+      tms9918->counterRunning = run;
     }
     // SR12 holds the value of the option in VR58 (options)
     else if (regIndex == PICO9918_REG_CONFIG_INDEX && PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))

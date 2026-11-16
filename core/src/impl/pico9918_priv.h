@@ -335,9 +335,8 @@ struct pico9918_s
   void* stepUserdata;
 #endif
 
-  uint32_t startTime;
-  uint32_t stopTime;
-  uint32_t currentTime;
+  uint32_t counterBase; /* the origin while counterRunning, else the held count */
+  bool counterRunning;
 
   struct
   {
@@ -356,10 +355,10 @@ struct pico9918_s
      owed. Not palDirty above, which is the converted palette copy owing PRAM. */
   bool configVdpDirty;
 
-  /* Aligned tile rendering optimization buffers - one extra tile for the scroll offset */
-  uint8_t __aligned(4) tileLayer2Buffer[SCANLINE_BUFFER_BYTES];
-  uint8_t __aligned(4) tileLayer1Buffer[SCANLINE_BUFFER_BYTES];
-  uint32_t __aligned(4) layerSelectionMask[SCANLINE_MASK_WORDS]; // 1 bit per pixel: 0=T1, 1=T2
+  /* TRAP: 8-byte aligned, or the row emitters compile larger and slower. One extra tile for scroll. */
+  uint8_t __aligned(8) tileLayer2Buffer[SCANLINE_BUFFER_BYTES];
+  uint8_t __aligned(8) tileLayer1Buffer[SCANLINE_BUFFER_BYTES];
+  uint32_t __aligned(8) layerSelectionMask[SCANLINE_MASK_WORDS]; // 1 bit per pixel: 0=T1, 1=T2
   uint32_t __aligned(4) finalMask[SCANLINE_MASK_WORDS];          // 1 bit per pixel: 0=T1, 1=T2
 
   /* Frame interrupt / status state. Not volatile, and touched from both the CPU-interface

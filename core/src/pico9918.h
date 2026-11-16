@@ -382,7 +382,7 @@ typedef enum
 #define PICO9918_R57_UNLOCK 0x1c /**< low two bits ignored; any other value locks again */
 
 /** \brief register 15 bits: the counter controls, and which status register S1 reads */
-#define PICO9918_R15_COUNTER_RESET 0x40 /**< reset the frame/scanline counters */
+#define PICO9918_R15_COUNTER_RESET 0x40 /**< zero the elapsed-time counter, if it is running */
 #define PICO9918_R15_COUNTER_SNAP  0x20 /**< latch the counters for reading */
 #define PICO9918_R15_COUNTER_EN    0x10 /**< let the counters run */
 #define PICO9918_R15_STATUS_NUM    0x0f /**< which status register S1 reads back */

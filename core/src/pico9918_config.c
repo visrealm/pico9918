@@ -239,8 +239,9 @@ void pico9918_config_apply(PICO9918_INST_ONLY_ARG)
       else
         TMS_REGISTER(tms9918, PICO9918_REG_ENHANCED2) &= (uint8_t)~PICO9918_R50_VSCANLINES;
 
+      const uint8_t sprites = 1 << (tms9918->config[PICO9918_CONF_SCANLINE_SPRITES] + 2);
       TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) =
-        1 << (tms9918->config[PICO9918_CONF_SCANLINE_SPRITES] + 2);
+        sprites < MAX_SPRITES ? sprites : MAX_SPRITES - 1;
 
       for (int i = 0; i < 16; ++i)
       {

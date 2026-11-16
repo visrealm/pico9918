@@ -71,10 +71,6 @@ v1.3.0; what is left is register semantics, status and the GPU.
 
 * S15 reconstructs each register from the bits the hardware stores, rather than returning the
   stored byte. That is the only register read-back path the hardware offers.
-* R30 is stored as the five bits the hardware has, and R30 = 0 restores the configured default
-  rather than a fixed 31.
-* R7's power-on default matches.
-* The timing counters sample correctly and no longer corrupt the start time.
 * Tile layer 2 and tile-layer-1 disable work in plain two-tone 80-column text on the 4bpp tier,
   not only with position-based attributes.
 * Correct the GPU's DMA trigger clear, which zeroes a byte it should leave alone.
