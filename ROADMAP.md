@@ -63,22 +63,6 @@ picture and the frame time are unchanged.
 * Continuous integration building both targets on Linux, macOS and Windows, with the library's
   standalone build as the boundary gate.
 
-## v1.4.0 - F18A compliance
-
-Close the remaining gaps where PICO9918 does not match real F18A behaviour, so that F18A
-software runs unmodified. The display-mode gaps were largely closed by the pipeline work in
-v1.3.0; what is left is register semantics, status and the GPU.
-
-* S15 reconstructs each register from the bits the hardware stores, rather than returning the
-  stored byte. That is the only register read-back path the hardware offers.
-* Tile layer 2 and tile-layer-1 disable work in plain two-tone 80-column text on the 4bpp tier,
-  not only with position-based attributes.
-* Correct the GPU's DMA trigger clear, which zeroes a byte it should leave alone.
-
-Not in scope: the GPU's 7-bit user status at `0xB000` is on hold, and several F18A GPU
-facilities (VRAM mirroring, the MPU register-page guard, the nanosecond counter pair) are
-recorded as unsupported by choice.
-
 ## v2.0.0 - the V9938
 
 The major version is the new VDP. With pico9918-core already in place, this release adds a base
@@ -100,8 +84,16 @@ Wanted, but not assigned to a version.
   carries a diverged fork.
 * Lite (settings-only) configurator ROM for the CreatiVision, which needs to fit a 16 KB
   cartridge.
+* S15 reconstructs each register from the bits the F18A stores, rather than returning the
+  stored byte.
+* Tile layer 2 and tile-layer-1 disable in plain two-tone 80-column text on the RP2040, not only
+  with position-based attributes.
 * Expose a real-time clock through PICO9918 registers ([#67](https://github.com/visrealm/pico9918/issues/67)).
 * Sega Master System Mode 4 ([#61](https://github.com/visrealm/pico9918/issues/61)).
 * Symbols, footprints and 3D renders for incorporating the PICO9918 into new designs
   ([#60](https://github.com/visrealm/pico9918/issues/60)).
 * No-cut modification parts list ([#30](https://github.com/visrealm/pico9918/issues/30)).
+
+Not planned: the GPU's 7-bit user status at `0xB000` is on hold, and several F18A GPU facilities
+(VRAM mirroring, the MPU register-page guard, the nanosecond counter pair) are unsupported by
+choice.
