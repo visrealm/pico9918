@@ -10,6 +10,10 @@ include(${CMAKE_SOURCE_DIR}/visrealm_cvbasic.cmake)
 
 set(VERSION_WITH_OUTPUT "v${PICO9918_VERSION_STR}${PICO9918_BRANCH_STR}${PICO9918_OUTPUT_STR}")
 set(FRIENDLYVER "${PICO9918_VERSION}")
+if(PICO9918_PRERELEASE MATCHES "^(.)[a-z]*([0-9]+)$")
+    string(TOUPPER "${CMAKE_MATCH_1}" _stage)
+    string(APPEND FRIENDLYVER " ${_stage}${CMAKE_MATCH_2}")
+endif()
 
 # Setup CVBasic toolchain (auto-build or find existing tools)
 setup_cvbasic_tools()
