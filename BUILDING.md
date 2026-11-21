@@ -136,6 +136,9 @@ and the final release of the same version are the same version to it. The config
 it, so a configurator carrying a later stage of the same version, or its final release, updates a
 board running an earlier pre-release.
 
+Without the flag, a build takes the stage the branch is heading for, set beside the version in
+`CMakeLists.txt` (and in `core/CMakeLists.txt` for the library). Empty both for the final release.
+
 CI builds one from a pushed tag: `v1.3.0-beta1` builds the firmware and configurators as `beta1`,
 and `v1.3.0` builds a final release. A tag whose version is not the one in `CMakeLists.txt` fails
 the run. The **Release Build** workflow can also be run by hand with the stage as its input. Either

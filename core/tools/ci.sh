@@ -100,8 +100,9 @@ findExe() {
 }
 
 goldens() {
+  # TRAP: the overlay golden draws the splash, so a stage would put its badge in the capture
   configure "$OUT" "$LIBROOT" -DPICO9918_GOLDEN=ON -DPICO9918_TEXT80_8BPP=OFF \
-    -DCMAKE_C_FLAGS=-O2
+    -DPICO9918_PRERELEASE= -DCMAKE_C_FLAGS=-O2
   build "$OUT"
   "$(findExe "$OUT" golden_runner)"
 }

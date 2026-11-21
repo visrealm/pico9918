@@ -28,7 +28,7 @@ option(PICO9918_TEXT80_8BPP "80-column text at 8bpp: ECM, palette select and bit
 # both the asset and its render path, so the image costs nothing in flash.
 option(PICO9918_NO_SPLASH "Omit the splash overlay and its image asset" OFF)
 
-set(PICO9918_PRERELEASE "" CACHE STRING "Pre-release stage and number: alphaN, betaN or rcN, N 1-31. Empty for a final release")
+set(PICO9918_PRERELEASE "beta2" CACHE STRING "Pre-release stage and number: alphaN, betaN or rcN, N 1-31. Empty for a final release")
 
 # Which chip an instance answers as, chosen per instance at runtime rather than by
 # the library build: a TMS9918, TMS9918A, F18A, PICO9918 or PICO9918 PRO. This is

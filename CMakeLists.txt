@@ -59,6 +59,11 @@ endif()
 if(NOT DEFINED PICO9918_PATCH_VER)
     set(PICO9918_PATCH_VER 0)
 endif()
+# The stage this branch is heading for, emptied for the final release. A tagged CI build passes
+# its own, so this is what an untagged build reports.
+if(NOT DEFINED PICO9918_PRERELEASE)
+    set(PICO9918_PRERELEASE "beta2")
+endif()
 # Optional artifact suffix (e.g. "a1", "alpha1", "rc2"). When non-empty, this
 # overrides the git branch name in generated artifact filenames. Setting it to an
 # empty string is a valid choice (use the branch name), so we guard on DEFINED.
