@@ -71,8 +71,6 @@ shared path is faster than the per-mode code it replaced.
 * GPU DMA: a width or height of 0 means 256, and a transfer running past the end of the 64 KB map
   wraps into it rather than out of it. A finished transfer clears only its trigger byte at 0x8008,
   leaving 0x8009 alone.
-* A palette write from a GPU program is noticed, so the picture takes the new colours, and the
-  border follows a palette change straight away.
 * A brief HIGH on /CSR during a read no longer counts as a second read.
 * With R50 bit 0 clear, its power-on value, ECM0 tile layer 2 covers sprites as on the F18A, where
   sprites used to show through it.
