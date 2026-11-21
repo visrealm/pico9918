@@ -88,10 +88,6 @@ shared path is faster than the per-mode code it replaced.
   setting introduced by a release always arrives at its default. Where the block and the caller
   agreed on an older version the sweep was skipped entirely, and the setting kept whatever bytes
   happened to be there - on that boot and every later one.
-* The TMS9918 and TMS9918A keep the four-sprite scanline limit those chips have. The register
-  that raises it belongs to the F18A and above, but every chip was answering to it, so a fifth
-  sprite on a line was drawn where the real one drops it - and a PICO9918's own sprite setting
-  followed it there.
 * R30 holds the five bits the F18A has, and 31 lifts the scanline sprite limit, so 32 sprites
   share a line rather than 31. A write of 0, or a register reset through R50, restores the
   configured scanline sprite limit, as the F18A restores its jumper setting.
