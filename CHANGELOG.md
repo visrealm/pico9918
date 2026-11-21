@@ -38,8 +38,8 @@ shared path is faster than the per-mode code it replaced.
 
 ### Changed
 
-* Faster per-scanline rendering in every display mode, faster GPU execution on the PICO9918 PRO,
-  and GPU block copies that no longer move a byte at a time.
+* Faster per-scanline rendering in every display mode, faster GPU execution on both boards, and
+  GPU block copies that no longer move a byte at a time.
 * The TMS9918A and F18A emulation is now
   [pico9918-core](https://github.com/visrealm/pico9918-core), published as a library in its own
   right for emulator authors. The firmware builds the copy in `core/`, so a host and a board run
