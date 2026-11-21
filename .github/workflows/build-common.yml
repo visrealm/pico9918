@@ -17,6 +17,11 @@ on:
         description: 'Suffix for artifact names'
         required: true
         type: string
+      prerelease:
+        description: 'Pre-release stage (alphaN, betaN or rcN), empty for a final build'
+        required: false
+        type: string
+        default: ''
       run-windows:
         description: 'Whether to run Windows job'
         required: false
@@ -60,7 +65,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON "-DPICO9918_PRERELEASE=${{ inputs.prerelease }}"
 
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
@@ -130,7 +135,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON "-DPICO9918_PRERELEASE=${{ inputs.prerelease }}"
 
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}
@@ -197,7 +202,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON
+        cmake -S .. -B . -G Ninja -DPICO_SDK_FETCH_FROM_GIT=ON "-DPICO_SDK_FETCH_FROM_GIT_TAG=2.1.1" -DPICO9918_BUILD_COMBINED=ON "-DPICO9918_PRERELEASE=${{ inputs.prerelease }}"
 
     - name: Build Firmware
       if: ${{ inputs.build-firmware }}

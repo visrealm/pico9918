@@ -1,0 +1,53 @@
+name: Release Build
+
+on:
+  push:
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Pre-release stage (alphaN, betaN or rcN), empty for a final build'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  stage:
+    runs-on: ubuntu-24.04
+    outputs:
+      prerelease: ${{ steps.stage.outputs.prerelease }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Read the stage from the tag or the input
+      id: stage
+      env:
+        INPUT_STAGE: ${{ inputs.prerelease }}
+      run: |
+        ver() { sed -n "s/^ *set(PICO9918_$1_VER \([0-9]*\))/\1/p" CMakeLists.txt; }
+        version="$(ver MAJOR).$(ver MINOR).$(ver PATCH)"
+        if [ "$GITHUB_REF_TYPE" = tag ]; then
+          if [[ ! $GITHUB_REF_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)(-((alpha|beta|rc)[0-9]+))?$ ]]; then
+            echo "::error::tag $GITHUB_REF_NAME is not vX.Y.Z or vX.Y.Z-alphaN, -betaN or -rcN"; exit 1
+          fi
+          if [ "${BASH_REMATCH[1]}" != "$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match CMakeLists.txt version $version"; exit 1
+          fi
+          stage="${BASH_REMATCH[3]}"
+        else
+          stage="$INPUT_STAGE"
+        fi
+        echo "prerelease=$stage" >> "$GITHUB_OUTPUT"
+        echo "Building $version${stage:+-$stage}" >> "$GITHUB_STEP_SUMMARY"
+
+  build:
+    needs: stage
+    uses: ./.github/workflows/build-common.yml
+    with:
+      build-firmware: true
+      build-configurator: true
+      artifact-name-suffix: release
+      prerelease: ${{ needs.stage.outputs.prerelease }}
+      run-windows: false
+      run-linux: true
+      run-macos: false

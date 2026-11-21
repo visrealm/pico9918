@@ -135,6 +135,11 @@ the stage so the configurator can show it. Nothing compares that byte: a pre-rel
 release of the same version are the same version to the settings migration and to the
 configurator's upgrade check.
 
+CI builds one from a pushed tag: `v1.3.0-beta1` builds the firmware and configurators as `beta1`,
+and `v1.3.0` builds a final release. A tag whose version is not the one in `CMakeLists.txt` fails
+the run. The **Release Build** workflow can also be run by hand with the stage as its input. Either
+way the artifacts are attached to the run.
+
 So **the config layout freezes at the first pre-release of a version.** A field claimed after
 beta1 carries the release's version, which beta units are already stamped with, so they would
 never default it. If a field cannot wait, the notes for that pre-release tell testers to reset
