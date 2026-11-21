@@ -131,9 +131,10 @@ cmake .. -DPICO9918_BUILD_COMBINED=ON -DPICO9918_PRERELEASE=beta1
 
 The artifacts are named `...-v1-3-0-beta1...`, the splash shows `BETA 1` beside the logo, the
 diagnostic `FWVER` row shows `1.3.0 B1`, picotool reports `1.3.0-beta1`, and config byte 7 carries
-the stage so the configurator can show it. Nothing compares that byte: a pre-release and the final
-release of the same version are the same version to the settings migration and to the
-configurator's upgrade check.
+the stage so the configurator can show it. The settings migration ignores that byte: a pre-release
+and the final release of the same version are the same version to it. The configurator does compare
+it, so a configurator carrying a later stage of the same version, or its final release, updates a
+board running an earlier pre-release.
 
 CI builds one from a pushed tag: `v1.3.0-beta1` builds the firmware and configurators as `beta1`,
 and `v1.3.0` builds a final release. A tag whose version is not the one in `CMakeLists.txt` fails

@@ -112,8 +112,18 @@ def main() -> int:
     parser.add_argument('-b', '--banksize', help='bank size (0, 8 or 16)', default=8, type=int, choices=[0,8,16])
     parser.add_argument('-o', '--outfile', help='output file - defaults to base input file name with .bas extension', default='firmware')
     parser.add_argument('--banksel', help='also write a banksel.bas with thunks sized for this firmware', default=None)
+    parser.add_argument('--prerelease', help='the firmware\'s pre-release stage (alphaN, betaN or rcN), empty for a final release', default='')
     parser.add_argument('uf2file')
     args = vars(parser.parse_args())
+
+    # config byte 7's encoding: the stage in bits 5-6, its number in bits 0-4
+    prerelease = 0
+    if args['prerelease']:
+        stage = re.fullmatch(r"(alpha|beta|rc)([1-9]|[12][0-9]|3[01])", args['prerelease'])
+        if not stage:
+            print("Error! --prerelease must be alphaN, betaN or rcN with N 1-31, not '{0}'".format(args['prerelease']))
+            return 1
+        prerelease = ((("alpha", "beta", "rc").index(stage.group(1)) + 1) << 5) | int(stage.group(2))
 
     filename = args['uf2file']
 
@@ -219,6 +229,7 @@ def main() -> int:
             header.write("  CONST FIRMWARE_MAJOR_VER = {0}\n".format(majorVer))
             header.write("  CONST FIRMWARE_MINOR_VER = {0}\n".format(minorVer))
             header.write("  CONST FIRMWARE_PATCH_VER = {0}\n".format(patchVer))
+            header.write("  CONST FIRMWARE_PRERELEASE = {0}\n".format(prerelease))
             header.write("  CONST #FIRMWARE_YEAR = {0}\n".format(fwDate.year))
             header.write("  CONST FIRMWARE_MONTH = {0}\n".format(fwDate.month))
             header.write("  CONST FIRMWARE_DAY = {0}\n".format(fwDate.day))

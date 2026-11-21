@@ -114,6 +114,7 @@ main: PROCEDURE
         statReg = VDP_STATUS
 
         verPatch = 0
+        verPre = 0
 
         IF (statReg AND $E8) = $E8 THEN
             VDP_STATUS_REG = 12  ' config
@@ -123,6 +124,8 @@ main: PROCEDURE
             verMinor = optValue AND $0f
             VDP_REG(58) = PICO9918_CONF_SW_PATCH_VERSION
             verPatch = VDP_STATUS
+            VDP_REG(58) = PICO9918_CONF_SW_PRERELEASE
+            verPre = VDP_STATUS
             VDP_REG(58) = PICO9918_CONF_PICO_MODEL
             picoModel = VDP_STATUS
             VDP_REG(58) = PICO9918_CONF_HW_VERSION

@@ -126,6 +126,20 @@ setupHeader: PROCEDURE
     END
 
 ' -----------------------------------------------------------------------------
+' print preValue, a config byte 7 pre-release stage, as "b1" - nothing if final
+' -----------------------------------------------------------------------------
+printPrerelease: PROCEDURE
+    IF preValue >= $60 THEN
+        PRINT "r"
+    ELSEIF preValue >= $40 THEN
+        PRINT "b"
+    ELSEIF preValue THEN
+        PRINT "a"
+    END IF
+    IF preValue THEN PRINT preValue AND $1f
+    END
+
+' -----------------------------------------------------------------------------
 ' update the PICO9918 palette (shades of blue)
 ' -----------------------------------------------------------------------------
 updatePalette: PROCEDURE

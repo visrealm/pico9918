@@ -34,7 +34,9 @@ firmwareMenu: PROCEDURE
     DRAW_TITLE("FIRMWARE UPDATE")
 
     PRINT AT XY(4, g_menuTopRow + 0), "Current version : v",verMajor, ".", verMinor, ".", verPatch
+    preValue = verPre: GOSUB printPrerelease
     PRINT AT XY(4, g_menuTopRow + 1), "New version     : v",FIRMWARE_MAJOR_VER,".",FIRMWARE_MINOR_VER,".",FIRMWARE_PATCH_VER
+    preValue = FIRMWARE_PRERELEASE: GOSUB printPrerelease
 
 
 #if BANKED_COMBINED

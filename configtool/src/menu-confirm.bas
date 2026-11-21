@@ -8,19 +8,30 @@
 ' an ARMED display change).
 '
 
-' Halt or force-update if device firmware is older than the embedded firmware.
+' Halt or force-update if device firmware is older than the embedded firmware,
+' an earlier pre-release of the same version included.
 checkFirmwareVersion: PROCEDURE
     ' (major << 12) | (minor << 8) | patch -- the introducedIn packing
     #deviceVer   = (verMajor * 4096) + (verMinor * 256) + verPatch
     #embeddedVer = (FIRMWARE_MAJOR_VER * 4096) + (FIRMWARE_MINOR_VER * 256) + FIRMWARE_PATCH_VER
 
-    IF #deviceVer >= #embeddedVer THEN RETURN
+    IF #deviceVer > #embeddedVer THEN RETURN
+
+    ' same version: a final release (byte 7 = 0) outranks every pre-release
+    IF #deviceVer = #embeddedVer THEN
+        IF verPre = 0 THEN RETURN
+        IF FIRMWARE_PRERELEASE THEN
+            IF verPre >= FIRMWARE_PRERELEASE THEN RETURN
+        END IF
+    END IF
 
     GOSUB clearScreen
     DRAW_TITLE("FIRMWARE OUT OF DATE")
 
     PRINT AT XY(2, MENU_TITLE_ROW + 3), "Device firmware  : v", verMajor, ".", verMinor, ".", verPatch
+    preValue = verPre: GOSUB printPrerelease
     PRINT AT XY(2, MENU_TITLE_ROW + 4), "Required version : v", FIRMWARE_MAJOR_VER, ".", FIRMWARE_MINOR_VER, ".", FIRMWARE_PATCH_VER
+    preValue = FIRMWARE_PRERELEASE: GOSUB printPrerelease
     PRINT AT XY(2, MENU_TITLE_ROW + 6), "This configurator needs newer"
     PRINT AT XY(2, MENU_TITLE_ROW + 7), "firmware to work safely."
 

@@ -42,6 +42,7 @@ function(convert_uf2_to_cvbasic BANK_SIZE OUTPUT_PREFIX)
                 -b ${BANK_SIZE}
                 -o "${OUTPUT_DIR}/${OUTPUT_PREFIX}"
                 --banksel "${OUTPUT_DIR}/banksel_${OUTPUT_PREFIX}.bas"
+                "--prerelease=${PICO9918_PRERELEASE}"
                 "${FIRMWARE_PATH}"
         DEPENDS "${CMAKE_SOURCE_DIR}/configtool/tools/uf2cvb.py" "${FIRMWARE_PATH}"
         COMMENT "Converting UF2 (${FIRMWARE_PATH}) to CVBasic data (${BANK_SIZE}KB banks)"
