@@ -10,9 +10,10 @@ What is planned beyond the newest entry below is in [ROADMAP.md](ROADMAP.md).
 Current firmware works on every official board: v0.3, v0.4 through v1.3, and PRO v2.0. A single
 `.uf2` has carried both the RP2040 and RP2350 images since v1.1.0.
 
-## v1.3.0 - unreleased
+## v1.3.0 - in beta
 
-Not released yet, and nothing in this section is downloadable. The largest F18A release since F18A
+Beta 1 is on [Releases](https://github.com/visrealm/pico9918/releases/tag/v1.3.0-beta1) as a
+pre-release, dated 2026-11-21; the final release is not out yet. The largest F18A release since F18A
 support arrived. Every display mode now runs through one shared tile pipeline instead of carrying
 its own special case, so features that existed in only some modes exist in all of them, and the
 shared path is faster than the per-mode code it replaced.
