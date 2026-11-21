@@ -217,7 +217,7 @@ packageVariant() {
   # run's copy is still sitting there.
   rm -rf "$variantStage"
   configure "$variantBuild" "$LIBROOT" "-DCMAKE_INSTALL_PREFIX=$variantStage" \
-    -DBUILD_SHARED_LIBS=$shared
+    -DBUILD_SHARED_LIBS=$shared "-DPICO9918_PRERELEASE=${PICO9918_PRERELEASE:-}"
   build "$variantBuild"
   $CMAKE --install "$variantBuild" --config "$CONFIG"
 

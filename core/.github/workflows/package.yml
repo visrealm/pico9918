@@ -28,6 +28,18 @@ jobs:
       - uses: ./.github/actions/env
         with:
           toolchain: ${{ matrix.name }}
+      - name: Read the stage from the tag
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          version=$(sed -n 's/^project(pico9918_core VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          if [[ ! $GITHUB_REF_NAME =~ ^v([0-9]+\.[0-9]+\.[0-9]+)(-((alpha|beta|rc)[0-9]+))?$ ]]; then
+            echo "::error::tag $GITHUB_REF_NAME is not vX.Y.Z or vX.Y.Z-alphaN, -betaN or -rcN"; exit 1
+          fi
+          if [ "${BASH_REMATCH[1]}" != "$version" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match CMakeLists.txt version $version"; exit 1
+          fi
+          echo "PICO9918_PRERELEASE=${BASH_REMATCH[3]}" >> "$GITHUB_ENV"
       - if: matrix.name != 'windows-msvc'
         run: tools/ci.sh package
       # cmd, so vcvars64 survives into the build. tools/msvc.cmd finds the
@@ -56,6 +68,8 @@ jobs:
           merge-multiple: true
       - env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PRERELEASE: ${{ contains(github.ref_name, '-') && '--prerelease' || '' }}
         run: >-
-          gh release create "$GITHUB_REF_NAME" dist/* --generate-notes
+          gh release create "$GITHUB_REF_NAME" dist/* --generate-notes $PRERELEASE
           || gh release upload "$GITHUB_REF_NAME" dist/* --clobber
