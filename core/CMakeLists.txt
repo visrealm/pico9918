@@ -267,6 +267,10 @@ if (PROJECT_IS_TOP_LEVEL AND NOT PICO9918_PICO_BUILD)
   else()
     set(PICO9918_CPACK_LINKAGE_SUFFIX "")
   endif()
+  # TRAP: MinGW and MSVC both report Windows-AMD64, and a release merges every leg's archives.
+  if(MSVC)
+    string(PREPEND PICO9918_CPACK_LINKAGE_SUFFIX "-msvc")
+  endif()
   set(CPACK_PACKAGE_FILE_NAME
       "pico9918-core-${PROJECT_VERSION}${PICO9918_PRERELEASE_SUFFIX}-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}${PICO9918_CPACK_LINKAGE_SUFFIX}")
   include(CPack)
