@@ -404,7 +404,6 @@ PICO9918_DLLEXPORT void __time_critical_func(pico9918_reset)(PICO9918_INST_ONLY_
 
   vdpRegisterReset(tms9918);
   TMS_REGISTER(tms9918, TMS_REG_1) = 0x00; // turn display off
-  TMS_REGISTER(tms9918, TMS_REG_7) = 0x00;
   pico9918_cached_mode               = TMS_MODE_GRAPHICS_I;
 
   // set up default palettes (arm is little-endian, tms9900 is big-endian)

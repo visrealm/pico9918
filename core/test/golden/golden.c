@@ -799,7 +799,7 @@ static void sceneF18aGfx2(void)
  * registers) and commits the unlocked mode by rendering a throwaway line,
  * then calls pico9918_reset() through the public API. The captured lines
  * are rendered WITHOUT the mode nudge sceneBegin() applies, so whatever the
- * reset path leaves behind (display off, backdrop 0, default palette, stale
+ * reset path leaves behind (display off, backdrop 15, default palette, stale
  * cached mode) is golden-file contract - independent of scene order. */
 static void sceneRawReset(void)
 {
@@ -810,7 +810,7 @@ static void sceneRawReset(void)
   regWrite(0, 0x00);
   regWrite(1, 0xe0);
   regWrite(2, 0x0e);
-  regWrite(7, 0x1f);
+  regWrite(7, 0x34);
   regWrite(49, 0x11); /* ECM1 tiles | ECM1 sprites */
   pico9918_scan_line(0); /* commit the unlocked Graphics-I mode */
   pico9918_reset();

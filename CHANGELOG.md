@@ -97,7 +97,8 @@ shared path is faster than the per-mode code it replaced.
 * R30 holds the five bits the F18A has, and 31 lifts the scanline sprite limit, so 32 sprites
   share a line rather than 31. A write of 0, or a register reset through R50, restores the
   configured scanline sprite limit, as the F18A restores its jumper setting.
-* A register reset through R50 leaves R7 at 0x1F, as the F18A does.
+* Power-on, a host reset and a register reset through R50 all leave R7 at 0x1F, as the F18A does,
+  so the backdrop is white until software sets it.
 * The elapsed-time counter in status registers 6-11 counts only while R15 bit 4 is set, holds its
   count while stopped, and changes the status registers only on a snapshot. Stopping it used to
   take a snapshot, and restarting it lost the count.

@@ -40,7 +40,7 @@ The shipping single-instance calling convention, with the full PICO9918 renderer
 | f18a-bml-stride | 192 | a bitmap layer 102 pixels wide - not a whole number of bytes, so the row stride rounds up to 26 and this is the only scene where a truncating divide would place the rows differently |
 | f18a-ecm0 | 192 | unlocked ECM0 tile path with h-scroll shift==2, non-ECM sprites below tiles including a colour-0 transparent sprite (sprite-mask release), and ReadData/read-ahead data-port traffic feeding the sprite table |
 | f18a-gfx2 | 192 | unlocked Graphics II - the f18aOpsTable Graphics-II row (stage4 sprites-then-bitmap trampoline) with 16px sprites and a transparent 2bpp bitmap window |
-| raw-reset | 8 | pico9918_reset() called from a deterministic unlocked+configured state, first lines rendered with no mode nudge - the post-reset contract (display off, backdrop 0, default palette) |
+| raw-reset | 8 | pico9918_reset() called from a deterministic unlocked+configured state, first lines rendered with no mode nudge - the post-reset contract (display off, backdrop 15, default palette) |
 
 The status byte recorded per line is the value *returned* by
 `pico9918_scan_line` (sprite 5S/COL flags plus the 5th-sprite number), not
