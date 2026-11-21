@@ -242,12 +242,6 @@ typedef struct
 #define PICO9918_M4(T)                                                                             \
   (PICO9918_CAN_UNLOCK(T) && (TMS_REGISTER(T, TMS_REG_0) & TMS_R0_MODE_TEXT_80))
 
-/* What VR30 resets to. A chip that cannot unlock has no VR30 to raise it with, so four a
-   line is the hardware's own limit; MAX_SPRITES - 1 is the F18A's "no limit" value, which
-   its jumper also selects. Folds to that in a fixed-chip build. */
-#define PICO9918_SCAN_SPRITE_LIMIT(T)                                                              \
-  (PICO9918_CAN_UNLOCK(T) ? (MAX_SPRITES - 1) : MAX_SCANLINE_SPRITES)
-
 #if PICO9918_BUILD_LAYER_MASK
 #define PICO9918_DRAWS(T, BIT)             (((T)->suppress & (BIT)) == 0)
 #define PICO9918_SUPPRESSED(T, BIT)        (((T)->suppress & (BIT)) != 0)
@@ -410,6 +404,16 @@ struct pico9918_s
    either. */
 _Static_assert(offsetof(struct pico9918_s, vram) == 0,
                "vram offset moved - PICO9918_MAP_* and the GPU MPU guard ranges both break");
+
+static inline uint8_t pico9918_scan_sprite_limit(const pico9918_t* t)
+{
+  if (PICO9918_HAS(t, PICO9918_FEAT_CONFIG))
+  {
+    const uint8_t sprites = 4 << t->config[PICO9918_CONF_SCANLINE_SPRITES];
+    return sprites < MAX_SPRITES ? sprites : MAX_SPRITES - 1;
+  }
+  return PICO9918_CAN_UNLOCK(t) ? MAX_SPRITES - 1 : MAX_SCANLINE_SPRITES;
+}
 
 #if PICO9918_SINGLE_INSTANCE
 extern pico9918_t* const tms9918;

@@ -307,7 +307,7 @@ static PICO9918_NOINLINE void vdpRegisterReset(pico9918_t* tms9918)
   TMS_REGISTER(tms9918, TMS_REG_5)                     = 0x0A;
   TMS_REGISTER(tms9918, TMS_REG_6)                     = 0x02;
   TMS_REGISTER(tms9918, TMS_REG_7)                     = 0x1F;
-  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = PICO9918_SCAN_SPRITE_LIMIT(tms9918);
+  TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = pico9918_scan_sprite_limit(tms9918);
   TMS_REGISTER(tms9918, PICO9918_REG_VRAM_INC)         = 1;               // vram address increment register
   TMS_REGISTER(tms9918, PICO9918_REG_MAX_SPRITES)      = MAX_SPRITES;     // Sprites to process
   TMS_REGISTER(tms9918, PICO9918_REG_GPU_PC_MSB)       = 0x40;
@@ -352,7 +352,7 @@ PICO9918_DLLEXPORT void pico9918_set_chip(PICO9918_INST_ARG pico9918_chip_t chip
   /* only a personality with no settings block takes its limit here - the block owns VR30 */
   if (!PICO9918_HAS(tms9918, PICO9918_FEAT_CONFIG))
   {
-    TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = PICO9918_SCAN_SPRITE_LIMIT(tms9918);
+    TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = pico9918_scan_sprite_limit(tms9918);
   }
 
 #if !PICO9918_NO_SPLASH
@@ -3535,7 +3535,7 @@ void __time_critical_func(pico9918_write_reg_value_impl)(PICO9918_INST_ARG uint8
     else if (regIndex == PICO9918_REG_MAX_SCAN_SPRITES)
     {
       value &= 0x1f;
-      TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = value ? value : MAX_SPRITES - 1;
+      TMS_REGISTER(tms9918, PICO9918_REG_MAX_SCAN_SPRITES) = value ? value : pico9918_scan_sprite_limit(tms9918);
     }
     else if ((regIndex == PICO9918_REG_ENHANCED2) && (value & PICO9918_R50_RESET))
     { // reset all registers?
