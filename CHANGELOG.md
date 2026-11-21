@@ -51,8 +51,6 @@ shared path is faster than the per-mode code it replaced.
   four-byte identity a host filled in. Three of those four bytes were facts the library already
   held: it stamps its own version, and the MCU follows the revision. Nothing about a board's
   stored settings changes, but the call and its struct do.
-* A settings block made for the other board model is kept and re-stamped rather than reset to
-  defaults.
 * The host bus interface sustains faster back-to-back reads: a scanline with nothing new to display
   no longer holds the bus off.
 * The configurator ROM is sized to the firmware it carries rather than fixed at 256 KB.
@@ -79,15 +77,10 @@ shared path is faster than the per-mode code it replaced.
 * Status register 15 returns the value of the register a read-address write names, as the F18A
   latches it, rather than the status number R15 last selected.
 * The GPU DMA registers power up zeroed, so a cold boot can no longer fire a stray transfer.
-* The diagnostic clock row shows the clock the board is actually running.
 * Status register 0 reports a fifth-sprite number of 0 where there is no fifth sprite, rather than
   a constant 31.
 * R50 bit 2 drives the simulated scanlines, so software that asks for the effect gets it. The
   configurator setting is now the power-on default for that bit rather than a second owner of it.
-* A stored settings block is swept against the version of the emulation that reads it, so a
-  setting introduced by a release always arrives at its default. Where the block and the caller
-  agreed on an older version the sweep was skipped entirely, and the setting kept whatever bytes
-  happened to be there - on that boot and every later one.
 * R30 holds the five bits the F18A has, and 31 lifts the scanline sprite limit, so 32 sprites
   share a line rather than 31. A write of 0, or a register reset through R50, restores the
   configured scanline sprite limit, as the F18A restores its jumper setting.
