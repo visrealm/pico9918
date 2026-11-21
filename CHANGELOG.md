@@ -54,14 +54,10 @@ shared path is faster than the per-mode code it replaced.
 * The host bus interface sustains faster back-to-back reads: a scanline with nothing new to display
   no longer holds the bus off.
 * The configurator ROM is sized to the firmware it carries rather than fixed at 256 KB.
-* A read drives the data bus as soon as /CSR falls, so the bus transceiver never relays an
-  undriven input to the host. Read data is valid about 40 ns sooner.
 
 ### Fixed
 
-* Holes in the tile pipeline: the backdrop and 40-column text take the tile palette select, a text
-  cell above an ECM0 layer draws as the ECM tile it is, and text no longer takes a vertical page
-  swap the hardware never applies.
+* The backdrop and 40-column text take the tile palette select.
 * A locked device masks a register write above R7 to three bits and aliases it onto R0-R7, the way
   a TMS9918A does, instead of ignoring it. Writes are still ignored where R0 bit 2 (M4) is set,
   which is the F18A's own rule, and it is the aliasing that software setting up 80 columns by
@@ -76,7 +72,6 @@ shared path is faster than the per-mode code it replaced.
   it.
 * Status register 15 returns the value of the register a read-address write names, as the F18A
   latches it, rather than the status number R15 last selected.
-* The GPU DMA registers power up zeroed, so a cold boot can no longer fire a stray transfer.
 * Status register 0 reports a fifth-sprite number of 0 where there is no fifth sprite, rather than
   a constant 31.
 * R50 bit 2 drives the simulated scanlines, so software that asks for the effect gets it. The
