@@ -11,7 +11,15 @@ Current firmware works on every official board: v0.3, v0.4 through v1.3, and PRO
 
 ## Unreleased
 
-Work past v1.2.1 lives on branches and is not downloadable.
+Work past v1.2.2 lives on branches and is not downloadable.
+
+## v1.2.2 - 2026-11-22
+
+A single fix to 80-column mode.
+
+### Fixed
+
+* 80-column mode doubled the right pixel of a pair into the left where the left pixel was colour 0.
 
 ## v1.2.1 - 2026-11-14
 
