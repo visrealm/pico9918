@@ -178,7 +178,8 @@ class Board:
                 out["rows"] = rows
                 out["dropped"] = len(self.live.dropped)
                 out["width"] = self.live.width
-                out["aspect"] = aspect(rows, regs[0] & scenes.R0_DOUBLE_ROWS)
+                out["aspect"] = (4 / 3 if self.live.border
+                                 else aspect(rows, regs[0] & scenes.R0_DOUBLE_ROWS))
             out["regs"] = list(regs)
             out["conf"] = {i: self.live.conf(i) for i in DIAG_CONF}
             out["unlocked"] = self.live.read(self.live.inst + self.live.off["isUnlocked"], 1)[0] != 0

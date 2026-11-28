@@ -52,6 +52,8 @@ class VdpAccess:
     scalars ahead of that union, which renders a blank instance while every read
     agrees with itself."""
 
+    border = False
+
     def vram(self, addr, data):
         """write VDP address space - VRAM below 0x4000, registers at 0x6000"""
         self.write(self.vdp + addr, bytes(data))
@@ -110,9 +112,26 @@ class VdpAccess:
         width = self.width
         pram = self.read(self.vdp + VRAM_PRAM, 64 * 2)   # 0xFRGB, big-endian
         pal = rgb_palette(struct.unpack_from(">H", pram, i * 2)[0] for i in range(64))
-        if width == PIXELS_X and self.regs()[0] & 0x04:
+        regs = self.regs()
+        packed = width == PIXELS_X and regs[0] & 0x04
+        if packed:
             pixels, width = unpack_nibbles(pixels, rows, width)
-        return png_bytes(width, rows, pixels[:rows * width], pal), rows
+        pixels, height = pixels[:rows * width], rows
+        if self.border:
+            pixels, width, height = self._bordered(pixels, width, rows, regs, packed)
+        return png_bytes(width, height, pixels, pal), rows
+
+    def _bordered(self, pixels, width, rows, regs, packed):
+        """The capture inside the 640x480 VGA frame, at the capture's own scale."""
+        hscale, vscale = 512 // width, 1 if regs[0] & 0x08 else 2
+        full_w, full_h = 640 // hscale, max(rows, 480 // vscale)
+        left, top = 64 // hscale, (full_h - rows) // 2
+        bg = (regs[7] & 0x0F) | (0 if packed else (regs[24] & 0x03) << 4)
+        out = bytearray([bg]) * (full_w * full_h)
+        for y in range(rows):
+            at = (top + y) * full_w + left
+            out[at:at + width] = pixels[y * width:(y + 1) * width]
+        return bytes(out), full_w, full_h
 
     def png(self, path, frame=None):
         data, rows = self.frame_png(frame)
