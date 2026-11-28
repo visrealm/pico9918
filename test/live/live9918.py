@@ -33,6 +33,7 @@ import struct
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import zlib
 
@@ -184,6 +185,8 @@ class OpenOcd:
     """openocd's TCL RPC. Bulk transfers go through dump_image/load_image,
     which move a file rather than a list of decimal strings."""
 
+    starting = threading.Lock()
+
     def __init__(self, target, speed=SWD_SPEED_KHZ, serial=None):
         self.proc = None
         self.sock = None
@@ -194,9 +197,23 @@ class OpenOcd:
         self.log = None
 
     def start(self):
+        # TRAP: two openocds starting at once on Windows each fail to find their
+        # CMSIS-DAP device. One process opens them in turn; two processes retry.
+        with OpenOcd.starting:
+            for attempt in range(3):
+                try:
+                    return self._start()
+                except RuntimeError as e:
+                    if attempt == 2 or "unable to find a matching CMSIS-DAP" not in str(e):
+                        raise
+                    self.log.close()
+                    time.sleep(0.4 + attempt * 0.6)
+
+    def _start(self):
         # openocd logs to stderr, and an unread pipe stops it dead as soon as the
         # OS buffer fills - so it goes to a file we can read back after a failure
-        self.log = open(os.path.join(tempfile.gettempdir(), "openocd-live9918.log"), "wb")
+        self.log = open(os.path.join(tempfile.gettempdir(),
+                                     "openocd-live9918-%d.log" % self.port), "wb")
         # the serial goes between the two configs: the interface one selects the
         # driver it applies to, and the target one is what opens the device
         args = [OPENOCD, "-s", OPENOCD_SCRIPTS, "-f", "interface/cmsis-dap.cfg"]
@@ -246,6 +263,20 @@ class OpenOcd:
             out += chunk
         return out[:-1].decode(errors="replace")
 
+    def read(self, addr, size):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "r.bin").replace("\\", "/")
+            self.cmd("dump_image %s 0x%08x %d" % (path, addr, size))
+            with open(path, "rb") as f:
+                return f.read()
+
+    def write(self, addr, data):
+        with tempfile.TemporaryDirectory() as d:
+            path = os.path.join(d, "w.bin").replace("\\", "/")
+            with open(path, "wb") as f:
+                f.write(data)
+            self.cmd("load_image %s 0x%08x bin" % (path, addr))
+
     def close(self):
         try:
             if self.sock:
@@ -260,11 +291,15 @@ class OpenOcd:
                 self.proc.kill()
         if self.log:
             self.log.close()
+            try:
+                os.remove(self.log.name)
+            except OSError:
+                pass
 
 
 class Live(VdpAccess):
     def __init__(self, elf, target=None, verify=True, speed=SWD_SPEED_KHZ, boot=None, probe=None,
-                 cdc=None):
+                 cdc=None, capture=True):
         self.elf = elf
         # what this run was against, for anything that prints rather than asserts -
         # the desktop backend has no ELF, so nothing may reach for one
@@ -278,7 +313,7 @@ class Live(VdpAccess):
         # Said here rather than at the first capture: a production ELF carries every
         # field struct_offsets checks, so nothing else notices until a stage asks for
         # a capture offset and dies on a bare KeyError a long way from the cause.
-        if self.capture_addr is None:
+        if self.capture_addr is None and capture:
             raise SystemExit("%s has no liveTestCapture - this is not a live-test build "
                              "(configure with -DPICO9918_LIVE_TEST=ON)" % self.label)
         self.off = struct_offsets(elf)
@@ -324,18 +359,10 @@ class Live(VdpAccess):
 
     # ---- raw memory -------------------------------------------------------
     def read(self, addr, size):
-        with tempfile.TemporaryDirectory() as d:
-            path = os.path.join(d, "r.bin").replace("\\", "/")
-            self.ocd.cmd("dump_image %s 0x%08x %d" % (path, addr, size))
-            with open(path, "rb") as f:
-                return f.read()
+        return self.ocd.read(addr, size)
 
     def write(self, addr, data):
-        with tempfile.TemporaryDirectory() as d:
-            path = os.path.join(d, "w.bin").replace("\\", "/")
-            with open(path, "wb") as f:
-                f.write(data)
-            self.ocd.cmd("load_image %s 0x%08x bin" % (path.replace("\\", "/"), addr))
+        self.ocd.write(addr, data)
 
     def _default_palette_bytes(self):
         """Off the running image, so it cannot drift from what the board booted."""
@@ -575,20 +602,11 @@ class Live(VdpAccess):
         suite this way: the capture struct happened to keep its address, so all 90
         goldens passed, and the diagnostic strings behind it came back as pixels,
         which `float("")` turns into a clean 0.00 us for every scene in the run."""
-        with tempfile.TemporaryDirectory() as d:
-            path = os.path.join(d, "image.bin")
-            subprocess.run([OBJCOPY, "-O", "binary", self.elf, path], check=True)
-            with open(path, "rb") as f:
-                image = f.read()
-        # boot2 at the front is the same in every build; a block past it is not,
-        # because a RAM section that changes size moves every literal after it
-        for at in (0x1000, len(image) // 2 & ~0xFFF):
-            want = image[at:at + 0x400]
-            if want and self.read(XIP_BASE + at, len(want)) != want:
-                raise SystemExit(
-                    "the board is not running %s - flash it (`--flash`, or "
-                    "`live9918.py flash <elf>`) before measuring anything"
-                    % os.path.basename(self.elf))
+        if not runs_image(self.read, elf_image(self.elf)):
+            raise SystemExit(
+                "the board is not running %s - flash it (`--flash`, or "
+                "`live9918.py flash <elf>`) before measuring anything"
+                % os.path.basename(self.elf))
 
     def run(self):
         """A halted core stays halted across an openocd session and across a
@@ -659,6 +677,24 @@ class Live(VdpAccess):
         self.ocd.cmd("reset run")
         self.wait_frames(2, timeout=10.0)
         return True
+
+
+def elf_image(elf):
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "image.bin")
+        subprocess.run([OBJCOPY, "-O", "binary", elf, path], check=True)
+        with open(path, "rb") as f:
+            return f.read()
+
+
+def runs_image(read, image):
+    # boot2 at the front is the same in every build; a block past it is not,
+    # because a RAM section that changes size moves every literal after it
+    for at in (0x1000, len(image) // 2 & ~0xFFF):
+        want = image[at:at + 0x400]
+        if want and read(XIP_BASE + at, len(want)) != want:
+            return False
+    return True
 
 
 def elf_symbols(elf):
@@ -783,7 +819,8 @@ def main():
 
     elf = args.elf or (args.arg if args.action == "flash" else None) or default_elf(args.board)
 
-    with Live(elf, args.target, verify=args.action != "flash") as t:
+    with Live(elf, args.target, verify=args.action != "flash",
+              capture=args.action == "shot") as t:
         if args.action == "flash":
             t.flash()
             print("programmed", elf)
