@@ -33,9 +33,10 @@ RESULT = {
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--board", choices=("pro", "2040"), default="pro")
+    ap.add_argument("--elf", default=None)
     args = ap.parse_args()
 
-    with live9918.Live(live9918.default_elf(args.board)) as t:
+    with live9918.Live(args.elf or live9918.default_elf(args.board)) as t:
         t.unlock()
 
         # This runs against whatever scene the board is displaying, and page 0 is

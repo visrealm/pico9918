@@ -22,6 +22,7 @@ test/live/perf-*.json
 test/live/shots-*/
 # reports are generated from the records beside them, so only the records are kept
 test/live/reports/
+test/live/jobs/
 test/live/history/history-data.json
 test/live/history/history-report.html
 # docs tooling working files (pdf -> markdown conversion)

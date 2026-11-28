@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PICO9918 Bench</title>
+<style>
+:root{
+ --ground:#f1f2f6;--surface:#fff;--surface-2:#e9ebf1;--rule:#d8dbe4;--rule-soft:#e6e8ef;
+ --ink:#161922;--ink-2:#3d4354;--muted:#5d6478;--accent:#0a6e7a;--accent-soft:rgba(10,110,122,.12);
+ --bad:#b93430;--bad-soft:rgba(185,52,48,.12);--warn:#8a6a08;--good:#1a7f2e;--good-soft:rgba(26,127,46,.12);
+ --log:#f7f8fb;--shadow:0 1px 2px rgba(20,24,40,.06),0 4px 14px rgba(20,24,40,.06);
+ --mono:ui-monospace,"Cascadia Code","Cascadia Mono",Consolas,SFMono-Regular,Menlo,monospace;
+ --sans:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --ground:#0e1016;--surface:#171a23;--surface-2:#1e222d;--rule:#2a3040;--rule-soft:#212633;
+ --ink:#e3e6ef;--ink-2:#b9bfd0;--muted:#868da0;--accent:#42ebf5;--accent-soft:rgba(66,235,245,.13);
+ --bad:#fc5554;--bad-soft:rgba(252,85,84,.14);--warn:#d4c154;--good:#21c842;--good-soft:rgba(33,200,66,.13);
+ --log:#11141b;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+}}
+:root[data-theme="dark"]{
+ --ground:#0e1016;--surface:#171a23;--surface-2:#1e222d;--rule:#2a3040;--rule-soft:#212633;
+ --ink:#e3e6ef;--ink-2:#b9bfd0;--muted:#868da0;--accent:#42ebf5;--accent-soft:rgba(66,235,245,.13);
+ --bad:#fc5554;--bad-soft:rgba(252,85,84,.14);--warn:#d4c154;--good:#21c842;--good-soft:rgba(33,200,66,.13);
+ --log:#11141b;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+a{color:var(--accent)}
+.mono{font-family:var(--mono)}
+.muted{color:var(--muted)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:-.02em;margin:2px 0 0}
+h2{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
+   font-weight:400;margin:0 0 10px}
+button{font:inherit;font-size:13px;color:var(--ink);background:var(--surface-2);border:1px solid var(--rule);
+       border-radius:6px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
+button.ghost{background:transparent;border-color:transparent;color:var(--ink-2)}
+button.ghost:hover{background:var(--surface-2)}
+button.danger{color:var(--bad)}
+button.small{font-size:12px;padding:2px 9px}
+select,input[type=text],input[type=number]{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);
+       border:1px solid var(--rule);border-radius:6px;padding:4px 7px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 18px;
+     border-bottom:1px solid var(--rule);background:var(--surface)}
+.top .left{display:flex;align-items:center;gap:14px;min-width:0}
+.top .right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+main{padding:18px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.st-ready .dot,.dot.st-ready{background:var(--good)}
+.st-busy .dot,.dot.st-busy{background:var(--accent);animation:pulse 1.1s ease-in-out infinite}
+.st-connecting .dot,.dot.st-connecting{background:var(--warn);animation:pulse 1.1s ease-in-out infinite}
+.st-offline .dot,.dot.st-offline{background:var(--bad)}
+.st-absent .dot,.dot.st-absent{background:var(--rule)}
+@keyframes pulse{50%{opacity:.35}}
+.chip.stale{background:var(--bad-soft);color:var(--bad)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:11.5px;padding:1px 8px;
+      border-radius:10px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.v{font-family:var(--mono);font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;letter-spacing:.03em;white-space:nowrap}
+.v-passed{background:var(--good-soft);color:var(--good)}
+.v-failed,.v-interrupted{background:var(--bad-soft);color:var(--bad)}
+.v-running,.v-queued{background:var(--accent-soft);color:var(--accent)}
+.v-cancelled{background:var(--surface-2);color:var(--muted)}
+
+/* dashboard */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden;cursor:pointer;
+      box-shadow:var(--shadow);transition:transform .12s,border-color .12s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.card .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px}
+.card .title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card .name{font-family:var(--mono);font-size:19px;font-weight:700;display:flex;align-items:center;gap:9px}
+.card .fw{font-family:var(--mono);font-size:12px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .chips{display:flex;gap:6px;flex-wrap:wrap}
+.card .last{font-size:12.5px;color:var(--muted);display:flex;gap:8px;align-items:center;min-height:20px}
+.screen{position:relative;background:#000;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.screen img{display:block;max-width:100%;max-height:100%;width:100%;height:100%;object-fit:fill;image-rendering:pixelated}
+.screen .empty{color:#9aa0b2;font-family:var(--mono);font-size:13px;text-align:center;padding:20px;line-height:1.6}
+.screen .banner{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:rgba(10,12,18,.78);color:#e3e6ef;
+                font-size:12.5px;display:flex;align-items:center;gap:10px;backdrop-filter:blur(4px)}
+.screen .banner .what{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.screen .banner .what b{color:#42ebf5;font-weight:600}
+.spin{width:13px;height:13px;border:2px solid rgba(66,235,245,.3);border-top-color:#42ebf5;border-radius:50%;
+      animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.section{margin-top:26px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{padding:6px 10px;border-top:1px solid var(--rule-soft);text-align:left;white-space:nowrap}
+th{font-weight:400;color:var(--muted);font-size:12px;border-top:0}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--surface-2)}
+tr.on td{background:var(--accent-soft)}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow)}
+
+/* board view */
+.board{display:grid;grid-template-columns:minmax(0,1fr) 470px;gap:18px;height:calc(100vh - 66px);padding:16px 18px}
+.stagecol{display:flex;flex-direction:column;gap:14px;min-height:0;overflow-y:auto}
+.board .screen{border-radius:10px;flex:none;width:min(100%,calc(62vh * 4 / 3));max-height:62vh;aspect-ratio:4/3;margin:0 auto;box-shadow:var(--shadow)}
+.screenbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.screenbar .grow{flex:1}
+.toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none;font-size:13px;color:var(--ink-2)}
+.toggle input{display:none}
+.toggle .sw{width:30px;height:17px;border-radius:9px;background:var(--rule);position:relative;transition:background .15s}
+.toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--surface);transition:left .15s}
+.toggle input:checked+.sw{background:var(--accent)}
+.toggle input:checked+.sw::after{left:15px}
+.result .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.result .head .t{font-weight:600;font-size:15px}
+.result .head .grow{flex:1}
+.facts{display:flex;gap:18px;flex-wrap:wrap;margin:10px 0 4px}
+.fact .k{font-size:11px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.fact .n{font-family:var(--mono);font-size:17px;font-weight:600}
+.pics{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.pics figure{margin:0;flex:0 1 220px;min-width:160px}
+.pics img{width:100%;image-rendering:pixelated;background:#000;border-radius:6px;display:block}
+.pics figcaption{font-size:11.5px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.problems{margin:8px 0 0;padding-left:18px;color:var(--bad);font-size:13px}
+details{margin-top:10px}
+summary{cursor:pointer;color:var(--muted);font-size:12.5px}
+pre{margin:8px 0 0;max-height:360px;overflow:auto;background:var(--log);border:1px solid var(--rule-soft);
+    border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap}
+.side{display:flex;flex-direction:column;min-height:0;background:var(--surface);border:1px solid var(--rule);
+      border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.tabs{display:flex;border-bottom:1px solid var(--rule);overflow-x:auto;flex:none}
+.tabs button{border:0;border-radius:0;background:transparent;padding:10px 12px;color:var(--muted);
+             border-bottom:2px solid transparent;font-size:13px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.tabs button:hover{border-color:transparent;color:var(--ink)}
+.tabs button.on:hover{border-bottom-color:var(--accent)}
+.tabbody{flex:1;overflow-y:auto;padding:14px 16px;min-height:0}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.filters input{flex:1;min-width:120px}
+.filters .chip{cursor:pointer;border:1px solid transparent}
+.filters .chip.on{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px}
+.thumb{cursor:pointer;border-radius:6px;position:relative}
+.thumb .pic{background:#000;aspect-ratio:4/3;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;
+            border:2px solid transparent}
+.thumb.on .pic{border-color:var(--accent)}
+.thumb:hover .pic{border-color:var(--rule)}
+.thumb.on:hover .pic{border-color:var(--accent)}
+.thumb img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;display:block}
+.thumb .nogold{color:#9aa0b2;font-size:11px;font-family:var(--mono);padding:6px;text-align:center}
+.thumb .cap{font-family:var(--mono);font-size:11px;margin-top:3px;display:flex;align-items:center;gap:5px;overflow:hidden}
+.thumb .cap span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.thumb .go{position:absolute;top:5px;right:5px;opacity:0;transition:opacity .1s;font-size:11px;padding:1px 8px;
+           background:var(--accent);color:var(--surface);border-color:var(--accent);font-weight:600}
+.thumb:hover .go{opacity:1}
+.mark{width:8px;height:8px;border-radius:50%;flex:none}
+.mark.passed{background:var(--good)}.mark.failed{background:var(--bad)}.mark.running,.mark.queued{background:var(--accent)}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-top:1px solid var(--rule-soft)}
+.row:first-child{border-top:0}
+.row .what{flex:1;min-width:0}
+.row .what .n{font-family:var(--mono);font-weight:600;font-size:13px}
+.row .what .d{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.row .res{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right}
+.big{display:flex;flex-direction:column;gap:12px}
+.prog{border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.prog .h{display:flex;align-items:center;gap:10px}
+.prog .h .n{font-family:var(--mono);font-weight:700;font-size:15px;flex:1}
+.prog .d{font-size:12.5px;color:var(--ink-2)}
+.prog .meta{font-size:12px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.suite{border:1px solid var(--accent);background:var(--accent-soft);border-radius:8px;padding:12px 14px;margin-bottom:14px}
+.suite .opts{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:8px 0 10px;font-size:13px}
+.suite .btns{display:flex;gap:8px}
+.ctl{display:grid;grid-template-columns:130px 1fr 34px;gap:4px 10px;align-items:center;font-size:12.5px}
+.ctl label{color:var(--ink-2)}
+.ctl .val{font-family:var(--mono);text-align:right;color:var(--muted)}
+.ctl input[type=range]{width:100%}
+.group{margin-bottom:14px}
+.fwrow{display:flex;gap:10px;align-items:center;padding:9px 2px;border-top:1px solid var(--rule-soft)}
+.fwrow:first-child{border-top:0}
+.fwrow .what{flex:1;min-width:0}
+.fwrow .n{font-family:var(--mono);font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fwrow .d{font-size:11.5px;color:var(--muted)}
+.fwrow.current{background:var(--accent-soft);border-radius:6px;padding-left:8px;padding-right:8px}
+.note{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+.warn{color:var(--bad)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--surface);
+       padding:9px 16px;border-radius:8px;font-size:13px;box-shadow:var(--shadow);opacity:0;pointer-events:none;
+       transition:opacity .2s;max-width:80vw;z-index:9}
+#toast.show{opacity:1}
+@media (max-width:1100px){
+ .board{grid-template-columns:1fr;height:auto}
+ .side{max-height:none}
+ .cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const enc = encodeURIComponent;
+
+const STAGE_INFO = {
+  "hostbus": "The socket, driven the way a host drives it",
+  "d4": "Layer arbitration, all 192 rows against an exact image",
+  "freeze": "Every scene against its frozen golden",
+  "diag": "Every scene with the diagnostic overlay on",
+  "perf": "Render and line time for every scene",
+  "perf-panels": "The same, with every overlay panel on",
+  "scroll": "A scrolled row is the unscrolled one rotated",
+  "colour": "Text colour through every sub-palette",
+  "ecm": "Text cells above ECM0 draw as ECM tiles",
+  "t80-8bpp": "8bpp 80-column text",
+  "dma": "The GPU DMA engine",
+  "tms9900": "TMS9900 instructions run inside the firmware",
+  "gpu": "Every GPU program against its picture",
+};
+const DEVICE = [
+  {name: "intpin", label: "/INT pin", d: "Arms the scanline source and reads the physical pin", needs: "swd"},
+  {name: "flashcheck", label: "R63 flash read", d: "One non-destructive program-data read through R63", needs: "swd"},
+  {name: "busident", label: "What is in the socket", d: "Reads the board's model over the bus", needs: "bus"},
+  {name: "pendingflow", label: "Display-change flow", d: "Changes the stored SCART mode, power-cycles twice, then walks it back", needs: "bus",
+   confirm: "This changes the stored SCART mode and power-cycles the board twice, then walks it back."},
+];
+const BOARD_NAME = {"pro": "PICO9918 PRO", "2040": "PICO9918"};
+
+const S = {lanes: [], jobs: [], catalog: null, route: {}, live: false, records: {}, firmware: {},
+           regs: null, selectedJob: null, logFrom: 0, scene: null, filter: "", group: "all",
+           tab: localStorage.getItem("bench.tab") || "scenes", suite: {save: true, report: true, label: ""}};
+
+async function api(path, body) {
+  const init = body === undefined ? {} : {method: "POST", headers: {"X-Bench": "1", "Content-Type": "application/json"},
+    body: body === null ? "" : JSON.stringify(body)};
+  const r = await fetch(path, init);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(data.error || (data.busy ? "busy" : r.statusText)); e.busy = data.busy; throw e; }
+  return data;
+}
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+function lane(key) { return S.lanes.find(l => l.key === (key ?? S.route.lane)); }
+function ago(t) {
+  if (!t) return "";
+  const s = Date.now() / 1000 - t;
+  if (s < 60) return "just now";
+  if (s < 3600) return Math.floor(s / 60) + " min ago";
+  if (s < 86400) return Math.floor(s / 3600) + " h ago";
+  return new Date(t * 1000).toLocaleDateString();
+}
+function took(j) {
+  if (!j.started) return "";
+  const s = (j.ended || Date.now() / 1000) - j.started;
+  return s < 60 ? s.toFixed(1) + " s" : Math.floor(s / 60) + "m " + Math.round(s % 60) + "s";
+}
+function specKey(spec) { return spec ? spec.type + ":" + (spec.name || "") : ""; }
+function lastResults(laneKey) {
+  const out = {};
+  for (const j of S.jobs) if (j.lane === laneKey && j.spec && !(specKey(j.spec) in out)) out[specKey(j.spec)] = j;
+  return out;
+}
+function statusLabel(l) {
+  return {ready: "Ready", busy: "Busy", connecting: "Connecting", offline: "Offline", absent: "Not connected"}[l.status] || l.status;
+}
+
+/* ---------- routing ---------- */
+function parseRoute() {
+  const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
+  S.route = parts[0] === "board" ? {view: "board", lane: decodeURIComponent(parts[1] || "")} : {view: "home"};
+}
+window.addEventListener("hashchange", () => { parseRoute(); S.live = false; S.selectedJob = null; S.regs = null; render(true); });
+
+/* ---------- rendering ---------- */
+let built = null;
+function render(full) {
+  const key = S.route.view + ":" + (S.route.lane || "");
+  if (full || built !== key) {
+    built = key;
+    $("#app").innerHTML = S.route.view === "board" ? boardShell() : homeShell();
+    if (S.route.view === "board") { renderTab(); if (S.selectedJob) openJob(S.selectedJob); }
+  }
+  if (S.route.view === "board") updateBoard(); else updateHome();
+}
+
+function screenHtml(l, cls = "") {
+  const f = l.frame;
+  const img = f ? `<img data-frame="${esc(l.key)}" src="/frame.png?lane=${enc(l.key)}&t=${f.at}" style="aspect-ratio:${f.aspect}" alt="">` : "";
+  return `<div class="screen ${cls}" data-screen="${esc(l.key)}">${img}${f ? "" : `<div class="empty">${esc(emptyText(l))}</div>`}<div class="bannerwrap"></div></div>`;
+}
+function emptyText(l) {
+  if (l.status === "absent") return "Probe not connected";
+  if (l.status === "connecting") return "Connecting...";
+  if (l.error) return l.error;
+  if (l.firmware && l.firmware.path && !l.live) return "No picture: not a live-test build";
+  return "No picture yet";
+}
+function activeBuild(l) {
+  return S.jobs.find(j => j.lane === l.key && j.kind === "build" && (j.status === "running" || j.status === "queued"));
+}
+function bannerHtml(l) {
+  const b = !l.job && activeBuild(l);
+  if (b) return `<div class="banner"><div class="spin"></div><div class="what"><b>${esc(b.title)}</b> ${esc(b.status === "queued" ? "queued" : b.progress || "")}</div></div>`;
+  if (l.job) return `<div class="banner"><div class="spin"></div><div class="what"><b>${esc(l.job.title)}</b> ${esc(l.job.progress || "")}</div>
+    ${S.route.view === "board" ? `<button class="small danger" data-cancel="${esc(l.job.id)}">Cancel</button>` : ""}</div>`;
+  if (l.status === "connecting") return `<div class="banner"><div class="spin"></div><div class="what">Connecting to the board...</div></div>`;
+  if (l.status === "offline") return `<div class="banner"><div class="what">Offline</div>
+    <button class="small" data-connect="${esc(l.key)}">Connect</button></div>`;
+  return "";
+}
+function setScreen(l) {
+  const el = document.querySelector(`[data-screen="${CSS.escape(l.key)}"]`);
+  if (!el) return;
+  const f = l.frame;
+  let img = el.querySelector("img");
+  if (f) {
+    const src = `/frame.png?lane=${enc(l.key)}&t=${f.at}`;
+    if (!img) { el.innerHTML = `<img src="${src}" alt=""><div class="bannerwrap"></div>`; img = el.querySelector("img"); }
+    else if (img.dataset.want !== src) {
+      img.dataset.want = src;
+      const pre = new Image(); pre.onload = () => { if (img.dataset.want === src) img.src = src; }; pre.src = src;
+    }
+    img.style.aspectRatio = f.aspect;
+  } else if (img || !el.querySelector(".empty")) {
+    el.innerHTML = `<div class="empty">${esc(emptyText(l))}</div><div class="bannerwrap"></div>`;
+  } else {
+    el.querySelector(".empty").textContent = emptyText(l);
+  }
+  const b = el.querySelector(".bannerwrap"), html = bannerHtml(l);
+  if (b.dataset.html !== html) { b.innerHTML = html; b.dataset.html = html; }
+}
+
+function fwLine(l) {
+  const f = l.firmware;
+  if (!f) return l.status === "absent" ? "" : "firmware not identified yet";
+  if (f.unknown) return "unknown firmware - not any build in this workspace";
+  if (!f.path) return f.name;
+  return `${f.name}  ${f.worktree}/${f.build}`;
+}
+function chipsHtml(l) {
+  const c = [];
+  if (l.firmware && l.firmware.path) c.push(l.live ? `<span class="chip">live-test</span>` : `<span class="chip">no capture</span>`);
+  if (l.firmware && l.firmware.stale) c.push(`<span class="chip stale" title="The worktree has changed since this build">out of date</span>`);
+  if (l.info && l.info.clock_mhz) c.push(`<span class="chip">${l.info.clock_mhz} MHz</span>`);
+  if (l.info && l.info.hw) c.push(`<span class="chip">hw ${esc(l.info.hw)}</span>`);
+  if (l.hostbus) c.push(`<span class="chip">bus probe ${l.armed ? "armed" : "idle"}${l.armed ? ", " + (l.switched ? "switched" : "manual") : ""}</span>`);
+  else if (l.serial) c.push(`<span class="chip">SWD only</span>`);
+  if (l.serial) c.push(`<span class="chip">${esc(l.port || "")} ${esc(l.serial.slice(-6))}</span>`);
+  return c.join("");
+}
+
+/* ---------- dashboard ---------- */
+function homeShell() {
+  return `<div class="top"><div class="left"><div><div class="eyebrow" id="where">PICO9918</div><h1>Bench</h1></div></div>
+    <div class="right"><button data-rescan>Rescan probes</button></div></div>
+    <main><div class="cards" id="cards"></div>
+    <div class="section"><h2>Recent activity</h2><div class="panel" style="padding:4px 6px"><table><tbody id="recent"></tbody></table></div></div></main>`;
+}
+function cardHtml(l) {
+  const last = S.jobs.find(j => j.lane === l.key && j.status !== "queued" && j.status !== "running");
+  return `<div class="card st-${l.status}" data-open="${esc(l.key)}">${screenHtml(l)}
+    <div class="body"><div class="title"><div class="name"><span class="dot"></span>${esc(l.name)}</div>
+      <span class="muted" style="font-size:12.5px">${esc(l.key === "desktop" ? "pico9918-core" : BOARD_NAME[l.tier] || "")} - ${esc(statusLabel(l))}</span></div>
+    <div class="fw" title="${esc(l.firmware && l.firmware.path || "")}">${esc(fwLine(l))}</div>
+    <div class="chips">${chipsHtml(l)}</div>
+    <div class="last">${last ? `<span class="v v-${last.status}">${last.status}</span> ${esc(last.title)} <span>${esc(ago(last.ended || last.created))}</span>` : ""}</div></div></div>`;
+}
+function updateHome() {
+  const w = $("#where"); if (w) w.textContent = "PICO9918 - " + (S.worktree || "");
+  const cards = $("#cards");
+  const order = [...S.lanes].sort((a, b) => (a.key === "desktop") - (b.key === "desktop") || (a.status === "absent") - (b.status === "absent"));
+  const sig = order.map(l => l.key).join();
+  if (cards.dataset.sig !== sig) { cards.innerHTML = order.map(cardHtml).join(""); cards.dataset.sig = sig; }
+  for (const l of order) {
+    const card = cards.querySelector(`[data-open="${CSS.escape(l.key)}"]`);
+    card.className = `card st-${l.status}`;
+    const body = card.querySelector(".body");
+    const tmp = document.createElement("div"); tmp.innerHTML = cardHtml(l);
+    const nb = tmp.querySelector(".body").innerHTML;
+    if (body.innerHTML !== nb) body.innerHTML = nb;
+    setScreen(l);
+  }
+  const recent = S.jobs.slice(0, 14);
+  $("#recent").innerHTML = recent.length ? recent.map(j => `<tr class="click" data-goto="${esc(j.lane)}" data-job="${esc(j.id)}">
+    <td><span class="v v-${j.status}">${j.status}</span></td><td>${esc(j.title)}</td>
+    <td class="muted">${esc((lane(j.lane) || {}).name || j.lane)}</td><td class="mono muted">${esc(took(j))}</td>
+    <td class="muted" style="text-align:right">${esc(ago(j.created))}</td></tr>`).join("")
+    : `<tr><td class="muted">Nothing run yet. Click a board to start.</td></tr>`;
+}
+
+/* ---------- board view ---------- */
+const TABS = [["scenes", "Scenes"], ["gpu", "GPU"], ["stages", "Stages"], ["device", "Device"],
+              ["tweak", "Tweak"], ["firmware", "Firmware"], ["history", "History"]];
+function boardShell() {
+  const l = lane();
+  if (!l) return `<main><p>No such board. <a href="#/">Back to the bench</a></p></main>`;
+  return `<div class="top"><div class="left"><button class="ghost" data-home>&larr; All boards</button>
+      <div><div class="eyebrow" id="bsub"></div><h1 style="display:flex;align-items:center;gap:10px"><span class="dot" id="bdot"></span>${esc(l.name)}</h1></div></div>
+    <div class="right" id="bactions"></div></div>
+    <div class="board"><div class="stagecol">
+      ${screenHtml(l)}
+      <div class="screenbar"><label class="toggle"><input type="checkbox" id="liveToggle"${S.live ? " checked" : ""}><span class="sw"></span>Live</label>
+        <button class="small" data-capture>Capture</button><span class="grow"></span><span id="framefacts" class="mono"></span></div>
+      <div id="result"></div>
+    </div>
+    <div class="side"><div class="tabs">${TABS.map(([k, n]) => `<button data-tab="${k}" class="${S.tab === k ? "on" : ""}">${n}</button>`).join("")}</div>
+      <div class="tabbody" id="tabbody"></div></div></div>`;
+}
+function updateBoard() {
+  const l = lane();
+  if (!l) return;
+  $("#bdot").className = "dot st-" + l.status;
+  $("#bsub").textContent = (l.key === "desktop" ? "pico9918-core" : BOARD_NAME[l.tier] || "") + " - " + statusLabel(l) + (l.firmware && l.firmware.name ? " - " + l.firmware.name : "") + (l.firmware && l.firmware.stale ? " (out of date)" : "");
+  const acts = [];
+  if (l.status === "offline" || l.status === "ready") acts.push(`<button data-connect="${esc(l.key)}">${l.status === "ready" ? "Reconnect" : "Connect"}</button>`);
+  if (l.hostbus) {
+    acts.push(`<select data-power="${esc(l.key)}" title="How the probe powers the board">${["switch", "manual"].map(m => `<option${m === l.power ? " selected" : ""}>${m}</option>`).join("")}</select>`);
+    acts.push(`<button data-run='{"type":"probe","name":"cycle"}'>Power cycle</button>`);
+    acts.push(l.armed ? `<button data-run='{"type":"probe","name":"off"}'>Release</button>` : `<button data-run='{"type":"probe","name":"arm"}'>Arm</button>`);
+  }
+  const html = acts.join("");
+  const ba = $("#bactions"); if (ba.dataset.html !== html) { ba.innerHTML = html; ba.dataset.html = html; }
+  setScreen(l);
+  const f = l.frame;
+  $("#framefacts").textContent = f ? `${f.rows} rows${f.dropped ? ", " + f.dropped + " dropped" : ""} - ${ago(f.at)}` : "";
+  $("#liveToggle").disabled = !l.live;
+  const sig = l.status + ":" + l.live + ":" + !!l.hostbus + ":" + (l.firmware && l.firmware.path);
+  if (S.tabSig !== sig && l.status !== "busy") { S.tabSig = sig; renderTab(); }
+  if (S.selectedJob) refreshResultIfRunning();
+  if (["scenes", "gpu", "stages", "device", "history", "firmware"].includes(S.tab)) updateTabMarks();
+  if (S.tab === "firmware") {
+    const sig = S.jobs.filter(j => j.lane === l.key && (j.kind === "build" || j.kind === "flash")).map(j => j.id + j.status + j.progress).join();
+    if (sig !== S.buildSig) { const done = S.buildSig !== undefined && !sig.includes("running"); S.buildSig = sig; if (done) loadFirmware(); else drawFirmware(); }
+  }
+}
+
+function renderTab() {
+  const body = $("#tabbody"); if (!body) return;
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === S.tab));
+  const fn = {scenes: tabScenes, gpu: tabGpu, stages: tabStages, device: tabDevice, tweak: tabTweak, firmware: tabFirmware, history: tabHistory}[S.tab];
+  body.innerHTML = fn ? fn() : "";
+  body.dataset.sig = "";
+  if (S.tab === "tweak") loadRegs();
+  if (S.tab === "firmware") loadFirmware();
+  if (S.tab === "history") loadRecords();
+  updateTabMarks();
+}
+
+function mark(j) { return j ? `<span class="mark ${j.status}" title="${esc(j.status)} ${esc(ago(j.ended || j.created))}"></span>` : ""; }
+function resultText(j) {
+  if (!j) return "";
+  if (j.status === "running") return j.progress || "running";
+  const r = j.result || {};
+  if (r.error) return r.error;
+  if (j.spec && j.spec.type === "gpu" && r.us) return `${(r.us / 1000).toFixed(1)} ms, ${r.frames} frames`;
+  if (j.spec && j.spec.type === "scene") return r.state || "";
+  if (r.problems) return r.problems.length ? r.problems.length + " problem" + (r.problems.length > 1 ? "s" : "") : "pass";
+  return j.status + " " + took(j);
+}
+
+function tabScenes() {
+  const l = lane();
+  if (!S.catalog) return "";
+  if (!l.live) return `<p class="note">Scenes need a live-test build on the board, so the picture can be read back. Flash one from the Firmware tab.</p>`;
+  const groups = ["all", "gm1", "gm2", "mcm", "t40", "t80", "dump"];
+  return `<div class="filters"><input type="text" id="sceneFilter" placeholder="Filter scenes" value="${esc(S.filter)}" autocomplete="off">
+    ${groups.map(g => `<span class="chip${S.group === g ? " on" : ""}" data-group="${g}">${g}</span>`).join("")}</div>
+    <p class="note">Click a scene to put it on the board. <b>Test</b> compares what the board draws against its golden.</p>
+    <div class="thumbs" id="thumbs">${sceneCards()}</div>`;
+}
+function sceneCards() {
+  const l = lane(), last = lastResults(l.key);
+  const f = S.filter.toLowerCase();
+  return S.catalog.scenes.filter(s => (S.group === "all" || s.group === S.group) && (!f || s.name.toLowerCase().includes(f)))
+    .map(s => `<div class="thumb${S.scene === s.name ? " on" : ""}" data-scene="${esc(s.name)}" title="${esc(s.name)}${s.note ? "\n" + esc(s.note) : ""}">
+      <div class="pic">${s.golden ? `<img loading="lazy" src="/thumb.png?lane=${enc(l.key)}&name=${enc(s.name)}" alt="">` : `<div class="nogold">no golden: over budget</div>`}</div>
+      <button class="go" data-run='${esc(JSON.stringify({type: "scene", name: s.name}))}'>Test</button>
+      <div class="cap" data-mark="scene:${esc(s.name)}">${mark(last["scene:" + s.name])}<span>${esc(s.name)}</span></div></div>`).join("");
+}
+function tabGpu() {
+  if (!S.catalog) return "";
+  const l = lane();
+  return `<p class="note">TMS9900 programs run on the board's GPU. Watching captures frames while it draws, a few a second over SWD.</p>
+    <div class="big">${S.catalog.gpu.map(p => `<div class="prog"><div class="h"><span class="n">${esc(p.name)}</span>
+      <span data-mark="gpu:${esc(p.name)}" class="res mono muted"></span>
+      <button class="primary" data-run='${esc(JSON.stringify({type: "gpu", name: p.name}))}'${l.live ? "" : " disabled"}>Run</button></div>
+      <div class="d">${esc(p.note)}</div><div class="meta"><span>by ${esc(p.credit)}</span><span>timeout ${p.timeout} s</span></div></div>`).join("")}</div>`;
+}
+function tabStages() {
+  const l = lane(), desk = l.key === "desktop";
+  return `<div class="suite"><h2 style="margin:0">Whole suite</h2>
+    <div class="opts"><label class="toggle"><input type="checkbox" id="suiteSave"${S.suite.save ? " checked" : ""}><span class="sw"></span>Save record</label>
+      <input type="text" id="suiteLabel" placeholder="label (optional)" value="${esc(S.suite.label)}" style="width:150px">
+      <label class="toggle"><input type="checkbox" id="suiteReport"${S.suite.report ? " checked" : ""}><span class="sw"></span>Report vs last</label></div>
+    <div class="btns"><button class="primary" data-suite="quick">Quick suite</button><button data-suite="full">Full suite</button></div></div>
+    <div class="rows">${S.catalog.stages.filter(s => !(desk && (s.timed || s.fixture))).map(s => {
+      const off = s.fixture && !l.hostbus;
+      return `<div class="row"><div class="what"><div class="n">${esc(s.name)}${s.quick ? ' <span class="chip">quick</span>' : ""}</div>
+        <div class="d">${esc(STAGE_INFO[s.name] || "")}</div></div>
+        <span class="res" data-mark="stage:${esc(s.name)}"></span>
+        <button data-run='${esc(JSON.stringify({type: "stage", name: s.name}))}'${off ? ' disabled title="needs the host-bus probe"' : ""}>Run</button></div>`;
+    }).join("")}</div>`;
+}
+function tabDevice() {
+  const l = lane();
+  if (l.key === "desktop") return `<p class="note">The desktop has no device to test.</p>`;
+  const dev = DEVICE.map(d => {
+    const off = d.needs === "bus" && !l.hostbus;
+    return `<div class="row"><div class="what"><div class="n">${esc(d.label)}</div><div class="d">${esc(d.d)}</div></div>
+      <span class="res" data-mark="device:${d.name}"></span>
+      <button data-run='${esc(JSON.stringify({type: "device", name: d.name}))}'${d.confirm ? ` data-confirm="${esc(d.confirm)}"` : ""}${off ? " disabled" : ""}>Run</button></div>`;
+  }).join("");
+  const bus = l.hostbus ? `<h2 style="margin-top:18px">Host bus, one group at a time</h2><div class="rows">${S.catalog.bus.map(b =>
+    `<div class="row"><div class="what"><div class="n">${esc(b.name)}</div><div class="d">${esc(b.doc)}</div></div>
+     <span class="res" data-mark="bus:${esc(b.name)}"></span>
+     <button data-run='${esc(JSON.stringify({type: "bus", name: b.name}))}'>Run</button></div>`).join("")}</div>`
+    : `<p class="note" style="margin-top:14px">Host-bus tests need the PICO9918 host-bus probe.</p>`;
+  return `<div class="rows">${dev}</div>${bus}`;
+}
+function updateTabMarks() {
+  const l = lane(); if (!l) return;
+  const last = lastResults(l.key);
+  document.querySelectorAll("[data-mark]").forEach(el => {
+    const j = last[el.dataset.mark];
+    const html = el.classList.contains("cap") ? mark(j) + el.querySelector("span").outerHTML
+      : j ? `${mark(j)} ${esc(resultText(j))}` : "";
+    if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; el.style.display = "flex"; el.style.gap = "6px"; el.style.alignItems = "center"; }
+  });
+  if (S.tab === "history") renderJobsTable();
+}
+
+/* tweak */
+function tabTweak() {
+  const l = lane();
+  if (!l.live) return `<p class="note">Register controls need a live-test build.</p>`;
+  return `<div id="tweak"><p class="note">Loading registers...</p></div>`;
+}
+async function loadRegs() {
+  try { S.regs = await withBoard(() => api(`/api/regs?lane=${enc(S.route.lane)}`)); drawTweak(); }
+  catch (e) { const t = $("#tweak"); if (t) t.innerHTML = `<p class="note">${esc(e.busy ? "The board is busy." : e.message)}</p>`; }
+}
+function ctlValue(it) {
+  const s = S.regs; if (!s) return 0;
+  const raw = it.conf ? (s.conf[it.reg] ? 1 : 0) : s.regs[it.reg];
+  return it.conf ? raw : (raw & it.mask) >> it.shift;
+}
+function drawTweak() {
+  const t = $("#tweak"); if (!t || !S.regs) return;
+  t.innerHTML = `<div class="group"><label class="toggle"><input type="checkbox" data-unlock${S.regs.unlocked ? " checked" : ""}><span class="sw"></span>F18A unlocked</label></div>` +
+    S.catalog.controls.map((g, gi) => `<div class="group"><h2>${esc(g.group)}</h2><div class="ctl">${g.items.map((it, ii) => {
+      const v = ctlValue(it), id = `c${gi}_${ii}`;
+      let input;
+      if (it.kind === "bit") input = `<label class="toggle"><input type="checkbox" data-ctl="${gi},${ii}" id="${id}"${(it.invert ? !v : v) ? " checked" : ""}><span class="sw"></span></label>`;
+      else if (it.kind === "field") input = `<select data-ctl="${gi},${ii}" id="${id}">${Array.from({length: it.max + 1}, (_, k) => `<option${k === v ? " selected" : ""}>${k}</option>`).join("")}</select>`;
+      else input = `<input type="range" min="0" max="${it.max}" value="${v}" data-ctl="${gi},${ii}" id="${id}">`;
+      return `<label for="${id}">${esc(it.label)}</label>${input}<span class="val">${it.kind === "range" ? v : ""}</span>`;
+    }).join("")}</div></div>`).join("") +
+    `<div class="group"><h2>Raw write</h2><div style="display:flex;gap:6px;align-items:center">R<input type="number" id="rawReg" min="0" max="63" value="0" style="width:64px"> =
+     <input type="text" id="rawVal" value="0x00" style="width:80px"><button data-raw>Write</button></div></div>`;
+}
+let poking = false, pokeNext = null;
+async function poke(path) {
+  if (poking) { pokeNext = path; return; }
+  poking = true;
+  try {
+    const r = await withBoard(() => api(path + `&capture=${S.live ? 1 : 0}`, null));
+    S.regs = r;
+    if (r.png) { const l = lane(); l.frame = {rows: r.rows, aspect: r.aspect, dropped: r.dropped, at: Date.now() / 1000}; setScreen(l); }
+  } catch (e) { toast(e.busy ? "The board is busy" : e.message); }
+  poking = false;
+  if (pokeNext) { const p = pokeNext; pokeNext = null; poke(p); } else drawTweakValues();
+}
+function drawTweakValues() {
+  document.querySelectorAll("[data-ctl]").forEach(el => {
+    if (el === document.activeElement && el.type === "range") return;
+    const [gi, ii] = el.dataset.ctl.split(",").map(Number), it = S.catalog.controls[gi].items[ii], v = ctlValue(it);
+    if (el.type === "checkbox") el.checked = !!(it.invert ? !v : v);
+    else el.value = v;
+    if (it.kind === "range") el.nextElementSibling.textContent = v;
+  });
+}
+function ctlChanged(el) {
+  const [gi, ii] = el.dataset.ctl.split(",").map(Number), it = S.catalog.controls[gi].items[ii];
+  let v = el.type === "checkbox" ? (el.checked ? 1 : 0) : Number(el.value);
+  if (it.invert) v = v ? 0 : 1;
+  const lk = enc(S.route.lane);
+  if (it.conf) poke(`/api/conf?lane=${lk}&index=${it.reg}&on=${v ? 1 : 0}`);
+  else poke(`/api/poke?lane=${lk}&reg=${it.reg}&value=${(v << it.shift) & it.mask}&mask=${it.mask}`);
+}
+
+/* firmware */
+function tabFirmware() { return `<div id="fwlist"><p class="note">Looking for builds...</p></div>`; }
+async function loadFirmware() {
+  const l = lane();
+  try { S.firmware[l.key] = await api(`/api/firmware?board=${enc(l.tier || "")}`); drawFirmware(); }
+  catch (e) { toast(e.message); }
+}
+function drawFirmware() {
+  const l = lane(), el = $("#fwlist"); if (!el) return;
+  if (l.key === "desktop") { el.innerHTML = `<p class="note">The desktop runs the library in a process; there is nothing to flash.</p>`; return; }
+  const all = S.firmware[l.key];
+  if (!all) return;
+  const cur = l.firmware && l.firmware.path;
+  const builds = all.filter(e => e.configured), fresh = all.filter(e => !e.configured);
+  const running = dir => S.jobs.find(j => j.kind === "build" && j.spec && j.spec.options && j.spec.options.dir === dir && (j.status === "running" || j.status === "queued"));
+  const btn = (e, flash, label, cls = "") => `<button class="small ${cls}" data-run='${esc(JSON.stringify({type: "build", options: {dir: e.dir, flash}}))}'>${label}</button>`;
+  const row = e => {
+    const on = cur && e.elf === cur, job = running(e.dir);
+    const sub = [`${e.worktree}/${e.build}`, e.mtime ? "built " + ago(e.mtime) : "not built yet", e.live ? "live-test" : "no capture"];
+    const chips = (e.stale ? ` <span class="chip stale">out of date</span>` : "") + (on ? ` <span class="chip" style="background:var(--accent-soft);color:var(--ink)">on the board</span>` : "");
+    const acts = job ? `<div class="spin" style="border-color:var(--accent-soft);border-top-color:var(--accent)"></div><span class="muted mono" style="font-size:11.5px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(job.status === "queued" ? "queued" : job.progress)}</span>`
+      : `${btn(e, false, "Build")}${e.elf ? `<button class="small" data-flash='${esc(JSON.stringify({path: e.elf, via: "swd"}))}'>Flash</button>` : ""}${btn(e, true, "Build &amp; flash", e.stale || !e.elf ? "primary" : "")}`;
+    return `<div class="fwrow${on ? " current" : ""}" title="${esc(e.dir)}"><div class="what"><div class="n">${esc(e.name || e.build)}</div>
+      <div class="d">${esc(sub.join(" - "))}${chips}</div></div><div style="display:flex;gap:5px;align-items:center">${acts}</div></div>`;
+  };
+  const busRows = builds.filter(e => e.uf2).map(e => `<div class="fwrow"><div class="what"><div class="n">${esc(e.uf2.split(/[\\/]/).pop())}</div>
+      <div class="d">${esc(e.worktree)}/${esc(e.build)} - built ${esc(ago(e.mtime))}</div></div>
+      <button class="small" data-flash='${esc(JSON.stringify({path: e.uf2, via: "verify"}))}'>Verify</button>
+      <button class="small" data-flash='${esc(JSON.stringify({path: e.uf2, via: "bus"}))}' data-confirm="Flash ${esc(e.uf2.split(/[\\/]/).pop())} over the host bus? Block 0 erases.">Flash</button></div>`).join("");
+  el.innerHTML = `<p class="note">Every configured build folder in every worktree. <b>Build</b> rebuilds it with its own settings; <b>Build &amp; flash</b> puts the result on this board when it succeeds.</p>
+    <div>${builds.map(row).join("") || `<p class="note">No builds for ${esc(l.name)} yet.</p>`}</div>
+    ${fresh.length ? `<div class="fwrow" style="margin-top:6px"><div class="what"><div class="n">New live build</div>
+      <div class="d">build-live, both boards, with the capture buffer the tests read</div></div>
+      <select id="freshWt">${fresh.map(e => `<option value="${esc(e.dir)}"${e.worktree === S.worktree ? " selected" : ""}>${esc(e.worktree)}</option>`).join("")}</select>
+      <button class="small primary" data-fresh>Create &amp; flash</button></div>` : ""}
+    ${l.hostbus && busRows ? `<h2 style="margin-top:20px">Over the host bus</h2><p class="note">The configurator's route, no SWD needed. Block 0 erases; a failure past it leaves only BOOTSEL.</p><div>${busRows}</div>` : ""}`;
+}
+
+/* history */
+function tabHistory() {
+  return `<h2>Jobs on this board</h2><table><tbody id="jobsTable"></tbody></table>
+    <h2 style="margin-top:22px">Saved records</h2><div id="records"><p class="note">Loading...</p></div>`;
+}
+function renderJobsTable() {
+  const el = $("#jobsTable"); if (!el) return;
+  const jobs = S.jobs.filter(j => j.lane === S.route.lane).slice(0, 60);
+  const html = jobs.length ? jobs.map(j => `<tr class="click${S.selectedJob === j.id ? " on" : ""}" data-job="${esc(j.id)}">
+    <td><span class="v v-${j.status}">${j.status}</span></td><td>${esc(j.title)}</td>
+    <td class="mono muted">${esc(took(j))}</td><td class="muted" style="text-align:right">${esc(ago(j.created))}</td></tr>`).join("")
+    : `<tr><td class="muted">Nothing run on this board yet.</td></tr>`;
+  if (el.dataset.html !== html) { el.innerHTML = html; el.dataset.html = html; }
+}
+async function loadRecords() {
+  const l = lane(), board = l.key === "desktop" ? "desktop" : l.tier;
+  try {
+    const recs = await api(`/api/records?board=${enc(board || "")}`);
+    const el = $("#records"); if (!el) return;
+    el.innerHTML = recs.length ? `<table><tbody>${recs.slice(0, 50).map((r, i) => {
+      const prev = recs[i + 1];
+      return `<tr><td><span class="v v-${r.problems.length ? "failed" : "passed"}" title="${esc(r.problems.join("\n"))}">${r.problems.length ? "fail" : "pass"}</span></td>
+        <td style="white-space:normal;max-width:0;width:100%" title="${esc(r.subject || "")}"><div class="mono" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.tag)}</div>
+        <div class="muted" style="font-size:11.5px">${esc((r.date || "").slice(0, 16).replace("T", " "))}${r.clock_mhz ? " - " + r.clock_mhz + " MHz" : ""}${r.stages && r.all && r.stages < r.all ? " - " + r.stages + "/" + r.all + " stages" : ""}</div></td>
+        <td style="text-align:right"><button class="small" data-report="${esc(r.tag)}">Report</button>
+        ${prev ? `<button class="small" data-report="${esc(r.tag)}" data-against="${esc(prev.tag)}" title="against ${esc(prev.tag)}">Diff</button>` : ""}</td></tr>`;
+    }).join("")}</tbody></table>` : `<p class="note">No saved records for this board.</p>`;
+  } catch (e) { toast(e.message); }
+}
+
+/* result card */
+async function openJob(id) {
+  S.selectedJob = id; S.logFrom = 0;
+  const el = $("#result"); if (!el) return;
+  el.innerHTML = `<div class="panel result"><div class="head" id="rhead"></div><div id="rbody"></div>
+    <details id="rlog"><summary>Log</summary><pre id="logtext"></pre></details></div>`;
+  await pollJob();
+}
+let jobTimer = null, jobBusy = false;
+async function pollJob() {
+  clearTimeout(jobTimer); jobTimer = null;
+  const id = S.selectedJob;
+  if (!id || jobBusy || !$("#rhead")) return;
+  jobBusy = true;
+  try {
+    const r = await api(`/api/job?id=${enc(id)}&from=${S.logFrom}`);
+    if (id !== S.selectedJob) return;
+    const pre = $("#logtext");
+    if (r.text) { pre.textContent += r.text; pre.scrollTop = pre.scrollHeight; }
+    S.logFrom = r.next;
+    drawResult(r.job);
+    if (r.job.status === "running" || r.job.status === "queued") jobTimer = setTimeout(pollJob, 500);
+  } catch (e) { toast(e.message); }
+  finally { jobBusy = false; }
+}
+function refreshResultIfRunning() {
+  const j = S.jobs.find(x => x.id === S.selectedJob);
+  if (j && (j.status === "running" || j.status === "queued") && !jobTimer && !jobBusy) pollJob();
+}
+function drawResult(j) {
+  const live = j.status === "running" || j.status === "queued";
+  const head = `<span class="v v-${j.status}">${j.status}</span><span class="t">${esc(j.title)}</span>
+    <span class="muted">${esc(took(j))}</span><span class="grow"></span>
+    ${live ? `<button class="small danger" data-cancel="${esc(j.id)}">Cancel</button>` : j.spec ? `<button class="small" data-again="${esc(j.id)}">Run again</button>` : ""}
+    <button class="small ghost" data-close>Close</button>`;
+  const h = $("#rhead"); if (h.dataset.html !== head) { h.innerHTML = head; h.dataset.html = head; }
+  const r = j.result || {}, facts = [];
+  if (j.spec && j.spec.type === "gpu") {
+    if (r.us) facts.push(["GPU time", (r.us / 1000).toFixed(1) + " ms"]);
+    if (r.frames) facts.push(["frames", r.frames]);
+    if (r.wall_ms) facts.push(["wall", (r.wall_ms / 1000).toFixed(2) + " s"]);
+    if (r.state) facts.push(["picture", r.state]);
+  } else if (j.spec && j.spec.type === "scene") {
+    if (r.state) facts.push(["verdict", r.state]);
+    if (r.rows) facts.push(["rows", r.rows]);
+    if (r.dropped) facts.push(["dropped", r.dropped]);
+    if (r.differ) facts.push(["differ", r.differ + " px"]);
+  } else if (r.checks !== undefined) {
+    facts.push(["checks", r.checks]); facts.push(["failures", r.failures]);
+  }
+  if (live && j.progress) facts.push(["now", j.progress]);
+  const pics = [];
+  const o = j.outputs || {};
+  if (o["frame.png"] && !live) pics.push(`<figure><img src="/jobs/${esc(j.id)}/frame.png?${j.ended}" style="aspect-ratio:4/3;object-fit:fill"><figcaption>the board</figcaption></figure>`);
+  if (o["golden.png"]) pics.push(`<figure><img src="/jobs/${esc(j.id)}/golden.png"><figcaption>the golden</figcaption></figure>`);
+  const links = [];
+  if (o.report) links.push(`<a href="/reports/${enc(o.report.split(/[\\/]/).pop())}" target="_blank">Open the report</a>`);
+  if (o.record) links.push(`<span class="mono muted" style="font-size:12px">${esc(o.record)}</span>`);
+  const problems = (r.problems || []).concat(r.error ? [r.error] : []);
+  const why = r.why && j.status === "failed" ? `<p class="note" style="margin:6px 0 0">${esc(r.why)}</p>` : "";
+  const body = (facts.length ? `<div class="facts">${facts.map(([k, v]) => `<div class="fact"><div class="k">${esc(k)}</div><div class="n">${esc(v)}</div></div>`).join("")}</div>` : "")
+    + why + (problems.length ? `<ul class="problems">${problems.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : "")
+    + (pics.length ? `<div class="pics">${pics.join("")}</div>` : "")
+    + (links.length ? `<div style="margin-top:10px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">${links.join("")}</div>` : "");
+  const b = $("#rbody"); if (b.dataset.html !== body) { b.innerHTML = body; b.dataset.html = body; }
+  const log = $("#rlog");
+  if (!log.dataset.auto && (j.kind === "build" || (j.status === "failed" && j.spec && !["scene", "gpu"].includes(j.spec.type)))) { log.open = true; log.dataset.auto = 1; }
+}
+
+/* ---------- actions ---------- */
+async function run(spec, confirmText) {
+  if (confirmText && !confirm(confirmText)) return;
+  try {
+    const j = await api("/api/run", {...spec, lane: S.route.lane});
+    S.jobs.unshift(j);
+    openJob(j.id);
+    updateTabMarks();
+  } catch (e) { toast(e.message); }
+}
+async function show(name) {
+  S.scene = name;
+  document.querySelectorAll(".thumb").forEach(t => t.classList.toggle("on", t.dataset.scene === name));
+  try {
+    const r = await withBoard(() => api(`/api/show?lane=${enc(S.route.lane)}&name=${enc(name)}`, null));
+    const l = lane(); l.frame = {rows: r.rows, aspect: r.aspect, dropped: r.dropped, at: Date.now() / 1000}; setScreen(l);
+    S.regs = r;
+  } catch (e) { toast(e.busy ? "The board is busy - " + ((lane().job || {}).title || "") : e.message); }
+}
+let capturing = false, captureDone = Promise.resolve(), holdLive = 0;
+async function withBoard(fn) {
+  holdLive++;
+  try { await captureDone; return await fn(); }
+  finally { holdLive--; }
+}
+async function capture(lane_) {
+  if (capturing) return;
+  capturing = true;
+  const req = api(`/api/capture?lane=${enc(lane_)}`, null);
+  captureDone = req.catch(() => {});
+  try { await req; }
+  catch (e) { if (!e.busy && S.route.view === "board") { S.live = false; const t = $("#liveToggle"); if (t) t.checked = false; toast(e.message); } }
+  capturing = false;
+  await poll();
+}
+async function liveLoop() {
+  while (S.live && S.route.view === "board") {
+    const l = lane();
+    if (holdLive || !l || !l.live || l.status !== "ready") { await new Promise(r => setTimeout(r, holdLive ? 30 : 400)); continue; }
+    await capture(l.key);
+  }
+}
+
+document.addEventListener("click", async e => {
+  const t = e.target.closest("[data-open],[data-home],[data-goto],[data-job],[data-tab],[data-scene],[data-run],[data-cancel],[data-again],[data-close],[data-connect],[data-rescan],[data-capture],[data-suite],[data-group],[data-flash],[data-report],[data-raw],[data-fresh]");
+  if (!t) return;
+  if (t.dataset.run) { e.stopPropagation(); return run(JSON.parse(t.dataset.run), t.dataset.confirm); }
+  if (t.dataset.cancel) { e.stopPropagation(); try { await api(`/api/cancel?id=${enc(t.dataset.cancel)}`, null); } catch (err) { toast(err.message); } return poll(); }
+  if (t.dataset.connect) { e.stopPropagation(); try { await api(`/api/connect?lane=${enc(t.dataset.connect)}`, null); } catch (err) { toast(err.message); } return poll(); }
+  if (t.dataset.open !== undefined) return location.hash = "#/board/" + enc(t.dataset.open);
+  if (t.dataset.home !== undefined) return location.hash = "#/";
+  if (t.dataset.goto) { S.pendingJob = t.dataset.job; location.hash = "#/board/" + enc(t.dataset.goto); return; }
+  if (t.dataset.job) { openJob(t.dataset.job); return renderJobsTable(); }
+  if (t.dataset.tab) { S.tab = t.dataset.tab; localStorage.setItem("bench.tab", S.tab); return renderTab(); }
+  if (t.dataset.scene) return show(t.dataset.scene);
+  if (t.dataset.again) { const j = S.jobs.find(x => x.id === t.dataset.again); if (j) run(j.spec); return; }
+  if (t.dataset.close !== undefined) { S.selectedJob = null; $("#result").innerHTML = ""; return; }
+  if (t.dataset.rescan !== undefined) { t.disabled = true; try { await api("/api/refresh", null); } catch (err) { toast(err.message); } t.disabled = false; return poll(); }
+  if (t.dataset.capture !== undefined) return capture(S.route.lane);
+  if (t.dataset.group) { S.group = t.dataset.group; document.querySelectorAll("[data-group]").forEach(c => c.classList.toggle("on", c.dataset.group === S.group)); $("#thumbs").innerHTML = sceneCards(); return; }
+  if (t.dataset.suite) {
+    return run({type: "suite", options: {quick: t.dataset.suite === "quick", save: S.suite.save, report: S.suite.report, label: S.suite.label}});
+  }
+  if (t.dataset.flash) {
+    const spec = JSON.parse(t.dataset.flash);
+    if (t.dataset.confirm && !confirm(t.dataset.confirm)) return;
+    return run({type: "flash", options: spec});
+  }
+  if (t.dataset.report) {
+    try { const r = await api(`/api/report?tag=${enc(t.dataset.report)}${t.dataset.against ? "&against=" + enc(t.dataset.against) : ""}`, null); window.open(r.url, "_blank"); }
+    catch (err) { toast(err.message); }
+    return;
+  }
+  if (t.dataset.fresh !== undefined) return run({type: "build", options: {dir: $("#freshWt").value, flash: true}});
+  if (t.dataset.raw !== undefined) {
+    const reg = Number($("#rawReg").value), val = Number($("#rawVal").value);
+    if (!(reg >= 0 && reg < 64) || !(val >= 0 && val < 256)) return toast("R0-R63, value 0-255");
+    return poke(`/api/poke?lane=${enc(S.route.lane)}&reg=${reg}&value=${val}&mask=255`);
+  }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "sceneFilter") { S.filter = e.target.value; $("#thumbs").innerHTML = sceneCards(); }
+  if (e.target.id === "suiteLabel") S.suite.label = e.target.value;
+  if (e.target.dataset.ctl && e.target.type === "range") {
+    e.target.nextElementSibling.textContent = e.target.value;
+    ctlChanged(e.target);
+  }
+});
+document.addEventListener("change", async e => {
+  const t = e.target;
+  if (t.id === "liveToggle") { S.live = t.checked; if (S.live) liveLoop(); }
+  if (t.id === "suiteSave") S.suite.save = t.checked;
+  if (t.id === "suiteReport") S.suite.report = t.checked;
+  if (t.dataset.ctl && t.type !== "range") ctlChanged(t);
+  if (t.dataset.unlock !== undefined) poke(`/api/unlock?lane=${enc(S.route.lane)}&on=${t.checked ? 1 : 0}`).then(drawTweak);
+  if (t.dataset.power) { try { await api(`/api/power?lane=${enc(t.dataset.power)}&mode=${t.value}`, null); } catch (err) { toast(err.message); } poll(); }
+});
+
+/* ---------- polling ---------- */
+let polling = false;
+async function poll() {
+  if (polling) return;
+  polling = true;
+  try {
+    const s = await api("/api/state");
+    S.lanes = s.lanes.filter(l => l.key !== "build"); S.jobs = s.jobs; S.worktree = s.worktree;
+    render(false);
+    if (S.pendingJob && S.route.view === "board") { const id = S.pendingJob; S.pendingJob = null; openJob(id); }
+  } catch (e) { toast("Bench not answering"); }
+  polling = false;
+}
+let lastDash = 0;
+setInterval(async () => {
+  await poll();
+  if (S.route.view === "home" && !document.hidden && Date.now() - lastDash > 4000) {
+    lastDash = Date.now();
+    for (const l of S.lanes) if (l.status === "ready" && l.live) api(`/api/capture?lane=${enc(l.key)}`, null).catch(() => {});
+  }
+}, 1000);
+
+(async () => {
+  parseRoute();
+  S.catalog = await api("/api/catalog");
+  await poll();
+  render(true);
+})();
+</script>
+</body>
+</html>

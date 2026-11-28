@@ -18,6 +18,7 @@ perf.py         every scene against the clock
 perflog.py      the perf history, and what moved between two runs
 results.py      what a run leaves behind
 runner.py       all of it, in one openocd session, in the order that works
+bench.py        every board on the desk and everything above, in a browser
 ci.sh           both desktop tiers, for CI
 
 history/        the perf record over time, and the page that plots it
@@ -172,7 +173,8 @@ board a run reaches is a coin toss that the chip check above only catches after 
 instead: `LIVE9918_PROBE_RP2040` and `LIVE9918_PROBE_RP2350` hold a serial each, and `--probe`
 overrides for a one-off. `LIVE9918_SPEED` sets the SWD clock for a probe that will not hold the
 default 20 MHz - a flying-wire fixture runs happily at `LIVE9918_SPEED=10000` and costs almost
-nothing, for the reason `SWD_SPEED_KHZ` records: the wire is not the bottleneck.
+nothing, for the reason `SWD_SPEED_KHZ` records: the wire is not the bottleneck. The bench needs
+neither variable: it reads each probe's DP identity and names the tier from that.
 
 The [PICO9918 debug probe](https://github.com/visrealm/pico9918-probe) needs one thing more. It gates
 SWD on being armed and answers `DAP_Connect` with a failure until it is, so an un-armed one looks
@@ -284,14 +286,17 @@ without the fix does at both reset steps.
 ### Without a board: `--desktop`
 
 ```
-cmake -S test/live/desktop -B build-live-desktop -G Ninja -DCMAKE_C_FLAGS=-O2
-cmake --build build-live-desktop
+cmake -S core/test/suite/shim -B core/build-live-desktop -G Ninja -DCMAKE_C_FLAGS=-O2
+cmake --build core/build-live-desktop
 
 python runner.py --desktop                    nine stages, 111 scenes, about a second
 python freeze.py --desktop                    the goldens alone
 python gpu.py --desktop                       the GPU programs, on the C core
 python web/console.py --desktop               the visualiser, same page
 ```
+
+The bench runs those two cmake steps itself when the shim is missing. On Windows it wants a host
+gcc, on PATH or MSYS2's at `C:\msys64\ucrt64\bin`, and links the shim static.
 
 Same scenes, same frozen references, same properties - against the library in a process instead of
 a board. **All 111 scenes reproduce their device-frozen goldens byte for byte**, and that is
