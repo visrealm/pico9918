@@ -180,11 +180,12 @@ static bool __in_flash_func(buildSyncData)(void)
   const uint32_t instIrq = pio_encode_irq_set(false, vga_rgb_RGB_IRQ) << vga_sync_WORD_EXEC_OFFSET;
   const uint32_t instNop = pio_encode_nop() << vga_sync_WORD_EXEC_OFFSET;
 
-  // sync data for an active display scanline
-  const int SYNC_LINE_ACTIVE = 0;
-  const int SYNC_LINE_FPORCH = 1;
-  const int SYNC_LINE_HSYNC  = 2;
-  const int SYNC_LINE_BPORCH = 3;
+  // TRAP: composite sync lines must start at the hsync, or every vsync pulse lands off the hsync phase
+  const int syncLineRotate   = combinedSync ? 2 : 0;
+  const int SYNC_LINE_ACTIVE = (0 + syncLineRotate) & 3;
+  const int SYNC_LINE_FPORCH = (1 + syncLineRotate) & 3;
+  const int SYNC_LINE_HSYNC  = (2 + syncLineRotate) & 3;
+  const int SYNC_LINE_BPORCH = (3 + syncLineRotate) & 3;
 
   syncDataActive[SYNC_LINE_ACTIVE] = instIrq | HoffVoff | activeTicks;
   syncDataActive[SYNC_LINE_FPORCH] = instNop | HoffVoff | fPorchTicks;
