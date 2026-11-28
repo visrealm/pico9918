@@ -50,6 +50,7 @@ checkFirmwareVersion: PROCEDURE
 #else
     PRINT AT XY(2, MENU_TITLE_ROW + 9), "Update via USB:"
     PRINT AT XY(2, MENU_TITLE_ROW + 10), "github.com/visrealm/pico9918"
+    VDP_ENABLE_INT
 #endif
 
     WHILE 1
